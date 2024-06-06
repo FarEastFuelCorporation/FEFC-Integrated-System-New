@@ -1,45 +1,79 @@
-// Login.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
-import { login } from '../../auth';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('marketing'); // Default role
-    const navigate = useNavigate(); // Use useNavigate instead of useHistory
+  const navigate = useNavigate();
+  const [employeeId, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        login({ username, role }); // Include role in login
-        navigate('/dashboard'); // Use navigate instead of history.push
-    };
+  async function submit(e) {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError(null);
 
-    return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username"
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                />
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
-                    <option value="marketing">Marketing</option>
-                    <option value="dispatching">Dispatching</option>
-                    <option value="receiving">Receiving</option>
-                </select>
-                <button type="submit">Login</button>
-            </form>
+      const response = await axios.post("http://localhost:3001/login", {
+        employeeId,
+        password,
+      });
+
+      if (response.data.message) {
+        navigate("/marketingDashboard", {
+          state: { employeeDetails: response.data.employeeDetails },
+        });
+      } else if (response.data.error) {
+        setError(response.data.error);
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+      console.error("Error signing up:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="login-page">
+        <div className="login-container">
+        <h2>Login</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <form onSubmit={submit} disabled={loading}>
+            <label htmlFor="employeeId">
+            Employee Id:
+            <input
+                type="text"
+                name="employeeId"
+                id="employeeId"
+                required
+                value={employeeId}
+                placeholder="Input your Employee Id"
+                onChange={(e) => setUsername(e.target.value)}
+            />
+            </label>
+            <br />
+            <label htmlFor="password">
+            Password:
+            <input
+                type="password"
+                name="password"
+                id="password"
+                required
+                value={password}
+                placeholder="Input your Password"
+                onChange={(e) => setPassword(e.target.value)}
+            />
+            </label>
+            <br /><br />
+            <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+            </button>
+        </form>
         </div>
-    );
+    </div>
+  );
 };
 
 export default Login;

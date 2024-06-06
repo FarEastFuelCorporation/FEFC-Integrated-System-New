@@ -1,44 +1,75 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { signup } from '../../auth';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Signup = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('marketing'); // Default role
-    const navigate = useNavigate();
+const SignUp = () => {
+  const navigate = useNavigate();
+  const [employeeId, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        signup({ username, role });
-        navigate('/dashboard');
-    };
+  async function submit(e) {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError(null);
 
-    return (
-        <div>
-            <h2>Signup</h2>
-            <form onSubmit={handleSubmit}>
+      const response = await axios.post("http://localhost:3001/signup", {
+        employeeId,
+        password,
+      });
+
+      if (response.data.message) {
+        navigate("/marketingDashboard", {
+          state: { employeeDetails: response.data.employeeDetails },
+        });
+      } else if (response.data.error) {
+        setError(response.data.error);
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+      console.error("Error signing up:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="login-page">
+        <div className="login-container">
+            <h2>Sign Up</h2>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <form onSubmit={submit} disabled={loading}>
+                <label>
+                Employee Id:
+                </label>
                 <input
                     type="text"
-                    value={username}
+                    required
+                    value={employeeId}
+                    placeholder="Input your Employee Id"
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username"
                 />
+                <br />
+                <label>
+                Password:
+                </label>
                 <input
                     type="password"
+                    required
                     value={password}
+                    placeholder="Input your Password"
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
                 />
-                {/* <select value={role} onChange={(e) => setRole(e.target.value)}>
-                    <option value="marketing">Marketing</option>
-                    <option value="dispatching">Dispatching</option>
-                    <option value="receiving">Receiving</option>
-                </select> */}
-                <button type="submit">Signup</button>
+                <br /><br />
+                <button type="submit" disabled={loading}>
+                {loading ? "Signing Up..." : "Sign Up"}
+                </button>
             </form>
         </div>
-    );
+    </div>
+  );
 };
 
-export default Signup;
+export default SignUp;

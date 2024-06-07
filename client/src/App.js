@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Signup from "./components/Auth/Signup";
 import Login from "./components/Auth/Login";
+import LandingPage from "./components/LandingPage";
 import MarketingDashboard from "./components/Dashboards/Marketing/MarketingDashboard";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <CssBaseline />
         <Navbar />
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 

@@ -17,7 +17,7 @@ async function homeController (req, res) {
     }
 }
 
-async function logoutController (req, res) {
+async function logoutController(req, res) {
     try {
         // Destroy the session
         req.session.destroy((err) => {
@@ -25,8 +25,10 @@ async function logoutController (req, res) {
                 console.error('Error destroying session:', err);
                 res.status(500).send('Internal Server Error');
             } else {
+                // Prevent caching
+                res.setHeader('Cache-Control', 'no-store');
                 // Redirect to the login page after successful logout
-                res.redirect('/login');
+                res.status(200).send('Logged out successfully');
             }
         });
     } catch (error) {
@@ -34,6 +36,8 @@ async function logoutController (req, res) {
         res.status(500).send('Internal Server Error');
     }
 }
+
+
 
 async function validateQuotation (req, res) {
     try {

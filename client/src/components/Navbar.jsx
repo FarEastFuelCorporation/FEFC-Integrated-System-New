@@ -36,6 +36,9 @@ const Navbar = () => {
         </Box>
         {!isAuthPage ? null : (
           <Box display="flex" gap={2}>
+            <Button component={Link} to="/" color="inherit">
+              <Typography variant="h5">Home</Typography>
+            </Button>
             <Button component={Link} to="/signup" color="inherit">
               <Typography variant="h5">Sign Up</Typography>
             </Button>

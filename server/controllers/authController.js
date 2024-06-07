@@ -63,6 +63,7 @@ async function postSignupController(req, res) {
 }
 
 async function getLoginController(req, res){
+    console.log('Login route hit');
     try {
         const viewsData = {
             pageTitle: 'Login',
@@ -85,21 +86,13 @@ async function postLoginController(req, res) {
 
         // Check if the user exists
         if (!user) {
-            const viewsData = {
-                pageTitle: 'Login',
-                error: 'Invalid employee ID or password',
-            };
-            return res.render('login', viewsData);
+            return res.status(401).json({ error: 'Invalid employee ID or password' });
         }
 
         // Check if the password is correct
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            const viewsData = {
-                pageTitle: 'Login',
-                error: 'Invalid employee ID or password',
-            };
-            return res.render('login', viewsData);
+            return res.status(401).json({ error: 'Invalid employee ID or password' });
         }
 
         // Find the user's role(s) from the EmployeeRolesEmployee table
@@ -108,41 +101,34 @@ async function postLoginController(req, res) {
         });
 
         // Assuming a user can have multiple roles, handle each role accordingly
-        let redirected = false;
+        let redirectUrl = '/';
         for (const role of employeeRoles) {
             if (role.employeeRoleId === 2) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/marketing_dashboard`);
-                redirected = true;
+                redirectUrl = '/marketingDashboard';
                 break;
             } else if (role.employeeRoleId === 3) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/dispatching_dashboard`);
-                redirected = true;
+                redirectUrl = '/dispatchingDashboard';
                 break;
             } else if (role.employeeRoleId === 4) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/receiving_dashboard`);
-                redirected = true;
+                redirectUrl = '/receivingDashboard';
                 break;
             } else if (role.employeeRoleId === 9) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/hr_dashboard`);
-                redirected = true;
+                redirectUrl = '/hrDashboard';
+                break;
+            } else if (role.employeeRoleId === 10) {
+                redirectUrl = '/hrDashboard';
                 break;
             }
         }
 
-        // If no role matched, redirect to a default route
-        if (!redirected) {
-            res.redirect(`/`);
-        }
+        req.session.employeeId = user.employeeId;
+        res.status(200).json({ redirectUrl });
 
     } catch (error) {
         console.error('Error:', error);
-        // Handle errors gracefully, redirect to an error page, or display a generic error message
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
 
 module.exports = { getSignupController, postLoginController, getLoginController, postSignupController };

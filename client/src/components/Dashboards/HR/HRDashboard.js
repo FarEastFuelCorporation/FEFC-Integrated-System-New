@@ -1,37 +1,12 @@
-// // components/Dashboards/Marketing/MarketingDashboard.js
-// import React from 'react';
-// import { Route, Routes  } from 'react-router-dom';
-// import MarketingSidebar from './MarketingSidebar';
-// import { getUser } from '../../../auth';
-
-// const MarketingHome = () => <div>Welcome to the Marketing Dashboard, {getUser().username}!</div>;
-// const MarketingSection1 = () => <div>Marketing Section 1 Content</div>;
-// const MarketingSection2 = () => <div>Marketing Section 2 Content</div>;
-
-// const MarketingDashboard = () => {
-//     return (
-//         <div className="dashboard">
-//             <MarketingSidebar />
-//             <div className="content">
-//                 <Routes >
-//                     <Route exact path="/marketingDashboard/home" component={MarketingHome} />
-//                     <Route path="/marketingDashboard/section1" component={MarketingSection1} />
-//                     <Route path="/marketingDashboard/section2" component={MarketingSection2} />
-//                 </Routes>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default MarketingDashboard;
-
+// components/Dashboards/HR/HRDashboard.js
 
 import React, { useState } from "react";
 import { ColorModeContext, useMode } from "../../../theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "../../Topbar";
-import MarketingSidebar from "./MarketingSidebar";
+import HRSidebar from "./HRSidebar";
+import Dashboard from "./scenes/dashboard";
 // import Dashboard from "../dashboard";
 // import Team from "../team";
 // import Contacts from "../contacts";
@@ -44,7 +19,7 @@ import MarketingSidebar from "./MarketingSidebar";
 // import Line from "../line";
 // import Geography from "../geography";
 
-function MarketingDashboard() {
+function HRDashboard() {
   const location = useLocation();
   const employeeDetails = location.state?.employeeDetails;
 
@@ -60,15 +35,15 @@ function MarketingDashboard() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className={`app ${isSidebarCollapsed ? "collapsed" : ""}`}>
-          <MarketingSidebar
+          <HRSidebar
             onToggle={handleSidebarToggle}
             employeeDetails={employeeDetails}
           />
           <main className="content">
             <Topbar />
             <Routes>
-              {/* <Route index element={<Dashboard />} />
-              <Route path="/team" element={<Team />} />
+              <Route index element={<Dashboard />} />
+              {/* <Route path="/team" element={<Team />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/form" element={<Form />} />
@@ -86,4 +61,4 @@ function MarketingDashboard() {
   );
 }
 
-export default MarketingDashboard;
+export default HRDashboard;

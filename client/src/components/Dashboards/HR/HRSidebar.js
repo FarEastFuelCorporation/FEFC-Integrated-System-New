@@ -1,41 +1,4 @@
-// import React from 'react';
-// import { Link } from 'react-router-dom';
-
-// const MarketingSidebar = () => {
-//     const handleLogout = async () => {
-//         try {
-//             const response = await fetch('http://localhost:3001/logout', {
-//                 method: 'GET',
-//                 credentials: 'include' // Include cookies in the request
-//             });
-
-//             if (response.ok) {
-//                 // Redirect to the login page
-//                 window.location.href = '/';
-//             } else {
-//                 // Handle errors if necessary
-//                 console.error('Error logging out:', response.statusText);
-//             }
-//         } catch (error) {
-//             // Handle network errors
-//             console.error('Error logging out:', error.message);
-//         }
-//     };
-
-//     return (
-//         <div className="sidebar">
-//             <ul>
-//                 <li><Link to="/marketingDashboard/home">Home</Link></li>
-//                 <li><Link to="/marketingDashboard/section1">Section 1</Link></li>
-//                 <li><Link to="/marketingDashboard/section2">Section 2</Link></li>
-//                 <li><button onClick={handleLogout}>Logout</button></li>
-//             </ul>
-//         </div>
-//     );
-// };
-
-// export default MarketingSidebar;
-
+// components/Dashboards/HR/HRSidebar.js
 
 import React, { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
@@ -74,7 +37,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const ReceivingSideba = ({ employeeDetails }) => {
+const HRSidebar = ({ employeeDetails }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -138,8 +101,8 @@ const ReceivingSideba = ({ employeeDetails }) => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  ADMIN
+                <Typography variant="h4" color={colors.grey[100]}>
+                  HUMAN RESOURCES
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -285,4 +248,4 @@ const ReceivingSideba = ({ employeeDetails }) => {
   );
 };
 
-export default MarketingSidebar;
+export default HRSidebar;

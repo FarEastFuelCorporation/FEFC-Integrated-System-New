@@ -7,6 +7,7 @@ import Signup from "./components/Auth/Signup";
 import Login from "./components/Auth/Login";
 import LandingPage from "./components/LandingPage";
 import MarketingDashboard from "./components/Dashboards/Marketing/MarketingDashboard";
+import HRDashboard from "./components/Dashboards/HR/HRDashboard";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -29,6 +30,10 @@ function App() {
               <Route
                 path="/marketingDashboard/*"
                 element={<MarketingDashboard />}
+              />
+              <Route
+                path="/hrDashboard/*"
+                element={<HRDashboard />}
               />
               {/* <Route path="/admin/*" element={<AdminDashboard />} />
               <Route path="/customer/*" element={<CustomerDashboard />} /> */}

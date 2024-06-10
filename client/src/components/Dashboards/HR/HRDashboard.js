@@ -7,17 +7,16 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "../../Topbar";
 import HRSidebar from "./HRSidebar";
 import Dashboard from "./scenes/dashboard";
-// import Dashboard from "../dashboard";
-// import Team from "../team";
-// import Contacts from "../contacts";
-// import Invoices from "../invoices";
-// import Form from "../form";
-// import Calendar from "../calendar";
-// import FAQ from "../faq";
-// import Bar from "../bar";
-// import Pie from "../pie";
-// import Line from "../line";
-// import Geography from "../geography";
+import Team from "./scenes/team";
+import Contacts from "./scenes/contacts";
+import Invoices from "./scenes/invoices";
+import Form from "./scenes/form";
+import Calendar from "./scenes/calendar";
+import FAQ from "./scenes/faq";
+import Bar from "./scenes/bar";
+import Pie from "./scenes/pie";
+import Line from "./scenes/line";
+import Geography from "./scenes/geography";
 
 function HRDashboard() {
   const location = useLocation();
@@ -43,7 +42,7 @@ function HRDashboard() {
             <Topbar />
             <Routes>
               <Route index element={<Dashboard />} />
-              {/* <Route path="/team" element={<Team />} />
+              <Route path="/team" element={<Team />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/form" element={<Form />} />
@@ -52,7 +51,7 @@ function HRDashboard() {
               <Route path="/bar" element={<Bar />} />
               <Route path="/pie" element={<Pie />} />
               <Route path="/line" element={<Line />} />
-              <Route path="/geography" element={<Geography />} /> */}
+              {/* <Route path="/geography" element={<Geography />} /> */}
             </Routes>
           </main>
         </div>

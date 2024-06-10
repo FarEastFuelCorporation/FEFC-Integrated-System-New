@@ -50,6 +50,7 @@ const Login = () => {
               name="employeeId"
               id="employeeId"
               required
+              autoFocus
               value={employeeId}
               autoComplete="off"
               placeholder="Input your Employee Id"

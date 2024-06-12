@@ -5,22 +5,23 @@ require("events").EventEmitter.defaultMaxListeners = 25;
 const express = require("express");
 const session = require("express-session");
 const multer = require("multer");
-const cors = require('cors');
+const cors = require("cors");
 const path = require("path");
 const bodyParser = require("body-parser");
-
 
 // Import utility functions and models
 require("./utils/associations");
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000', // Specify the origin you want to allow
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify the allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
-  credentials: true // Allow credentials (cookies, authorization headers, etc.) to be sent cross-origin
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Specify the origin you want to allow
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify the allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specify the allowed headers
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.) to be sent cross-origin
+  })
+);
 
 // Set up storage for multer
 const storage = multer.memoryStorage();

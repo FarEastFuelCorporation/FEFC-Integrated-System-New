@@ -1,81 +1,77 @@
-// signup.js
-
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import LandingPage from "../LandingPage/LandingPage";
 
 const Signup = () => {
-  const navigate = useNavigate();
-  const [employeeId, setUsername] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  async function submit(e) {
+  const submit = async (e) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      const response = await axios.post("http://localhost:3001/signup", {
+    try {
+      // Make a POST request to your server to handle user sign-up
+      const response = await axios.post("/signup", {
         employeeId,
         password,
       });
-
-      if (response.data.message) {
-        navigate("/marketingDashboard", {
-          state: { employeeDetails: response.data.employeeDetails },
-        });
-      } else if (response.data.error) {
-        setError(response.data.error);
-      }
+      console.log(response.data); // Assuming your server responds with relevant data
+      setSuccess(true);
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error("Error signing up:", error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="login-page">
-        <div className="login-container">
+      <LandingPage />
+      <div className="login-container">
         <h2>Sign Up</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
+        {success && <p style={{ color: "green" }}>Sign up successful!</p>}
         <form onSubmit={submit} disabled={loading}>
-            <label htmlFor="employeeId">
+          <label htmlFor="employeeId">
             Employee Id:
             <input
-                type="text"
-                name="employeeId"
-                id="employeeId"
-                required
-                value={employeeId}
-                autoComplete="off"
-                placeholder="Input your Employee Id"
-                onChange={(e) => setUsername(e.target.value)}
+              type="text"
+              name="employeeId"
+              id="employeeId"
+              required
+              value={employeeId}
+              autoComplete="off"
+              placeholder="Input your Employee Id"
+              onChange={(e) => setEmployeeId(e.target.value)}
             />
-            </label>
-            <br />
-            <label htmlFor="password">
+          </label>
+          <br />
+          <label htmlFor="password">
             Password:
             <input
-                type="password"
-                name="password"
-                id="password"
-                required
-                value={password}
-                autoComplete="off"
-                placeholder="Input your Password"
-                onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              name="password"
+              id="password"
+              required
+              value={password}
+              autoComplete="off"
+              placeholder="Input your Password"
+              onChange={(e) => setPassword(e.target.value)}
             />
-            </label>
-            <br /><br />
-            <button type="submit" disabled={loading}>
+          </label>
+          <br />
+          <br />
+          <button type="submit" disabled={loading}>
             {loading ? "Signing up..." : "Sign up"}
-            </button>
+          </button>
         </form>
-        </div>
+      </div>
     </div>
   );
 };

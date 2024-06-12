@@ -1,44 +1,43 @@
-// login.js
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import LandingPage from "../LandingPage/LandingPage";
 
 const Login = () => {
-  const navigate = useNavigate();
+  const history = useNavigate();
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  async function submit(e) {
+  const submit = async (e) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
+    try {
       const response = await axios.post("http://localhost:3001/login", {
         employeeId,
         password,
       });
 
-      if (response.data.redirectUrl) {
-        navigate(response.data.redirectUrl, {
-          state: { employeeDetails: response.data.employeeDetails },
-        });
-      } else if (response.data.error) {
-        setError(response.data.error);
+      if (!response.data.redirectUrl) {
+        throw new Error("Failed to login");
       }
+
+      // Redirect to the dashboard based on the returned URL
+      history(response.data.redirectUrl);
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      setError(error.message || "An error occurred. Please try again.");
       console.error("Error signing in:", error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="login-page">
+      <LandingPage />
       <div className="login-container">
         <h2>Login</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
@@ -71,7 +70,8 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
-          <br /><br />
+          <br />
+          <br />
           <button type="submit" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>

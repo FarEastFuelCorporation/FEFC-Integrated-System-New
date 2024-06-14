@@ -1,15 +1,39 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Check if the current route is either "/signup" or "/login"
   const isAuthPage =
     location.pathname === "/signup" ||
     location.pathname === "/login" ||
     location.pathname === "/";
+
+  const handleLogout = async () => {
+    try {
+      // Make a request to logout endpoint
+      const response = await axios.get("http://localhost:3001/logout", {
+        withCredentials: true, // send cookies if any
+      });
+
+      if (response.status === 200) {
+        // Clear browser history
+        window.history.pushState(null, "", "/login");
+        navigate("/login", { replace: true }); // Use replace: true to replace current history entry
+      } else {
+        console.error("Logout failed:", response.statusText);
+        // Handle error if necessary
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Handle error if necessary
+    }
+  };
+
   return (
     <AppBar position="static">
       <Toolbar sx={{ padding: "10px" }}>
@@ -34,7 +58,17 @@ const Navbar = () => {
             FAR EAST FUEL CORPORATION
           </Typography>
         </Box>
-        {!isAuthPage ? null : (
+        {!isAuthPage ? (
+          <Box display="flex" gap={2}>
+            <Button onClick={handleLogout} color="inherit">
+              <Typography variant="h5">Logout</Typography>
+              <i
+                className="fa-solid fa-right-from-bracket"
+                style={{ fontSize: "20px", marginLeft: "10px" }}
+              ></i>
+            </Button>
+          </Box>
+        ) : (
           <Box display="flex" gap={2}>
             <Button component={Link} to="/" color="inherit">
               <Typography variant="h5">Home</Typography>

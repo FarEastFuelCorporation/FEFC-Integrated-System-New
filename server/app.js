@@ -16,10 +16,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Specify the origin you want to allow
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Specify the allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify the allowed headers
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.) to be sent cross-origin
+    origin: "http://localhost:3000", // your frontend URL
+    credentials: true, // Allow credentials (cookies) to be sent
   })
 );
 
@@ -52,14 +50,10 @@ app.use(bodyParser.json());
 // Use express-session middleware
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: "your_secret_key",
     resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: false, // Use only with HTTPS
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 10000, // Session expiration time
-    },
+    saveUninitialized: false,
+    cookie: { secure: false }, // Use secure: true in production with HTTPS
   })
 );
 
@@ -69,6 +63,23 @@ app.use("/requests", isAuthenticated);
 app.use("/marketing_dashboard", isAuthenticated);
 app.use("/dispatching_dashboard", isAuthenticated);
 app.use("/hr_dashboard", isAuthenticated);
+
+// Route to check authentication status
+app.get("/check-auth", (req, res) => {
+  console.log("Checking authentication...");
+  if (req.session) {
+    console.log("Session exists:", req.session);
+    if (req.session.user) {
+      console.log("Authenticated user:", req.session.user);
+      return res.status(200).json({ authenticated: true });
+    } else {
+      console.log("User not authenticated");
+    }
+  } else {
+    console.log("No session found");
+  }
+  res.status(401).json({ authenticated: false });
+});
 
 // Include your routes
 const authRoutes = require("./routes/auth");
@@ -84,10 +95,10 @@ const sequelize = require("./config/database");
 app.use(authRoutes);
 app.use(othersRoutes);
 app.use("/requests", requestsRoutes);
-app.use("/marketing_dashboard", marketingDashboardRoutes);
-app.use("/dispatching_dashboard", dispatchingDashboardRoutes);
-app.use("/receiving_dashboard", receivingDashboardRoutes);
-app.use("/hr_dashboard", hrDashboardRoutes);
+app.use("/marketingDashboard", marketingDashboardRoutes);
+app.use("/dispatchingDashboard", dispatchingDashboardRoutes);
+app.use("/receivingDashboard", receivingDashboardRoutes);
+app.use("/hrDashboard", hrDashboardRoutes);
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(error404Controller);

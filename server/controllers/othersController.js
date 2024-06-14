@@ -25,8 +25,12 @@ async function logoutController(req, res) {
         console.error("Error destroying session:", err);
         res.status(500).send("Internal Server Error");
       } else {
+        // Clear the cookie
+        res.clearCookie("connect.sid", { path: "/" });
+
         // Prevent caching
         res.setHeader("Cache-Control", "no-store");
+
         // Redirect to the login page after successful logout
         res.status(200).send("Logged out successfully");
       }

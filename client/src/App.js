@@ -1,8 +1,9 @@
-// App.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { Route, Routes } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import axios from "axios";
+
 import Navbar from "./layouts/Navbar";
 import LandingPage from "./components/LandingPage/LandingPage";
 import Login from "./components/Auth/Login";
@@ -17,11 +18,61 @@ import ReceivingDashboard from "./layouts/Receiving/ReceivingDashboard";
 import ReceivingSection1 from "./layouts/Receiving/sections/Section1";
 import ReceivingSection2 from "./layouts/Receiving/sections/Section2";
 import HRDashboard from "./layouts/HR/HRDashboard";
-import HRSection1 from "./layouts/HR/sections/Section1";
-import HRSection2 from "./layouts/HR/sections/Section2";
+import Dashboard from "./layouts/HR/sections/dashboard";
+import Team from "./layouts/HR/sections/team";
+import Contacts from "./layouts/HR/sections/contacts";
+import Invoices from "./layouts/HR/sections/team";
+import Form from "./layouts/HR/sections/form";
+import Calendar from "./layouts/HR/sections/calendar";
+import FAQ from "./layouts/HR/sections/faq";
+import Bar from "./layouts/HR/sections/bar";
+import Pie from "./layouts/HR/sections/pie";
+import Line from "./layouts/HR/sections/line";
+import Geography from "./layouts/HR/sections/geography";
 
 const App = () => {
   const [theme, colorMode] = useMode();
+  const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  const checkAuthentication = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/check-auth", {
+        withCredentials: true,
+      });
+      if (response.data.authenticated) {
+        setAuthenticated(true);
+      } else {
+        setAuthenticated(false);
+      }
+    } catch (error) {
+      console.error("Authentication check failed:", error);
+      setAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const privatePaths = [
+      "/marketingDashboard",
+      "/dispatchingDashboard",
+      "/receivingDashboard",
+      "/hrDashboard",
+      "/hrDashboard/team",
+    ];
+
+    if (privatePaths.includes(location.pathname)) {
+      checkAuthentication();
+    } else {
+      setLoading(false);
+    }
+  }, [location.pathname]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -32,30 +83,114 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/marketingDashboard" element={<MarketingDashboard />} />
-          <Route path="/marketing/section1" element={<MarketingSection1 />} />
-          <Route path="/marketing/section2" element={<MarketingSection2 />} />
           <Route
-            path="/dispatchingDashboard/*"
-            element={<DispatchingDashboard />}
+            path="/marketingDashboard"
+            element={
+              authenticated ? <MarketingDashboard /> : <Navigate to="/login" />
+            }
           />
           <Route
-            path="/dispatching/section1"
-            element={<DispatchingSection1 />}
+            path="/marketingDashboard/section1"
+            element={
+              authenticated ? <MarketingSection1 /> : <Navigate to="/login" />
+            }
           />
           <Route
-            path="/dispatching/section2"
-            element={<DispatchingSection2 />}
+            path="/marketingDashboard/section2"
+            element={
+              authenticated ? <MarketingSection2 /> : <Navigate to="/login" />
+            }
           />
           <Route
-            path="/receivingDashboard/*"
-            element={<ReceivingDashboard />}
+            path="/dispatchingDashboard"
+            element={
+              authenticated ? (
+                <DispatchingDashboard />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
-          <Route path="/receiving/section1" element={<ReceivingSection1 />} />
-          <Route path="/receiving/section2" element={<ReceivingSection2 />} />
-          <Route path="/hrDashboard/*" element={<HRDashboard />} />
-          <Route path="/hr/section1" element={<HRSection1 />} />
-          <Route path="/hr/section2" element={<HRSection2 />} />
+          <Route
+            path="/dispatchingDashboard/section1"
+            element={
+              authenticated ? <DispatchingSection1 /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/dispatchingDashboard/section2"
+            element={
+              authenticated ? <DispatchingSection2 /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/receivingDashboard"
+            element={
+              authenticated ? <ReceivingDashboard /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/receivingDashboard/section1"
+            element={
+              authenticated ? <ReceivingSection1 /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/receivingDashboard/section2"
+            element={
+              authenticated ? <ReceivingSection2 /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/hrDashboard"
+            element={authenticated ? <HRDashboard /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard"
+            element={authenticated ? <Dashboard /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/team"
+            element={authenticated ? <Team /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/contacts"
+            element={authenticated ? <Contacts /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/invoices"
+            element={authenticated ? <Invoices /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/form"
+            element={authenticated ? <Form /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/calendar"
+            element={authenticated ? <Calendar /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/faq"
+            element={authenticated ? <FAQ /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/bar"
+            element={authenticated ? <Bar /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/pie"
+            element={authenticated ? <Pie /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/line"
+            element={authenticated ? <Line /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/hrDashboard/geography"
+            element={authenticated ? <Geography /> : <Navigate to="/login" />}
+          />
+          {/* Fallback route when no match is found */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </ThemeProvider>
     </ColorModeContext.Provider>

@@ -84,7 +84,7 @@ const HRSidebar = ({ employeeDetails }) => {
       }}
     >
       <ProSidebar collapsed={isCollapsed}>
-        <Menu iconShape="square">
+        <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
           {/* Logo and Menu Icon */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -145,7 +145,6 @@ const HRSidebar = ({ employeeDetails }) => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to=""
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import LandingPage from "../LandingPage/LandingPage";
 
 const Login = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,20 +16,38 @@ const Login = () => {
     setError(null);
 
     try {
-      const response = await axios.post("http://localhost:3001/login", {
-        employeeId,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:3001/login",
+        { employeeId, password },
+        { withCredentials: true }
+      );
 
-      if (!response.data.redirectUrl) {
+      console.log("Server response:", response.data); // Log the server response
+
+      if (response.data.redirectUrl) {
+        console.log("Redirecting to:", response.data.redirectUrl); // Log the redirection URL
+        navigate(response.data.redirectUrl); // Redirect user to the specified URL
+      } else {
         throw new Error("Failed to login");
       }
-
-      // Redirect to the dashboard based on the returned URL
-      history(response.data.redirectUrl);
     } catch (error) {
-      setError(error.message || "An error occurred. Please try again.");
-      console.error("Error signing in:", error);
+      if (error.response) {
+        console.error("Error response status:", error.response.status);
+        console.error("Error response data:", error.response.data);
+
+        if (error.response.status === 401) {
+          setError("Invalid employee ID or password");
+        } else {
+          setError("An error occurred. Please try again.");
+        }
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+        setError("Network error. Please try again later.");
+      } else {
+        console.error("Error message:", error.message);
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Error config:", error.config);
     } finally {
       setLoading(false);
     }

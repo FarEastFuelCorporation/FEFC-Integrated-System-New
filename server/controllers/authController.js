@@ -5,18 +5,6 @@ const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee ");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
-async function getSignupController(req, res) {
-  try {
-    const viewsData = {
-      pageTitle: "Sign Up",
-    };
-    res.render("signup", viewsData); // Assuming you have a signup.ejs file in your views folder
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
-
 // Example controller function for handling signup
 async function postSignupController(req, res) {
   try {
@@ -65,27 +53,13 @@ async function postSignupController(req, res) {
   }
 }
 
-async function getLoginController(req, res) {
-  console.log("Login route hit");
-  try {
-    const viewsData = {
-      pageTitle: "Login",
-    };
-    res.render("login", viewsData); // Assuming you have a login.ejs file in your views folder
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
-
 // Example controller function for handling login
 async function postLoginController(req, res) {
   const { employeeId, password } = req.body;
+
   try {
     // Find the user with the provided employee ID
-    const user = await User.findOne({
-      where: { employeeId },
-    });
+    const user = await User.findOne({ where: { employeeId } });
 
     // Check if the user exists
     if (!user) {
@@ -98,43 +72,55 @@ async function postLoginController(req, res) {
       return res.status(401).json({ error: "Invalid employee ID or password" });
     }
 
-    // Find the user's role(s) from the EmployeeRolesEmployee table
+    // Find the user's roles from the EmployeeRolesEmployee table
     const employeeRoles = await EmployeeRolesEmployee.findAll({
       where: { employeeId },
     });
 
-    // Assuming a user can have multiple roles, handle each role accordingly
+    // Determine redirect URL based on roles
     let redirectUrl = "/";
     for (const role of employeeRoles) {
-      if (role.employeeRoleId === 2) {
-        redirectUrl = "/marketingDashboard";
-        break;
-      } else if (role.employeeRoleId === 3) {
-        redirectUrl = "/dispatchingDashboard";
-        break;
-      } else if (role.employeeRoleId === 4) {
-        redirectUrl = "/receivingDashboard";
-        break;
-      } else if (role.employeeRoleId === 9) {
-        redirectUrl = "/hrDashboard";
-        break;
-      } else if (role.employeeRoleId === 10) {
-        redirectUrl = "/hrDashboard";
-        break;
+      switch (role.employeeRoleId) {
+        case 2:
+          redirectUrl = "/marketingDashboard";
+          break;
+        case 3:
+          redirectUrl = "/dispatchingDashboard";
+          break;
+        case 4:
+          redirectUrl = "/receivingDashboard";
+          break;
+        case 9:
+        case 10:
+          redirectUrl = "/hrDashboard";
+          break;
+        default:
+          // Default to '/' if no specific role matches
+          break;
+      }
+      if (redirectUrl !== "/") {
+        break; // Exit loop if a valid redirectUrl is found
       }
     }
 
-    req.session.employeeId = user.employeeId;
+    // Set session data
+    req.session.user = {
+      id: user.employeeId,
+      userType: employeeRoles[0].employeeRoleId,
+    };
+
+    console.log("Session User:", req.session.user);
+    console.log("URL:", redirectUrl);
+
+    // Respond with redirect URL
     res.status(200).json({ redirectUrl });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error during login:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
 
 module.exports = {
-  getSignupController,
   postLoginController,
-  getLoginController,
   postSignupController,
 };

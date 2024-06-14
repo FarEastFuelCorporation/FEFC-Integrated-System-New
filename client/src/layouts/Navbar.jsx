@@ -1,11 +1,25 @@
-import React from "react";
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import React, { useContext } from "react";
+import { ColorModeContext, tokens } from "../theme";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  useTheme,
+} from "@mui/material";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const colorMode = useContext(ColorModeContext);
 
   // Check if the current route is either "/signup" or "/login"
   const isAuthPage =
@@ -58,14 +72,25 @@ const Navbar = () => {
             FAR EAST FUEL CORPORATION
           </Typography>
         </Box>
+        <Box display="flex">
+          <IconButton
+            onClick={colorMode.toggleColorMode}
+            style={{ color: colors.greenAccent[500] }}
+          >
+            {theme.palette.mode === "dark" ? (
+              <DarkModeOutlinedIcon />
+            ) : (
+              <LightModeOutlinedIcon />
+            )}
+          </IconButton>
+        </Box>
         {!isAuthPage ? (
           <Box display="flex" gap={2}>
             <Button onClick={handleLogout} color="inherit">
               <Typography variant="h5">Logout</Typography>
-              <i
-                className="fa-solid fa-right-from-bracket"
-                style={{ fontSize: "20px", marginLeft: "10px" }}
-              ></i>
+              <Typography variant="h5" style={{ marginLeft: "10px" }}>
+                <i className="fa-solid fa-right-from-bracket"></i>
+              </Typography>
             </Button>
           </Box>
         ) : (

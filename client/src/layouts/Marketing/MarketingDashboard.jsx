@@ -1,11 +1,10 @@
 import React from "react";
 import MarketingSidebar from "./MarketingSidebar";
 
-const MarketingDashboard = () => {
+const MarketingDashboard = ({ user }) => {
   return (
     <div>
-      <MarketingSidebar />
-      {/* Default Content for Marketing Dashboard */}
+      <MarketingSidebar user={user} />
     </div>
   );
 };

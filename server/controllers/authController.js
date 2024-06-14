@@ -2,6 +2,7 @@
 
 const Employee = require("../models/Employee");
 const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee ");
+const IdInformation = require("../models/IdInformation");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
@@ -77,43 +78,63 @@ async function postLoginController(req, res) {
       where: { employeeId },
     });
 
-    // Determine redirect URL based on roles
-    let redirectUrl = "/";
-    for (const role of employeeRoles) {
-      switch (role.employeeRoleId) {
-        case 2:
-          redirectUrl = "/marketingDashboard";
-          break;
-        case 3:
-          redirectUrl = "/dispatchingDashboard";
-          break;
-        case 4:
-          redirectUrl = "/receivingDashboard";
-          break;
-        case 9:
-        case 10:
-          redirectUrl = "/hrDashboard";
-          break;
-        default:
-          // Default to '/' if no specific role matches
-          break;
-      }
-      if (redirectUrl !== "/") {
-        break; // Exit loop if a valid redirectUrl is found
-      }
-    }
+    const employeeDetails = await Employee.findOne({
+      where: { employeeId },
+      attributes: [
+        "firstName",
+        "middleName",
+        "lastName",
+        "affix",
+        "department",
+        "designation",
+      ],
+    });
+
+    const employeePicture = await IdInformation.findOne({
+      where: { employee_id: employeeId },
+      attributes: ["profile_picture"],
+    });
 
     // Set session data
     req.session.user = {
       id: user.employeeId,
       userType: employeeRoles[0].employeeRoleId,
+      employeeDetails: employeeDetails,
+      employeePicture: employeePicture,
     };
 
     console.log("Session User:", req.session.user);
-    console.log("URL:", redirectUrl);
 
-    // Respond with redirect URL
-    res.status(200).json({ redirectUrl });
+    // Determine redirect URL based on userType
+    let redirectUrl;
+    switch (employeeRoles[0].employeeRoleId) {
+      case 2:
+        redirectUrl = "/marketingDashboard";
+        break;
+      case 3:
+        redirectUrl = "/dispatchingDashboard";
+        break;
+      case 4:
+        redirectUrl = "/receivingDashboard";
+        break;
+      case 9:
+        redirectUrl = "/hrDashboard";
+        break;
+      default:
+        redirectUrl = "/dashboard"; // Default redirect
+        break;
+    }
+
+    // Respond with redirect URL and session details
+    res.status(200).json({
+      redirectUrl,
+      user: {
+        id: user.employeeId,
+        userType: employeeRoles[0].employeeRoleId,
+        employeeDetails: employeeDetails,
+        employeePicture: employeePicture,
+      },
+    });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ error: "Internal Server Error" });

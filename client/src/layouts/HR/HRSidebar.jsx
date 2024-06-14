@@ -1,5 +1,3 @@
-// components/Dashboards/HR/HRSidebar.js
-
 import React, { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
@@ -18,17 +16,22 @@ import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import axios from "axios";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const handleClick = () => {
+    console.log(`Navigating to ${to}`); // Log the 'to' prop value
+    setSelected(title); // Update the selected state
+  };
+
   return (
     <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
       <MenuItem
         active={selected === title}
         style={{ color: colors.grey[100] }}
-        onClick={() => setSelected(title)}
+        onClick={handleClick} // Call handleClick on click
         icon={icon}
       >
         <Typography>{title}</Typography>
@@ -37,31 +40,37 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const HRSidebar = ({ employeeDetails }) => {
+const HRSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const [employeeDetailsSession, setEmployeeDetailsSession] = useState(null);
-
-  const fetchEmployeeDetails = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:3001/api/employee-details",
-        { withCredentials: true }
-      );
-      console.log("Server response:", response.data);
-      setEmployeeDetailsSession(response.data);
-    } catch (error) {
-      console.error("Error fetching employeeDetailsSession:", error);
-    }
-  };
+  const [profilePictureSrc, setProfilePictureSrc] = useState(null);
 
   useEffect(() => {
-    if (!employeeDetailsSession) {
-      setTimeout(fetchEmployeeDetails, 500);
-    }
-  }, [employeeDetailsSession]);
+    const convertUint8ArrayToBlob = () => {
+      if (
+        !user ||
+        !user.employeePicture ||
+        !user.employeePicture.profile_picture
+      ) {
+        return;
+      }
+
+      const uint8Array = new Uint8Array(
+        user.employeePicture.profile_picture.data
+      );
+      const blob = new Blob([uint8Array], { type: "image/jpeg" });
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfilePictureSrc(reader.result);
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    convertUint8ArrayToBlob();
+  }, [user]);
 
   return (
     <Box
@@ -110,18 +119,19 @@ const HRSidebar = ({ employeeDetails }) => {
               </Box>
             )}
           </MenuItem>
-          {console.log(employeeDetails)}
+
           {/* User */}
-          {!isCollapsed && employeeDetails && (
+          {!isCollapsed && user && profilePictureSrc && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
+                {/* Display the profile picture */}
                 <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/CENTENO_JEMINA.jpg`}
+                  src={profilePictureSrc}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
-                ></img>
+                />
               </Box>
 
               <Box textAlign="center">
@@ -131,11 +141,11 @@ const HRSidebar = ({ employeeDetails }) => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  {employeeDetails.firstName} {}
-                  {employeeDetails.lastName}
+                  {user.employeeDetails.firstName}{" "}
+                  {user.employeeDetails.lastName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  {employeeDetails.designation}
+                  {user.employeeDetails.designation}
                 </Typography>
               </Box>
             </Box>
@@ -145,6 +155,7 @@ const HRSidebar = ({ employeeDetails }) => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
+              to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -158,21 +169,21 @@ const HRSidebar = ({ employeeDetails }) => {
             </Typography>
             <Item
               title="Manage Team"
-              to="team"
+              to="/team"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Contacts Information"
-              to="contacts"
+              to="/contacts"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Invoice Balances"
-              to="invoices"
+              to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -186,21 +197,21 @@ const HRSidebar = ({ employeeDetails }) => {
             </Typography>
             <Item
               title="Profile Form"
-              to="form"
+              to="/form"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              to="calendar"
+              to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="FAQ Page"
-              to="faq"
+              to="/faq"
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -214,28 +225,28 @@ const HRSidebar = ({ employeeDetails }) => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="bar"
+              to="/bar"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="pie"
+              to="/pie"
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Line Chart"
-              to="line"
+              to="/line"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Geography Chart"
-              to="geography"
+              to="/geography"
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

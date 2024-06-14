@@ -65,20 +65,12 @@ app.use("/dispatching_dashboard", isAuthenticated);
 app.use("/hr_dashboard", isAuthenticated);
 
 // Route to check authentication status
-app.get("/check-auth", (req, res) => {
-  console.log("Checking authentication...");
-  if (req.session) {
-    console.log("Session exists:", req.session);
-    if (req.session.user) {
-      console.log("Authenticated user:", req.session.user);
-      return res.status(200).json({ authenticated: true });
-    } else {
-      console.log("User not authenticated");
-    }
+app.get("/api/session", (req, res) => {
+  if (req.session.user) {
+    res.status(200).json({ user: req.session.user });
   } else {
-    console.log("No session found");
+    res.status(401).json({ error: "Not authenticated" });
   }
-  res.status(401).json({ authenticated: false });
 });
 
 // Include your routes

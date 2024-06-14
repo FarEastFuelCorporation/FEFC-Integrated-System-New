@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LandingPage from "../LandingPage/LandingPage";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
@@ -24,12 +24,9 @@ const Login = () => {
 
       console.log("Server response:", response.data); // Log the server response
 
-      if (response.data.redirectUrl) {
-        console.log("Redirecting to:", response.data.redirectUrl); // Log the redirection URL
-        navigate(response.data.redirectUrl); // Redirect user to the specified URL
-      } else {
-        throw new Error("Failed to login");
-      }
+      const { user } = response.data;
+      onLogin(user); // Update user state in App component
+      navigate(response.data.redirectUrl); // Redirect user to the specified URL
     } catch (error) {
       if (error.response) {
         console.error("Error response status:", error.response.status);

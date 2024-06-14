@@ -1,10 +1,10 @@
 import React from "react";
 import HRSidebar from "./HRSidebar";
 
-const HRDashboard = () => {
+const HRDashboard = ({ user }) => {
   return (
     <div>
-      <HRSidebar />
+      <HRSidebar user={user} />
     </div>
   );
 };

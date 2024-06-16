@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -16,36 +16,65 @@ import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import log from "loglevel";
+
+log.setLevel("info");
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    console.log(`Navigating to ${to}`); // Log the 'to' prop value
-    setSelected(title); // Update the selected state
+    log.info(`Navigating to ${to}`);
+    setSelected(title);
+    navigate(to);
   };
 
   return (
-    <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
-      <MenuItem
-        active={selected === title}
-        style={{ color: colors.grey[100] }}
-        onClick={handleClick} // Call handleClick on click
-        icon={icon}
-      >
-        <Typography>{title}</Typography>
-      </MenuItem>
-    </Link>
+    <MenuItem
+      active={selected === title} // Apply 'active' prop based on selected state
+      style={{
+        color: colors.grey[100],
+        backgroundColor:
+          selected === title ? colors.primary[500] : "transparent", // Apply background color based on active state
+      }}
+      onClick={handleClick}
+      icon={icon}
+    >
+      <Typography>{title}</Typography>
+    </MenuItem>
   );
 };
 
-const HRSidebar = ({ user }) => {
+const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
+  const pathToTitleMap = {
+    "/hrDashboard/dashboard": "Dashboard",
+    "/hrDashboard/team": "Manage Team",
+    "/hrDashboard/contacts": "Contacts Information",
+    "/hrDashboard/invoices": "Invoice Balances",
+    "/hrDashboard/form": "Profile Form",
+    "/hrDashboard/calendar": "Calendar",
+    "/hrDashboard/faq": "FAQ Page",
+    "/hrDashboard/bar": "Bar Chart",
+    "/hrDashboard/pie": "Pie Chart",
+    "/hrDashboard/line": "Line Chart",
+    "/hrDashboard/geography": "Geography Chart",
+  };
+
+  const initialSelected = pathToTitleMap[location.pathname] || "Dashboard";
+  const [selected, setSelected] = useState(initialSelected);
   const [profilePictureSrc, setProfilePictureSrc] = useState(null);
+
+  useEffect(() => {
+    console.log("Location changed to:", location.pathname);
+    const currentTitle = pathToTitleMap[location.pathname] || "Dashboard";
+    console.log("Current selected:", currentTitle);
+    setSelected(currentTitle);
+  }, [location]);
 
   useEffect(() => {
     const convertUint8ArrayToBlob = () => {
@@ -94,12 +123,11 @@ const HRSidebar = ({ user }) => {
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
-          {/* Logo and Menu Icon */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "0 0 20px 0",
               color: colors.grey[100],
             }}
           >
@@ -120,11 +148,9 @@ const HRSidebar = ({ user }) => {
             )}
           </MenuItem>
 
-          {/* User */}
           {!isCollapsed && user && profilePictureSrc && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                {/* Display the profile picture */}
                 <img
                   alt="profile-user"
                   width="100px"
@@ -151,13 +177,26 @@ const HRSidebar = ({ user }) => {
             </Box>
           )}
 
-          {/* Menu Items */}
+          {isCollapsed && user && profilePictureSrc && (
+            <Box mb="25px">
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <img
+                  alt="profile-user"
+                  width="50px"
+                  height="50px"
+                  src={profilePictureSrc}
+                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                />
+              </Box>
+            </Box>
+          )}
+
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/dashboard"
+              to="/hrDashboard/dashboard"
               icon={<HomeOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Dashboard"}
               setSelected={setSelected}
             />
             <Typography
@@ -169,23 +208,23 @@ const HRSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Manage Team"
-              to="/team"
+              to="/hrDashboard/team"
               icon={<PeopleOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Manage Team"}
               setSelected={setSelected}
             />
             <Item
               title="Contacts Information"
-              to="/contacts"
+              to="/hrDashboard/contacts"
               icon={<ContactsOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Contacts Information"}
               setSelected={setSelected}
             />
             <Item
               title="Invoice Balances"
-              to="/invoices"
+              to="/hrDashboard/invoices"
               icon={<ReceiptOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Invoice Balances"}
               setSelected={setSelected}
             />
             <Typography
@@ -197,23 +236,23 @@ const HRSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Profile Form"
-              to="/form"
+              to="/hrDashboard/form"
               icon={<PersonOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Profile Form"}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              to="/calendar"
+              to="/hrDashboard/calendar"
               icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Calendar"}
               setSelected={setSelected}
             />
             <Item
               title="FAQ Page"
-              to="/faq"
+              to="/hrDashboard/faq"
               icon={<HelpOutlinedIcon />}
-              selected={selected}
+              selected={selected === "FAQ Page"}
               setSelected={setSelected}
             />
             <Typography
@@ -225,30 +264,30 @@ const HRSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="/bar"
+              to="/hrDashboard/bar"
               icon={<BarChartOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Bar Chart"}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="/pie"
+              to="/hrDashboard/pie"
               icon={<PieChartOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Pie Chart"}
               setSelected={setSelected}
             />
             <Item
               title="Line Chart"
-              to="/line"
+              to="/hrDashboard/line"
               icon={<TimelineOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Line Chart"}
               setSelected={setSelected}
             />
             <Item
               title="Geography Chart"
-              to="/geography"
+              to="/hrDashboard/geography"
               icon={<MapOutlinedIcon />}
-              selected={selected}
+              selected={selected === "Geography Chart"}
               setSelected={setSelected}
             />
           </Box>

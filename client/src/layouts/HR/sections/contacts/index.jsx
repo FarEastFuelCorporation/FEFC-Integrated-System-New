@@ -83,7 +83,9 @@ const Contacts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3001/employee");
+        const response = await fetch(
+          "http://localhost:3001/hrDashboard/employee"
+        );
         const data = await response.json();
         const rowsWithId = data.map((row, index) => ({
           ...row,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
@@ -15,7 +15,6 @@ import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import log from "loglevel";
 
 log.setLevel("info");
@@ -47,23 +46,27 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
+const HRSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
-  const pathToTitleMap = {
-    "/hrDashboard/dashboard": "Dashboard",
-    "/hrDashboard/team": "Manage Team",
-    "/hrDashboard/contacts": "Contacts Information",
-    "/hrDashboard/invoices": "Invoice Balances",
-    "/hrDashboard/form": "Profile Form",
-    "/hrDashboard/calendar": "Calendar",
-    "/hrDashboard/faq": "FAQ Page",
-    "/hrDashboard/bar": "Bar Chart",
-    "/hrDashboard/pie": "Pie Chart",
-    "/hrDashboard/line": "Line Chart",
-    "/hrDashboard/geography": "Geography Chart",
-  };
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathToTitleMap = useMemo(
+    () => ({
+      "/hrDashboard/dashboard": "Dashboard",
+      "/hrDashboard/team": "Manage Team",
+      "/hrDashboard/contacts": "Contacts Information",
+      "/hrDashboard/invoices": "Invoice Balances",
+      "/hrDashboard/form": "Profile Form",
+      "/hrDashboard/calendar": "Calendar",
+      "/hrDashboard/faq": "FAQ Page",
+      "/hrDashboard/bar": "Bar Chart",
+      "/hrDashboard/pie": "Pie Chart",
+      "/hrDashboard/line": "Line Chart",
+      "/hrDashboard/geography": "Geography Chart",
+    }),
+    []
+  ); // No dependencies, as this is a static object
 
   const initialSelected = pathToTitleMap[location.pathname] || "Dashboard";
   const [selected, setSelected] = useState(initialSelected);
@@ -74,7 +77,7 @@ const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
     const currentTitle = pathToTitleMap[location.pathname] || "Dashboard";
     console.log("Current selected:", currentTitle);
     setSelected(currentTitle);
-  }, [location]);
+  }, [location, pathToTitleMap]);
 
   useEffect(() => {
     const convertUint8ArrayToBlob = () => {
@@ -101,6 +104,10 @@ const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
     convertUint8ArrayToBlob();
   }, [user]);
 
+  const handleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
     <Box
       sx={{
@@ -124,7 +131,7 @@ const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
           <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={handleCollapse}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
               margin: "0 0 20px 0",
@@ -141,7 +148,7 @@ const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
                 <Typography variant="h4" color={colors.grey[100]}>
                   HUMAN RESOURCES
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
@@ -214,8 +221,8 @@ const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
               setSelected={setSelected}
             />
             <Item
-              title="Contacts Information"
-              to="/hrDashboard/contacts"
+              title="Employee Records"
+              to="/hrDashboard/employee"
               icon={<ContactsOutlinedIcon />}
               selected={selected === "Contacts Information"}
               setSelected={setSelected}
@@ -281,13 +288,6 @@ const HRSidebar = ({ user, isCollapsed, setIsCollapsed }) => {
               to="/hrDashboard/line"
               icon={<TimelineOutlinedIcon />}
               selected={selected === "Line Chart"}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/hrDashboard/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected === "Geography Chart"}
               setSelected={setSelected}
             />
           </Box>

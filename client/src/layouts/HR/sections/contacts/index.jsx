@@ -86,7 +86,8 @@ const Contacts = () => {
         const response = await fetch(
           "http://localhost:3001/hrDashboard/employee"
         );
-        const data = await response.json();
+        const employeeRecords = await response.json();
+        const data = await employeeRecords.employeeRecords;
         const rowsWithId = data.map((row, index) => ({
           ...row,
           id: index + 1,
@@ -105,19 +106,19 @@ const Contacts = () => {
   }, []);
 
   return (
-    <Box m="20px">
+    <Box p="20px" width="100% !important">
       <Header
-        title="Contacts"
-        subtitle="List of Contacts for Future Reference"
+        title="Employee Records"
+        subtitle="List of Employee for Future Reference"
       />
       <Box
         m="40px 0 0 0"
         height="75vh"
         width="100% !important"
-        overflow="scroll"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
+            width: "100%",
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",

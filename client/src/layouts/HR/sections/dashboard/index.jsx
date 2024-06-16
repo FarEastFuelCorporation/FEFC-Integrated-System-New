@@ -1,21 +1,83 @@
+import { useState, useEffect } from "react";
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import Header from "../Header";
 import { tokens } from "../../../../theme";
-import { mockTransactions } from "../../sections/data/mockData";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
 import LineChart from "../LineChart";
 import BarChart from "../BarChart";
-import GeographyChart from "../GeographyChart";
 import StatBox from "../StatBox";
 import ProgressCircle from "../ProgressCircle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUserTie,
+  faUserTag,
+  faUserPen,
+  faUsers,
+} from "@fortawesome/free-solid-svg-icons";
+import { mockLineData } from "../data/mockData";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [regularEmployeeCount, setRegularEmployeeCount] = useState(0);
+  const [regularEmployeeProgress, setRegularEmployeeProgress] = useState(0);
+  const [probationaryEmployeeCount, setProbationaryEmployeeCount] = useState(0);
+  const [probationaryEmployeeProgress, setProbationaryEmployeeProgress] =
+    useState(0);
+  const [projectBasedEmployeeCount, setProjectBasedEmployeeCount] = useState(0);
+  const [projectBasedEmployeeProgress, setProjectBasedEmployeeProgress] =
+    useState(0);
+  const [totalEmployeeCount, setTotalEmployeeCount] = useState(0);
+  const [expiredContractEmployeeCount, setExpiredContractEmployeeCount] =
+    useState(0);
+  const [expiredContractEmployees, setExpiredContractEmployees] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3001/hrDashboard/employee"
+        );
+        const data = await response.json();
+
+        setRegularEmployeeCount(data.regularEmployeeCount);
+        setProbationaryEmployeeCount(data.probationaryEmployeeCount);
+        setProjectBasedEmployeeCount(data.projectBasedEmployeeCount);
+        setTotalEmployeeCount(data.totalEmployee);
+        setExpiredContractEmployeeCount(data.expiredContractEmployeeCount);
+        setExpiredContractEmployees(data.expiredContractEmployees);
+
+        // Calculate the progress based on the fetched counts
+        setRegularEmployeeProgress(
+          data.regularEmployeeCount / data.totalEmployee
+        );
+        setProbationaryEmployeeProgress(
+          data.probationaryEmployeeCount / data.totalEmployee
+        );
+        setProjectBasedEmployeeProgress(
+          data.projectBasedEmployeeCount / data.totalEmployee
+        );
+
+        setLoading(false); // Set loading to false once data is fetched
+      } catch (error) {
+        console.error("Error fetching employeeData:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box m="20px">
+        <Typography variant="h4" color={colors.grey[100]}>
+          Loading...
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -41,7 +103,7 @@ const Dashboard = () => {
           gridAutoRows="140px"
           gap="20px"
         >
-          {/* ROW 1 */}
+          {/* COUNTERS */}
           <Box
             gridColumn="span 3"
             backgroundColor={colors.primary[400]}
@@ -50,13 +112,15 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title={(12, 361)}
-              subtitle="Emails Sent"
-              progress="0.75"
+              title={regularEmployeeCount}
+              subtitle="Regular Employee"
+              progress={regularEmployeeProgress}
+              progressColor="#00FF00"
               increase="+14%"
               icon={
-                <EmailIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                <FontAwesomeIcon
+                  icon={faUserTie}
+                  style={{ color: colors.greenAccent[600], fontSize: "26px" }}
                 />
               }
             />
@@ -69,13 +133,15 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title={(431, 225)}
-              subtitle="Sales Obtained"
-              progress="0.5"
+              title={probationaryEmployeeCount}
+              subtitle="Probationary Employee"
+              progress={probationaryEmployeeProgress}
+              progressColor="#FFFF00"
               increase="+21%"
               icon={
-                <PointOfSaleIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                <FontAwesomeIcon
+                  icon={faUserTag}
+                  style={{ color: colors.greenAccent[600], fontSize: "26px" }}
                 />
               }
             />
@@ -88,13 +154,15 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title={(32, 441)}
-              subtitle="New Clients"
-              progress="0.30"
+              title={projectBasedEmployeeCount}
+              subtitle="Project Based Employee"
+              progress={projectBasedEmployeeProgress}
+              progressColor="#FF0000"
               increase="+5%"
               icon={
-                <PersonAddIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                <FontAwesomeIcon
+                  icon={faUserPen}
+                  style={{ color: colors.greenAccent[600], fontSize: "26px" }}
                 />
               }
             />
@@ -107,13 +175,19 @@ const Dashboard = () => {
             justifyContent="center"
           >
             <StatBox
-              title={(1, 325, 134)}
-              subtitle="Traffic Inbound"
-              progress="0.80"
+              title={totalEmployeeCount}
+              subtitle="Total Employee"
+              progress={regularEmployeeProgress}
+              progress2={probationaryEmployeeProgress}
+              progress3={projectBasedEmployeeProgress}
+              progressColor="#00FF00"
+              progressColor2="#FFFF00"
+              progressColor3="#FF0000"
               increase="+43%"
               icon={
-                <TrafficIcon
-                  sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                <FontAwesomeIcon
+                  icon={faUsers}
+                  style={{ color: colors.greenAccent[600], fontSize: "26px" }}
                 />
               }
             />
@@ -138,14 +212,14 @@ const Dashboard = () => {
                   fontWeight="600"
                   color={colors.grey[100]}
                 >
-                  Revenue Generated
+                  Average Company Monthly Salary For Employees 2023
                 </Typography>
                 <Typography
                   variant="h3"
                   fontWeight="bold"
                   color={colors.greenAccent[500]}
                 >
-                  P3,238,586
+                  P 268,125
                 </Typography>
               </Box>
               <Box>
@@ -161,60 +235,66 @@ const Dashboard = () => {
             </Box>
           </Box>
 
-          {/* TRANSACTIONS */}
+          {/* EXPIRED CONTRACTS */}
           <Box
             gridColumn="span 4"
-            gridRow="span 2"
+            gridRow="span 4"
             backgroundColor={colors.primary[400]}
-            overflow="auto"
+            overflow="hidden"
+            position="relative" // Ensure the container has relative positioning
           >
             <Box
               display="flex"
               justifyContent="space-between"
               alignItems="center"
               borderBottom={`4px solid ${colors.primary[500]}`}
-              colors={colors.grey[100]}
+              color={colors.grey[100]}
               p="15px"
+              position="sticky" // Make the header sticky
+              top="0" // Stick to the top of the container
+              zIndex="100" // Ensure it's above other content
+              backgroundColor={colors.primary[400]} // Match container background
             >
-              <Typography
-                color={colors.grey[100]}
-                variant="h5"
-                fontWeight="600"
-              >
-                Recent Transactions
+              <Typography variant="h5" fontWeight="600">
+                Expired Contracts ({expiredContractEmployeeCount})
               </Typography>
             </Box>
-            {mockTransactions.map((transaction, i) => (
-              <Box
-                key={`${transaction.txId}-${i}`}
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                borderBottom={`4px solid ${colors.primary[500]}`}
-                p="15px"
-              >
-                <Box>
-                  <Typography
-                    color={colors.greenAccent[500]}
-                    variant="h5"
-                    fontWeight="600"
-                  >
-                    {transaction.txId}
-                  </Typography>
-                  <Typography color={colors.grey[100]}>
-                    {transaction.user}
-                  </Typography>
-                </Box>
-                <Box color={colors.grey[100]}>{transaction.date}</Box>
+            <Box maxHeight="calc(100vh - 80px)" overflow="auto">
+              {expiredContractEmployees.map((employee, i) => (
                 <Box
-                  backgroundColor={colors.greenAccent[500]}
-                  p="5px 10px"
-                  borderRadius="4px"
+                  key={`${employee.employeeId}-${i}`}
+                  display="grid"
+                  gridTemplateColumns="1fr 1fr 1fr" // Divide into 3 equal columns
+                  gap="10px" // Add gap between grid items
+                  borderBottom={`4px solid ${colors.primary[500]}`}
+                  p="15px"
                 >
-                  {transaction.cost}
+                  {/* Column 1 */}
+                  <Box>
+                    <Typography
+                      color={colors.greenAccent[500]}
+                      variant="h5"
+                      fontWeight="600"
+                    >
+                      {employee.employeeId}
+                    </Typography>
+                    <Typography color={colors.grey[100]}>
+                      {employee.firstName} {employee.lastName}
+                    </Typography>
+                  </Box>
+
+                  {/* Column 2 */}
+                  <Box color={colors.grey[100]} textAlign="center">
+                    {employee.IdInformation.date_expire}
+                  </Box>
+
+                  {/* Column 3 */}
+                  <Box p="5px 10px" borderRadius="4px" textAlign="center">
+                    {employee.designation}
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              ))}
+            </Box>
           </Box>
 
           {/* ROW 3 */}
@@ -257,24 +337,10 @@ const Dashboard = () => {
               fontWeight="600"
               sx={{ p: "30px 30px 0 30px" }}
             >
-              Sales Quantity
+              Employee Recruitment
             </Typography>
             <Box height="250px" mt="-20px">
               <BarChart isDashboard={true} />
-            </Box>
-          </Box>
-
-          <Box
-            gridColumn="span 4"
-            gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-            p="30px"
-          >
-            <Typography variant="h5" fontWeight="600" sx={{ mb: "15px" }}>
-              Geography Based Traffic
-            </Typography>
-            <Box height="250px" mt="-20px">
-              <GeographyChart isDashboard={true} />
             </Box>
           </Box>
         </Box>

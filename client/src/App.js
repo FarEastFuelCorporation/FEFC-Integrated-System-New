@@ -7,6 +7,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import "font-awesome/css/font-awesome.min.css";
 import { tokens } from "./theme";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";

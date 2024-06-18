@@ -41,72 +41,6 @@ async function logoutController(req, res) {
   }
 }
 
-async function validateQuotation(req, res) {
-  try {
-    var currentPage, totalPages, entriesPerPage, searchQuery;
-    const quotationCode = req.params.quotationCode;
-    const revisionNumber = req.params.revisionNumber;
-    const typesOfWastes = await TypeOfWaste.findAll();
-    const vehicleTypes = await VehicleType.findAll();
-    const quotation = await Quotation.findAll({
-      where: { quotationCode, revisionNumber },
-      include: [
-        { model: Client, as: "Client" },
-        {
-          model: QuotationWaste,
-          as: "QuotationWaste",
-          include: [{ model: TypeOfWaste, as: "TypeOfWaste" }],
-        },
-        {
-          model: QuotationTransportation,
-          as: "QuotationTransportation",
-          include: [{ model: VehicleType, as: "VehicleType" }],
-        },
-        { model: Employee, as: "Employee" },
-      ],
-    });
-
-    // Function to convert a string to proper case
-    function toProperCase(str) {
-      return str.replace(/\w\S*/g, function (txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      });
-    }
-
-    // Apply the function to the employee's first and last names
-    const employeeName = `${toProperCase(
-      quotation[0]?.Employee.firstName
-    )} ${toProperCase(quotation[0]?.Employee.lastName)}`;
-    const employeeSignature = quotation[0]?.Employee.picture.replace(
-      /\.jpg$/,
-      ".png"
-    );
-
-    // Render the dashboard view with data
-    const viewsData = {
-      pageTitle: "Marketing User - Update Quotation Form",
-      sidebar: "marketing/marketing_sidebar",
-      content: "marketing/update_quotation",
-      route: "marketing_dashboard",
-      general_scripts: "marketing/marketing_scripts",
-      currentPage,
-      totalPages,
-      entriesPerPage,
-      searchQuery,
-      employeeName,
-      employeeSignature,
-      quotation,
-      typesOfWastes,
-      vehicleTypes,
-    };
-    res.render("validate_quotation", viewsData);
-  } catch (error) {
-    console.error("Error in getUpdateQuotationController:", error);
-    // Handle the error appropriately (e.g., send an error response)
-    res.status(500).send("Internal Server Error");
-  }
-}
-
 async function error404Controller(req, res, next) {
   res.status(404).send("404 Not Found");
 }
@@ -114,6 +48,5 @@ async function error404Controller(req, res, next) {
 module.exports = {
   homeController,
   logoutController,
-  validateQuotation,
   error404Controller,
 };

@@ -5,10 +5,16 @@ const moment = require("moment-timezone");
 const Client = sequelize.define(
   "Client",
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+    },
     clientId: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true,
+      unique: true,
     },
     clientName: {
       type: DataTypes.STRING,

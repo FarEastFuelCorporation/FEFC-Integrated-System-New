@@ -18,11 +18,14 @@ import axios from "axios";
 import { tokens } from "../../../../theme";
 
 const Clients = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+  console.log("apiUrl:", apiUrl);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState({
+    id: "",
     clientId: "",
     clientName: "",
     address: "",
@@ -38,17 +41,12 @@ const Clients = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/marketingDashboard/clients"
+          `${apiUrl}/marketingDashboard/clients`
         );
         const clientRecords = response.data;
 
         if (clientRecords && Array.isArray(clientRecords.clients)) {
-          const data = clientRecords.clients.map((client) => ({
-            ...client,
-            id: client.clientId,
-          }));
-
-          setEmployeeData(data);
+          setEmployeeData(clientRecords.clients);
         } else {
           console.error(
             "clientRecords or clientRecords.clients is undefined or not an array"
@@ -60,7 +58,7 @@ const Clients = () => {
     };
 
     fetchData();
-  }, []);
+  }, [apiUrl]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -73,6 +71,7 @@ const Clients = () => {
 
   const clearFormData = () => {
     setFormData({
+      id: "",
       clientId: "",
       clientName: "",
       address: "",
@@ -90,30 +89,27 @@ const Clients = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (formData.clientId) {
+      if (formData.id) {
         const response = await axios.put(
-          `http://localhost:3001/marketingDashboard/clients/${formData.clientId}`,
+          `${apiUrl}/marketingDashboard/clients/${formData.id}`,
           formData
         );
         const updatedClient = response.data;
 
         const updatedData = employeeData.map((client) =>
-          client.clientId === updatedClient.clientId ? updatedClient : client
+          client.id === updatedClient.id ? updatedClient : client
         );
 
         setEmployeeData(updatedData);
         setSuccessMessage("Client updated successfully!");
       } else {
         const response = await axios.post(
-          "http://localhost:3001/marketingDashboard/clients",
+          `${apiUrl}/marketingDashboard/clients`,
           formData
         );
         const newClient = response.data;
 
-        setEmployeeData([
-          ...employeeData,
-          { ...newClient, id: newClient.clientId },
-        ]);
+        setEmployeeData([...employeeData, newClient]);
         setSuccessMessage("Client added successfully!");
       }
 
@@ -124,9 +120,10 @@ const Clients = () => {
   };
 
   const handleEditClick = (id) => {
-    const clientToEdit = employeeData.find((client) => client.clientId === id);
+    const clientToEdit = employeeData.find((client) => client.id === id);
     if (clientToEdit) {
       setFormData({
+        id: clientToEdit.id,
         clientId: clientToEdit.clientId,
         clientName: clientToEdit.clientName,
         address: clientToEdit.address,
@@ -141,14 +138,18 @@ const Clients = () => {
   };
 
   const handleDeleteClick = async (id) => {
-    try {
-      await axios.delete(
-        `http://localhost:3001/marketingDashboard/clients/${id}`
-      );
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this client?"
+    );
 
-      const updatedData = employeeData.filter(
-        (client) => client.clientId !== id
-      );
+    if (!isConfirmed) {
+      return; // Abort the deletion if the user cancels
+    }
+
+    try {
+      await axios.delete(`${apiUrl}/marketingDashboard/clients/${id}`);
+
+      const updatedData = employeeData.filter((client) => client.id !== id);
       setEmployeeData(updatedData);
       setSuccessMessage("Client deleted successfully!");
     } catch (error) {
@@ -162,39 +163,45 @@ const Clients = () => {
       headerName: "Client ID",
       headerAlign: "center",
       align: "center",
+      width: 150, // Set a minimum width or initial width
     },
     {
       field: "clientName",
       headerName: "Client Name",
       headerAlign: "center",
       align: "center",
-      width: 300,
+      flex: 1, // Use flex to allow content to dictate width
+      minWidth: 150, // Minimum width
     },
     {
       field: "address",
       headerName: "Address",
       headerAlign: "center",
       align: "center",
-      width: 300,
+      flex: 1,
+      minWidth: 150,
     },
     {
       field: "natureOfBusiness",
       headerName: "Nature of Business",
       headerAlign: "center",
       align: "center",
-      width: 200,
+      flex: 1,
+      minWidth: 150,
     },
     {
       field: "contactNumber",
       headerName: "Contact Number",
       headerAlign: "center",
       align: "center",
+      width: 180, // Set a width based on content requirements
     },
     {
       field: "clientType",
       headerName: "Client Type",
       headerAlign: "center",
       align: "center",
+      width: 180, // Set a width based on content requirements
     },
     {
       field: "edit",
@@ -206,7 +213,7 @@ const Clients = () => {
       renderCell: (params) => (
         <IconButton
           color="warning"
-          onClick={() => handleEditClick(params.row.clientId)}
+          onClick={() => handleEditClick(params.row.id)}
         >
           <EditIcon />
         </IconButton>
@@ -222,7 +229,7 @@ const Clients = () => {
       renderCell: (params) => (
         <IconButton
           color="error"
-          onClick={() => handleDeleteClick(params.row.clientId)}
+          onClick={() => handleDeleteClick(params.row.id)}
         >
           <DeleteIcon />
         </IconButton>
@@ -283,10 +290,15 @@ const Clients = () => {
         }}
       >
         <DataGrid
-          rows={employeeData.map((row) => ({ ...row, id: row.clientId }))}
+          rows={employeeData}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "clientId", sort: "asc" }],
+            },
+          }}
         />
       </Box>
       <Modal open={openModal} onClose={handleCloseModal}>
@@ -306,7 +318,7 @@ const Clients = () => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.clientId ? "Edit Client" : "Add New Client"}
+            {formData.id ? "Edit Client" : "Add New Client"}
           </Typography>
           <TextField
             label="Client Name"
@@ -314,6 +326,7 @@ const Clients = () => {
             value={formData.clientName}
             onChange={handleInputChange}
             fullWidth
+            autoComplete="off"
           />
           <TextField
             label="Address"
@@ -321,6 +334,7 @@ const Clients = () => {
             value={formData.address}
             onChange={handleInputChange}
             fullWidth
+            autoComplete="off"
           />
           <TextField
             label="Nature of Business"
@@ -328,6 +342,7 @@ const Clients = () => {
             value={formData.natureOfBusiness}
             onChange={handleInputChange}
             fullWidth
+            autoComplete="off"
           />
           <TextField
             label="Contact Number"
@@ -335,6 +350,7 @@ const Clients = () => {
             value={formData.contactNumber}
             onChange={handleInputChange}
             fullWidth
+            autoComplete="off"
           />
           <TextField
             label="Client Type"
@@ -343,6 +359,7 @@ const Clients = () => {
             onChange={handleInputChange}
             select
             fullWidth
+            autoComplete="off"
           >
             <MenuItem value="GENERATOR">GENERATOR</MenuItem>
             <MenuItem value="TRANSPORTER">TRANSPORTER</MenuItem>
@@ -355,7 +372,7 @@ const Clients = () => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.clientId ? "Update Client" : "Add Client"}
+            {formData.id ? "Update Client" : "Add Client"}
           </Button>
         </Box>
       </Modal>

@@ -19,7 +19,7 @@ async function generateClientId(clientType) {
         throw new Error("Invalid client type");
     }
 
-    // Find the latest client ID with the specified prefix
+    // Find the latest client ID with the specified prefix, including soft-deleted records
     const latestClient = await Client.findOne({
       where: {
         clientId: {
@@ -27,6 +27,7 @@ async function generateClientId(clientType) {
         },
       },
       order: [["createdAt", "DESC"]],
+      paranoid: false, // Include soft-deleted records
     });
 
     // Generate the new client ID

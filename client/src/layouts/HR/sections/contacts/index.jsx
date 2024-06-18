@@ -5,6 +5,7 @@ import Header from "../Header";
 import { tokens } from "../../../../theme";
 
 const Contacts = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -83,9 +84,7 @@ const Contacts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3001/hrDashboard/employee"
-        );
+        const response = await fetch(`${apiUrl}/hrDashboard/employee`);
         const employeeRecords = await response.json();
         const data = await employeeRecords.employeeRecords;
         const rowsWithId = data.map((row, index) => ({
@@ -103,7 +102,7 @@ const Contacts = () => {
     };
 
     fetchData();
-  }, []);
+  }, [apiUrl]);
 
   return (
     <Box p="20px" width="100% !important">

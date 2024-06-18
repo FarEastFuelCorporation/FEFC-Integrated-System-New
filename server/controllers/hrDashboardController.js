@@ -1,6 +1,5 @@
 const Employee = require("../models/Employee");
 const IdInformation = require("../models/IdInformation");
-const { Op } = require("sequelize");
 
 // Dashboard controller
 async function getEmployeeRecords(req, res) {

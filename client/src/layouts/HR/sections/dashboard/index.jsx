@@ -14,9 +14,9 @@ import {
   faUserPen,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import { mockLineData } from "../data/mockData";
 
 const Dashboard = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(true); // Add loading state
@@ -36,9 +36,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3001/hrDashboard/employee"
-        );
+        const response = await fetch(`${apiUrl}/hrDashboard/employee`);
         const data = await response.json();
 
         setRegularEmployeeCount(data.regularEmployeeCount);
@@ -66,7 +64,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [apiUrl]);
 
   if (loading) {
     return (
@@ -240,6 +238,7 @@ const Dashboard = () => {
             gridColumn="span 4"
             gridRow="span 4"
             backgroundColor={colors.primary[400]}
+            height="100%"
             overflow="hidden"
             position="relative" // Ensure the container has relative positioning
           >

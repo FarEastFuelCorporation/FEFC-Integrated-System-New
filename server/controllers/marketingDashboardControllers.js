@@ -24,6 +24,7 @@ const LogisticsTransaction = require("../models/LogisticsTransaction");
 const LogisticsTransactionHelper = require("../models/LogisticsTransactionHelper");
 const DispatchLogisticsTransaction = require("../models/DispatchLogisticsTransaction");
 const Vehicle = require("../models/Vehicle");
+const generateClientId = require("../utils/generateClientId");
 
 // Dashboard controller
 async function getMarketingDashboardController(req, res) {
@@ -539,102 +540,21 @@ async function delete_booked_transactionsController(req, res) {
   }
 }
 
-// Clients controller
+// Get Clients controller
 async function getClientsController(req, res) {
   try {
     // Fetch all clients from the database
     const clients = await Client.findAll();
 
-    // Get the page number, entries per page, and search query from the query parameters
-    const currentPage = parseInt(req.query.page) || 1;
-    const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
-    const searchQuery = req.query.search || ""; // Default to an empty string if no search query
-
-    // Additional logic to filter clients based on the search query
-    const filteredClients = clients.filter((client) => {
-      // Customize this logic based on how you want to perform the search
-      return client.clientName
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      // Add more fields if needed
-    });
-
-    // Calculate total pages based on the total number of filtered clients and entries per page
-    const totalFilteredClients = filteredClients.length;
-    const totalPages = Math.ceil(totalFilteredClients / entriesPerPage);
-
-    // Implement pagination and send the filtered clients to the view
-    const startIndex = (currentPage - 1) * entriesPerPage;
-    const endIndex = currentPage * entriesPerPage;
-    const paginatedClients = filteredClients.slice(startIndex, endIndex);
-
-    // Check for the success query parameter
-    let successMessage;
-    if (req.query.success === "new") {
-      successMessage = "Client added successfully!";
-    } else if (req.query.success === "update") {
-      successMessage = "Client updated successfully!";
-    }
-
-    // Render the 'marketing/clients' view and pass the necessary data
-    const viewsData = {
-      pageTitle: "Marketing User - Clients",
-      sidebar: "marketing/marketing_sidebar",
-      content: "marketing/clients",
-      route: "clients",
-      clients: paginatedClients,
-      currentPage,
-      totalPages,
-      entriesPerPage,
-      searchQuery,
-      successMessage,
-    };
-    res.render("dashboard", viewsData);
+    res.json({ clients });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
-async function getClientDetails(req, res) {
-  try {
-    const clientId = req.params.clientId;
 
-    // Find the client by ID
-    const client = await Client.findOne({
-      where: {
-        clientId: clientId,
-      },
-    });
-
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
-    }
-
-    // Respond with client details
-    return res.status(200).json(client);
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-}
-
-// New Client controller
-async function getNewClientController(req, res) {
-  try {
-    // Render the dashboard view with data
-    const viewsData = {
-      pageTitle: "Marketing User - New Client Form",
-      sidebar: "marketing/marketing_sidebar",
-      content: "marketing/new_client",
-      route: "marketing_dashboard",
-    };
-    res.render("dashboard", viewsData);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
-async function postNewClientController(req, res) {
+// Create Client controller
+async function createClientController(req, res) {
   try {
     // Extracting data from the request body
     const {
@@ -642,27 +562,32 @@ async function postNewClientController(req, res) {
       address,
       natureOfBusiness,
       contactNumber,
+      clientType,
       billerName,
       billerAddress,
       billerContactPerson,
       billerContactNumber,
     } = req.body;
 
+    // Generate a new client ID based on the client type
+    const clientId = await generateClientId(clientType);
+
     // Creating a new client
-    await Client.create({
+    const newClient = await Client.create({
+      clientId,
       clientName,
       address,
       natureOfBusiness,
       contactNumber,
+      clientType,
       billerName,
       billerAddress,
       billerContactPerson,
       billerContactNumber,
-      clientId: await generateClientId(), // You need to implement this function to generate a unique client ID
     });
 
-    // Redirect back to the client route with a success message
-    res.redirect("/marketing_dashboard/clients?success=new");
+    // Respond with the newly created client data
+    res.status(201).json(newClient);
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -670,78 +595,68 @@ async function postNewClientController(req, res) {
   }
 }
 
-// Function to generate a unique client ID (You need to implement this)
-async function generateClientId(req, res) {
+// Update Client controller
+async function updateClientController(req, res) {
   try {
-    // Find the last created client
-    const lastClient = await Client.findOne({
-      order: [["clientId", "DESC"]], // Order by clientId in descending order
+    const clientId = req.params.id;
+    console.log("Updating client with ID:", clientId);
+
+    const { clientName, address, natureOfBusiness, contactNumber, clientType } =
+      req.body;
+
+    // Find the client by clientId and update it
+    const updatedClient = await Client.findOne({
+      where: { clientId: clientId },
     });
 
-    // Extract the counter from the last client's ID
-    const lastCounter = lastClient
-      ? parseInt(lastClient.clientId.slice(-4), 10)
-      : 0;
+    if (updatedClient) {
+      // Update client attributes
+      updatedClient.clientName = clientName;
+      updatedClient.address = address;
+      updatedClient.natureOfBusiness = natureOfBusiness;
+      updatedClient.contactNumber = contactNumber;
+      updatedClient.clientType = clientType;
 
-    // Increment the counter
-    const counter = lastCounter + 1;
+      // Save the updated client
+      await updatedClient.save();
 
-    // Generate the new client ID
-    const currentYear = new Date().getFullYear();
-    const clientId = `C${currentYear}${counter.toString().padStart(4, "0")}`;
-
-    return clientId;
+      // Respond with the updated client object including its unique id
+      res.json({ ...updatedClient.toJSON(), id: updatedClient.id });
+    } else {
+      // If client with the specified ID was not found
+      res.status(404).json({ message: `Client with ID ${clientId} not found` });
+    }
   } catch (error) {
-    console.error("Error:", error);
-    // Handle the error appropriately in your application
-    return null; // or throw a different error or provide a default value
+    // Handle errors
+    console.error("Error updating client:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
-async function postUpdateClientController(req, res) {
+// Delete Client controller
+async function deleteClientController(req, res) {
   try {
-    // Extracting data from the request body
-    const {
-      clientId,
-      clientName,
-      address,
-      natureOfBusiness,
-      contactNumber,
-      billerName,
-      billerAddress,
-      billerContactPerson,
-      billerContactNumber,
-    } = req.body;
+    const clientId = req.params.id;
+    console.log("Soft deleting client with ID:", clientId);
 
-    // Find the client in the database based on the provided client ID
-    const existingClient = await Client.findOne({
-      where: {
-        clientId: clientId,
-      },
-    });
+    // Find the client by clientId
+    const clientToDelete = await Client.findByPk(clientId);
 
-    // If the client is not found, return an error
-    if (!existingClient) {
-      return res.status(404).json({ message: "Client not found" });
+    if (clientToDelete) {
+      // Soft delete the client (sets deletedAt timestamp)
+      await clientToDelete.destroy();
+
+      // Respond with a success message
+      res.json({
+        message: `Client with ID ${clientId} soft-deleted successfully`,
+      });
+    } else {
+      // If client with the specified ID was not found
+      res.status(404).json({ message: `Client with ID ${clientId} not found` });
     }
-
-    // Update the client with the new data
-    await existingClient.update({
-      clientName,
-      address,
-      natureOfBusiness,
-      contactNumber,
-      billerName,
-      billerAddress,
-      billerContactPerson,
-      billerContactNumber,
-    });
-
-    // Redirect back to the client route with a success message
-    res.redirect("/marketing_dashboard/clients?success=update");
   } catch (error) {
-    // Handling errors
-    console.error("Error:", error);
+    // Handle errors
+    console.error("Error soft-deleting client:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -1237,10 +1152,9 @@ module.exports = {
   updateBookedTransactionsController,
   delete_booked_transactionsController,
   getClientsController,
-  getClientDetails,
-  getNewClientController,
-  postNewClientController,
-  postUpdateClientController,
+  createClientController,
+  updateClientController,
+  deleteClientController,
   getTypeOfWasteController,
   getQuotationsController,
   getNewQuotationController,

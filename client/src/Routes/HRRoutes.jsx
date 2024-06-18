@@ -11,7 +11,6 @@ import FAQ from "../layouts/HR/sections/faq";
 import Bar from "../layouts/HR/sections/bar";
 import Pie from "../layouts/HR/sections/pie";
 import Line from "../layouts/HR/sections/line";
-import Geography from "../layouts/HR/sections/geography";
 
 const HRRoutes = ({ user }) => (
   <Routes>
@@ -27,7 +26,6 @@ const HRRoutes = ({ user }) => (
       <Route path="bar" element={<Bar />} />
       <Route path="pie" element={<Pie />} />
       <Route path="line" element={<Line />} />
-      <Route path="geography" element={<Geography />} />
     </Route>
   </Routes>
 );

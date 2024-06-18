@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -15,31 +15,66 @@ import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import log from "loglevel";
+
+log.setLevel("info");
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    log.info(`Navigating to ${to}`);
+    setSelected(title);
+    navigate(to);
+  };
+
   return (
-    <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
-      <MenuItem
-        active={selected === title}
-        style={{ color: colors.grey[100] }}
-        onClick={() => setSelected(title)}
-        icon={icon}
-      >
-        <Typography>{title}</Typography>
-      </MenuItem>
-    </Link>
+    <MenuItem
+      active={selected === title} // Apply 'active' prop based on selected state
+      style={{
+        color: colors.grey[100],
+        backgroundColor:
+          selected === title ? colors.primary[500] : "transparent", // Apply background color based on active state
+      }}
+      onClick={handleClick}
+      icon={icon}
+    >
+      <Typography>{title}</Typography>
+    </MenuItem>
   );
 };
 
 const MarketingSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
+  const pathToTitleMap = useMemo(
+    () => ({
+      "/marketingDashboard/dashboard": "Dashboard",
+      "/marketingDashboard/clients": "Clients",
+      "/marketingDashboard/quotations": "Quotations",
+      "/marketingDashboard/commissions": "Commissions",
+      "/marketingDashboard/form": "Profile Form",
+      "/marketingDashboard/calendar": "Calendar",
+      "/marketingDashboard/faq": "FAQ Page",
+      "/marketingDashboard/bar": "Bar Chart",
+      "/marketingDashboard/pie": "Pie Chart",
+      "/marketingDashboard/line": "Line Chart",
+    }),
+    []
+  ); // No dependencies, as this is a static object
+
+  const initialSelected = pathToTitleMap[location.pathname] || "Dashboard";
+  const [selected, setSelected] = useState(initialSelected);
   const [profilePictureSrc, setProfilePictureSrc] = useState(null);
+
+  useEffect(() => {
+    const currentTitle = pathToTitleMap[location.pathname] || "Dashboard";
+    setSelected(currentTitle);
+  }, [location, pathToTitleMap]);
 
   useEffect(() => {
     const convertUint8ArrayToBlob = () => {
@@ -54,7 +89,7 @@ const MarketingSidebar = ({ user }) => {
       const uint8Array = new Uint8Array(
         user.employeePicture.profile_picture.data
       );
-      const blob = new Blob([uint8Array], { type: "image/jpeg" }); // Adjust type as per your image type
+      const blob = new Blob([uint8Array], { type: "image/jpeg" });
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -65,6 +100,10 @@ const MarketingSidebar = ({ user }) => {
 
     convertUint8ArrayToBlob();
   }, [user]);
+
+  const handleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   return (
     <Box
@@ -88,12 +127,11 @@ const MarketingSidebar = ({ user }) => {
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
-          {/* Logo and Menu Icon */}
           <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={handleCollapse}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "0 0 20px 0",
               color: colors.grey[100],
             }}
           >
@@ -104,19 +142,19 @@ const MarketingSidebar = ({ user }) => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h4" color={colors.grey[100]}></Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <Typography variant="h4" color={colors.grey[100]}>
+                  MARKETING
+                </Typography>
+                <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
             )}
           </MenuItem>
 
-          {/* User */}
           {!isCollapsed && user && profilePictureSrc && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                {/* Display the profile picture */}
                 <img
                   alt="profile-user"
                   width="100px"
@@ -143,11 +181,24 @@ const MarketingSidebar = ({ user }) => {
             </Box>
           )}
 
-          {/* Menu Items */}
+          {isCollapsed && user && profilePictureSrc && (
+            <Box mb="25px">
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <img
+                  alt="profile-user"
+                  width="50px"
+                  height="50px"
+                  src={profilePictureSrc}
+                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                />
+              </Box>
+            </Box>
+          )}
+
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="dashboard"
+              to="/marketingDashboard/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -160,22 +211,22 @@ const MarketingSidebar = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Manage Team"
-              to="team"
+              title="Clients"
+              to="/marketingDashboard/clients"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Contacts Information"
-              to="contacts"
+              title="Quotations"
+              to="/marketingDashboard/quotations"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Invoice Balances"
-              to="invoices"
+              title="Commissions"
+              to="/marketingDashboard/commissions"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -189,21 +240,21 @@ const MarketingSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Profile Form"
-              to="form"
+              to="/marketingDashboard/form"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              to="calendar"
+              to="/marketingDashboard/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="FAQ Page"
-              to="faq"
+              to="/marketingDashboard/faq"
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -217,29 +268,22 @@ const MarketingSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="bar"
+              to="/marketingDashboard/bar"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="pie"
+              to="/marketingDashboard/pie"
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Line Chart"
-              to="line"
+              to="/marketingDashboard/line"
               icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="geography"
-              icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

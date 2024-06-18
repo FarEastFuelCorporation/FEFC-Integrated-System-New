@@ -55,7 +55,7 @@ const HRSidebar = ({ user }) => {
     () => ({
       "/hrDashboard/dashboard": "Dashboard",
       "/hrDashboard/team": "Manage Team",
-      "/hrDashboard/contacts": "Contacts Information",
+      "/hrDashboard/employee": "Employee Records",
       "/hrDashboard/invoices": "Invoice Balances",
       "/hrDashboard/form": "Profile Form",
       "/hrDashboard/calendar": "Calendar",
@@ -63,7 +63,6 @@ const HRSidebar = ({ user }) => {
       "/hrDashboard/bar": "Bar Chart",
       "/hrDashboard/pie": "Pie Chart",
       "/hrDashboard/line": "Line Chart",
-      "/hrDashboard/geography": "Geography Chart",
     }),
     []
   ); // No dependencies, as this is a static object
@@ -73,9 +72,7 @@ const HRSidebar = ({ user }) => {
   const [profilePictureSrc, setProfilePictureSrc] = useState(null);
 
   useEffect(() => {
-    console.log("Location changed to:", location.pathname);
     const currentTitle = pathToTitleMap[location.pathname] || "Dashboard";
-    console.log("Current selected:", currentTitle);
     setSelected(currentTitle);
   }, [location, pathToTitleMap]);
 
@@ -203,7 +200,7 @@ const HRSidebar = ({ user }) => {
               title="Dashboard"
               to="/hrDashboard/dashboard"
               icon={<HomeOutlinedIcon />}
-              selected={selected === "Dashboard"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Typography
@@ -217,21 +214,21 @@ const HRSidebar = ({ user }) => {
               title="Manage Team"
               to="/hrDashboard/team"
               icon={<PeopleOutlinedIcon />}
-              selected={selected === "Manage Team"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Employee Records"
               to="/hrDashboard/employee"
               icon={<ContactsOutlinedIcon />}
-              selected={selected === "Contacts Information"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Invoice Balances"
               to="/hrDashboard/invoices"
               icon={<ReceiptOutlinedIcon />}
-              selected={selected === "Invoice Balances"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Typography
@@ -245,21 +242,21 @@ const HRSidebar = ({ user }) => {
               title="Profile Form"
               to="/hrDashboard/form"
               icon={<PersonOutlinedIcon />}
-              selected={selected === "Profile Form"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
               to="/hrDashboard/calendar"
               icon={<CalendarTodayOutlinedIcon />}
-              selected={selected === "Calendar"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="FAQ Page"
               to="/hrDashboard/faq"
               icon={<HelpOutlinedIcon />}
-              selected={selected === "FAQ Page"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Typography
@@ -273,21 +270,21 @@ const HRSidebar = ({ user }) => {
               title="Bar Chart"
               to="/hrDashboard/bar"
               icon={<BarChartOutlinedIcon />}
-              selected={selected === "Bar Chart"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
               to="/hrDashboard/pie"
               icon={<PieChartOutlinedIcon />}
-              selected={selected === "Pie Chart"}
+              selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Line Chart"
               to="/hrDashboard/line"
               icon={<TimelineOutlinedIcon />}
-              selected={selected === "Line Chart"}
+              selected={selected}
               setSelected={setSelected}
             />
           </Box>

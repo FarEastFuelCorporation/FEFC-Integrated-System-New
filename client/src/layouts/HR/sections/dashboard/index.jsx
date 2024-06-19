@@ -6,7 +6,7 @@ import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import LineChart from "../LineChart";
 import BarChart from "../BarChart";
 import StatBox from "../StatBox";
-import ProgressCircle from "../ProgressCircle";
+import PieChart from "../PieChart";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserTie,
@@ -304,25 +304,10 @@ const Dashboard = () => {
             p="30px"
           >
             <Typography variant="h5" fontWeight="600">
-              Campaign
+              Employee Count
             </Typography>
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              mt="25px"
-            >
-              <ProgressCircle size="125" />
-              <Typography
-                variant="h5"
-                color={colors.greenAccent[500]}
-                sx={{ mt: "15px" }}
-              >
-                P1,395,285 Revenue Generated
-              </Typography>
-              <Typography>
-                Includes Extra Misc Expenditures and Costs
-              </Typography>
+            <Box height="250px" mt="-20px">
+              <PieChart isDashboard={true} />
             </Box>
           </Box>
 

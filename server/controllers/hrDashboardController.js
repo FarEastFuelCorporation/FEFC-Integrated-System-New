@@ -48,6 +48,19 @@ async function getEmployeeRecords(req, res) {
 
     const expiredContractEmployeeCount = expiredContractEmployees.length;
 
+    // Calculate employee count per department
+    const departmentCounts = {};
+    employeeRecords.forEach((emp) => {
+      console.log(emp.dataValues.department);
+      const department = emp.dataValues.department;
+      if (department) {
+        if (!departmentCounts[department]) {
+          departmentCounts[department] = 0;
+        }
+        departmentCounts[department]++;
+      }
+    });
+
     res.json({
       employeeRecords,
       regularEmployeeCount,
@@ -56,6 +69,7 @@ async function getEmployeeRecords(req, res) {
       totalEmployee,
       expiredContractEmployeeCount,
       expiredContractEmployees,
+      departmentCounts,
     });
   } catch (error) {
     console.error("Error:", error);

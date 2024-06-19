@@ -1,5 +1,7 @@
 require("dotenv").config();
 const Client = require("../models/Client");
+const TreatmentProcess = require("../models/TreatmentProcess");
+const TypeOfWaste = require("../models/TypeOfWaste");
 const generateClientId = require("../utils/generateClientId");
 
 // Dashboard controller
@@ -123,9 +125,73 @@ async function deleteClientController(req, res) {
   }
 }
 
+// Create Treatment Process controller
+async function createTreatmentProcessController(req, res) {
+  try {
+    // Extracting data from the request body
+    const { treatmentProcess } = req.body;
+    console.log(treatmentProcess);
+    // Creating a new client
+    const newTreatmentProcess = await TreatmentProcess.create({
+      treatmentProcess,
+    });
+
+    // Respond with the newly created client data
+    res.status(201).json(newTreatmentProcess);
+  } catch (error) {
+    // Handling errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Get Clients controller
+async function getTypeOfWastesController(req, res) {
+  try {
+    // Fetch all clients from the database
+    const typeOfWastes = await TypeOfWaste.findAll({
+      include: {
+        model: TreatmentProcess,
+        as: "treatmentProcesses",
+      },
+    });
+
+    res.json({ typeOfWastes });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Create Type Of Waste controller
+async function createTypeOfWastesController(req, res) {
+  try {
+    // Extracting data from the request body
+    const { wasteCategory, wasteCode, wasteDescription, treatmentProcessId } =
+      req.body;
+    // Creating a new client
+    const newTypeOfWaste = await TypeOfWaste.create({
+      wasteCategory,
+      wasteCode,
+      wasteDescription,
+      treatmentProcessId,
+    });
+
+    // Respond with the newly created client data
+    res.status(201).json(newTypeOfWaste);
+  } catch (error) {
+    // Handling errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   getClientsController,
   createClientController,
   updateClientController,
   deleteClientController,
+  createTreatmentProcessController,
+  getTypeOfWastesController,
+  createTypeOfWastesController,
 };

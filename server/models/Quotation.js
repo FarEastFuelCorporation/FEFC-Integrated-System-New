@@ -1,12 +1,11 @@
-// models/TypeOfWaste.js
+// models/Quotation.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const moment = require("moment-timezone");
-const TreatmentProcess = require("./TreatmentProcess");
 
-const TypeOfWaste = sequelize.define(
-  "TypeOfWaste",
+const Quotation = sequelize.define(
+  "Quotation",
   {
     id: {
       type: DataTypes.UUID,
@@ -14,25 +13,42 @@ const TypeOfWaste = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    wasteCategory: {
+    quotationCode: {
       type: DataTypes.STRING,
-      values: ["NHW", "HW"],
+      allowNull: false,
+      unique: true,
     },
-    wasteCode: {
+    revisionNumber: {
+      type: DataTypes.STRING,
+      defaultValue: "00",
+    },
+    validity: {
+      type: DataTypes.DATE,
+    },
+    clientId: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    wasteDescription: {
+    termsCharge: {
+      type: DataTypes.STRING,
+    },
+    termsBuying: {
+      type: DataTypes.STRING,
+    },
+    scopeOfWork: {
+      type: DataTypes.STRING,
+    },
+    remarks: {
+      type: DataTypes.STRING,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: ["active", "inactive"],
+      defaultValue: "active",
+    },
+    submittedBy: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    treatmentProcessId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: TreatmentProcess,
-        key: "id",
-      },
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -67,4 +83,4 @@ const TypeOfWaste = sequelize.define(
   }
 );
 
-module.exports = TypeOfWaste;
+module.exports = Quotation;

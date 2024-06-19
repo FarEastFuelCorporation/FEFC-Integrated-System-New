@@ -1,12 +1,9 @@
-// models/TypeOfWaste.js
-
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const moment = require("moment-timezone");
-const TreatmentProcess = require("./TreatmentProcess");
 
-const TypeOfWaste = sequelize.define(
-  "TypeOfWaste",
+const QuotationTransportation = sequelize.define(
+  "QuotationTransportation",
   {
     id: {
       type: DataTypes.UUID,
@@ -14,25 +11,39 @@ const TypeOfWaste = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    wasteCategory: {
-      type: DataTypes.STRING,
-      values: ["NHW", "HW"],
-    },
-    wasteCode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    wasteDescription: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    treatmentProcessId: {
+    quotationId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: TreatmentProcess,
+        model: "Quotations",
         key: "id",
       },
+    },
+    vehicleId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    haulingArea: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    mode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    unit: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    unitPrice: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    vatCalculation: {
+      type: DataTypes.STRING,
+    },
+    maxCapacity: {
+      type: DataTypes.INTEGER,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -67,4 +78,4 @@ const TypeOfWaste = sequelize.define(
   }
 );
 
-module.exports = TypeOfWaste;
+module.exports = QuotationTransportation;

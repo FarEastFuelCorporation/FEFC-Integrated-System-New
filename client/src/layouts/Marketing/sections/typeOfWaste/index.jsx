@@ -17,7 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { tokens } from "../../../../theme";
 
-const Clients = () => {
+const TypeOfWastes = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   console.log("apiUrl:", apiUrl);
   const theme = useTheme();
@@ -41,12 +41,15 @@ const Clients = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/marketingDashboard/clients`
+          `${apiUrl}/marketingDashboard/typeOfWastes`
         );
-        const clientRecords = response.data;
-
-        if (clientRecords && Array.isArray(clientRecords.clients)) {
-          setClientData(clientRecords.clients);
+        const typeOfWastesRecords = response.data;
+        console.log(typeOfWastesRecords);
+        if (
+          typeOfWastesRecords &&
+          Array.isArray(typeOfWastesRecords.typeOfWastes)
+        ) {
+          setClientData(typeOfWastesRecords.typeOfWastes);
         } else {
           console.error(
             "clientRecords or clientRecords.clients is undefined or not an array"
@@ -159,49 +162,35 @@ const Clients = () => {
 
   const columns = [
     {
-      field: "clientId",
-      headerName: "Client ID",
+      field: "wasteCategory",
+      headerName: "Waste Category",
       headerAlign: "center",
       align: "center",
       width: 150, // Set a minimum width or initial width
     },
     {
-      field: "clientName",
-      headerName: "Client Name",
+      field: "wasteCode",
+      headerName: "Waste Code",
       headerAlign: "center",
       align: "center",
       flex: 1, // Use flex to allow content to dictate width
       minWidth: 150, // Minimum width
     },
     {
-      field: "address",
-      headerName: "Address",
+      field: "wasteDescription",
+      headerName: "Waste Description",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
     },
     {
-      field: "natureOfBusiness",
-      headerName: "Nature of Business",
+      field: "treatmentProcessId",
+      headerName: "Treatment Process",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
-    },
-    {
-      field: "contactNumber",
-      headerName: "Contact Number",
-      headerAlign: "center",
-      align: "center",
-      width: 180, // Set a width based on content requirements
-    },
-    {
-      field: "clientType",
-      headerName: "Client Type",
-      headerAlign: "center",
-      align: "center",
-      width: 180, // Set a width based on content requirements
     },
     {
       field: "edit",
@@ -380,4 +369,4 @@ const Clients = () => {
   );
 };
 
-export default Clients;
+export default TypeOfWastes;

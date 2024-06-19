@@ -55,6 +55,7 @@ const MarketingSidebar = ({ user }) => {
     () => ({
       "/marketingDashboard/dashboard": "Dashboard",
       "/marketingDashboard/clients": "Clients",
+      "/marketingDashboard/typeOfWastes": "Type Of Wastes",
       "/marketingDashboard/quotations": "Quotations",
       "/marketingDashboard/commissions": "Commissions",
       "/marketingDashboard/form": "Profile Form",
@@ -213,6 +214,13 @@ const MarketingSidebar = ({ user }) => {
             <Item
               title="Clients"
               to="/marketingDashboard/clients"
+              icon={<PeopleOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Type Of Wastes"
+              to="/marketingDashboard/typeOfWastes"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

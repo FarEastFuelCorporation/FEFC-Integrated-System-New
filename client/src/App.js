@@ -11,18 +11,15 @@ import "font-awesome/css/font-awesome.min.css";
 import { tokens } from "./theme";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
-import MarketingRoutes from "./Routes/MarketingRoutes";
-import DispatchingRoutes from "./Routes/DispatchingRoutes";
-import ReceivingRoutes from "./Routes/ReceivingRoutes";
-import HRRoutes from "./Routes/HRRoutes";
 
-import Navbar from "./layouts/Navbar";
-import LandingPage from "./components/LandingPage/LandingPage";
-import Login from "./components/Auth/Login";
-import Signup from "./components/Auth/Signup";
-import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import Navbar from "./OtherComponents/Navbar";
+import LandingPage from "./OtherComponents/LandingPage";
+import Login from "./Auth/Login";
+import Signup from "./Auth/Signup";
+import Dashboard from "./OtherComponents/Dashboard";
 
 const App = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [user, setUser] = useState(null); // State to hold user information
   const [loading, setLoading] = useState(true); // State to indicate loading
   const [theme, colorMode] = useMode();
@@ -32,7 +29,7 @@ const App = () => {
   // Function to update user information after successful login
   const handleLogin = (userData) => {
     setUser(userData);
-    navigate(userData.redirectUrl);
+    navigate("/dashboard");
     setLoading(false); // Set loading to false after user data is set and navigation is done
   };
 
@@ -40,7 +37,7 @@ const App = () => {
   useEffect(() => {
     setLoading(true); // Set loading to true before making the request
     axios
-      .get("http://localhost:3001/api/session", { withCredentials: true })
+      .get(`${apiUrl}/api/session`, { withCredentials: true })
       .then((response) => {
         setUser(response.data.user);
       })
@@ -50,7 +47,7 @@ const App = () => {
       .finally(() => {
         setLoading(false); // Set loading to false after the request completes (success or error)
       });
-  }, []);
+  }, [apiUrl]);
 
   if (loading) {
     return (
@@ -102,48 +99,12 @@ const App = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/login"
-            element={<Login onLogin={handleLogin} />} // Pass handleLogin function to Login component
-          />
-          <Route path="/signup" element={<Signup />} />
-          {user ? ( // Render protected routes only if user is authenticated
-            <>
-              <Route
-                path="/marketingDashboard/*"
-                element={
-                  <RoleProtectedRoute user={user} allowedRoles={[2]}>
-                    <MarketingRoutes user={user} />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dispatchingDashboard/*"
-                element={
-                  <RoleProtectedRoute user={user} allowedRoles={[3]}>
-                    <DispatchingRoutes user={user} />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/receivingDashboard/*"
-                element={
-                  <RoleProtectedRoute user={user} allowedRoles={[4]}>
-                    <ReceivingRoutes user={user} />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/hrDashboard/*"
-                element={
-                  <RoleProtectedRoute user={user} allowedRoles={[9]}>
-                    <HRRoutes user={user} />
-                  </RoleProtectedRoute>
-                }
-              />
-            </>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
+          {user ? (
+            <Route path="/dashboard/*" element={<Dashboard user={user} />} />
           ) : (
-            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="" element={<Navigate to="/login" />} />
           )}
         </Routes>
       </ThemeProvider>

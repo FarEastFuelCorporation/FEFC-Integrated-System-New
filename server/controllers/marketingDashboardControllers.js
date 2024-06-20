@@ -152,8 +152,9 @@ async function getTypeOfWastesController(req, res) {
     const typeOfWastes = await TypeOfWaste.findAll({
       include: {
         model: TreatmentProcess,
-        as: "treatmentProcesses",
+        as: "TreatmentProcess",
       },
+      order: [["wasteCode", "ASC"]],
     });
 
     res.json({ typeOfWastes });

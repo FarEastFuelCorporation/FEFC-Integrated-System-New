@@ -49,7 +49,7 @@ body,
 .landing-page-container {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 100px;
 }
 
 .landing-page-content {
@@ -99,6 +99,7 @@ body,
 }
 
 .login-page .login-container button {
+  width: 100%;
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -106,6 +107,11 @@ body,
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.login-page .login-container .button-switch {
+  background-color: #fff000;
+  color: black;
 }
 
 .login-page .login-container button:disabled {

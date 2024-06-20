@@ -4,19 +4,21 @@ const IdInformation = require("../models/IdInformation");
 // Dashboard controller
 async function getEmployeeRecords(req, res) {
   try {
-    // Fetch all employees with their associated IdInformation
-    const employeeRecords = await Employee.findAll({
-      include: {
-        model: IdInformation,
-        attributes: ["date_expire"], // Specify the fields you want to include from IdInformation
-      },
-    });
+    // Fetch all employees and their IdInformation records
+    const employeeRecords = await Employee.findAll({});
+    const employeeIdRecords = await IdInformation.findAll({});
+
+    // Create a map of IdInformation records for quick lookup by employee_id
+    const idInformationMap = employeeIdRecords.reduce((map, idInfo) => {
+      map[idInfo.employee_id] = idInfo;
+      return map;
+    }, {});
 
     // Calculate various employee counts
     const regularEmployeeCount = employeeRecords.filter(
       (emp) => emp.employeeType === "REGULAR"
     ).length;
-    const probationaryEmployeeCount = 20;
+    const probationaryEmployeeCount = 20; // Assuming this is a fixed value, adjust as needed
     const projectBasedEmployeeCount = employeeRecords.filter(
       (emp) => emp.employeeType === "PROJECT BASED"
     ).length;
@@ -29,7 +31,7 @@ async function getEmployeeRecords(req, res) {
     const currentDate = new Date();
     const expiredContractEmployees = employeeRecords
       .filter((emp) => {
-        const idInfo = emp.IdInformation;
+        const idInfo = idInformationMap[emp.employeeId];
         if (idInfo && idInfo.date_expire) {
           const expirationDate = new Date(idInfo.date_expire);
           // Exclude dates in 1970
@@ -40,9 +42,16 @@ async function getEmployeeRecords(req, res) {
         }
         return false;
       })
+      .map((emp) => {
+        const idInfo = idInformationMap[emp.employeeId];
+        return {
+          ...emp.dataValues,
+          date_expire: idInfo ? idInfo.date_expire : null,
+        };
+      })
       .sort((a, b) => {
-        const dateA = new Date(a.IdInformation.date_expire);
-        const dateB = new Date(b.IdInformation.date_expire);
+        const dateA = new Date(a.date_expire);
+        const dateB = new Date(b.date_expire);
         return dateA - dateB; // Sort by date_expire ascending (oldest to newest)
       });
 
@@ -51,7 +60,6 @@ async function getEmployeeRecords(req, res) {
     // Calculate employee count per department
     const departmentCounts = {};
     employeeRecords.forEach((emp) => {
-      console.log(emp.dataValues.department);
       const department = emp.dataValues.department;
       if (department) {
         if (!departmentCounts[department]) {
@@ -61,8 +69,17 @@ async function getEmployeeRecords(req, res) {
       }
     });
 
+    // Include date_hire from IdInformation
+    const employeeRecordsWithDateHire = employeeRecords.map((emp) => {
+      const idInfo = idInformationMap[emp.employeeId];
+      return {
+        ...emp.dataValues,
+        date_hire: idInfo ? idInfo.date_hire : null,
+      };
+    });
+
     res.json({
-      employeeRecords,
+      employeeRecords: employeeRecordsWithDateHire,
       regularEmployeeCount,
       probationaryEmployeeCount,
       projectBasedEmployeeCount,

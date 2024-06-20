@@ -16,8 +16,20 @@ const IdInformation = require("../models/IdInformation");
 const Quotation = require("../models/Quotation");
 const QuotationWaste = require("../models/QuotationWaste");
 const QuotationTransportation = require("../models/QuotationTransportation");
+const ClientUser = require("../models/ClientUser");
 
 // Define associations
+Client.hasMany(ClientUser, {
+  as: "ClientUser",
+  foreignKey: "clientId",
+  sourceKey: "clientId",
+});
+ClientUser.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "clientId",
+  targetKey: "clientId",
+});
+
 Employee.hasMany(User, {
   as: "User",
   foreignKey: "employeeId",
@@ -26,16 +38,6 @@ Employee.hasMany(User, {
 User.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "employeeId",
-  targetKey: "employeeId",
-});
-
-Employee.hasOne(IdInformation, {
-  foreignKey: "employee_id",
-  sourceKey: "employeeId",
-});
-
-IdInformation.belongsTo(Employee, {
-  foreignKey: "employee_id",
   targetKey: "employeeId",
 });
 
@@ -87,12 +89,12 @@ VehicleLog.belongsTo(Vehicle, {
 });
 
 TreatmentProcess.hasMany(TypeOfWaste, {
-  as: "TypeOfWasteTreatmentProcess",
+  as: "TypeOfWaste",
   foreignKey: "treatmentProcessId",
   sourceKey: "id",
 });
 TypeOfWaste.belongsTo(TreatmentProcess, {
-  as: "TreatmentProcessTypeOfWaste",
+  as: "TreatmentProcess",
   foreignKey: "treatmentProcessId",
   targetKey: "id",
 });
@@ -117,18 +119,6 @@ Quotation.hasMany(QuotationWaste, {
 QuotationWaste.belongsTo(Quotation, {
   as: "Quotation",
   foreignKey: "quotationId",
-  targetKey: "id",
-});
-
-TreatmentProcess.hasMany(TypeOfWaste, {
-  as: "TypeOfWaste",
-  foreignKey: "treatmentProcessId",
-  sourceKey: "id",
-  onDelete: "CASCADE",
-});
-TypeOfWaste.belongsTo(TreatmentProcess, {
-  as: "TreatmentProcess",
-  foreignKey: "treatmentProcessId",
   targetKey: "id",
 });
 

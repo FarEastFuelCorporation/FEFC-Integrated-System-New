@@ -4,13 +4,22 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  postLoginController,
-  postSignupController,
+  createEmployeeSignupController,
+  createEmployeeLoginController,
+  createClientSignupController,
+  createClientLoginController,
 } = require("../controllers/authController");
 
-router.post("/signup", postSignupController);
+// Create Employee Signup route
+router.post("/employeeSignup", createEmployeeSignupController);
 
-// Handle login form submission
-router.post("/login", postLoginController);
+// Create Employee Login route
+router.post("/employeeLogin", createEmployeeLoginController);
+
+// Create Client Signup route
+router.post("/clientSignup", createClientSignupController);
+
+// Create Client Login route
+router.post("/clientLogin", createClientLoginController);
 
 module.exports = router;

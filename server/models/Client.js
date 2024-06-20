@@ -1,7 +1,6 @@
-// models/Client.js
-
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const { v4: uuidv4 } = require("uuid");
 const moment = require("moment-timezone");
 
 const Client = sequelize.define(
@@ -9,7 +8,7 @@ const Client = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: () => uuidv4(), // Generate UUID automatically
       allowNull: false,
       primaryKey: true,
     },
@@ -59,9 +58,14 @@ const Client = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    employeeId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"), // Default value set to current timestamp
       get() {
         const rawValue = this.getDataValue("createdAt");
         return moment(rawValue).tz("Asia/Singapore").format();
@@ -70,6 +74,7 @@ const Client = sequelize.define(
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"), // Default value set to current timestamp
       get() {
         const rawValue = this.getDataValue("updatedAt");
         return moment(rawValue).tz("Asia/Singapore").format();
@@ -89,6 +94,18 @@ const Client = sequelize.define(
   {
     // Enable soft deletion (paranoid mode)
     paranoid: true,
+    hooks: {
+      beforeCreate: (client, options) => {
+        // Set createdAt and updatedAt to current timestamp on creation
+        const currentTime = moment().tz("Asia/Singapore").format();
+        client.createdAt = currentTime;
+        client.updatedAt = currentTime;
+      },
+      beforeUpdate: (client, options) => {
+        // Set updatedAt to current timestamp on update
+        client.updatedAt = moment().tz("Asia/Singapore").format();
+      },
+    },
   }
 );
 

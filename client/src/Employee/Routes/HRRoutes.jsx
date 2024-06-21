@@ -16,7 +16,6 @@ const HRRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<HRDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
-      <Route path="dashboard" element={<Dashboard />} />
       <Route path="team" element={<Team />} />
       <Route path="employee" element={<Contacts />} />
       <Route path="invoices" element={<Invoices />} />

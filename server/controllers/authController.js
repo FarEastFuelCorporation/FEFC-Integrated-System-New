@@ -188,7 +188,6 @@ async function createClientSignupController(req, res) {
 
     const clientDetails = await Client.findOne({
       where: { clientId },
-      attributes: ["clientName"],
     });
 
     const clientRole = clientId.substring(0, 3);
@@ -236,7 +235,6 @@ async function createClientLoginController(req, res) {
 
     const clientDetails = await Client.findOne({
       where: { clientId },
-      attributes: ["clientName"],
     });
 
     const clientRole = clientId.substring(0, 3);

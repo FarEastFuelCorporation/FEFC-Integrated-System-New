@@ -19,7 +19,6 @@ import { tokens } from "../../../../../theme";
 
 const Clients = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  console.log("apiUrl:", apiUrl);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -32,7 +31,11 @@ const Clients = ({ user }) => {
     natureOfBusiness: "",
     contactNumber: "",
     clientType: "",
+    clientPicture: "",
+    submittedBy: user.id,
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState("");
 
   const [clientData, setClientData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
@@ -78,45 +81,14 @@ const Clients = ({ user }) => {
       natureOfBusiness: "",
       contactNumber: "",
       clientType: "",
+      clientPicture: "",
+      submittedBy: user.id,
     });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (formData.id) {
-        const response = await axios.put(
-          `${apiUrl}/marketingDashboard/clients/${formData.id}`,
-          formData
-        );
-        const updatedClient = response.data;
-
-        const updatedData = clientData.map((client) =>
-          client.id === updatedClient.id ? updatedClient : client
-        );
-
-        setClientData(updatedData);
-        setSuccessMessage("Client updated successfully!");
-      } else {
-        const response = await axios.post(
-          `${apiUrl}/marketingDashboard/clients`,
-          formData
-        );
-        const newClient = response.data;
-
-        setClientData([...clientData, newClient]);
-        setSuccessMessage("Client added successfully!");
-      }
-
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error:", error);
-    }
   };
 
   const handleEditClick = (id) => {
@@ -130,6 +102,7 @@ const Clients = ({ user }) => {
         natureOfBusiness: clientToEdit.natureOfBusiness,
         contactNumber: clientToEdit.contactNumber,
         clientType: clientToEdit.clientType,
+        submittedBy: clientToEdit.submittedBy,
       });
       handleOpenModal();
     } else {
@@ -157,13 +130,109 @@ const Clients = ({ user }) => {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFileName(file.name);
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("clientName", formData.clientName);
+      formDataToSend.append("address", formData.address);
+      formDataToSend.append("natureOfBusiness", formData.natureOfBusiness);
+      formDataToSend.append("contactNumber", formData.contactNumber);
+      formDataToSend.append("clientType", formData.clientType);
+      formDataToSend.append("submittedBy", formData.submittedBy);
+
+      // Add clientPicture if it's selected
+      if (selectedFile) {
+        formDataToSend.append("clientPicture", selectedFile);
+      }
+
+      let response;
+
+      if (formData.id) {
+        // Update existing client
+        response = await axios.put(
+          `${apiUrl}/marketingDashboard/clients/${formData.id}`,
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const updatedClient = response.data;
+
+        const updatedData = clientData.map((client) =>
+          client.id === updatedClient.id ? updatedClient : client
+        );
+
+        setClientData(updatedData);
+        setSuccessMessage("Client updated successfully!");
+      } else {
+        // Add new client
+        response = await axios.post(
+          `${apiUrl}/marketingDashboard/clients`,
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const newClient = response.data;
+        setClientData([...clientData, newClient]);
+        setSuccessMessage("Client added successfully!");
+      }
+
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const columns = [
     {
       field: "clientId",
       headerName: "Client ID",
       headerAlign: "center",
       align: "center",
-      width: 150, // Set a minimum width or initial width
+      width: 100, // Set a minimum width or initial width
+    },
+    {
+      field: "clientPicture",
+      headerName: "Logo",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 50,
+      renderCell: (params) => {
+        // Convert Buffer to Uint8Array
+        const uint8Array = new Uint8Array(params.value.data);
+
+        // Create Blob from Uint8Array
+        const blob = new Blob([uint8Array], { type: params.value.type });
+
+        // Create object URL from Blob
+        const imageUrl = URL.createObjectURL(blob);
+
+        return (
+          <img
+            src={imageUrl}
+            alt="Logo"
+            style={{ width: 40, height: 40, borderRadius: "50%" }}
+          />
+        );
+      },
     },
     {
       field: "clientName",
@@ -179,7 +248,7 @@ const Clients = ({ user }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 250,
     },
     {
       field: "natureOfBusiness",
@@ -194,14 +263,14 @@ const Clients = ({ user }) => {
       headerName: "Contact Number",
       headerAlign: "center",
       align: "center",
-      width: 180, // Set a width based on content requirements
+      minWidth: 150,
     },
     {
       field: "clientType",
       headerName: "Client Type",
       headerAlign: "center",
       align: "center",
-      width: 180, // Set a width based on content requirements
+      width: 100, // Set a width based on content requirements
     },
     {
       field: "edit",
@@ -303,6 +372,8 @@ const Clients = ({ user }) => {
       </Box>
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
+          component="form"
+          onSubmit={handleFormSubmit}
           sx={{
             position: "absolute",
             top: "50%",
@@ -367,6 +438,34 @@ const Clients = ({ user }) => {
               INTEGRATED FACILITIES MANAGEMENT
             </MenuItem>
           </TextField>
+          <input
+            type="file"
+            className="form-control visually-hidden"
+            accept="image/*"
+            onChange={handleFileChange}
+            id="clientPicture"
+            name="clientPicture"
+            style={{ display: "none" }}
+          />
+          <label htmlFor="clientPicture">
+            <Typography>File: {fileName}</Typography>
+            <Button
+              variant="contained"
+              component="span"
+              sx={{ mt: 2, backgroundColor: colors.primary[500] }}
+            >
+              Upload Client Picture
+            </Button>
+          </label>
+          <TextField
+            label="Submitted By"
+            name="submittedBy"
+            value={formData.submittedBy}
+            onChange={handleInputChange}
+            fullWidth
+            autoComplete="off"
+            // style={{ display: "none" }}
+          />
           <Button
             variant="contained"
             color="primary"

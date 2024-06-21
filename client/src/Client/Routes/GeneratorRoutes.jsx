@@ -17,7 +17,6 @@ const GeneratorRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<GeneratorDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
-      <Route path="dashboard" element={<Dashboard />} />
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes />} />
       <Route path="quotations" element={<Quotations />} />

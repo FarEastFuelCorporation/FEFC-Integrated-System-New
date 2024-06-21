@@ -23,11 +23,13 @@ Client.hasMany(ClientUser, {
   as: "ClientUser",
   foreignKey: "clientId",
   sourceKey: "clientId",
+  onDelete: "CASCADE",
 });
 ClientUser.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
   targetKey: "clientId",
+  onDelete: "CASCADE",
 });
 
 Employee.hasMany(User, {

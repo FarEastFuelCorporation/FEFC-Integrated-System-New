@@ -33,8 +33,24 @@ async function createClientController(req, res) {
       billerAddress,
       billerContactPerson,
       billerContactNumber,
+      submittedBy,
     } = req.body;
 
+    let clientPicture = null;
+    if (req.file) {
+      clientPicture = req.file.buffer;
+    }
+
+    console.log("clientName:" + clientName);
+    console.log("clientType:" + address);
+    console.log("contactNumber:" + contactNumber);
+    console.log("billerName:" + billerName);
+    console.log("billerAddress:" + billerAddress);
+    console.log("billerContactPerson:" + billerContactPerson);
+    console.log("billerContactNumber:" + billerContactNumber);
+    console.log("clientPicture:" + clientPicture);
+    console.log("clientType:" + clientType);
+    console.log("submittedBy:" + submittedBy);
     // Generate a new client ID based on the client type
     const clientId = await generateClientId(clientType);
 
@@ -50,6 +66,8 @@ async function createClientController(req, res) {
       billerAddress,
       billerContactPerson,
       billerContactNumber,
+      clientPicture,
+      submittedBy,
     });
 
     // Respond with the newly created client data
@@ -71,7 +89,10 @@ async function updateClientController(req, res) {
       req.body;
 
     // Find the client by UUID (id) and update it
-    const updatedClient = await Client.findByPk(id);
+    const updatedClient = await Client.findOne({ id });
+
+    console.log(clientName);
+    console.log(address);
 
     if (updatedClient) {
       // Update client attributes
@@ -104,7 +125,7 @@ async function deleteClientController(req, res) {
     console.log("Soft deleting client with ID:", id);
 
     // Find the client by UUID (id)
-    const clientToDelete = await Client.findByPk(id);
+    const clientToDelete = await Client.findOne({ id });
 
     if (clientToDelete) {
       // Soft delete the client (sets deletedAt timestamp)

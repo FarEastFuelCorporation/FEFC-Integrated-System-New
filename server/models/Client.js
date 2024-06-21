@@ -2,6 +2,14 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment-timezone");
+const fs = require("fs");
+const path = require("path");
+
+// Path to the default image
+const DEFAULT_IMAGE_PATH = path.join(
+  __dirname,
+  "../../public/assets/unknown.png"
+);
 
 const Client = sequelize.define(
   "Client",
@@ -58,7 +66,11 @@ const Client = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    employeeId: {
+    clientPicture: {
+      type: DataTypes.BLOB("long"),
+      allowNull: true,
+    },
+    submittedBy: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -95,11 +107,21 @@ const Client = sequelize.define(
     // Enable soft deletion (paranoid mode)
     paranoid: true,
     hooks: {
-      beforeCreate: (client, options) => {
+      beforeCreate: async (client, options) => {
         // Set createdAt and updatedAt to current timestamp on creation
         const currentTime = moment().tz("Asia/Singapore").format();
         client.createdAt = currentTime;
         client.updatedAt = currentTime;
+
+        // Set default clientPicture if not provided
+        if (!client.clientPicture) {
+          try {
+            const defaultImage = fs.readFileSync(DEFAULT_IMAGE_PATH);
+            client.clientPicture = defaultImage;
+          } catch (error) {
+            console.error("Error reading default image:", error);
+          }
+        }
       },
       beforeUpdate: (client, options) => {
         // Set updatedAt to current timestamp on update

@@ -19,7 +19,6 @@ import { tokens } from "../../../../../theme";
 
 const Clients = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  console.log("apiUrl:", apiUrl);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 

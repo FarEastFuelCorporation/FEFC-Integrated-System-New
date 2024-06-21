@@ -1,6 +1,8 @@
 // routes/marketing_dashboard.js
 
 const express = require("express");
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 const {
   getClientsController,
@@ -16,10 +18,14 @@ const {
 router.get("/clients", getClientsController);
 
 // Create Client route
-router.post("/clients", createClientController);
+router.post("/clients", upload.single("clientPicture"), createClientController);
 
 // Update Client route
-router.put("/clients/:id", updateClientController);
+router.put(
+  "/clients/:id",
+  upload.single("clientPicture"),
+  updateClientController
+);
 
 // Delete Client route
 router.delete("/clients/:id", deleteClientController);

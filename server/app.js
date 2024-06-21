@@ -76,6 +76,7 @@ app.get("/api/session", (req, res) => {
 // Include your routes
 const authRoutes = require("./routes/auth");
 const othersRoutes = require("./routes/others");
+const clientRoutes = require("./routes/client");
 const requestsRoutes = require("./routes/requests");
 const marketingDashboardRoutes = require("./routes/marketing_dashboard");
 const dispatchingDashboardRoutes = require("./routes/dispatching_dashboard");
@@ -86,6 +87,7 @@ const sequelize = require("./config/database");
 
 app.use(authRoutes);
 app.use(othersRoutes);
+app.use("/client", clientRoutes);
 app.use("/requests", requestsRoutes);
 app.use("/marketingDashboard", marketingDashboardRoutes);
 app.use("/dispatchingDashboard", dispatchingDashboardRoutes);

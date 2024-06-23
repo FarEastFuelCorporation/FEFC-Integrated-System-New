@@ -8,12 +8,12 @@ import HRRoutes from "../Employee/Routes/HRRoutes";
 import RoleProtectedRoute from "../OtherComponents/RoleProtectedRoute";
 import { Navigate } from "react-router-dom";
 
-const Dashboard = ({ user }) => {
+const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
     case "GEN":
       return (
         <RoleProtectedRoute user={user} allowedRoles={["GEN"]}>
-          <GeneratorRoutes user={user} />
+          <GeneratorRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case "TRP":

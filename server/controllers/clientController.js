@@ -12,22 +12,6 @@ async function getClientRecords(req, res) {
   }
 }
 
-// Update client details
-async function updateClientRecords(req, res) {
-  try {
-    const client = await Client.findByPk(req.params.id);
-    if (client) {
-      await client.update(req.body);
-      res.json(client);
-    } else {
-      res.status(404).json({ error: "Client not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
 module.exports = {
   getClientRecords,
-  updateClientRecords,
 };

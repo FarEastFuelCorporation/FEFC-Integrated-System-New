@@ -15,36 +15,10 @@ import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import Item from "../../../OtherComponents/Item";
 import log from "loglevel";
 
 log.setLevel("info");
-
-const Item = ({ title, to, icon, selected, setSelected }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    log.info(`Navigating to ${to}`);
-    setSelected(title);
-    navigate(to);
-  };
-
-  return (
-    <MenuItem
-      active={selected === title} // Apply 'active' prop based on selected state
-      style={{
-        color: colors.grey[100],
-        backgroundColor:
-          selected === title ? colors.primary[500] : "transparent", // Apply background color based on active state
-      }}
-      onClick={handleClick}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-    </MenuItem>
-  );
-};
 
 const MarketingSidebar = ({ user }) => {
   const theme = useTheme();

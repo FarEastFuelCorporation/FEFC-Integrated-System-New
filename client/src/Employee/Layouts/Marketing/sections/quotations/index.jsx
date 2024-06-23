@@ -1,14 +1,7 @@
+// components/Quotations.js
+
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  IconButton,
-  Modal,
-  Typography,
-  TextField,
-  Button,
-  useTheme,
-  MenuItem,
-} from "@mui/material";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -16,21 +9,39 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { tokens } from "../../../../../theme";
+import QuotationFormModal from "../../../../../OtherComponents/Modals/QuotationFormModal";
 
 const Quotations = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [openModal, setOpenModal] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     id: "",
-    wasteCategory: "",
-    wasteCode: "",
-    wasteDescription: "",
-    treatmentProcessId: "",
-  });
+    clientId: "",
+    quotationCode: "",
+    validity: "",
+    termsCharge: "",
+    termsBuying: "",
+    scopeOfWork: "",
+    remarks: "",
+    quotationWastes: [
+      {
+        id: null,
+        quotationId: null,
+        wasteId: "",
+        wasteName: "",
+        mode: "",
+        unit: "",
+        unitPrice: 0,
+        vatCalculation: "",
+        maxCapacity: 0,
+      },
+    ],
+  };
 
+  const [openModal, setOpenModal] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
   const [employeeData, setEmployeeData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -63,22 +74,23 @@ const Quotations = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    clearFormData();
-  };
-
-  const clearFormData = () => {
-    setFormData({
-      id: "",
-      wasteCategory: "",
-      wasteCode: "",
-      wasteDescription: "",
-      treatmentProcessId: "",
-    });
+    setFormData(initialFormData);
+    setSuccessMessage("");
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleInputChangeWaste = (index, field, value) => {
+    const updatedWastes = [...formData.quotationWastes];
+    updatedWastes[index][field] = value;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      quotationWastes: updatedWastes,
+    }));
   };
 
   const handleFormSubmit = async (e) => {
@@ -99,7 +111,7 @@ const Quotations = () => {
         setSuccessMessage("Client updated successfully!");
       } else {
         const response = await axios.post(
-          `${apiUrl}/marketingDashboard/typeOfWaste`,
+          `${apiUrl}/marketingDashboard/clients`,
           formData
         );
         const newClient = response.data;
@@ -120,11 +132,13 @@ const Quotations = () => {
       setFormData({
         id: clientToEdit.id,
         clientId: clientToEdit.clientId,
-        clientName: clientToEdit.clientName,
-        address: clientToEdit.address,
-        natureOfBusiness: clientToEdit.natureOfBusiness,
-        contactNumber: clientToEdit.contactNumber,
-        clientType: clientToEdit.clientType,
+        quotationCode: clientToEdit.quotationCode,
+        validity: clientToEdit.validity,
+        termsCharge: clientToEdit.termsCharge,
+        termsBuying: clientToEdit.termsBuying,
+        scopeOfWork: clientToEdit.scopeOfWork,
+        remarks: clientToEdit.remarks,
+        quotationWastes: [...clientToEdit.quotationWastes],
       });
       handleOpenModal();
     } else {
@@ -296,66 +310,15 @@ const Quotations = () => {
           }}
         />
       </Box>
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <Typography variant="h6" component="h2">
-            {formData.id ? "Update Quotation" : "Add New Quotation"}
-          </Typography>
-          <TextField
-            label="wasteCategory"
-            name="wasteCategory"
-            value={formData.clientName}
-            onChange={handleInputChange}
-            fullWidth
-            autoComplete="off"
-          />
-          <TextField
-            label="wasteCode"
-            name="wasteCode"
-            value={formData.address}
-            onChange={handleInputChange}
-            fullWidth
-            autoComplete="off"
-          />
-          <TextField
-            label="wasteDescription"
-            name="wasteDescription"
-            value={formData.natureOfBusiness}
-            onChange={handleInputChange}
-            fullWidth
-            autoComplete="off"
-          />
-          <TextField
-            label="treatmentProcessId"
-            name="treatmentProcessId"
-            value={formData.contactNumber}
-            onChange={handleInputChange}
-            fullWidth
-            autoComplete="off"
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFormSubmit}
-          >
-            {formData.id ? "Update Client" : "Add Client"}
-          </Button>
-        </Box>
-      </Modal>
+      <QuotationFormModal
+        open={openModal}
+        handleCloseModal={handleCloseModal}
+        handleInputChange={handleInputChange}
+        handleFormSubmit={handleFormSubmit}
+        formData={formData}
+        successMessage={successMessage}
+        handleInputChangeWaste={handleInputChangeWaste}
+      />
     </Box>
   );
 };

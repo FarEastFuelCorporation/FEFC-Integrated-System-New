@@ -2,6 +2,7 @@
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const { v4: uuidv4 } = require("uuid");
 const moment = require("moment-timezone");
 
 const Quotation = sequelize.define(
@@ -9,7 +10,7 @@ const Quotation = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: () => uuidv4(), // Generate UUID automatically
       allowNull: false,
       primaryKey: true,
     },

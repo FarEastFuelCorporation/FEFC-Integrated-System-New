@@ -33,6 +33,10 @@ const App = () => {
     setLoading(false); // Set loading to false after user data is set and navigation is done
   };
 
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   // Function to fetch session data on initial load
   useEffect(() => {
     setLoading(true); // Set loading to true before making the request
@@ -102,7 +106,12 @@ const App = () => {
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           {user ? (
-            <Route path="/dashboard/*" element={<Dashboard user={user} />} />
+            <Route
+              path="/dashboard/*"
+              element={
+                <Dashboard user={user} onUpdateUser={handleUpdateUser} />
+              }
+            />
           ) : (
             <Route path="" element={<Navigate to="/login" />} />
           )}

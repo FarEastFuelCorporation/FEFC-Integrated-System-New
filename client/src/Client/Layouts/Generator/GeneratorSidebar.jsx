@@ -10,56 +10,31 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import SuccessMessage from "../../../OtherComponents/SuccessMessage";
+import Item from "../../../OtherComponents/Item";
+import {
+  HomeOutlined as HomeOutlinedIcon,
+  PeopleOutlined as PeopleOutlinedIcon,
+  ContactsOutlined as ContactsOutlinedIcon,
+  ReceiptOutlined as ReceiptOutlinedIcon,
+  PersonOutlined as PersonOutlinedIcon,
+  CalendarTodayOutlined as CalendarTodayOutlinedIcon,
+  HelpOutlined as HelpOutlinedIcon,
+  BarChartOutlined as BarChartOutlinedIcon,
+  PieChartOutlined as PieChartOutlinedIcon,
+  TimelineOutlined as TimelineOutlinedIcon,
+  MenuOutlined as MenuOutlinedIcon,
+} from "@mui/icons-material";
 import axios from "axios";
-import log from "loglevel";
-
-log.setLevel("info");
-
-const Item = ({ title, to, icon, selected, setSelected }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    log.info(`Navigating to ${to}`);
-    setSelected(title);
-    navigate(to);
-  };
-
-  return (
-    <MenuItem
-      active={selected === title} // Apply 'active' prop based on selected state
-      style={{
-        color: colors.grey[100],
-        backgroundColor:
-          selected === title ? colors.primary[500] : "transparent", // Apply background color based on active state
-      }}
-      onClick={handleClick}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-    </MenuItem>
-  );
-};
 
 const GeneratorSidebar = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathToTitleMap = useMemo(
     () => ({
@@ -76,27 +51,32 @@ const GeneratorSidebar = ({ user }) => {
       "/dashboard/line": "Line Chart",
     }),
     []
-  ); // No dependencies, as this is a static object
+  );
 
   const initialSelected = pathToTitleMap[location.pathname] || "Dashboard";
   const [selected, setSelected] = useState(initialSelected);
-  const [profilePictureSrc, setProfilePictureSrc] = useState(null);
+
+  const [profilePictureSrc, setProfilePictureSrc] = useState(
+    "/assets/unknown.png"
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const [clientDetails, setClientDetails] = useState({
-    clientId: user?.clientDetails?.clientId || "",
-    clientName: user?.clientDetails?.clientName || "",
-    address: user?.clientDetails?.address || "",
-    natureOfBusiness: user?.clientDetails?.natureOfBusiness || "",
-    contactNumber: user?.clientDetails?.contactNumber || "",
-    clientType: user?.clientDetails?.clientType || "",
-    billerName: user?.clientDetails?.billerName || "",
-    billerAddress: user?.clientDetails?.billerAddress || "",
-    billerContactPerson: user?.clientDetails?.billerContactPerson || "",
-    billerContactNumber: user?.clientDetails?.billerContactNumber || "",
-    clientPicture: user?.clientDetails?.clientPicture || "",
+    clientId: "",
+    clientName: "",
+    address: "",
+    natureOfBusiness: "",
+    contactNumber: "",
+    clientType: "",
+    billerName: "",
+    billerAddress: "",
+    billerContactPerson: "",
+    billerContactNumber: "",
+    clientPicture: "",
   });
 
   useEffect(() => {
@@ -105,41 +85,51 @@ const GeneratorSidebar = ({ user }) => {
   }, [location, pathToTitleMap]);
 
   useEffect(() => {
-    const convertUint8ArrayToBlob = () => {
-      if (
-        !user ||
-        !user.clientDetails ||
-        !user.clientDetails.clientPicture ||
-        !user.clientDetails.clientPicture.data
-      ) {
-        // If no user or no profile picture data, set default image
-        setProfilePictureSrc("/assets/unknown.png");
-        return;
-      }
-
+    if (
+      user &&
+      user.clientDetails &&
+      user.clientDetails.clientPicture &&
+      user.clientDetails.clientPicture.data
+    ) {
       const clientPictureData = new Uint8Array(
         user.clientDetails.clientPicture.data
       );
-
-      // Check if clientPictureData is indeed a Uint8Array
-      if (clientPictureData instanceof Uint8Array) {
-        const blob = new Blob([clientPictureData], {
-          type: user.clientDetails.clientPicture.type,
-        });
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          setProfilePictureSrc(reader.result);
-        };
-        reader.readAsDataURL(blob);
-      } else {
-        // Handle case where clientPictureData is not a Uint8Array (optional)
-        console.error("Client picture data is not a Uint8Array");
+      const blob = new Blob([clientPictureData], {
+        type: user.clientDetails.clientPicture.type,
+      });
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfilePictureSrc(reader.result);
+      };
+      reader.onerror = () => {
+        console.error("Error reading the Blob as Data URL");
         setProfilePictureSrc("/assets/unknown.png");
-      }
-    };
+      };
+      reader.readAsDataURL(blob);
+    } else {
+      setProfilePictureSrc("/assets/unknown.png");
+    }
+  }, [user]);
 
-    convertUint8ArrayToBlob();
+  const initializeClientDetails = () => {
+    const { clientDetails } = user || {};
+    setClientDetails({
+      clientId: clientDetails?.clientId || "",
+      clientName: clientDetails?.clientName || "",
+      address: clientDetails?.address || "",
+      natureOfBusiness: clientDetails?.natureOfBusiness || "",
+      contactNumber: clientDetails?.contactNumber || "",
+      clientType: clientDetails?.clientType || "",
+      billerName: clientDetails?.billerName || "",
+      billerAddress: clientDetails?.billerAddress || "",
+      billerContactPerson: clientDetails?.billerContactPerson || "",
+      billerContactNumber: clientDetails?.billerContactNumber || "",
+      clientPicture: clientDetails?.clientPicture || "",
+    });
+  };
+
+  useEffect(() => {
+    initializeClientDetails();
   }, [user]);
 
   const handleCollapse = () => {
@@ -173,8 +163,6 @@ const GeneratorSidebar = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(clientDetails);
-
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("clientName", clientDetails.clientName);
@@ -200,10 +188,8 @@ const GeneratorSidebar = ({ user }) => {
         formDataToSend.append("clientPicture", selectedFile);
       }
 
-      let response;
-
       // Update existing client
-      response = await axios.put(
+      await axios.put(
         `${apiUrl}/client/${clientDetails.clientId}`,
         formDataToSend,
         {
@@ -213,8 +199,18 @@ const GeneratorSidebar = ({ user }) => {
         }
       );
 
-      setSuccessMessage("Client updated successfully!");
+      // Update the profile picture source if a new file was uploaded
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setProfilePictureSrc(reader.result);
+        };
+        reader.readAsDataURL(selectedFile);
+      }
 
+      setSuccessMessage("Client updated successfully!");
+      setShowSuccessMessage(true); // Show the success message
+      initializeClientDetails();
       handleCloseModal();
     } catch (error) {
       console.error("Error:", error);
@@ -241,6 +237,12 @@ const GeneratorSidebar = ({ user }) => {
         },
       }}
     >
+      {showSuccessMessage && (
+        <SuccessMessage
+          message={successMessage}
+          onClose={() => setShowSuccessMessage(false)}
+        />
+      )}
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
           <MenuItem
@@ -281,7 +283,7 @@ const GeneratorSidebar = ({ user }) => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={clientDetails.profilePictureSrc}
+                  src={profilePictureSrc}
                   style={{ borderRadius: "50%" }}
                 />
               </Box>
@@ -322,11 +324,12 @@ const GeneratorSidebar = ({ user }) => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to=""
+              to="/dashboard/dashboard"
               icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Dashboard"}
+              setSelected={() => setSelected("Dashboard")}
             />
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -336,32 +339,33 @@ const GeneratorSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Clients"
-              to="clients"
+              to="/dashboard/clients"
               icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Clients"}
+              setSelected={() => setSelected("Clients")}
             />
             <Item
               title="Type Of Wastes"
-              to="typeOfWastes"
+              to="/dashboard/typeOfWastes"
               icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Type Of Wastes"}
+              setSelected={() => setSelected("Type Of Wastes")}
             />
             <Item
               title="Quotations"
-              to="quotations"
+              to="/dashboard/quotations"
               icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Quotations"}
+              setSelected={() => setSelected("Quotations")}
             />
             <Item
               title="Commissions"
-              to="commissions"
+              to="/dashboard/commissions"
               icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Commissions"}
+              setSelected={() => setSelected("Commissions")}
             />
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -371,25 +375,26 @@ const GeneratorSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Profile Form"
-              to="form"
+              to="/dashboard/form"
               icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Profile Form"}
+              setSelected={() => setSelected("Profile Form")}
             />
             <Item
               title="Calendar"
-              to="calendar"
+              to="/dashboard/calendar"
               icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Calendar"}
+              setSelected={() => setSelected("Calendar")}
             />
             <Item
               title="FAQ Page"
-              to="faq"
+              to="/dashboard/faq"
               icon={<HelpOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "FAQ Page"}
+              setSelected={() => setSelected("FAQ Page")}
             />
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -399,24 +404,24 @@ const GeneratorSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="bar"
+              to="/dashboard/bar"
               icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Bar Chart"}
+              setSelected={() => setSelected("Bar Chart")}
             />
             <Item
               title="Pie Chart"
-              to="pie"
+              to="/dashboard/pie"
               icon={<PieChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Pie Chart"}
+              setSelected={() => setSelected("Pie Chart")}
             />
             <Item
               title="Line Chart"
-              to="line"
+              to="/dashboard/line"
               icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selected === "Line Chart"}
+              setSelected={() => setSelected("Line Chart")}
             />
           </Box>
         </Menu>

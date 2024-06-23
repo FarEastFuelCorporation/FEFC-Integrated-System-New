@@ -16,6 +16,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { tokens } from "../../../../../theme";
+import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 
 const Clients = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -39,6 +40,7 @@ const Clients = ({ user }) => {
 
   const [clientData, setClientData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +69,16 @@ const Clients = ({ user }) => {
     setOpenModal(true);
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 5000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
@@ -84,6 +96,7 @@ const Clients = ({ user }) => {
       clientPicture: "",
       submittedBy: user.id,
     });
+    setFileName("");
   };
 
   const handleInputChange = (e) => {
@@ -102,7 +115,7 @@ const Clients = ({ user }) => {
         natureOfBusiness: clientToEdit.natureOfBusiness,
         contactNumber: clientToEdit.contactNumber,
         clientType: clientToEdit.clientType,
-        submittedBy: clientToEdit.submittedBy,
+        submittedBy: user.id,
       });
       handleOpenModal();
     } else {
@@ -194,6 +207,7 @@ const Clients = ({ user }) => {
         setSuccessMessage("Client added successfully!");
       }
 
+      setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
       console.error("Error:", error);
@@ -216,22 +230,42 @@ const Clients = ({ user }) => {
       sortable: false,
       width: 50,
       renderCell: (params) => {
-        // Convert Buffer to Uint8Array
-        const uint8Array = new Uint8Array(params.value.data);
+        // Check if params.value is valid
+        if (params.value && params.value.data && params.value.type) {
+          try {
+            // Convert Buffer to Uint8Array
+            const uint8Array = new Uint8Array(params.value.data);
+            // Create Blob from Uint8Array
+            const blob = new Blob([uint8Array], { type: params.value.type });
+            // Create object URL from Blob
+            const imageUrl = URL.createObjectURL(blob);
 
-        // Create Blob from Uint8Array
-        const blob = new Blob([uint8Array], { type: params.value.type });
-
-        // Create object URL from Blob
-        const imageUrl = URL.createObjectURL(blob);
-
-        return (
-          <img
-            src={imageUrl}
-            alt="Logo"
-            style={{ width: 40, height: 40, borderRadius: "50%" }}
-          />
-        );
+            return (
+              <img
+                src={imageUrl}
+                alt="Logo"
+                style={{ width: 40, height: 40, borderRadius: "50%" }}
+              />
+            );
+          } catch (error) {
+            console.error("Error creating image URL:", error);
+            return (
+              <img
+                src="/assets/unknown.png"
+                alt="Logo"
+                style={{ width: 40, height: 40, borderRadius: "50%" }}
+              />
+            );
+          }
+        } else {
+          return (
+            <img
+              src="/assets/unknown.png"
+              alt="Logo"
+              style={{ width: 40, height: 40, borderRadius: "50%" }}
+            />
+          );
+        }
       },
     },
     {
@@ -307,7 +341,7 @@ const Clients = ({ user }) => {
   ];
 
   return (
-    <Box p="20px" width="100% !important">
+    <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
         <Header title="Clients" subtitle="List of Clients" />
         <Box display="flex">
@@ -316,16 +350,12 @@ const Clients = ({ user }) => {
           </IconButton>
         </Box>
       </Box>
-      {successMessage && (
-        <Box bgcolor="success.main" p={1}>
-          <Typography
-            variant="body1"
-            color="success"
-            sx={{ marginTop: "10px", textAlign: "center" }}
-          >
-            {successMessage}
-          </Typography>
-        </Box>
+
+      {showSuccessMessage && (
+        <SuccessMessage
+          message={successMessage}
+          onClose={() => setShowSuccessMessage(false)}
+        />
       )}
       <Box
         m="40px 0 0 0"
@@ -464,7 +494,7 @@ const Clients = ({ user }) => {
             onChange={handleInputChange}
             fullWidth
             autoComplete="off"
-            // style={{ display: "none" }}
+            style={{ display: "none" }}
           />
           <Button
             variant="contained"

@@ -41,16 +41,6 @@ async function createClientController(req, res) {
       clientPicture = req.file.buffer;
     }
 
-    console.log("clientName:" + clientName);
-    console.log("clientType:" + address);
-    console.log("contactNumber:" + contactNumber);
-    console.log("billerName:" + billerName);
-    console.log("billerAddress:" + billerAddress);
-    console.log("billerContactPerson:" + billerContactPerson);
-    console.log("billerContactNumber:" + billerContactNumber);
-    console.log("clientPicture:" + clientPicture);
-    console.log("clientType:" + clientType);
-    console.log("submittedBy:" + submittedBy);
     // Generate a new client ID based on the client type
     const clientId = await generateClientId(clientType);
 
@@ -85,14 +75,26 @@ async function updateClientController(req, res) {
     const id = req.params.id;
     console.log("Updating client with ID:", id);
 
-    const { clientName, address, natureOfBusiness, contactNumber, clientType } =
-      req.body;
+    const {
+      clientName,
+      address,
+      natureOfBusiness,
+      contactNumber,
+      clientType,
+      billerName,
+      billerAddress,
+      billerContactPerson,
+      billerContactNumber,
+      submittedBy,
+    } = req.body;
+
+    let clientPicture = null;
+    if (req.file) {
+      clientPicture = req.file.buffer;
+    }
 
     // Find the client by UUID (id) and update it
     const updatedClient = await Client.findOne({ id });
-
-    console.log(clientName);
-    console.log(address);
 
     if (updatedClient) {
       // Update client attributes
@@ -101,6 +103,12 @@ async function updateClientController(req, res) {
       updatedClient.natureOfBusiness = natureOfBusiness;
       updatedClient.contactNumber = contactNumber;
       updatedClient.clientType = clientType;
+      updatedClient.billerName = billerName;
+      updatedClient.billerAddress = billerAddress;
+      updatedClient.billerContactPerson = billerContactPerson;
+      updatedClient.billerContactNumber = billerContactNumber;
+      updatedClient.submittedBy = submittedBy;
+      updatedClient.clientPicture = clientPicture;
 
       // Save the updated client
       await updatedClient.save();
@@ -151,7 +159,7 @@ async function createTreatmentProcessController(req, res) {
   try {
     // Extracting data from the request body
     const { treatmentProcess } = req.body;
-    console.log(treatmentProcess);
+
     // Creating a new client
     const newTreatmentProcess = await TreatmentProcess.create({
       treatmentProcess,

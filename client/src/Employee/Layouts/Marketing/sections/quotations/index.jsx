@@ -84,13 +84,12 @@ const Quotations = () => {
   };
 
   const handleInputChangeWaste = (index, field, value) => {
-    const updatedWastes = [...formData.quotationWastes];
-    updatedWastes[index][field] = value;
-
-    setFormData((prevData) => ({
-      ...prevData,
-      quotationWastes: updatedWastes,
-    }));
+    const updatedWastes = formData.quotationWastes.map((waste, i) =>
+      i === index ? { ...waste, [field]: value } : waste
+    );
+    handleInputChange({
+      target: { name: "quotationWastes", value: updatedWastes },
+    });
   };
 
   const handleFormSubmit = async (e) => {

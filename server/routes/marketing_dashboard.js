@@ -10,8 +10,10 @@ const {
   updateClientController,
   deleteClientController,
   createTreatmentProcessController,
-  createTypeOfWastesController,
+  createTypeOfWasteController,
   getTypeOfWastesController,
+  getQuotationsController,
+  createQuotationController,
 } = require("../controllers/marketingDashboardControllers");
 
 // Get Clients route
@@ -37,6 +39,12 @@ router.post("/treatmentProcess", createTreatmentProcessController);
 router.get("/typeOfWastes", getTypeOfWastesController);
 
 // Create Type Of Waste route
-router.post("/typeOfWastes", createTypeOfWastesController);
+router.post("/typeOfWastes", createTypeOfWasteController);
+
+// Get Quotations route
+router.get("/quotations", getQuotationsController);
+
+// Create Quotation route
+router.post("/quotations", createQuotationController);
 
 module.exports = router;

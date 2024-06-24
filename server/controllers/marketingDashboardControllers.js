@@ -1,5 +1,7 @@
 require("dotenv").config();
 const Client = require("../models/Client");
+const Quotation = require("../models/Quotation");
+const QuotationWaste = require("../models/QuotationWaste");
 const TreatmentProcess = require("../models/TreatmentProcess");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const generateClientId = require("../utils/generateClientId");
@@ -174,7 +176,7 @@ async function createTreatmentProcessController(req, res) {
   }
 }
 
-// Get Clients controller
+// Get Type Of Waste controller
 async function getTypeOfWastesController(req, res) {
   try {
     // Fetch all clients from the database
@@ -194,7 +196,7 @@ async function getTypeOfWastesController(req, res) {
 }
 
 // Create Type Of Waste controller
-async function createTypeOfWastesController(req, res) {
+async function createTypeOfWasteController(req, res) {
   try {
     // Extracting data from the request body
     const { wasteCategory, wasteCode, wasteDescription, treatmentProcessId } =
@@ -216,6 +218,89 @@ async function createTypeOfWastesController(req, res) {
   }
 }
 
+// Get Quotations controller
+async function getQuotationsController(req, res) {
+  try {
+    // Fetch all clients from the database
+    const typeOfWastes = await TypeOfWaste.findAll({
+      include: {
+        model: TreatmentProcess,
+        as: "TreatmentProcess",
+      },
+      order: [["wasteCode", "ASC"]],
+    });
+
+    res.json({ typeOfWastes });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Create Quotation controller
+async function createQuotationController(req, res) {
+  const {
+    quotationCode,
+    validity,
+    clientId,
+    termsCharge,
+    termsBuying,
+    scopeOfWork,
+    remarks,
+    submittedBy,
+    quotationWastes, // This should be an array of quotation wastes
+  } = req.body;
+
+  try {
+    // Create the quotation record
+    const quotation = await Quotation.create({
+      quotationCode,
+      validity,
+      clientId,
+      termsCharge,
+      termsBuying,
+      scopeOfWork,
+      remarks,
+      submittedBy,
+    });
+
+    // Create the quotation wastes associated with this quotation
+    const createdQuotationWastes = await Promise.all(
+      quotationWastes.map(async (waste) => {
+        const {
+          wasteId,
+          wasteName,
+          mode,
+          unit,
+          unitPrice,
+          vatCalculation,
+          maxCapacity,
+        } = waste;
+
+        return await QuotationWaste.create({
+          quotationId: quotation.id,
+          wasteId,
+          wasteName,
+          mode,
+          unit,
+          unitPrice,
+          vatCalculation,
+          maxCapacity,
+        });
+      })
+    );
+
+    // Response with created quotation and its wastes
+    res.status(201).json({
+      quotation,
+      quotationWastes: createdQuotationWastes,
+    });
+  } catch (error) {
+    console.error("Error creating quotation:", error);
+    res.status(500).json({ error: "Failed to create quotation" });
+  }
+}
+
 module.exports = {
   getClientsController,
   createClientController,
@@ -223,5 +308,7 @@ module.exports = {
   deleteClientController,
   createTreatmentProcessController,
   getTypeOfWastesController,
-  createTypeOfWastesController,
+  createTypeOfWasteController,
+  getQuotationsController,
+  createQuotationController,
 };

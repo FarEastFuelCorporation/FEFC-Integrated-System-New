@@ -22,11 +22,9 @@ import { tokens } from "../../theme";
 const QuotationFormModal = ({
   open,
   handleCloseModal,
-  handleInputChange,
-  handleFormSubmit,
   formData,
   successMessage,
-  handleInputChangeWaste,
+  handleInputChange,
 }) => {
   const [clients, setClients] = useState([]);
   const theme = useTheme();
@@ -90,7 +88,18 @@ const QuotationFormModal = ({
     const updatedWastes = formData.quotationWastes.filter(
       (waste, i) => i !== index
     );
-    handleInputChangeWaste(updatedWastes);
+    handleInputChange({
+      target: { name: "quotationWastes", value: updatedWastes },
+    });
+  };
+
+  const handleWasteInputChangeLocal = (index, field, value) => {
+    const updatedWastes = formData.quotationWastes.map((waste, i) =>
+      i === index ? { ...waste, [field]: value } : waste
+    );
+    handleInputChange({
+      target: { name: "quotationWastes", value: updatedWastes },
+    });
   };
 
   const handleWasteCodeChange = (index, value) => {
@@ -99,10 +108,26 @@ const QuotationFormModal = ({
     );
 
     if (selectedWasteType) {
-      handleInputChangeWaste(index, "wasteId", value);
-      handleInputChangeWaste(index, "wasteName", selectedWasteType.wasteName);
+      handleWasteInputChangeLocal(index, "wasteId", value);
+      handleWasteInputChangeLocal(
+        index,
+        "wasteName",
+        selectedWasteType.wasteName
+      );
     } else {
       console.warn(`No waste type found for id: ${value}`);
+    }
+  };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      await axios.post(`${apiUrl}/marketingDashboard/quotations`, formData);
+      // Assuming successMessage is handled by the parent component
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error submitting the form:", error);
     }
   };
 
@@ -150,7 +175,7 @@ const QuotationFormModal = ({
                 <InputLabel
                   id="client-select-label"
                   style={{
-                    color: colors.grey[100], // Adjust color as needed
+                    color: colors.grey[100],
                   }}
                 >
                   Client
@@ -263,7 +288,7 @@ const QuotationFormModal = ({
                       <InputLabel
                         id={`waste-type-select-label-${index}`}
                         style={{
-                          color: colors.grey[100], // Adjust color as needed
+                          color: colors.grey[100],
                         }}
                       >
                         Type of Waste
@@ -297,7 +322,7 @@ const QuotationFormModal = ({
                       name={`quotationWastes[${index}].wasteName`}
                       value={waste.wasteName}
                       onChange={(e) =>
-                        handleInputChangeWaste(
+                        handleWasteInputChangeLocal(
                           index,
                           "wasteName",
                           e.target.value
@@ -316,7 +341,7 @@ const QuotationFormModal = ({
                       <InputLabel
                         id={`mode-label-${index}`}
                         style={{
-                          color: colors.grey[100], // Adjust color as needed
+                          color: colors.grey[100],
                         }}
                       >
                         Mode
@@ -326,7 +351,11 @@ const QuotationFormModal = ({
                         name={`quotationWastes[${index}].mode`}
                         value={waste.mode}
                         onChange={(e) =>
-                          handleInputChangeWaste(index, "mode", e.target.value)
+                          handleWasteInputChangeLocal(
+                            index,
+                            "mode",
+                            e.target.value
+                          )
                         }
                         fullWidth
                         inputProps={{
@@ -347,7 +376,7 @@ const QuotationFormModal = ({
                       <InputLabel
                         id={`unit-label-${index}`}
                         style={{
-                          color: colors.grey[100], // Adjust color as needed
+                          color: colors.grey[100],
                         }}
                       >
                         Unit
@@ -357,7 +386,11 @@ const QuotationFormModal = ({
                         name={`quotationWastes[${index}].unit`}
                         value={waste.unit}
                         onChange={(e) =>
-                          handleInputChangeWaste(index, "unit", e.target.value)
+                          handleWasteInputChangeLocal(
+                            index,
+                            "unit",
+                            e.target.value
+                          )
                         }
                         fullWidth
                         inputProps={{
@@ -379,7 +412,7 @@ const QuotationFormModal = ({
                       name={`quotationWastes[${index}].unitPrice`}
                       value={waste.unitPrice}
                       onChange={(e) =>
-                        handleInputChangeWaste(
+                        handleWasteInputChangeLocal(
                           index,
                           "unitPrice",
                           e.target.value
@@ -398,7 +431,7 @@ const QuotationFormModal = ({
                       <InputLabel
                         id={`vat-calculation-label-${index}`}
                         style={{
-                          color: colors.grey[100], // Adjust color as needed
+                          color: colors.grey[100],
                         }}
                       >
                         VAT Calculation
@@ -408,7 +441,7 @@ const QuotationFormModal = ({
                         name={`quotationWastes[${index}].vatCalculation`}
                         value={waste.vatCalculation}
                         onChange={(e) =>
-                          handleInputChangeWaste(
+                          handleWasteInputChangeLocal(
                             index,
                             "vatCalculation",
                             e.target.value
@@ -434,7 +467,7 @@ const QuotationFormModal = ({
                       name={`quotationWastes[${index}].maxCapacity`}
                       value={waste.maxCapacity}
                       onChange={(e) =>
-                        handleInputChangeWaste(
+                        handleWasteInputChangeLocal(
                           index,
                           "maxCapacity",
                           e.target.value

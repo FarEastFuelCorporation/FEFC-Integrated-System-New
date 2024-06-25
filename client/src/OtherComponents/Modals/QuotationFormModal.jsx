@@ -108,12 +108,14 @@ const QuotationFormModal = ({
     );
 
     if (selectedWasteType) {
-      handleWasteInputChangeLocal(index, "wasteId", value);
-      handleWasteInputChangeLocal(
-        index,
-        "wasteName",
-        selectedWasteType.wasteName
+      const updatedWastes = formData.quotationWastes.map((waste, i) =>
+        i === index
+          ? { ...waste, wasteId: value, wasteName: selectedWasteType.wasteName }
+          : waste
       );
+      handleInputChange({
+        target: { name: "quotationWastes", value: updatedWastes },
+      });
     } else {
       console.warn(`No waste type found for id: ${value}`);
     }

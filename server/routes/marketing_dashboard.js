@@ -14,6 +14,8 @@ const {
   getTypeOfWastesController,
   getQuotationsController,
   createQuotationController,
+  deleteQuotationController,
+  updateQuotationController,
 } = require("../controllers/marketingDashboardControllers");
 
 // Get Clients route
@@ -46,5 +48,11 @@ router.get("/quotations", getQuotationsController);
 
 // Create Quotation route
 router.post("/quotations", createQuotationController);
+
+// Update Quotation route
+router.put("/quotations/:id", updateQuotationController);
+
+// Delete Quotation route
+router.delete("/quotations/:id", deleteQuotationController);
 
 module.exports = router;

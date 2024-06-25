@@ -19,7 +19,7 @@ const MarketingRoutes = ({ user }) => (
       <Route path="" element={<Dashboard />} />
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes />} />
-      <Route path="quotations" element={<Quotations />} />
+      <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="commissions" element={<Commissions />} />
       <Route path="form" element={<Form />} />
       <Route path="calendar" element={<Calendar />} />

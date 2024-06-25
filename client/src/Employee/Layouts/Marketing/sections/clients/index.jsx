@@ -17,6 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { tokens } from "../../../../../theme";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
+import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 
 const Clients = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -357,37 +358,7 @@ const Clients = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        width="100% !important"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-            width: "100%",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[100]} !important`,
-          },
-        }}
-      >
+      <CustomDataGridStyles>
         <DataGrid
           rows={clientData}
           columns={columns}
@@ -399,7 +370,7 @@ const Clients = ({ user }) => {
             },
           }}
         />
-      </Box>
+      </CustomDataGridStyles>
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           component="form"

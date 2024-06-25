@@ -1,20 +1,20 @@
 // components/Quotations.js
 
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import { tokens } from "../../../../../theme";
+import { format } from "date-fns";
 import QuotationFormModal from "../../../../../OtherComponents/Modals/QuotationFormModal";
+import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 
-const Quotations = () => {
+const Quotations = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const initialFormData = {
     id: "",
@@ -25,6 +25,7 @@ const Quotations = () => {
     termsBuying: "",
     scopeOfWork: "",
     remarks: "",
+    submittedBy: user.id,
     quotationWastes: [
       {
         id: null,
@@ -42,26 +43,36 @@ const Quotations = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [employeeData, setEmployeeData] = useState([]);
+  const [quotationsData, setQuotationsData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/marketingDashboard/clients`
+          `${apiUrl}/marketingDashboard/quotations`
         );
-        const clientRecords = response.data;
-
-        if (clientRecords && Array.isArray(clientRecords.clients)) {
-          setEmployeeData(clientRecords.clients);
+        const quotations = response.data;
+        console.log(quotations);
+        if (quotations && Array.isArray(quotations.quotations)) {
+          const flattenedData = quotations.quotations.map((item) => ({
+            ...item,
+            clientPicture: item.Client ? item.Client.clientPicture : null,
+            clientName: item.Client ? item.Client.clientName : null,
+            quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
+            validity: item.validity
+              ? new Date(item.validity).toISOString().split("T")[0]
+              : null, // Convert timestamp to yyyy-mm-dd format
+          }));
+          setQuotationsData(flattenedData);
         } else {
           console.error(
             "clientRecords or clientRecords.clients is undefined or not an array"
           );
         }
       } catch (error) {
-        console.error("Error fetching employeeData:", error);
+        console.error("Error fetching quotationsData:", error);
       }
     };
 
@@ -92,56 +103,28 @@ const Quotations = () => {
     });
   };
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (formData.id) {
-        const response = await axios.put(
-          `${apiUrl}/marketingDashboard/clients/${formData.id}`,
-          formData
-        );
-        const updatedClient = response.data;
-
-        const updatedData = employeeData.map((client) =>
-          client.id === updatedClient.id ? updatedClient : client
-        );
-
-        setEmployeeData(updatedData);
-        setSuccessMessage("Client updated successfully!");
-      } else {
-        const response = await axios.post(
-          `${apiUrl}/marketingDashboard/clients`,
-          formData
-        );
-        const newClient = response.data;
-
-        setEmployeeData([...employeeData, newClient]);
-        setSuccessMessage("Client added successfully!");
-      }
-
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const handleEditClick = (id) => {
-    const clientToEdit = employeeData.find((client) => client.id === id);
-    if (clientToEdit) {
+    const quotationToEdit = quotationsData.find(
+      (quotation) => quotation.id === id
+    );
+    if (quotationToEdit) {
       setFormData({
-        id: clientToEdit.id,
-        clientId: clientToEdit.clientId,
-        quotationCode: clientToEdit.quotationCode,
-        validity: clientToEdit.validity,
-        termsCharge: clientToEdit.termsCharge,
-        termsBuying: clientToEdit.termsBuying,
-        scopeOfWork: clientToEdit.scopeOfWork,
-        remarks: clientToEdit.remarks,
-        quotationWastes: [...clientToEdit.quotationWastes],
+        id: quotationToEdit.id,
+        clientId: quotationToEdit.clientId,
+        quotationCode: quotationToEdit.quotationCode,
+        validity: quotationToEdit.validity,
+        termsCharge: quotationToEdit.termsCharge,
+        termsBuying: quotationToEdit.termsBuying,
+        scopeOfWork: quotationToEdit.scopeOfWork,
+        remarks: quotationToEdit.remarks,
+        submittedBy: quotationToEdit.Client.submittedBy,
+        quotationWastes: quotationToEdit.quotationWastes
+          ? quotationToEdit.quotationWastes
+          : [], // Ensure quotationWastes is an array
       });
       handleOpenModal();
     } else {
-      console.error(`Client with ID ${id} not found for editing.`);
+      console.error(`Quotation with ID ${id} not found for editing.`);
     }
   };
 
@@ -155,11 +138,102 @@ const Quotations = () => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/marketingDashboard/clients/${id}`);
+      await axios.delete(`${apiUrl}/marketingDashboard/quotations/${id}`);
 
-      const updatedData = employeeData.filter((client) => client.id !== id);
-      setEmployeeData(updatedData);
-      setSuccessMessage("Client deleted successfully!");
+      const updatedData = quotationsData.filter(
+        (quotation) => quotation.id !== id
+      );
+      setQuotationsData(updatedData);
+      setSuccessMessage("Quotation deleted successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      let response;
+
+      if (formData.id) {
+        // Update existing quotation
+        response = await axios.put(
+          `${apiUrl}/marketingDashboard/quotations/${formData.id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const updatedQuotation = response.data;
+
+        // Update quotationsData state with the updated quotation
+        const updatedData = quotationsData.map((quotation) =>
+          quotation.id === updatedQuotation.id
+            ? {
+                ...quotation,
+                ...updatedQuotation,
+                clientPicture: updatedQuotation.Client
+                  ? updatedQuotation.Client.clientPicture
+                  : null,
+                clientName: updatedQuotation.Client
+                  ? updatedQuotation.Client.clientName
+                  : null,
+                quotationWastes: updatedQuotation.QuotationWaste
+                  ? updatedQuotation.QuotationWaste
+                  : [],
+                validity: updatedQuotation.validity
+                  ? new Date(updatedQuotation.validity)
+                      .toISOString()
+                      .split("T")[0]
+                  : null,
+              }
+            : quotation
+        );
+
+        setQuotationsData(updatedData);
+        setSuccessMessage("Quotation updated successfully!");
+      } else {
+        // Add new quotation
+        response = await axios.post(
+          `${apiUrl}/marketingDashboard/quotations`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const newQuotation = response.data;
+        setQuotationsData([
+          ...quotationsData,
+          {
+            ...newQuotation,
+            clientPicture: newQuotation.Client
+              ? newQuotation.Client.clientPicture
+              : null,
+            clientName: newQuotation.Client
+              ? newQuotation.Client.clientName
+              : null,
+            quotationWastes: newQuotation.QuotationWaste
+              ? newQuotation.QuotationWaste
+              : [],
+            validity: newQuotation.validity
+              ? new Date(newQuotation.validity).toISOString().split("T")[0]
+              : null,
+          },
+        ]);
+        setSuccessMessage("Quotation added successfully!");
+      }
+
+      setShowSuccessMessage(true);
+      handleCloseModal();
     } catch (error) {
       console.error("Error:", error);
     }
@@ -167,49 +241,107 @@ const Quotations = () => {
 
   const columns = [
     {
-      field: "clientId",
-      headerName: "Client ID",
+      field: "quotationCode",
+      headerName: "Quotation Code",
       headerAlign: "center",
       align: "center",
-      width: 150, // Set a minimum width or initial width
+      width: 120, // Set a minimum width or initial width
+    },
+    {
+      field: "revisionNumber",
+      headerName: "Revision Number",
+      headerAlign: "center",
+      align: "center",
+      minWidth: 120, // Minimum width
+    },
+    {
+      field: "clientPicture",
+      headerName: "Logo",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 50,
+      renderCell: (params) => {
+        // Check if params.value is valid
+        if (params.value && params.value.data && params.value.type) {
+          try {
+            // Convert Buffer to Uint8Array
+            const uint8Array = new Uint8Array(params.value.data);
+            // Create Blob from Uint8Array
+            const blob = new Blob([uint8Array], { type: params.value.type });
+            // Create object URL from Blob
+            const imageUrl = URL.createObjectURL(blob);
+
+            return (
+              <img
+                src={imageUrl}
+                alt="Logo"
+                style={{ width: 40, height: 40, borderRadius: "50%" }}
+              />
+            );
+          } catch (error) {
+            console.error("Error creating image URL:", error);
+            return (
+              <img
+                src="/assets/unknown.png"
+                alt="Logo"
+                style={{ width: 40, height: 40, borderRadius: "50%" }}
+              />
+            );
+          }
+        } else {
+          return (
+            <img
+              src="/assets/unknown.png"
+              alt="Logo"
+              style={{ width: 40, height: 40, borderRadius: "50%" }}
+            />
+          );
+        }
+      },
     },
     {
       field: "clientName",
       headerName: "Client Name",
       headerAlign: "center",
       align: "center",
-      flex: 1, // Use flex to allow content to dictate width
-      minWidth: 150, // Minimum width
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => <div className={"wrap-text"}>{params.value}</div>,
     },
     {
-      field: "address",
-      headerName: "Address",
+      field: "termsCharge",
+      headerName: "Terms (Charge)",
+      headerAlign: "center",
+      align: "center",
+      minWidth: 120,
+    },
+    {
+      field: "termsBuying",
+      headerName: "Terms (Buying)",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+    },
+    {
+      field: "scopeOfWork",
+      headerName: "Scope Of Work",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 180,
+      renderCell: (params) => <div className={"wrap-text"}>{params.value}</div>,
     },
     {
-      field: "natureOfBusiness",
-      headerName: "Nature of Business",
+      field: "validity",
+      headerName: "Validity",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
-    },
-    {
-      field: "contactNumber",
-      headerName: "Contact Number",
-      headerAlign: "center",
-      align: "center",
-      width: 180, // Set a width based on content requirements
-    },
-    {
-      field: "clientType",
-      headerName: "Client Type",
-      headerAlign: "center",
-      align: "center",
-      width: 180, // Set a width based on content requirements
+      minWidth: 100,
+      valueFormatter: (params) => {
+        if (!params.value) return ""; // Handle empty or null values
+        return format(new Date(params.value), "MMMM dd yyyy");
+      },
     },
     {
       field: "edit",
@@ -255,68 +387,33 @@ const Quotations = () => {
           </IconButton>
         </Box>
       </Box>
-      {successMessage && (
-        <Box bgcolor="success.main" p={1}>
-          <Typography
-            variant="body1"
-            color="success"
-            sx={{ marginTop: "10px", textAlign: "center" }}
-          >
-            {successMessage}
-          </Typography>
-        </Box>
+      {showSuccessMessage && (
+        <SuccessMessage
+          message={successMessage}
+          onClose={() => setShowSuccessMessage(false)}
+        />
       )}
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        width="100% !important"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-            width: "100%",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[100]} !important`,
-          },
-        }}
-      >
+      <CustomDataGridStyles>
         <DataGrid
-          rows={employeeData}
+          rows={quotationsData}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "clientId", sort: "asc" }],
+              sortModel: [{ field: "quotationCode", sort: "asc" }],
             },
           }}
         />
-      </Box>
+      </CustomDataGridStyles>
       <QuotationFormModal
+        user={user.id}
         open={openModal}
         handleCloseModal={handleCloseModal}
-        handleInputChange={handleInputChange}
-        handleFormSubmit={handleFormSubmit}
         formData={formData}
-        successMessage={successMessage}
+        handleInputChange={handleInputChange}
         handleInputChangeWaste={handleInputChangeWaste}
+        handleFormSubmit={handleFormSubmit}
       />
     </Box>
   );

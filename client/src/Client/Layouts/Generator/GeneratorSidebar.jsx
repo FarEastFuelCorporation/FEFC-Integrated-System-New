@@ -490,9 +490,7 @@ const GeneratorSidebar = ({ user }) => {
             name="clientType"
             value={clientDetails.clientType}
             onChange={handleInputChange}
-            InputProps={{
-              readOnly: true,
-            }}
+            disabled
           />
           <TextField
             margin="normal"

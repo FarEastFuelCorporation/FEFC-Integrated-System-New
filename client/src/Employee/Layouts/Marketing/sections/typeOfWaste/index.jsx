@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import axios from "axios";
-import { tokens } from "../../../../../theme";
+import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 
 const TypeOfWastes = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const [clientData, setClientData] = useState([]);
 
@@ -84,39 +82,9 @@ const TypeOfWastes = () => {
   return (
     <Box p="20px" width="100% !important">
       <Box display="flex" justifyContent="space-between">
-        <Header title="Clients" subtitle="List of Clients" />
+        <Header title="Types Waste" subtitle="List of Wastes" />
       </Box>
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        width="100% !important"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-            width: "100%",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[100]} !important`,
-          },
-        }}
-      >
+      <CustomDataGridStyles>
         <DataGrid
           rows={clientData}
           columns={columns}
@@ -128,7 +96,7 @@ const TypeOfWastes = () => {
             },
           }}
         />
-      </Box>
+      </CustomDataGridStyles>
     </Box>
   );
 };

@@ -20,12 +20,14 @@ import axios from "axios";
 import { tokens } from "../../theme";
 
 const QuotationFormModal = ({
+  user,
   open,
   handleCloseModal,
   formData,
-  successMessage,
   handleInputChange,
+  handleFormSubmit,
 }) => {
+  // console.log(user);
   const [clients, setClients] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -121,18 +123,6 @@ const QuotationFormModal = ({
     }
   };
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      await axios.post(`${apiUrl}/marketingDashboard/quotations`, formData);
-      // Assuming successMessage is handled by the parent component
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error submitting the form:", error);
-    }
-  };
-
   return (
     <Modal
       open={open}
@@ -165,6 +155,8 @@ const QuotationFormModal = ({
                 value={formData.quotationCode}
                 onChange={handleInputChange}
                 fullWidth
+                required
+                disabled={!!formData.id}
                 InputLabelProps={{
                   style: {
                     color: colors.grey[100],
@@ -189,9 +181,11 @@ const QuotationFormModal = ({
                   onChange={handleInputChange}
                   label="Client"
                   fullWidth
+                  required
+                  disabled={!!formData.id}
                 >
                   {clients.map((client) => (
-                    <MenuItem key={client.id} value={client.id}>
+                    <MenuItem key={client.clientId} value={client.clientId}>
                       {client.clientName}
                     </MenuItem>
                   ))}
@@ -203,9 +197,11 @@ const QuotationFormModal = ({
               <TextField
                 label="Validity"
                 name="validity"
+                type="date"
                 value={formData.validity}
                 onChange={handleInputChange}
                 fullWidth
+                required
                 InputLabelProps={{
                   style: {
                     color: colors.grey[100],
@@ -234,6 +230,7 @@ const QuotationFormModal = ({
                 value={formData.termsBuying}
                 onChange={handleInputChange}
                 fullWidth
+                required
                 InputLabelProps={{
                   style: {
                     color: colors.grey[100],
@@ -248,6 +245,7 @@ const QuotationFormModal = ({
                 value={formData.scopeOfWork}
                 onChange={handleInputChange}
                 fullWidth
+                required
                 InputLabelProps={{
                   style: {
                     color: colors.grey[100],
@@ -270,7 +268,16 @@ const QuotationFormModal = ({
               />
             </Grid>
           </Grid>
-
+          <TextField
+            label="Submitted By"
+            name="submittedBy"
+            value={user}
+            onChange={handleInputChange}
+            fullWidth
+            required
+            autoComplete="off"
+            style={{ display: "none" }}
+          />
           <Typography
             variant="subtitle1"
             gutterBottom
@@ -304,6 +311,7 @@ const QuotationFormModal = ({
                         }
                         label="Type of Waste"
                         fullWidth
+                        required
                         InputLabelProps={{
                           style: {
                             color: colors.grey[100],
@@ -331,6 +339,7 @@ const QuotationFormModal = ({
                         )
                       }
                       fullWidth
+                      required
                       InputLabelProps={{
                         style: {
                           color: colors.grey[100],
@@ -360,6 +369,7 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
+                        required
                         inputProps={{
                           name: `quotationWastes[${index}].mode`,
                           id: `mode-select-${index}`,
@@ -395,6 +405,7 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
+                        required
                         inputProps={{
                           name: `quotationWastes[${index}].unit`,
                           id: `unit-select-${index}`,
@@ -421,6 +432,7 @@ const QuotationFormModal = ({
                         )
                       }
                       fullWidth
+                      required
                       InputLabelProps={{
                         style: {
                           color: colors.grey[100],
@@ -450,6 +462,7 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
+                        required
                         inputProps={{
                           name: `quotationWastes[${index}].vatCalculation`,
                           id: `vat-calculation-select-${index}`,
@@ -476,6 +489,7 @@ const QuotationFormModal = ({
                         )
                       }
                       fullWidth
+                      required
                       InputLabelProps={{
                         style: {
                           color: colors.grey[100],
@@ -506,15 +520,6 @@ const QuotationFormModal = ({
             </Button>
           </Box>
         </form>
-        {successMessage && (
-          <Typography
-            variant="body2"
-            color="success"
-            sx={{ marginTop: "10px", textAlign: "center" }}
-          >
-            {successMessage}
-          </Typography>
-        )}
       </Box>
     </Modal>
   );

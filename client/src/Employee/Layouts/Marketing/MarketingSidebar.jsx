@@ -6,8 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -195,21 +194,21 @@ const MarketingSidebar = ({ user }) => {
             <Item
               title="Type Of Wastes"
               to="typeOfWastes"
-              icon={<PeopleOutlinedIcon />}
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Quotations"
               to="quotations"
-              icon={<ContactsOutlinedIcon />}
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Commissions"
               to="commissions"
-              icon={<ReceiptOutlinedIcon />}
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

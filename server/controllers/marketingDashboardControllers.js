@@ -222,15 +222,23 @@ async function createTypeOfWasteController(req, res) {
 async function getQuotationsController(req, res) {
   try {
     // Fetch all clients from the database
-    const typeOfWastes = await TypeOfWaste.findAll({
-      include: {
-        model: TreatmentProcess,
-        as: "TreatmentProcess",
-      },
-      order: [["wasteCode", "ASC"]],
+    const quotations = await Quotation.findAll({
+      include: [
+        {
+          model: QuotationWaste,
+          as: "QuotationWaste",
+        },
+        {
+          model: Client,
+          as: "Client",
+        },
+      ],
+      order: [["quotationCode", "ASC"]],
     });
 
-    res.json({ typeOfWastes });
+    console.log(quotations);
+
+    res.json({ quotations });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -301,6 +309,134 @@ async function createQuotationController(req, res) {
   }
 }
 
+// Update Quotation controller
+async function updateQuotationController(req, res) {
+  try {
+    const id = req.params.id;
+    console.log("Updating quotation with ID:", id);
+
+    const {
+      quotationCode,
+      validity,
+      clientId,
+      termsCharge,
+      termsBuying,
+      scopeOfWork,
+      remarks,
+      quotationWastes, // This should be an array of quotation wastes
+    } = req.body;
+
+    // Find the quotation by ID and update it
+    const updatedQuotation = await Quotation.findByPk(id);
+
+    if (updatedQuotation) {
+      // Update quotation attributes
+      updatedQuotation.quotationCode = quotationCode;
+      updatedQuotation.validity = validity;
+      updatedQuotation.clientId = clientId;
+      updatedQuotation.termsCharge = termsCharge;
+      updatedQuotation.termsBuying = termsBuying;
+      updatedQuotation.scopeOfWork = scopeOfWork;
+      updatedQuotation.remarks = remarks;
+
+      // Save the updated quotation
+      await updatedQuotation.save();
+
+      // Update or create quotation wastes associated with this quotation
+      const updatedQuotationWastes = await Promise.all(
+        quotationWastes.map(async (waste) => {
+          const {
+            id: quotationWasteId, // Assuming quotationWasteId is passed for updates
+            wasteId,
+            wasteName,
+            mode,
+            unit,
+            unitPrice,
+            vatCalculation,
+            maxCapacity,
+          } = waste;
+
+          if (quotationWasteId) {
+            // If quotationWasteId is provided, update existing quotation waste
+            const existingQuotationWaste = await QuotationWaste.findByPk(
+              quotationWasteId
+            );
+            if (existingQuotationWaste) {
+              existingQuotationWaste.wasteId = wasteId;
+              existingQuotationWaste.wasteName = wasteName;
+              existingQuotationWaste.mode = mode;
+              existingQuotationWaste.unit = unit;
+              existingQuotationWaste.unitPrice = unitPrice;
+              existingQuotationWaste.vatCalculation = vatCalculation;
+              existingQuotationWaste.maxCapacity = maxCapacity;
+              await existingQuotationWaste.save();
+              return existingQuotationWaste;
+            } else {
+              throw new Error(
+                `Quotation waste with ID ${quotationWasteId} not found`
+              );
+            }
+          } else {
+            // If quotationWasteId is not provided, create new quotation waste
+            const newQuotationWaste = await QuotationWaste.create({
+              quotationId: updatedQuotation.id,
+              wasteId,
+              wasteName,
+              mode,
+              unit,
+              unitPrice,
+              vatCalculation,
+              maxCapacity,
+            });
+            return newQuotationWaste;
+          }
+        })
+      );
+
+      // Respond with the updated quotation and its wastes
+      res.json({
+        quotation: updatedQuotation,
+        quotationWastes: updatedQuotationWastes,
+      });
+    } else {
+      // If quotation with the specified ID was not found
+      res.status(404).json({ message: `Quotation with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating quotation:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Delete Quotation controller
+async function deleteQuotationController(req, res) {
+  try {
+    const id = req.params.id;
+    console.log("Soft deleting quotation with ID:", id);
+
+    // Find the client by UUID (id)
+    const quotationToDelete = await Quotation.findOne({ id });
+
+    if (quotationToDelete) {
+      // Soft delete the client (sets deletedAt timestamp)
+      await quotationToDelete.destroy();
+
+      // Respond with a success message
+      res.json({
+        message: `Quotation with ID ${quotationToDelete.quotationCode} soft-deleted successfully`,
+      });
+    } else {
+      // If client with the specified ID was not found
+      res.status(404).json({ message: `Client with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error soft-deleting client:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   getClientsController,
   createClientController,
@@ -311,4 +447,6 @@ module.exports = {
   createTypeOfWasteController,
   getQuotationsController,
   createQuotationController,
+  updateQuotationController,
+  deleteQuotationController,
 };

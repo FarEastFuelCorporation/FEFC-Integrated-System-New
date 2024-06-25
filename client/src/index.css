@@ -122,3 +122,8 @@ body,
 .login-page .login-container button:hover {
   background-color: #0056b3;
 }
+
+.wrap-text {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}

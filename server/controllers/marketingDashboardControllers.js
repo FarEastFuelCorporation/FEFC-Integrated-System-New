@@ -282,7 +282,9 @@ async function createQuotationController(req, res) {
           unit,
           unitPrice,
           vatCalculation,
-          maxCapacity,
+          hasFixedRate,
+          fixedWeight,
+          fixedPrice,
         } = waste;
 
         return await QuotationWaste.create({
@@ -293,12 +295,14 @@ async function createQuotationController(req, res) {
           unit,
           unitPrice,
           vatCalculation,
-          maxCapacity,
+          hasFixedRate,
+          fixedWeight,
+          fixedPrice,
         });
       })
     );
 
-    // Response with created quotation and its wastes
+    // Respond with created quotation and its wastes
     res.status(201).json({
       quotation,
       quotationWastes: createdQuotationWastes,
@@ -325,6 +329,8 @@ async function updateQuotationController(req, res) {
       remarks,
       quotationWastes, // This should be an array of quotation wastes
     } = req.body;
+
+    console.log("Request body:", req.body);
 
     // Find the quotation by ID and update it
     const updatedQuotation = await Quotation.findByPk(id);
@@ -353,7 +359,9 @@ async function updateQuotationController(req, res) {
             unit,
             unitPrice,
             vatCalculation,
-            maxCapacity,
+            hasFixedRate,
+            fixedWeight,
+            fixedPrice,
           } = waste;
 
           if (quotationWasteId) {
@@ -368,7 +376,9 @@ async function updateQuotationController(req, res) {
               existingQuotationWaste.unit = unit;
               existingQuotationWaste.unitPrice = unitPrice;
               existingQuotationWaste.vatCalculation = vatCalculation;
-              existingQuotationWaste.maxCapacity = maxCapacity;
+              existingQuotationWaste.hasFixedRate = hasFixedRate;
+              existingQuotationWaste.fixedWeight = fixedWeight;
+              existingQuotationWaste.fixedPrice = fixedPrice;
               await existingQuotationWaste.save();
               return existingQuotationWaste;
             } else {
@@ -386,7 +396,9 @@ async function updateQuotationController(req, res) {
               unit,
               unitPrice,
               vatCalculation,
-              maxCapacity,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
             });
             return newQuotationWaste;
           }

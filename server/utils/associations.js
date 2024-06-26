@@ -49,7 +49,6 @@ EmployeeRole.belongsToMany(Employee, {
   otherKey: "employeeId",
   as: "Employees",
 });
-
 Employee.belongsToMany(EmployeeRole, {
   through: EmployeeRolesEmployee,
   foreignKey: "employeeId",
@@ -59,13 +58,13 @@ Employee.belongsToMany(EmployeeRole, {
 
 VehicleType.hasMany(Vehicle, {
   as: "Vehicle",
-  foreignKey: "vehicleId",
-  sourceKey: "vehicleId",
+  foreignKey: "id",
+  sourceKey: "id",
 });
 Vehicle.belongsTo(VehicleType, {
   as: "VehicleType",
-  foreignKey: "vehicleId",
-  targetKey: "vehicleId",
+  foreignKey: "id",
+  targetKey: "id",
 });
 
 VehicleStatus.hasMany(VehicleLog, {
@@ -106,7 +105,6 @@ Client.hasMany(Quotation, {
   foreignKey: "clientId",
   sourceKey: "clientId",
 });
-
 Quotation.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
@@ -119,7 +117,6 @@ Quotation.hasMany(QuotationWaste, {
   sourceKey: "id",
   onDelete: "CASCADE",
 });
-
 QuotationWaste.belongsTo(Quotation, {
   as: "Quotation",
   foreignKey: "quotationId",

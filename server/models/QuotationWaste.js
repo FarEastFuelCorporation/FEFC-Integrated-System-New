@@ -49,8 +49,18 @@ const QuotationWaste = sequelize.define(
     vatCalculation: {
       type: DataTypes.STRING,
     },
-    maxCapacity: {
+    hasFixedRate: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    fixedWeight: {
       type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    fixedPrice: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,

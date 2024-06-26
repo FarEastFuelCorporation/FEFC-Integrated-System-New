@@ -12,6 +12,8 @@ import {
   InputLabel,
   Grid,
   useTheme,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -27,7 +29,6 @@ const QuotationFormModal = ({
   handleInputChange,
   handleFormSubmit,
 }) => {
-  // console.log(user);
   const [clients, setClients] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -78,7 +79,9 @@ const QuotationFormModal = ({
       unit: "",
       unitPrice: 0,
       vatCalculation: "",
-      maxCapacity: 0,
+      hasFixedRate: false,
+      fixedWeight: 0,
+      fixedPrice: 0,
     };
     const updatedWastes = [...formData.quotationWastes, newWaste];
     handleInputChange({
@@ -292,7 +295,7 @@ const QuotationFormModal = ({
                   Waste Entry #{index + 1}
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid item xs={1.5}>
                     <FormControl fullWidth>
                       <InputLabel
                         id={`waste-type-select-label-${index}`}
@@ -326,7 +329,7 @@ const QuotationFormModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <TextField
                       label="Waste Name"
                       name={`quotationWastes[${index}].wasteName`}
@@ -476,27 +479,24 @@ const QuotationFormModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={1}>
-                    <TextField
-                      label="Max Capacity"
-                      name={`quotationWastes[${index}].maxCapacity`}
-                      value={waste.maxCapacity}
-                      onChange={(e) =>
-                        handleWasteInputChangeLocal(
-                          index,
-                          "maxCapacity",
-                          e.target.value
-                        )
+                  <Grid item xs={0.5}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={waste.hasFixedRate}
+                          onChange={(e) =>
+                            handleWasteInputChangeLocal(
+                              index,
+                              "hasFixedRate",
+                              e.target.checked
+                            )
+                          }
+                        />
                       }
-                      fullWidth
-                      required
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
+                      label="Has Fixed Rate"
                     />
                   </Grid>
+
                   <Grid item xs={0.5} textAlign="right">
                     <IconButton
                       color="error"
@@ -505,6 +505,52 @@ const QuotationFormModal = ({
                       <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
                     </IconButton>
                   </Grid>
+                  {waste.hasFixedRate && (
+                    <>
+                      <Grid item xs={1}>
+                        <TextField
+                          label="Fixed Weight"
+                          name={`quotationWastes[${index}].fixedWeight`}
+                          value={waste.fixedWeight}
+                          onChange={(e) =>
+                            handleWasteInputChangeLocal(
+                              index,
+                              "fixedWeight",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                          required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={1}>
+                        <TextField
+                          label="Fixed Price"
+                          name={`quotationWastes[${index}].fixedPrice`}
+                          value={waste.fixedPrice}
+                          onChange={(e) =>
+                            handleWasteInputChangeLocal(
+                              index,
+                              "fixedPrice",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                          required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </>
+                  )}
                 </Grid>
               </Box>
             ))}

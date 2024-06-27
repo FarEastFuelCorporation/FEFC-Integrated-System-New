@@ -9,14 +9,13 @@ const VehicleType = require("../models/VehicleType");
 const Vehicle = require("../models/Vehicle");
 const Client = require("../models/Client");
 const TransactionStatus = require("../models/TransactionStatus");
-const VehicleStatus = require("../models/VehicleStatus");
 const VehicleLog = require("../models/VehicleLog");
 const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee ");
-const IdInformation = require("../models/IdInformation");
 const Quotation = require("../models/Quotation");
 const QuotationWaste = require("../models/QuotationWaste");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const ClientUser = require("../models/ClientUser");
+const VehicleMaintenanceRequest = require("../models/VehicleMaintenanceRequest");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -36,11 +35,26 @@ Employee.hasMany(User, {
   as: "User",
   foreignKey: "employeeId",
   sourceKey: "employeeId",
+  onDelete: "CASCADE",
 });
 User.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "employeeId",
   targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(VehicleMaintenanceRequest, {
+  as: "VehicleMaintenanceRequest",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+VehicleMaintenanceRequest.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
 });
 
 EmployeeRole.belongsToMany(Employee, {
@@ -48,67 +62,79 @@ EmployeeRole.belongsToMany(Employee, {
   foreignKey: "employeeRoleId",
   otherKey: "employeeId",
   as: "Employees",
+  onDelete: "CASCADE",
 });
 Employee.belongsToMany(EmployeeRole, {
   through: EmployeeRolesEmployee,
   foreignKey: "employeeId",
   otherKey: "employeeRoleId",
   as: "EmployeeRoles",
+  onDelete: "CASCADE",
 });
 
 VehicleType.hasMany(Vehicle, {
   as: "Vehicle",
-  foreignKey: "id",
+  foreignKey: "vehicleTypeId",
   sourceKey: "id",
+  onDelete: "CASCADE",
 });
 Vehicle.belongsTo(VehicleType, {
   as: "VehicleType",
-  foreignKey: "id",
+  foreignKey: "vehicleTypeId",
   targetKey: "id",
-});
-
-VehicleStatus.hasMany(VehicleLog, {
-  as: "VehicleLog",
-  foreignKey: "vehicleStatusId",
-  sourceKey: "id",
-});
-VehicleLog.belongsTo(VehicleStatus, {
-  as: "VehicleStatus",
-  foreignKey: "vehicleStatusId",
-  targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 Vehicle.hasMany(VehicleLog, {
   as: "VehicleLog",
   foreignKey: "plateNumber",
   sourceKey: "plateNumber",
+  onDelete: "CASCADE",
 });
 VehicleLog.belongsTo(Vehicle, {
   as: "Vehicle",
   foreignKey: "plateNumber",
   targetKey: "plateNumber",
+  onDelete: "CASCADE",
+});
+
+Vehicle.hasMany(VehicleMaintenanceRequest, {
+  as: "VehicleMaintenanceRequest",
+  foreignKey: "plateNumber",
+  sourceKey: "plateNumber",
+  onDelete: "CASCADE",
+});
+VehicleMaintenanceRequest.belongsTo(Vehicle, {
+  as: "Vehicle",
+  foreignKey: "plateNumber",
+  targetKey: "plateNumber",
+  onDelete: "CASCADE",
 });
 
 TreatmentProcess.hasMany(TypeOfWaste, {
   as: "TypeOfWaste",
   foreignKey: "treatmentProcessId",
   sourceKey: "id",
+  onDelete: "CASCADE",
 });
 TypeOfWaste.belongsTo(TreatmentProcess, {
   as: "TreatmentProcess",
   foreignKey: "treatmentProcessId",
   targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 Client.hasMany(Quotation, {
   as: "Quotation",
   foreignKey: "clientId",
   sourceKey: "clientId",
+  onDelete: "CASCADE",
 });
 Quotation.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
   targetKey: "clientId",
+  onDelete: "CASCADE",
 });
 
 Quotation.hasMany(QuotationWaste, {
@@ -121,6 +147,7 @@ QuotationWaste.belongsTo(Quotation, {
   as: "Quotation",
   foreignKey: "quotationId",
   targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 TypeOfWaste.hasMany(QuotationWaste, {
@@ -133,6 +160,7 @@ QuotationWaste.belongsTo(TypeOfWaste, {
   as: "TypeOfWaste",
   foreignKey: "wasteId",
   targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 Quotation.hasMany(QuotationTransportation, {
@@ -145,6 +173,7 @@ QuotationTransportation.belongsTo(Quotation, {
   as: "Quotation",
   foreignKey: "quotationId",
   targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 // Export the associations
@@ -158,6 +187,5 @@ module.exports = {
   Vehicle,
   Client,
   TransactionStatus,
-  VehicleStatus,
   VehicleLog,
 };

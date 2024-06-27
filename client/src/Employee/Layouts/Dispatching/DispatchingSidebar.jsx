@@ -2,11 +2,12 @@ import React, { useEffect, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import BuildIcon from "@mui/icons-material/Build";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -27,10 +28,9 @@ const DispatchingSidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
-      "/dashboard/clients": "Clients",
-      "/dashboard/typeOfWastes": "Type Of Wastes",
-      "/dashboard/quotations": "Quotations",
-      "/dashboard/commissions": "Commissions",
+      "/dashboard/vehicleTypes": "Type Of Vehicles",
+      "/dashboard/vehicles": "Vehicles",
+      "/dashboard/VehicleMaintenanceRequest": "Vehicle Maintenance Request",
       "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
@@ -185,30 +185,23 @@ const DispatchingSidebar = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Clients"
-              to="clients"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Type Of Wastes"
-              to="typeOfWastes"
+              title="Type Of Vehicles"
+              to="vehicleTypes"
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Quotations"
-              to="quotations"
-              icon={<FormatListBulletedIcon />}
+              title="Vehicles"
+              to="vehicles"
+              icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Commissions"
-              to="commissions"
-              icon={<FormatListBulletedIcon />}
+              title="Vehicle Maintenance Request"
+              to="VehicleMaintenanceRequest"
+              icon={<BuildIcon />}
               selected={selected}
               setSelected={setSelected}
             />

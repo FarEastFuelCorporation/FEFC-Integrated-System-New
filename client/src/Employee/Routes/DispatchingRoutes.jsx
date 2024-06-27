@@ -2,10 +2,9 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import DispatchingDashboard from "../../Employee/Layouts/Dispatching/DispatchingDashboard";
 import Dashboard from "../../Employee/Layouts/Dispatching/sections/dashboard";
-import Clients from "../../Employee/Layouts/Dispatching/sections/clients";
-import TypeOfWastes from "../../Employee/Layouts/Dispatching/sections/typeOfWaste";
-import Quotations from "../../Employee/Layouts/Dispatching/sections/quotations";
-import Commissions from "../../Employee/Layouts/Dispatching/sections/commissions";
+import VehicleTypes from "../Layouts/Dispatching/sections/vehicleTypes";
+import Vehicles from "../../Employee/Layouts/Dispatching/sections/vehicles";
+import VehicleMaintenanceRequest from "../Layouts/Dispatching/sections/vehicleMaintenanceRequest";
 import Form from "../../Employee/Layouts/Dispatching/sections/form";
 import Calendar from "../../Employee/Layouts/Dispatching/sections/calendar";
 import FAQ from "../../Employee/Layouts/Dispatching/sections/faq";
@@ -17,10 +16,12 @@ const DispatchingRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<DispatchingDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
-      <Route path="clients" element={<Clients user={user} />} />
-      <Route path="typeOfWastes" element={<TypeOfWastes />} />
-      <Route path="quotations" element={<Quotations user={user} />} />
-      <Route path="commissions" element={<Commissions />} />
+      <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
+      <Route path="vehicles" element={<Vehicles user={user} />} />
+      <Route
+        path="vehicleMaintenanceRequest"
+        element={<VehicleMaintenanceRequest user={user} />}
+      />
       <Route path="form" element={<Form />} />
       <Route path="calendar" element={<Calendar />} />
       <Route path="faq" element={<FAQ />} />

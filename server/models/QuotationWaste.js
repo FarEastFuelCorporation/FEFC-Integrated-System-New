@@ -2,8 +2,6 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment-timezone");
-const Quotation = require("./Quotation");
-const TypeOfWaste = require("./TypeOfWaste");
 
 const QuotationWaste = sequelize.define(
   "QuotationWaste",
@@ -17,18 +15,10 @@ const QuotationWaste = sequelize.define(
     quotationId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: Quotation,
-        key: "id",
-      },
     },
     wasteId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: TypeOfWaste,
-        key: "id",
-      },
     },
     wasteName: {
       type: DataTypes.STRING,

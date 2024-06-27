@@ -14,10 +14,14 @@ const Vehicle = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
+    vehicleTypeId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     plateNumber: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true,
+      unique: true,
     },
     vehicleName: {
       type: DataTypes.STRING,
@@ -31,10 +35,6 @@ const Vehicle = sequelize.define(
       type: DataTypes.ENUM("OWNED", "LEASED"),
       allowNull: false,
     },
-    vehicleId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -43,6 +43,10 @@ const Vehicle = sequelize.define(
         return moment(rawValue).tz("Asia/Singapore").format();
       },
     },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -50,6 +54,10 @@ const Vehicle = sequelize.define(
         const rawValue = this.getDataValue("updatedAt");
         return moment(rawValue).tz("Asia/Singapore").format();
       },
+    },
+    updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     // Paranoid option for soft deletion
     deletedAt: {
@@ -60,6 +68,10 @@ const Vehicle = sequelize.define(
         const rawValue = this.getDataValue("deletedAt");
         return rawValue ? moment(rawValue).tz("Asia/Singapore").format() : null;
       },
+    },
+    deletedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

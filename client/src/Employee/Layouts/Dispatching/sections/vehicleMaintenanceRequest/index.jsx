@@ -15,11 +15,12 @@ import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import { format } from "date-fns";
 import { tokens } from "../../../../../theme";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 
-const Vehicles = ({ user }) => {
+const VehicleMaintenanceRequest = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -27,59 +28,56 @@ const Vehicles = ({ user }) => {
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
-    vehicleTypeId: "",
     plateNumber: "",
-    vehicleName: "",
-    netCapacity: "",
-    ownership: "",
-    vehicleId: "",
+    requestDetails: "",
     createdBy: user.id,
   });
 
-  const [vehicleData, setVehicleData] = useState([]);
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [vehicleRequests, setVehicleRequests] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const vehicleResponse = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicles`
+        const response = await axios.get(
+          `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests`
         );
-        const vehicleRecords = vehicleResponse.data;
 
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const vehiclesWithTypes = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
+        if (
+          response &&
+          Array.isArray(response.data.vehicleMaintenanceRequests)
+        ) {
+          const flattenedData = response.data.vehicleMaintenanceRequests.map(
+            (item) => ({
+              ...item,
+              createdByName: item.Employee
+                ? item.Employee.firstName + " " + item.Employee.lastName
+                : null,
+            })
+          );
 
-          // Set state with vehicles including typeOfVehicle
-          setVehicleData(vehiclesWithTypes);
+          setVehicleRequests(flattenedData);
         } else {
           console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
+            "response or vehicleMaintenanceRequests is undefined or not an array"
           );
         }
 
-        const vehicleTypeResponse = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`
+        const vehicleResponse = await axios.get(
+          `${apiUrl}/dispatchingDashboard/vehicles`
         );
-        const sortedVehicleTypes = vehicleTypeResponse.data.vehicleTypes.sort(
-          (a, b) => {
-            if (a.typeOfVehicle < b.typeOfVehicle) {
-              return -1;
-            }
-            if (a.typeOfVehicle > b.typeOfVehicle) {
-              return 1;
-            }
-            return 0;
+        const sortedVehicles = vehicleResponse.data.vehicles.sort((a, b) => {
+          if (a.plateNumber < b.plateNumber) {
+            return -1;
           }
-        );
-        setVehicleTypes(sortedVehicleTypes);
+          if (a.plateNumber > b.plateNumber) {
+            return 1;
+          }
+          return 0;
+        });
+        setVehicles(sortedVehicles);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -100,7 +98,7 @@ const Vehicles = ({ user }) => {
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [showSuccessMessage]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -110,12 +108,8 @@ const Vehicles = ({ user }) => {
   const clearFormData = () => {
     setFormData({
       id: "",
-      vehicleTypeId: "",
       plateNumber: "",
-      vehicleName: "",
-      netCapacity: "",
-      ownership: "",
-      vehicleId: "",
+      requestDetails: "",
       createdBy: user.id,
     });
   };
@@ -126,26 +120,25 @@ const Vehicles = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const vehicleToEdit = vehicleData.find((vehicle) => vehicle.id === id);
-    if (vehicleToEdit) {
+    const requestToEdit = vehicleRequests.find((request) => request.id === id);
+    if (requestToEdit) {
       setFormData({
-        id: vehicleToEdit.id,
-        vehicleTypeId: vehicleToEdit.vehicleTypeId,
-        plateNumber: vehicleToEdit.plateNumber,
-        vehicleName: vehicleToEdit.vehicleName,
-        netCapacity: vehicleToEdit.netCapacity,
-        ownership: vehicleToEdit.ownership,
+        id: requestToEdit.id,
+        plateNumber: requestToEdit.plateNumber,
+        requestDetails: requestToEdit.requestDetails,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Vehicle with ID ${id} not found for editing.`);
+      console.error(
+        `Vehicle maintenance request with ID ${id} not found for editing.`
+      );
     }
   };
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle?"
+      "Are you sure you want to delete this vehicle maintenance request?"
     );
 
     if (!isConfirmed) {
@@ -153,11 +146,18 @@ const Vehicles = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/dispatchingDashboard/vehicles/${id}`);
+      await axios.delete(
+        `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests/${id}`,
+        {
+          data: { deletedBy: user.id },
+        }
+      );
 
-      const updatedData = vehicleData.filter((vehicle) => vehicle.id !== id);
-      setVehicleData(updatedData);
-      setSuccessMessage("Vehicle deleted successfully!");
+      const updatedData = vehicleRequests.filter(
+        (request) => request.id !== id
+      );
+      setVehicleRequests(updatedData);
+      setSuccessMessage("Vehicle maintenance request deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -171,41 +171,61 @@ const Vehicles = ({ user }) => {
       let response;
 
       if (formData.id) {
-        // Update existing vehicle
+        // Update existing vehicle maintenance request
         response = await axios.put(
-          `${apiUrl}/dispatchingDashboard/vehicles/${formData.id}`,
+          `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests/${formData.id}`,
           formData
         );
 
-        const updatedVehicle = response.data.vehicles;
+        if (
+          response &&
+          Array.isArray(response.data.vehicleMaintenanceRequests)
+        ) {
+          const flattenedData = response.data.vehicleMaintenanceRequests.map(
+            (item) => ({
+              ...item,
+              createdByName: item.Employee
+                ? item.Employee.firstName + " " + item.Employee.lastName
+                : null,
+            })
+          );
 
-        const vehiclesWithTypes = updatedVehicle.map((vehicle) => ({
-          ...vehicle,
-          typeOfVehicle: vehicle.VehicleType
-            ? vehicle.VehicleType.typeOfVehicle
-            : null,
-        }));
-
-        setVehicleData(vehiclesWithTypes);
-        setSuccessMessage("Vehicle updated successfully!");
+          setVehicleRequests(flattenedData);
+          setSuccessMessage(
+            "Vehicle maintenance request updated successfully!"
+          );
+        } else {
+          console.error(
+            "response or vehicleMaintenanceRequests is undefined or not an array"
+          );
+        }
       } else {
-        // Add new vehicle
+        // Add new vehicle maintenance request
         response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicles`,
+          `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests`,
           formData
         );
 
-        const updatedVehicle = response.data.vehicles;
+        if (
+          response &&
+          Array.isArray(response.data.vehicleMaintenanceRequests)
+        ) {
+          const flattenedData = response.data.vehicleMaintenanceRequests.map(
+            (item) => ({
+              ...item,
+              createdByName: item.Employee
+                ? item.Employee.firstName + " " + item.Employee.lastName
+                : null,
+            })
+          );
 
-        const vehiclesWithTypes = updatedVehicle.map((vehicle) => ({
-          ...vehicle,
-          typeOfVehicle: vehicle.VehicleType
-            ? vehicle.VehicleType.typeOfVehicle
-            : null,
-        }));
-
-        setVehicleData(vehiclesWithTypes);
-        setSuccessMessage("Vehicle added successfully!");
+          setVehicleRequests(flattenedData);
+          setSuccessMessage("Vehicle maintenance request added successfully!");
+        } else {
+          console.error(
+            "response or vehicleMaintenanceRequests is undefined or not an array"
+          );
+        }
       }
 
       setShowSuccessMessage(true);
@@ -221,36 +241,34 @@ const Vehicles = ({ user }) => {
       headerName: "Plate Number",
       headerAlign: "center",
       align: "center",
-      width: 150,
-    },
-    {
-      field: "vehicleName",
-      headerName: "Vehicle Name",
-      headerAlign: "center",
-      align: "center",
       flex: 1,
       minWidth: 150,
     },
     {
-      field: "netCapacity",
-      headerName: "Net Capacity",
+      field: "requestDetails",
+      headerName: "Request Details",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 2,
+      minWidth: 250,
     },
     {
-      field: "ownership",
-      headerName: "Ownership",
+      field: "createdByName",
+      headerName: "Requested By",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      minWidth: 250,
     },
     {
-      field: "typeOfVehicle",
-      headerName: "Vehicle Type",
+      field: "createdAt",
+      headerName: "Date Of Request",
       headerAlign: "center",
       align: "center",
-      width: 200,
+      minWidth: 100,
+      valueFormatter: (params) => {
+        if (!params.value) return ""; // Handle empty or null values
+        return format(new Date(params.value), "MMMM dd yyyy");
+      },
     },
     {
       field: "edit",
@@ -289,7 +307,10 @@ const Vehicles = ({ user }) => {
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
-        <Header title="Vehicles" subtitle="List of Vehicles" />
+        <Header
+          title="Vehicle Maintenance Requests"
+          subtitle="List of Vehicle Maintenance Requests"
+        />
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />
@@ -305,13 +326,13 @@ const Vehicles = ({ user }) => {
       )}
       <CustomDataGridStyles>
         <DataGrid
-          rows={vehicleData}
+          rows={vehicleRequests}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
+              sortModel: [{ field: "plateNumber", sort: "asc" }],
             },
           }}
         />
@@ -335,77 +356,15 @@ const Vehicles = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Vehicle" : "Add New Vehicle"}
+            {formData.id
+              ? "Update Vehicle Maintenance Request"
+              : "Add New Vehicle Maintenance Request"}
           </Typography>
-          <TextField
-            label="Vehicle Type"
-            name="vehicleTypeId"
-            value={formData.vehicleTypeId}
-            onChange={handleInputChange}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            {vehicleTypes.map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.typeOfVehicle}
-              </MenuItem>
-            ))}
-          </TextField>
           <TextField
             label="Plate Number"
             name="plateNumber"
             value={formData.plateNumber}
             onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Vehicle Name"
-            name="vehicleName"
-            value={formData.vehicleName}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Net Capacity"
-            name="netCapacity"
-            value={formData.netCapacity}
-            onChange={handleInputChange}
-            type="number"
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Ownership"
-            name="ownership"
-            value={formData.ownership}
-            onChange={handleInputChange}
             select
             fullWidth
             required
@@ -416,9 +375,26 @@ const Vehicles = ({ user }) => {
             }}
             autoComplete="off"
           >
-            <MenuItem value="OWNED">OWNED</MenuItem>
-            <MenuItem value="LEASED">LEASED</MenuItem>
+            {vehicles.map((type) => (
+              <MenuItem key={type.id} value={type.plateNumber}>
+                {type.plateNumber}
+              </MenuItem>
+            ))}
           </TextField>
+          <TextField
+            label="Request Details"
+            name="requestDetails"
+            value={formData.requestDetails}
+            onChange={handleInputChange}
+            fullWidth
+            required
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
           <TextField
             label="Created By"
             name="createdBy"
@@ -433,7 +409,9 @@ const Vehicles = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Vehicle" : "Add Vehicle"}
+            {formData.id
+              ? "Update Vehicle Maintenance Request"
+              : "Add Vehicle Maintenance Request"}
           </Button>
         </Box>
       </Modal>
@@ -441,4 +419,4 @@ const Vehicles = ({ user }) => {
   );
 };
 
-export default Vehicles;
+export default VehicleMaintenanceRequest;

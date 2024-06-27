@@ -54,7 +54,7 @@ const Quotations = ({ user }) => {
           `${apiUrl}/marketingDashboard/quotations`
         );
         const quotations = response.data;
-        console.log(quotations);
+
         if (quotations && Array.isArray(quotations.quotations)) {
           const flattenedData = quotations.quotations.map((item) => ({
             ...item,

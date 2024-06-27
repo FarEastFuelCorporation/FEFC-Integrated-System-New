@@ -206,6 +206,7 @@ const QuotationFormModal = ({
                 fullWidth
                 required
                 InputLabelProps={{
+                  shrink: true,
                   style: {
                     color: colors.grey[100],
                   },
@@ -434,6 +435,7 @@ const QuotationFormModal = ({
                           e.target.value
                         )
                       }
+                      type="number"
                       fullWidth
                       required
                       InputLabelProps={{
@@ -519,6 +521,7 @@ const QuotationFormModal = ({
                               e.target.value
                             )
                           }
+                          type="number"
                           fullWidth
                           required
                           InputLabelProps={{
@@ -540,6 +543,7 @@ const QuotationFormModal = ({
                               e.target.value
                             )
                           }
+                          type="number"
                           fullWidth
                           required
                           InputLabelProps={{

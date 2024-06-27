@@ -29,7 +29,14 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       onClick={handleClick}
       icon={icon}
     >
-      <Typography>{title}</Typography>
+      <Typography
+        style={{
+          whiteSpace: "normal", // Allow text to wrap
+          wordBreak: "break-word", // Break long words
+        }}
+      >
+        {title}
+      </Typography>
     </MenuItem>
   );
 };

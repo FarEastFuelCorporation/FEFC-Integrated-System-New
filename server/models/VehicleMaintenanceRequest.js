@@ -1,12 +1,12 @@
-// models/VehicleType.js
+// models/VehicleMaintenanceRequest.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment-timezone");
 
-const VehicleType = sequelize.define(
-  "VehicleType",
+const VehicleMaintenanceRequest = sequelize.define(
+  "VehicleMaintenanceRequest",
   {
     id: {
       type: DataTypes.UUID,
@@ -14,7 +14,11 @@ const VehicleType = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    typeOfVehicle: {
+    plateNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    requestDetails: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -32,7 +36,8 @@ const VehicleType = sequelize.define(
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
       get() {
         const rawValue = this.getDataValue("updatedAt");
         return moment(rawValue).tz("Asia/Singapore").format();
@@ -63,4 +68,4 @@ const VehicleType = sequelize.define(
   }
 );
 
-module.exports = VehicleType;
+module.exports = VehicleMaintenanceRequest;

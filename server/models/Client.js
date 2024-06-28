@@ -72,37 +72,32 @@ const Client = sequelize.define(
       type: DataTypes.BLOB("long"),
       allowNull: true,
     },
-    submittedBy: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"), // Default value set to current timestamp
-      get() {
-        const rawValue = this.getDataValue("createdAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
+    },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"), // Default value set to current timestamp
-      get() {
-        const rawValue = this.getDataValue("updatedAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
+      allowNull: true,
+      defaultValue: null,
+    },
+    updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     // Paranoid option for soft deletion
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
-      get() {
-        const rawValue = this.getDataValue("deletedAt");
-        return rawValue ? moment(rawValue).tz("Asia/Singapore").format() : null;
-      },
+    },
+    deletedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
@@ -110,11 +105,6 @@ const Client = sequelize.define(
     paranoid: true,
     hooks: {
       beforeCreate: async (client, options) => {
-        // Set createdAt and updatedAt to current timestamp on creation
-        const currentTime = moment().tz("Asia/Singapore").format();
-        client.createdAt = currentTime;
-        client.updatedAt = currentTime;
-
         // Set default clientPicture if not provided
         if (!client.clientPicture) {
           try {
@@ -124,10 +114,6 @@ const Client = sequelize.define(
             console.error("Error reading default image:", error);
           }
         }
-      },
-      beforeUpdate: (client, options) => {
-        // Set updatedAt to current timestamp on update
-        client.updatedAt = moment().tz("Asia/Singapore").format();
       },
     },
   }

@@ -3,7 +3,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
-const moment = require("moment-timezone");
 
 const VehicleType = sequelize.define(
   "VehicleType",
@@ -21,10 +20,6 @@ const VehicleType = sequelize.define(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("createdAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
     },
     createdBy: {
       type: DataTypes.STRING,
@@ -33,10 +28,6 @@ const VehicleType = sequelize.define(
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("updatedAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
     },
     updatedBy: {
       type: DataTypes.STRING,
@@ -47,10 +38,6 @@ const VehicleType = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
-      get() {
-        const rawValue = this.getDataValue("deletedAt");
-        return rawValue ? moment(rawValue).tz("Asia/Singapore").format() : null;
-      },
     },
     deletedBy: {
       type: DataTypes.STRING,

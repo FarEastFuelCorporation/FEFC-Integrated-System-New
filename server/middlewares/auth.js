@@ -2,23 +2,30 @@
 
 // Middleware to check authentication and role
 const isAuthenticated = (req, res, next) => {
-  if (req.session && req.session.user && req.session.user.role) {
-    const userRole = req.session.user.role;
+  const userRole = req;
+  const requestedPath = req.path;
 
+  console.log("request" + req);
+
+  if (req.session && req.session.user && req.session.user.userType) {
     // Check if user's role allows access to the requested route
     const isAuthorized =
-      (req.path === "/marketingDashboard" && userRole === 2) ||
-      (req.path === "/dispatchingDashboard" && userRole === 3) ||
-      (req.path === "/receivingDashboard" && userRole === 4) ||
-      (req.path === "/hrDashboard" && userRole === 9);
+      (requestedPath.startsWith("/marketingDashboard") && userRole === 2) ||
+      (requestedPath.startsWith("/dispatchingDashboard") && userRole === 3) ||
+      (requestedPath.startsWith("/receivingDashboard") && userRole === 4) ||
+      (requestedPath.startsWith("/certificationDashboard") && userRole === 7) ||
+      (requestedPath.startsWith("/hrDashboard") && userRole === 9);
 
     if (isAuthorized) {
-      // User is authenticated and authorized
-      res.json({ authenticated: true });
+      console.log("User is authorized");
+      // User is authenticated and authorized, proceed to the next middleware or route handler
+      next();
     } else {
+      console.log("User is not authorized");
       res.status(403).json({ authenticated: false, message: "Unauthorized" });
     }
   } else {
+    console.log("User is not authenticated");
     res
       .status(401)
       .json({ authenticated: false, message: "Not authenticated" });

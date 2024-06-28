@@ -55,28 +55,16 @@ const Quotation = sequelize.define(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("createdAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("updatedAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
     },
     // Paranoid option for soft deletion
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
-      get() {
-        const rawValue = this.getDataValue("deletedAt");
-        return rawValue ? moment(rawValue).tz("Asia/Singapore").format() : null;
-      },
     },
   },
   {

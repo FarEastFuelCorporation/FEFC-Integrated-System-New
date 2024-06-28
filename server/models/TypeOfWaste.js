@@ -38,28 +38,29 @@ const TypeOfWaste = sequelize.define(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("createdAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
+    },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("updatedAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
+      allowNull: true,
+      defaultValue: null,
+    },
+    updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     // Paranoid option for soft deletion
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
-      get() {
-        const rawValue = this.getDataValue("deletedAt");
-        return rawValue ? moment(rawValue).tz("Asia/Singapore").format() : null;
-      },
+    },
+    deletedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

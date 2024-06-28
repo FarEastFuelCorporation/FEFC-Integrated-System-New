@@ -9,14 +9,16 @@ const {
   createClientController,
   updateClientController,
   deleteClientController,
-  createTreatmentProcessController,
-  createTypeOfWasteController,
-  getTypeOfWastesController,
   getQuotationsController,
   createQuotationController,
   deleteQuotationController,
   updateQuotationController,
 } = require("../controllers/marketingDashboardControllers");
+const {
+  createTreatmentProcessController,
+  getTypeOfWastesController,
+  createTypeOfWasteController,
+} = require("../controllers/certificationDashboardControllers");
 
 // Get Clients route
 router.get("/clients", getClientsController);

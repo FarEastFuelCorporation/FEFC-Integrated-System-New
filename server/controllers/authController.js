@@ -138,6 +138,8 @@ async function createEmployeeLoginController(req, res) {
       employeePicture: employeePicture,
     };
 
+    console.log(req.session.user);
+
     // Respond with redirect URL and session details
     res.status(200).json({
       user: {

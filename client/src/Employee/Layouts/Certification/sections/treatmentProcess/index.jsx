@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  IconButton,
   Modal,
   Typography,
   TextField,
   Button,
+  IconButton,
   useTheme,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { tokens } from "../../../../../theme";
-import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 
-const VehicleTypes = ({ user }) => {
+const TreatmentProcess = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -26,11 +26,11 @@ const VehicleTypes = ({ user }) => {
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
-    typeOfVehicle: "",
+    treatmentProcess: "",
     createdBy: user.id,
   });
 
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [treatmentProcess, setTreatmentProcess] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -38,11 +38,11 @@ const VehicleTypes = ({ user }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`
+          `${apiUrl}/certificationDashboard/treatmentProcess`
         );
-        setVehicleTypes(response.data.treatmentProcess);
+        setTreatmentProcess(response.data.treatmentProcesses);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching treatmentProcess:", error);
       }
     };
 
@@ -53,16 +53,6 @@ const VehicleTypes = ({ user }) => {
     setOpenModal(true);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
@@ -71,7 +61,7 @@ const VehicleTypes = ({ user }) => {
   const clearFormData = () => {
     setFormData({
       id: "",
-      typeOfVehicle: "",
+      treatmentProcess: "",
       createdBy: user.id,
     });
   };
@@ -82,22 +72,24 @@ const VehicleTypes = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const typeToEdit = vehicleTypes.find((type) => type.id === id);
-    if (typeToEdit) {
+    const treatmentProcessToEdit = treatmentProcess.find(
+      (process) => process.id === id
+    );
+    if (treatmentProcessToEdit) {
       setFormData({
-        id: typeToEdit.id,
-        typeOfVehicle: typeToEdit.typeOfVehicle,
+        id: treatmentProcessToEdit.id,
+        treatmentProcess: treatmentProcessToEdit.treatmentProcess,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Vehicle type with ID ${id} not found for editing.`);
+      console.error(`Treatment Process with ID ${id} not found for editing.`);
     }
   };
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle type?"
+      "Are you sure you want to delete this treatment process?"
     );
 
     if (!isConfirmed) {
@@ -105,13 +97,16 @@ const VehicleTypes = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/dispatchingDashboard/vehicleTypes/${id}`, {
-        data: { deletedBy: user.id },
-      });
+      await axios.delete(
+        `${apiUrl}/certificationDashboard/treatmentProcess/${id}`,
+        {
+          data: { deletedBy: user.id },
+        }
+      );
 
-      const updatedData = vehicleTypes.filter((type) => type.id !== id);
-      setVehicleTypes(updatedData);
-      setSuccessMessage("Vehicle Type deleted successfully!");
+      const updatedData = treatmentProcess.filter((waste) => waste.id !== id);
+      setTreatmentProcess(updatedData);
+      setSuccessMessage("Treatment Process deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -125,27 +120,27 @@ const VehicleTypes = ({ user }) => {
       let response;
 
       if (formData.id) {
-        // Update existing vehicle type
+        // Update existing type of waste
         response = await axios.put(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes/${formData.id}`,
+          `${apiUrl}/certificationDashboard/treatmentProcess/${formData.id}`,
           formData
         );
 
-        const updatedData = response.data.vehicleTypes;
+        const updatedData = response.data.treatmentProcesses;
 
-        setVehicleTypes(updatedData);
-        setSuccessMessage("Vehicle Type updated successfully!");
+        setTreatmentProcess(updatedData);
+        setSuccessMessage("Treatment Process updated successfully!");
       } else {
-        // Add new vehicle type
+        // Add new type of waste
         response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`,
+          `${apiUrl}/certificationDashboard/treatmentProcess`,
           formData
         );
 
-        const updatedData = response.data.vehicleTypes;
-
-        setVehicleTypes(updatedData);
-        setSuccessMessage("Vehicle Type added successfully!");
+        const updatedData = response.data.treatmentProcesses;
+        console.log(updatedData);
+        setTreatmentProcess(updatedData);
+        setSuccessMessage("Type of waste added successfully!");
       }
 
       setShowSuccessMessage(true);
@@ -157,8 +152,8 @@ const VehicleTypes = ({ user }) => {
 
   const columns = [
     {
-      field: "typeOfVehicle",
-      headerName: "Type of Vehicle",
+      field: "treatmentProcess",
+      headerName: "Treatment Process",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -217,13 +212,13 @@ const VehicleTypes = ({ user }) => {
       )}
       <CustomDataGridStyles>
         <DataGrid
-          rows={vehicleTypes}
+          rows={treatmentProcess}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
+              sortModel: [{ field: "wasteCode", sort: "asc" }],
             },
           }}
         />
@@ -247,12 +242,14 @@ const VehicleTypes = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Vehicle Type" : "Add New Vehicle Type"}
+            {formData.id
+              ? "Update Treatment Process Form"
+              : "Add Treatment Process Form"}
           </Typography>
           <TextField
-            label="Type of Vehicle"
-            name="typeOfVehicle"
-            value={formData.typeOfVehicle}
+            label="Treatment Process"
+            name="treatmentProcess"
+            value={formData.treatmentProcess}
             onChange={handleInputChange}
             fullWidth
             required
@@ -277,7 +274,7 @@ const VehicleTypes = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Vehicle Type" : "Add Vehicle Type"}
+            {formData.id ? "Update Treatment Process" : "Add Treatment Process"}
           </Button>
         </Box>
       </Modal>
@@ -285,4 +282,4 @@ const VehicleTypes = ({ user }) => {
   );
 };
 
-export default VehicleTypes;
+export default TreatmentProcess;

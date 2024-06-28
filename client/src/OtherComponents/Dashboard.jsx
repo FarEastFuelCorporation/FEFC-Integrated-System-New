@@ -4,6 +4,7 @@ import GeneratorRoutes from "../Client/Routes/GeneratorRoutes";
 import MarketingRoutes from "../Employee/Routes/MarketingRoutes";
 import DispatchingRoutes from "../Employee/Routes/DispatchingRoutes";
 import ReceivingRoutes from "../Employee/Routes/ReceivingRoutes";
+import CertificationRoutes from "../Employee/Routes/CertificationRoutes.";
 import HRRoutes from "../Employee/Routes/HRRoutes";
 import RoleProtectedRoute from "../OtherComponents/RoleProtectedRoute";
 import { Navigate } from "react-router-dom";
@@ -39,6 +40,12 @@ const Dashboard = ({ user, onUpdateUser }) => {
       return (
         <RoleProtectedRoute user={user} allowedRoles={[4]}>
           <ReceivingRoutes user={user} />
+        </RoleProtectedRoute>
+      );
+    case 7:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[7]}>
+          <CertificationRoutes user={user} />
         </RoleProtectedRoute>
       );
     case 9:

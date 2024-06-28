@@ -50,7 +50,7 @@ app.use(bodyParser.json());
 // Use express-session middleware
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }, // Use secure: true in production with HTTPS
@@ -59,10 +59,12 @@ app.use(
 
 // Middleware to check authentication
 const { isAuthenticated } = require("./middlewares/auth");
-app.use("/requests", isAuthenticated);
-app.use("/marketing_dashboard", isAuthenticated);
-app.use("/dispatching_dashboard", isAuthenticated);
-app.use("/hr_dashboard", isAuthenticated);
+app.use("/requests/*", isAuthenticated);
+app.use("/marketing_Dashboard/*", isAuthenticated);
+app.use("/dispatching_Dashboard/*", isAuthenticated);
+app.use("/receiving_Dashboard/*", isAuthenticated);
+app.use("/certification_Dashboard/*", isAuthenticated);
+app.use("/hr_Dashboard/*", isAuthenticated);
 
 // Route to check authentication status
 app.get("/api/session", (req, res) => {
@@ -81,6 +83,7 @@ const requestsRoutes = require("./routes/requests");
 const marketingDashboardRoutes = require("./routes/marketing_dashboard");
 const dispatchingDashboardRoutes = require("./routes/dispatching_dashboard");
 const receivingDashboardRoutes = require("./routes/receiving_dashboard");
+const certificationDashboard = require("./routes/certification_dashboard");
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const { error404Controller } = require("./controllers/othersController");
 const sequelize = require("./config/database");
@@ -92,6 +95,7 @@ app.use("/requests", requestsRoutes);
 app.use("/marketingDashboard", marketingDashboardRoutes);
 app.use("/dispatchingDashboard", dispatchingDashboardRoutes);
 app.use("/receivingDashboard", receivingDashboardRoutes);
+app.use("/certificationDashboard", certificationDashboard);
 app.use("/hrDashboard", hrDashboardRoutes);
 
 app.use(express.json()); // Middleware to parse JSON request bodies

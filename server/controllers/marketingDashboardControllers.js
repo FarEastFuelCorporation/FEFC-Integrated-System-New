@@ -2,8 +2,6 @@ require("dotenv").config();
 const Client = require("../models/Client");
 const Quotation = require("../models/Quotation");
 const QuotationWaste = require("../models/QuotationWaste");
-const TreatmentProcess = require("../models/TreatmentProcess");
-const TypeOfWaste = require("../models/TypeOfWaste");
 const generateClientId = require("../utils/generateClientId");
 
 // Dashboard controller
@@ -35,7 +33,7 @@ async function createClientController(req, res) {
       billerAddress,
       billerContactPerson,
       billerContactNumber,
-      submittedBy,
+      createdBy,
     } = req.body;
 
     let clientPicture = null;
@@ -59,7 +57,7 @@ async function createClientController(req, res) {
       billerContactPerson,
       billerContactNumber,
       clientPicture,
-      submittedBy,
+      createdBy,
     });
 
     // Respond with the newly created client data
@@ -87,7 +85,7 @@ async function updateClientController(req, res) {
       billerAddress,
       billerContactPerson,
       billerContactNumber,
-      submittedBy,
+      createdBy,
     } = req.body;
 
     let clientPicture = null;
@@ -109,7 +107,7 @@ async function updateClientController(req, res) {
       updatedClient.billerAddress = billerAddress;
       updatedClient.billerContactPerson = billerContactPerson;
       updatedClient.billerContactNumber = billerContactNumber;
-      updatedClient.submittedBy = submittedBy;
+      updatedClient.updatedBy = createdBy;
       updatedClient.clientPicture = clientPicture;
 
       // Save the updated client
@@ -132,12 +130,19 @@ async function updateClientController(req, res) {
 async function deleteClientController(req, res) {
   try {
     const id = req.params.id;
+    const { deletedBy } = req.body;
+
     console.log("Soft deleting client with ID:", id);
 
     // Find the client by UUID (id)
     const clientToDelete = await Client.findOne({ id });
 
     if (clientToDelete) {
+      // Update the deletedBy field
+      clientToDelete.updatedBy = deletedBy;
+      clientToDelete.deletedBy = deletedBy;
+      await clientToDelete.save();
+
       // Soft delete the client (sets deletedAt timestamp)
       await clientToDelete.destroy();
 
@@ -152,68 +157,6 @@ async function deleteClientController(req, res) {
   } catch (error) {
     // Handle errors
     console.error("Error soft-deleting client:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-}
-
-// Create Treatment Process controller
-async function createTreatmentProcessController(req, res) {
-  try {
-    // Extracting data from the request body
-    const { treatmentProcess } = req.body;
-
-    // Creating a new client
-    const newTreatmentProcess = await TreatmentProcess.create({
-      treatmentProcess,
-    });
-
-    // Respond with the newly created client data
-    res.status(201).json(newTreatmentProcess);
-  } catch (error) {
-    // Handling errors
-    console.error("Error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-}
-
-// Get Type Of Waste controller
-async function getTypeOfWastesController(req, res) {
-  try {
-    // Fetch all clients from the database
-    const typeOfWastes = await TypeOfWaste.findAll({
-      include: {
-        model: TreatmentProcess,
-        as: "TreatmentProcess",
-      },
-      order: [["wasteCode", "ASC"]],
-    });
-
-    res.json({ typeOfWastes });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
-
-// Create Type Of Waste controller
-async function createTypeOfWasteController(req, res) {
-  try {
-    // Extracting data from the request body
-    const { wasteCategory, wasteCode, wasteDescription, treatmentProcessId } =
-      req.body;
-    // Creating a new client
-    const newTypeOfWaste = await TypeOfWaste.create({
-      wasteCategory,
-      wasteCode,
-      wasteDescription,
-      treatmentProcessId,
-    });
-
-    // Respond with the newly created client data
-    res.status(201).json(newTypeOfWaste);
-  } catch (error) {
-    // Handling errors
-    console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -454,9 +397,6 @@ module.exports = {
   createClientController,
   updateClientController,
   deleteClientController,
-  createTreatmentProcessController,
-  getTypeOfWastesController,
-  createTypeOfWasteController,
   getQuotationsController,
   createQuotationController,
   updateQuotationController,

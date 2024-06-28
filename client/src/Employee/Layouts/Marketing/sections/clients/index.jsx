@@ -34,7 +34,7 @@ const Clients = ({ user }) => {
     contactNumber: "",
     clientType: "",
     clientPicture: "",
-    submittedBy: user.id,
+    createdBy: user.id,
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState("");
@@ -95,7 +95,7 @@ const Clients = ({ user }) => {
       contactNumber: "",
       clientType: "",
       clientPicture: "",
-      submittedBy: user.id,
+      createdBy: user.id,
     });
     setFileName("");
   };
@@ -116,7 +116,7 @@ const Clients = ({ user }) => {
         natureOfBusiness: clientToEdit.natureOfBusiness,
         contactNumber: clientToEdit.contactNumber,
         clientType: clientToEdit.clientType,
-        submittedBy: user.id,
+        createdBy: user.id,
       });
       handleOpenModal();
     } else {
@@ -134,7 +134,9 @@ const Clients = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/marketingDashboard/clients/${id}`);
+      await axios.delete(`${apiUrl}/marketingDashboard/clients/${id}`, {
+        data: { deletedBy: user.id },
+      });
 
       const updatedData = clientData.filter((client) => client.id !== id);
       setClientData(updatedData);
@@ -162,7 +164,7 @@ const Clients = ({ user }) => {
       formDataToSend.append("natureOfBusiness", formData.natureOfBusiness);
       formDataToSend.append("contactNumber", formData.contactNumber);
       formDataToSend.append("clientType", formData.clientType);
-      formDataToSend.append("submittedBy", formData.submittedBy);
+      formDataToSend.append("createdBy", formData.createdBy);
 
       // Add clientPicture if it's selected
       if (selectedFile) {
@@ -459,9 +461,9 @@ const Clients = ({ user }) => {
             </Button>
           </label>
           <TextField
-            label="Submitted By"
-            name="submittedBy"
-            value={formData.submittedBy}
+            label="Created By"
+            name="createdBy"
+            value={formData.createdBy}
             onChange={handleInputChange}
             fullWidth
             autoComplete="off"

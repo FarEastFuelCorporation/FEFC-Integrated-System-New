@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  IconButton,
   Modal,
   Typography,
   TextField,
   Button,
+  IconButton,
   useTheme,
   MenuItem,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { tokens } from "../../../../../theme";
-import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 
-const Vehicles = ({ user }) => {
+const TypeOfWastes = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -27,17 +27,15 @@ const Vehicles = ({ user }) => {
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
-    vehicleTypeId: "",
-    plateNumber: "",
-    vehicleName: "",
-    netCapacity: "",
-    ownership: "",
-    vehicleId: "",
+    wasteCategory: "",
+    wasteCode: "",
+    wasteDescription: "",
+    treatmentProcessId: "",
     createdBy: user.id,
   });
 
-  const [vehicleData, setVehicleData] = useState([]);
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [typeOfWastes, setTypeOfWastes] = useState([]);
+  const [treatmentProcess, setTreatmentProcess] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -45,43 +43,40 @@ const Vehicles = ({ user }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicles`
+          `${apiUrl}/certificationDashboard/typeOfWastes`
         );
-        const vehicleRecords = response.data;
+        const typeOfWastesRecords = response.data;
+        console.log(typeOfWastesRecords.typeOfWastes);
+        if (
+          typeOfWastesRecords &&
+          Array.isArray(typeOfWastesRecords.typeOfWastes)
+        ) {
+          const flattenedData = typeOfWastesRecords.typeOfWastes.map(
+            (item) => ({
+              ...item,
+              treatmentProcess: item.TreatmentProcess
+                ? item.TreatmentProcess.treatmentProcess
+                : null,
+            })
+          );
 
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
+          console.log(flattenedData);
+          setTypeOfWastes(flattenedData);
 
-          // Set state with vehicles including typeOfVehicle
-          setVehicleData(flattenedData);
+          const treatmentProcessResponse = await axios.get(
+            `${apiUrl}/certificationDashboard/treatmentProcess`
+          );
+          const treatmentProcessRecords =
+            treatmentProcessResponse.data.treatmentProcess;
+
+          setTreatmentProcess(treatmentProcessRecords);
         } else {
           console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
+            "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
           );
         }
-
-        const vehicleTypeResponse = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`
-        );
-        const sortedVehicleTypes = vehicleTypeResponse.data.vehicleTypes.sort(
-          (a, b) => {
-            if (a.typeOfVehicle < b.typeOfVehicle) {
-              return -1;
-            }
-            if (a.typeOfVehicle > b.typeOfVehicle) {
-              return 1;
-            }
-            return 0;
-          }
-        );
-        setVehicleTypes(sortedVehicleTypes);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching typeOfWastes:", error);
       }
     };
 
@@ -92,16 +87,6 @@ const Vehicles = ({ user }) => {
     setOpenModal(true);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
@@ -110,12 +95,10 @@ const Vehicles = ({ user }) => {
   const clearFormData = () => {
     setFormData({
       id: "",
-      vehicleTypeId: "",
-      plateNumber: "",
-      vehicleName: "",
-      netCapacity: "",
-      ownership: "",
-      vehicleId: "",
+      wasteCategory: "",
+      wasteCode: "",
+      wasteDescription: "",
+      treatmentProcessId: "",
       createdBy: user.id,
     });
   };
@@ -126,26 +109,25 @@ const Vehicles = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const vehicleToEdit = vehicleData.find((vehicle) => vehicle.id === id);
-    if (vehicleToEdit) {
+    const wasteToEdit = typeOfWastes.find((waste) => waste.id === id);
+    if (wasteToEdit) {
       setFormData({
-        id: vehicleToEdit.id,
-        vehicleTypeId: vehicleToEdit.vehicleTypeId,
-        plateNumber: vehicleToEdit.plateNumber,
-        vehicleName: vehicleToEdit.vehicleName,
-        netCapacity: vehicleToEdit.netCapacity,
-        ownership: vehicleToEdit.ownership,
+        id: wasteToEdit.id,
+        wasteCategory: wasteToEdit.wasteCategory,
+        wasteCode: wasteToEdit.wasteCode,
+        wasteDescription: wasteToEdit.wasteDescription,
+        treatmentProcessId: wasteToEdit.treatmentProcessId || "",
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Vehicle with ID ${id} not found for editing.`);
+      console.error(`Type of Waste with ID ${id} not found for editing.`);
     }
   };
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle?"
+      "Are you sure you want to delete this type of waste?"
     );
 
     if (!isConfirmed) {
@@ -153,13 +135,16 @@ const Vehicles = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/dispatchingDashboard/vehicles/${id}`, {
-        data: { deletedBy: user.id },
-      });
+      await axios.delete(
+        `${apiUrl}/certificationDashboard/typeOfWastes/${id}`,
+        {
+          data: { deletedBy: user.id },
+        }
+      );
 
-      const updatedData = vehicleData.filter((vehicle) => vehicle.id !== id);
-      setVehicleData(updatedData);
-      setSuccessMessage("Vehicle deleted successfully!");
+      const updatedData = typeOfWastes.filter((waste) => waste.id !== id);
+      setTypeOfWastes(updatedData);
+      setSuccessMessage("Type of waste deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -173,51 +158,61 @@ const Vehicles = ({ user }) => {
       let response;
 
       if (formData.id) {
-        // Update existing vehicle
+        // Update existing type of waste
         response = await axios.put(
-          `${apiUrl}/dispatchingDashboard/vehicles/${formData.id}`,
+          `${apiUrl}/certificationDashboard/typeOfWastes/${formData.id}`,
           formData
         );
 
-        const vehicleRecords = response.data;
+        const typeOfWastesRecords = response.data;
 
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
+        if (
+          typeOfWastesRecords &&
+          Array.isArray(typeOfWastesRecords.typeOfWastes)
+        ) {
+          const flattenedData = typeOfWastesRecords.typeOfWastes.map(
+            (item) => ({
+              ...item,
+              treatmentProcess: item.TreatmentProcess
+                ? item.TreatmentProcess.treatmentProcess
+                : null,
+            })
+          );
 
-          setVehicleData(flattenedData);
-          setSuccessMessage("Vehicle updated successfully!");
+          setTypeOfWastes(flattenedData);
+          setSuccessMessage("Type of waste updated successfully!");
         } else {
           console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
+            "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
           );
         }
       } else {
-        // Add new vehicle
+        // Add new type of waste
         response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicles`,
+          `${apiUrl}/certificationDashboard/typeOfWastes`,
           formData
         );
 
-        const vehicleRecords = response.data;
+        const typeOfWastesRecords = response.data;
 
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
+        if (
+          typeOfWastesRecords &&
+          Array.isArray(typeOfWastesRecords.typeOfWastes)
+        ) {
+          const flattenedData = typeOfWastesRecords.typeOfWastes.map(
+            (item) => ({
+              ...item,
+              treatmentProcess: item.TreatmentProcess
+                ? item.TreatmentProcess.treatmentProcess
+                : null,
+            })
+          );
 
-          setVehicleData(flattenedData);
-          setSuccessMessage("Vehicle added successfully!");
+          setTypeOfWastes(flattenedData);
+          setSuccessMessage("Type of waste added successfully!");
         } else {
           console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
+            "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
           );
         }
       }
@@ -231,40 +226,35 @@ const Vehicles = ({ user }) => {
 
   const columns = [
     {
-      field: "plateNumber",
-      headerName: "Plate Number",
+      field: "wasteCategory",
+      headerName: "Waste Category",
       headerAlign: "center",
       align: "center",
       width: 150,
     },
     {
-      field: "vehicleName",
-      headerName: "Vehicle Name",
+      field: "wasteCode",
+      headerName: "Waste Code",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
     },
     {
-      field: "netCapacity",
-      headerName: "Net Capacity",
+      field: "wasteDescription",
+      headerName: "Waste Description",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1,
+      minWidth: 150,
     },
     {
-      field: "ownership",
-      headerName: "Ownership",
+      field: "treatmentProcess",
+      headerName: "Treatment Process",
       headerAlign: "center",
       align: "center",
-      width: 150,
-    },
-    {
-      field: "typeOfVehicle",
-      headerName: "Vehicle Type",
-      headerAlign: "center",
-      align: "center",
-      width: 200,
+      flex: 1,
+      minWidth: 150,
     },
     {
       field: "edit",
@@ -303,7 +293,7 @@ const Vehicles = ({ user }) => {
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
-        <Header title="Vehicles" subtitle="List of Vehicles" />
+        <Header title="Vehicle Types" subtitle="List of Vehicle Types" />
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />
@@ -319,13 +309,13 @@ const Vehicles = ({ user }) => {
       )}
       <CustomDataGridStyles>
         <DataGrid
-          rows={vehicleData}
+          rows={typeOfWastes}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
+              sortModel: [{ field: "wasteCode", sort: "asc" }],
             },
           }}
         />
@@ -349,12 +339,14 @@ const Vehicles = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Vehicle" : "Add New Vehicle"}
+            {formData.id
+              ? "Update Type of Waste Form"
+              : "Add New Type of Waste Form"}
           </Typography>
           <TextField
-            label="Vehicle Type"
-            name="vehicleTypeId"
-            value={formData.vehicleTypeId}
+            label="Waste Category"
+            name="wasteCategory"
+            value={formData.wasteCategory}
             onChange={handleInputChange}
             select
             fullWidth
@@ -366,16 +358,17 @@ const Vehicles = ({ user }) => {
             }}
             autoComplete="off"
           >
-            {vehicleTypes.map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.typeOfVehicle}
-              </MenuItem>
-            ))}
+            <MenuItem key={"HW"} value={"HW"}>
+              {"HAZARDOUS WASTE"}
+            </MenuItem>
+            <MenuItem key={"NHW"} value={"NHW"}>
+              {"NON HAZARDOUS WASTE"}
+            </MenuItem>
           </TextField>
           <TextField
-            label="Plate Number"
-            name="plateNumber"
-            value={formData.plateNumber}
+            label="Waste Code"
+            name="wasteCode"
+            value={formData.wasteCode}
             onChange={handleInputChange}
             fullWidth
             required
@@ -384,12 +377,11 @@ const Vehicles = ({ user }) => {
                 color: colors.grey[100],
               },
             }}
-            autoComplete="off"
           />
           <TextField
-            label="Vehicle Name"
-            name="vehicleName"
-            value={formData.vehicleName}
+            label="Waste Description"
+            name="wasteDescription"
+            value={formData.wasteDescription}
             onChange={handleInputChange}
             fullWidth
             required
@@ -398,27 +390,11 @@ const Vehicles = ({ user }) => {
                 color: colors.grey[100],
               },
             }}
-            autoComplete="off"
           />
           <TextField
-            label="Net Capacity"
-            name="netCapacity"
-            value={formData.netCapacity}
-            onChange={handleInputChange}
-            type="number"
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Ownership"
-            name="ownership"
-            value={formData.ownership}
+            label="Treatment Process"
+            name="treatmentProcessId"
+            value={formData.treatmentProcessId}
             onChange={handleInputChange}
             select
             fullWidth
@@ -430,8 +406,11 @@ const Vehicles = ({ user }) => {
             }}
             autoComplete="off"
           >
-            <MenuItem value="OWNED">OWNED</MenuItem>
-            <MenuItem value="LEASED">LEASED</MenuItem>
+            {treatmentProcess.map((type) => (
+              <MenuItem key={type.id} value={type.id}>
+                {type.treatmentProcess}
+              </MenuItem>
+            ))}
           </TextField>
           <TextField
             label="Created By"
@@ -447,7 +426,7 @@ const Vehicles = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Vehicle" : "Add Vehicle"}
+            {formData.id ? "Update Type of Waste" : "Add Type of Waste"}
           </Button>
         </Box>
       </Modal>
@@ -455,4 +434,4 @@ const Vehicles = ({ user }) => {
   );
 };
 
-export default Vehicles;
+export default TypeOfWastes;

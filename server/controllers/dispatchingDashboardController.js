@@ -107,7 +107,7 @@ async function deleteVehicleTypeController(req, res) {
 
       // Respond with a success message
       res.json({
-        message: `VehicleType with ID ${vehicleTypeToDelete.id} soft-deleted successfully`,
+        message: `VehicleType with ID ${id} soft-deleted successfully`,
       });
     } else {
       // If VehicleType with the specified ID was not found
@@ -258,7 +258,7 @@ async function deleteVehicleController(req, res) {
 
       // Respond with a success message
       res.json({
-        message: `Vehicle with ID ${vehicleToDelete.id} soft-deleted successfully`,
+        message: `Vehicle with ID ${id} soft-deleted successfully`,
       });
     } else {
       // If Vehicle with the specified ID was not found
@@ -411,7 +411,7 @@ async function deleteVehicleMaintenanceRequestController(req, res) {
 
       // Respond with a success message
       res.json({
-        message: `VehicleMaintenanceRequest with ID ${vehicleMaintenanceRequestToDelete.id} soft-deleted successfully`,
+        message: `VehicleMaintenanceRequest with ID ${id} soft-deleted successfully`,
       });
     } else {
       // If VehicleType with the specified ID was not found

@@ -235,6 +235,12 @@ const VehicleMaintenanceRequest = ({ user }) => {
     }
   };
 
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
   const columns = [
     {
       field: "plateNumber",
@@ -243,6 +249,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "requestDetails",
@@ -251,6 +258,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
       align: "center",
       flex: 2,
       minWidth: 250,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "createdByName",
@@ -258,51 +266,58 @@ const VehicleMaintenanceRequest = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 250,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "createdAt",
       headerName: "Date Of Request",
       headerAlign: "center",
       align: "center",
-      minWidth: 100,
+      minWidth: 120,
       valueFormatter: (params) => {
         if (!params.value) return ""; // Handle empty or null values
         return format(new Date(params.value), "MMMM dd yyyy");
       },
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: renderCellWithWrapText,
     },
   ];
+
+  if (user.userType === 7) {
+    columns.push(
+      {
+        field: "edit",
+        headerName: "Edit",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+      }
+    );
+  }
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
@@ -311,11 +326,13 @@ const VehicleMaintenanceRequest = ({ user }) => {
           title="Vehicle Maintenance Requests"
           subtitle="List of Vehicle Maintenance Requests"
         />
-        <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
-            <PostAddIcon sx={{ fontSize: "40px" }} />
-          </IconButton>
-        </Box>
+        {user.userType === 7 && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       {showSuccessMessage && (

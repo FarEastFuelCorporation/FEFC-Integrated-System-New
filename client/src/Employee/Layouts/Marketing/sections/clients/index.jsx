@@ -70,16 +70,6 @@ const Clients = ({ user }) => {
     setOpenModal(true);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
@@ -177,37 +167,36 @@ const Clients = ({ user }) => {
         // Update existing client
         response = await axios.put(
           `${apiUrl}/marketingDashboard/clients/${formData.id}`,
-          formDataToSend,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
+          formDataToSend
         );
 
-        const updatedClient = response.data;
+        const clientRecords = response.data;
 
-        const updatedData = clientData.map((client) =>
-          client.id === updatedClient.id ? updatedClient : client
-        );
-
-        setClientData(updatedData);
-        setSuccessMessage("Client updated successfully!");
+        if (clientRecords && Array.isArray(clientRecords.clients)) {
+          setClientData(clientRecords.clients);
+          setSuccessMessage("Client updated successfully!");
+        } else {
+          console.error(
+            "clientRecords or clientRecords.clients is undefined or not an array"
+          );
+        }
       } else {
         // Add new client
         response = await axios.post(
           `${apiUrl}/marketingDashboard/clients`,
-          formDataToSend,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
+          formDataToSend
         );
 
-        const newClient = response.data;
-        setClientData([...clientData, newClient]);
-        setSuccessMessage("Client added successfully!");
+        const clientRecords = response.data;
+
+        if (clientRecords && Array.isArray(clientRecords.clients)) {
+          setClientData(clientRecords.clients);
+          setSuccessMessage("Client added successfully!");
+        } else {
+          console.error(
+            "clientRecords or clientRecords.clients is undefined or not an array"
+          );
+        }
       }
 
       setShowSuccessMessage(true);
@@ -217,13 +206,20 @@ const Clients = ({ user }) => {
     }
   };
 
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
   const columns = [
     {
       field: "clientId",
       headerName: "Client ID",
       headerAlign: "center",
       align: "center",
-      width: 100, // Set a minimum width or initial width
+      width: 100,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "clientPicture",
@@ -276,8 +272,9 @@ const Clients = ({ user }) => {
       headerName: "Client Name",
       headerAlign: "center",
       align: "center",
-      flex: 1, // Use flex to allow content to dictate width
-      minWidth: 150, // Minimum width
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "address",
@@ -286,6 +283,7 @@ const Clients = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 250,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "natureOfBusiness",
@@ -294,6 +292,7 @@ const Clients = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "contactNumber",
@@ -301,57 +300,66 @@ const Clients = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "clientType",
       headerName: "Client Type",
       headerAlign: "center",
       align: "center",
-      width: 100, // Set a width based on content requirements
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
       width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: renderCellWithWrapText,
     },
   ];
+
+  if (user.userType === 2) {
+    columns.push(
+      {
+        field: "edit",
+        headerName: "Edit",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+      }
+    );
+  }
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
         <Header title="Clients" subtitle="List of Clients" />
-        <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
-            <PostAddIcon sx={{ fontSize: "40px" }} />
-          </IconButton>
-        </Box>
+        {user.userType === 2 && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       {showSuccessMessage && (
@@ -400,6 +408,7 @@ const Clients = ({ user }) => {
             value={formData.clientName}
             onChange={handleInputChange}
             fullWidth
+            required
             autoComplete="off"
           />
           <TextField
@@ -408,6 +417,7 @@ const Clients = ({ user }) => {
             value={formData.address}
             onChange={handleInputChange}
             fullWidth
+            required
             autoComplete="off"
           />
           <TextField
@@ -416,6 +426,7 @@ const Clients = ({ user }) => {
             value={formData.natureOfBusiness}
             onChange={handleInputChange}
             fullWidth
+            required
             autoComplete="off"
           />
           <TextField
@@ -424,6 +435,7 @@ const Clients = ({ user }) => {
             value={formData.contactNumber}
             onChange={handleInputChange}
             fullWidth
+            required
             autoComplete="off"
           />
           <TextField
@@ -432,6 +444,8 @@ const Clients = ({ user }) => {
             value={formData.clientType}
             onChange={handleInputChange}
             select
+            required
+            disabled={!!formData.id}
             fullWidth
             autoComplete="off"
           >

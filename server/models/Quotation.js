@@ -3,7 +3,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
-const moment = require("moment-timezone");
 
 const Quotation = sequelize.define(
   "Quotation",
@@ -17,7 +16,6 @@ const Quotation = sequelize.define(
     quotationCode: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     revisionNumber: {
       type: DataTypes.STRING,
@@ -48,23 +46,31 @@ const Quotation = sequelize.define(
       values: ["active", "inactive"],
       defaultValue: "active",
     },
-    submittedBy: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     // Paranoid option for soft deletion
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
+    },
+    deletedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

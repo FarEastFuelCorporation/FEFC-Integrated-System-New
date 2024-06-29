@@ -229,6 +229,12 @@ const Vehicles = ({ user }) => {
     }
   };
 
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
   const columns = [
     {
       field: "plateNumber",
@@ -236,6 +242,7 @@ const Vehicles = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "vehicleName",
@@ -244,6 +251,7 @@ const Vehicles = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "netCapacity",
@@ -251,6 +259,7 @@ const Vehicles = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "ownership",
@@ -258,6 +267,7 @@ const Vehicles = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "typeOfVehicle",
@@ -265,40 +275,46 @@ const Vehicles = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 200,
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: renderCellWithWrapText,
     },
   ];
+
+  if (user.userType === 3) {
+    columns.push(
+      {
+        field: "edit",
+        headerName: "Edit",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+      }
+    );
+  }
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import {
@@ -16,9 +16,7 @@ import SuccessMessage from "../../../OtherComponents/SuccessMessage";
 import Item from "../../../OtherComponents/Item";
 import {
   HomeOutlined as HomeOutlinedIcon,
-  PeopleOutlined as PeopleOutlinedIcon,
   ContactsOutlined as ContactsOutlinedIcon,
-  ReceiptOutlined as ReceiptOutlinedIcon,
   PersonOutlined as PersonOutlinedIcon,
   CalendarTodayOutlined as CalendarTodayOutlinedIcon,
   HelpOutlined as HelpOutlinedIcon,
@@ -39,10 +37,7 @@ const GeneratorSidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
-      "/dashboard/clients": "Clients",
-      "/dashboard/typeOfWastes": "Type Of Wastes",
       "/dashboard/quotations": "Quotations",
-      "/dashboard/commissions": "Commissions",
       "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
@@ -111,7 +106,7 @@ const GeneratorSidebar = ({ user }) => {
     }
   }, [user]);
 
-  const initializeClientDetails = () => {
+  const initializeClientDetails = useCallback(() => {
     const { clientDetails } = user || {};
     setClientDetails({
       clientId: clientDetails?.clientId || "",
@@ -126,11 +121,11 @@ const GeneratorSidebar = ({ user }) => {
       billerContactNumber: clientDetails?.billerContactNumber || "",
       clientPicture: clientDetails?.clientPicture || "",
     });
-  };
+  }, [user]);
 
   useEffect(() => {
     initializeClientDetails();
-  }, [user]);
+  }, [initializeClientDetails]);
 
   const handleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -324,10 +319,10 @@ const GeneratorSidebar = ({ user }) => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/dashboard/dashboard"
+              to=""
               icon={<HomeOutlinedIcon />}
-              selected={selected === "Dashboard"}
-              setSelected={() => setSelected("Dashboard")}
+              selected={selected}
+              setSelected={setSelected}
             />
 
             <Typography
@@ -338,34 +333,19 @@ const GeneratorSidebar = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Clients"
-              to="/dashboard/clients"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected === "Clients"}
-              setSelected={() => setSelected("Clients")}
-            />
-            <Item
-              title="Type Of Wastes"
-              to="/dashboard/typeOfWastes"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected === "Type Of Wastes"}
-              setSelected={() => setSelected("Type Of Wastes")}
+              title="Transactions"
+              to="transactions"
+              icon={<ContactsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
             />
             <Item
               title="Quotations"
-              to="/dashboard/quotations"
+              to="quotations"
               icon={<ContactsOutlinedIcon />}
-              selected={selected === "Quotations"}
-              setSelected={() => setSelected("Quotations")}
+              selected={selected}
+              setSelected={setSelected}
             />
-            <Item
-              title="Commissions"
-              to="/dashboard/commissions"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected === "Commissions"}
-              setSelected={() => setSelected("Commissions")}
-            />
-
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -375,24 +355,24 @@ const GeneratorSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Profile Form"
-              to="/dashboard/form"
+              to="form"
               icon={<PersonOutlinedIcon />}
-              selected={selected === "Profile Form"}
-              setSelected={() => setSelected("Profile Form")}
+              selected={selected}
+              setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              to="/dashboard/calendar"
+              to="calendar"
               icon={<CalendarTodayOutlinedIcon />}
-              selected={selected === "Calendar"}
-              setSelected={() => setSelected("Calendar")}
+              selected={selected}
+              setSelected={setSelected}
             />
             <Item
               title="FAQ Page"
-              to="/dashboard/faq"
+              to="faq"
               icon={<HelpOutlinedIcon />}
-              selected={selected === "FAQ Page"}
-              setSelected={() => setSelected("FAQ Page")}
+              selected={selected}
+              setSelected={setSelected}
             />
 
             <Typography
@@ -404,24 +384,24 @@ const GeneratorSidebar = ({ user }) => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="/dashboard/bar"
+              to="bar"
               icon={<BarChartOutlinedIcon />}
-              selected={selected === "Bar Chart"}
-              setSelected={() => setSelected("Bar Chart")}
+              selected={selected}
+              setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="/dashboard/pie"
+              to="pie"
               icon={<PieChartOutlinedIcon />}
-              selected={selected === "Pie Chart"}
-              setSelected={() => setSelected("Pie Chart")}
+              selected={selected}
+              setSelected={setSelected}
             />
             <Item
               title="Line Chart"
-              to="/dashboard/line"
+              to="line"
               icon={<TimelineOutlinedIcon />}
-              selected={selected === "Line Chart"}
-              setSelected={() => setSelected("Line Chart")}
+              selected={selected}
+              setSelected={setSelected}
             />
           </Box>
         </Menu>

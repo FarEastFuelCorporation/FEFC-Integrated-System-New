@@ -11,7 +11,9 @@ require("dotenv").config();
 async function getVehicleTypesController(req, res) {
   try {
     // Fetch all vehicleTypes from the database
-    const vehicleTypes = await VehicleType.findAll();
+    const vehicleTypes = await VehicleType.findAll({
+      order: [["typeOfVehicle", "ASC"]],
+    });
 
     res.json({ vehicleTypes });
   } catch (error) {

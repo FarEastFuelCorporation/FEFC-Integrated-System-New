@@ -1,7 +1,7 @@
 // components/Quotations.js
 
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -25,7 +25,7 @@ const Quotations = ({ user }) => {
     termsBuying: "",
     scopeOfWork: "",
     remarks: "",
-    submittedBy: user.id,
+    createdBy: user.id,
     quotationWastes: [
       {
         id: null,
@@ -36,7 +36,24 @@ const Quotations = ({ user }) => {
         unit: "",
         unitPrice: 0,
         vatCalculation: "",
-        maxCapacity: 0,
+        hasFixedRate: false,
+        fixedWeight: 0,
+        fixedPrice: 0,
+      },
+    ],
+    quotationTransportation: [
+      {
+        id: null,
+        quotationId: null,
+        vehicleId: "",
+        haulingArea: "",
+        mode: "",
+        unit: "",
+        unitPrice: 0,
+        vatCalculation: "",
+        hasFixedRate: false,
+        fixedWeight: 0,
+        fixedPrice: 0,
       },
     ],
   };
@@ -61,6 +78,9 @@ const Quotations = ({ user }) => {
             clientPicture: item.Client ? item.Client.clientPicture : null,
             clientName: item.Client ? item.Client.clientName : null,
             quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
+            quotationTransportation: item.QuotationTransportation
+              ? item.QuotationTransportation
+              : [],
             validity: item.validity
               ? new Date(item.validity).toISOString().split("T")[0]
               : null, // Convert timestamp to yyyy-mm-dd format
@@ -68,7 +88,7 @@ const Quotations = ({ user }) => {
           setQuotationsData(flattenedData);
         } else {
           console.error(
-            "clientRecords or clientRecords.clients is undefined or not an array"
+            "quotations or quotations.quotations is undefined or not an array"
           );
         }
       } catch (error) {
@@ -94,15 +114,6 @@ const Quotations = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleInputChangeWaste = (index, field, value) => {
-    const updatedWastes = formData.quotationWastes.map((waste, i) =>
-      i === index ? { ...waste, [field]: value } : waste
-    );
-    handleInputChange({
-      target: { name: "quotationWastes", value: updatedWastes },
-    });
-  };
-
   const handleEditClick = (id) => {
     const quotationToEdit = quotationsData.find(
       (quotation) => quotation.id === id
@@ -117,9 +128,12 @@ const Quotations = ({ user }) => {
         termsBuying: quotationToEdit.termsBuying,
         scopeOfWork: quotationToEdit.scopeOfWork,
         remarks: quotationToEdit.remarks,
-        submittedBy: quotationToEdit.Client.submittedBy,
+        createdBy: user.id,
         quotationWastes: quotationToEdit.quotationWastes
           ? quotationToEdit.quotationWastes
+          : [], // Ensure quotationWastes is an array
+        quotationTransportation: quotationToEdit.quotationTransportation
+          ? quotationToEdit.quotationTransportation
           : [], // Ensure quotationWastes is an array
       });
       handleOpenModal();
@@ -138,12 +152,14 @@ const Quotations = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/marketingDashboard/quotations/${id}`);
+      await axios.delete(`${apiUrl}/marketingDashboard/quotations/${id}`, {
+        data: { deletedBy: user.id },
+      });
 
-      const updatedData = quotationsData.filter(
+      const quotations = quotationsData.filter(
         (quotation) => quotation.id !== id
       );
-      setQuotationsData(updatedData);
+      setQuotationsData(quotations);
       setSuccessMessage("Quotation deleted successfully!");
     } catch (error) {
       console.error("Error:", error);
@@ -164,74 +180,56 @@ const Quotations = ({ user }) => {
         // Update existing quotation
         response = await axios.put(
           `${apiUrl}/marketingDashboard/quotations/${formData.id}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          formData
         );
 
-        const updatedQuotation = response.data;
+        const quotations = response.data;
 
-        // Update quotationsData state with the updated quotation
-        const updatedData = quotationsData.map((quotation) =>
-          quotation.id === updatedQuotation.id
-            ? {
-                ...quotation,
-                ...updatedQuotation,
-                clientPicture: updatedQuotation.Client
-                  ? updatedQuotation.Client.clientPicture
-                  : null,
-                clientName: updatedQuotation.Client
-                  ? updatedQuotation.Client.clientName
-                  : null,
-                quotationWastes: updatedQuotation.QuotationWaste
-                  ? updatedQuotation.QuotationWaste
-                  : [],
-                validity: updatedQuotation.validity
-                  ? new Date(updatedQuotation.validity)
-                      .toISOString()
-                      .split("T")[0]
-                  : null,
-              }
-            : quotation
-        );
-
-        setQuotationsData(updatedData);
-        setSuccessMessage("Quotation updated successfully!");
+        if (quotations && Array.isArray(quotations.quotations)) {
+          const flattenedData = quotations.quotations.map((item) => ({
+            ...item,
+            clientPicture: item.Client ? item.Client.clientPicture : null,
+            clientName: item.Client ? item.Client.clientName : null,
+            quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
+            quotationTransportation: item.QuotationTransportation
+              ? item.QuotationTransportation
+              : [],
+            validity: item.validity
+              ? new Date(item.validity).toISOString().split("T")[0]
+              : null, // Convert timestamp to yyyy-mm-dd format
+          }));
+          setQuotationsData(flattenedData);
+          setSuccessMessage("Quotation updated successfully!");
+        } else {
+          console.error(
+            "quotations or quotations.quotations is undefined or not an array"
+          );
+        }
       } else {
         // Add new quotation
         response = await axios.post(
           `${apiUrl}/marketingDashboard/quotations`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          formData
         );
 
-        const newQuotation = response.data;
-        setQuotationsData([
-          ...quotationsData,
-          {
-            ...newQuotation,
-            clientPicture: newQuotation.Client
-              ? newQuotation.Client.clientPicture
-              : null,
-            clientName: newQuotation.Client
-              ? newQuotation.Client.clientName
-              : null,
-            quotationWastes: newQuotation.QuotationWaste
-              ? newQuotation.QuotationWaste
+        const quotations = response.data;
+
+        if (quotations && Array.isArray(quotations.quotations)) {
+          const flattenedData = quotations.quotations.map((item) => ({
+            ...item,
+            clientPicture: item.Client ? item.Client.clientPicture : null,
+            clientName: item.Client ? item.Client.clientName : null,
+            quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
+            quotationTransportation: item.QuotationTransportation
+              ? item.QuotationTransportation
               : [],
-            validity: newQuotation.validity
-              ? new Date(newQuotation.validity).toISOString().split("T")[0]
-              : null,
-          },
-        ]);
-        setSuccessMessage("Quotation added successfully!");
+            validity: item.validity
+              ? new Date(item.validity).toISOString().split("T")[0]
+              : null, // Convert timestamp to yyyy-mm-dd format
+          }));
+          setQuotationsData(flattenedData);
+          setSuccessMessage("Quotation added successfully!");
+        }
       }
 
       setShowSuccessMessage(true);
@@ -241,20 +239,28 @@ const Quotations = ({ user }) => {
     }
   };
 
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
   const columns = [
     {
       field: "quotationCode",
       headerName: "Quotation Code",
       headerAlign: "center",
       align: "center",
-      width: 120, // Set a minimum width or initial width
+      width: 120,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "revisionNumber",
       headerName: "Revision Number",
       headerAlign: "center",
       align: "center",
-      minWidth: 120, // Minimum width
+      minWidth: 120,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "clientPicture",
@@ -309,7 +315,7 @@ const Quotations = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => <div className={"wrap-text"}>{params.value}</div>,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "termsCharge",
@@ -317,6 +323,7 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 120,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "termsBuying",
@@ -324,6 +331,7 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "scopeOfWork",
@@ -332,62 +340,70 @@ const Quotations = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 180,
-      renderCell: (params) => <div className={"wrap-text"}>{params.value}</div>,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "validity",
       headerName: "Validity",
       headerAlign: "center",
       align: "center",
-      minWidth: 100,
+      minWidth: 120,
       valueFormatter: (params) => {
         if (!params.value) return ""; // Handle empty or null values
         return format(new Date(params.value), "MMMM dd yyyy");
       },
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: renderCellWithWrapText,
     },
   ];
+
+  if (user.userType === 2) {
+    columns.push(
+      {
+        field: "edit",
+        headerName: "Edit",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+      }
+    );
+  }
 
   return (
     <Box p="20px" width="100% !important">
       <Box display="flex" justifyContent="space-between">
         <Header title="Quotations" subtitle="List of Quotations" />
-        <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
-            <PostAddIcon sx={{ fontSize: "40px" }} />
-          </IconButton>
-        </Box>
+        {user.userType === 2 && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
       </Box>
       {showSuccessMessage && (
         <SuccessMessage
@@ -414,7 +430,6 @@ const Quotations = ({ user }) => {
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
-        handleInputChangeWaste={handleInputChangeWaste}
         handleFormSubmit={handleFormSubmit}
       />
     </Box>

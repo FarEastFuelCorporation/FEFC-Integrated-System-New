@@ -67,7 +67,7 @@ const TypeOfWastes = ({ user }) => {
             `${apiUrl}/certificationDashboard/treatmentProcess`
           );
           const treatmentProcessRecords =
-            treatmentProcessResponse.data.treatmentProcess;
+            treatmentProcessResponse.data.treatmentProcesses;
 
           setTreatmentProcess(treatmentProcessRecords);
         } else {
@@ -224,6 +224,12 @@ const TypeOfWastes = ({ user }) => {
     }
   };
 
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
   const columns = [
     {
       field: "wasteCategory",
@@ -231,6 +237,7 @@ const TypeOfWastes = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "wasteCode",
@@ -239,6 +246,7 @@ const TypeOfWastes = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "wasteDescription",
@@ -247,6 +255,7 @@ const TypeOfWastes = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "treatmentProcess",
@@ -255,50 +264,58 @@ const TypeOfWastes = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: renderCellWithWrapText,
     },
   ];
+
+  if (user.userType === 7) {
+    columns.push(
+      {
+        field: "edit",
+        headerName: "Edit",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+      }
+    );
+  }
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
         <Header title="Vehicle Types" subtitle="List of Vehicle Types" />
-        <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
-            <PostAddIcon sx={{ fontSize: "40px" }} />
-          </IconButton>
-        </Box>
+        {user.userType === 7 && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       {showSuccessMessage && (

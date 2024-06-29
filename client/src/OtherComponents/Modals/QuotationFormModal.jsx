@@ -29,12 +29,13 @@ const QuotationFormModal = ({
   handleInputChange,
   handleFormSubmit,
 }) => {
-  const [clients, setClients] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [clients, setClients] = useState([]);
   const [wasteTypes, setWasteTypes] = useState([]);
+  const [vehicleTypes, setVehicleTypes] = useState([]);
   const modeOptions = ["BUYING", "CHARGE", "FREE OF CHARGE"];
-  const unitOptions = ["PC", "KG", "L", "DRUM", "LOT"];
+  const unitOptions = ["PC", "KG", "L", "DRUM", "LOT", "TRIP"];
   const vatCalculationOptions = [
     "VAT EXCLUSIVE",
     "VAT INCLUSIVE",
@@ -43,29 +44,25 @@ const QuotationFormModal = ({
 
   useEffect(() => {
     if (open) {
-      const fetchClientsAndWasteTypes = async () => {
+      const fetchData = async () => {
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
-          const [clientsResponse, wasteTypesResponse] = await Promise.all([
-            axios.get(`${apiUrl}/marketingDashboard/clients`),
-            axios.get(`${apiUrl}/marketingDashboard/typeOfWastes`),
-          ]);
+          const [clientsResponse, wasteTypesResponse, vehicleTypesResponse] =
+            await Promise.all([
+              axios.get(`${apiUrl}/marketingDashboard/clients`),
+              axios.get(`${apiUrl}/marketingDashboard/typeOfWastes`),
+              axios.get(`${apiUrl}/dispatchingDashboard/vehicleTypes`),
+            ]);
 
           setClients(clientsResponse.data.clients);
-          const mappedWasteTypes = wasteTypesResponse.data.typeOfWastes.map(
-            (waste) => ({
-              id: waste.id,
-              wasteName: waste.wasteName,
-              wasteCode: waste.wasteCode,
-            })
-          );
-          setWasteTypes(mappedWasteTypes);
+          setWasteTypes(wasteTypesResponse.data.typeOfWastes);
+          setVehicleTypes(vehicleTypesResponse.data.vehicleTypes);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       };
 
-      fetchClientsAndWasteTypes();
+      fetchData();
     }
   }, [open]);
 
@@ -89,12 +86,44 @@ const QuotationFormModal = ({
     });
   };
 
+  const handleAddTransportation = () => {
+    const newTransportation = {
+      id: null,
+      quotationId: null,
+      vehicleId: "",
+      haulingArea: "",
+      mode: "",
+      unit: "",
+      unitPrice: 0,
+      vatCalculation: "",
+      hasFixedRate: false,
+      fixedWeight: 0,
+      fixedPrice: 0,
+    };
+    const updatedTransportation = [
+      ...formData.quotationTransportation,
+      newTransportation,
+    ];
+    handleInputChange({
+      target: { name: "quotationTransportation", value: updatedTransportation },
+    });
+  };
+
   const handleRemoveWaste = (index) => {
     const updatedWastes = formData.quotationWastes.filter(
       (waste, i) => i !== index
     );
     handleInputChange({
       target: { name: "quotationWastes", value: updatedWastes },
+    });
+  };
+
+  const handleRemoveTransportation = (index) => {
+    const updatedTransportation = formData.quotationTransportation.filter(
+      (transportation, i) => i !== index
+    );
+    handleInputChange({
+      target: { name: "quotationTransportation", value: updatedTransportation },
     });
   };
 
@@ -107,6 +136,16 @@ const QuotationFormModal = ({
     });
   };
 
+  const handleTransportationInputChangeLocal = (index, field, value) => {
+    const updatedTransportation = formData.quotationTransportation.map(
+      (transportation, i) =>
+        i === index ? { ...transportation, [field]: value } : transportation
+    );
+    handleInputChange({
+      target: { name: "quotationTransportation", value: updatedTransportation },
+    });
+  };
+
   const handleWasteCodeChange = (index, value) => {
     const selectedWasteType = wasteTypes.find(
       (wasteType) => wasteType.id === value
@@ -115,11 +154,41 @@ const QuotationFormModal = ({
     if (selectedWasteType) {
       const updatedWastes = formData.quotationWastes.map((waste, i) =>
         i === index
-          ? { ...waste, wasteId: value, wasteName: selectedWasteType.wasteName }
+          ? {
+              ...waste,
+              wasteId: value,
+              wasteName: selectedWasteType.wasteDescription,
+            }
           : waste
       );
       handleInputChange({
         target: { name: "quotationWastes", value: updatedWastes },
+      });
+    } else {
+      console.warn(`No waste type found for id: ${value}`);
+    }
+  };
+
+  const handleVehicleTypeChange = (index, value) => {
+    const selectedVehicleType = vehicleTypes.find(
+      (vehicleType) => vehicleType.id === value
+    );
+
+    if (selectedVehicleType) {
+      const updatedTransportation = formData.quotationTransportation.map(
+        (transportation, i) =>
+          i === index
+            ? {
+                ...transportation,
+                vehicleId: value,
+              }
+            : transportation
+      );
+      handleInputChange({
+        target: {
+          name: "quotationTransportation",
+          value: updatedTransportation,
+        },
       });
     } else {
       console.warn(`No waste type found for id: ${value}`);
@@ -165,6 +234,7 @@ const QuotationFormModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                autoComplete="off"
               />
             </Grid>
             <Grid item xs={3}>
@@ -211,6 +281,7 @@ const QuotationFormModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                autoComplete="off"
               />
             </Grid>
             <Grid item xs={1}>
@@ -225,6 +296,7 @@ const QuotationFormModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                autoComplete="off"
               />
             </Grid>
             <Grid item xs={1}>
@@ -240,6 +312,7 @@ const QuotationFormModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                autoComplete="off"
               />
             </Grid>
             <Grid item xs={2.5}>
@@ -255,6 +328,7 @@ const QuotationFormModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                autoComplete="off"
               />
             </Grid>
             <Grid item xs={2.5}>
@@ -269,12 +343,13 @@ const QuotationFormModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                autoComplete="off"
               />
             </Grid>
           </Grid>
           <TextField
-            label="Submitted By"
-            name="submittedBy"
+            label="Created By"
+            name="createdBy"
             value={user}
             onChange={handleInputChange}
             fullWidth
@@ -349,6 +424,7 @@ const QuotationFormModal = ({
                           color: colors.grey[100],
                         },
                       }}
+                      autoComplete="off"
                     />
                   </Grid>
                   <Grid item xs={1.5}>
@@ -561,6 +637,289 @@ const QuotationFormModal = ({
           </Box>
           <Box display="flex" justifyContent="center" mt={2}>
             <IconButton color="success" onClick={handleAddWaste}>
+              <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+            </IconButton>
+          </Box>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ marginTop: "20px" }}
+          >
+            Quotation Transportation
+          </Typography>
+          <Box>
+            {formData.quotationTransportation.map((transportation, index) => (
+              <Box key={index} sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Transportation Entry #{index + 1}
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={1.5}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`transportation-type-select-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        Type of Vehicle
+                      </InputLabel>
+                      <Select
+                        labelId={`transportation-type-select-label-${index}`}
+                        name={`quotationTransportation[${index}].vehicleId`}
+                        value={transportation.vehicleId}
+                        onChange={(e) =>
+                          handleVehicleTypeChange(index, e.target.value)
+                        }
+                        label="Type of Waste"
+                        fullWidth
+                        required
+                        InputLabelProps={{
+                          style: {
+                            color: colors.grey[100],
+                          },
+                        }}
+                      >
+                        {vehicleTypes.map((vehicleType) => (
+                          <MenuItem key={vehicleType.id} value={vehicleType.id}>
+                            {vehicleType.typeOfVehicle}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <TextField
+                      label="Haling Area"
+                      name={`quotationTransportation[${index}].haulingArea`}
+                      value={transportation.haulingArea}
+                      onChange={(e) =>
+                        handleTransportationInputChangeLocal(
+                          index,
+                          "haulingArea",
+                          e.target.value
+                        )
+                      }
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                      autoComplete="off"
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`mode-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        Mode
+                      </InputLabel>
+                      <Select
+                        labelId={`mode-label-${index}`}
+                        name={`quotationTransportation[${index}].mode`}
+                        value={transportation.mode}
+                        onChange={(e) =>
+                          handleTransportationInputChangeLocal(
+                            index,
+                            "mode",
+                            e.target.value
+                          )
+                        }
+                        fullWidth
+                        required
+                        inputProps={{
+                          name: `quotationTransportation[${index}].mode`,
+                          id: `mode-select-${index}`,
+                        }}
+                      >
+                        {modeOptions.map((option, idx) => (
+                          <MenuItem key={idx} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={1}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`unit-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        Unit
+                      </InputLabel>
+                      <Select
+                        labelId={`unit-label-${index}`}
+                        name={`quotationTransportation[${index}].unit`}
+                        value={transportation.unit}
+                        onChange={(e) =>
+                          handleTransportationInputChangeLocal(
+                            index,
+                            "unit",
+                            e.target.value
+                          )
+                        }
+                        fullWidth
+                        required
+                        inputProps={{
+                          name: `quotationTransportation[${index}].unit`,
+                          id: `unit-select-${index}`,
+                        }}
+                      >
+                        {unitOptions.map((option, idx) => (
+                          <MenuItem key={idx} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={1}>
+                    <TextField
+                      label="Unit Price"
+                      name={`quotationTransportation[${index}].unitPrice`}
+                      value={transportation.unitPrice}
+                      onChange={(e) =>
+                        handleTransportationInputChangeLocal(
+                          index,
+                          "unitPrice",
+                          e.target.value
+                        )
+                      }
+                      type="number"
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`vat-calculation-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        VAT Calculation
+                      </InputLabel>
+                      <Select
+                        labelId={`vat-calculation-label-${index}`}
+                        name={`quotationTransportation[${index}].vatCalculation`}
+                        value={transportation.vatCalculation}
+                        onChange={(e) =>
+                          handleTransportationInputChangeLocal(
+                            index,
+                            "vatCalculation",
+                            e.target.value
+                          )
+                        }
+                        fullWidth
+                        required
+                        inputProps={{
+                          name: `quotationTransportation[${index}].vatCalculation`,
+                          id: `vat-calculation-select-${index}`,
+                        }}
+                      >
+                        {vatCalculationOptions.map((option, idx) => (
+                          <MenuItem key={idx} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={0.5}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={transportation.hasFixedRate}
+                          onChange={(e) =>
+                            handleTransportationInputChangeLocal(
+                              index,
+                              "hasFixedRate",
+                              e.target.checked
+                            )
+                          }
+                        />
+                      }
+                      label="Has Fixed Rate"
+                    />
+                  </Grid>
+
+                  <Grid item xs={0.5} textAlign="right">
+                    <IconButton
+                      color="error"
+                      onClick={() => handleRemoveTransportation(index)}
+                    >
+                      <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                    </IconButton>
+                  </Grid>
+                  {transportation.hasFixedRate && (
+                    <>
+                      <Grid item xs={1}>
+                        <TextField
+                          label="Fixed Weight"
+                          name={`quotationTransportation[${index}].fixedWeight`}
+                          value={transportation.fixedWeight}
+                          onChange={(e) =>
+                            handleTransportationInputChangeLocal(
+                              index,
+                              "fixedWeight",
+                              e.target.value
+                            )
+                          }
+                          type="number"
+                          fullWidth
+                          required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={1}>
+                        <TextField
+                          label="Fixed Price"
+                          name={`quotationTransportation[${index}].fixedPrice`}
+                          value={transportation.fixedPrice}
+                          onChange={(e) =>
+                            handleTransportationInputChangeLocal(
+                              index,
+                              "fixedPrice",
+                              e.target.value
+                            )
+                          }
+                          type="number"
+                          fullWidth
+                          required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </>
+                  )}
+                </Grid>
+              </Box>
+            ))}
+          </Box>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <IconButton color="success" onClick={handleAddTransportation}>
               <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
             </IconButton>
           </Box>

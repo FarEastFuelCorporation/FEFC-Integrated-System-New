@@ -2,10 +2,8 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import GeneratorDashboard from "../../Client/Layouts/Generator/GeneratorDashboard";
 import Dashboard from "../../Client/Layouts/Generator/sections/dashboard";
-import Clients from "../../Client/Layouts/Generator/sections/clients";
-import TypeOfWastes from "../../Client/Layouts/Generator/sections/typeOfWaste";
-import Quotations from "../../Client/Layouts/Generator/sections/quotations";
-import Commissions from "../../Client/Layouts/Generator/sections/commissions";
+import Transactions from "../Layouts/Generator/sections/transactions";
+import Quotations from "../../Employee/Layouts/Marketing/sections/quotations";
 import Form from "../../Client/Layouts/Generator/sections/form";
 import Calendar from "../../Client/Layouts/Generator/sections/calendar";
 import FAQ from "../../Client/Layouts/Generator/sections/faq";
@@ -17,10 +15,8 @@ const GeneratorRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<GeneratorDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
-      <Route path="clients" element={<Clients user={user} />} />
-      <Route path="typeOfWastes" element={<TypeOfWastes />} />
-      <Route path="quotations" element={<Quotations />} />
-      <Route path="commissions" element={<Commissions />} />
+      <Route path="transactions" element={<Transactions user={user} />} />
+      <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="form" element={<Form />} />
       <Route path="calendar" element={<Calendar />} />
       <Route path="faq" element={<FAQ />} />

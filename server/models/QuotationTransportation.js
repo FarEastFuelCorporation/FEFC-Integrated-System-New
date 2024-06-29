@@ -1,26 +1,22 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const moment = require("moment-timezone");
+const { v4: uuidv4 } = require("uuid");
 
 const QuotationTransportation = sequelize.define(
   "QuotationTransportation",
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: () => uuidv4(), // Generate UUID automatically
       allowNull: false,
       primaryKey: true,
     },
     quotationId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: "Quotations",
-        key: "id",
-      },
     },
     vehicleId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
     },
     haulingArea: {
@@ -36,40 +32,50 @@ const QuotationTransportation = sequelize.define(
       allowNull: false,
     },
     unitPrice: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
     vatCalculation: {
       type: DataTypes.STRING,
     },
-    maxCapacity: {
-      type: DataTypes.INTEGER,
+    hasFixedRate: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    fixedWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    fixedPrice: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("createdAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
+    },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      get() {
-        const rawValue = this.getDataValue("updatedAt");
-        return moment(rawValue).tz("Asia/Singapore").format();
-      },
+    },
+    updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     // Paranoid option for soft deletion
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
-      get() {
-        const rawValue = this.getDataValue("deletedAt");
-        return rawValue ? moment(rawValue).tz("Asia/Singapore").format() : null;
-      },
+    },
+    deletedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

@@ -40,7 +40,7 @@ const VehicleTypes = ({ user }) => {
         const response = await axios.get(
           `${apiUrl}/dispatchingDashboard/vehicleTypes`
         );
-        setVehicleTypes(response.data.treatmentProcess);
+        setVehicleTypes(response.data.vehicleTypes);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -155,6 +155,12 @@ const VehicleTypes = ({ user }) => {
     }
   };
 
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
   const columns = [
     {
       field: "typeOfVehicle",
@@ -163,50 +169,58 @@ const VehicleTypes = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: renderCellWithWrapText,
     },
   ];
+
+  if (user.userType === 3) {
+    columns.push(
+      {
+        field: "edit",
+        headerName: "Edit",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 60,
+        renderCell: (params) => (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+      }
+    );
+  }
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
         <Header title="Vehicle Types" subtitle="List of Vehicle Types" />
-        <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
-            <PostAddIcon sx={{ fontSize: "40px" }} />
-          </IconButton>
-        </Box>
+        {user.userType === 3 && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       {showSuccessMessage && (

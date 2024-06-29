@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import CertificationDashboard from "../Layouts/Certification/CertificationDashboard";
 import Dashboard from "../Layouts/Certification/sections/dashboard";
-import Clients from "../Layouts/Certification/sections/clients";
+import Clients from "../Layouts/Marketing/sections/clients";
 import TreatmentProcess from "../Layouts/Certification/sections/treatmentProcess";
 import TypeOfWastes from "../Layouts/Certification/sections/typeOfWaste";
 import Form from "../Layouts/Certification/sections/form";
@@ -16,7 +16,7 @@ const CertificationRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<CertificationDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
-      <Route path="clients" element={<Clients />} />
+      <Route path="clients" element={<Clients user={user} />} />
       <Route
         path="treatmentProcess"
         element={<TreatmentProcess user={user} />}

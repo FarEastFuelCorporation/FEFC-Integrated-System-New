@@ -176,6 +176,19 @@ QuotationTransportation.belongsTo(Quotation, {
   onDelete: "CASCADE",
 });
 
+VehicleType.hasMany(QuotationTransportation, {
+  as: "QuotationTransportation",
+  foreignKey: "vehicleId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+QuotationTransportation.belongsTo(VehicleType, {
+  as: "VehicleType",
+  foreignKey: "vehicleId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 // Export the associations
 module.exports = {
   Employee,

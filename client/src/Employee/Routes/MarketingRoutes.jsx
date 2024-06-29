@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import MarketingDashboard from "../../Employee/Layouts/Marketing/MarketingDashboard";
 import Dashboard from "../../Employee/Layouts/Marketing/sections/dashboard";
 import Clients from "../../Employee/Layouts/Marketing/sections/clients";
-import TypeOfWastes from "../../Employee/Layouts/Marketing/sections/typeOfWaste";
+import TypeOfWastes from "../../Employee/Layouts/Certification/sections/typeOfWaste";
 import Quotations from "../../Employee/Layouts/Marketing/sections/quotations";
 import Commissions from "../../Employee/Layouts/Marketing/sections/commissions";
 import Form from "../../Employee/Layouts/Marketing/sections/form";
@@ -18,7 +18,7 @@ const MarketingRoutes = ({ user }) => (
     <Route path="/" element={<MarketingDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="clients" element={<Clients user={user} />} />
-      <Route path="typeOfWastes" element={<TypeOfWastes />} />
+      <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="commissions" element={<Commissions />} />
       <Route path="form" element={<Form />} />

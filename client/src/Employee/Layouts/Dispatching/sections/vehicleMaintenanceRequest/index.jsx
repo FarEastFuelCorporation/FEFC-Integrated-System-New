@@ -41,9 +41,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests`
-        );
+        const response = await axios.get(`${apiUrl}/vehicleMaintenanceRequest`);
 
         if (
           response &&
@@ -65,9 +63,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
           );
         }
 
-        const vehicleResponse = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicles`
-        );
+        const vehicleResponse = await axios.get(`${apiUrl}/vehicle`);
         const sortedVehicles = vehicleResponse.data.vehicles.sort((a, b) => {
           if (a.plateNumber < b.plateNumber) {
             return -1;
@@ -146,12 +142,9 @@ const VehicleMaintenanceRequest = ({ user }) => {
     }
 
     try {
-      await axios.delete(
-        `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests/${id}`,
-        {
-          data: { deletedBy: user.id },
-        }
-      );
+      await axios.delete(`${apiUrl}/vehicleMaintenanceRequest/${id}`, {
+        data: { deletedBy: user.id },
+      });
 
       const updatedData = vehicleRequests.filter(
         (request) => request.id !== id
@@ -173,7 +166,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
       if (formData.id) {
         // Update existing vehicle maintenance request
         response = await axios.put(
-          `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests/${formData.id}`,
+          `${apiUrl}/vehicleMaintenanceRequest/${formData.id}`,
           formData
         );
 
@@ -202,7 +195,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
       } else {
         // Add new vehicle maintenance request
         response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicleMaintenanceRequests`,
+          `${apiUrl}/vehicleMaintenanceRequest`,
           formData
         );
 

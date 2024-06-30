@@ -7,47 +7,141 @@ import {
   TextField,
   Button,
   useTheme,
+  MenuItem,
 } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { format } from "date-fns";
 import axios from "axios";
 import { tokens } from "../../../../../theme";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
-import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import {
+  CustomAccordionStyles,
+  CustomAccordionSummary,
+} from "../../../../../OtherComponents/CustomAccordionStyles";
 
 const Transactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [openModal, setOpenModal] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     id: "",
-    typeOfVehicle: "",
+    quotationWasteId: "",
+    quotationTransportationId: "",
+    haulingDate: "",
+    haulingTime: "",
+    pttNo: "",
+    manifestNo: "",
+    pullOutFormNo: "",
+    remarks: "",
+    statusId: 1,
     createdBy: user.id,
-  });
+  };
 
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
+  const [bookedTransactions, setBookedTransactions] = useState([]);
+  const [quotationsData, setQuotationsData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`
-        );
-        setVehicleTypes(response.data.vehicleTypes);
+        const [bookedTransactionResponse, quotationResponse] =
+          await Promise.all([
+            axios.get(`${apiUrl}/bookedTransaction`),
+            axios.get(`${apiUrl}/quotation/${user.id}`),
+          ]);
+
+        const bookedTransactions = bookedTransactionResponse.data;
+        console.log(bookedTransactions);
+        console.log(bookedTransactions.bookedTransactions);
+        if (
+          bookedTransactions &&
+          Array.isArray(bookedTransactions.bookedTransactions)
+        ) {
+          const flattenedData = bookedTransactions.bookedTransactions.map(
+            (item) => {
+              const haulingDate = item.haulingDate
+                ? new Date(item.haulingDate)
+                : null;
+              let haulingTime = null;
+              if (item.haulingTime) {
+                const [hours, minutes, seconds] = item.haulingTime.split(":");
+                haulingTime = new Date(
+                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
+                ); // Create a date using UTC
+              }
+
+              return {
+                ...item,
+                haulingDate: haulingDate
+                  ? haulingDate.toISOString().split("T")[0]
+                  : null,
+                haulingTime: haulingTime
+                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
+                  : null,
+                wasteName: item.QuotationWaste
+                  ? item.QuotationWaste.wasteName
+                  : null,
+                vehicleType: item.QuotationTransportation
+                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
+                  : null,
+              };
+            }
+          );
+          console.log(flattenedData);
+          setBookedTransactions(flattenedData);
+        } else {
+          console.error(
+            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
+          );
+        }
+
+        const quotations = quotationResponse.data;
+
+        if (quotations && Array.isArray(quotations.quotations)) {
+          const flattenedData = quotations.quotations.map((item) => ({
+            ...item,
+            wasteNames: item.QuotationWaste
+              ? item.QuotationWaste.map((qw) =>
+                  qw.wasteName ? qw.wasteName : null
+                )
+              : [],
+            quotationWasteId: item.QuotationWaste
+              ? item.QuotationWaste.map((qw) => (qw.id ? qw.id : null))
+              : [],
+            vehicleTypes: item.QuotationTransportation
+              ? item.QuotationTransportation.map((qt) =>
+                  qt.VehicleType ? qt.VehicleType.typeOfVehicle : null
+                )
+              : [],
+            quotationTransportationId: item.QuotationTransportation
+              ? item.QuotationTransportation.map((qt) => (qt.id ? qt.id : null))
+              : [],
+            haulingDate: item.haulingDate
+              ? new Date(item.haulingDate).toISOString().split("T")[0]
+              : null, // Convert timestamp to yyyy-mm-dd format
+          }));
+          console.log(quotationResponse.data);
+          console.log(flattenedData);
+          setQuotationsData(flattenedData);
+        } else {
+          console.error(
+            "quotations or quotations.quotations is undefined or not an array"
+          );
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [apiUrl]);
+  }, [apiUrl, user.id]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -69,11 +163,7 @@ const Transactions = ({ user }) => {
   };
 
   const clearFormData = () => {
-    setFormData({
-      id: "",
-      typeOfVehicle: "",
-      createdBy: user.id,
-    });
+    setFormData(initialFormData);
   };
 
   const handleInputChange = (e) => {
@@ -82,11 +172,18 @@ const Transactions = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const typeToEdit = vehicleTypes.find((type) => type.id === id);
+    const typeToEdit = bookedTransactions.find((type) => type.id === id);
     if (typeToEdit) {
       setFormData({
         id: typeToEdit.id,
-        typeOfVehicle: typeToEdit.typeOfVehicle,
+        quotationWasteId: typeToEdit.quotationWasteId,
+        quotationTransportationId: typeToEdit.quotationTransportationId,
+        haulingDate: typeToEdit.haulingDate,
+        haulingTime: typeToEdit.haulingTime,
+        pttNo: typeToEdit.pttNo,
+        manifestNo: typeToEdit.manifestNo,
+        pullOutFormNo: typeToEdit.pullOutFormNo,
+        statusId: 1,
         createdBy: user.id,
       });
       handleOpenModal();
@@ -105,12 +202,12 @@ const Transactions = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/dispatchingDashboard/vehicleTypes/${id}`, {
+      await axios.delete(`${apiUrl}/bookedTransaction/${id}`, {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = vehicleTypes.filter((type) => type.id !== id);
-      setVehicleTypes(updatedData);
+      const updatedData = bookedTransactions.filter((type) => type.id !== id);
+      setBookedTransactions(updatedData);
       setSuccessMessage("Vehicle Type deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -125,27 +222,22 @@ const Transactions = ({ user }) => {
       let response;
 
       if (formData.id) {
-        // Update existing vehicle type
         response = await axios.put(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes/${formData.id}`,
+          `${apiUrl}/bookedTransaction/${formData.id}`,
           formData
         );
 
-        const updatedData = response.data.vehicleTypes;
+        const updatedData = response.data.bookedTransactions;
 
-        setVehicleTypes(updatedData);
-        setSuccessMessage("Vehicle Type updated successfully!");
+        setBookedTransactions(updatedData);
+        setSuccessMessage("Booked Transaction updated successfully!");
       } else {
-        // Add new vehicle type
-        response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`,
-          formData
-        );
+        response = await axios.post(`${apiUrl}/bookedTransaction`, formData);
 
-        const updatedData = response.data.vehicleTypes;
+        const updatedData = response.data.bookedTransactions;
 
-        setVehicleTypes(updatedData);
-        setSuccessMessage("Vehicle Type added successfully!");
+        setBookedTransactions(updatedData);
+        setSuccessMessage("Booked Transaction successfully!");
       }
 
       setShowSuccessMessage(true);
@@ -155,60 +247,15 @@ const Transactions = ({ user }) => {
     }
   };
 
-  const renderCellWithWrapText = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {params.value}
-    </div>
-  );
-
-  const columns = [
-    {
-      field: "typeOfVehicle",
-      headerName: "Type of Vehicle",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-  ];
-
-  if (user.userType === 3) {
-    columns.push(
-      {
-        field: "edit",
-        headerName: "Edit",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row.id)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
-      },
-      {
-        field: "delete",
-        headerName: "Delete",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
-      }
-    );
-  }
+  const parseTimeString = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date;
+  };
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
@@ -229,19 +276,40 @@ const Transactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <CustomDataGridStyles>
-        <DataGrid
-          rows={vehicleTypes}
-          columns={columns}
-          components={{ Toolbar: GridToolbar }}
-          getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
-            },
-          }}
-        />
-      </CustomDataGridStyles>
+      <CustomAccordionStyles>
+        {bookedTransactions.map((row) => (
+          <Accordion key={row.id}>
+            <CustomAccordionSummary
+              row={row}
+              handleEditClick={handleEditClick}
+              handleDeleteClick={handleDeleteClick}
+            />
+            <AccordionDetails
+              sx={{
+                paddingLeft: "100px !important",
+              }}
+            >
+              <Typography variant="h4" color={colors.greenAccent[400]}>
+                Booked
+              </Typography>
+              <Typography variant="h5">
+                Hauling Date:{" "}
+                {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+              </Typography>
+              <Typography variant="h5">
+                Hauling Time:{" "}
+                {row.haulingTime
+                  ? format(parseTimeString(row.haulingTime), "hh:mm aa")
+                  : ""}
+              </Typography>
+              <Typography variant="h5">Waste Name: {row.wasteName}</Typography>
+              <Typography variant="h5">
+                Vehicle Type: {row.vehicleType}
+              </Typography>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </CustomAccordionStyles>
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           component="form"
@@ -261,13 +329,48 @@ const Transactions = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Vehicle Type" : "Add New Vehicle Type"}
+            {formData.id ? "Update Booked Transaction" : "Book Transaction"}
           </Typography>
+          <div style={{ width: "100%", display: "flex", gap: "20px" }}>
+            <TextField
+              label="Hauling Date"
+              name="haulingDate"
+              value={formData.haulingDate}
+              onChange={handleInputChange}
+              fullWidth
+              type="date"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+            <TextField
+              label="Hauling Time"
+              name="haulingTime"
+              value={formData.haulingTime}
+              onChange={handleInputChange}
+              fullWidth
+              type="time"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </div>
           <TextField
-            label="Type of Vehicle"
-            name="typeOfVehicle"
-            value={formData.typeOfVehicle}
+            label="Waste Name"
+            name="quotationWasteId"
+            value={formData.wasteName}
             onChange={handleInputChange}
+            select
             fullWidth
             required
             InputLabelProps={{
@@ -276,6 +379,46 @@ const Transactions = ({ user }) => {
               },
             }}
             autoComplete="off"
+          >
+            {quotationsData
+              .flatMap((q) => q.quotationWasteId)
+              .map((wasteId, index) => (
+                <MenuItem key={index} value={wasteId}>
+                  {quotationsData[index].wasteNames[index]}
+                </MenuItem>
+              ))}
+          </TextField>
+          <TextField
+            label="Vehicle Type"
+            name="quotationTransportationId"
+            value={formData.vehicleType}
+            onChange={handleInputChange}
+            select
+            fullWidth
+            required
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          >
+            {quotationsData
+              .flatMap((q) => q.quotationTransportationId)
+              .map((transportationId, index) => (
+                <MenuItem key={index} value={transportationId}>
+                  {quotationsData[index].vehicleTypes[index]}
+                </MenuItem>
+              ))}
+          </TextField>
+          <TextField
+            label="Status Id"
+            name="statusId"
+            value={formData.statusId}
+            onChange={handleInputChange}
+            fullWidth
+            autoComplete="off"
+            style={{ display: "none" }}
           />
           <TextField
             label="Created By"
@@ -291,7 +434,7 @@ const Transactions = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Vehicle Type" : "Add Vehicle Type"}
+            {formData.id ? "Update Booked Transaction" : "Book Transaction"}
           </Button>
         </Box>
       </Modal>

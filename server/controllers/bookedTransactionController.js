@@ -1,53 +1,50 @@
-// controllers/clientController.js
+// controllers/bookedTransactionController.js
 
-const Client = require("../models/Client");
-const generateClientId = require("../utils/generateClientId");
+const BookedTransaction = require("../models/BookedTransaction");
+const QuotationTransportation = require("../models/QuotationTransportation");
+const QuotationWaste = require("../models/QuotationWaste");
+const TypeOfWaste = require("../models/TypeOfWaste");
+const VehicleType = require("../models/VehicleType");
+const generateTransactionId = require("../utils/generateTransactionId");
 
-// Create Client controller
-async function createClientController(req, res) {
+// Create Booked Transaction controller
+async function createBookedTransactionController(req, res) {
   try {
     // Extracting data from the request body
     const {
-      clientName,
-      address,
-      natureOfBusiness,
-      contactNumber,
-      clientType,
-      billerName,
-      billerAddress,
-      billerContactPerson,
-      billerContactNumber,
+      quotationWasteId,
+      quotationTransportationId,
+      haulingDate,
+      haulingTime,
+      pttNo,
+      manifestNo,
+      pullOutFormNo,
+      remarks,
+      statusId,
       createdBy,
     } = req.body;
 
-    let clientPicture = null;
-    if (req.file) {
-      clientPicture = req.file.buffer;
-    }
-
-    // Generate a new client ID based on the client type
-    const clientId = await generateClientId(clientType);
+    const transactionId = await generateTransactionId();
 
     // Creating a new client
-    await Client.create({
-      clientId,
-      clientName,
-      address,
-      natureOfBusiness,
-      contactNumber,
-      clientType,
-      billerName,
-      billerAddress,
-      billerContactPerson,
-      billerContactNumber,
-      clientPicture,
+    await BookedTransaction.create({
+      transactionId,
+      quotationWasteId,
+      quotationTransportationId,
+      haulingDate,
+      haulingTime,
+      pttNo,
+      manifestNo,
+      pullOutFormNo,
+      remarks,
+      statusId,
       createdBy,
     });
 
-    const clients = await Client.findAll();
+    const bookedTransactions = await BookedTransaction.findAll();
 
     // Respond with the newly created client data
-    res.status(201).json({ clients });
+    res.status(201).json({ bookedTransactions });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -55,21 +52,44 @@ async function createClientController(req, res) {
   }
 }
 
-// Get Clients controller
-async function getClientsController(req, res) {
+// Get Booked Transactions controller
+async function getBookedTransactionsController(req, res) {
   try {
     // Fetch all clients from the database
-    const clients = await Client.findAll();
+    const bookedTransactions = await BookedTransaction.findAll({
+      include: [
+        {
+          model: QuotationWaste,
+          as: "QuotationWaste",
+          include: [
+            {
+              model: TypeOfWaste,
+              as: "TypeOfWaste",
+            },
+          ],
+        },
+        {
+          model: QuotationTransportation,
+          as: "QuotationTransportation",
+          include: [
+            {
+              model: VehicleType,
+              as: "VehicleType",
+            },
+          ],
+        },
+      ],
+    });
 
-    res.json({ clients });
+    res.json({ bookedTransactions });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
 
-// Get Client controller
-async function getClientController(req, res) {
+// Get Booked Transaction controller
+async function getBookedTransactionController(req, res) {
   try {
     const client = await Client.findByPk(req.params.id);
     res.json(client);
@@ -78,8 +98,8 @@ async function getClientController(req, res) {
   }
 }
 
-// Update Client controller
-async function updateClientController(req, res) {
+// Update Booked Transaction controller
+async function updateBookedTransactionController(req, res) {
   try {
     const id = req.params.id;
     console.log("Updating client with ID:", id);
@@ -137,8 +157,8 @@ async function updateClientController(req, res) {
   }
 }
 
-// Delete Client controller
-async function deleteClientController(req, res) {
+// Delete Booked Transaction controller
+async function deleteBookedTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
@@ -173,9 +193,9 @@ async function deleteClientController(req, res) {
 }
 
 module.exports = {
-  createClientController,
-  getClientsController,
-  getClientController,
-  updateClientController,
-  deleteClientController,
+  createBookedTransactionController,
+  getBookedTransactionsController,
+  getBookedTransactionController,
+  updateBookedTransactionController,
+  deleteBookedTransactionController,
 };

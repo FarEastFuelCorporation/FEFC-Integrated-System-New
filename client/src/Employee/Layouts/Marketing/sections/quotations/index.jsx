@@ -67,9 +67,16 @@ const Quotations = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/marketingDashboard/quotations`
-        );
+        let response;
+        if (
+          user.userType === "GEN" ||
+          user.userType === "TRP" ||
+          user.userType === "IFM"
+        ) {
+          response = await axios.get(`${apiUrl}/quotation/${user.id}`);
+        } else {
+          response = await axios.get(`${apiUrl}/quotation`);
+        }
         const quotations = response.data;
 
         if (quotations && Array.isArray(quotations.quotations)) {
@@ -97,7 +104,7 @@ const Quotations = ({ user }) => {
     };
 
     fetchData();
-  }, [apiUrl]);
+  }, [apiUrl, user.id, user.userType]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -152,7 +159,7 @@ const Quotations = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/marketingDashboard/quotations/${id}`, {
+      await axios.delete(`${apiUrl}/quotation/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -179,7 +186,7 @@ const Quotations = ({ user }) => {
 
         // Update existing quotation
         response = await axios.put(
-          `${apiUrl}/marketingDashboard/quotations/${formData.id}`,
+          `${apiUrl}/quotation/${formData.id}`,
           formData
         );
 
@@ -207,10 +214,7 @@ const Quotations = ({ user }) => {
         }
       } else {
         // Add new quotation
-        response = await axios.post(
-          `${apiUrl}/marketingDashboard/quotations`,
-          formData
-        );
+        response = await axios.post(`${apiUrl}/quotation`, formData);
 
         const quotations = response.data;
 

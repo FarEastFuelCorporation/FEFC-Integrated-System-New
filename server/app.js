@@ -78,24 +78,32 @@ app.get("/api/session", (req, res) => {
 // Include your routes
 const authRoutes = require("./routes/auth");
 const othersRoutes = require("./routes/others");
-const clientRoutes = require("./routes/client");
 const requestsRoutes = require("./routes/requests");
-const marketingDashboardRoutes = require("./routes/marketing_dashboard");
-const dispatchingDashboardRoutes = require("./routes/dispatching_dashboard");
+const clientRoutes = require("./routes/clientRoutes");
+const quotationRoutes = require("./routes/quotationRoutes");
+const typeOfWasteRoutes = require("./routes/typeOfWasteRoutes");
+const treatmentProcessRoutes = require("./routes/treatmentProcessRoutes");
+const vehicleTypeRoutes = require("./routes/vehicleTypeRoutes");
+const vehicleRoutes = require("./routes/vehicleRoutes");
+const vehicleMaintenanceRequestRoutes = require("./routes/vehicleMaintenanceRequestRoutes");
+const bookedTransactionRoutes = require("./routes/bookedTransactionRoutes");
 const receivingDashboardRoutes = require("./routes/receiving_dashboard");
-const certificationDashboard = require("./routes/certification_dashboard");
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const { error404Controller } = require("./controllers/othersController");
 const sequelize = require("./config/database");
 
 app.use(authRoutes);
 app.use(othersRoutes);
+app.use("/request", requestsRoutes);
 app.use("/client", clientRoutes);
-app.use("/requests", requestsRoutes);
-app.use("/marketingDashboard", marketingDashboardRoutes);
-app.use("/dispatchingDashboard", dispatchingDashboardRoutes);
+app.use("/quotation", quotationRoutes);
+app.use("/typeOfWaste", typeOfWasteRoutes);
+app.use("/treatmentProcess", treatmentProcessRoutes);
+app.use("/vehicleType", vehicleTypeRoutes);
+app.use("/vehicle", vehicleRoutes);
+app.use("/vehicleMaintenanceRequest", vehicleMaintenanceRequestRoutes);
+app.use("/bookedTransaction", bookedTransactionRoutes);
 app.use("/receivingDashboard", receivingDashboardRoutes);
-app.use("/certificationDashboard", certificationDashboard);
 app.use("/hrDashboard", hrDashboardRoutes);
 
 app.use(express.json()); // Middleware to parse JSON request bodies

@@ -46,9 +46,7 @@ const Clients = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/marketingDashboard/clients`
-        );
+        const response = await axios.get(`${apiUrl}/client`);
         const clientRecords = response.data;
 
         if (clientRecords && Array.isArray(clientRecords.clients)) {
@@ -124,7 +122,7 @@ const Clients = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/marketingDashboard/clients/${id}`, {
+      await axios.delete(`${apiUrl}/client/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -166,7 +164,7 @@ const Clients = ({ user }) => {
       if (formData.id) {
         // Update existing client
         response = await axios.put(
-          `${apiUrl}/marketingDashboard/clients/${formData.id}`,
+          `${apiUrl}/client/${formData.id}`,
           formDataToSend
         );
 
@@ -182,10 +180,7 @@ const Clients = ({ user }) => {
         }
       } else {
         // Add new client
-        response = await axios.post(
-          `${apiUrl}/marketingDashboard/clients`,
-          formDataToSend
-        );
+        response = await axios.post(`${apiUrl}/client`, formDataToSend);
 
         const clientRecords = response.data;
 

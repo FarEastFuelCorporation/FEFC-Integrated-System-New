@@ -37,9 +37,7 @@ const VehicleTypes = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`
-        );
+        const response = await axios.get(`${apiUrl}/vehicleType`);
         setVehicleTypes(response.data.vehicleTypes);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -105,7 +103,7 @@ const VehicleTypes = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/dispatchingDashboard/vehicleTypes/${id}`, {
+      await axios.delete(`${apiUrl}/vehicleType/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -127,7 +125,7 @@ const VehicleTypes = ({ user }) => {
       if (formData.id) {
         // Update existing vehicle type
         response = await axios.put(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes/${formData.id}`,
+          `${apiUrl}//vehicleType/${formData.id}`,
           formData
         );
 
@@ -137,10 +135,7 @@ const VehicleTypes = ({ user }) => {
         setSuccessMessage("Vehicle Type updated successfully!");
       } else {
         // Add new vehicle type
-        response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicleTypes`,
-          formData
-        );
+        response = await axios.post(`${apiUrl}/vehicleType`, formData);
 
         const updatedData = response.data.vehicleTypes;
 

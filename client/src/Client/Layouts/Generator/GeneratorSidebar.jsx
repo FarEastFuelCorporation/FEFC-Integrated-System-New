@@ -37,6 +37,7 @@ const GeneratorSidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
+      "/dashboard/transactions": "Transactions",
       "/dashboard/quotations": "Quotations",
       "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",

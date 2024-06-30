@@ -1,3 +1,5 @@
+// utils/generateClientId
+
 const Client = require("../models/Client");
 const { Op } = require("sequelize");
 

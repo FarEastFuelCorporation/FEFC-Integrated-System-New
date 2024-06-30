@@ -37,9 +37,7 @@ const TreatmentProcess = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/certificationDashboard/treatmentProcess`
-        );
+        const response = await axios.get(`${apiUrl}/treatmentProcess`);
         setTreatmentProcess(response.data.treatmentProcesses);
       } catch (error) {
         console.error("Error fetching treatmentProcess:", error);
@@ -97,12 +95,9 @@ const TreatmentProcess = ({ user }) => {
     }
 
     try {
-      await axios.delete(
-        `${apiUrl}/certificationDashboard/treatmentProcess/${id}`,
-        {
-          data: { deletedBy: user.id },
-        }
-      );
+      await axios.delete(`${apiUrl}/treatmentProcess/${id}`, {
+        data: { deletedBy: user.id },
+      });
 
       const updatedData = treatmentProcess.filter((waste) => waste.id !== id);
       setTreatmentProcess(updatedData);
@@ -122,7 +117,7 @@ const TreatmentProcess = ({ user }) => {
       if (formData.id) {
         // Update existing type of waste
         response = await axios.put(
-          `${apiUrl}/certificationDashboard/treatmentProcess/${formData.id}`,
+          `${apiUrl}/treatmentProcess/${formData.id}`,
           formData
         );
 
@@ -132,10 +127,7 @@ const TreatmentProcess = ({ user }) => {
         setSuccessMessage("Treatment Process updated successfully!");
       } else {
         // Add new type of waste
-        response = await axios.post(
-          `${apiUrl}/certificationDashboard/treatmentProcess`,
-          formData
-        );
+        response = await axios.post(`${apiUrl}/treatmentProcess`, formData);
 
         const updatedData = response.data.treatmentProcesses;
         console.log(updatedData);

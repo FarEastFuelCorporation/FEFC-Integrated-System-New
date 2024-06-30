@@ -16,6 +16,7 @@ const QuotationWaste = require("../models/QuotationWaste");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const ClientUser = require("../models/ClientUser");
 const VehicleMaintenanceRequest = require("../models/VehicleMaintenanceRequest");
+const BookedTransaction = require("../models/BookedTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -185,6 +186,45 @@ VehicleType.hasMany(QuotationTransportation, {
 QuotationTransportation.belongsTo(VehicleType, {
   as: "VehicleType",
   foreignKey: "vehicleId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+QuotationWaste.hasMany(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "quotationWasteId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+BookedTransaction.belongsTo(QuotationWaste, {
+  as: "QuotationWaste",
+  foreignKey: "quotationWasteId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+QuotationTransportation.hasMany(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "quotationTransportationId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+BookedTransaction.belongsTo(QuotationTransportation, {
+  as: "QuotationTransportation",
+  foreignKey: "quotationTransportationId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+TransactionStatus.hasMany(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "statusId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+BookedTransaction.belongsTo(TransactionStatus, {
+  as: "TransactionStatus",
+  foreignKey: "statusId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

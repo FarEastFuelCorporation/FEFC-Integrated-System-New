@@ -48,6 +48,86 @@ const Transactions = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const processDataBookedTransaction = (response) => {
+    const transactions = response.data;
+    if (transactions && Array.isArray(transactions.bookedTransactions)) {
+      const flattenedData = transactions.bookedTransactions.map((item) => {
+        const haulingDate = item.haulingDate
+          ? new Date(item.haulingDate)
+          : null;
+        const createdDate = item.createdAt ? new Date(item.createdAt) : null;
+        let haulingTime = null;
+        let createdTime = null;
+        if (item.haulingTime) {
+          const [hours, minutes, seconds] = item.haulingTime.split(":");
+          haulingTime = new Date(Date.UTC(1970, 0, 1, hours, minutes, seconds)); // Create a date using UTC
+        }
+        if (createdDate) {
+          createdTime = createdDate.toISOString().split("T")[1].slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
+        }
+
+        return {
+          ...item,
+          haulingDate: haulingDate
+            ? haulingDate.toISOString().split("T")[0]
+            : null,
+          haulingTime: haulingTime
+            ? haulingTime.toISOString().split("T")[1].slice(0, 5)
+            : null,
+          createdDate: createdDate
+            ? createdDate.toISOString().split("T")[0]
+            : null,
+          createdTime: createdTime,
+          wasteName: item.QuotationWaste ? item.QuotationWaste.wasteName : null,
+          vehicleType: item.QuotationTransportation
+            ? item.QuotationTransportation.VehicleType.typeOfVehicle
+            : null,
+        };
+      });
+
+      setBookedTransactions(flattenedData);
+    } else {
+      console.error(
+        "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
+      );
+    }
+  };
+
+  const processDataQuotations = (response) => {
+    const transactions = response.data;
+
+    if (transactions && Array.isArray(transactions.quotations)) {
+      const flattenedData = transactions.quotations.map((item) => ({
+        ...item,
+        wasteNames: item.QuotationWaste
+          ? item.QuotationWaste.map((qw) =>
+              qw.wasteName ? qw.wasteName : null
+            )
+          : [],
+        quotationWasteId: item.QuotationWaste
+          ? item.QuotationWaste.map((qw) => (qw.id ? qw.id : null))
+          : [],
+        vehicleTypes: item.QuotationTransportation
+          ? item.QuotationTransportation.map((qt) =>
+              qt.VehicleType ? qt.VehicleType.typeOfVehicle : null
+            )
+          : [],
+        quotationTransportationId: item.QuotationTransportation
+          ? item.QuotationTransportation.map((qt) => (qt.id ? qt.id : null))
+          : [],
+        haulingDate: item.haulingDate
+          ? new Date(item.haulingDate).toISOString().split("T")[0]
+          : null, // Convert timestamp to yyyy-mm-dd format
+      }));
+
+      setQuotationsData(flattenedData);
+    } else {
+      console.error(
+        "quotations or quotations.quotations is undefined or not an array"
+      );
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,97 +136,8 @@ const Transactions = ({ user }) => {
             axios.get(`${apiUrl}/bookedTransaction`),
             axios.get(`${apiUrl}/quotation/${user.id}`),
           ]);
-
-        const bookedTransactions = bookedTransactionResponse.data;
-
-        if (
-          bookedTransactions &&
-          Array.isArray(bookedTransactions.bookedTransactions)
-        ) {
-          const flattenedData = bookedTransactions.bookedTransactions.map(
-            (item) => {
-              const haulingDate = item.haulingDate
-                ? new Date(item.haulingDate)
-                : null;
-              const createdDate = item.createdAt
-                ? new Date(item.createdAt)
-                : null;
-              let haulingTime = null;
-              let createdTime = null;
-              if (item.haulingTime) {
-                const [hours, minutes, seconds] = item.haulingTime.split(":");
-                haulingTime = new Date(
-                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
-                ); // Create a date using UTC
-              }
-              if (createdDate) {
-                createdTime = createdDate
-                  .toISOString()
-                  .split("T")[1]
-                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-              }
-
-              return {
-                ...item,
-                haulingDate: haulingDate
-                  ? haulingDate.toISOString().split("T")[0]
-                  : null,
-                haulingTime: haulingTime
-                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                  : null,
-                createdDate: createdDate
-                  ? createdDate.toISOString().split("T")[0]
-                  : null,
-                createdTime: createdTime,
-                wasteName: item.QuotationWaste
-                  ? item.QuotationWaste.wasteName
-                  : null,
-                vehicleType: item.QuotationTransportation
-                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
-                  : null,
-              };
-            }
-          );
-
-          setBookedTransactions(flattenedData);
-        } else {
-          console.error(
-            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-          );
-        }
-
-        const quotations = quotationResponse.data;
-
-        if (quotations && Array.isArray(quotations.quotations)) {
-          const flattenedData = quotations.quotations.map((item) => ({
-            ...item,
-            wasteNames: item.QuotationWaste
-              ? item.QuotationWaste.map((qw) =>
-                  qw.wasteName ? qw.wasteName : null
-                )
-              : [],
-            quotationWasteId: item.QuotationWaste
-              ? item.QuotationWaste.map((qw) => (qw.id ? qw.id : null))
-              : [],
-            vehicleTypes: item.QuotationTransportation
-              ? item.QuotationTransportation.map((qt) =>
-                  qt.VehicleType ? qt.VehicleType.typeOfVehicle : null
-                )
-              : [],
-            quotationTransportationId: item.QuotationTransportation
-              ? item.QuotationTransportation.map((qt) => (qt.id ? qt.id : null))
-              : [],
-            haulingDate: item.haulingDate
-              ? new Date(item.haulingDate).toISOString().split("T")[0]
-              : null, // Convert timestamp to yyyy-mm-dd format
-          }));
-
-          setQuotationsData(flattenedData);
-        } else {
-          console.error(
-            "quotations or quotations.quotations is undefined or not an array"
-          );
-        }
+        processDataBookedTransaction(bookedTransactionResponse);
+        processDataQuotations(quotationResponse);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -176,8 +167,6 @@ const Transactions = ({ user }) => {
   const handleEditClick = (id) => {
     const typeToEdit = bookedTransactions.find((type) => type.id === id);
     if (typeToEdit) {
-      console.log(typeToEdit.quotationWasteId);
-      console.log(typeToEdit.quotationTransportationId);
       setFormData({
         id: typeToEdit.id,
         quotationWasteId: typeToEdit.quotationWasteId,
@@ -232,125 +221,13 @@ const Transactions = ({ user }) => {
           formData
         );
 
-        const bookedTransactions = response.data;
-
-        if (
-          bookedTransactions &&
-          Array.isArray(bookedTransactions.bookedTransactions)
-        ) {
-          const flattenedData = bookedTransactions.bookedTransactions.map(
-            (item) => {
-              const haulingDate = item.haulingDate
-                ? new Date(item.haulingDate)
-                : null;
-              const createdDate = item.createdAt
-                ? new Date(item.createdAt)
-                : null;
-              let haulingTime = null;
-              let createdTime = null;
-              if (item.haulingTime) {
-                const [hours, minutes, seconds] = item.haulingTime.split(":");
-                haulingTime = new Date(
-                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
-                ); // Create a date using UTC
-              }
-              if (createdDate) {
-                createdTime = createdDate
-                  .toISOString()
-                  .split("T")[1]
-                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-              }
-
-              return {
-                ...item,
-                haulingDate: haulingDate
-                  ? haulingDate.toISOString().split("T")[0]
-                  : null,
-                haulingTime: haulingTime
-                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                  : null,
-                createdDate: createdDate
-                  ? createdDate.toISOString().split("T")[0]
-                  : null,
-                createdTime: createdTime,
-                wasteName: item.QuotationWaste
-                  ? item.QuotationWaste.wasteName
-                  : null,
-                vehicleType: item.QuotationTransportation
-                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
-                  : null,
-              };
-            }
-          );
-
-          setBookedTransactions(flattenedData);
-          setSuccessMessage("Booked Transaction updated successfully!");
-        } else {
-          console.error(
-            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-          );
-        }
+        processDataBookedTransaction(response);
+        setSuccessMessage("Booked Transaction updated successfully!");
       } else {
         response = await axios.post(`${apiUrl}/bookedTransaction`, formData);
 
-        const bookedTransactions = response.data;
-
-        if (
-          bookedTransactions &&
-          Array.isArray(bookedTransactions.bookedTransactions)
-        ) {
-          const flattenedData = bookedTransactions.bookedTransactions.map(
-            (item) => {
-              const haulingDate = item.haulingDate
-                ? new Date(item.haulingDate)
-                : null;
-              const createdDate = item.createdAt
-                ? new Date(item.createdAt)
-                : null;
-              let haulingTime = null;
-              let createdTime = null;
-              if (item.haulingTime) {
-                const [hours, minutes, seconds] = item.haulingTime.split(":");
-                haulingTime = new Date(
-                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
-                ); // Create a date using UTC
-              }
-              if (createdDate) {
-                createdTime = createdDate
-                  .toISOString()
-                  .split("T")[1]
-                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-              }
-
-              return {
-                ...item,
-                haulingDate: haulingDate
-                  ? haulingDate.toISOString().split("T")[0]
-                  : null,
-                haulingTime: haulingTime
-                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                  : null,
-                createdDate: createdDate
-                  ? createdDate.toISOString().split("T")[0]
-                  : null,
-                createdTime: createdTime,
-                wasteName: item.QuotationWaste
-                  ? item.QuotationWaste.wasteName
-                  : null,
-                vehicleType: item.QuotationTransportation
-                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
-                  : null,
-              };
-            }
-          );
-
-          setBookedTransactions(flattenedData);
-          setSuccessMessage("Booked Transaction successfully!");
-        } else {
-          console.error(
-            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-          );
-        }
+        processDataBookedTransaction(response);
+        setSuccessMessage("Booked Transaction successfully!");
       }
 
       setShowSuccessMessage(true);

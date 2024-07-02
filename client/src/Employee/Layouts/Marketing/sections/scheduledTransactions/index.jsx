@@ -2,15 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
-  Button,
-  CardContent,
   IconButton,
   Modal,
   Typography,
   TextField,
   Button,
   useTheme,
-  MenuItem,
   Tabs,
   Tab,
 } from "@mui/material";
@@ -22,10 +19,15 @@ import axios from "axios";
 import { tokens } from "../../../../../theme";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import {
+  CircleLogo,
   CustomAccordionDetails,
   CustomAccordionStyles,
-  CustomAccordionSummary,
 } from "../../../../../OtherComponents/CustomAccordionStyles";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import AlarmIcon from "@mui/icons-material/Alarm";
 
 const ScheduledTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -34,23 +36,18 @@ const ScheduledTransactions = ({ user }) => {
 
   const initialFormData = {
     id: "",
-    quotationWasteId: "",
-    quotationTransportationId: "",
-    haulingDate: "",
-    haulingTime: "",
-    pttNo: "",
-    manifestNo: "",
-    pullOutFormNo: "",
+    bookedTransactionId: "",
+    scheduledDate: "",
+    scheduledTime: "",
     remarks: "",
-    statusId: 1,
+    statusId: 2,
     createdBy: user.id,
   };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [bookedTransactions, setBookedTransactions] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
-  const [quotationsData, setQuotationsData] = useState([]);
+  const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
@@ -59,110 +56,169 @@ const ScheduledTransactions = ({ user }) => {
     setSelectedTab(newValue);
   };
 
-  let finishedTransactions = [];
-
   const transactions =
     selectedTab === 0 ? pendingTransactions : finishedTransactions;
+
+  const processData = (response) => {
+    const transactions = response.data;
+    console.log(transactions);
+    if (transactions && Array.isArray(transactions.pendingTransactions)) {
+      const flattenedPendingData = transactions.pendingTransactions.map(
+        (item) => {
+          const haulingDate = item.haulingDate
+            ? new Date(item.haulingDate)
+            : null;
+          const bookedCreatedDate = item.createdAt
+            ? new Date(item.createdAt)
+            : null;
+          let haulingTime = null;
+          let bookedCreatedTime = null;
+          if (item.haulingTime) {
+            const [hours, minutes, seconds] = item.haulingTime.split(":");
+            haulingTime = new Date(
+              Date.UTC(1970, 0, 1, hours, minutes, seconds)
+            ); // Create a date using UTC
+          }
+          if (bookedCreatedDate) {
+            bookedCreatedTime = bookedCreatedDate
+              .toISOString()
+              .split("T")[1]
+              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
+          }
+
+          return {
+            ...item,
+            haulingDate: haulingDate
+              ? haulingDate.toISOString().split("T")[0]
+              : null,
+            haulingTime: haulingTime
+              ? haulingTime.toISOString().split("T")[1].slice(0, 5)
+              : null,
+            bookedCreatedDate: bookedCreatedDate
+              ? bookedCreatedDate.toISOString().split("T")[0]
+              : null,
+            bookedCreatedTime: bookedCreatedTime,
+            clientName: item.Client ? item.Client.clientName : null,
+            wasteName: item.QuotationWaste
+              ? item.QuotationWaste.wasteName
+              : null,
+            vehicleType: item.QuotationTransportation
+              ? item.QuotationTransportation.VehicleType.typeOfVehicle
+              : null,
+            bookedRemarks: item.remarks,
+          };
+        }
+      );
+
+      setPendingTransactions(flattenedPendingData);
+    } else {
+      console.error(
+        "bookedTransactions or bookedTransactions.pendingTransactions is undefined or not an array"
+      );
+    }
+
+    if (transactions && Array.isArray(transactions.finishedTransactions)) {
+      const flattenedFinishedData = transactions.finishedTransactions.map(
+        (scheduledItem) => {
+          const item = scheduledItem.BookedTransaction;
+          const haulingDate = item.haulingDate
+            ? new Date(item.haulingDate)
+            : null;
+          const scheduledDate = scheduledItem.scheduledDate
+            ? new Date(scheduledItem.scheduledDate)
+            : null;
+          const bookedCreatedDate = item.createdAt
+            ? new Date(item.createdAt)
+            : null;
+          const scheduledCreatedDate = scheduledItem.createdAt
+            ? new Date(scheduledItem.createdAt)
+            : null;
+          let haulingTime = null;
+          let scheduledTime = null;
+          let bookedCreatedTime = null;
+          let scheduledCreatedTime = null;
+          if (item.haulingTime) {
+            const [hours, minutes, seconds] = item.haulingTime.split(":");
+            haulingTime = new Date(
+              Date.UTC(1970, 0, 1, hours, minutes, seconds)
+            ); // Create a date using UTC
+          }
+          if (scheduledItem.scheduledTime) {
+            const [hours, minutes, seconds] =
+              scheduledItem.scheduledTime.split(":");
+            scheduledTime = new Date(
+              Date.UTC(1970, 0, 1, hours, minutes, seconds)
+            ); // Create a date using UTC
+          }
+          if (bookedCreatedDate) {
+            bookedCreatedTime = bookedCreatedDate
+              .toISOString()
+              .split("T")[1]
+              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
+          }
+          if (scheduledCreatedDate) {
+            scheduledCreatedTime = scheduledCreatedDate
+              .toISOString()
+              .split("T")[1]
+              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
+          }
+
+          const createdBy =
+            scheduledItem.Employee.firstName +
+            " " +
+            scheduledItem.Employee.lastName;
+
+          return {
+            ...scheduledItem,
+            haulingDate: haulingDate
+              ? haulingDate.toISOString().split("T")[0]
+              : null,
+            scheduledDate: scheduledDate
+              ? scheduledDate.toISOString().split("T")[0]
+              : null,
+            haulingTime: haulingTime
+              ? haulingTime.toISOString().split("T")[1].slice(0, 5)
+              : null,
+            scheduledTime: scheduledTime
+              ? scheduledTime.toISOString().split("T")[1].slice(0, 5)
+              : null,
+            bookedCreatedDate: bookedCreatedDate
+              ? bookedCreatedDate.toISOString().split("T")[0]
+              : null,
+            scheduledCreatedDate: scheduledCreatedDate
+              ? scheduledCreatedDate.toISOString().split("T")[0]
+              : null,
+            bookedCreatedTime: bookedCreatedTime,
+            scheduledCreatedTime: scheduledCreatedTime,
+            clientName: item.Client ? item.Client.clientName : null,
+            wasteName: item.QuotationWaste
+              ? item.QuotationWaste.wasteName
+              : null,
+            transactionId: item.transactionId ? item.transactionId : null,
+            vehicleType: item.QuotationTransportation
+              ? item.QuotationTransportation.VehicleType.typeOfVehicle
+              : null,
+            bookedRemarks: item.remarks,
+            createdBy: createdBy,
+            scheduledRemarks: scheduledItem.remarks,
+          };
+        }
+      );
+
+      setFinishedTransactions(flattenedFinishedData);
+    } else {
+      console.error(
+        "bookedTransactions or bookedTransactions.finishedTransactions is undefined or not an array"
+      );
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [bookedTransactionResponse, quotationResponse] =
-          await Promise.all([
-            axios.get(`${apiUrl}/scheduledTransaction`),
-            axios.get(`${apiUrl}/quotation/${user.id}`),
-          ]);
+        const response = await axios.get(`${apiUrl}/scheduledTransaction`);
 
-        const bookedTransactions = bookedTransactionResponse.data;
-        console.log(bookedTransactions);
-        if (
-          bookedTransactions &&
-          Array.isArray(bookedTransactions.pendingTransactions)
-        ) {
-          const flattenedData = bookedTransactions.pendingTransactions.map(
-            (item) => {
-              const haulingDate = item.haulingDate
-                ? new Date(item.haulingDate)
-                : null;
-              const createdDate = item.createdAt
-                ? new Date(item.createdAt)
-                : null;
-              let haulingTime = null;
-              let createdTime = null;
-              if (item.haulingTime) {
-                const [hours, minutes, seconds] = item.haulingTime.split(":");
-                haulingTime = new Date(
-                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
-                ); // Create a date using UTC
-              }
-              if (createdDate) {
-                createdTime = createdDate
-                  .toISOString()
-                  .split("T")[1]
-                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-              }
-
-              return {
-                ...item,
-                haulingDate: haulingDate
-                  ? haulingDate.toISOString().split("T")[0]
-                  : null,
-                haulingTime: haulingTime
-                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                  : null,
-                createdDate: createdDate
-                  ? createdDate.toISOString().split("T")[0]
-                  : null,
-                createdTime: createdTime,
-                wasteName: item.QuotationWaste
-                  ? item.QuotationWaste.wasteName
-                  : null,
-                vehicleType: item.QuotationTransportation
-                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
-                  : null,
-              };
-            }
-          );
-
-          setPendingTransactions(flattenedData);
-        } else {
-          console.error(
-            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-          );
-        }
-
-        const quotations = quotationResponse.data;
-
-        if (quotations && Array.isArray(quotations.quotations)) {
-          const flattenedData = quotations.quotations.map((item) => ({
-            ...item,
-            wasteNames: item.QuotationWaste
-              ? item.QuotationWaste.map((qw) =>
-                  qw.wasteName ? qw.wasteName : null
-                )
-              : [],
-            quotationWasteId: item.QuotationWaste
-              ? item.QuotationWaste.map((qw) => (qw.id ? qw.id : null))
-              : [],
-            vehicleTypes: item.QuotationTransportation
-              ? item.QuotationTransportation.map((qt) =>
-                  qt.VehicleType ? qt.VehicleType.typeOfVehicle : null
-                )
-              : [],
-            quotationTransportationId: item.QuotationTransportation
-              ? item.QuotationTransportation.map((qt) => (qt.id ? qt.id : null))
-              : [],
-            haulingDate: item.haulingDate
-              ? new Date(item.haulingDate).toISOString().split("T")[0]
-              : null, // Convert timestamp to yyyy-mm-dd format
-          }));
-
-          setQuotationsData(flattenedData);
-        } else {
-          console.error(
-            "quotations or quotations.quotations is undefined or not an array"
-          );
-        }
+        processData(response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -171,7 +227,16 @@ const ScheduledTransactions = ({ user }) => {
     fetchData();
   }, [apiUrl, user.id]);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (id) => {
+    setFormData({
+      id: "",
+      bookedTransactionId: id,
+      scheduledDate: "",
+      scheduledTime: "",
+      remarks: "",
+      statusId: 2,
+      createdBy: user.id,
+    });
     setOpenModal(true);
   };
 
@@ -190,24 +255,29 @@ const ScheduledTransactions = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const typeToEdit = pendingTransactions.find((type) => type.id === id);
+    console.log(id);
+    const typeToEdit = finishedTransactions.find((type) => type.id === id);
+    console.log(typeToEdit);
+    console.log(typeToEdit.bookedTransactionId);
+    console.log(typeToEdit.scheduledDate);
+    console.log(typeToEdit.scheduledTime);
+
     if (typeToEdit) {
       setFormData({
         id: typeToEdit.id,
-        quotationWasteId: typeToEdit.quotationWasteId,
-        quotationTransportationId: typeToEdit.quotationTransportationId,
-        haulingDate: typeToEdit.haulingDate,
-        haulingTime: typeToEdit.haulingTime,
-        pttNo: typeToEdit.pttNo,
-        manifestNo: typeToEdit.manifestNo,
-        pullOutFormNo: typeToEdit.pullOutFormNo,
-        statusId: 1,
+        bookedTransactionId: typeToEdit.bookedTransactionId,
+        scheduledDate: typeToEdit.scheduledDate,
+        scheduledTime: typeToEdit.scheduledTime,
+        remarks: typeToEdit.remarks,
+        statusId: 2,
         createdBy: user.id,
       });
-      handleOpenModal();
+
+      setOpenModal(true);
     } else {
       console.error(`Vehicle type with ID ${id} not found for editing.`);
     }
+    console.log(formData);
   };
 
   const handleDeleteClick = async (id) => {
@@ -241,129 +311,17 @@ const ScheduledTransactions = ({ user }) => {
 
       if (formData.id) {
         response = await axios.put(
-          `${apiUrl}/bookedTransaction/${formData.id}`,
+          `${apiUrl}/scheduledTransaction/${formData.id}`,
           formData
         );
 
-        const bookedTransactions = response.data;
-
-        if (
-          bookedTransactions &&
-          Array.isArray(bookedTransactions.bookedTransactions)
-        ) {
-          const flattenedData = bookedTransactions.bookedTransactions.map(
-            (item) => {
-              const haulingDate = item.haulingDate
-                ? new Date(item.haulingDate)
-                : null;
-              const createdDate = item.createdAt
-                ? new Date(item.createdAt)
-                : null;
-              let haulingTime = null;
-              let createdTime = null;
-              if (item.haulingTime) {
-                const [hours, minutes, seconds] = item.haulingTime.split(":");
-                haulingTime = new Date(
-                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
-                ); // Create a date using UTC
-              }
-              if (createdDate) {
-                createdTime = createdDate
-                  .toISOString()
-                  .split("T")[1]
-                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-              }
-
-              return {
-                ...item,
-                haulingDate: haulingDate
-                  ? haulingDate.toISOString().split("T")[0]
-                  : null,
-                haulingTime: haulingTime
-                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                  : null,
-                createdDate: createdDate
-                  ? createdDate.toISOString().split("T")[0]
-                  : null,
-                createdTime: createdTime,
-                wasteName: item.QuotationWaste
-                  ? item.QuotationWaste.wasteName
-                  : null,
-                vehicleType: item.QuotationTransportation
-                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
-                  : null,
-              };
-            }
-          );
-
-          setPendingTransactions(flattenedData);
-          setSuccessMessage("Booked Transaction updated successfully!");
-        } else {
-          console.error(
-            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-          );
-        }
+        processData(response);
+        setSuccessMessage("Update Scheduled Transaction successfully!");
       } else {
-        response = await axios.post(`${apiUrl}/bookedTransaction`, formData);
+        response = await axios.post(`${apiUrl}/scheduledTransaction`, formData);
 
-        const bookedTransactions = response.data;
-
-        if (
-          bookedTransactions &&
-          Array.isArray(bookedTransactions.bookedTransactions)
-        ) {
-          const flattenedData = bookedTransactions.bookedTransactions.map(
-            (item) => {
-              const haulingDate = item.haulingDate
-                ? new Date(item.haulingDate)
-                : null;
-              const createdDate = item.createdAt
-                ? new Date(item.createdAt)
-                : null;
-              let haulingTime = null;
-              let createdTime = null;
-              if (item.haulingTime) {
-                const [hours, minutes, seconds] = item.haulingTime.split(":");
-                haulingTime = new Date(
-                  Date.UTC(1970, 0, 1, hours, minutes, seconds)
-                ); // Create a date using UTC
-              }
-              if (createdDate) {
-                createdTime = createdDate
-                  .toISOString()
-                  .split("T")[1]
-                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-              }
-
-              return {
-                ...item,
-                haulingDate: haulingDate
-                  ? haulingDate.toISOString().split("T")[0]
-                  : null,
-                haulingTime: haulingTime
-                  ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                  : null,
-                createdDate: createdDate
-                  ? createdDate.toISOString().split("T")[0]
-                  : null,
-                createdTime: createdTime,
-                wasteName: item.QuotationWaste
-                  ? item.QuotationWaste.wasteName
-                  : null,
-                vehicleType: item.QuotationTransportation
-                  ? item.QuotationTransportation.VehicleType.typeOfVehicle
-                  : null,
-              };
-            }
-          );
-
-          setPendingTransactions(flattenedData);
-          setSuccessMessage("Booked Transaction successfully!");
-        } else {
-          console.error(
-            "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-          );
-        }
+        processData(response);
+        setSuccessMessage("Scheduled Transaction successfully!");
       }
 
       setShowSuccessMessage(true);
@@ -403,7 +361,7 @@ const ScheduledTransactions = ({ user }) => {
         />
       )}
 
-      <Box mt="20px">
+      <Box mt="40px">
         <Card>
           <Tabs
             value={selectedTab}
@@ -422,48 +380,146 @@ const ScheduledTransactions = ({ user }) => {
           <CustomAccordionStyles>
             {transactions.map((row) => (
               <Accordion key={row.id}>
-                <CustomAccordionSummary
-                  row={row}
-                  handleEditClick={handleEditClick}
-                  handleDeleteClick={handleDeleteClick}
-                />
+                <AccordionSummary sx={{}}>
+                  <Typography variant="h4">
+                    Transaction ID: {row.transactionId}
+                    {" - "}
+                    {((user.userType !== "GEN") !== "TRP") !== "IFM" && (
+                      <Box>
+                        {" - "}
+                        {row.clientName} {" - "}
+                        {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+                      </Box>
+                    )}
+                  </Typography>
+                  {selectedTab === 0 ? (
+                    <Button
+                      onClick={() => handleOpenModal(row.id)}
+                      sx={{ backgroundColor: `${colors.greenAccent[700]}` }}
+                    >
+                      <Typography
+                        sx={{
+                          color: `${colors.grey[100]}`,
+                          fontSize: "10px !important",
+                        }}
+                      >
+                        Schedule
+                      </Typography>
+                    </Button>
+                  ) : (
+                    <div style={{ display: "flex" }}>
+                      <IconButton onClick={() => handleEditClick(row.id)}>
+                        <EditIcon sx={{ color: "#ff9800" }} />
+                      </IconButton>
+                      <IconButton onClick={() => handleDeleteClick(row.id)}>
+                        <DeleteIcon sx={{ color: "#f44336" }} />
+                      </IconButton>
+                    </div>
+                  )}
+                </AccordionSummary>
                 <CustomAccordionDetails>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography variant="h4" color={colors.greenAccent[400]}>
-                      Booked
+                  <Box sx={{ my: 3, position: "relative" }}>
+                    <CircleLogo>
+                      <CollectionsBookmarkIcon
+                        sx={{
+                          fontSize: "30px",
+                          color: `${colors.greenAccent[400]}`,
+                        }}
+                      />
+                    </CircleLogo>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        variant="h4"
+                        my={1}
+                        color={colors.greenAccent[400]}
+                      >
+                        Booked
+                      </Typography>
+                      <Typography variant="h5">
+                        {row.bookedCreatedDate} {row.bookedCreatedTime}
+                      </Typography>
+                    </Box>
+
+                    <Typography variant="h5">
+                      Hauling Date:{" "}
+                      {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
                     </Typography>
                     <Typography variant="h5">
-                      {row.createdDate} {row.createdTime}
+                      Hauling Time:{" "}
+                      {row.haulingTime
+                        ? format(parseTimeString(row.haulingTime), "hh:mm aa")
+                        : ""}
+                    </Typography>
+                    <Typography variant="h5">
+                      Waste Name: {row.wasteName}
+                    </Typography>
+                    <Typography variant="h5">
+                      Vehicle Type: {row.vehicleType}
+                    </Typography>
+                    <Typography variant="h5">
+                      Remarks: {row.bookedRemarks}
                     </Typography>
                   </Box>
-                  <Typography variant="h5">
-                    Hauling Date:{" "}
-                    {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
-                  </Typography>
-                  <Typography variant="h5">
-                    Hauling Time:{" "}
-                    {row.haulingTime
-                      ? format(parseTimeString(row.haulingTime), "hh:mm aa")
-                      : ""}
-                  </Typography>
-                  <Typography variant="h5">
-                    Waste Name: {row.wasteName}
-                  </Typography>
-                  <Typography variant="h5">
-                    Vehicle Type: {row.vehicleType}
-                  </Typography>
-                  <hr></hr>
-                  <IconButton
-                    onClick={() => handleDeleteClick(row.id)}
-                    sx={{ backgroundColor: "#f44336" }}
-                  >
-                    <Typography>Schedule</Typography>
-                  </IconButton>
+                  <hr />
+                  <Box sx={{ my: 3, position: "relative" }}>
+                    <CircleLogo>
+                      <AlarmIcon
+                        sx={{
+                          fontSize: "30px",
+                          color: `${colors.grey[900]}`,
+                        }}
+                      />
+                    </CircleLogo>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        variant="h4"
+                        my={1}
+                        color={colors.greenAccent[400]}
+                      >
+                        {selectedTab === 0 ? "For Scheduling" : "Scheduled"}
+                      </Typography>
+                      <Typography variant="h5">
+                        {row.scheduledCreatedDate} {row.scheduledCreatedTime}
+                      </Typography>
+                    </Box>
+                    {selectedTab === 0 ? (
+                      <Box></Box>
+                    ) : (
+                      <Box>
+                        <Typography variant="h5">
+                          Scheduled Date:{" "}
+                          {format(new Date(row.scheduledDate), "MMMM dd, yyyy")}
+                        </Typography>
+                        <Typography variant="h5">
+                          Scheduled Time:{" "}
+                          {row.haulingTime
+                            ? format(
+                                parseTimeString(row.scheduledTime),
+                                "hh:mm aa"
+                              )
+                            : ""}
+                        </Typography>
+
+                        <Typography variant="h5">
+                          Remarks: {row.scheduledRemarks}
+                        </Typography>
+                        <Typography variant="h5">
+                          Scheduled By: {row.createdBy}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                  <hr />
                 </CustomAccordionDetails>
               </Accordion>
             ))}
@@ -489,12 +545,14 @@ const ScheduledTransactions = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Booked Transaction" : "Book Transaction"}
+            {formData.id
+              ? "Update Scheduled Transaction"
+              : "Schedule Transaction"}
           </Typography>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
-              label="Hauling Date"
-              name="haulingDate"
+              label="Scheduled Date"
+              name="scheduledDate"
               value={formData.haulingDate}
               onChange={handleInputChange}
               fullWidth
@@ -509,8 +567,8 @@ const ScheduledTransactions = ({ user }) => {
               autoComplete="off"
             />
             <TextField
-              label="Hauling Time"
-              name="haulingTime"
+              label="Scheduled Time"
+              name="scheduledTime"
               value={formData.haulingTime}
               onChange={handleInputChange}
               fullWidth
@@ -525,52 +583,6 @@ const ScheduledTransactions = ({ user }) => {
               autoComplete="off"
             />
           </div>
-          <TextField
-            label="Waste Name"
-            name="quotationWasteId"
-            value={formData.wasteName}
-            onChange={handleInputChange}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            {quotationsData
-              .flatMap((q) => q.quotationWasteId)
-              .map((wasteId, index) => (
-                <MenuItem key={index} value={wasteId}>
-                  {quotationsData[index].wasteNames[index]}
-                </MenuItem>
-              ))}
-          </TextField>
-          <TextField
-            label="Vehicle Type"
-            name="quotationTransportationId"
-            value={formData.vehicleType}
-            onChange={handleInputChange}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            {quotationsData
-              .flatMap((q) => q.quotationTransportationId)
-              .map((transportationId, index) => (
-                <MenuItem key={index} value={transportationId}>
-                  {quotationsData[index].vehicleTypes[index]}
-                </MenuItem>
-              ))}
-          </TextField>
           <TextField
             label="Remarks"
             name="remarks"
@@ -607,7 +619,9 @@ const ScheduledTransactions = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Booked Transaction" : "Book Transaction"}
+            {formData.id
+              ? "Update Scheduled Transaction"
+              : "Schedule Transaction"}
           </Button>
         </Box>
       </Modal>

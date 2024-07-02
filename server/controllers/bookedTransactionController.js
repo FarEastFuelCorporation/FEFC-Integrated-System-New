@@ -1,6 +1,7 @@
 // controllers/bookedTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
+const Client = require("../models/Client");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const TypeOfWaste = require("../models/TypeOfWaste");
@@ -24,7 +25,9 @@ async function createBookedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    remarks = remarks.toUpperCase();
+    if (remarks) {
+      remarks = remarks.toUpperCase();
+    }
 
     const transactionId = await generateTransactionId();
 
@@ -43,32 +46,36 @@ async function createBookedTransactionController(req, res) {
       createdBy,
     });
 
+    // Fetch all bookedTransactions from the database
     const bookedTransactions = await BookedTransaction.findAll({
+      attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
       include: [
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          include: [
-            {
-              model: TypeOfWaste,
-              as: "TypeOfWaste",
-            },
-          ],
+          attributes: ["wasteName"],
         },
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
+          attributes: ["id"],
           include: [
             {
               model: VehicleType,
               as: "VehicleType",
+              attributes: ["typeOfVehicle"],
             },
           ],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
         },
       ],
       order: [["transactionId", "DESC"]],
     });
-    console.log(bookedTransactions);
+
     // Respond with the newly created client data
     res.status(201).json({ bookedTransactions });
   } catch (error) {
@@ -81,28 +88,31 @@ async function createBookedTransactionController(req, res) {
 // Get Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
   try {
-    // Fetch all clients from the database
+    // Fetch all bookedTransactions from the database
     const bookedTransactions = await BookedTransaction.findAll({
+      attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
       include: [
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          include: [
-            {
-              model: TypeOfWaste,
-              as: "TypeOfWaste",
-            },
-          ],
+          attributes: ["wasteName"],
         },
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
+          attributes: ["id"],
           include: [
             {
               model: VehicleType,
               as: "VehicleType",
+              attributes: ["typeOfVehicle"],
             },
           ],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
         },
       ],
       order: [["transactionId", "DESC"]],
@@ -134,7 +144,9 @@ async function updateBookedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    remarks = remarks.toUpperCase();
+    if (remarks) {
+      remarks = remarks.toUpperCase();
+    }
 
     // Find the booked transaction by UUID (id) and update it
     const updatedBookedTransaction = await BookedTransaction.findByPk(id);
@@ -156,27 +168,31 @@ async function updateBookedTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedBookedTransaction.save();
 
+      // Fetch all bookedTransactions from the database
       const bookedTransactions = await BookedTransaction.findAll({
+        attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
         include: [
           {
             model: QuotationWaste,
             as: "QuotationWaste",
-            include: [
-              {
-                model: TypeOfWaste,
-                as: "TypeOfWaste",
-              },
-            ],
+            attributes: ["wasteName"],
           },
           {
             model: QuotationTransportation,
             as: "QuotationTransportation",
+            attributes: ["id"],
             include: [
               {
                 model: VehicleType,
                 as: "VehicleType",
+                attributes: ["typeOfVehicle"],
               },
             ],
+          },
+          {
+            model: Client,
+            as: "Client",
+            attributes: ["clientName"],
           },
         ],
         order: [["transactionId", "DESC"]],

@@ -5,7 +5,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 
 export const CustomAccordionStyles = ({ children }) => {
   const theme = useTheme();
@@ -89,33 +88,36 @@ export const CustomAccordionDetails = ({ children }) => {
     >
       <div
         style={{
+          height: "calc(100% - 80px)",
           position: "absolute",
+          top: "40px",
           left: "40px",
           borderLeft: `4px solid ${colors.grey[300]}`,
-          height: "calc(100% - 32px)",
         }}
       ></div>
-      <div
-        style={{
-          position: "absolute",
-          left: "22px",
-          height: "40px",
-          width: "40px",
-          borderRadius: "100%",
-          backgroundColor: `${colors.grey[100]}`,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CollectionsBookmarkIcon
-          sx={{
-            fontSize: "30px",
-            color: `${colors.greenAccent[400]}`,
-          }}
-        />
-      </div>
       {children}
     </AccordionDetails>
+  );
+};
+
+export const CircleLogo = ({ children }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: "-58px",
+        height: "40px",
+        width: "40px",
+        borderRadius: "100%",
+        backgroundColor: `${colors.grey[100]}`,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      {children}
+    </div>
   );
 };

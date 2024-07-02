@@ -33,6 +33,19 @@ ClientUser.belongsTo(Client, {
   onDelete: "CASCADE",
 });
 
+Client.hasMany(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "clientId",
+  onDelete: "CASCADE",
+});
+BookedTransaction.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "createdBy",
+  targetKey: "clientId",
+  onDelete: "CASCADE",
+});
+
 Employee.hasMany(User, {
   as: "User",
   foreignKey: "employeeId",
@@ -71,6 +84,19 @@ Employee.belongsToMany(EmployeeRole, {
   foreignKey: "employeeId",
   otherKey: "employeeRoleId",
   as: "EmployeeRoles",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(ScheduledTransaction, {
+  as: "ScheduledTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+ScheduledTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
   onDelete: "CASCADE",
 });
 

@@ -1,79 +1,144 @@
 // controllers/scheduledTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
+const Client = require("../models/Client");
+const Employee = require("../models/Employee");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
-const generateTransactionId = require("../utils/generateTransactionId");
 const { Op, literal } = require("sequelize");
-const sequelize = require("../config/database");
 
 // Create Scheduled Transaction controller
 async function createScheduledTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
-      quotationWasteId,
-      quotationTransportationId,
-      haulingDate,
-      haulingTime,
-      pttNo,
-      manifestNo,
-      pullOutFormNo,
+      bookedTransactionId,
+      scheduledDate,
+      scheduledTime,
       remarks,
       statusId,
       createdBy,
     } = req.body;
 
-    remarks = remarks.toUpperCase();
-
-    const transactionId = await generateTransactionId();
+    if (remarks) {
+      remarks = remarks.toUpperCase();
+    }
 
     // Creating a new client
-    await BookedTransaction.create({
-      transactionId,
-      quotationWasteId,
-      quotationTransportationId,
-      haulingDate,
-      haulingTime,
-      pttNo,
-      manifestNo,
-      pullOutFormNo,
+    await ScheduledTransaction.create({
+      bookedTransactionId,
+      scheduledDate,
+      scheduledTime,
       remarks,
-      statusId,
       createdBy,
     });
 
-    const bookedTransactions = await BookedTransaction.findAll({
-      include: [
-        {
-          model: QuotationWaste,
-          as: "QuotationWaste",
-          include: [
-            {
-              model: TypeOfWaste,
-              as: "TypeOfWaste",
-            },
-          ],
+    const updatedBookedTransaction = await BookedTransaction.findByPk(
+      bookedTransactionId
+    );
+
+    if (updatedBookedTransaction) {
+      // Update booked transaction attributes
+      updatedBookedTransaction.statusId = statusId;
+
+      // Save the updated booked transaction
+      await updatedBookedTransaction.save();
+
+      // Fetch pending transactions
+      const pendingTransactions = await BookedTransaction.findAll({
+        attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
+        where: {
+          id: {
+            [Op.notIn]: literal(
+              "(SELECT `bookedTransactionId` FROM `ScheduledTransactions`)"
+            ),
+          },
         },
-        {
-          model: QuotationTransportation,
-          as: "QuotationTransportation",
-          include: [
-            {
-              model: VehicleType,
-              as: "VehicleType",
-            },
-          ],
-        },
-      ],
-      order: [["transactionId", "DESC"]],
-    });
-    console.log(bookedTransactions);
-    // Respond with the newly created client data
-    res.status(201).json({ bookedTransactions });
+        include: [
+          {
+            model: QuotationWaste,
+            as: "QuotationWaste",
+            attributes: ["wasteName"],
+          },
+          {
+            model: QuotationTransportation,
+            as: "QuotationTransportation",
+            attributes: ["id"],
+            include: [
+              {
+                model: VehicleType,
+                as: "VehicleType",
+                attributes: ["typeOfVehicle"],
+              },
+            ],
+          },
+          {
+            model: Client,
+            as: "Client",
+            attributes: ["clientName"],
+          },
+        ],
+        order: [["transactionId", "DESC"]],
+      });
+
+      // Fetch finished transactions
+      const finishedTransactions = await ScheduledTransaction.findAll({
+        attributes: ["scheduledDate", "scheduledTime", "remarks", "createdBy"],
+        include: [
+          {
+            model: BookedTransaction,
+            as: "BookedTransaction",
+            attributes: [
+              "transactionId",
+              "haulingDate",
+              "haulingTime",
+              "remarks",
+            ],
+            include: [
+              {
+                model: QuotationWaste,
+                as: "QuotationWaste",
+                attributes: ["wasteName"],
+              },
+              {
+                model: QuotationTransportation,
+                as: "QuotationTransportation",
+                attributes: ["id"],
+                include: [
+                  {
+                    model: VehicleType,
+                    as: "VehicleType",
+                    attributes: ["typeOfVehicle"],
+                  },
+                ],
+              },
+              {
+                model: Client,
+                as: "Client",
+                attributes: ["clientName"],
+              },
+            ],
+            order: [["transactionId", "DESC"]],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      });
+
+      // Respond with the updated booked transaction data
+      res.json({ pendingTransactions, finishedTransactions });
+    } else {
+      // If booked transaction with the specified ID was not found
+      res
+        .status(404)
+        .json({ message: `Booked Transaction with ID ${id} not found` });
+    }
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -86,6 +151,13 @@ async function getScheduledTransactionsController(req, res) {
   try {
     // Fetch pending transactions
     const pendingTransactions = await BookedTransaction.findAll({
+      attributes: [
+        "transactionId",
+        "haulingDate",
+        "haulingTime",
+        "remarks",
+        "createdAt",
+      ],
       where: {
         id: {
           [Op.notIn]: literal(
@@ -97,22 +169,24 @@ async function getScheduledTransactionsController(req, res) {
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          include: [
-            {
-              model: TypeOfWaste,
-              as: "TypeOfWaste",
-            },
-          ],
+          attributes: ["wasteName"],
         },
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
+          attributes: ["id"],
           include: [
             {
               model: VehicleType,
               as: "VehicleType",
+              attributes: ["typeOfVehicle"],
             },
           ],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
         },
       ],
       order: [["transactionId", "DESC"]],
@@ -120,40 +194,55 @@ async function getScheduledTransactionsController(req, res) {
 
     // Fetch finished transactions
     const finishedTransactions = await ScheduledTransaction.findAll({
+      attributes: [
+        "scheduledDate",
+        "scheduledTime",
+        "remarks",
+        "createdBy",
+        "createdAt",
+      ],
       include: [
         {
           model: BookedTransaction,
           as: "BookedTransaction",
+          attributes: [
+            "transactionId",
+            "haulingDate",
+            "haulingTime",
+            "remarks",
+            "createdAt",
+          ],
           include: [
             {
               model: QuotationWaste,
               as: "QuotationWaste",
-              include: [
-                {
-                  model: TypeOfWaste,
-                  as: "TypeOfWaste",
-                },
-              ],
+              attributes: ["wasteName"],
             },
             {
               model: QuotationTransportation,
               as: "QuotationTransportation",
+              attributes: ["id"],
               include: [
                 {
                   model: VehicleType,
                   as: "VehicleType",
+                  attributes: ["typeOfVehicle"],
                 },
               ],
             },
+            {
+              model: Client,
+              as: "Client",
+              attributes: ["clientName"],
+            },
           ],
+          order: [["transactionId", "DESC"]],
         },
-      ],
-      order: [
-        [
-          { model: BookedTransaction, as: "BookedTransaction" },
-          "transactionId",
-          "DESC",
-        ],
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
       ],
     });
 
@@ -171,13 +260,9 @@ async function updateScheduledTransactionController(req, res) {
     console.log("Updating booked transaction with ID:", id);
 
     let {
-      quotationWasteId,
-      quotationTransportationId,
-      haulingDate,
-      haulingTime,
-      pttNo,
-      manifestNo,
-      pullOutFormNo,
+      bookedTransactionId,
+      scheduledDate,
+      scheduledTime,
       remarks,
       statusId,
       createdBy,
@@ -186,7 +271,7 @@ async function updateScheduledTransactionController(req, res) {
     remarks = remarks.toUpperCase();
 
     // Find the booked transaction by UUID (id) and update it
-    const updatedBookedTransaction = await BookedTransaction.findByPk(id);
+    const updatedBookedTransaction = await ScheduledTransaction.findByPk(id);
 
     if (updatedBookedTransaction) {
       // Update booked transaction attributes

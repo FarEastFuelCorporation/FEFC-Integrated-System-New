@@ -84,15 +84,15 @@ async function createScheduledTransactionController(req, res) {
 // Get Scheduled Transactions controller
 async function getScheduledTransactionsController(req, res) {
   try {
-    // Fetch all clients from the database
+    // Fetch pending transactions
     const pendingTransactions = await BookedTransaction.findAll({
-      //   where: {
-      //     id: {
-      //       [Op.notIn]: sequelize.literal(
-      //         '(SELECT "bookedTransactionId" FROM "ScheduledTransactions")'
-      //       ),
-      //     },
-      //   },
+      where: {
+        id: {
+          [Op.notIn]: literal(
+            "(SELECT `bookedTransactionId` FROM `ScheduledTransactions`)"
+          ),
+        },
+      },
       include: [
         {
           model: QuotationWaste,
@@ -118,6 +118,7 @@ async function getScheduledTransactionsController(req, res) {
       order: [["transactionId", "DESC"]],
     });
 
+    // Fetch finished transactions
     const finishedTransactions = await ScheduledTransaction.findAll({
       include: [
         {
@@ -145,8 +146,14 @@ async function getScheduledTransactionsController(req, res) {
               ],
             },
           ],
-          order: [["transactionId", "DESC"]],
         },
+      ],
+      order: [
+        [
+          { model: BookedTransaction, as: "BookedTransaction" },
+          "transactionId",
+          "DESC",
+        ],
       ],
     });
 

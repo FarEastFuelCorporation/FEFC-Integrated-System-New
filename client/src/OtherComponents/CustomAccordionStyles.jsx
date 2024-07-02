@@ -12,7 +12,6 @@ export const CustomAccordionStyles = ({ children }) => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box
-      m="40px 0 0 0"
       sx={{
         "& .MuiAccordion-root": {
           backgroundColor: colors.primary[400],

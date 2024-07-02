@@ -87,6 +87,7 @@ const vehicleTypeRoutes = require("./routes/vehicleTypeRoutes");
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const vehicleMaintenanceRequestRoutes = require("./routes/vehicleMaintenanceRequestRoutes");
 const bookedTransactionRoutes = require("./routes/bookedTransactionRoutes");
+const scheduledTransactionRoutes = require("./routes/scheduledTransactionRoutes");
 const receivingDashboardRoutes = require("./routes/receiving_dashboard");
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const { error404Controller } = require("./controllers/othersController");
@@ -103,6 +104,7 @@ app.use("/vehicleType", vehicleTypeRoutes);
 app.use("/vehicle", vehicleRoutes);
 app.use("/vehicleMaintenanceRequest", vehicleMaintenanceRequestRoutes);
 app.use("/bookedTransaction", bookedTransactionRoutes);
+app.use("/scheduledTransaction", scheduledTransactionRoutes);
 app.use("/receivingDashboard", receivingDashboardRoutes);
 app.use("/hrDashboard", hrDashboardRoutes);
 

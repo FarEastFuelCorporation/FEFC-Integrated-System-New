@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import GeneratorDashboard from "../../Client/Layouts/Generator/GeneratorDashboard";
 import Dashboard from "../../Client/Layouts/Generator/sections/dashboard";
-import Transactions from "../Layouts/Generator/sections/transactions";
+import BookedTransactions from "../Layouts/Generator/sections/bookedTransactions";
 import Quotations from "../../Employee/Layouts/Marketing/sections/quotations";
 import Form from "../../Client/Layouts/Generator/sections/form";
 import Calendar from "../../Client/Layouts/Generator/sections/calendar";
@@ -15,7 +15,7 @@ const GeneratorRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<GeneratorDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
-      <Route path="transactions" element={<Transactions user={user} />} />
+      <Route path="transactions" element={<BookedTransactions user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="form" element={<Form />} />
       <Route path="calendar" element={<Calendar />} />

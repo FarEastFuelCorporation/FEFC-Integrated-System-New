@@ -5,7 +5,6 @@ const router = express.Router();
 const {
   createBookedTransactionController,
   getBookedTransactionsController,
-  getBookedTransactionController,
   updateBookedTransactionController,
   deleteBookedTransactionController,
 } = require("../controllers/bookedTransactionController");
@@ -15,9 +14,6 @@ router.post("/", createBookedTransactionController);
 
 // Get Booked Transactions route
 router.get("/", getBookedTransactionsController);
-
-// Get Booked Transaction route
-router.get("/:id", getBookedTransactionController);
 
 // Update Booked Transaction route
 router.put("/:id", updateBookedTransactionController);

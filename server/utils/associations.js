@@ -17,6 +17,7 @@ const QuotationTransportation = require("../models/QuotationTransportation");
 const ClientUser = require("../models/ClientUser");
 const VehicleMaintenanceRequest = require("../models/VehicleMaintenanceRequest");
 const BookedTransaction = require("../models/BookedTransaction");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -225,6 +226,19 @@ TransactionStatus.hasMany(BookedTransaction, {
 BookedTransaction.belongsTo(TransactionStatus, {
   as: "TransactionStatus",
   foreignKey: "statusId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BookedTransaction.hasMany(ScheduledTransaction, {
+  as: "ScheduledTransaction",
+  foreignKey: "bookedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+ScheduledTransaction.belongsTo(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "bookedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

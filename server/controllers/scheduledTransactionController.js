@@ -1,14 +1,17 @@
-// controllers/bookedTransactionController.js
+// controllers/scheduledTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
 const generateTransactionId = require("../utils/generateTransactionId");
+const { Op, literal } = require("sequelize");
+const sequelize = require("../config/database");
 
-// Create Booked Transaction controller
-async function createBookedTransactionController(req, res) {
+// Create Scheduled Transaction controller
+async function createScheduledTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
@@ -78,11 +81,18 @@ async function createBookedTransactionController(req, res) {
   }
 }
 
-// Get Booked Transactions controller
-async function getBookedTransactionsController(req, res) {
+// Get Scheduled Transactions controller
+async function getScheduledTransactionsController(req, res) {
   try {
     // Fetch all clients from the database
-    const bookedTransactions = await BookedTransaction.findAll({
+    const pendingTransactions = await BookedTransaction.findAll({
+      //   where: {
+      //     id: {
+      //       [Op.notIn]: sequelize.literal(
+      //         '(SELECT "bookedTransactionId" FROM "ScheduledTransactions")'
+      //       ),
+      //     },
+      //   },
       include: [
         {
           model: QuotationWaste,
@@ -108,15 +118,47 @@ async function getBookedTransactionsController(req, res) {
       order: [["transactionId", "DESC"]],
     });
 
-    res.json({ bookedTransactions });
+    const finishedTransactions = await ScheduledTransaction.findAll({
+      include: [
+        {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          include: [
+            {
+              model: QuotationWaste,
+              as: "QuotationWaste",
+              include: [
+                {
+                  model: TypeOfWaste,
+                  as: "TypeOfWaste",
+                },
+              ],
+            },
+            {
+              model: QuotationTransportation,
+              as: "QuotationTransportation",
+              include: [
+                {
+                  model: VehicleType,
+                  as: "VehicleType",
+                },
+              ],
+            },
+          ],
+          order: [["transactionId", "DESC"]],
+        },
+      ],
+    });
+
+    res.json({ pendingTransactions, finishedTransactions });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
 
-// Update Booked Transaction controller
-async function updateBookedTransactionController(req, res) {
+// Update Scheduled Transaction controller
+async function updateScheduledTransactionController(req, res) {
   try {
     const id = req.params.id;
     console.log("Updating booked transaction with ID:", id);
@@ -197,8 +239,8 @@ async function updateBookedTransactionController(req, res) {
   }
 }
 
-// Delete Booked Transaction controller
-async function deleteBookedTransactionController(req, res) {
+// Delete Scheduled Transaction controller
+async function deleteScheduledTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
@@ -235,8 +277,8 @@ async function deleteBookedTransactionController(req, res) {
 }
 
 module.exports = {
-  createBookedTransactionController,
-  getBookedTransactionsController,
-  updateBookedTransactionController,
-  deleteBookedTransactionController,
+  createScheduledTransactionController,
+  getScheduledTransactionsController,
+  updateScheduledTransactionController,
+  deleteScheduledTransactionController,
 };

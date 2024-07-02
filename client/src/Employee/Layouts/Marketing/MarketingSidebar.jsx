@@ -30,8 +30,8 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/clients": "Clients",
       "/dashboard/typeOfWastes": "Type Of Wastes",
       "/dashboard/quotations": "Quotations",
+      "/dashboard/transactions": "Transactions",
       "/dashboard/commissions": "Commissions",
-      "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
@@ -206,6 +206,13 @@ const MarketingSidebar = ({ user }) => {
               setSelected={setSelected}
             />
             <Item
+              title="Transactions"
+              to="transactions"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
               title="Commissions"
               to="commissions"
               icon={<FormatListBulletedIcon />}
@@ -219,13 +226,7 @@ const MarketingSidebar = ({ user }) => {
             >
               Pages
             </Typography>
-            <Item
-              title="Profile Form"
-              to="form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+
             <Item
               title="Calendar"
               to="calendar"

@@ -1,11 +1,11 @@
-// models/BookedTransaction.js
+// models/ScheduledTransaction.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const BookedTransaction = sequelize.define(
-  "BookedTransaction",
+const ScheduledTransaction = sequelize.define(
+  "ScheduledTransaction",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,40 +13,16 @@ const BookedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    transactionId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    quotationWasteId: {
+    bookedTransactionId: {
       type: DataTypes.UUID,
       allowNull: false,
     },
-    quotationTransportationId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    haulingDate: {
+    scheduledDate: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    haulingTime: {
+    scheduledTime: {
       type: DataTypes.TIME,
-      allowNull: false,
-    },
-    pttNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    manifestNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    pullOutFormNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    statusId: {
-      type: DataTypes.INTEGER,
       allowNull: false,
     },
     remarks: {
@@ -86,4 +62,4 @@ const BookedTransaction = sequelize.define(
   }
 );
 
-module.exports = BookedTransaction;
+module.exports = ScheduledTransaction;

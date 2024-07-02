@@ -4,13 +4,15 @@ import { tokens } from "../theme";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 
 export const CustomAccordionStyles = ({ children }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
   return (
     <Box
+      m="40px 0 0 0"
       sx={{
         "& .MuiAccordion-root": {
           backgroundColor: colors.primary[400],
@@ -25,6 +27,10 @@ export const CustomAccordionStyles = ({ children }) => {
           borderBottom: `1px solid ${colors.grey[300]}`,
           "&:hover": {
             backgroundColor: colors.blueAccent[800],
+            display: "flex",
+            width: "100%",
+            justifyContent: "space-between",
+            alignItem: "center",
           },
           "& .MuiAccordionSummary-content": {
             margin: 0,
@@ -32,6 +38,8 @@ export const CustomAccordionStyles = ({ children }) => {
               width: "100%",
               fontSize: theme.typography.h4.fontSize,
               fontWeight: theme.typography.fontWeightBold,
+              display: "flex",
+              alignItems: "center",
             },
           },
         },
@@ -43,6 +51,8 @@ export const CustomAccordionStyles = ({ children }) => {
       }}
     >
       {children}
+
+      <Box sx={{ borderLeft: "1px solid black" }}></Box>
     </Box>
   );
 };
@@ -53,13 +63,7 @@ export const CustomAccordionSummary = ({
   handleDeleteClick,
 }) => {
   return (
-    <AccordionSummary
-      sx={{
-        display: "flex",
-        width: "100%",
-        justifyContent: "space-between",
-      }}
-    >
+    <AccordionSummary sx={{}}>
       <Typography variant="h4">Transaction ID: {row.transactionId}</Typography>
 
       <div style={{ display: "flex" }}>
@@ -71,5 +75,48 @@ export const CustomAccordionSummary = ({
         </IconButton>
       </div>
     </AccordionSummary>
+  );
+};
+
+export const CustomAccordionDetails = ({ children }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  return (
+    <AccordionDetails
+      sx={{
+        paddingLeft: "80px !important",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "40px",
+          borderLeft: `4px solid ${colors.grey[300]}`,
+          height: "calc(100% - 32px)",
+        }}
+      ></div>
+      <div
+        style={{
+          position: "absolute",
+          left: "22px",
+          height: "40px",
+          width: "40px",
+          borderRadius: "100%",
+          backgroundColor: `${colors.grey[100]}`,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CollectionsBookmarkIcon
+          sx={{
+            fontSize: "30px",
+            color: `${colors.greenAccent[400]}`,
+          }}
+        />
+      </div>
+      {children}
+    </AccordionDetails>
   );
 };

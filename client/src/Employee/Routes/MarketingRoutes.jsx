@@ -5,8 +5,8 @@ import Dashboard from "../../Employee/Layouts/Marketing/sections/dashboard";
 import Clients from "../../Employee/Layouts/Marketing/sections/clients";
 import TypeOfWastes from "../../Employee/Layouts/Certification/sections/typeOfWaste";
 import Quotations from "../../Employee/Layouts/Marketing/sections/quotations";
+import ScheduledTransactions from "../../Employee/Layouts/Marketing/sections/scheduledTransactions";
 import Commissions from "../../Employee/Layouts/Marketing/sections/commissions";
-import Form from "../../Employee/Layouts/Marketing/sections/form";
 import Calendar from "../../Employee/Layouts/Marketing/sections/calendar";
 import FAQ from "../../Employee/Layouts/Marketing/sections/faq";
 import Bar from "../../Employee/Layouts/Marketing/sections/bar";
@@ -20,8 +20,11 @@ const MarketingRoutes = ({ user }) => (
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
+      <Route
+        path="transactions"
+        element={<ScheduledTransactions user={user} />}
+      />
       <Route path="commissions" element={<Commissions />} />
-      <Route path="form" element={<Form />} />
       <Route path="calendar" element={<Calendar />} />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />

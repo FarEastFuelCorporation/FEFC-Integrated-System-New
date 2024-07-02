@@ -10,7 +10,6 @@ import {
   MenuItem,
 } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import { format } from "date-fns";
@@ -18,11 +17,12 @@ import axios from "axios";
 import { tokens } from "../../../../../theme";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import {
+  CustomAccordionDetails,
   CustomAccordionStyles,
   CustomAccordionSummary,
 } from "../../../../../OtherComponents/CustomAccordionStyles";
 
-const Transactions = ({ user }) => {
+const ScheduledTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -53,28 +53,37 @@ const Transactions = ({ user }) => {
       try {
         const [bookedTransactionResponse, quotationResponse] =
           await Promise.all([
-            axios.get(`${apiUrl}/bookedTransaction`),
+            axios.get(`${apiUrl}/scheduledTransaction`),
             axios.get(`${apiUrl}/quotation/${user.id}`),
           ]);
 
         const bookedTransactions = bookedTransactionResponse.data;
         console.log(bookedTransactions);
-        console.log(bookedTransactions.bookedTransactions);
         if (
           bookedTransactions &&
-          Array.isArray(bookedTransactions.bookedTransactions)
+          Array.isArray(bookedTransactions.pendingTransactions)
         ) {
-          const flattenedData = bookedTransactions.bookedTransactions.map(
+          const flattenedData = bookedTransactions.pendingTransactions.map(
             (item) => {
               const haulingDate = item.haulingDate
                 ? new Date(item.haulingDate)
                 : null;
+              const createdDate = item.createdAt
+                ? new Date(item.createdAt)
+                : null;
               let haulingTime = null;
+              let createdTime = null;
               if (item.haulingTime) {
                 const [hours, minutes, seconds] = item.haulingTime.split(":");
                 haulingTime = new Date(
                   Date.UTC(1970, 0, 1, hours, minutes, seconds)
                 ); // Create a date using UTC
+              }
+              if (createdDate) {
+                createdTime = createdDate
+                  .toISOString()
+                  .split("T")[1]
+                  .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
               }
 
               return {
@@ -85,6 +94,10 @@ const Transactions = ({ user }) => {
                 haulingTime: haulingTime
                   ? haulingTime.toISOString().split("T")[1].slice(0, 5)
                   : null,
+                createdDate: createdDate
+                  ? createdDate.toISOString().split("T")[0]
+                  : null,
+                createdTime: createdTime,
                 wasteName: item.QuotationWaste
                   ? item.QuotationWaste.wasteName
                   : null,
@@ -94,7 +107,7 @@ const Transactions = ({ user }) => {
               };
             }
           );
-          console.log(flattenedData);
+
           setBookedTransactions(flattenedData);
         } else {
           console.error(
@@ -127,8 +140,7 @@ const Transactions = ({ user }) => {
               ? new Date(item.haulingDate).toISOString().split("T")[0]
               : null, // Convert timestamp to yyyy-mm-dd format
           }));
-          console.log(quotationResponse.data);
-          console.log(flattenedData);
+
           setQuotationsData(flattenedData);
         } else {
           console.error(
@@ -146,16 +158,6 @@ const Transactions = ({ user }) => {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -284,14 +286,20 @@ const Transactions = ({ user }) => {
               handleEditClick={handleEditClick}
               handleDeleteClick={handleDeleteClick}
             />
-            <AccordionDetails
-              sx={{
-                paddingLeft: "100px !important",
-              }}
-            >
-              <Typography variant="h4" color={colors.greenAccent[400]}>
-                Booked
-              </Typography>
+            <CustomAccordionDetails>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography variant="h4" color={colors.greenAccent[400]}>
+                  Booked
+                </Typography>
+                <Typography variant="h5">
+                  {row.createdDate} {row.createdTime}
+                </Typography>
+              </Box>
               <Typography variant="h5">
                 Hauling Date:{" "}
                 {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
@@ -306,7 +314,8 @@ const Transactions = ({ user }) => {
               <Typography variant="h5">
                 Vehicle Type: {row.vehicleType}
               </Typography>
-            </AccordionDetails>
+              <hr></hr>
+            </CustomAccordionDetails>
           </Accordion>
         ))}
       </CustomAccordionStyles>
@@ -412,6 +421,19 @@ const Transactions = ({ user }) => {
               ))}
           </TextField>
           <TextField
+            label="Remarks"
+            name="remarks"
+            value={formData.remarks}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
             label="Status Id"
             name="statusId"
             value={formData.statusId}
@@ -442,4 +464,4 @@ const Transactions = ({ user }) => {
   );
 };
 
-export default Transactions;
+export default ScheduledTransactions;

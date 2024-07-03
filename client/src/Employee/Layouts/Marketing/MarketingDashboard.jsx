@@ -8,8 +8,14 @@ const MarketingDashboard = ({ user }) => {
       <div>
         <MarketingSidebar user={user} />
       </div>
-      <div style={{ width: "100%", overflow: "hidden" }}>
-        <Outlet />
+      <div
+        style={{
+          width: "100%",
+          height: "calc(100vh - 64px)",
+          overflowY: "scroll",
+        }}
+      >
+        <Outlet style={{ overflow: "none" }} />
       </div>
     </div>
   );

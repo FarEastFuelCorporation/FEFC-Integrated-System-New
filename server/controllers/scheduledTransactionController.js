@@ -6,9 +6,112 @@ const Employee = require("../models/Employee");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
-const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
 const { Op, literal } = require("sequelize");
+
+// Utility function to fetch pending transactions
+async function fetchPendingTransactions() {
+  return await BookedTransaction.findAll({
+    attributes: [
+      "id",
+      "transactionId",
+      "haulingDate",
+      "haulingTime",
+      "remarks",
+      "createdAt",
+    ],
+    where: {
+      id: {
+        [Op.notIn]: literal(
+          "(SELECT `bookedTransactionId` FROM `ScheduledTransactions` WHERE `deletedAt` IS NULL)"
+        ),
+      },
+    },
+    include: [
+      {
+        model: QuotationWaste,
+        as: "QuotationWaste",
+        attributes: ["wasteName"],
+      },
+      {
+        model: QuotationTransportation,
+        as: "QuotationTransportation",
+        attributes: ["id"],
+        include: [
+          {
+            model: VehicleType,
+            as: "VehicleType",
+            attributes: ["typeOfVehicle"],
+          },
+        ],
+      },
+      {
+        model: Client,
+        as: "Client",
+        attributes: ["clientName"],
+      },
+    ],
+    order: [["transactionId", "DESC"]],
+  });
+}
+
+// Utility function to fetch finished transactions
+async function fetchFinishedTransactions() {
+  return await ScheduledTransaction.findAll({
+    attributes: [
+      "id",
+      "bookedTransactionId",
+      "scheduledDate",
+      "scheduledTime",
+      "remarks",
+      "createdBy",
+      "createdAt",
+    ],
+    include: [
+      {
+        model: BookedTransaction,
+        as: "BookedTransaction",
+        attributes: [
+          "transactionId",
+          "haulingDate",
+          "haulingTime",
+          "remarks",
+          "createdAt",
+        ],
+        include: [
+          {
+            model: QuotationWaste,
+            as: "QuotationWaste",
+            attributes: ["wasteName"],
+          },
+          {
+            model: QuotationTransportation,
+            as: "QuotationTransportation",
+            attributes: ["id"],
+            include: [
+              {
+                model: VehicleType,
+                as: "VehicleType",
+                attributes: ["typeOfVehicle"],
+              },
+            ],
+          },
+          {
+            model: Client,
+            as: "Client",
+            attributes: ["clientName"],
+          },
+        ],
+        order: [["transactionId", "DESC"]],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  });
+}
 
 // Create Scheduled Transaction controller
 async function createScheduledTransactionController(req, res) {
@@ -47,91 +150,11 @@ async function createScheduledTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedBookedTransaction.save();
 
-      // Fetch pending transactions
-      const pendingTransactions = await BookedTransaction.findAll({
-        attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
-        where: {
-          id: {
-            [Op.notIn]: literal(
-              "(SELECT `bookedTransactionId` FROM `ScheduledTransactions`)"
-            ),
-          },
-        },
-        include: [
-          {
-            model: QuotationWaste,
-            as: "QuotationWaste",
-            attributes: ["wasteName"],
-          },
-          {
-            model: QuotationTransportation,
-            as: "QuotationTransportation",
-            attributes: ["id"],
-            include: [
-              {
-                model: VehicleType,
-                as: "VehicleType",
-                attributes: ["typeOfVehicle"],
-              },
-            ],
-          },
-          {
-            model: Client,
-            as: "Client",
-            attributes: ["clientName"],
-          },
-        ],
-        order: [["transactionId", "DESC"]],
-      });
+      // Fetch pending and finished transactions
+      const pendingTransactions = await fetchPendingTransactions();
+      const finishedTransactions = await fetchFinishedTransactions();
 
-      // Fetch finished transactions
-      const finishedTransactions = await ScheduledTransaction.findAll({
-        attributes: ["scheduledDate", "scheduledTime", "remarks", "createdBy"],
-        include: [
-          {
-            model: BookedTransaction,
-            as: "BookedTransaction",
-            attributes: [
-              "transactionId",
-              "haulingDate",
-              "haulingTime",
-              "remarks",
-            ],
-            include: [
-              {
-                model: QuotationWaste,
-                as: "QuotationWaste",
-                attributes: ["wasteName"],
-              },
-              {
-                model: QuotationTransportation,
-                as: "QuotationTransportation",
-                attributes: ["id"],
-                include: [
-                  {
-                    model: VehicleType,
-                    as: "VehicleType",
-                    attributes: ["typeOfVehicle"],
-                  },
-                ],
-              },
-              {
-                model: Client,
-                as: "Client",
-                attributes: ["clientName"],
-              },
-            ],
-            order: [["transactionId", "DESC"]],
-          },
-          {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
-        ],
-      });
-
-      // Respond with the updated booked transaction data
+      // Respond with the updated data
       res.json({ pendingTransactions, finishedTransactions });
     } else {
       // If booked transaction with the specified ID was not found
@@ -149,102 +172,9 @@ async function createScheduledTransactionController(req, res) {
 // Get Scheduled Transactions controller
 async function getScheduledTransactionsController(req, res) {
   try {
-    // Fetch pending transactions
-    const pendingTransactions = await BookedTransaction.findAll({
-      attributes: [
-        "transactionId",
-        "haulingDate",
-        "haulingTime",
-        "remarks",
-        "createdAt",
-      ],
-      where: {
-        id: {
-          [Op.notIn]: literal(
-            "(SELECT `bookedTransactionId` FROM `ScheduledTransactions`)"
-          ),
-        },
-      },
-      include: [
-        {
-          model: QuotationWaste,
-          as: "QuotationWaste",
-          attributes: ["wasteName"],
-        },
-        {
-          model: QuotationTransportation,
-          as: "QuotationTransportation",
-          attributes: ["id"],
-          include: [
-            {
-              model: VehicleType,
-              as: "VehicleType",
-              attributes: ["typeOfVehicle"],
-            },
-          ],
-        },
-        {
-          model: Client,
-          as: "Client",
-          attributes: ["clientName"],
-        },
-      ],
-      order: [["transactionId", "DESC"]],
-    });
-
-    // Fetch finished transactions
-    const finishedTransactions = await ScheduledTransaction.findAll({
-      attributes: [
-        "scheduledDate",
-        "scheduledTime",
-        "remarks",
-        "createdBy",
-        "createdAt",
-      ],
-      include: [
-        {
-          model: BookedTransaction,
-          as: "BookedTransaction",
-          attributes: [
-            "transactionId",
-            "haulingDate",
-            "haulingTime",
-            "remarks",
-            "createdAt",
-          ],
-          include: [
-            {
-              model: QuotationWaste,
-              as: "QuotationWaste",
-              attributes: ["wasteName"],
-            },
-            {
-              model: QuotationTransportation,
-              as: "QuotationTransportation",
-              attributes: ["id"],
-              include: [
-                {
-                  model: VehicleType,
-                  as: "VehicleType",
-                  attributes: ["typeOfVehicle"],
-                },
-              ],
-            },
-            {
-              model: Client,
-              as: "Client",
-              attributes: ["clientName"],
-            },
-          ],
-          order: [["transactionId", "DESC"]],
-        },
-        {
-          model: Employee,
-          as: "Employee",
-          attributes: ["firstName", "lastName"],
-        },
-      ],
-    });
+    // Fetch pending and finished transactions
+    const pendingTransactions = await fetchPendingTransactions();
+    const finishedTransactions = await fetchFinishedTransactions();
 
     res.json({ pendingTransactions, finishedTransactions });
   } catch (error) {
@@ -268,56 +198,31 @@ async function updateScheduledTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    remarks = remarks.toUpperCase();
+    if (remarks) {
+      remarks = remarks.toUpperCase();
+    }
 
     // Find the booked transaction by UUID (id) and update it
-    const updatedBookedTransaction = await ScheduledTransaction.findByPk(id);
+    const updatedScheduledTransaction = await ScheduledTransaction.findByPk(id);
 
-    if (updatedBookedTransaction) {
+    if (updatedScheduledTransaction) {
       // Update booked transaction attributes
-      updatedBookedTransaction.quotationWasteId = quotationWasteId;
-      updatedBookedTransaction.quotationTransportationId =
-        quotationTransportationId;
-      updatedBookedTransaction.haulingDate = haulingDate;
-      updatedBookedTransaction.haulingTime = haulingTime;
-      updatedBookedTransaction.pttNo = pttNo;
-      updatedBookedTransaction.manifestNo = manifestNo;
-      updatedBookedTransaction.pullOutFormNo = pullOutFormNo;
-      updatedBookedTransaction.remarks = remarks;
-      updatedBookedTransaction.statusId = statusId;
-      updatedBookedTransaction.updatedBy = createdBy;
+      updatedScheduledTransaction.bookedTransactionId = bookedTransactionId;
+      updatedScheduledTransaction.scheduledDate = scheduledDate;
+      updatedScheduledTransaction.scheduledTime = scheduledTime;
+      updatedScheduledTransaction.remarks = remarks;
+      updatedScheduledTransaction.statusId = statusId;
+      updatedScheduledTransaction.updatedBy = createdBy;
 
       // Save the updated booked transaction
-      await updatedBookedTransaction.save();
+      await updatedScheduledTransaction.save();
 
-      const bookedTransactions = await BookedTransaction.findAll({
-        include: [
-          {
-            model: QuotationWaste,
-            as: "QuotationWaste",
-            include: [
-              {
-                model: TypeOfWaste,
-                as: "TypeOfWaste",
-              },
-            ],
-          },
-          {
-            model: QuotationTransportation,
-            as: "QuotationTransportation",
-            include: [
-              {
-                model: VehicleType,
-                as: "VehicleType",
-              },
-            ],
-          },
-        ],
-        order: [["transactionId", "DESC"]],
-      });
+      // Fetch pending and finished transactions
+      const pendingTransactions = await fetchPendingTransactions();
+      const finishedTransactions = await fetchFinishedTransactions();
 
-      // Respond with the updated booked transaction data
-      res.json({ bookedTransactions });
+      // Respond with the updated data
+      res.json({ pendingTransactions, finishedTransactions });
     } else {
       // If booked transaction with the specified ID was not found
       res
@@ -337,33 +242,46 @@ async function deleteScheduledTransactionController(req, res) {
     const id = req.params.id;
     const { deletedBy } = req.body;
 
-    console.log("Soft deleting booked transaction with ID:", id);
+    console.log("Soft deleting scheduled transaction with ID:", id);
 
-    // Find the booked transaction by UUID (id)
-    const bookedTransactionToDelete = await BookedTransaction.findByPk(id);
+    // Find the scheduled transaction by UUID (id)
+    const scheduledTransactionToDelete = await ScheduledTransaction.findByPk(
+      id
+    );
 
-    if (bookedTransactionToDelete) {
+    if (scheduledTransactionToDelete) {
       // Update the deletedBy field
-      bookedTransactionToDelete.updatedBy = deletedBy;
-      bookedTransactionToDelete.deletedBy = deletedBy;
-      await bookedTransactionToDelete.save();
+      scheduledTransactionToDelete.updatedBy = deletedBy;
+      scheduledTransactionToDelete.deletedBy = deletedBy;
+      await scheduledTransactionToDelete.save();
 
-      // Soft delete the booked transaction (sets deletedAt timestamp)
-      await bookedTransactionToDelete.destroy();
+      console.log(scheduledTransactionToDelete.bookedTransactionId);
 
-      // Respond with a success message
-      res.json({
-        message: `Booked Transaction with ID ${id} soft-deleted successfully`,
-      });
+      const updatedBookedTransaction = await BookedTransaction.findByPk(
+        scheduledTransactionToDelete.bookedTransactionId
+      );
+      updatedBookedTransaction.statusId = 1;
+
+      await updatedBookedTransaction.save();
+
+      // Soft delete the scheduled transaction (sets deletedAt timestamp)
+      await scheduledTransactionToDelete.destroy();
+
+      // Fetch pending and finished transactions
+      const pendingTransactions = await fetchPendingTransactions();
+      const finishedTransactions = await fetchFinishedTransactions();
+
+      // Respond with the updated data
+      res.json({ pendingTransactions, finishedTransactions });
     } else {
-      // If booked transaction with the specified ID was not found
+      // If scheduled transaction with the specified ID was not found
       res
         .status(404)
-        .json({ message: `Booked Transaction with ID ${id} not found` });
+        .json({ message: `Scheduled Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error soft-deleting booked transaction:", error);
+    console.error("Error soft-deleting scheduled transaction:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

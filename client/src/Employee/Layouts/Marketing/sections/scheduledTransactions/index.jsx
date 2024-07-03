@@ -61,7 +61,7 @@ const ScheduledTransactions = ({ user }) => {
 
   const processData = (response) => {
     const transactions = response.data;
-    console.log(transactions);
+
     if (transactions && Array.isArray(transactions.pendingTransactions)) {
       const flattenedPendingData = transactions.pendingTransactions.map(
         (item) => {
@@ -217,7 +217,7 @@ const ScheduledTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${apiUrl}/scheduledTransaction`);
-
+        console.log(response);
         processData(response);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -228,6 +228,7 @@ const ScheduledTransactions = ({ user }) => {
   }, [apiUrl, user.id]);
 
   const handleOpenModal = (id) => {
+    console.log(id);
     setFormData({
       id: "",
       bookedTransactionId: id,
@@ -255,12 +256,7 @@ const ScheduledTransactions = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    console.log(id);
     const typeToEdit = finishedTransactions.find((type) => type.id === id);
-    console.log(typeToEdit);
-    console.log(typeToEdit.bookedTransactionId);
-    console.log(typeToEdit.scheduledDate);
-    console.log(typeToEdit.scheduledTime);
 
     if (typeToEdit) {
       setFormData({
@@ -277,12 +273,11 @@ const ScheduledTransactions = ({ user }) => {
     } else {
       console.error(`Vehicle type with ID ${id} not found for editing.`);
     }
-    console.log(formData);
   };
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle type?"
+      "Are you sure you want to delete this Scheduled Transaction?"
     );
 
     if (!isConfirmed) {
@@ -290,13 +285,15 @@ const ScheduledTransactions = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/bookedTransaction/${id}`, {
-        data: { deletedBy: user.id },
-      });
+      const response = await axios.delete(
+        `${apiUrl}/scheduledTransaction/${id}`,
+        {
+          data: { deletedBy: user.id },
+        }
+      );
 
-      const updatedData = pendingTransactions.filter((type) => type.id !== id);
-      setPendingTransactions(updatedData);
-      setSuccessMessage("Vehicle Type deleted successfully!");
+      processData(response);
+      setSuccessMessage("Scheduled Transaction deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -318,8 +315,8 @@ const ScheduledTransactions = ({ user }) => {
         processData(response);
         setSuccessMessage("Update Scheduled Transaction successfully!");
       } else {
+        console.log(formData);
         response = await axios.post(`${apiUrl}/scheduledTransaction`, formData);
-
         processData(response);
         setSuccessMessage("Scheduled Transaction successfully!");
       }
@@ -553,7 +550,7 @@ const ScheduledTransactions = ({ user }) => {
             <TextField
               label="Scheduled Date"
               name="scheduledDate"
-              value={formData.haulingDate}
+              value={formData.scheduledDate}
               onChange={handleInputChange}
               fullWidth
               type="date"
@@ -569,7 +566,7 @@ const ScheduledTransactions = ({ user }) => {
             <TextField
               label="Scheduled Time"
               name="scheduledTime"
-              value={formData.haulingTime}
+              value={formData.scheduledTime}
               onChange={handleInputChange}
               fullWidth
               type="time"

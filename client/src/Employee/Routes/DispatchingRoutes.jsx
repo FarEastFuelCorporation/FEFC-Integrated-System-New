@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import DispatchingDashboard from "../../Employee/Layouts/Dispatching/DispatchingDashboard";
 import Dashboard from "../../Employee/Layouts/Dispatching/sections/dashboard";
+import DispatchedTransactions from "../Layouts/Dispatching/sections/dispatchedTransactions";
 import VehicleTypes from "../Layouts/Dispatching/sections/vehicleTypes";
 import Vehicles from "../../Employee/Layouts/Dispatching/sections/vehicles";
 import VehicleMaintenanceRequest from "../Layouts/Dispatching/sections/vehicleMaintenanceRequest";
@@ -16,6 +17,10 @@ const DispatchingRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<DispatchingDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
+      <Route
+        path="transactions"
+        element={<DispatchedTransactions user={user} />}
+      />
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />
       <Route

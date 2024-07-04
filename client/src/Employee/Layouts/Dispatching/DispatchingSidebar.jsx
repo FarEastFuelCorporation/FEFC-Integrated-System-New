@@ -28,6 +28,7 @@ const DispatchingSidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
+      "/dashboard/transactions": "Transactions",
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/VehicleMaintenanceRequest": "Vehicle Maintenance Request",
@@ -184,6 +185,13 @@ const DispatchingSidebar = ({ user }) => {
             >
               Data
             </Typography>
+            <Item
+              title="Transactions"
+              to="transactions"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Item
               title="Type Of Vehicles"
               to="vehicleTypes"

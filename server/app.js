@@ -44,7 +44,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Use express-session middleware
@@ -88,6 +88,7 @@ const vehicleRoutes = require("./routes/vehicleRoutes");
 const vehicleMaintenanceRequestRoutes = require("./routes/vehicleMaintenanceRequestRoutes");
 const bookedTransactionRoutes = require("./routes/bookedTransactionRoutes");
 const scheduledTransactionRoutes = require("./routes/scheduledTransactionRoutes");
+const dispatchedTransactionRoutes = require("./routes/dispatchedTransactionRoutes");
 const receivingDashboardRoutes = require("./routes/receiving_dashboard");
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const { error404Controller } = require("./controllers/othersController");
@@ -105,6 +106,7 @@ app.use("/vehicle", vehicleRoutes);
 app.use("/vehicleMaintenanceRequest", vehicleMaintenanceRequestRoutes);
 app.use("/bookedTransaction", bookedTransactionRoutes);
 app.use("/scheduledTransaction", scheduledTransactionRoutes);
+app.use("/dispatchedTransaction", dispatchedTransactionRoutes);
 app.use("/receivingDashboard", receivingDashboardRoutes);
 app.use("/hrDashboard", hrDashboardRoutes);
 

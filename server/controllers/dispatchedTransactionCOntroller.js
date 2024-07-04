@@ -1,4 +1,4 @@
-// controllers/scheduledTransactionController.js
+// controllers/dispatchedTransactionCOntroller.js
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
@@ -6,58 +6,12 @@ const Employee = require("../models/Employee");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
+const DispatchedTransaction = require("../models/DispatchedTransaction");
 const VehicleType = require("../models/VehicleType");
 const { Op, literal } = require("sequelize");
 
 // Utility function to fetch pending transactions
 async function fetchPendingTransactions() {
-  return await BookedTransaction.findAll({
-    attributes: [
-      "id",
-      "transactionId",
-      "haulingDate",
-      "haulingTime",
-      "remarks",
-      "statusId",
-      "createdAt",
-    ],
-    where: {
-      id: {
-        [Op.notIn]: literal(
-          "(SELECT `bookedTransactionId` FROM `ScheduledTransactions` WHERE `deletedAt` IS NULL)"
-        ),
-      },
-    },
-    include: [
-      {
-        model: QuotationWaste,
-        as: "QuotationWaste",
-        attributes: ["wasteName"],
-      },
-      {
-        model: QuotationTransportation,
-        as: "QuotationTransportation",
-        attributes: ["id"],
-        include: [
-          {
-            model: VehicleType,
-            as: "VehicleType",
-            attributes: ["typeOfVehicle"],
-          },
-        ],
-      },
-      {
-        model: Client,
-        as: "Client",
-        attributes: ["clientName"],
-      },
-    ],
-    order: [["transactionId", "DESC"]],
-  });
-}
-
-// Utility function to fetch finished transactions
-async function fetchFinishedTransactions() {
   return await ScheduledTransaction.findAll({
     attributes: [
       "id",
@@ -112,11 +66,97 @@ async function fetchFinishedTransactions() {
         attributes: ["firstName", "lastName"],
       },
     ],
+    where: {
+      id: {
+        [Op.notIn]: literal(
+          "(SELECT `scheduledTransactionId` FROM `DispatchedTransactions` WHERE `deletedAt` IS NULL)"
+        ),
+      },
+    },
   });
 }
 
-// Create Scheduled Transaction controller
-async function createScheduledTransactionController(req, res) {
+// Utility function to fetch finished transactions
+async function fetchFinishedTransactions() {
+  return await DispatchedTransaction.findAll({
+    attributes: [
+      "id",
+      "scheduledTransactionId",
+      "dispatchedDate",
+      "dispatchedTime",
+      "remarks",
+      "createdBy",
+      "createdAt",
+    ],
+    include: [
+      {
+        model: ScheduledTransaction,
+        as: "ScheduledTransaction",
+        attributes: [
+          "id",
+          "bookedTransactionId",
+          "scheduledDate",
+          "scheduledTime",
+          "remarks",
+          "createdBy",
+          "createdAt",
+        ],
+        include: [
+          {
+            model: BookedTransaction,
+            as: "BookedTransaction",
+            attributes: [
+              "transactionId",
+              "haulingDate",
+              "haulingTime",
+              "remarks",
+              "statusId",
+              "createdAt",
+            ],
+            include: [
+              {
+                model: QuotationWaste,
+                as: "QuotationWaste",
+                attributes: ["wasteName"],
+              },
+              {
+                model: QuotationTransportation,
+                as: "QuotationTransportation",
+                attributes: ["id"],
+                include: [
+                  {
+                    model: VehicleType,
+                    as: "VehicleType",
+                    attributes: ["typeOfVehicle"],
+                  },
+                ],
+              },
+              {
+                model: Client,
+                as: "Client",
+                attributes: ["clientName"],
+              },
+            ],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+    order: [["id", "DESC"]],
+  });
+}
+
+// Create Dispatched Transaction controller
+async function createDispatchedTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
@@ -171,8 +211,8 @@ async function createScheduledTransactionController(req, res) {
   }
 }
 
-// Get Scheduled Transactions controller
-async function getScheduledTransactionsController(req, res) {
+// Get Dispatched Transactions controller
+async function getDispatchedTransactionsController(req, res) {
   try {
     // Fetch pending and finished transactions
     const pendingTransactions = await fetchPendingTransactions();
@@ -185,8 +225,8 @@ async function getScheduledTransactionsController(req, res) {
   }
 }
 
-// Update Scheduled Transaction controller
-async function updateScheduledTransactionController(req, res) {
+// Update Dispatched Transaction controller
+async function updateDispatchedTransactionController(req, res) {
   try {
     const id = req.params.id;
     console.log("Updating booked transaction with ID:", id);
@@ -238,8 +278,8 @@ async function updateScheduledTransactionController(req, res) {
   }
 }
 
-// Delete Scheduled Transaction controller
-async function deleteScheduledTransactionController(req, res) {
+// Delete Dispatched Transaction controller
+async function deleteDispatchedTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
@@ -289,8 +329,8 @@ async function deleteScheduledTransactionController(req, res) {
 }
 
 module.exports = {
-  createScheduledTransactionController,
-  getScheduledTransactionsController,
-  updateScheduledTransactionController,
-  deleteScheduledTransactionController,
+  createDispatchedTransactionController,
+  getDispatchedTransactionsController,
+  updateDispatchedTransactionController,
+  deleteDispatchedTransactionController,
 };

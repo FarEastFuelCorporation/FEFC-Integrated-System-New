@@ -7,17 +7,19 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 
-const ScheduledTransactions = ({ user }) => {
+const DispatchedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  console.log(user.userType);
 
   const initialFormData = {
     id: "",
-    bookedTransactionId: "",
-    scheduledDate: "",
+    scheduledTransactionId: "",
+    vehicleId: "",
+    driverId: "",
+    helperId: "",
+    isDispatched: false,
     scheduledTime: "",
     remarks: "",
-    statusId: 2,
+    statusId: 3,
     createdBy: user.id,
   };
 
@@ -32,62 +34,7 @@ const ScheduledTransactions = ({ user }) => {
     const transactions = response.data;
 
     if (transactions && Array.isArray(transactions.pendingTransactions)) {
-      const flattenedPendingData = transactions.pendingTransactions.map(
-        (item) => {
-          const haulingDate = item.haulingDate
-            ? new Date(item.haulingDate)
-            : null;
-          const bookedCreatedDate = item.createdAt
-            ? new Date(item.createdAt)
-            : null;
-          let haulingTime = null;
-          let bookedCreatedTime = null;
-          if (item.haulingTime) {
-            const [hours, minutes, seconds] = item.haulingTime.split(":");
-            haulingTime = new Date(
-              Date.UTC(1970, 0, 1, hours, minutes, seconds)
-            ); // Create a date using UTC
-          }
-          if (bookedCreatedDate) {
-            bookedCreatedTime = bookedCreatedDate
-              .toISOString()
-              .split("T")[1]
-              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-          }
-
-          return {
-            ...item,
-            haulingDate: haulingDate
-              ? haulingDate.toISOString().split("T")[0]
-              : null,
-            haulingTime: haulingTime
-              ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-              : null,
-            bookedCreatedDate: bookedCreatedDate
-              ? bookedCreatedDate.toISOString().split("T")[0]
-              : null,
-            bookedCreatedTime: bookedCreatedTime,
-            clientName: item.Client ? item.Client.clientName : null,
-            wasteName: item.QuotationWaste
-              ? item.QuotationWaste.wasteName
-              : null,
-            vehicleType: item.QuotationTransportation
-              ? item.QuotationTransportation.VehicleType.typeOfVehicle
-              : null,
-            bookedRemarks: item.remarks,
-          };
-        }
-      );
-
-      setPendingTransactions(flattenedPendingData);
-    } else {
-      console.error(
-        "bookedTransactions or bookedTransactions.pendingTransactions is undefined or not an array"
-      );
-    }
-
-    if (transactions && Array.isArray(transactions.finishedTransactions)) {
-      const flattenedFinishedData = transactions.finishedTransactions.map(
+      const flattenedFinishedData = transactions.pendingTransactions.map(
         (scheduledItem) => {
           const item = scheduledItem.BookedTransaction;
           const haulingDate = item.haulingDate
@@ -106,33 +53,37 @@ const ScheduledTransactions = ({ user }) => {
           let scheduledTime = null;
           let bookedCreatedTime = null;
           let scheduledCreatedTime = null;
+
           if (item.haulingTime) {
             const [hours, minutes, seconds] = item.haulingTime.split(":");
             haulingTime = new Date(
               Date.UTC(1970, 0, 1, hours, minutes, seconds)
-            ); // Create a date using UTC
+            );
           }
+
           if (scheduledItem.scheduledTime) {
             const [hours, minutes, seconds] =
               scheduledItem.scheduledTime.split(":");
             scheduledTime = new Date(
               Date.UTC(1970, 0, 1, hours, minutes, seconds)
-            ); // Create a date using UTC
+            );
           }
+
           if (bookedCreatedDate) {
             bookedCreatedTime = bookedCreatedDate
               .toISOString()
               .split("T")[1]
-              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
+              .slice(0, 8);
           }
+
           if (scheduledCreatedDate) {
             scheduledCreatedTime = scheduledCreatedDate
               .toISOString()
               .split("T")[1]
-              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
+              .slice(0, 8);
           }
 
-          const createdBy =
+          const scheduledCreatedBy =
             scheduledItem.Employee.firstName +
             " " +
             scheduledItem.Employee.lastName;
@@ -169,16 +120,116 @@ const ScheduledTransactions = ({ user }) => {
               : null,
             bookedRemarks: item.remarks,
             statusId: item.statusId,
-            createdBy: createdBy,
+            scheduledCreatedBy: scheduledCreatedBy,
             scheduledRemarks: scheduledItem.remarks,
           };
         }
       );
 
-      setFinishedTransactions(flattenedFinishedData);
+      setPendingTransactions(flattenedFinishedData);
     } else {
       console.error(
-        "bookedTransactions or bookedTransactions.finishedTransactions is undefined or not an array"
+        "transactions or transactions.finishedTransactions is undefined or not an array"
+      );
+    }
+
+    if (transactions && Array.isArray(transactions.finishedTransactions)) {
+      const flattenedDispatchedData = transactions.finishedTransactions.map(
+        (dispatchedItem) => {
+          const item = dispatchedItem.ScheduledTransaction.BookedTransaction;
+          const haulingDate = item.haulingDate
+            ? new Date(item.haulingDate)
+            : null;
+          const scheduledDate = dispatchedItem.scheduledDate
+            ? new Date(dispatchedItem.scheduledDate)
+            : null;
+          const bookedCreatedDate = item.createdAt
+            ? new Date(item.createdAt)
+            : null;
+          const scheduledCreatedDate = dispatchedItem.createdAt
+            ? new Date(dispatchedItem.createdAt)
+            : null;
+          let haulingTime = null;
+          let scheduledTime = null;
+          let bookedCreatedTime = null;
+          let scheduledCreatedTime = null;
+
+          if (item.haulingTime) {
+            const [hours, minutes, seconds] = item.haulingTime.split(":");
+            haulingTime = new Date(
+              Date.UTC(1970, 0, 1, hours, minutes, seconds)
+            );
+          }
+
+          if (dispatchedItem.scheduledTime) {
+            const [hours, minutes, seconds] =
+              dispatchedItem.scheduledTime.split(":");
+            scheduledTime = new Date(
+              Date.UTC(1970, 0, 1, hours, minutes, seconds)
+            );
+          }
+
+          if (bookedCreatedDate) {
+            bookedCreatedTime = bookedCreatedDate
+              .toISOString()
+              .split("T")[1]
+              .slice(0, 8);
+          }
+
+          if (scheduledCreatedDate) {
+            scheduledCreatedTime = scheduledCreatedDate
+              .toISOString()
+              .split("T")[1]
+              .slice(0, 8);
+          }
+
+          const createdBy =
+            dispatchedItem.Employee.firstName +
+            " " +
+            dispatchedItem.Employee.lastName;
+
+          return {
+            ...dispatchedItem,
+            haulingDate: haulingDate
+              ? haulingDate.toISOString().split("T")[0]
+              : null,
+            scheduledDate: scheduledDate
+              ? scheduledDate.toISOString().split("T")[0]
+              : null,
+            haulingTime: haulingTime
+              ? haulingTime.toISOString().split("T")[1].slice(0, 5)
+              : null,
+            scheduledTime: scheduledTime
+              ? scheduledTime.toISOString().split("T")[1].slice(0, 5)
+              : null,
+            bookedCreatedDate: bookedCreatedDate
+              ? bookedCreatedDate.toISOString().split("T")[0]
+              : null,
+            scheduledCreatedDate: scheduledCreatedDate
+              ? scheduledCreatedDate.toISOString().split("T")[0]
+              : null,
+            bookedCreatedTime: bookedCreatedTime,
+            scheduledCreatedTime: scheduledCreatedTime,
+            clientName: item.Client ? item.Client.clientName : null,
+            wasteName: item.QuotationWaste
+              ? item.QuotationWaste.wasteName
+              : null,
+            transactionId: item.transactionId ? item.transactionId : null,
+            vehicleType: item.QuotationTransportation
+              ? item.QuotationTransportation.VehicleType.typeOfVehicle
+              : null,
+            bookedRemarks: item.remarks,
+            statusId: item.statusId,
+            createdBy: createdBy,
+            scheduledRemarks: dispatchedItem.remarks,
+          };
+        }
+      );
+
+      setFinishedTransactions(flattenedDispatchedData);
+    } else {
+      console.error(
+        "transactions or transactions.dispatchedTransactions is undefined or not an array"
       );
     }
   };
@@ -186,7 +237,7 @@ const ScheduledTransactions = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/scheduledTransaction`);
+        const response = await axios.get(`${apiUrl}/dispatchedTransaction`);
         console.log(response);
         processData(response);
       } catch (error) {
@@ -319,7 +370,7 @@ const ScheduledTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Schedule"}
+        buttonText={"Set"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
@@ -338,4 +389,4 @@ const ScheduledTransactions = ({ user }) => {
   );
 };
 
-export default ScheduledTransactions;
+export default DispatchedTransactions;

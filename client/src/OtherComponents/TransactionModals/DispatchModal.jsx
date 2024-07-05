@@ -6,6 +6,7 @@ import {
   useTheme,
   TextField,
   Button,
+  MenuItem,
 } from "@mui/material";
 import axios from "axios";
 import { tokens } from "../../theme";
@@ -22,6 +23,8 @@ const DispatchModal = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [quotationsData, setQuotationsData] = useState([]);
+  const [employeesData, setEmployeesData] = useState([]);
+
   const processDataQuotations = (response) => {
     const transactions = response.data;
 
@@ -56,14 +59,16 @@ const DispatchModal = ({
       );
     }
   };
+  console.log(employeesData);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const quotationResponse = await axios.get(
-          `${apiUrl}/quotation/${user.id}`
-        );
-
+        const [quotationResponse, employeeResponse] = await Promise.all([
+          axios.get(`${apiUrl}/quotation/${user.id}`),
+          axios.get(`${apiUrl}/employee`),
+        ]);
         processDataQuotations(quotationResponse);
+        setEmployeesData(employeeResponse.data.employees);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -71,6 +76,7 @@ const DispatchModal = ({
 
     fetchData();
   }, [apiUrl, user.id]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -129,6 +135,28 @@ const DispatchModal = ({
             autoComplete="off"
           />
         </div>
+        <TextField
+          label="Vehicle Type"
+          name="vehicleTypeId"
+          value={formData.vehicleTypeId}
+          onChange={handleInputChange}
+          select
+          fullWidth
+          required
+          InputLabelProps={{
+            style: {
+              color: colors.grey[100],
+            },
+          }}
+          autoComplete="off"
+        >
+          {employeesData.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.firstName}
+              {type.lastName}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
           label="Remarks"
           name="remarks"

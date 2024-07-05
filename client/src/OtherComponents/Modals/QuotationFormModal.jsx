@@ -90,7 +90,7 @@ const QuotationFormModal = ({
     const newTransportation = {
       id: null,
       quotationId: null,
-      vehicleId: "",
+      vehicleTypeId: "",
       haulingArea: "",
       mode: "",
       unit: "",
@@ -180,7 +180,7 @@ const QuotationFormModal = ({
           i === index
             ? {
                 ...transportation,
-                vehicleId: value,
+                vehicleTypeId: value,
               }
             : transportation
       );
@@ -666,8 +666,8 @@ const QuotationFormModal = ({
                       </InputLabel>
                       <Select
                         labelId={`transportation-type-select-label-${index}`}
-                        name={`quotationTransportation[${index}].vehicleId`}
-                        value={transportation.vehicleId}
+                        name={`quotationTransportation[${index}].vehicleTypeId`}
+                        value={transportation.vehicleTypeId}
                         onChange={(e) =>
                           handleVehicleTypeChange(index, e.target.value)
                         }

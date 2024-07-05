@@ -45,7 +45,7 @@ const Quotations = ({ user }) => {
       {
         id: null,
         quotationId: null,
-        vehicleId: "",
+        vehicleTypeId: "",
         haulingArea: "",
         mode: "",
         unit: "",

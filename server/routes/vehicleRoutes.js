@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createVehicleController,
   getVehiclesController,
+  getVehiclesByVehicleTypeIdController,
   updateVehicleController,
   deleteVehicleController,
 } = require("../controllers/vehicleController");
@@ -15,10 +16,13 @@ router.post("/", createVehicleController);
 // Get Vehicles route
 router.get("/", getVehiclesController);
 
-// Update Vehicle Type route
+// Get Vehicle by vehicleTypeId route
+router.get("/:id", getVehiclesByVehicleTypeIdController);
+
+// Update Vehicle route
 router.put("/:id", updateVehicleController);
 
-// Delete Vehicle Type route
+// Delete Vehicle route
 router.delete("/:id", deleteVehicleController);
 
 module.exports = router;

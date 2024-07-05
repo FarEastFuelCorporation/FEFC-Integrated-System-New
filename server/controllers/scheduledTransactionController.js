@@ -37,7 +37,7 @@ async function fetchPendingTransactions() {
       {
         model: QuotationTransportation,
         as: "QuotationTransportation",
-        attributes: ["id"],
+        attributes: ["id", "vehicleTypeId"],
         include: [
           {
             model: VehicleType,
@@ -49,7 +49,7 @@ async function fetchPendingTransactions() {
       {
         model: Client,
         as: "Client",
-        attributes: ["clientName"],
+        attributes: ["clientId", "clientName"],
       },
     ],
     order: [["transactionId", "DESC"]],
@@ -89,7 +89,7 @@ async function fetchFinishedTransactions() {
           {
             model: QuotationTransportation,
             as: "QuotationTransportation",
-            attributes: ["id"],
+            attributes: ["id", "vehicleTypeId"],
             include: [
               {
                 model: VehicleType,
@@ -101,7 +101,7 @@ async function fetchFinishedTransactions() {
           {
             model: Client,
             as: "Client",
-            attributes: ["clientName"],
+            attributes: ["clientId", "clientName"],
           },
         ],
         order: [["transactionId", "DESC"]],

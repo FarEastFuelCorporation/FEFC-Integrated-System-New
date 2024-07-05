@@ -77,7 +77,7 @@ async function createQuotationController(req, res) {
     await Promise.all(
       quotationTransportation.map(async (transportation) => {
         let {
-          vehicleId,
+          vehicleTypeId,
           haulingArea,
           mode,
           unit,
@@ -92,7 +92,7 @@ async function createQuotationController(req, res) {
 
         return await QuotationTransportation.create({
           quotationId: quotation.id,
-          vehicleId,
+          vehicleTypeId,
           haulingArea,
           mode,
           unit,
@@ -300,7 +300,7 @@ async function updateQuotationController(req, res) {
       await Promise.all(
         quotationTransportation.map(async (transportation) => {
           let {
-            vehicleId,
+            vehicleTypeId,
             haulingArea,
             mode,
             unit,
@@ -315,7 +315,7 @@ async function updateQuotationController(req, res) {
 
           return await QuotationTransportation.create({
             quotationId: quotation.id,
-            vehicleId,
+            vehicleTypeId,
             haulingArea,
             mode,
             unit,

@@ -1,4 +1,4 @@
-// controllers/dispatchedTransactionCOntroller.js
+// controllers/dispatchedTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
@@ -43,7 +43,7 @@ async function fetchPendingTransactions() {
           {
             model: QuotationTransportation,
             as: "QuotationTransportation",
-            attributes: ["id"],
+            attributes: ["id", "vehicleTypeId"],
             include: [
               {
                 model: VehicleType,
@@ -55,7 +55,7 @@ async function fetchPendingTransactions() {
           {
             model: Client,
             as: "Client",
-            attributes: ["clientName"],
+            attributes: ["clientId", "clientName"],
           },
         ],
         order: [["transactionId", "DESC"]],
@@ -122,7 +122,7 @@ async function fetchFinishedTransactions() {
               {
                 model: QuotationTransportation,
                 as: "QuotationTransportation",
-                attributes: ["id"],
+                attributes: ["id", "vehicleTypeId"],
                 include: [
                   {
                     model: VehicleType,
@@ -134,7 +134,7 @@ async function fetchFinishedTransactions() {
               {
                 model: Client,
                 as: "Client",
-                attributes: ["clientName"],
+                attributes: ["clientId", "clientName"],
               },
             ],
           },
@@ -161,8 +161,13 @@ async function createDispatchedTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      scheduledDate,
-      scheduledTime,
+      scheduledTransactionId,
+      vehicleId,
+      driverId,
+      helperIds,
+      isDispatched,
+      dispatchedDate,
+      dispatchedTime,
       remarks,
       statusId,
       createdBy,
@@ -173,11 +178,16 @@ async function createDispatchedTransactionController(req, res) {
     }
 
     // Creating a new client
-    await ScheduledTransaction.create({
-      bookedTransactionId,
-      scheduledDate,
-      scheduledTime,
+    await DispatchedTransaction.create({
+      scheduledTransactionId,
+      vehicleId,
+      driverId,
+      helperIds,
+      isDispatched,
+      dispatchedDate,
+      dispatchedTime,
       remarks,
+      statusId,
       createdBy,
     });
 

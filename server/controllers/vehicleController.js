@@ -56,6 +56,29 @@ async function getVehiclesController(req, res) {
         model: VehicleType,
         as: "VehicleType",
       },
+      order: [["plateNumber", "ASC"]],
+    });
+
+    res.json({ vehicles });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get Vehicles by vehicleTypeId controller
+async function getVehiclesByVehicleTypeIdController(req, res) {
+  try {
+    const id = req.params.id;
+
+    // Fetch all vehicles from the database
+    const vehicles = await Vehicle.findAll({
+      where: { vehicleTypeId: id },
+      include: {
+        model: VehicleType,
+        as: "VehicleType",
+      },
+      order: [["plateNumber", "ASC"]],
     });
 
     res.json({ vehicles });
@@ -157,8 +180,9 @@ async function deleteVehicleController(req, res) {
 }
 
 module.exports = {
-  getVehiclesController,
   createVehicleController,
+  getVehiclesController,
+  getVehiclesByVehicleTypeIdController,
   updateVehicleController,
   deleteVehicleController,
 };

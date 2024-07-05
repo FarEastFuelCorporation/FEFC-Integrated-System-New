@@ -39,8 +39,7 @@ const Transaction = ({
   const handleChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
-  console.log(pendingTransactions);
-  console.log(finishedTransactions);
+
   const transactions =
     selectedTab === 0 ? pendingTransactions : finishedTransactions;
 
@@ -67,7 +66,6 @@ const Transaction = ({
               <AccordionSummary sx={{}}>
                 <Typography variant="h4">
                   Transaction ID: {row.transactionId}
-                  {console.log(user.userType)}
                   {!Number.isInteger(user.userType) ? (
                     <Box>
                       {" - "}
@@ -87,7 +85,14 @@ const Transaction = ({
                       <Box></Box>
                     ) : (
                       <Button
-                        onClick={() => handleOpenModal(row.id)}
+                        onClick={() =>
+                          handleOpenModal(
+                            row.id,
+                            row.bookedTransactionId,
+                            row.BookedTransaction.QuotationTransportation
+                              .vehicleTypeId
+                          )
+                        }
                         sx={{
                           backgroundColor: `${colors.greenAccent[700]}`,
                           color: `${colors.grey[100]}`,

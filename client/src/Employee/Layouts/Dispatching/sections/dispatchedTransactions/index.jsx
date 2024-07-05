@@ -12,12 +12,14 @@ const DispatchedTransactions = ({ user }) => {
 
   const initialFormData = {
     id: "",
+    bookedTransactionId: "",
     scheduledTransactionId: "",
     vehicleId: "",
     driverId: "",
-    helperId: "",
+    helperIds: "",
     isDispatched: false,
-    scheduledTime: "",
+    dispatchedDate: null,
+    dispatchedTime: null,
     remarks: "",
     statusId: 3,
     createdBy: user.id,
@@ -29,6 +31,7 @@ const DispatchedTransactions = ({ user }) => {
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [error, setError] = useState("");
 
   const processData = (response) => {
     const transactions = response.data;
@@ -238,7 +241,7 @@ const DispatchedTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${apiUrl}/dispatchedTransaction`);
-        console.log(response);
+
         processData(response);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -248,16 +251,18 @@ const DispatchedTransactions = ({ user }) => {
     fetchData();
   }, [apiUrl, user.id]);
 
-  const handleOpenModal = (id) => {
-    console.log(id);
+  const handleOpenModal = (id, bookedTransactionId, vehicleTypeId) => {
     setFormData({
+      vehicleTypeId: vehicleTypeId,
       id: "",
+      bookedTransactionId: bookedTransactionId,
       scheduledTransactionId: id,
       vehicleId: "",
       driverId: "",
-      helperId: "",
+      helperIds: "",
       isDispatched: false,
-      scheduledTime: "",
+      dispatchedDate: null,
+      dispatchedTime: null,
       remarks: "",
       statusId: 3,
       createdBy: user.id,
@@ -277,6 +282,15 @@ const DispatchedTransactions = ({ user }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleAutocompleteChange = (event, newValue) => {
+    const updatedHelperIds = newValue.map((item) => item.employeeId);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      helperIds: updatedHelperIds.join(", "),
+    }));
+    console.log(updatedHelperIds);
   };
 
   const handleEditClick = (id) => {
@@ -301,7 +315,7 @@ const DispatchedTransactions = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Scheduled Transaction?"
+      "Are you sure you want to delete this Dispatched Transaction?"
     );
 
     if (!isConfirmed) {
@@ -310,14 +324,14 @@ const DispatchedTransactions = ({ user }) => {
 
     try {
       const response = await axios.delete(
-        `${apiUrl}/scheduledTransaction/${id}`,
+        `${apiUrl}/dispatchedTransaction/${id}`,
         {
           data: { deletedBy: user.id },
         }
       );
 
       processData(response);
-      setSuccessMessage("Scheduled Transaction deleted successfully!");
+      setSuccessMessage("Dispatched Transaction deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -326,27 +340,34 @@ const DispatchedTransactions = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      let response;
-
-      if (formData.id) {
-        response = await axios.put(
-          `${apiUrl}/scheduledTransaction/${formData.id}`,
-          formData
-        );
-
-        processData(response);
-        setSuccessMessage("Update Scheduled Transaction successfully!");
+      if (!formData.driverId) {
+        setError("Driver selection is required.");
       } else {
-        console.log(formData);
-        response = await axios.post(`${apiUrl}/scheduledTransaction`, formData);
-        processData(response);
-        setSuccessMessage("Scheduled Transaction successfully!");
-      }
+        setError("");
 
-      setShowSuccessMessage(true);
-      handleCloseModal();
+        let response;
+
+        if (formData.id) {
+          response = await axios.put(
+            `${apiUrl}/dispatchedTransaction/${formData.id}`,
+            formData
+          );
+
+          processData(response);
+          setSuccessMessage("Update Dispatched Transaction successfully!");
+        } else {
+          response = await axios.post(
+            `${apiUrl}/dispatchedTransaction`,
+            formData
+          );
+          processData(response);
+          setSuccessMessage("Dispatch Transaction successfully!");
+        }
+
+        setShowSuccessMessage(true);
+        handleCloseModal();
+      }
     } catch (error) {
       console.error("Error:", error);
     }
@@ -382,6 +403,8 @@ const DispatchedTransactions = ({ user }) => {
       />
       <Modal
         user={user}
+        error={error}
+        handleAutocompleteChange={handleAutocompleteChange}
         open={openModal}
         onClose={handleCloseModal}
         formData={formData}

@@ -7,7 +7,7 @@ const {
   getDispatchedTransactionsController,
   updateDispatchedTransactionController,
   deleteDispatchedTransactionController,
-} = require("../controllers/dispatchedTransactionCOntroller");
+} = require("../controllers/dispatchedTransactionController");
 
 // Create Dispatched Transaction route
 router.post("/", createDispatchedTransactionController);

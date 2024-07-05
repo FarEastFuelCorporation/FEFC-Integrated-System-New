@@ -49,7 +49,7 @@ const BookModal = ({
           ? new Date(item.haulingDate).toISOString().split("T")[0]
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
-
+      console.log(flattenedData);
       setQuotationsData(flattenedData);
     } else {
       console.error(
@@ -63,7 +63,7 @@ const BookModal = ({
         const quotationResponse = await axios.get(
           `${apiUrl}/quotation/${user.id}`
         );
-
+        console.log(quotationResponse);
         processDataQuotations(quotationResponse);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -72,6 +72,7 @@ const BookModal = ({
 
     fetchData();
   }, [apiUrl, user.id]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -143,13 +144,13 @@ const BookModal = ({
           }}
           autoComplete="off"
         >
-          {quotationsData
-            .flatMap((q) => q.quotationWasteId)
-            .map((wasteId, index) => (
-              <MenuItem key={index} value={wasteId}>
-                {quotationsData[index].wasteNames[index]}
+          {quotationsData.map((q, index) =>
+            q.QuotationWaste.map((waste, wasteIndex) => (
+              <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
+                {waste.wasteName}
               </MenuItem>
-            ))}
+            ))
+          )}
         </TextField>
         <TextField
           label="Vehicle Type"
@@ -166,13 +167,13 @@ const BookModal = ({
           }}
           autoComplete="off"
         >
-          {quotationsData
-            .flatMap((q) => q.quotationTransportationId)
-            .map((transportationId, index) => (
-              <MenuItem key={transportationId} value={transportationId}>
-                {quotationsData[index].vehicleTypes[index]}
+          {quotationsData.map((q, index) =>
+            q.QuotationTransportation.map((transport, transportIndex) => (
+              <MenuItem key={`${index}-${transportIndex}`} value={transport.id}>
+                {transport.VehicleType.typeOfVehicle}
               </MenuItem>
-            ))}
+            ))
+          )}
         </TextField>
         <TextField
           label="Remarks"

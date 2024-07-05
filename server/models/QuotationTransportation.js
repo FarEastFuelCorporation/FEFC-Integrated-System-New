@@ -15,7 +15,7 @@ const QuotationTransportation = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
-    vehicleId: {
+    vehicleTypeId: {
       type: DataTypes.UUID,
       allowNull: false,
     },

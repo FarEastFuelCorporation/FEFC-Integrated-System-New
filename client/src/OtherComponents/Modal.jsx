@@ -5,6 +5,9 @@ import DispatchModal from "./TransactionModals/DispatchModal";
 
 const Modal = ({
   user,
+  setError,
+  error,
+  handleAutocompleteChange,
   open,
   onClose,
   formData,
@@ -40,6 +43,8 @@ const Modal = ({
       ModalComponent = (
         <DispatchModal
           user={user}
+          error={error}
+          handleAutocompleteChange={handleAutocompleteChange}
           open={open}
           onClose={onClose}
           formData={formData}

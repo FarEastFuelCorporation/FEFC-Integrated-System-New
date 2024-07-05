@@ -78,11 +78,12 @@ const DispatchedTransaction = ({ row }) => {
           </Box>
           {scheduledDate && (
             <Typography variant="h5">
-              Scheduled Date: {format(new Date(scheduledDate), "MMMM dd, yyyy")}
+              Dispatched Date:{" "}
+              {format(new Date(scheduledDate), "MMMM dd, yyyy")}
             </Typography>
           )}
           <Typography variant="h5">
-            Scheduled Time:{" "}
+            Dispatched Time:{" "}
             {scheduledTime
               ? format(parseTimeString(scheduledTime), "hh:mm aa")
               : ""}

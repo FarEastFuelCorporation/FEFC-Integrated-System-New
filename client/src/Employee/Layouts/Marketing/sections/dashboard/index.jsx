@@ -3,10 +3,10 @@ import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import Header from "../Header";
 import { tokens } from "../../../../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import LineChart from "../LineChart";
-import BarChart from "../BarChart";
+// import LineChart from "../LineChart";
+// import BarChart from "../BarChart";
 import StatBox from "../StatBox";
-import ProgressCircle from "../ProgressCircle";
+// import ProgressCircle from "../ProgressCircle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserTie,

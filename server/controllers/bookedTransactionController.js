@@ -58,7 +58,7 @@ async function createBookedTransactionController(req, res) {
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
-          attributes: ["id"],
+          attributes: ["id", "vehicleTypeId"],
           include: [
             {
               model: VehicleType,
@@ -70,7 +70,7 @@ async function createBookedTransactionController(req, res) {
         {
           model: Client,
           as: "Client",
-          attributes: ["clientName"],
+          attributes: ["clientId", "clientName"],
         },
       ],
       order: [["transactionId", "DESC"]],
@@ -100,7 +100,7 @@ async function getBookedTransactionsController(req, res) {
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
-          attributes: ["id"],
+          attributes: ["id", "vehicleTypeId"],
           include: [
             {
               model: VehicleType,
@@ -112,7 +112,7 @@ async function getBookedTransactionsController(req, res) {
         {
           model: Client,
           as: "Client",
-          attributes: ["clientName"],
+          attributes: ["clientId", "clientName"],
         },
       ],
       order: [["transactionId", "DESC"]],
@@ -180,7 +180,7 @@ async function updateBookedTransactionController(req, res) {
           {
             model: QuotationTransportation,
             as: "QuotationTransportation",
-            attributes: ["id"],
+            attributes: ["id", "vehicleTypeId"],
             include: [
               {
                 model: VehicleType,
@@ -192,7 +192,7 @@ async function updateBookedTransactionController(req, res) {
           {
             model: Client,
             as: "Client",
-            attributes: ["clientName"],
+            attributes: ["clientId", "clientName"],
           },
         ],
         order: [["transactionId", "DESC"]],

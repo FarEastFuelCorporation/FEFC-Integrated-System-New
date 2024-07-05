@@ -220,13 +220,13 @@ QuotationTransportation.belongsTo(Quotation, {
 
 VehicleType.hasMany(QuotationTransportation, {
   as: "QuotationTransportation",
-  foreignKey: "vehicleId",
+  foreignKey: "vehicleTypeId",
   sourceKey: "id",
   onDelete: "CASCADE",
 });
 QuotationTransportation.belongsTo(VehicleType, {
   as: "VehicleType",
-  foreignKey: "vehicleId",
+  foreignKey: "vehicleTypeId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

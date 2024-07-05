@@ -6,13 +6,15 @@ import {
   useTheme,
   TextField,
   Button,
-  MenuItem,
+  Autocomplete,
 } from "@mui/material";
 import axios from "axios";
 import { tokens } from "../../theme";
 
 const DispatchModal = ({
   user,
+  error,
+  handleAutocompleteChange,
   open,
   onClose,
   formData,
@@ -22,60 +24,27 @@ const DispatchModal = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [quotationsData, setQuotationsData] = useState([]);
   const [employeesData, setEmployeesData] = useState([]);
+  const [vehiclesData, setVehiclesData] = useState([]);
+  console.log(formData);
 
-  const processDataQuotations = (response) => {
-    const transactions = response.data;
-
-    if (transactions && Array.isArray(transactions.quotations)) {
-      const flattenedData = transactions.quotations.map((item) => ({
-        ...item,
-        wasteNames: item.QuotationWaste
-          ? item.QuotationWaste.map((qw) =>
-              qw.wasteName ? qw.wasteName : null
-            )
-          : [],
-        quotationWasteId: item.QuotationWaste
-          ? item.QuotationWaste.map((qw) => (qw.id ? qw.id : null))
-          : [],
-        vehicleTypes: item.QuotationTransportation
-          ? item.QuotationTransportation.map((qt) =>
-              qt.VehicleType ? qt.VehicleType.typeOfVehicle : null
-            )
-          : [],
-        quotationTransportationId: item.QuotationTransportation
-          ? item.QuotationTransportation.map((qt) => (qt.id ? qt.id : null))
-          : [],
-        haulingDate: item.haulingDate
-          ? new Date(item.haulingDate).toISOString().split("T")[0]
-          : null, // Convert timestamp to yyyy-mm-dd format
-      }));
-
-      setQuotationsData(flattenedData);
-    } else {
-      console.error(
-        "quotations or quotations.quotations is undefined or not an array"
-      );
-    }
-  };
-  console.log(employeesData);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [quotationResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/quotation/${user.id}`),
+        const [employeeResponse, vehicleResponse] = await Promise.all([
           axios.get(`${apiUrl}/employee`),
+          axios.get(`${apiUrl}/vehicle/${formData.vehicleTypeId}`),
         ]);
-        processDataQuotations(quotationResponse);
+
         setEmployeesData(employeeResponse.data.employees);
+        setVehiclesData(vehicleResponse.data.vehicles);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [apiUrl, user.id]);
+  }, [apiUrl, user.id, formData.vehicleTypeId]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -101,7 +70,7 @@ const DispatchModal = ({
             ? "Update Dispatched Transaction"
             : "Dispatch Transaction"}
         </Typography>
-        <div style={{ width: "100%", display: "flex", gap: "20px" }}>
+        <div style={{ width: "100%", display: "none", gap: "20px" }}>
           <TextField
             label="Dispatch Date"
             name="scheduledDate"
@@ -135,28 +104,105 @@ const DispatchModal = ({
             autoComplete="off"
           />
         </div>
-        <TextField
-          label="Vehicle Type"
-          name="vehicleTypeId"
-          value={formData.vehicleTypeId}
-          onChange={handleInputChange}
-          select
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
+        <Autocomplete
+          options={vehiclesData}
+          getOptionLabel={(option) =>
+            option.id === "" ? "" : `${option.plateNumber}`
+          }
+          value={
+            vehiclesData.find((emp) => emp.id === formData.vehicleId) || null
+          }
+          onChange={(event, newValue) => {
+            handleInputChange({
+              target: {
+                name: "vehicleId",
+                value: newValue ? newValue.id : "",
+              },
+            });
           }}
-          autoComplete="off"
-        >
-          {employeesData.map((type) => (
-            <MenuItem key={type.id} value={type.id}>
-              {type.firstName}
-              {type.lastName}
-            </MenuItem>
-          ))}
-        </TextField>
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Choose Vehicle"
+              name="vehicleId"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+              error={!!error}
+              helperText={error}
+            />
+          )}
+        />{" "}
+        <Autocomplete
+          options={employeesData}
+          getOptionLabel={(option) =>
+            option.employeeId === ""
+              ? ""
+              : `${option.firstName} ${option.lastName}`
+          }
+          value={
+            employeesData.find((emp) => emp.employeeId === formData.driverId) ||
+            null
+          }
+          onChange={(event, newValue) => {
+            handleInputChange({
+              target: {
+                name: "driverId",
+                value: newValue ? newValue.employeeId : "",
+              },
+            });
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Choose Driver"
+              name="driverId"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+              error={!!error}
+              helperText={error}
+            />
+          )}
+        />{" "}
+        <Autocomplete
+          multiple
+          options={employeesData}
+          getOptionLabel={(option) =>
+            option.employeeId === ""
+              ? ""
+              : `${option.firstName} ${option.lastName}`
+          }
+          value={employeesData.filter((emp) =>
+            formData.helperIds.includes(emp.employeeId)
+          )}
+          onChange={handleAutocompleteChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Choose Helper(s)"
+              name="helperIds"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          )}
+        />
         <TextField
           label="Remarks"
           name="remarks"

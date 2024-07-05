@@ -252,11 +252,14 @@ const DispatchedTransactions = ({ user }) => {
     console.log(id);
     setFormData({
       id: "",
-      bookedTransactionId: id,
-      scheduledDate: "",
+      scheduledTransactionId: id,
+      vehicleId: "",
+      driverId: "",
+      helperId: "",
+      isDispatched: false,
       scheduledTime: "",
       remarks: "",
-      statusId: 2,
+      statusId: 3,
       createdBy: user.id,
     });
     setOpenModal(true);

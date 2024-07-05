@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Modal,
@@ -7,16 +7,70 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import axios from "axios";
 import { tokens } from "../../theme";
+
 const DispatchModal = ({
+  user,
   open,
   onClose,
   formData,
   handleInputChange,
   handleFormSubmit,
 }) => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [quotationsData, setQuotationsData] = useState([]);
+  const processDataQuotations = (response) => {
+    const transactions = response.data;
+
+    if (transactions && Array.isArray(transactions.quotations)) {
+      const flattenedData = transactions.quotations.map((item) => ({
+        ...item,
+        wasteNames: item.QuotationWaste
+          ? item.QuotationWaste.map((qw) =>
+              qw.wasteName ? qw.wasteName : null
+            )
+          : [],
+        quotationWasteId: item.QuotationWaste
+          ? item.QuotationWaste.map((qw) => (qw.id ? qw.id : null))
+          : [],
+        vehicleTypes: item.QuotationTransportation
+          ? item.QuotationTransportation.map((qt) =>
+              qt.VehicleType ? qt.VehicleType.typeOfVehicle : null
+            )
+          : [],
+        quotationTransportationId: item.QuotationTransportation
+          ? item.QuotationTransportation.map((qt) => (qt.id ? qt.id : null))
+          : [],
+        haulingDate: item.haulingDate
+          ? new Date(item.haulingDate).toISOString().split("T")[0]
+          : null, // Convert timestamp to yyyy-mm-dd format
+      }));
+
+      setQuotationsData(flattenedData);
+    } else {
+      console.error(
+        "quotations or quotations.quotations is undefined or not an array"
+      );
+    }
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const quotationResponse = await axios.get(
+          `${apiUrl}/quotation/${user.id}`
+        );
+
+        processDataQuotations(quotationResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [apiUrl, user.id]);
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -43,7 +97,7 @@ const DispatchModal = ({
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField
-            label="Scheduled Date"
+            label="Dispatch Date"
             name="scheduledDate"
             value={formData.scheduledDate}
             onChange={handleInputChange}
@@ -59,7 +113,7 @@ const DispatchModal = ({
             autoComplete="off"
           />
           <TextField
-            label="Scheduled Time"
+            label="Dispatch Time"
             name="scheduledTime"
             value={formData.scheduledTime}
             onChange={handleInputChange}

@@ -39,6 +39,7 @@ const Modal = ({
     case 3:
       ModalComponent = (
         <DispatchModal
+          user={user}
           open={open}
           onClose={onClose}
           formData={formData}

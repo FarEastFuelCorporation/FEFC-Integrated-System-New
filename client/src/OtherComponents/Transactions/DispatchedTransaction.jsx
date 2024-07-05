@@ -26,11 +26,10 @@ const DispatchedTransaction = ({ row }) => {
     date.setMilliseconds(0);
     return date;
   };
-  console.log("pass");
-  console.log(statusId);
+
   return (
     <Box>
-      {statusId === 3 ? (
+      {statusId === 2 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
             <LocalShippingIcon

@@ -1,12 +1,11 @@
-// controllers/vehicleController.js
+// controllers/employeeController.js
 
 const Employee = require("../models/Employee");
 const Vehicle = require("../models/Vehicle");
-const VehicleMaintenanceRequest = require("../models/VehicleMaintenanceRequest");
 const VehicleType = require("../models/VehicleType");
 
-// Create Vehicle controller
-async function createVehicleController(req, res) {
+// Create Employee controller
+async function createEmployeeController(req, res) {
   try {
     // Extracting data from the request body
     let {
@@ -47,26 +46,21 @@ async function createVehicleController(req, res) {
   }
 }
 
-// Get Vehicles controller
-async function getVehiclesController(req, res) {
+// Get Employees controller
+async function getEmployeesController(req, res) {
   try {
     // Fetch all vehicles from the database
-    const vehicles = await Vehicle.findAll({
-      include: {
-        model: VehicleType,
-        as: "VehicleType",
-      },
-    });
+    const employees = await Employee.findAll();
 
-    res.json({ vehicles });
+    res.json({ employees });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
 
-// Update Vehicle controller
-async function updateVehicleController(req, res) {
+// Update Employee controller
+async function updateEmployeeController(req, res) {
   try {
     const id = req.params.id;
     console.log("Updating vehicle with ID:", id);
@@ -121,8 +115,8 @@ async function updateVehicleController(req, res) {
   }
 }
 
-// Delete Vehicle controller
-async function deleteVehicleController(req, res) {
+// Delete Employee controller
+async function deleteEmployeeController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
@@ -157,8 +151,8 @@ async function deleteVehicleController(req, res) {
 }
 
 module.exports = {
-  getVehiclesController,
-  createVehicleController,
-  updateVehicleController,
-  deleteVehicleController,
+  createEmployeeController,
+  getEmployeesController,
+  updateEmployeeController,
+  deleteEmployeeController,
 };

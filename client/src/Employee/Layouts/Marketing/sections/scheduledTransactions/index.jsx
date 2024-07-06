@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -23,27 +23,28 @@ const ScheduledTransactions = ({ user }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
+  const [responseData, setResponseData] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  const processData = (response) => {
+  const processData = useCallback((response) => {
     const transactions = response.data;
 
     if (transactions && Array.isArray(transactions.pendingTransactions)) {
       const flattenedPendingData = transactions.pendingTransactions.map(
-        (item) => {
-          const haulingDate = item.haulingDate
-            ? new Date(item.haulingDate)
+        (bookItem) => {
+          const haulingDate = bookItem.haulingDate
+            ? new Date(bookItem.haulingDate)
             : null;
-          const bookedCreatedDate = item.createdAt
-            ? new Date(item.createdAt)
+          const bookedCreatedDate = bookItem.createdAt
+            ? new Date(bookItem.createdAt)
             : null;
           let haulingTime = null;
           let bookedCreatedTime = null;
-          if (item.haulingTime) {
-            const [hours, minutes, seconds] = item.haulingTime.split(":");
+          if (bookItem.haulingTime) {
+            const [hours, minutes, seconds] = bookItem.haulingTime.split(":");
             haulingTime = new Date(
               Date.UTC(1970, 0, 1, hours, minutes, seconds)
             ); // Create a date using UTC
@@ -56,7 +57,7 @@ const ScheduledTransactions = ({ user }) => {
           }
 
           return {
-            ...item,
+            ...bookItem,
             haulingDate: haulingDate
               ? haulingDate.toISOString().split("T")[0]
               : null,
@@ -67,14 +68,14 @@ const ScheduledTransactions = ({ user }) => {
               ? bookedCreatedDate.toISOString().split("T")[0]
               : null,
             bookedCreatedTime: bookedCreatedTime,
-            clientName: item.Client ? item.Client.clientName : null,
-            wasteName: item.QuotationWaste
-              ? item.QuotationWaste.wasteName
+            clientName: bookItem.Client ? bookItem.Client.clientName : null,
+            wasteName: bookItem.QuotationWaste
+              ? bookItem.QuotationWaste.wasteName
               : null,
-            vehicleType: item.QuotationTransportation
-              ? item.QuotationTransportation.VehicleType.typeOfVehicle
+            vehicleType: bookItem.QuotationTransportation
+              ? bookItem.QuotationTransportation.VehicleType.typeOfVehicle
               : null,
-            bookedRemarks: item.remarks,
+            bookedRemarks: bookItem.remarks,
           };
         }
       );
@@ -181,14 +182,14 @@ const ScheduledTransactions = ({ user }) => {
         "bookedTransactions or bookedTransactions.finishedTransactions is undefined or not an array"
       );
     }
-  };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${apiUrl}/scheduledTransaction`);
         console.log(response);
-        processData(response);
+        setResponseData(response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -197,11 +198,16 @@ const ScheduledTransactions = ({ user }) => {
     fetchData();
   }, [apiUrl, user.id]);
 
-  const handleOpenModal = (id) => {
-    console.log(id);
+  useEffect(() => {
+    if (responseData) {
+      processData(responseData);
+    }
+  }, [responseData, processData]);
+
+  const handleOpenModal = (row) => {
     setFormData({
       id: "",
-      bookedTransactionId: id,
+      bookedTransactionId: row.id,
       scheduledDate: "",
       scheduledTime: "",
       remarks: "",
@@ -225,8 +231,8 @@ const ScheduledTransactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleEditClick = (id) => {
-    const typeToEdit = finishedTransactions.find((type) => type.id === id);
+  const handleEditClick = (row) => {
+    const typeToEdit = finishedTransactions.find((type) => type.id === row.id);
 
     if (typeToEdit) {
       setFormData({
@@ -241,11 +247,11 @@ const ScheduledTransactions = ({ user }) => {
 
       setOpenModal(true);
     } else {
-      console.error(`Vehicle type with ID ${id} not found for editing.`);
+      console.error(`Vehicle type with ID ${row.id} not found for editing.`);
     }
   };
 
-  const handleDeleteClick = async (id) => {
+  const handleDeleteClick = async (row) => {
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Scheduled Transaction?"
     );
@@ -256,7 +262,7 @@ const ScheduledTransactions = ({ user }) => {
 
     try {
       const response = await axios.delete(
-        `${apiUrl}/scheduledTransaction/${id}`,
+        `${apiUrl}/scheduledTransaction/${row.id}`,
         {
           data: { deletedBy: user.id },
         }

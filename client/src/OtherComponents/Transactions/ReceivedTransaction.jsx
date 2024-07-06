@@ -1,21 +1,22 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import AlarmIcon from "@mui/icons-material/Alarm";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 
-const ScheduledTransaction = ({ row }) => {
+const ReceivedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const {
     statusId,
-    scheduledCreatedDate,
-    scheduledCreatedTime,
-    scheduledDate,
-    scheduledTime,
-    scheduledRemarks,
-    scheduledCreatedBy,
+    dispatchedCreatedDate,
+    dispatchedCreatedTime,
+    dispatchedDate,
+    dispatchedTime,
+    vehicleType,
+    dispatchedRemarks,
+    dispatchedCreatedBy,
   } = row;
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -29,11 +30,11 @@ const ScheduledTransaction = ({ row }) => {
 
   return (
     <Box>
-      {statusId === 1 ? (
+      {statusId === 3 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           {" "}
           <CircleLogo>
-            <AlarmIcon
+            <LocalShippingIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.greenAccent[400]}`,
@@ -47,7 +48,7 @@ const ScheduledTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Scheduled
+              For Receiving
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -57,7 +58,7 @@ const ScheduledTransaction = ({ row }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <AlarmIcon
+            <LocalShippingIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.greenAccent[400]}`,
@@ -71,27 +72,38 @@ const ScheduledTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Scheduled
+              Received
             </Typography>
             <Typography variant="h5">
-              {scheduledCreatedDate} {scheduledCreatedTime}
+              {dispatchedCreatedDate} {dispatchedCreatedTime}
             </Typography>
           </Box>
           <Typography variant="h5">
-            Scheduled Date:
-            {scheduledDate && format(new Date(scheduledDate), "MMMM dd, yyyy")}
+            Dispatched Date:{" "}
+            {dispatchedDate
+              ? format(new Date(dispatchedDate), "MMMM dd, yyyy")
+              : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Scheduled Time:{" "}
-            {scheduledTime
-              ? format(parseTimeString(scheduledTime), "hh:mm aa")
-              : ""}
+            Dispatched Time:{" "}
+            {dispatchedTime
+              ? format(parseTimeString(dispatchedTime), "hh:mm aa")
+              : "Pending"}
           </Typography>
 
-          <Typography variant="h5">Remarks: {scheduledRemarks}</Typography>
+          <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
           <Typography variant="h5">
-            Scheduled By: {scheduledCreatedBy}
+            Plate Number: {row.Vehicle.plateNumber}
           </Typography>
+          <Typography variant="h5">
+            Driver:{" "}
+            {`${row.EmployeeDriver.firstName} ${row.EmployeeDriver.lastName}`}
+          </Typography>
+          <Typography variant="h5">
+            Helper(s): {row.helper ? row.helper : "No Helper"}
+          </Typography>
+          <Typography variant="h5">Remarks: {dispatchedRemarks}</Typography>
+          <Typography variant="h5">Set By: {dispatchedCreatedBy}</Typography>
           <br />
           <hr />
         </Box>
@@ -100,4 +112,4 @@ const ScheduledTransaction = ({ row }) => {
   );
 };
 
-export default ScheduledTransaction;
+export default ReceivedTransaction;

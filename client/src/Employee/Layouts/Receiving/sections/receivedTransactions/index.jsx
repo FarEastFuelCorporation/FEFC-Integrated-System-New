@@ -7,7 +7,7 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 
-const DispatchedTransactions = ({ user }) => {
+const ReceivedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialFormData = {
@@ -500,4 +500,4 @@ const DispatchedTransactions = ({ user }) => {
   );
 };
 
-export default DispatchedTransactions;
+export default ReceivedTransactions;

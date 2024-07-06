@@ -1,4 +1,4 @@
-// controllers/dispatchedTransactionController.js
+// controllers/receivingTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
@@ -170,8 +170,8 @@ async function fetchFinishedTransactions() {
   });
 }
 
-// Create Dispatched Transaction controller
-async function createDispatchedTransactionController(req, res) {
+// Create Received Transaction controller
+async function createReceivedTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
@@ -236,8 +236,8 @@ async function createDispatchedTransactionController(req, res) {
   }
 }
 
-// Get Dispatched Transactions controller
-async function getDispatchedTransactionsController(req, res) {
+// Get Received Transactions controller
+async function getReceivedTransactionsController(req, res) {
   try {
     // Fetch pending and finished transactions
     const pendingTransactions = await fetchPendingTransactions();
@@ -250,11 +250,11 @@ async function getDispatchedTransactionsController(req, res) {
   }
 }
 
-// Update Dispatched Transaction controller
-async function updateDispatchedTransactionController(req, res) {
+// Update Received Transaction controller
+async function updateReceivedTransactionController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating dispatched transaction with ID:", id);
+    console.log("Updating Received transaction with ID:", id);
 
     let {
       scheduledTransactionId,
@@ -314,8 +314,8 @@ async function updateDispatchedTransactionController(req, res) {
   }
 }
 
-// Delete Dispatched Transaction controller
-async function deleteDispatchedTransactionController(req, res) {
+// Delete Received Transaction controller
+async function deleteReceivedTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy, bookedTransactionId } = req.body;
@@ -367,8 +367,8 @@ async function deleteDispatchedTransactionController(req, res) {
 }
 
 module.exports = {
-  createDispatchedTransactionController,
-  getDispatchedTransactionsController,
-  updateDispatchedTransactionController,
-  deleteDispatchedTransactionController,
+  createReceivedTransactionController,
+  getReceivedTransactionsController,
+  updateReceivedTransactionController,
+  deleteReceivedTransactionController,
 };

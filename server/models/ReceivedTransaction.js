@@ -1,11 +1,11 @@
-// models/DispatchedTransaction.js
+// models/ReceivedTransaction.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const DispatchedTransaction = sequelize.define(
-  "DispatchedTransaction",
+const ReceivedTransaction = sequelize.define(
+  "ReceivedTransaction",
   {
     id: {
       type: DataTypes.UUID,
@@ -79,4 +79,4 @@ const DispatchedTransaction = sequelize.define(
   }
 );
 
-module.exports = DispatchedTransaction;
+module.exports = ReceivedTransaction;

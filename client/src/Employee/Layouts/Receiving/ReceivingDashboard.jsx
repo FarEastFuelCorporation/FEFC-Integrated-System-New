@@ -1,10 +1,22 @@
 import React from "react";
 import ReceivingSidebar from "./ReceivingSidebar";
+import { Outlet } from "react-router-dom";
 
-const ReceivingDashboard = () => {
+const ReceivingDashboard = ({ user }) => {
   return (
-    <div>
-      <ReceivingSidebar />
+    <div style={{ display: "flex", width: "100%", marginTop: "64px" }}>
+      <div>
+        <ReceivingSidebar user={user} />
+      </div>
+      <div
+        style={{
+          width: "100%",
+          height: "calc(100vh - 64px)",
+          overflowY: "scroll",
+        }}
+      >
+        <Outlet style={{ overflow: "none" }} />
+      </div>
     </div>
   );
 };

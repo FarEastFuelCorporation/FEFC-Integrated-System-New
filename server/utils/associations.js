@@ -296,6 +296,32 @@ DispatchedTransaction.belongsTo(ScheduledTransaction, {
   onDelete: "CASCADE",
 });
 
+Vehicle.hasMany(DispatchedTransaction, {
+  as: "DispatchedTransaction",
+  foreignKey: "vehicleId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+DispatchedTransaction.belongsTo(Vehicle, {
+  as: "Vehicle",
+  foreignKey: "vehicleId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(DispatchedTransaction, {
+  as: "DispatchedTransactionDriver",
+  foreignKey: "driverId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+DispatchedTransaction.belongsTo(Employee, {
+  as: "EmployeeDriver",
+  foreignKey: "driverId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
 // Export the associations
 module.exports = {
   Employee,

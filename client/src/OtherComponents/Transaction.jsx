@@ -22,6 +22,7 @@ import BookedTransaction from "./Transactions/BookedTransaction";
 import ScheduledTransaction from "./Transactions/ScheduledTransaction";
 import DispatchedTransaction from "./Transactions/DispatchedTransaction";
 import { tokens } from "../theme";
+import ReceivedTransaction from "./Transactions/ReceivedTransaction";
 
 const Transaction = ({
   user,
@@ -85,14 +86,7 @@ const Transaction = ({
                       <Box></Box>
                     ) : (
                       <Button
-                        onClick={() =>
-                          handleOpenModal(
-                            row.id,
-                            row.bookedTransactionId,
-                            row.BookedTransaction.QuotationTransportation
-                              .vehicleTypeId
-                          )
-                        }
+                        onClick={() => handleOpenModal(row)}
                         sx={{
                           backgroundColor: `${colors.greenAccent[700]}`,
                           color: `${colors.grey[100]}`,
@@ -104,10 +98,10 @@ const Transaction = ({
                   </Box>
                 ) : (
                   <div style={{ display: "flex" }}>
-                    <IconButton onClick={() => handleEditClick(row.id)}>
+                    <IconButton onClick={() => handleEditClick(row)}>
                       <EditIcon sx={{ color: "#ff9800" }} />
                     </IconButton>
-                    <IconButton onClick={() => handleDeleteClick(row.id)}>
+                    <IconButton onClick={() => handleDeleteClick(row)}>
                       <DeleteIcon sx={{ color: "#f44336" }} />
                     </IconButton>
                   </div>
@@ -117,6 +111,7 @@ const Transaction = ({
                 <BookedTransaction row={row} />
                 {row.statusId >= 1 && <ScheduledTransaction row={row} />}
                 {row.statusId >= 2 && <DispatchedTransaction row={row} />}
+                {row.statusId >= 3 && <ReceivedTransaction row={row} />}
               </CustomAccordionDetails>
             </Accordion>
           ))}

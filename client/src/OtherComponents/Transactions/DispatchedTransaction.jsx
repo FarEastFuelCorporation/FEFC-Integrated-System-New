@@ -10,12 +10,13 @@ const DispatchedTransaction = ({ row }) => {
   const colors = tokens(theme.palette.mode);
   const {
     statusId,
-    scheduledCreatedDate,
-    scheduledCreatedTime,
-    scheduledDate,
-    scheduledTime,
-    scheduledRemarks,
-    scheduledCreatedBy,
+    dispatchedCreatedDate,
+    dispatchedCreatedTime,
+    dispatchedDate,
+    dispatchedTime,
+    vehicleType,
+    dispatchedRemarks,
+    dispatchedCreatedBy,
   } = row;
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -31,6 +32,7 @@ const DispatchedTransaction = ({ row }) => {
     <Box>
       {statusId === 2 ? (
         <Box sx={{ my: 3, position: "relative" }}>
+          {" "}
           <CircleLogo>
             <LocalShippingIcon
               sx={{
@@ -73,26 +75,35 @@ const DispatchedTransaction = ({ row }) => {
               Dispatched
             </Typography>
             <Typography variant="h5">
-              {scheduledCreatedDate} {scheduledCreatedTime}
+              {dispatchedCreatedDate} {dispatchedCreatedTime}
             </Typography>
           </Box>
-          {scheduledDate && (
-            <Typography variant="h5">
-              Dispatched Date:{" "}
-              {format(new Date(scheduledDate), "MMMM dd, yyyy")}
-            </Typography>
-          )}
+          <Typography variant="h5">
+            Dispatched Date:{" "}
+            {dispatchedDate
+              ? format(new Date(dispatchedDate), "MMMM dd, yyyy")
+              : "Pending"}
+          </Typography>
           <Typography variant="h5">
             Dispatched Time:{" "}
-            {scheduledTime
-              ? format(parseTimeString(scheduledTime), "hh:mm aa")
-              : ""}
+            {dispatchedTime
+              ? format(parseTimeString(dispatchedTime), "hh:mm aa")
+              : "Pending"}
           </Typography>
 
-          <Typography variant="h5">Remarks: {scheduledRemarks}</Typography>
+          <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
           <Typography variant="h5">
-            Scheduled By: {scheduledCreatedBy}
+            Plate Number: {row.Vehicle.plateNumber}
           </Typography>
+          <Typography variant="h5">
+            Driver:{" "}
+            {`${row.EmployeeDriver.firstName} ${row.EmployeeDriver.lastName}`}
+          </Typography>
+          <Typography variant="h5">
+            Helper(s): {row.helper ? row.helper : "No Helper"}
+          </Typography>
+          <Typography variant="h5">Remarks: {dispatchedRemarks}</Typography>
+          <Typography variant="h5">Set By: {dispatchedCreatedBy}</Typography>
           <br />
           <hr />
         </Box>

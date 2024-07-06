@@ -26,7 +26,6 @@ const DispatchModal = ({
   const colors = tokens(theme.palette.mode);
   const [employeesData, setEmployeesData] = useState([]);
   const [vehiclesData, setVehiclesData] = useState([]);
-  console.log(formData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,11 +69,11 @@ const DispatchModal = ({
             ? "Update Dispatched Transaction"
             : "Dispatch Transaction"}
         </Typography>
-        <div style={{ width: "100%", display: "none", gap: "20px" }}>
+        <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField
             label="Dispatch Date"
-            name="scheduledDate"
-            value={formData.scheduledDate}
+            name="dispatchedDate"
+            value={formData.dispatchedDate}
             onChange={handleInputChange}
             fullWidth
             type="date"
@@ -89,8 +88,8 @@ const DispatchModal = ({
           />
           <TextField
             label="Dispatch Time"
-            name="scheduledTime"
-            value={formData.scheduledTime}
+            name="dispatchedTime"
+            value={formData.dispatchedTime}
             onChange={handleInputChange}
             fullWidth
             type="time"

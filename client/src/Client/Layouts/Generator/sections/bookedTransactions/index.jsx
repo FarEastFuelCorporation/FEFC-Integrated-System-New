@@ -75,7 +75,8 @@ const Transactions = ({ user }) => {
       );
     }
   };
-
+  const data = [];
+  setFinishedTransactions(data);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -110,8 +111,8 @@ const Transactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleEditClick = (id) => {
-    const typeToEdit = pendingTransactions.find((type) => type.id === id);
+  const handleEditClick = (row) => {
+    const typeToEdit = pendingTransactions.find((type) => type.id === row.id);
     if (typeToEdit) {
       setFormData({
         id: typeToEdit.id,
@@ -128,7 +129,9 @@ const Transactions = ({ user }) => {
       });
       handleOpenModal();
     } else {
-      console.error(`Booked Transaction with ID ${id} not found for editing.`);
+      console.error(
+        `Booked Transaction with ID ${row.id} not found for editing.`
+      );
     }
   };
 

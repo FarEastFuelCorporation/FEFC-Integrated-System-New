@@ -108,9 +108,7 @@ const ScheduleModal = ({
           style={{ display: "none" }}
         />
         <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-          {formData.id
-            ? "Update Scheduled Transaction"
-            : "Schedule Transaction"}
+          {formData.id ? "Update" : "Schedule"}
         </Button>
       </Box>
     </Modal>

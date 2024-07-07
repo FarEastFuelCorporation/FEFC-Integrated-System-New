@@ -132,7 +132,7 @@ async function createScheduledTransactionController(req, res) {
       remarks = remarks.toUpperCase();
     }
 
-    // Creating a new client
+    // Creating a new transaction
     await ScheduledTransaction.create({
       bookedTransactionId,
       scheduledDate,
@@ -189,7 +189,7 @@ async function getScheduledTransactionsController(req, res) {
 async function updateScheduledTransactionController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating booked transaction with ID:", id);
+    console.log("Updating scheduled transaction with ID:", id);
 
     let {
       bookedTransactionId,
@@ -204,11 +204,11 @@ async function updateScheduledTransactionController(req, res) {
       remarks = remarks.toUpperCase();
     }
 
-    // Find the booked transaction by UUID (id) and update it
+    // Find the scheduled transaction by UUID (id) and update it
     const updatedScheduledTransaction = await ScheduledTransaction.findByPk(id);
 
     if (updatedScheduledTransaction) {
-      // Update booked transaction attributes
+      // Update scheduled transaction attributes
       updatedScheduledTransaction.bookedTransactionId = bookedTransactionId;
       updatedScheduledTransaction.scheduledDate = scheduledDate;
       updatedScheduledTransaction.scheduledTime = scheduledTime;
@@ -226,14 +226,14 @@ async function updateScheduledTransactionController(req, res) {
       // Respond with the updated data
       res.json({ pendingTransactions, finishedTransactions });
     } else {
-      // If booked transaction with the specified ID was not found
+      // If scheduled transaction with the specified ID was not found
       res
         .status(404)
-        .json({ message: `Booked Transaction with ID ${id} not found` });
+        .json({ message: `Scheduled Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating booked transaction:", error);
+    console.error("Error updating scheduled transaction:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

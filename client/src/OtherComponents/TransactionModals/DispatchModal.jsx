@@ -234,9 +234,7 @@ const DispatchModal = ({
           style={{ display: "none" }}
         />
         <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-          {formData.id
-            ? "Update Dispatched Transaction"
-            : "Dispatch Transaction"}
+          {formData.id ? "Update" : "Dispatch"}
         </Button>
       </Box>
     </Modal>

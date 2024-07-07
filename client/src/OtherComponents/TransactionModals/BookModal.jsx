@@ -49,7 +49,7 @@ const BookModal = ({
           ? new Date(item.haulingDate).toISOString().split("T")[0]
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
-      console.log(flattenedData);
+
       setQuotationsData(flattenedData);
     } else {
       console.error(
@@ -63,7 +63,7 @@ const BookModal = ({
         const quotationResponse = await axios.get(
           `${apiUrl}/quotation/${user.id}`
         );
-        console.log(quotationResponse);
+
         processDataQuotations(quotationResponse);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -207,7 +207,7 @@ const BookModal = ({
           style={{ display: "none" }}
         />
         <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-          {formData.id ? "Update Booked Transaction" : "Book Transaction"}
+          {formData.id ? "Update" : "Book"}
         </Button>
       </Box>
     </Modal>

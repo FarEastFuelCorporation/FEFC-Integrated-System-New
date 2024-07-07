@@ -69,10 +69,6 @@ const Transactions = ({ user }) => {
       });
 
       setPendingTransactions(flattenedData);
-    } else {
-      console.error(
-        "bookedTransactions or bookedTransactions.bookedTransactions is undefined or not an array"
-      );
     }
   };
   const data = [];

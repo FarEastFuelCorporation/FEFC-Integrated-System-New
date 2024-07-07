@@ -2,15 +2,16 @@ import React from "react";
 import BookModal from "./TransactionModals/BookModal";
 import ScheduleModal from "./TransactionModals/ScheduleModal";
 import DispatchModal from "./TransactionModals/DispatchModal";
+import ReceiveModal from "./TransactionModals/ReceiveModal";
 
 const Modal = ({
   user,
-  setError,
   error,
   handleAutocompleteChange,
   open,
   onClose,
   formData,
+  setFormData,
   handleInputChange,
   handleFormSubmit,
 }) => {
@@ -48,6 +49,20 @@ const Modal = ({
           open={open}
           onClose={onClose}
           formData={formData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+        />
+      );
+      break;
+    case 4:
+      ModalComponent = (
+        <ReceiveModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
         />

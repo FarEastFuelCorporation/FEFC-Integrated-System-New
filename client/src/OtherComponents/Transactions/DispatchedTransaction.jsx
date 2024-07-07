@@ -15,6 +15,8 @@ const DispatchedTransaction = ({ row }) => {
     dispatchedDate,
     dispatchedTime,
     vehicleType,
+    driverName,
+    plateNumber,
     dispatchedRemarks,
     dispatchedCreatedBy,
   } = row;
@@ -92,18 +94,17 @@ const DispatchedTransaction = ({ row }) => {
           </Typography>
 
           <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
-          <Typography variant="h5">
-            Plate Number: {row.Vehicle.plateNumber}
-          </Typography>
-          <Typography variant="h5">
-            Driver:{" "}
-            {`${row.EmployeeDriver.firstName} ${row.EmployeeDriver.lastName}`}
-          </Typography>
+          <Typography variant="h5">Plate Number: {plateNumber}</Typography>
+          <Typography variant="h5">Driver: {driverName}</Typography>
           <Typography variant="h5">
             Helper(s): {row.helper ? row.helper : "No Helper"}
           </Typography>
-          <Typography variant="h5">Remarks: {dispatchedRemarks}</Typography>
-          <Typography variant="h5">Set By: {dispatchedCreatedBy}</Typography>
+          <Typography variant="h5">
+            Remarks: {dispatchedRemarks ? dispatchedRemarks : "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">
+            Dispatched By: {dispatchedCreatedBy}
+          </Typography>
           <br />
           <hr />
         </Box>

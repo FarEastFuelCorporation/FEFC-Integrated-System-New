@@ -31,7 +31,7 @@ async function createBookedTransactionController(req, res) {
 
     const transactionId = await generateTransactionId();
 
-    // Creating a new client
+    // Creating a new transaction
     await BookedTransaction.create({
       transactionId,
       quotationWasteId,

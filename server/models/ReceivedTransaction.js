@@ -17,29 +17,56 @@ const ReceivedTransaction = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    dispatchedTransactionId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
     vehicleId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     driverId: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    receivedDate: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
-    helperId: {
+    receivedTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    pttNo: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    isDispatched: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    dispatchedDate: {
-      type: DataTypes.DATE,
+    manifestNo: {
+      type: DataTypes.STRING,
       allowNull: true,
     },
-    dispatchedTime: {
-      type: DataTypes.TIME,
+    pullOutFormNo: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    manifestWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    clientWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    grossWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    tareWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    netWeight: {
+      type: DataTypes.FLOAT,
       allowNull: true,
     },
     remarks: {

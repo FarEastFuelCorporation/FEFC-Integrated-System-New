@@ -36,11 +36,11 @@ const DispatchedTransaction = sequelize.define(
     },
     dispatchedDate: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     dispatchedTime: {
       type: DataTypes.TIME,
-      allowNull: true,
+      allowNull: false,
     },
     remarks: {
       type: DataTypes.STRING,

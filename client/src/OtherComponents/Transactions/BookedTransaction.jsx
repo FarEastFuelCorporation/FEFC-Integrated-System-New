@@ -59,7 +59,9 @@ const BookedTransaction = ({ row }) => {
       </Typography>
       <Typography variant="h5">Waste Name: {wasteName}</Typography>
       <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
-      <Typography variant="h5">Remarks: {bookedRemarks}</Typography>
+      <Typography variant="h5">
+        Remarks: {bookedRemarks ? bookedRemarks : "NO REMARKS"}
+      </Typography>
       <br />
       <hr />
     </Box>

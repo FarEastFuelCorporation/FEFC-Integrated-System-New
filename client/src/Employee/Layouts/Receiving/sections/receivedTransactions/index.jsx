@@ -14,14 +14,19 @@ const ReceivedTransactions = ({ user }) => {
     id: "",
     bookedTransactionId: "",
     scheduledTransactionId: "",
-    vehicleId: "",
-    driverId: "",
-    helperIds: "",
-    isDispatched: false,
-    dispatchedDate: null,
-    dispatchedTime: null,
+    dispatchedTransactionId: "",
+    receivedDate: null,
+    receivedTime: null,
+    pttNo: "",
+    manifestNo: "",
+    pullOutFormNo: "",
+    manifestWeight: 0,
+    clientWeight: 0,
+    grossWeight: 0,
+    tareWeight: 0,
+    netWeight: 0,
     remarks: "",
-    statusId: 3,
+    statusId: 4,
     createdBy: user.id,
   };
 
@@ -40,108 +45,7 @@ const ReceivedTransactions = ({ user }) => {
       const transactions = response.data;
 
       if (transactions && Array.isArray(transactions.pendingTransactions)) {
-        const flattenedFinishedData = transactions.pendingTransactions.map(
-          (scheduledItem) => {
-            const bookItem = scheduledItem.BookedTransaction;
-            const haulingDate = bookItem.haulingDate
-              ? new Date(bookItem.haulingDate)
-              : null;
-            const scheduledDate = scheduledItem.scheduledDate
-              ? new Date(scheduledItem.scheduledDate)
-              : null;
-            const bookedCreatedDate = bookItem.createdAt
-              ? new Date(bookItem.createdAt)
-              : null;
-            const scheduledCreatedDate = scheduledItem.createdAt
-              ? new Date(scheduledItem.createdAt)
-              : null;
-            let haulingTime = null;
-            let scheduledTime = null;
-            let bookedCreatedTime = null;
-            let scheduledCreatedTime = null;
-
-            if (bookItem.haulingTime) {
-              const [hours, minutes, seconds] = bookItem.haulingTime.split(":");
-              haulingTime = new Date(
-                Date.UTC(1970, 0, 1, hours, minutes, seconds)
-              );
-            }
-
-            if (scheduledItem.scheduledTime) {
-              const [hours, minutes, seconds] =
-                scheduledItem.scheduledTime.split(":");
-              scheduledTime = new Date(
-                Date.UTC(1970, 0, 1, hours, minutes, seconds)
-              );
-            }
-
-            if (bookedCreatedDate) {
-              bookedCreatedTime = bookedCreatedDate
-                .toISOString()
-                .split("T")[1]
-                .slice(0, 8);
-            }
-
-            if (scheduledCreatedDate) {
-              scheduledCreatedTime = scheduledCreatedDate
-                .toISOString()
-                .split("T")[1]
-                .slice(0, 8);
-            }
-
-            const scheduledCreatedBy =
-              scheduledItem.Employee.firstName +
-              " " +
-              scheduledItem.Employee.lastName;
-
-            return {
-              ...scheduledItem,
-              haulingDate: haulingDate
-                ? haulingDate.toISOString().split("T")[0]
-                : null,
-              scheduledDate: scheduledDate
-                ? scheduledDate.toISOString().split("T")[0]
-                : null,
-              haulingTime: haulingTime
-                ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-                : null,
-              scheduledTime: scheduledTime
-                ? scheduledTime.toISOString().split("T")[1].slice(0, 5)
-                : null,
-              bookedCreatedDate: bookedCreatedDate
-                ? bookedCreatedDate.toISOString().split("T")[0]
-                : null,
-              scheduledCreatedDate: scheduledCreatedDate
-                ? scheduledCreatedDate.toISOString().split("T")[0]
-                : null,
-              bookedCreatedTime: bookedCreatedTime,
-              scheduledCreatedTime: scheduledCreatedTime,
-              clientName: bookItem.Client ? bookItem.Client.clientName : null,
-              wasteName: bookItem.QuotationWaste
-                ? bookItem.QuotationWaste.wasteName
-                : null,
-              transactionId: bookItem.transactionId
-                ? bookItem.transactionId
-                : null,
-              vehicleType: bookItem.QuotationTransportation
-                ? bookItem.QuotationTransportation.VehicleType.typeOfVehicle
-                : null,
-              vehicleTypeId: bookItem.QuotationTransportation
-                ? bookItem.QuotationTransportation.vehicleTypeId
-                : null,
-              bookedRemarks: bookItem.remarks,
-              statusId: bookItem.statusId,
-              scheduledCreatedBy: scheduledCreatedBy,
-              scheduledRemarks: scheduledItem.remarks,
-            };
-          }
-        );
-
-        setPendingTransactions(flattenedFinishedData);
-      }
-
-      if (transactions && Array.isArray(transactions.finishedTransactions)) {
-        const flattenedDispatchedData = transactions.finishedTransactions.map(
+        const flattenedPendingData = transactions.pendingTransactions.map(
           (dispatchItem) => {
             const scheduledItem = dispatchItem.ScheduledTransaction;
             const bookItem = scheduledItem.BookedTransaction;
@@ -285,18 +189,222 @@ const ReceivedTransactions = ({ user }) => {
               vehicleTypeId: bookItem.QuotationTransportation
                 ? bookItem.QuotationTransportation.vehicleTypeId
                 : null,
-              bookedRemarks: bookItem.remarks,
               statusId: bookItem.statusId,
-              scheduledCreatedBy: scheduledCreatedBy,
-              scheduledRemarks: scheduledItem.remarks,
+              plateNumber: dispatchItem.Vehicle.plateNumber,
+              driverName: `${dispatchItem.EmployeeDriver.firstName} ${dispatchItem.EmployeeDriver.lastName}`,
               helper: helper,
+              bookedRemarks: bookItem.remarks,
+              scheduledRemarks: scheduledItem.remarks,
+              scheduledCreatedBy: scheduledCreatedBy,
               dispatchedCreatedBy: dispatchedCreatedBy,
               dispatchedRemarks: dispatchItem.remarks,
             };
           }
         );
 
-        setFinishedTransactions(flattenedDispatchedData);
+        setPendingTransactions(flattenedPendingData);
+      }
+
+      if (transactions && Array.isArray(transactions.finishedTransactions)) {
+        const flattenedFinishedData = transactions.finishedTransactions.map(
+          (receiveItem) => {
+            const dispatchItem = receiveItem.DispatchedTransaction;
+            const scheduledItem = dispatchItem.ScheduledTransaction;
+            const bookItem = scheduledItem.BookedTransaction;
+            const haulingDate = bookItem.haulingDate
+              ? new Date(bookItem.haulingDate)
+              : null;
+            const scheduledDate = scheduledItem.scheduledDate
+              ? new Date(scheduledItem.scheduledDate)
+              : null;
+            const dispatchedDate = dispatchItem.dispatchedDate
+              ? new Date(dispatchItem.dispatchedDate)
+              : null;
+            const receivedDate = receiveItem.receivedDate
+              ? new Date(receiveItem.receivedDate)
+              : null;
+            const bookedCreatedDate = bookItem.createdAt
+              ? new Date(bookItem.createdAt)
+              : null;
+            const scheduledCreatedDate = scheduledItem.createdAt
+              ? new Date(scheduledItem.createdAt)
+              : null;
+            const dispatchedCreatedDate = dispatchItem.createdAt
+              ? new Date(dispatchItem.createdAt)
+              : null;
+            const receivedCreatedDate = receiveItem.createdAt
+              ? new Date(receiveItem.createdAt)
+              : null;
+            let haulingTime = null;
+            let scheduledTime = null;
+            let dispatchedTime = null;
+            let receivedTime = null;
+            let bookedCreatedTime = null;
+            let scheduledCreatedTime = null;
+            let dispatchedCreatedTime = null;
+            let receivedCreatedTime = null;
+
+            if (bookItem.haulingTime) {
+              const [hours, minutes, seconds] = bookItem.haulingTime.split(":");
+              haulingTime = new Date(
+                Date.UTC(1970, 0, 1, hours, minutes, seconds)
+              );
+            }
+
+            if (scheduledItem.scheduledTime) {
+              const [hours, minutes, seconds] =
+                scheduledItem.scheduledTime.split(":");
+              scheduledTime = new Date(
+                Date.UTC(1970, 0, 1, hours, minutes, seconds)
+              );
+            }
+
+            if (dispatchItem.dispatchedTime) {
+              const [hours, minutes, seconds] =
+                dispatchItem.dispatchedTime.split(":");
+              dispatchedTime = new Date(
+                Date.UTC(1970, 0, 1, hours, minutes, seconds)
+              );
+            }
+
+            if (receiveItem.receivedTime) {
+              const [hours, minutes, seconds] =
+                receiveItem.receivedTime.split(":");
+              receivedTime = new Date(
+                Date.UTC(1970, 0, 1, hours, minutes, seconds)
+              );
+            }
+
+            if (bookedCreatedDate) {
+              bookedCreatedTime = bookedCreatedDate
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8);
+            }
+
+            if (scheduledCreatedDate) {
+              scheduledCreatedTime = scheduledCreatedDate
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8);
+            }
+
+            if (dispatchedCreatedDate) {
+              dispatchedCreatedTime = dispatchedCreatedDate
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8);
+            }
+
+            if (receivedCreatedDate) {
+              receivedCreatedTime = receivedCreatedDate
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8);
+            }
+
+            const scheduledCreatedBy =
+              scheduledItem.Employee.firstName +
+              " " +
+              scheduledItem.Employee.lastName;
+
+            const dispatchedCreatedBy =
+              dispatchItem.Employee.firstName +
+              " " +
+              dispatchItem.Employee.lastName;
+
+            const receivedCreatedBy =
+              receiveItem.Employee.firstName +
+              " " +
+              receiveItem.Employee.lastName;
+
+            const helperIdsArray = dispatchItem.helperId
+              .split(",")
+              .map((id) => id.trim());
+
+            const helper = helperIdsArray
+              .map((helperId) => {
+                const employee = employeeData.find(
+                  (emp) => emp.employeeId === helperId
+                );
+                return employee
+                  ? `${employee.firstName} ${employee.lastName}`
+                  : null;
+              })
+              .filter((name) => name !== null)
+              .join(", ");
+
+            return {
+              ...receiveItem,
+              haulingDate: haulingDate
+                ? haulingDate.toISOString().split("T")[0]
+                : null,
+              scheduledDate: scheduledDate
+                ? scheduledDate.toISOString().split("T")[0]
+                : null,
+              dispatchedDate: dispatchedDate
+                ? dispatchedDate.toISOString().split("T")[0]
+                : null,
+              receivedDate: receivedDate
+                ? receivedDate.toISOString().split("T")[0]
+                : null,
+              haulingTime: haulingTime
+                ? haulingTime.toISOString().split("T")[1].slice(0, 5)
+                : null,
+              scheduledTime: scheduledTime
+                ? scheduledTime.toISOString().split("T")[1].slice(0, 5)
+                : null,
+              dispatchedTime: dispatchedTime
+                ? dispatchedTime.toISOString().split("T")[1].slice(0, 5)
+                : null,
+              receivedTime: receivedTime
+                ? receivedTime.toISOString().split("T")[1].slice(0, 5)
+                : null,
+              bookedCreatedDate: bookedCreatedDate
+                ? bookedCreatedDate.toISOString().split("T")[0]
+                : null,
+              scheduledCreatedDate: scheduledCreatedDate
+                ? scheduledCreatedDate.toISOString().split("T")[0]
+                : null,
+              dispatchedCreatedDate: dispatchedCreatedDate
+                ? dispatchedCreatedDate.toISOString().split("T")[0]
+                : null,
+              receivedCreatedDate: receivedCreatedDate
+                ? receivedCreatedDate.toISOString().split("T")[0]
+                : null,
+              bookedCreatedTime: bookedCreatedTime,
+              scheduledCreatedTime: scheduledCreatedTime,
+              dispatchedCreatedTime: dispatchedCreatedTime,
+              receivedCreatedTime: receivedCreatedTime,
+              clientName: bookItem.Client ? bookItem.Client.clientName : null,
+              wasteName: bookItem.QuotationWaste
+                ? bookItem.QuotationWaste.wasteName
+                : null,
+              transactionId: bookItem.transactionId
+                ? bookItem.transactionId
+                : null,
+              vehicleType: bookItem.QuotationTransportation
+                ? bookItem.QuotationTransportation.VehicleType.typeOfVehicle
+                : null,
+              vehicleTypeId: bookItem.QuotationTransportation
+                ? bookItem.QuotationTransportation.vehicleTypeId
+                : null,
+              statusId: bookItem.statusId,
+              plateNumber: dispatchItem.Vehicle.plateNumber,
+              driverName: `${dispatchItem.EmployeeDriver.firstName} ${dispatchItem.EmployeeDriver.lastName}`,
+              helper: helper,
+              bookedRemarks: bookItem.remarks,
+              dispatchedRemarks: dispatchItem.remarks,
+              scheduledRemarks: scheduledItem.remarks,
+              receivedRemarks: receiveItem.remarks,
+              scheduledCreatedBy: scheduledCreatedBy,
+              dispatchedCreatedBy: dispatchedCreatedBy,
+              receivedCreatedBy: receivedCreatedBy,
+            };
+          }
+        );
+        console.log(flattenedFinishedData);
+        setFinishedTransactions(flattenedFinishedData);
       }
     },
     [employeeData]
@@ -306,7 +414,7 @@ const ReceivedTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const [dispatchResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/dispatchedTransaction`),
+          axios.get(`${apiUrl}/receivingTransaction`),
           axios.get(`${apiUrl}/employee`),
         ]);
 
@@ -326,21 +434,24 @@ const ReceivedTransactions = ({ user }) => {
     }
   }, [responseData, processData]);
 
-  console.log(finishedTransactions);
   const handleOpenModal = (row) => {
     setFormData({
-      vehicleTypeId: row.vehicleTypeId,
       id: "",
-      bookedTransactionId: row.bookedTransactionId,
-      scheduledTransactionId: row.id,
-      vehicleId: "",
-      driverId: "",
-      helperIds: "",
-      isDispatched: false,
-      dispatchedDate: null,
-      dispatchedTime: null,
+      bookedTransactionId: row.ScheduledTransaction.bookedTransactionId,
+      scheduledTransactionId: row.ScheduledTransaction.id,
+      dispatchedTransactionId: row.id,
+      receivedDate: null,
+      receivedTime: null,
+      pttNo: "",
+      manifestNo: "",
+      pullOutFormNo: "",
+      manifestWeight: 0,
+      clientWeight: 0,
+      grossWeight: 0,
+      tareWeight: 0,
+      netWeight: 0,
       remarks: "",
-      statusId: 3,
+      statusId: 4,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -360,44 +471,43 @@ const ReceivedTransactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleAutocompleteChange = (event, newValue) => {
-    const updatedHelperIds = newValue.map((item) => item.employeeId);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      helperIds: updatedHelperIds.join(", "),
-    }));
-  };
-
   const handleEditClick = (row) => {
     const typeToEdit = finishedTransactions.find((type) => type.id === row.id);
 
     if (typeToEdit) {
       setFormData({
-        vehicleTypeId: typeToEdit.vehicleTypeId,
         id: typeToEdit.id,
         bookedTransactionId: typeToEdit.bookedTransactionId,
-        scheduledTransactionId: typeToEdit.scheduledTransactionId,
-        vehicleId: typeToEdit.vehicleId,
-        driverId: typeToEdit.driverId,
-        helperIds: typeToEdit.helperId,
-        isDispatched: typeToEdit.isDispatched,
-        dispatchedDate: typeToEdit.dispatchedDate,
-        dispatchedTime: typeToEdit.dispatchedTime,
+        scheduledTransactionId:
+          typeToEdit.DispatchedTransaction.scheduledTransactionId,
+        dispatchedTransactionId: typeToEdit.dispatchedTransactionId,
+        receivedDate: typeToEdit.receivedDate,
+        receivedTime: typeToEdit.receivedTime,
+        pttNo: typeToEdit.pttNo,
+        manifestNo: typeToEdit.manifestNo,
+        pullOutFormNo: typeToEdit.pullOutFormNo,
+        manifestWeight: typeToEdit.manifestWeight,
+        clientWeight: typeToEdit.clientWeight,
+        grossWeight: typeToEdit.grossWeight,
+        tareWeight: typeToEdit.tareWeight,
+        netWeight: typeToEdit.netWeight,
         remarks: typeToEdit.remarks,
-        statusId: 3,
+        statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
 
       setOpenModal(true);
     } else {
-      console.error(`Vehicle type with ID ${row.id} not found for editing.`);
+      console.error(
+        `Received Transaction with ID ${row.id} not found for editing.`
+      );
     }
   };
 
   const handleDeleteClick = async (row) => {
     console.log(row);
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Dispatched Transaction?"
+      "Are you sure you want to delete this Received Transaction?"
     );
 
     if (!isConfirmed) {
@@ -406,17 +516,19 @@ const ReceivedTransactions = ({ user }) => {
 
     try {
       const response = await axios.delete(
-        `${apiUrl}/dispatchedTransaction/${row.id}`,
+        `${apiUrl}/receivingTransaction/${row.id}`,
         {
           data: {
             deletedBy: user.id,
-            bookedTransactionId: row.ScheduledTransaction.bookedTransactionId,
+            bookedTransactionId:
+              row.DispatchedTransaction.ScheduledTransaction
+                .bookedTransactionId,
           },
         }
       );
 
       processData(response);
-      setSuccessMessage("Dispatched Transaction deleted successfully!");
+      setSuccessMessage("Received Transaction deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -426,33 +538,24 @@ const ReceivedTransactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!formData.driverId) {
-        setError("Driver selection is required.");
+      let response;
+      console.log(formData);
+      if (formData.id) {
+        response = await axios.put(
+          `${apiUrl}/receivingTransaction/${formData.id}`,
+          formData
+        );
+
+        processData(response);
+        setSuccessMessage("Update Received Transaction successfully!");
       } else {
-        setError("");
-
-        let response;
-
-        if (formData.id) {
-          response = await axios.put(
-            `${apiUrl}/dispatchedTransaction/${formData.id}`,
-            formData
-          );
-
-          processData(response);
-          setSuccessMessage("Update Dispatched Transaction successfully!");
-        } else {
-          response = await axios.post(
-            `${apiUrl}/dispatchedTransaction`,
-            formData
-          );
-          processData(response);
-          setSuccessMessage("Dispatch Transaction successfully!");
-        }
-
-        setShowSuccessMessage(true);
-        handleCloseModal();
+        response = await axios.post(`${apiUrl}/receivingTransaction`, formData);
+        processData(response);
+        setSuccessMessage("Receive Transaction successfully!");
       }
+
+      setShowSuccessMessage(true);
+      handleCloseModal();
     } catch (error) {
       console.error("Error:", error);
     }
@@ -479,7 +582,7 @@ const ReceivedTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Set"}
+        buttonText={"Received"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
@@ -489,10 +592,10 @@ const ReceivedTransactions = ({ user }) => {
       <Modal
         user={user}
         error={error}
-        handleAutocompleteChange={handleAutocompleteChange}
         open={openModal}
         onClose={handleCloseModal}
         formData={formData}
+        setFormData={setFormData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
       />

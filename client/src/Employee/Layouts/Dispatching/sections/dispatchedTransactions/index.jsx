@@ -40,7 +40,7 @@ const DispatchedTransactions = ({ user }) => {
       const transactions = response.data;
 
       if (transactions && Array.isArray(transactions.pendingTransactions)) {
-        const flattenedFinishedData = transactions.pendingTransactions.map(
+        const flattenedPendingData = transactions.pendingTransactions.map(
           (scheduledItem) => {
             const bookItem = scheduledItem.BookedTransaction;
             const haulingDate = bookItem.haulingDate
@@ -137,11 +137,11 @@ const DispatchedTransactions = ({ user }) => {
           }
         );
 
-        setPendingTransactions(flattenedFinishedData);
+        setPendingTransactions(flattenedPendingData);
       }
 
       if (transactions && Array.isArray(transactions.finishedTransactions)) {
-        const flattenedDispatchedData = transactions.finishedTransactions.map(
+        const flattenedFinishedData = transactions.finishedTransactions.map(
           (dispatchItem) => {
             const scheduledItem = dispatchItem.ScheduledTransaction;
             const bookItem = scheduledItem.BookedTransaction;
@@ -296,7 +296,7 @@ const DispatchedTransactions = ({ user }) => {
           }
         );
 
-        setFinishedTransactions(flattenedDispatchedData);
+        setFinishedTransactions(flattenedFinishedData);
       }
     },
     [employeeData]
@@ -326,7 +326,6 @@ const DispatchedTransactions = ({ user }) => {
     }
   }, [responseData, processData]);
 
-  console.log(finishedTransactions);
   const handleOpenModal = (row) => {
     setFormData({
       vehicleTypeId: row.vehicleTypeId,
@@ -390,7 +389,9 @@ const DispatchedTransactions = ({ user }) => {
 
       setOpenModal(true);
     } else {
-      console.error(`Vehicle type with ID ${row.id} not found for editing.`);
+      console.error(
+        `Dispatched Transaction with ID ${row.id} not found for editing.`
+      );
     }
   };
 
@@ -479,7 +480,7 @@ const DispatchedTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Set"}
+        buttonText={"Dispatch"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}

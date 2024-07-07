@@ -19,6 +19,7 @@ const VehicleMaintenanceRequest = require("../models/VehicleMaintenanceRequest")
 const BookedTransaction = require("../models/BookedTransaction");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
+const ReceivedTransaction = require("../models/ReceivedTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -108,6 +109,19 @@ Employee.hasMany(DispatchedTransaction, {
   onDelete: "CASCADE",
 });
 DispatchedTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(ReceivedTransaction, {
+  as: "ReceivedTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+ReceivedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
@@ -319,6 +333,32 @@ DispatchedTransaction.belongsTo(Employee, {
   as: "EmployeeDriver",
   foreignKey: "driverId",
   targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+DispatchedTransaction.hasMany(ReceivedTransaction, {
+  as: "ReceivedTransaction",
+  foreignKey: "dispatchedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+ReceivedTransaction.belongsTo(DispatchedTransaction, {
+  as: "DispatchedTransaction",
+  foreignKey: "dispatchedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+ScheduledTransaction.hasMany(ReceivedTransaction, {
+  as: "ReceivedTransaction",
+  foreignKey: "scheduledTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+ReceivedTransaction.belongsTo(ScheduledTransaction, {
+  as: "ScheduledTransaction",
+  foreignKey: "scheduledTransactionId",
+  targetKey: "id",
   onDelete: "CASCADE",
 });
 

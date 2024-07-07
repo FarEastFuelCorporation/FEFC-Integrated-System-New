@@ -10,13 +10,20 @@ const ReceivedTransaction = ({ row }) => {
   const colors = tokens(theme.palette.mode);
   const {
     statusId,
-    dispatchedCreatedDate,
-    dispatchedCreatedTime,
-    dispatchedDate,
-    dispatchedTime,
-    vehicleType,
-    dispatchedRemarks,
-    dispatchedCreatedBy,
+    receivedCreatedDate,
+    receivedCreatedTime,
+    receivedDate,
+    receivedTime,
+    pttNo,
+    manifestNo,
+    pullOutFormNo,
+    manifestWeight,
+    clientWeight,
+    grossWeight,
+    tareWeight,
+    netWeight,
+    receivedRemarks,
+    receivedCreatedBy,
   } = row;
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -26,6 +33,13 @@ const ReceivedTransaction = ({ row }) => {
     date.setSeconds(0);
     date.setMilliseconds(0);
     return date;
+  };
+
+  const formatWeight = (weight) => {
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(weight);
   };
 
   return (
@@ -75,35 +89,51 @@ const ReceivedTransaction = ({ row }) => {
               Received
             </Typography>
             <Typography variant="h5">
-              {dispatchedCreatedDate} {dispatchedCreatedTime}
+              {receivedCreatedDate} {receivedCreatedTime}
             </Typography>
           </Box>
           <Typography variant="h5">
-            Dispatched Date:{" "}
-            {dispatchedDate
-              ? format(new Date(dispatchedDate), "MMMM dd, yyyy")
+            Received Date:{" "}
+            {receivedDate
+              ? format(new Date(receivedDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Dispatched Time:{" "}
-            {dispatchedTime
-              ? format(parseTimeString(dispatchedTime), "hh:mm aa")
+            Received Time:{" "}
+            {receivedTime
+              ? format(parseTimeString(receivedTime), "hh:mm aa")
               : "Pending"}
           </Typography>
-
-          <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
           <Typography variant="h5">
-            Plate Number: {row.Vehicle.plateNumber}
+            Permit To Transport No: {pttNo ? pttNo : "N/A"}
           </Typography>
           <Typography variant="h5">
-            Driver:{" "}
-            {`${row.EmployeeDriver.firstName} ${row.EmployeeDriver.lastName}`}
+            PTT No: {manifestNo ? manifestNo : "N/A"}
           </Typography>
           <Typography variant="h5">
-            Helper(s): {row.helper ? row.helper : "No Helper"}
+            Pull Out Form No: {pullOutFormNo ? pullOutFormNo : "N/A"}
           </Typography>
-          <Typography variant="h5">Remarks: {dispatchedRemarks}</Typography>
-          <Typography variant="h5">Set By: {dispatchedCreatedBy}</Typography>
+          <Typography variant="h5">
+            Manifest Weight:{" "}
+            {manifestWeight ? `${formatWeight(manifestWeight)} Kg` : "N/A"}
+          </Typography>
+          <Typography variant="h5">
+            Client Weight:{" "}
+            {clientWeight ? `${formatWeight(clientWeight)} Kg` : "N/A"}
+          </Typography>
+          <Typography variant="h5">
+            Gross Weight: {formatWeight(grossWeight)} Kg
+          </Typography>
+          <Typography variant="h5">
+            Tare Weight: {formatWeight(tareWeight)} Kg
+          </Typography>
+          <Typography variant="h5">
+            Net Weight: {formatWeight(netWeight)} Kg
+          </Typography>
+          <Typography variant="h5">
+            Remarks: {receivedRemarks ? receivedRemarks : "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">Received By: {receivedCreatedBy}</Typography>
           <br />
           <hr />
         </Box>

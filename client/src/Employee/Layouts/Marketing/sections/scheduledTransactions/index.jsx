@@ -81,10 +81,6 @@ const ScheduledTransactions = ({ user }) => {
       );
 
       setPendingTransactions(flattenedPendingData);
-    } else {
-      console.error(
-        "bookedTransactions or bookedTransactions.pendingTransactions is undefined or not an array"
-      );
     }
 
     if (transactions && Array.isArray(transactions.finishedTransactions)) {
@@ -177,10 +173,6 @@ const ScheduledTransactions = ({ user }) => {
       );
 
       setFinishedTransactions(flattenedFinishedData);
-    } else {
-      console.error(
-        "bookedTransactions or bookedTransactions.finishedTransactions is undefined or not an array"
-      );
     }
   }, []);
 

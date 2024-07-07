@@ -88,7 +88,9 @@ const ScheduledTransaction = ({ row }) => {
               : ""}
           </Typography>
 
-          <Typography variant="h5">Remarks: {scheduledRemarks}</Typography>
+          <Typography variant="h5">
+            Remarks: {scheduledRemarks ? scheduledRemarks : "NO REMARKS"}
+          </Typography>
           <Typography variant="h5">
             Scheduled By: {scheduledCreatedBy}
           </Typography>

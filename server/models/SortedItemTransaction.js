@@ -1,11 +1,11 @@
-// models/SortedTransaction.js
+// models/SortedItemTransaction.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const SortedTransaction = sequelize.define(
-  "SortedTransaction",
+const SortedItemTransaction = sequelize.define(
+  "SortedItemTransaction",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,7 +13,7 @@ const SortedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    receivedTransactionId: {
+    sortedTransactionId: {
       type: DataTypes.UUID,
       allowNull: false,
     },
@@ -82,4 +82,4 @@ const SortedTransaction = sequelize.define(
   }
 );
 
-module.exports = SortedTransaction;
+module.exports = SortedItemTransaction;

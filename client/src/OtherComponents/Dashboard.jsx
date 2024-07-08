@@ -8,6 +8,7 @@ import CertificationRoutes from "../Employee/Routes/CertificationRoutes.";
 import HRRoutes from "../Employee/Routes/HRRoutes";
 import RoleProtectedRoute from "../OtherComponents/RoleProtectedRoute";
 import { Navigate } from "react-router-dom";
+import SortingRoutes from "../Employee/Routes/SortingRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -40,6 +41,12 @@ const Dashboard = ({ user, onUpdateUser }) => {
       return (
         <RoleProtectedRoute user={user} allowedRoles={[4]}>
           <ReceivingRoutes user={user} />
+        </RoleProtectedRoute>
+      );
+    case 5:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[5]}>
+          <SortingRoutes user={user} />
         </RoleProtectedRoute>
       );
     case 7:

@@ -7,24 +7,31 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 
-const ReceivedTransactions = ({ user }) => {
+const SortedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    scheduledTransactionId: "",
-    dispatchedTransactionId: "",
-    receivedDate: null,
-    receivedTime: null,
-    pttNo: "",
-    manifestNo: "",
-    pullOutFormNo: "",
-    manifestWeight: 0,
-    clientWeight: 0,
-    grossWeight: 0,
-    tareWeight: 0,
-    netWeight: 0,
+    receivedTransactionId: "",
+    quotationWasteId: "",
+    treatmentProcessId: "",
+    sortedDate: null,
+    sortedTime: null,
+    wastes: [
+      {
+        quotationId: null,
+        wasteId: "",
+        wasteName: "",
+        mode: "",
+        unit: "",
+        unitPrice: 0,
+        vatCalculation: "",
+        hasFixedRate: false,
+        fixedWeight: 0,
+        fixedPrice: 0,
+      },
+    ],
     remarks: "",
     statusId: 4,
     createdBy: user.id,
@@ -45,7 +52,8 @@ const ReceivedTransactions = ({ user }) => {
 
       if (transactions && Array.isArray(transactions.pendingTransactions)) {
         const flattenedPendingData = transactions.pendingTransactions.map(
-          (dispatchItem) => {
+          (receiveItem) => {
+            const dispatchItem = receiveItem.DispatchedTransaction;
             const scheduledItem = dispatchItem.ScheduledTransaction;
             const bookItem = scheduledItem.BookedTransaction;
             const haulingDate = bookItem.haulingDate
@@ -57,6 +65,9 @@ const ReceivedTransactions = ({ user }) => {
             const dispatchedDate = dispatchItem.dispatchedDate
               ? new Date(dispatchItem.dispatchedDate)
               : null;
+            const receivedDate = receiveItem.receivedDate
+              ? new Date(receiveItem.receivedDate)
+              : null;
             const bookedCreatedDate = bookItem.createdAt
               ? new Date(bookItem.createdAt)
               : null;
@@ -66,12 +77,17 @@ const ReceivedTransactions = ({ user }) => {
             const dispatchedCreatedDate = dispatchItem.createdAt
               ? new Date(dispatchItem.createdAt)
               : null;
+            const receivedCreatedDate = receiveItem.createdAt
+              ? new Date(receiveItem.createdAt)
+              : null;
             let haulingTime = null;
             let scheduledTime = null;
             let dispatchedTime = null;
+            let receivedTime = null;
             let bookedCreatedTime = null;
             let scheduledCreatedTime = null;
             let dispatchedCreatedTime = null;
+            let receivedCreatedTime = null;
 
             if (bookItem.haulingTime) {
               const [hours, minutes, seconds] = bookItem.haulingTime.split(":");
@@ -92,6 +108,14 @@ const ReceivedTransactions = ({ user }) => {
               const [hours, minutes, seconds] =
                 dispatchItem.dispatchedTime.split(":");
               dispatchedTime = new Date(
+                Date.UTC(1970, 0, 1, hours, minutes, seconds)
+              );
+            }
+
+            if (receiveItem.receivedTime) {
+              const [hours, minutes, seconds] =
+                receiveItem.receivedTime.split(":");
+              receivedTime = new Date(
                 Date.UTC(1970, 0, 1, hours, minutes, seconds)
               );
             }
@@ -117,6 +141,13 @@ const ReceivedTransactions = ({ user }) => {
                 .slice(0, 8);
             }
 
+            if (receivedCreatedDate) {
+              receivedCreatedTime = receivedCreatedDate
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8);
+            }
+
             const scheduledCreatedBy =
               scheduledItem.Employee.firstName +
               " " +
@@ -126,6 +157,11 @@ const ReceivedTransactions = ({ user }) => {
               dispatchItem.Employee.firstName +
               " " +
               dispatchItem.Employee.lastName;
+
+            const receivedCreatedBy =
+              receiveItem.Employee.firstName +
+              " " +
+              receiveItem.Employee.lastName;
 
             const helperIdsArray = dispatchItem.helperId
               .split(",")
@@ -144,7 +180,7 @@ const ReceivedTransactions = ({ user }) => {
               .join(", ");
 
             return {
-              ...dispatchItem,
+              ...receiveItem,
               haulingDate: haulingDate
                 ? haulingDate.toISOString().split("T")[0]
                 : null,
@@ -153,6 +189,9 @@ const ReceivedTransactions = ({ user }) => {
                 : null,
               dispatchedDate: dispatchedDate
                 ? dispatchedDate.toISOString().split("T")[0]
+                : null,
+              receivedDate: receivedDate
+                ? receivedDate.toISOString().split("T")[0]
                 : null,
               haulingTime: haulingTime
                 ? haulingTime.toISOString().split("T")[1].slice(0, 5)
@@ -163,6 +202,9 @@ const ReceivedTransactions = ({ user }) => {
               dispatchedTime: dispatchedTime
                 ? dispatchedTime.toISOString().split("T")[1].slice(0, 5)
                 : null,
+              receivedTime: receivedTime
+                ? receivedTime.toISOString().split("T")[1].slice(0, 5)
+                : null,
               bookedCreatedDate: bookedCreatedDate
                 ? bookedCreatedDate.toISOString().split("T")[0]
                 : null,
@@ -172,9 +214,13 @@ const ReceivedTransactions = ({ user }) => {
               dispatchedCreatedDate: dispatchedCreatedDate
                 ? dispatchedCreatedDate.toISOString().split("T")[0]
                 : null,
+              receivedCreatedDate: receivedCreatedDate
+                ? receivedCreatedDate.toISOString().split("T")[0]
+                : null,
               bookedCreatedTime: bookedCreatedTime,
               scheduledCreatedTime: scheduledCreatedTime,
               dispatchedCreatedTime: dispatchedCreatedTime,
+              receivedCreatedTime: receivedCreatedTime,
               clientName: bookItem.Client ? bookItem.Client.clientName : null,
               wasteName: bookItem.QuotationWaste
                 ? bookItem.QuotationWaste.wasteName
@@ -193,14 +239,16 @@ const ReceivedTransactions = ({ user }) => {
               driverName: `${dispatchItem.EmployeeDriver.firstName} ${dispatchItem.EmployeeDriver.lastName}`,
               helper: helper,
               bookedRemarks: bookItem.remarks,
+              dispatchedRemarks: dispatchItem.remarks,
               scheduledRemarks: scheduledItem.remarks,
+              receivedRemarks: receiveItem.remarks,
               scheduledCreatedBy: scheduledCreatedBy,
               dispatchedCreatedBy: dispatchedCreatedBy,
-              dispatchedRemarks: dispatchItem.remarks,
+              receivedCreatedBy: receivedCreatedBy,
             };
           }
         );
-
+        console.log(flattenedPendingData);
         setPendingTransactions(flattenedPendingData);
       }
 
@@ -413,7 +461,7 @@ const ReceivedTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const [dispatchResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/receivingTransaction`),
+          axios.get(`${apiUrl}/sortingTransaction`),
           axios.get(`${apiUrl}/employee`),
         ]);
 
@@ -436,8 +484,9 @@ const ReceivedTransactions = ({ user }) => {
   const handleOpenModal = (row) => {
     setFormData({
       id: "",
-      bookedTransactionId: row.ScheduledTransaction.bookedTransactionId,
-      scheduledTransactionId: row.ScheduledTransaction.id,
+      bookedTransactionId:
+        row.DispatchedTransaction.ScheduledTransaction.bookedTransactionId,
+      scheduledTransactionId: row.DispatchedTransaction.ScheduledTransaction.id,
       dispatchedTransactionId: row.id,
       receivedDate: null,
       receivedTime: null,
@@ -515,7 +564,7 @@ const ReceivedTransactions = ({ user }) => {
 
     try {
       const response = await axios.delete(
-        `${apiUrl}/receivingTransaction/${row.id}`,
+        `${apiUrl}/sortingTransaction/${row.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -541,14 +590,14 @@ const ReceivedTransactions = ({ user }) => {
       console.log(formData);
       if (formData.id) {
         response = await axios.put(
-          `${apiUrl}/receivingTransaction/${formData.id}`,
+          `${apiUrl}/sortingTransaction/${formData.id}`,
           formData
         );
 
         processData(response);
         setSuccessMessage("Update Received Transaction successfully!");
       } else {
-        response = await axios.post(`${apiUrl}/receivingTransaction`, formData);
+        response = await axios.post(`${apiUrl}/sortingTransaction`, formData);
         processData(response);
         setSuccessMessage("Receive Transaction successfully!");
       }
@@ -581,7 +630,7 @@ const ReceivedTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Receive"}
+        buttonText={"Sort"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
@@ -601,4 +650,4 @@ const ReceivedTransactions = ({ user }) => {
   );
 };
 
-export default ReceivedTransactions;
+export default SortedTransactions;

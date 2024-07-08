@@ -40,6 +40,7 @@ const App = () => {
       })
       .catch((error) => {
         console.error("Error fetching session data:", error);
+        navigate("/login");
       })
       .finally(() => {
         setLoading(false); // Set loading to false after the request completes (success or error)

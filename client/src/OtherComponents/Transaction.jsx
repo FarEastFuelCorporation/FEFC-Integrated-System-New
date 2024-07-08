@@ -18,11 +18,12 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccordionSummary from "@mui/material/AccordionSummary";
+import { tokens } from "../theme";
 import BookedTransaction from "./Transactions/BookedTransaction";
 import ScheduledTransaction from "./Transactions/ScheduledTransaction";
 import DispatchedTransaction from "./Transactions/DispatchedTransaction";
-import { tokens } from "../theme";
 import ReceivedTransaction from "./Transactions/ReceivedTransaction";
+import SortedTransaction from "./Transactions/SortedTransaction";
 
 const Transaction = ({
   user,
@@ -112,6 +113,7 @@ const Transaction = ({
                 {row.statusId >= 1 && <ScheduledTransaction row={row} />}
                 {row.statusId >= 2 && <DispatchedTransaction row={row} />}
                 {row.statusId >= 3 && <ReceivedTransaction row={row} />}
+                {row.statusId >= 4 && <SortedTransaction row={row} />}
               </CustomAccordionDetails>
             </Accordion>
           ))}

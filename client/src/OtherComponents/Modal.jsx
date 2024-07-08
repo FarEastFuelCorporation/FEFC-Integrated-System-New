@@ -3,6 +3,7 @@ import BookModal from "./TransactionModals/BookModal";
 import ScheduleModal from "./TransactionModals/ScheduleModal";
 import DispatchModal from "./TransactionModals/DispatchModal";
 import ReceiveModal from "./TransactionModals/ReceiveModal";
+import SortModal from "./TransactionModals/SortModal";
 
 const Modal = ({
   user,
@@ -57,6 +58,20 @@ const Modal = ({
     case 4:
       ModalComponent = (
         <ReceiveModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+        />
+      );
+      break;
+    case 5:
+      ModalComponent = (
+        <SortModal
           user={user}
           error={error}
           open={open}

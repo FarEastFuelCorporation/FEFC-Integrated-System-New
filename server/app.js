@@ -90,6 +90,7 @@ const bookedTransactionRoutes = require("./routes/bookedTransactionRoutes");
 const scheduledTransactionRoutes = require("./routes/scheduledTransactionRoutes");
 const dispatchedTransactionRoutes = require("./routes/dispatchedTransactionRoutes");
 const receivingTransactionRoutes = require("./routes/receivingTransactionRoutes");
+const sortingTransactionRoutes = require("./routes/sortingTransactionRoutes");
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const employeeRoutes = require("./routes/employeeRoutes");
 const { error404Controller } = require("./controllers/othersController");
@@ -109,6 +110,7 @@ app.use("/bookedTransaction", bookedTransactionRoutes);
 app.use("/scheduledTransaction", scheduledTransactionRoutes);
 app.use("/dispatchedTransaction", dispatchedTransactionRoutes);
 app.use("/receivingTransaction", receivingTransactionRoutes);
+app.use("/sortingTransaction", sortingTransactionRoutes);
 app.use("/hrDashboard", hrDashboardRoutes);
 app.use("/employee", employeeRoutes);
 

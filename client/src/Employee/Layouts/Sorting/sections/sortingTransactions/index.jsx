@@ -14,13 +14,15 @@ const SortedTransactions = ({ user }) => {
     id: "",
     bookedTransactionId: "",
     receivedTransactionId: "",
-    quotationWasteId: "",
-    treatmentProcessId: "",
     sortedDate: null,
     sortedTime: null,
-    wastes: [
+    totalSortedWeight: 0,
+    discrepancyWeight: 0,
+    sortedWastes: [
       {
         quotationId: null,
+        quotationWasteId: "",
+        treatmentProcessId: "",
         wasteId: "",
         wasteName: "",
         mode: "",
@@ -33,7 +35,7 @@ const SortedTransactions = ({ user }) => {
       },
     ],
     remarks: "",
-    statusId: 4,
+    statusId: 5,
     createdBy: user.id,
   };
 

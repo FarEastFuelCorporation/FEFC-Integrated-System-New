@@ -21,6 +21,7 @@ const ScheduledTransaction = require("../models/ScheduledTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
 const SortedTransaction = require("../models/SortedTransaction");
+const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -372,6 +373,19 @@ ReceivedTransaction.hasMany(SortedTransaction, {
 SortedTransaction.belongsTo(ReceivedTransaction, {
   as: "ReceivedTransaction",
   foreignKey: "receivedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+SortedTransaction.hasMany(SortedWasteTransaction, {
+  as: "SortedWasteTransaction",
+  foreignKey: "sortedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+SortedWasteTransaction.belongsTo(SortedTransaction, {
+  as: "SortedTransaction",
+  foreignKey: "sortedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

@@ -17,14 +17,6 @@ const SortedTransaction = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
-    quotationWasteId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    treatmentProcessId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
     sortedDate: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -33,15 +25,11 @@ const SortedTransaction = sequelize.define(
       type: DataTypes.TIME,
       allowNull: false,
     },
-    wasteName: {
-      type: DataTypes.STRING,
+    totalSortedWeight: {
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
-    formNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    weight: {
+    discrepancyWeight: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },

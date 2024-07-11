@@ -278,7 +278,6 @@ async function createReceivedTransactionController(req, res) {
       tareWeight,
       netWeight,
       remarks,
-      statusId,
       createdBy,
     });
 
@@ -346,7 +345,6 @@ async function updateReceivedTransactionController(req, res) {
       tareWeight,
       netWeight,
       remarks,
-      statusId,
       createdBy,
     } = req.body;
 
@@ -376,7 +374,6 @@ async function updateReceivedTransactionController(req, res) {
       updatedReceivedTransaction.tareWeight = tareWeight;
       updatedReceivedTransaction.netWeight = netWeight;
       updatedReceivedTransaction.remarks = remarks;
-      updatedReceivedTransaction.statusId = statusId;
       updatedReceivedTransaction.updatedBy = createdBy;
 
       // Save the updated received transaction

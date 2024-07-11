@@ -1,10 +1,10 @@
-// models/SortedWasteTransaction.js
+// models/SortedScrapTransaction.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const SortedWasteTransaction = sequelize.define("SortedWasteTransaction", {
+const SortedScrapTransaction = sequelize.define("SortedScrapTransaction", {
   id: {
     type: DataTypes.UUID,
     defaultValue: () => uuidv4(), // Generate UUID automatically
@@ -15,16 +15,8 @@ const SortedWasteTransaction = sequelize.define("SortedWasteTransaction", {
     type: DataTypes.UUID,
     allowNull: false,
   },
-  quotationWasteId: {
+  scrapTypeId: {
     type: DataTypes.UUID,
-    allowNull: false,
-  },
-  treatmentProcessId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-  },
-  wasteName: {
-    type: DataTypes.STRING,
     allowNull: false,
   },
   weight: {
@@ -37,4 +29,4 @@ const SortedWasteTransaction = sequelize.define("SortedWasteTransaction", {
   },
 });
 
-module.exports = SortedWasteTransaction;
+module.exports = SortedScrapTransaction;

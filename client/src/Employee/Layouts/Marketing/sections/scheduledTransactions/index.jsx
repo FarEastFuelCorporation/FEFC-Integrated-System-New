@@ -28,6 +28,8 @@ const ScheduledTransactions = ({ user }) => {
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const processData = useCallback((response) => {
     const transactions = response.data;
@@ -271,6 +273,15 @@ const ScheduledTransactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    // Perform client-side validation
+    const { scheduledDate, scheduledTime, statusId, createdBy } = formData;
+
+    if (!scheduledDate || !scheduledTime || !statusId || !createdBy) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
     try {
       let response;
 
@@ -331,6 +342,8 @@ const ScheduledTransactions = ({ user }) => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
       />
     </Box>
   );

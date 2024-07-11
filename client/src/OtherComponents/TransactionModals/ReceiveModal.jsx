@@ -11,13 +11,14 @@ import {
 import { tokens } from "../../theme";
 
 const ReceiveModal = ({
-  user,
   open,
   onClose,
   formData,
   setFormData,
   handleInputChange,
   handleFormSubmit,
+  errorMessage,
+  showErrorMessage,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -62,6 +63,9 @@ const ReceiveModal = ({
       >
         <Typography variant="h6" component="h2">
           {formData.id ? "Update Received Transaction" : "Receive Transaction"}
+        </Typography>
+        <Typography variant="h6" component="h2" color="error">
+          {showErrorMessage && errorMessage}
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField

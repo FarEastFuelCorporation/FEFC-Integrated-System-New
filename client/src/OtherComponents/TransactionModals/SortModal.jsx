@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Modal,
@@ -7,38 +7,234 @@ import {
   TextField,
   Button,
   Grid,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import axios from "axios";
 import { tokens } from "../../theme";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
 const SortModal = ({
-  user,
   open,
   onClose,
   formData,
   setFormData,
   handleInputChange,
   handleFormSubmit,
+  errorMessage,
+  showErrorMessage,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [quotations, setQuotations] = useState([]);
+  const [treatmentProcesses, setTreatmentProcesses] = useState([]);
+  const [scrapTypes, setScrapTypes] = useState([]);
+  const [isDiscrepancy, setIsDiscrepancy] = useState(true);
 
-  const calculateNetWeight = (grossWeight, tareWeight) => {
-    return grossWeight - tareWeight;
+  useEffect(() => {
+    if (open) {
+      const fetchData = async () => {
+        try {
+          const apiUrl = process.env.REACT_APP_API_URL;
+          const [
+            quotationsResponse,
+            treatmentProcessResponse,
+            scrapTypesResponse,
+          ] = await Promise.all([
+            axios.get(`${apiUrl}/quotation/${formData.clientId}`),
+            axios.get(`${apiUrl}/treatmentProcess`),
+            axios.get(`${apiUrl}/scrapType`),
+          ]);
+          console.log(formData.clientId);
+          console.log(quotationsResponse.data.quotations);
+          console.log(treatmentProcessResponse.data.treatmentProcesses);
+          setQuotations(quotationsResponse.data.quotations);
+          setTreatmentProcesses(
+            treatmentProcessResponse.data.treatmentProcesses
+          );
+          setScrapTypes(scrapTypesResponse.data.scrapTypes);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [open, formData.clientId]);
+
+  useEffect(() => {
+    const totalSortedWeight = calculateTotalSortedWeight(
+      formData.sortedWastes,
+      formData.sortedScraps
+    );
+    const discrepancyWeight = calculateDiscrepancyWeight(
+      parseFloat(formData.batchWeight || 0),
+      totalSortedWeight
+    );
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      totalSortedWeight,
+      discrepancyWeight,
+    }));
+    if (discrepancyWeight === 0) {
+      setIsDiscrepancy(false);
+    } else {
+      setIsDiscrepancy(true);
+    }
+  }, [
+    formData.sortedWastes,
+    formData.sortedScraps,
+    formData.batchWeight,
+    setFormData,
+  ]);
+
+  const calculateTotalSortedWeight = (sortedWastes, sortedScraps) => {
+    const totalSortedWasteWeight = sortedWastes.reduce((total, waste) => {
+      return total + parseFloat(waste.weight || 0);
+    }, 0);
+
+    const totalSortedScrapWeight = sortedScraps.reduce((total, scrap) => {
+      return total + parseFloat(scrap.weight || 0);
+    }, 0);
+
+    return totalSortedWasteWeight + totalSortedScrapWeight;
   };
 
-  const handleInputChangeWithNetWeight = (e) => {
-    const { name, value } = e.target;
-    const updatedFormData = { ...formData, [name]: value };
+  const calculateDiscrepancyWeight = (batchWeight, totalSortedWeight) => {
+    return batchWeight - totalSortedWeight;
+  };
 
-    if (name === "grossWeight" || name === "tareWeight") {
-      const netWeight = calculateNetWeight(
-        parseFloat(updatedFormData.grossWeight || 0),
-        parseFloat(updatedFormData.tareWeight || 0)
+  const handleWasteChange = (index, field, value) => {
+    const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
+      i === index ? { ...waste, [field]: value } : waste
+    );
+    setFormData({
+      ...formData,
+      sortedWastes: updatedSortedWastes,
+    });
+  };
+
+  const handleWasteCodeChange = (index, value) => {
+    let selectedWasteType = null;
+
+    // Find the selected waste type in the nested QuotationWaste array
+    for (let quotation of quotations) {
+      selectedWasteType = quotation.QuotationWaste.find(
+        (waste) => waste.id === value
       );
-      updatedFormData.netWeight = netWeight;
+      if (selectedWasteType) break;
     }
 
-    setFormData(updatedFormData);
+    if (selectedWasteType) {
+      const updatedWastes = formData.sortedWastes.map((waste, i) =>
+        i === index
+          ? {
+              ...waste,
+              quotationWasteId: value,
+              wasteName: selectedWasteType.wasteName, // Updated to use wasteName
+            }
+          : waste
+      );
+      handleInputChange({
+        target: { name: "sortedWastes", value: updatedWastes },
+      });
+    } else {
+      console.warn(`No waste type found for id: ${value}`);
+    }
+  };
+
+  const handleScrapChange = (index, field, value) => {
+    const updatedSortedScraps = formData.sortedScraps.map((scrap, i) =>
+      i === index ? { ...scrap, [field]: value } : scrap
+    );
+    setFormData({
+      ...formData,
+      sortedScraps: updatedSortedScraps,
+    });
+  };
+
+  const handleScrapTypeChange = (index, value) => {
+    const selectedScrapType = scrapTypes.find((scrap) => scrap.id === value);
+
+    if (selectedScrapType) {
+      const updatedScraps = formData.sortedScraps.map((scrap, i) =>
+        i === index
+          ? {
+              ...scrap,
+              scrapTypeId: value,
+            }
+          : scrap
+      );
+      handleInputChange({
+        target: { name: "sortedScraps", value: updatedScraps },
+      });
+    } else {
+      console.warn(`No scrap type found for id: ${value}`);
+    }
+  };
+
+  const handleTreatmentProcessChange = (index, value) => {
+    // Find the selected treatment process by its ID
+    const selectedTreatmentProcess = treatmentProcesses.find(
+      (treatmentProcess) => treatmentProcess.id === value
+    );
+
+    if (selectedTreatmentProcess) {
+      // Update the formData state with the new selected treatment process
+      const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
+        i === index ? { ...waste, treatmentProcessId: value } : waste
+      );
+
+      setFormData({
+        ...formData,
+        sortedWastes: updatedSortedWastes,
+      });
+    } else {
+      console.warn(`No treatment process found for id: ${value}`);
+    }
+  };
+
+  const addWasteField = () => {
+    setFormData({
+      ...formData,
+      sortedWastes: [
+        ...formData.sortedWastes,
+        {
+          quotationWasteId: "",
+          treatmentProcessId: "",
+          wasteName: "",
+          weight: 0,
+          formNo: "",
+        },
+      ],
+    });
+  };
+
+  const removeWasteField = (index) => {
+    const newSortedWastes = formData.sortedWastes.filter((_, i) => i !== index);
+    setFormData({ ...formData, sortedWastes: newSortedWastes });
+  };
+
+  const addScrapField = () => {
+    setFormData({
+      ...formData,
+      sortedScraps: [
+        ...formData.sortedScraps,
+        {
+          scrapTypeId: "",
+          weight: 0,
+        },
+      ],
+    });
+  };
+
+  const removeScrapField = (index) => {
+    const newSortedScraps = formData.sortedScraps.filter((_, i) => i !== index);
+    setFormData({ ...formData, sortedScraps: newSortedScraps });
   };
 
   return (
@@ -51,17 +247,24 @@ const SortModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 800,
+          width: 1000,
+          maxHeight: "80vh",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
           display: "flex",
           flexDirection: "column",
           gap: 2,
+          overflowY: "scroll",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
         <Typography variant="h6" component="h2">
           {formData.id ? "Update Sorted Transaction" : "Sort Transaction"}
+        </Typography>
+        <Typography variant="h6" component="h2" color="error">
+          {showErrorMessage && errorMessage}
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField
@@ -97,86 +300,12 @@ const SortModal = ({
             autoComplete="off"
           />
         </div>
-        <TextField
-          label="PTT No."
-          name="pttNo"
-          value={formData.pttNo}
-          onChange={handleInputChange}
-          fullWidth
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
-        <TextField
-          label="Manifest No."
-          name="manifestNo"
-          value={formData.manifestNo}
-          onChange={handleInputChange}
-          fullWidth
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
-        <TextField
-          label="Pull Out Form No."
-          name="pullOutFormNo"
-          value={formData.pullOutFormNo}
-          onChange={handleInputChange}
-          fullWidth
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              label="Manifest Weight"
-              name={`manifestWeight`}
-              value={formData.manifestWeight}
-              onChange={handleInputChange}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Client Weight"
-              name={`clientWeight`}
-              value={formData.clientWeight}
-              onChange={handleInputChange}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-            />
-          </Grid>
-        </Grid>
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <TextField
-              label="Gross Weight"
-              name={`grossWeight`}
-              value={formData.grossWeight}
-              onChange={handleInputChangeWithNetWeight}
+              label="Batch Weight"
+              name={`batchWeight`}
+              value={formData.batchWeight}
               type="number"
               fullWidth
               InputLabelProps={{
@@ -185,14 +314,14 @@ const SortModal = ({
                 },
               }}
               autoComplete="off"
+              disabled
             />
           </Grid>
           <Grid item xs={4}>
             <TextField
-              label="Tare Weight"
-              name={`tareWeight`}
-              value={formData.tareWeight}
-              onChange={handleInputChangeWithNetWeight}
+              label="Total Sorted Weight"
+              name={`totalSortedWeight`}
+              value={formData.totalSortedWeight}
               type="number"
               fullWidth
               InputLabelProps={{
@@ -201,14 +330,14 @@ const SortModal = ({
                 },
               }}
               autoComplete="off"
+              disabled
             />
           </Grid>
           <Grid item xs={4}>
             <TextField
-              label="Net Weight"
-              name={`netWeight`}
-              value={formData.netWeight}
-              onChange={handleInputChange}
+              label="Discrepancy Weight"
+              name={`discrepancyWeight`}
+              value={formData.discrepancyWeight}
               type="number"
               fullWidth
               InputLabelProps={{
@@ -221,19 +350,236 @@ const SortModal = ({
             />
           </Grid>
         </Grid>
-        <TextField
-          label="Remarks"
-          name="remarks"
-          value={formData.remarks}
-          onChange={handleInputChange}
-          fullWidth
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
+        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "20px" }}>
+          Sorted Wastes
+        </Typography>
+        {formData.sortedWastes.map((waste, index) => (
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              Waste Entry #{index + 1}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={2}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id={`waste-type-select-label-${index}`}
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Category
+                  </InputLabel>
+                  <Select
+                    labelId={`waste-type-select-label-${index}`}
+                    name={`sortedWastes[${index}].quotationWasteId`}
+                    value={waste.quotationWasteId}
+                    onChange={(e) =>
+                      handleWasteCodeChange(index, e.target.value)
+                    }
+                    label="Category"
+                    fullWidth
+                    required
+                  >
+                    {quotations.map((quotation) =>
+                      quotation.QuotationWaste.map((waste) => (
+                        <MenuItem key={waste.id} value={waste.id}>
+                          {waste.wasteName}
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  label="Waste Name"
+                  name="wasteName"
+                  value={waste.wasteName}
+                  onChange={(e) =>
+                    handleWasteChange(index, "wasteName", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id={`treatmentProcess-type-select-label-${index}`}
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    TreatmentProcess
+                  </InputLabel>
+                  <Select
+                    labelId={`treatmentProcess-type-select-label-${index}`}
+                    name={`sortedWastes[${index}].treatmentProcessId`}
+                    value={waste.treatmentProcessId}
+                    onChange={(e) =>
+                      handleTreatmentProcessChange(index, e.target.value)
+                    }
+                    label="TreatmentProcess"
+                    fullWidth
+                    required
+                  >
+                    {treatmentProcesses.map((treatmentProcess) => (
+                      <MenuItem
+                        key={treatmentProcess.id}
+                        value={treatmentProcess.id}
+                      >
+                        {treatmentProcess.treatmentProcess}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={1.5}>
+                <TextField
+                  label="Weight"
+                  name="weight"
+                  value={waste.weight}
+                  onChange={(e) =>
+                    handleWasteChange(index, "weight", e.target.value)
+                  }
+                  type="number"
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={1.5}>
+                <TextField
+                  label="Form No"
+                  name="formNo"
+                  value={waste.formNo}
+                  onChange={(e) =>
+                    handleWasteChange(index, "formNo", e.target.value)
+                  }
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton
+                  color="error"
+                  onClick={() => removeWasteField(index)}
+                >
+                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+        <Box display="flex" justifyContent="center" mt={2}>
+          <IconButton color="success" onClick={addWasteField}>
+            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+          </IconButton>
+        </Box>
+        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "20px" }}>
+          Sorted Scraps
+        </Typography>
+        {formData.sortedScraps.map((scrap, index) => (
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              Scrap Entry #{index + 1}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id={`scrap-type-select-label-${index}`}
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Category
+                  </InputLabel>
+                  <Select
+                    labelId={`scrap-type-select-label-${index}`}
+                    name={`sortedWastes[${index}].scrapTypeId`}
+                    value={scrap.scrapTypeId}
+                    onChange={(e) =>
+                      handleScrapTypeChange(index, e.target.value)
+                    }
+                    label="Category"
+                    fullWidth
+                    required
+                  >
+                    {scrapTypes.map((scrapType) => (
+                      <MenuItem key={scrapType.id} value={scrapType.id}>
+                        {scrapType.typeOfScrap}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={1.5}>
+                <TextField
+                  label="Weight"
+                  name="weight"
+                  value={scrap.weight}
+                  onChange={(e) =>
+                    handleScrapChange(index, "weight", e.target.value)
+                  }
+                  type="number"
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <IconButton
+                  color="error"
+                  onClick={() => removeScrapField(index)}
+                >
+                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+        <Box display="flex" justifyContent="center" mt={2}>
+          <IconButton color="success" onClick={addScrapField}>
+            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+          </IconButton>
+        </Box>
+        {isDiscrepancy && (
+          <TextField
+            label="Discrepancy Remarks"
+            name="remarks"
+            value={formData.remarks}
+            onChange={handleInputChange}
+            fullWidth
+            required={isDiscrepancy}
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+        )}
         <TextField
           label="Status Id"
           name="statusId"

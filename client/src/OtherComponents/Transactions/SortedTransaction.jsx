@@ -10,20 +10,16 @@ const SortedTransaction = ({ row }) => {
   const colors = tokens(theme.palette.mode);
   const {
     statusId,
-    receivedCreatedDate,
-    receivedCreatedTime,
-    receivedDate,
-    receivedTime,
-    pttNo,
-    manifestNo,
-    pullOutFormNo,
-    manifestWeight,
-    clientWeight,
-    grossWeight,
-    tareWeight,
+    sortedCreatedDate,
+    sortedCreatedTime,
+    sortedDate,
+    sortedTime,
     netWeight,
-    receivedRemarks,
-    receivedCreatedBy,
+    totalSortedWeight,
+    discrepancyWeight,
+    sortedRemarks,
+    SortedWasteTransaction,
+    sortedCreatedBy,
   } = row;
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -89,51 +85,50 @@ const SortedTransaction = ({ row }) => {
               Sorted
             </Typography>
             <Typography variant="h5">
-              {receivedCreatedDate} {receivedCreatedTime}
+              {sortedCreatedDate} {sortedCreatedTime}
             </Typography>
           </Box>
+          {SortedWasteTransaction && SortedWasteTransaction.length > 0 ? (
+            SortedWasteTransaction.map((waste, index) => (
+              <Box key={index} sx={{ my: 2 }}>
+                <Typography variant="h5">Item {index + 1}</Typography>
+                <Typography variant="h5">
+                  Waste Name: {waste.wasteName}
+                </Typography>
+                <Typography variant="h5">
+                  Weight: {formatWeight(waste.weight)} Kg
+                </Typography>
+                <Typography variant="h5">Form No: {waste.formNo}</Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="h5">No Sorted Waste Transactions</Typography>
+          )}
           <Typography variant="h5">
-            Received Date:{" "}
-            {receivedDate
-              ? format(new Date(receivedDate), "MMMM dd, yyyy")
+            Sorted Date:{" "}
+            {sortedDate
+              ? format(new Date(sortedDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Received Time:{" "}
-            {receivedTime
-              ? format(parseTimeString(receivedTime), "hh:mm aa")
+            Sorted Time:{" "}
+            {sortedTime
+              ? format(parseTimeString(sortedTime), "hh:mm aa")
               : "Pending"}
-          </Typography>
-          <Typography variant="h5">
-            Permit To Transport No: {pttNo ? pttNo : "N/A"}
-          </Typography>
-          <Typography variant="h5">
-            PTT No: {manifestNo ? manifestNo : "N/A"}
-          </Typography>
-          <Typography variant="h5">
-            Pull Out Form No: {pullOutFormNo ? pullOutFormNo : "N/A"}
-          </Typography>
-          <Typography variant="h5">
-            Manifest Weight:{" "}
-            {manifestWeight ? `${formatWeight(manifestWeight)} Kg` : "N/A"}
-          </Typography>
-          <Typography variant="h5">
-            Client Weight:{" "}
-            {clientWeight ? `${formatWeight(clientWeight)} Kg` : "N/A"}
-          </Typography>
-          <Typography variant="h5">
-            Gross Weight: {formatWeight(grossWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
-            Tare Weight: {formatWeight(tareWeight)} Kg
           </Typography>
           <Typography variant="h5">
             Net Weight: {formatWeight(netWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Remarks: {receivedRemarks ? receivedRemarks : "NO REMARKS"}
+            Total Sorted Weight: {formatWeight(totalSortedWeight)} Kg
           </Typography>
-          <Typography variant="h5">Received By: {receivedCreatedBy}</Typography>
+          <Typography variant="h5">
+            Discrepancy Weight: {formatWeight(discrepancyWeight)} Kg
+          </Typography>
+          <Typography variant="h5">
+            Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">Sorted By: {sortedCreatedBy}</Typography>
           <br />
           <hr />
         </Box>

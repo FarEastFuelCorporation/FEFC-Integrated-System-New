@@ -196,7 +196,6 @@ async function updateScheduledTransactionController(req, res) {
       scheduledDate,
       scheduledTime,
       remarks,
-      statusId,
       createdBy,
     } = req.body;
 
@@ -213,7 +212,6 @@ async function updateScheduledTransactionController(req, res) {
       updatedScheduledTransaction.scheduledDate = scheduledDate;
       updatedScheduledTransaction.scheduledTime = scheduledTime;
       updatedScheduledTransaction.remarks = remarks;
-      updatedScheduledTransaction.statusId = statusId;
       updatedScheduledTransaction.updatedBy = createdBy;
 
       // Save the updated booked transaction

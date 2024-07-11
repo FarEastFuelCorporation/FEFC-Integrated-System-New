@@ -33,6 +33,8 @@ const DispatchedTransactions = ({ user }) => {
   const [employeeData, setEmployeeData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [error, setError] = useState("");
 
   const processData = useCallback(
@@ -426,6 +428,32 @@ const DispatchedTransactions = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    // Perform client-side validation
+    const {
+      dispatchedDate,
+      dispatchedTime,
+      vehicleId,
+      driverId,
+      helperIds,
+      statusId,
+      createdBy,
+    } = formData;
+
+    if (
+      !dispatchedDate ||
+      !dispatchedTime ||
+      !vehicleId ||
+      !driverId ||
+      helperIds.length === 0 ||
+      !statusId ||
+      !createdBy
+    ) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
     try {
       if (!formData.driverId) {
         setError("Driver selection is required.");
@@ -496,6 +524,8 @@ const DispatchedTransactions = ({ user }) => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
       />
     </Box>
   );

@@ -194,10 +194,7 @@ const Vehicles = ({ user }) => {
         }
       } else {
         // Add new vehicle
-        response = await axios.post(
-          `${apiUrl}/dispatchingDashboard/vehicle`,
-          formData
-        );
+        response = await axios.post(`${apiUrl}/vehicle`, formData);
 
         const vehicleRecords = response.data;
 

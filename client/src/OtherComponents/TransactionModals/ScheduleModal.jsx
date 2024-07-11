@@ -15,6 +15,8 @@ const ScheduleModal = ({
   formData,
   handleInputChange,
   handleFormSubmit,
+  errorMessage,
+  showErrorMessage,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -41,6 +43,9 @@ const ScheduleModal = ({
           {formData.id
             ? "Update Scheduled Transaction"
             : "Schedule Transaction"}
+        </Typography>
+        <Typography variant="h6" component="h2" color="error">
+          {showErrorMessage && errorMessage}
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField

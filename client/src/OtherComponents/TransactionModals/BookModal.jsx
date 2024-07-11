@@ -18,6 +18,8 @@ const BookModal = ({
   formData,
   handleInputChange,
   handleFormSubmit,
+  errorMessage,
+  showErrorMessage,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
@@ -94,6 +96,9 @@ const BookModal = ({
       >
         <Typography variant="h6" component="h2">
           {formData.id ? "Update Booked Transaction" : "Book Transaction"}
+        </Typography>
+        <Typography variant="h6" component="h2" color="error">
+          {showErrorMessage && errorMessage}
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField

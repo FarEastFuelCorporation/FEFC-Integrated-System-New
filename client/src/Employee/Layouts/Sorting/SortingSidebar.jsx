@@ -29,7 +29,7 @@ const SortingDashboard = ({ user }) => {
     () => ({
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
-      "/dashboard/vehicleTypes": "Type Of Vehicles",
+      "/dashboard/scrapTypes": "Type Of Scraps",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/VehicleMaintenanceRequest": "Vehicle Maintenance Request",
       "/dashboard/form": "Profile Form",
@@ -193,8 +193,8 @@ const SortingDashboard = ({ user }) => {
               setSelected={setSelected}
             />
             <Item
-              title="Type Of Vehicles"
-              to="vehicleTypes"
+              title="Type Of Scraps"
+              to="scrapTypes"
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}

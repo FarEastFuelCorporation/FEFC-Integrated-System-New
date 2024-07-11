@@ -202,7 +202,6 @@ async function createDispatchedTransactionController(req, res) {
       dispatchedDate,
       dispatchedTime,
       remarks,
-      statusId,
       createdBy,
     });
 
@@ -265,7 +264,6 @@ async function updateDispatchedTransactionController(req, res) {
       dispatchedDate,
       dispatchedTime,
       remarks,
-      statusId,
       createdBy,
     } = req.body;
 
@@ -289,7 +287,6 @@ async function updateDispatchedTransactionController(req, res) {
       updatedDispatchedTransaction.dispatchedDate = dispatchedDate;
       updatedDispatchedTransaction.dispatchedTime = dispatchedTime;
       updatedDispatchedTransaction.remarks = remarks;
-      updatedDispatchedTransaction.statusId = statusId;
       updatedDispatchedTransaction.updatedBy = createdBy;
 
       // Save the updated dispatched transaction

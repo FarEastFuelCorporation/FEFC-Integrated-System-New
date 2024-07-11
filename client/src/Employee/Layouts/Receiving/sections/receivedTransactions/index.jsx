@@ -38,6 +38,8 @@ const ReceivedTransactions = ({ user }) => {
   const [employeeData, setEmployeeData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const processData = useCallback(
     (response) => {
@@ -536,6 +538,42 @@ const ReceivedTransactions = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    // Perform client-side validation
+    const {
+      receivedDate,
+      receivedTime,
+      pttNo,
+      manifestNo,
+      pullOutFormNo,
+      manifestWeight,
+      clientWeight,
+      grossWeight,
+      tareWeight,
+      netWeight,
+      statusId,
+      createdBy,
+    } = formData;
+
+    if (
+      !receivedDate ||
+      !receivedTime ||
+      !pttNo ||
+      !manifestNo ||
+      !pullOutFormNo ||
+      !manifestWeight ||
+      !clientWeight ||
+      !grossWeight ||
+      !tareWeight ||
+      !netWeight ||
+      !statusId ||
+      !createdBy
+    ) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
     try {
       let response;
       console.log(formData);
@@ -596,6 +634,8 @@ const ReceivedTransactions = ({ user }) => {
         setFormData={setFormData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
       />
     </Box>
   );

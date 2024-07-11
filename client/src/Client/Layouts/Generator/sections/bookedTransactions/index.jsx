@@ -30,6 +30,8 @@ const Transactions = ({ user }) => {
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const processDataBookedTransaction = (response) => {
     const transactions = response.data;
@@ -157,6 +159,29 @@ const Transactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    // Perform client-side validation
+    const {
+      haulingDate,
+      haulingTime,
+      quotationWasteId,
+      quotationTransportationId,
+      statusId,
+      createdBy,
+    } = formData;
+
+    if (
+      !haulingDate ||
+      !haulingTime ||
+      !quotationWasteId ||
+      !quotationTransportationId ||
+      !statusId ||
+      !createdBy
+    ) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
     try {
       let response;
 
@@ -216,6 +241,8 @@ const Transactions = ({ user }) => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
       />
     </Box>
   );

@@ -15,6 +15,8 @@ const Modal = ({
   setFormData,
   handleInputChange,
   handleFormSubmit,
+  errorMessage,
+  showErrorMessage,
 }) => {
   let ModalComponent;
   switch (user.userType) {
@@ -27,6 +29,8 @@ const Modal = ({
           formData={formData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
         />
       );
       break;
@@ -38,6 +42,8 @@ const Modal = ({
           formData={formData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
         />
       );
       break;
@@ -52,6 +58,8 @@ const Modal = ({
           formData={formData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
         />
       );
       break;
@@ -66,6 +74,8 @@ const Modal = ({
           setFormData={setFormData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
         />
       );
       break;
@@ -80,6 +90,8 @@ const Modal = ({
           setFormData={setFormData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
         />
       );
       break;
@@ -92,6 +104,8 @@ const Modal = ({
           formData={formData}
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
         />
       );
   }

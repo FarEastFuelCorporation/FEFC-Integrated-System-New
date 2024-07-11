@@ -12,7 +12,6 @@ import axios from "axios";
 import { tokens } from "../../theme";
 
 const DispatchModal = ({
-  user,
   error,
   handleAutocompleteChange,
   open,
@@ -20,6 +19,8 @@ const DispatchModal = ({
   formData,
   handleInputChange,
   handleFormSubmit,
+  errorMessage,
+  showErrorMessage,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
@@ -43,7 +44,7 @@ const DispatchModal = ({
     };
 
     fetchData();
-  }, [apiUrl, user.id, formData.vehicleTypeId]);
+  }, [apiUrl, formData.vehicleTypeId]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -68,6 +69,9 @@ const DispatchModal = ({
           {formData.id
             ? "Update Dispatched Transaction"
             : "Dispatch Transaction"}
+        </Typography>
+        <Typography variant="h6" component="h2" color="error">
+          {showErrorMessage && errorMessage}
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField

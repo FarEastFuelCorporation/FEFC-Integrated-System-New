@@ -46,12 +46,11 @@ const ReceivedTransaction = ({ row }) => {
     <Box>
       {statusId === 3 ? (
         <Box sx={{ my: 3, position: "relative" }}>
-          {" "}
-          <CircleLogo>
+          <CircleLogo pending={true}>
             <LocalShippingIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[500]}`,
               }}
             />
           </CircleLogo>
@@ -75,7 +74,7 @@ const ReceivedTransaction = ({ row }) => {
             <LocalShippingIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[100]}`,
               }}
             />
           </CircleLogo>

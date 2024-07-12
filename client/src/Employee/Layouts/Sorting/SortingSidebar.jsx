@@ -5,10 +5,7 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import BuildIcon from "@mui/icons-material/Build";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -16,11 +13,8 @@ import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
-import log from "loglevel";
 
-log.setLevel("info");
-
-const SortingDashboard = ({ user }) => {
+const SortingSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
@@ -30,9 +24,6 @@ const SortingDashboard = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
       "/dashboard/scrapTypes": "Type Of Scraps",
-      "/dashboard/vehicles": "Vehicles",
-      "/dashboard/VehicleMaintenanceRequest": "Vehicle Maintenance Request",
-      "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
@@ -178,6 +169,13 @@ const SortingDashboard = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title="Transactions"
+              to="transactions"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -186,30 +184,9 @@ const SortingDashboard = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Transactions"
-              to="transactions"
-              icon={<FormatListBulletedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
               title="Type Of Scraps"
               to="scrapTypes"
               icon={<FormatListBulletedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Vehicles"
-              to="vehicles"
-              icon={<LocalShippingIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Vehicle Maintenance Request"
-              to="VehicleMaintenanceRequest"
-              icon={<BuildIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -220,13 +197,6 @@ const SortingDashboard = ({ user }) => {
             >
               Pages
             </Typography>
-            <Item
-              title="Profile Form"
-              to="form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Item
               title="Calendar"
               to="calendar"
@@ -276,4 +246,4 @@ const SortingDashboard = ({ user }) => {
   );
 };
 
-export default SortingDashboard;
+export default SortingSidebar;

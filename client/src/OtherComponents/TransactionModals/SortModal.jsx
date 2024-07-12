@@ -27,35 +27,26 @@ const SortModal = ({
   handleFormSubmit,
   errorMessage,
   showErrorMessage,
+  setIsDiscrepancy,
+  isDiscrepancy,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [quotations, setQuotations] = useState([]);
-  const [treatmentProcesses, setTreatmentProcesses] = useState([]);
   const [scrapTypes, setScrapTypes] = useState([]);
-  const [isDiscrepancy, setIsDiscrepancy] = useState(true);
 
   useEffect(() => {
     if (open) {
       const fetchData = async () => {
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
-          const [
-            quotationsResponse,
-            treatmentProcessResponse,
-            scrapTypesResponse,
-          ] = await Promise.all([
+          const [quotationsResponse, scrapTypesResponse] = await Promise.all([
             axios.get(`${apiUrl}/quotation/${formData.clientId}`),
-            axios.get(`${apiUrl}/treatmentProcess`),
             axios.get(`${apiUrl}/scrapType`),
           ]);
           console.log(formData.clientId);
           console.log(quotationsResponse.data.quotations);
-          console.log(treatmentProcessResponse.data.treatmentProcesses);
           setQuotations(quotationsResponse.data.quotations);
-          setTreatmentProcesses(
-            treatmentProcessResponse.data.treatmentProcesses
-          );
           setScrapTypes(scrapTypesResponse.data.scrapTypes);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -90,6 +81,7 @@ const SortModal = ({
     formData.sortedScraps,
     formData.batchWeight,
     setFormData,
+    setIsDiscrepancy,
   ]);
 
   const calculateTotalSortedWeight = (sortedWastes, sortedScraps) => {
@@ -174,27 +166,6 @@ const SortModal = ({
       });
     } else {
       console.warn(`No scrap type found for id: ${value}`);
-    }
-  };
-
-  const handleTreatmentProcessChange = (index, value) => {
-    // Find the selected treatment process by its ID
-    const selectedTreatmentProcess = treatmentProcesses.find(
-      (treatmentProcess) => treatmentProcess.id === value
-    );
-
-    if (selectedTreatmentProcess) {
-      // Update the formData state with the new selected treatment process
-      const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
-        i === index ? { ...waste, treatmentProcessId: value } : waste
-      );
-
-      setFormData({
-        ...formData,
-        sortedWastes: updatedSortedWastes,
-      });
-    } else {
-      console.warn(`No treatment process found for id: ${value}`);
     }
   };
 
@@ -359,7 +330,7 @@ const SortModal = ({
               Waste Entry #{index + 1}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={2}>
+              <Grid item xs={4}>
                 <FormControl fullWidth>
                   <InputLabel
                     id={`waste-type-select-label-${index}`}
@@ -390,7 +361,7 @@ const SortModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <TextField
                   label="Waste Name"
                   name="wasteName"
@@ -408,38 +379,7 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={3}>
-                <FormControl fullWidth>
-                  <InputLabel
-                    id={`treatmentProcess-type-select-label-${index}`}
-                    style={{
-                      color: colors.grey[100],
-                    }}
-                  >
-                    TreatmentProcess
-                  </InputLabel>
-                  <Select
-                    labelId={`treatmentProcess-type-select-label-${index}`}
-                    name={`sortedWastes[${index}].treatmentProcessId`}
-                    value={waste.treatmentProcessId}
-                    onChange={(e) =>
-                      handleTreatmentProcessChange(index, e.target.value)
-                    }
-                    label="TreatmentProcess"
-                    fullWidth
-                    required
-                  >
-                    {treatmentProcesses.map((treatmentProcess) => (
-                      <MenuItem
-                        key={treatmentProcess.id}
-                        value={treatmentProcess.id}
-                      >
-                        {treatmentProcess.treatmentProcess}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+
               <Grid item xs={1.5}>
                 <TextField
                   label="Weight"
@@ -501,7 +441,7 @@ const SortModal = ({
               Scrap Entry #{index + 1}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item xs={8}>
                 <FormControl fullWidth>
                   <InputLabel
                     id={`scrap-type-select-label-${index}`}
@@ -548,6 +488,7 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
+              <Grid item xs={1.5}></Grid>
               <Grid item xs={1}>
                 <IconButton
                   color="error"

@@ -33,7 +33,7 @@ const BookedTransaction = ({ row }) => {
         <CollectionsBookmarkIcon
           sx={{
             fontSize: "30px",
-            color: `${colors.greenAccent[400]}`,
+            color: `${colors.grey[100]}`,
           }}
         />
       </CircleLogo>

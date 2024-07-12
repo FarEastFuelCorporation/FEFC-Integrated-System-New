@@ -1,5 +1,6 @@
 import React from "react";
 import "font-awesome/css/font-awesome.min.css";
+import { Navigate } from "react-router-dom";
 import GeneratorRoutes from "../Client/Routes/GeneratorRoutes";
 import MarketingRoutes from "../Employee/Routes/MarketingRoutes";
 import DispatchingRoutes from "../Employee/Routes/DispatchingRoutes";
@@ -7,8 +8,8 @@ import ReceivingRoutes from "../Employee/Routes/ReceivingRoutes";
 import CertificationRoutes from "../Employee/Routes/CertificationRoutes.";
 import HRRoutes from "../Employee/Routes/HRRoutes";
 import RoleProtectedRoute from "../OtherComponents/RoleProtectedRoute";
-import { Navigate } from "react-router-dom";
 import SortingRoutes from "../Employee/Routes/SortingRoutes";
+import TreatmentRoutes from "../Employee/Routes/TreatmentRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -47,6 +48,12 @@ const Dashboard = ({ user, onUpdateUser }) => {
       return (
         <RoleProtectedRoute user={user} allowedRoles={[5]}>
           <SortingRoutes user={user} />
+        </RoleProtectedRoute>
+      );
+    case 6:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[6]}>
+          <TreatmentRoutes user={user} />
         </RoleProtectedRoute>
       );
     case 7:

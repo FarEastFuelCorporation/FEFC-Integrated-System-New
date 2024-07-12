@@ -100,7 +100,7 @@ export const CustomAccordionDetails = ({ children }) => {
   );
 };
 
-export const CircleLogo = ({ children }) => {
+export const CircleLogo = ({ children, pending }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
@@ -111,7 +111,7 @@ export const CircleLogo = ({ children }) => {
         height: "40px",
         width: "40px",
         borderRadius: "100%",
-        backgroundColor: `${colors.grey[100]}`,
+        backgroundColor: pending ? "#FFFF00" : colors.greenAccent[500],
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

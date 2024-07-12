@@ -31,12 +31,11 @@ const ScheduledTransaction = ({ row }) => {
     <Box>
       {statusId === 1 ? (
         <Box sx={{ my: 3, position: "relative" }}>
-          {" "}
-          <CircleLogo>
+          <CircleLogo pending={true}>
             <AlarmIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[500]}`,
               }}
             />
           </CircleLogo>
@@ -60,7 +59,7 @@ const ScheduledTransaction = ({ row }) => {
             <AlarmIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[100]}`,
               }}
             />
           </CircleLogo>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import HRDashboard from "../../Employee/Layouts/HR/HRDashboard";
+import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../../Employee/Layouts/HR/sections/dashboard";
 import Team from "../../Employee/Layouts/HR/sections/team";
 import Contacts from "../../Employee/Layouts/HR/sections/contacts";
@@ -14,7 +14,7 @@ import Line from "../../Employee/Layouts/HR/sections/line";
 
 const HRRoutes = ({ user }) => (
   <Routes>
-    <Route path="/" element={<HRDashboard user={user} />}>
+    <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="team" element={<Team />} />
       <Route path="employee" element={<Contacts />} />

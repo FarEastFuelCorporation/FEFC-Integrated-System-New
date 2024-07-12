@@ -7,8 +7,6 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import BuildIcon from "@mui/icons-material/Build";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -16,9 +14,6 @@ import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
-import log from "loglevel";
-
-log.setLevel("info");
 
 const ReceivingDashboard = ({ user }) => {
   const theme = useTheme();
@@ -31,8 +26,6 @@ const ReceivingDashboard = ({ user }) => {
       "/dashboard/transactions": "Transactions",
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
-      "/dashboard/VehicleMaintenanceRequest": "Vehicle Maintenance Request",
-      "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
@@ -178,13 +171,6 @@ const ReceivingDashboard = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
             <Item
               title="Transactions"
               to="transactions"
@@ -192,6 +178,13 @@ const ReceivingDashboard = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              Data
+            </Typography>
             <Item
               title="Type Of Vehicles"
               to="vehicleTypes"
@@ -206,13 +199,6 @@ const ReceivingDashboard = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Vehicle Maintenance Request"
-              to="VehicleMaintenanceRequest"
-              icon={<BuildIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -220,13 +206,6 @@ const ReceivingDashboard = ({ user }) => {
             >
               Pages
             </Typography>
-            <Item
-              title="Profile Form"
-              to="form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Item
               title="Calendar"
               to="calendar"

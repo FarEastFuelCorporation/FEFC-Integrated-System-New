@@ -4,6 +4,7 @@ import ScheduleModal from "./TransactionModals/ScheduleModal";
 import DispatchModal from "./TransactionModals/DispatchModal";
 import ReceiveModal from "./TransactionModals/ReceiveModal";
 import SortModal from "./TransactionModals/SortModal";
+import TreatModal from "./TransactionModals/TreatModal";
 
 const Modal = ({
   user,
@@ -17,10 +18,14 @@ const Modal = ({
   handleFormSubmit,
   errorMessage,
   showErrorMessage,
+  setIsDiscrepancy,
+  isDiscrepancy,
 }) => {
   let ModalComponent;
   switch (user.userType) {
-    case "GEN" || "TRP" || "IFM":
+    case "GEN":
+    case "TRP":
+    case "IFM":
       ModalComponent = (
         <BookModal
           user={user}
@@ -92,6 +97,26 @@ const Modal = ({
           handleFormSubmit={handleFormSubmit}
           errorMessage={errorMessage}
           showErrorMessage={showErrorMessage}
+          setIsDiscrepancy={setIsDiscrepancy}
+          isDiscrepancy={isDiscrepancy}
+        />
+      );
+      break;
+    case 6:
+      ModalComponent = (
+        <TreatModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
+          setIsDiscrepancy={setIsDiscrepancy}
+          isDiscrepancy={isDiscrepancy}
         />
       );
       break;

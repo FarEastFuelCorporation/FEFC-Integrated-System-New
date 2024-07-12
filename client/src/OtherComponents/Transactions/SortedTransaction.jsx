@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
@@ -19,6 +19,7 @@ const SortedTransaction = ({ row }) => {
     discrepancyWeight,
     sortedRemarks,
     SortedWasteTransaction,
+    SortedScrapTransaction,
     sortedCreatedBy,
   } = row;
   const parseTimeString = (timeString) => {
@@ -42,12 +43,11 @@ const SortedTransaction = ({ row }) => {
     <Box>
       {statusId === 4 ? (
         <Box sx={{ my: 3, position: "relative" }}>
-          {" "}
-          <CircleLogo>
-            <LocalShippingIcon
+          <CircleLogo pending={true}>
+            <SwapVertIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[500]}`,
               }}
             />
           </CircleLogo>
@@ -68,10 +68,10 @@ const SortedTransaction = ({ row }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <LocalShippingIcon
+            <SwapVertIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[100]}`,
               }}
             />
           </CircleLogo>
@@ -104,6 +104,21 @@ const SortedTransaction = ({ row }) => {
           ) : (
             <Typography variant="h5">No Sorted Waste Transactions</Typography>
           )}
+          {SortedScrapTransaction && SortedScrapTransaction.length > 0 ? (
+            SortedScrapTransaction.map((scrap, index) => (
+              <Box key={index} sx={{ my: 2 }}>
+                <Typography variant="h5">Scrap {index + 1}</Typography>
+                <Typography variant="h5">
+                  Waste Name: {scrap.ScrapType.typeOfScrap}
+                </Typography>
+                <Typography variant="h5">
+                  Weight: {formatWeight(scrap.weight)} Kg
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="h5">No Sorted Waste Transactions</Typography>
+          )}
           <Typography variant="h5">
             Sorted Date:{" "}
             {sortedDate
@@ -126,7 +141,7 @@ const SortedTransaction = ({ row }) => {
             Discrepancy Weight: {formatWeight(discrepancyWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
+            Discrepancy Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">Sorted By: {sortedCreatedBy}</Typography>
           <br />

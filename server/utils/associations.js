@@ -24,6 +24,7 @@ const SortedTransaction = require("../models/SortedTransaction");
 const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 const ScrapType = require("../models/ScrapType");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
+const TreatmentMachine = require("../models/TreatmentMachine");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -191,6 +192,19 @@ TreatmentProcess.hasMany(TypeOfWaste, {
   onDelete: "CASCADE",
 });
 TypeOfWaste.belongsTo(TreatmentProcess, {
+  as: "TreatmentProcess",
+  foreignKey: "treatmentProcessId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+TreatmentProcess.hasMany(TreatmentMachine, {
+  as: "TreatmentMachine",
+  foreignKey: "treatmentProcessId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatmentMachine.belongsTo(TreatmentProcess, {
   as: "TreatmentProcess",
   foreignKey: "treatmentProcessId",
   targetKey: "id",

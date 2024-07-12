@@ -1,12 +1,12 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import MarketingDashboard from "../../Employee/Layouts/Marketing/MarketingDashboard";
+import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../../Employee/Layouts/Marketing/sections/dashboard";
-import Clients from "../../Employee/Layouts/Marketing/sections/clients";
-import TypeOfWastes from "../../Employee/Layouts/Certification/sections/typeOfWaste";
-import Quotations from "../../Employee/Layouts/Marketing/sections/quotations";
+import Clients from "../../OtherComponents/Sections/clients";
+import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
+import Quotations from "../../OtherComponents/Sections/quotations";
 import ScheduledTransactions from "../../Employee/Layouts/Marketing/sections/scheduledTransactions";
-import Commissions from "../../Employee/Layouts/Marketing/sections/commissions";
+import Commissions from "../../OtherComponents/Sections/commissions";
 import Calendar from "../../Employee/Layouts/Marketing/sections/calendar";
 import FAQ from "../../Employee/Layouts/Marketing/sections/faq";
 import Bar from "../../Employee/Layouts/Marketing/sections/bar";
@@ -15,7 +15,8 @@ import Line from "../../Employee/Layouts/Marketing/sections/line";
 
 const MarketingRoutes = ({ user }) => (
   <Routes>
-    <Route path="/" element={<MarketingDashboard user={user} />}>
+    {" "}
+    <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />

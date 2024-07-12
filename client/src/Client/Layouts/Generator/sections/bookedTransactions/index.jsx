@@ -73,8 +73,7 @@ const Transactions = ({ user }) => {
       setPendingTransactions(flattenedData);
     }
   };
-  const data = [];
-  setFinishedTransactions(data);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -83,6 +82,7 @@ const Transactions = ({ user }) => {
         );
 
         processDataBookedTransaction(bookedTransactionResponse);
+        setFinishedTransactions([]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

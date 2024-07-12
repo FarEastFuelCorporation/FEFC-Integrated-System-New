@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, IconButton } from "@mui/material";
-import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
+import Header from "../../../../../OtherComponents/Header";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";

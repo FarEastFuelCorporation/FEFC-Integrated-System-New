@@ -1,8 +1,6 @@
 // controllers/vehicleController.js
 
-const Employee = require("../models/Employee");
 const Vehicle = require("../models/Vehicle");
-const VehicleMaintenanceRequest = require("../models/VehicleMaintenanceRequest");
 const VehicleType = require("../models/VehicleType");
 
 // Create Vehicle controller

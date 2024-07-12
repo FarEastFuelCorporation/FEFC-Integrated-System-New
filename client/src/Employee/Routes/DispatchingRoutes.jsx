@@ -1,12 +1,11 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import DispatchingDashboard from "../../Employee/Layouts/Dispatching/DispatchingDashboard";
+import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../../Employee/Layouts/Dispatching/sections/dashboard";
 import DispatchedTransactions from "../Layouts/Dispatching/sections/dispatchedTransactions";
-import VehicleTypes from "../Layouts/Dispatching/sections/vehicleTypes";
-import Vehicles from "../../Employee/Layouts/Dispatching/sections/vehicles";
-import VehicleMaintenanceRequest from "../Layouts/Dispatching/sections/vehicleMaintenanceRequest";
-import Form from "../../Employee/Layouts/Dispatching/sections/form";
+import VehicleTypes from "../../OtherComponents/Sections/vehicleTypes";
+import Vehicles from "../../OtherComponents/Sections/vehicles";
+import VehicleMaintenanceRequest from "../../OtherComponents/Sections/vehicleMaintenanceRequest";
 import Calendar from "../../Employee/Layouts/Dispatching/sections/calendar";
 import FAQ from "../../Employee/Layouts/Dispatching/sections/faq";
 import Bar from "../../Employee/Layouts/Dispatching/sections/bar";
@@ -15,7 +14,7 @@ import Line from "../../Employee/Layouts/Dispatching/sections/line";
 
 const DispatchingRoutes = ({ user }) => (
   <Routes>
-    <Route path="/" element={<DispatchingDashboard user={user} />}>
+    <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route
         path="transactions"
@@ -24,10 +23,9 @@ const DispatchingRoutes = ({ user }) => (
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />
       <Route
-        path="vehicleMaintenanceRequest"
+        path="vehicleMaintenanceRequests"
         element={<VehicleMaintenanceRequest user={user} />}
       />
-      <Route path="form" element={<Form />} />
       <Route path="calendar" element={<Calendar />} />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />

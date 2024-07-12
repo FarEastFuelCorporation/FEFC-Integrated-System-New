@@ -7,7 +7,6 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -29,8 +28,7 @@ const CertificationSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/clients": "Clients",
       "/dashboard/treatmentProcess": "Treatment Process",
-      "/dashboard/typeOfWastes": "Type Of Wastes",
-      "/dashboard/form": "Profile Form",
+      "/dashboard/typeOfWastes": "Waste Types",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
@@ -198,7 +196,7 @@ const CertificationSidebar = ({ user }) => {
               setSelected={setSelected}
             />
             <Item
-              title="Type Of Wastes"
+              title="Waste Types"
               to="typeOfWastes"
               icon={<FormatListBulletedIcon />}
               selected={selected}
@@ -211,13 +209,6 @@ const CertificationSidebar = ({ user }) => {
             >
               Pages
             </Typography>
-            <Item
-              title="Profile Form"
-              to="form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Item
               title="Calendar"
               to="calendar"

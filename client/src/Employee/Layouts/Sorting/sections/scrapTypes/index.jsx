@@ -23,16 +23,20 @@ const ScrapTypes = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [openModal, setOpenModal] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     id: "",
     typeOfScrap: "",
     createdBy: user.id,
-  });
+  };
+
+  const [openModal, setOpenModal] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
 
   const [scrapTypes, setScrapTypes] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,11 +71,7 @@ const ScrapTypes = ({ user }) => {
   };
 
   const clearFormData = () => {
-    setFormData({
-      id: "",
-      typeOfScrap: "",
-      createdBy: user.id,
-    });
+    setFormData(initialFormData);
   };
 
   const handleInputChange = (e) => {
@@ -118,6 +118,16 @@ const ScrapTypes = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    // Perform client-side validation
+    const { plateNumber, requestDetails } = formData;
+
+    // Check if all required fields are filled
+    if (!plateNumber || !requestDetails) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
 
     try {
       let response;
@@ -258,6 +268,9 @@ const ScrapTypes = ({ user }) => {
         >
           <Typography variant="h6" component="h2">
             {formData.id ? "Update Scrap Type" : "Add New Scrap Type"}
+          </Typography>
+          <Typography variant="h6" component="h2" color="error">
+            {showErrorMessage && errorMessage}
           </Typography>
           <TextField
             label="Type of Scrap"

@@ -15,6 +15,7 @@ const ReceivedTransaction = require("../models/ReceivedTransaction");
 const SortedTransaction = require("../models/SortedTransaction");
 const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
+const ScrapType = require("../models/ScrapType");
 
 // Utility function to fetch pending transactions
 async function fetchPendingTransactions() {
@@ -271,6 +272,16 @@ async function fetchFinishedTransactions() {
         as: "SortedWasteTransaction",
       },
       {
+        model: SortedScrapTransaction,
+        as: "SortedScrapTransaction",
+        include: [
+          {
+            model: ScrapType,
+            as: "ScrapType",
+          },
+        ],
+      },
+      {
         model: Employee,
         as: "Employee",
         attributes: ["firstName", "lastName"],
@@ -314,6 +325,7 @@ async function createSortedTransactionController(req, res) {
         sortedTime,
         totalSortedWeight,
         discrepancyWeight,
+        remarks,
         createdBy,
       },
       { transaction: transaction }
@@ -332,7 +344,6 @@ async function createSortedTransactionController(req, res) {
           {
             sortedTransactionId: newSortedTransaction.id,
             quotationWasteId: waste.quotationWasteId,
-            treatmentProcessId: waste.treatmentProcessId,
             wasteName: wasteName,
             weight: waste.weight,
             formNo: waste.formNo,
@@ -409,6 +420,7 @@ async function getSortedTransactionsController(req, res) {
 
 // Update Sorted Transaction controller
 async function updateSortedTransactionController(req, res) {
+  const transaction = await sequelize.transaction();
   try {
     const id = req.params.id;
     console.log("Updating Sorted transaction with ID:", id);
@@ -420,7 +432,9 @@ async function updateSortedTransactionController(req, res) {
       totalSortedWeight,
       discrepancyWeight,
       sortedWastes,
+      sortedScraps,
       remarks,
+      statusId,
       createdBy,
     } = req.body;
 
@@ -438,66 +452,107 @@ async function updateSortedTransactionController(req, res) {
       updatedSortedTransaction.sortedTime = sortedTime;
       updatedSortedTransaction.totalSortedWeight = totalSortedWeight;
       updatedSortedTransaction.discrepancyWeight = discrepancyWeight;
+      updatedSortedTransaction.remarks = remarks;
       updatedSortedTransaction.updatedBy = createdBy;
 
       // Save the updated sorted transaction
-      await updatedSortedTransaction.save();
+      await updatedSortedTransaction.save({ transaction });
 
-      // Fetch existing sorted wastes from the database
+      // Fetch existing sorted wastes and scraps from the database
       const existingSortedWastes = await SortedWasteTransaction.findAll({
         where: { sortedTransactionId: id },
+        transaction,
       });
 
-      // Extract existing sorted waste IDs
+      const existingSortedScraps = await SortedScrapTransaction.findAll({
+        where: { sortedTransactionId: id },
+        transaction,
+      });
+
+      // Extract existing sorted waste and scrap IDs
       const existingWasteIds = existingSortedWastes.map((waste) => waste.id);
+      const existingScrapIds = existingSortedScraps.map((scrap) => scrap.id);
 
-      // Extract updated sorted waste IDs from the request body
+      // Extract updated sorted waste and scrap IDs from the request body
       const updatedWasteIds = sortedWastes.map((waste) => waste.id);
+      const updatedScrapIds = sortedScraps.map((scrap) => scrap.id);
 
-      // Identify wastes to delete (those not present in the updated data)
+      // Identify wastes and scraps to delete (those not present in the updated data)
       const wastesToDelete = existingSortedWastes.filter(
         (waste) => !updatedWasteIds.includes(waste.id)
       );
 
-      // Identify wastes to update and create
+      const scrapsToDelete = existingSortedScraps.filter(
+        (scrap) => !updatedScrapIds.includes(scrap.id)
+      );
+
+      // Identify wastes and scraps to update and create
       const sortedWastePromises = sortedWastes.map(async (waste) => {
         if (waste.id && existingWasteIds.includes(waste.id)) {
           // Update existing waste
-          let wasteName = waste.wasteName;
-
-          if (wasteName) {
-            wasteName = wasteName.toUpperCase();
-          }
           await SortedWasteTransaction.update(
             {
               quotationWasteId: waste.quotationWasteId,
-              treatmentProcessId: waste.treatmentProcessId,
-              wasteName: wasteName,
+              wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
               weight: waste.weight,
               formNo: waste.formNo,
             },
-            { where: { id: waste.id } }
+            { where: { id: waste.id }, transaction }
           );
         } else {
           // Create new waste
-          await SortedWasteTransaction.create({
-            sortedTransactionId: id,
-            quotationWasteId: waste.quotationWasteId,
-            treatmentProcessId: waste.treatmentProcessId,
-            wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
-            weight: waste.weight,
-            formNo: waste.formNo,
-          });
+          await SortedWasteTransaction.create(
+            {
+              sortedTransactionId: id,
+              quotationWasteId: waste.quotationWasteId,
+              wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
+              weight: waste.weight,
+              formNo: waste.formNo,
+            },
+            { transaction }
+          );
         }
       });
 
-      // Delete wastes that are no longer present
+      const sortedScrapPromises = sortedScraps.map(async (scrap) => {
+        if (scrap.id && existingScrapIds.includes(scrap.id)) {
+          // Update existing scrap
+          await SortedScrapTransaction.update(
+            {
+              scrapTypeId: scrap.scrapTypeId,
+              weight: scrap.weight,
+            },
+            { where: { id: scrap.id }, transaction }
+          );
+        } else {
+          // Create new scrap
+          await SortedScrapTransaction.create(
+            {
+              sortedTransactionId: id,
+              scrapTypeId: scrap.scrapTypeId,
+              weight: scrap.weight,
+            },
+            { transaction }
+          );
+        }
+      });
+
+      // Delete wastes and scraps that are no longer present
       const deleteWastePromises = wastesToDelete.map((waste) =>
-        SortedWasteTransaction.destroy({ where: { id: waste.id } })
+        SortedWasteTransaction.destroy({ where: { id: waste.id }, transaction })
+      );
+
+      const deleteScrapPromises = scrapsToDelete.map((scrap) =>
+        SortedScrapTransaction.destroy({ where: { id: scrap.id }, transaction })
       );
 
       // Wait for all promises to resolve
-      await Promise.all([...sortedWastePromises, ...deleteWastePromises]);
+      await Promise.all([
+        ...sortedWastePromises,
+        ...sortedScrapPromises,
+        ...deleteWastePromises,
+        ...deleteScrapPromises,
+      ]);
 
       // Fetch pending and finished transactions
       const pendingTransactions = await fetchPendingTransactions();
@@ -505,6 +560,9 @@ async function updateSortedTransactionController(req, res) {
 
       // Respond with the updated data
       res.json({ pendingTransactions, finishedTransactions });
+
+      // Commit the transaction
+      await transaction.commit();
     } else {
       // If sorted transaction with the specified ID was not found
       res
@@ -514,6 +572,7 @@ async function updateSortedTransactionController(req, res) {
   } catch (error) {
     // Handle errors
     console.error("Error updating sorted transaction:", error);
+    await transaction.rollback();
     res.status(500).json({ message: "Internal server error" });
   }
 }

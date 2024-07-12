@@ -34,12 +34,11 @@ const DispatchedTransaction = ({ row }) => {
     <Box>
       {statusId === 2 ? (
         <Box sx={{ my: 3, position: "relative" }}>
-          {" "}
-          <CircleLogo>
+          <CircleLogo pending={true}>
             <LocalShippingIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[500]}`,
               }}
             />
           </CircleLogo>
@@ -63,7 +62,7 @@ const DispatchedTransaction = ({ row }) => {
             <LocalShippingIcon
               sx={{
                 fontSize: "30px",
-                color: `${colors.greenAccent[400]}`,
+                color: `${colors.grey[100]}`,
               }}
             />
           </CircleLogo>
@@ -92,7 +91,6 @@ const DispatchedTransaction = ({ row }) => {
               ? format(parseTimeString(dispatchedTime), "hh:mm aa")
               : "Pending"}
           </Typography>
-
           <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
           <Typography variant="h5">Plate Number: {plateNumber}</Typography>
           <Typography variant="h5">Driver: {driverName}</Typography>

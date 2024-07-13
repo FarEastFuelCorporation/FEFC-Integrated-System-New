@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../Layouts/Treatment/sections/dashboard";
 import TreatedTransactions from "../Layouts/Treatment/sections/treatedTransactions";
-import TreatmentMachine from "../Layouts/Treatment/sections/treatmentMachine";
+import TreatmentMachine from "../../OtherComponents/Sections/treatmentMachine";
 import Calendar from "../Layouts/Treatment/sections/calendar";
 import FAQ from "../Layouts/Treatment/sections/faq";
 import Bar from "../Layouts/Treatment/sections/bar";

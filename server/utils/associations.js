@@ -25,6 +25,7 @@ const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 const ScrapType = require("../models/ScrapType");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
 const TreatmentMachine = require("../models/TreatmentMachine");
+const TreatedTransaction = require("../models/TreatedTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -140,6 +141,19 @@ Employee.hasMany(SortedTransaction, {
   onDelete: "CASCADE",
 });
 SortedTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(TreatedTransaction, {
+  as: "TreatedTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+TreatedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
@@ -441,6 +455,19 @@ ScrapType.hasMany(SortedScrapTransaction, {
 SortedScrapTransaction.belongsTo(ScrapType, {
   as: "ScrapType",
   foreignKey: "scrapTypeId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+SortedWasteTransaction.hasMany(TreatedTransaction, {
+  as: "TreatedTransaction",
+  foreignKey: "sortedWasteTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatedTransaction.belongsTo(SortedWasteTransaction, {
+  as: "SortedWasteTransaction",
+  foreignKey: "sortedWasteTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

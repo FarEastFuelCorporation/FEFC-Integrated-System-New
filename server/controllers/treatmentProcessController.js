@@ -18,8 +18,6 @@ async function createTreatmentProcessController(req, res) {
 
     const treatmentProcesses = await TreatmentProcess.findAll();
 
-    console.log(treatmentProcesses);
-
     // Respond with the updated treatment processes data
     res.status(201).json({ treatmentProcesses });
   } catch (error) {

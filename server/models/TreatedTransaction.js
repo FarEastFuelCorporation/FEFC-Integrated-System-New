@@ -1,0 +1,77 @@
+// models/TreatedTransaction.js
+
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
+const { v4: uuidv4 } = require("uuid");
+
+const TreatedTransaction = sequelize.define(
+  "TreatedTransaction",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: () => uuidv4(), // Generate UUID automatically
+      allowNull: false,
+      primaryKey: true,
+    },
+    sortedWasteTransactionId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    treatmentProcessId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    treatmentMachineId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    treatedDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    treatedTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    weight: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    remarks: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    createdBy: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    // Paranoid option for soft deletion
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+    },
+    deletedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  },
+  {
+    // Enable soft deletion (paranoid mode)
+    paranoid: true,
+  }
+);
+
+module.exports = TreatedTransaction;

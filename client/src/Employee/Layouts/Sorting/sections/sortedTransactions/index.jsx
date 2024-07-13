@@ -507,7 +507,7 @@ const SortedTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const [dispatchResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/sortingTransaction`),
+          axios.get(`${apiUrl}/sortedTransaction`),
           axios.get(`${apiUrl}/employee`),
         ]);
 
@@ -616,7 +616,7 @@ const SortedTransactions = ({ user }) => {
 
     try {
       const response = await axios.delete(
-        `${apiUrl}/sortingTransaction/${row.id}`,
+        `${apiUrl}/sortedTransaction/${row.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -672,14 +672,14 @@ const SortedTransactions = ({ user }) => {
       console.log(formData);
       if (formData.id) {
         response = await axios.put(
-          `${apiUrl}/sortingTransaction/${formData.id}`,
+          `${apiUrl}/sortedTransaction/${formData.id}`,
           formData
         );
 
         processData(response);
         setSuccessMessage("Update Received Transaction successfully!");
       } else {
-        response = await axios.post(`${apiUrl}/sortingTransaction`, formData);
+        response = await axios.post(`${apiUrl}/sortedTransaction`, formData);
         processData(response);
         setSuccessMessage("Receive Transaction successfully!");
       }

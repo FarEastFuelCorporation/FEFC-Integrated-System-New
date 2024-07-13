@@ -1,4 +1,4 @@
-// routes/sortingTransactionRoutes.js
+// routes/sortedTransactionRoutes.js
 
 const express = require("express");
 const router = express.Router();
@@ -7,7 +7,7 @@ const {
   getSortedTransactionsController,
   updateSortedTransactionController,
   deleteSortedTransactionController,
-} = require("../controllers/sortingTransactionController");
+} = require("../controllers/sortedTransactionController");
 
 // Create Sorted Transaction route
 router.post("/", createSortedTransactionController);

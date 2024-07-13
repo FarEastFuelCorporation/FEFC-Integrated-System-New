@@ -1,4 +1,4 @@
-// controllers/receivingTransactionController.js
+// controllers/receivedTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");

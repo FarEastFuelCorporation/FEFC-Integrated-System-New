@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../Layouts/Sorting/sections/dashboard";
 import SortedTransactions from "../Layouts/Sorting/sections/sortedTransactions";
-import ScrapTypes from "../Layouts/Sorting/sections/scrapTypes";
+import ScrapTypes from "../../OtherComponents/Sections/scrapTypes";
 import Calendar from "../Layouts/Sorting/sections/calendar";
 import FAQ from "../Layouts/Sorting/sections/faq";
 import Bar from "../Layouts/Sorting/sections/bar";

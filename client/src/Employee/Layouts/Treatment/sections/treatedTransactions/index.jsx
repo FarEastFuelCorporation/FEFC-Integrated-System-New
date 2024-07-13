@@ -11,24 +11,19 @@ const TreatedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialFormData = {
+    waste: [],
     id: "",
-    clientId: "",
     bookedTransactionId: "",
-    receivedTransactionId: "",
-    sortedDate: null,
-    sortedTime: null,
-    batchWeight: 0,
-    totalSortedWeight: 0,
-    discrepancyWeight: 0,
-    sortedWastes: [
+    sortedWasteTransactionId: "",
+    treatedWastes: [
       {
-        quotationWasteId: "",
-        wasteName: "",
+        treatedDate: null,
+        treatedTime: null,
+        treatmentProcessId: "",
+        treatmentMachineId: "",
         weight: 0,
-        formNo: "",
       },
     ],
-    sortedScraps: [],
     remarks: "",
     statusId: 5,
     createdBy: user.id,
@@ -52,7 +47,8 @@ const TreatedTransactions = ({ user }) => {
 
       if (transactions && Array.isArray(transactions.pendingTransactions)) {
         const flattenedPendingData = transactions.pendingTransactions.map(
-          (receiveItem) => {
+          (sortItem) => {
+            const receiveItem = sortItem.ReceivedTransaction;
             const dispatchItem = receiveItem.DispatchedTransaction;
             const scheduledItem = dispatchItem.ScheduledTransaction;
             const bookItem = scheduledItem.BookedTransaction;
@@ -68,6 +64,9 @@ const TreatedTransactions = ({ user }) => {
             const receivedDate = receiveItem.receivedDate
               ? new Date(receiveItem.receivedDate)
               : null;
+            const sortedDate = sortItem.sortedDate
+              ? new Date(sortItem.sortedDate)
+              : null;
             const bookedCreatedDate = bookItem.createdAt
               ? new Date(bookItem.createdAt)
               : null;
@@ -80,14 +79,20 @@ const TreatedTransactions = ({ user }) => {
             const receivedCreatedDate = receiveItem.createdAt
               ? new Date(receiveItem.createdAt)
               : null;
+            const sortedCreatedDate = sortItem.createdAt
+              ? new Date(sortItem.createdAt)
+              : null;
             let haulingTime = null;
             let scheduledTime = null;
             let dispatchedTime = null;
             let receivedTime = null;
+            let sortedTime = null;
             let bookedCreatedTime = null;
             let scheduledCreatedTime = null;
             let dispatchedCreatedTime = null;
             let receivedCreatedTime = null;
+            let sortedCreatedTime = null;
+            let treatedTransaction = [];
 
             if (bookItem.haulingTime) {
               const [hours, minutes, seconds] = bookItem.haulingTime.split(":");
@@ -120,6 +125,13 @@ const TreatedTransactions = ({ user }) => {
               );
             }
 
+            if (sortItem.sortedTime) {
+              const [hours, minutes, seconds] = sortItem.sortedTime.split(":");
+              sortedTime = new Date(
+                Date.UTC(1970, 0, 1, hours, minutes, seconds)
+              );
+            }
+
             if (bookedCreatedDate) {
               bookedCreatedTime = bookedCreatedDate
                 .toISOString()
@@ -148,6 +160,13 @@ const TreatedTransactions = ({ user }) => {
                 .slice(0, 8);
             }
 
+            if (sortedCreatedDate) {
+              sortedCreatedTime = sortedCreatedDate
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 8);
+            }
+
             const scheduledCreatedBy =
               scheduledItem.Employee.firstName +
               " " +
@@ -162,6 +181,9 @@ const TreatedTransactions = ({ user }) => {
               receiveItem.Employee.firstName +
               " " +
               receiveItem.Employee.lastName;
+
+            const sortedCreatedBy =
+              sortItem.Employee.firstName + " " + sortItem.Employee.lastName;
 
             const helperIdsArray = dispatchItem.helperId
               .split(",")
@@ -179,8 +201,12 @@ const TreatedTransactions = ({ user }) => {
               .filter((name) => name !== null)
               .join(", ");
 
+            treatedTransaction = sortItem.SortedWasteTransaction.flatMap(
+              (item) => (item.TreatedTransaction ? item.TreatedTransaction : [])
+            );
+
             return {
-              ...receiveItem,
+              ...sortItem,
               haulingDate: haulingDate
                 ? haulingDate.toISOString().split("T")[0]
                 : null,
@@ -192,6 +218,9 @@ const TreatedTransactions = ({ user }) => {
                 : null,
               receivedDate: receivedDate
                 ? receivedDate.toISOString().split("T")[0]
+                : null,
+              sortedDate: sortedDate
+                ? sortedDate.toISOString().split("T")[0]
                 : null,
               haulingTime: haulingTime
                 ? haulingTime.toISOString().split("T")[1].slice(0, 5)
@@ -205,6 +234,9 @@ const TreatedTransactions = ({ user }) => {
               receivedTime: receivedTime
                 ? receivedTime.toISOString().split("T")[1].slice(0, 5)
                 : null,
+              sortedTime: sortedTime
+                ? sortedTime.toISOString().split("T")[1].slice(0, 5)
+                : null,
               bookedCreatedDate: bookedCreatedDate
                 ? bookedCreatedDate.toISOString().split("T")[0]
                 : null,
@@ -217,10 +249,14 @@ const TreatedTransactions = ({ user }) => {
               receivedCreatedDate: receivedCreatedDate
                 ? receivedCreatedDate.toISOString().split("T")[0]
                 : null,
+              sortedCreatedDate: sortedCreatedDate
+                ? sortedCreatedDate.toISOString().split("T")[0]
+                : null,
               bookedCreatedTime: bookedCreatedTime,
               scheduledCreatedTime: scheduledCreatedTime,
               dispatchedCreatedTime: dispatchedCreatedTime,
               receivedCreatedTime: receivedCreatedTime,
+              sortedCreatedTime: sortedCreatedTime,
               clientName: bookItem.Client ? bookItem.Client.clientName : null,
               wasteName: bookItem.QuotationWaste
                 ? bookItem.QuotationWaste.wasteName
@@ -242,9 +278,22 @@ const TreatedTransactions = ({ user }) => {
               dispatchedRemarks: dispatchItem.remarks,
               scheduledRemarks: scheduledItem.remarks,
               receivedRemarks: receiveItem.remarks,
+              sortedRemarks: sortItem.remarks,
+              pttNo: receiveItem.pttNo,
+              manifestNo: receiveItem.manifestNo,
+              pullOutFormNo: receiveItem.pullOutFormNo,
+              manifestWeight: receiveItem.manifestWeight,
+              clientWeight: receiveItem.clientWeight,
+              grossWeight: receiveItem.grossWeight,
+              tareWeight: receiveItem.tareWeight,
+              netWeight: receiveItem.netWeight,
               scheduledCreatedBy: scheduledCreatedBy,
               dispatchedCreatedBy: dispatchedCreatedBy,
               receivedCreatedBy: receivedCreatedBy,
+              sortedCreatedBy: sortedCreatedBy,
+              sortedWasteTransaction: sortItem.SortedWasteTransaction,
+              sortedScrapTransaction: sortItem.SortedScrapTransaction,
+              treatedTransaction: treatedTransaction,
             };
           }
         );
@@ -507,7 +556,7 @@ const TreatedTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const [dispatchResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/sortingTransaction`),
+          axios.get(`${apiUrl}/treatedTransaction`),
           axios.get(`${apiUrl}/employee`),
         ]);
 
@@ -527,31 +576,26 @@ const TreatedTransactions = ({ user }) => {
     }
   }, [responseData, processData]);
 
-  const handleOpenModal = (row) => {
+  const handleOpenModal = (row, waste) => {
+    console.log(waste);
     setFormData({
+      waste: waste,
       id: "",
-      clientId:
-        row.DispatchedTransaction.ScheduledTransaction.BookedTransaction.Client
-          .clientId,
       bookedTransactionId:
-        row.DispatchedTransaction.ScheduledTransaction.bookedTransactionId,
-      receivedTransactionId: row.id,
-      sortedDate: null,
-      sortedTime: null,
-      batchWeight: row.netWeight,
-      totalSortedWeight: 0,
-      discrepancyWeight: 0,
-      sortedWastes: [
+        row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
+          .bookedTransactionId,
+      sortedWasteTransactionId: waste.id,
+      treatedWastes: [
         {
-          quotationWasteId: "",
-          wasteName: "",
+          treatedDate: null,
+          treatedTime: null,
+          treatmentProcessId: "",
+          treatmentMachineId: "",
           weight: 0,
-          formNo: "",
         },
       ],
-      sortedScraps: [],
       remarks: "",
-      statusId: 5,
+      statusId: 6,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -605,7 +649,6 @@ const TreatedTransactions = ({ user }) => {
   };
 
   const handleDeleteClick = async (row) => {
-    console.log(row);
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Received Transaction?"
     );
@@ -616,7 +659,7 @@ const TreatedTransactions = ({ user }) => {
 
     try {
       const response = await axios.delete(
-        `${apiUrl}/sortingTransaction/${row.id}`,
+        `${apiUrl}/sortedTransaction/${row.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -669,17 +712,17 @@ const TreatedTransactions = ({ user }) => {
     }
     try {
       let response;
-      console.log(formData);
+
       if (formData.id) {
         response = await axios.put(
-          `${apiUrl}/sortingTransaction/${formData.id}`,
+          `${apiUrl}/sortedTransaction/${formData.id}`,
           formData
         );
 
         processData(response);
         setSuccessMessage("Update Received Transaction successfully!");
       } else {
-        response = await axios.post(`${apiUrl}/sortingTransaction`, formData);
+        response = await axios.post(`${apiUrl}/sortedTransaction`, formData);
         processData(response);
         setSuccessMessage("Receive Transaction successfully!");
       }
@@ -712,7 +755,7 @@ const TreatedTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Sort"}
+        buttonText={"Treat"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
@@ -730,7 +773,6 @@ const TreatedTransactions = ({ user }) => {
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
         setIsDiscrepancy={setIsDiscrepancy}
-        isDiscrepancy={isDiscrepancy}
       />
     </Box>
   );

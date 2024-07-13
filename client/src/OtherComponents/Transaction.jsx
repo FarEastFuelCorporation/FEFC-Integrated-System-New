@@ -115,7 +115,13 @@ const Transaction = ({
                 {row.statusId >= 2 && <DispatchedTransaction row={row} />}
                 {row.statusId >= 3 && <ReceivedTransaction row={row} />}
                 {row.statusId >= 4 && <SortedTransaction row={row} />}
-                {row.statusId >= 5 && <TreatedTransaction row={row} />}
+                {row.statusId >= 5 && (
+                  <TreatedTransaction
+                    row={row}
+                    handleDeleteClick={handleDeleteClick}
+                    handleOpenModal={handleOpenModal}
+                  />
+                )}
               </CustomAccordionDetails>
             </Accordion>
           ))}

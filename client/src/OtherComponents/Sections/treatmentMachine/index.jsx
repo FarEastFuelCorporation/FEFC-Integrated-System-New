@@ -7,32 +7,37 @@ import {
   TextField,
   Button,
   useTheme,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Header from "../Header";
+import Header from "../../../Employee/Layouts/Treatment/sections/Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import { tokens } from "../../../../../theme";
-import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
-import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import { tokens } from "../../../theme";
+import SuccessMessage from "../../SuccessMessage";
+import CustomDataGridStyles from "../../CustomDataGridStyles";
 
-const ScrapTypes = ({ user }) => {
+const TreatmentMachine = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
   const initialFormData = {
     id: "",
-    typeOfScrap: "",
+    treatmentProcessId: "",
+    machineName: "",
     createdBy: user.id,
   };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [scrapTypes, setScrapTypes] = useState([]);
+  const [treatmentProcesses, setTreatmentProcesses] = useState([]);
+  const [treatmentMachines, setTreatmentMachines] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -41,8 +46,33 @@ const ScrapTypes = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/scrapType`);
-        setScrapTypes(response.data.scrapTypes);
+        const [treatmentProcessResponse, treatmentMachineResponse] =
+          await Promise.all([
+            axios.get(`${apiUrl}/treatmentProcess`),
+            axios.get(`${apiUrl}/treatmentMachine`),
+          ]);
+
+        if (
+          treatmentMachineResponse &&
+          Array.isArray(treatmentMachineResponse.data.treatmentMachines)
+        ) {
+          const flattenedData =
+            treatmentMachineResponse.data.treatmentMachines.map((machine) => ({
+              ...machine,
+              treatmentProcess: machine.TreatmentProcess
+                ? machine.TreatmentProcess.treatmentProcess
+                : null,
+            }));
+
+          // Set state with vehicles including typeOfVehicle
+          setTreatmentMachines(flattenedData);
+        } else {
+          console.error(
+            "treatmentMachineResponse is undefined or not an array"
+          );
+        }
+
+        setTreatmentProcesses(treatmentProcessResponse.data.treatmentProcesses);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -54,16 +84,6 @@ const ScrapTypes = ({ user }) => {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -80,22 +100,23 @@ const ScrapTypes = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const typeToEdit = scrapTypes.find((type) => type.id === id);
+    const typeToEdit = treatmentMachines.find((type) => type.id === id);
     if (typeToEdit) {
       setFormData({
         id: typeToEdit.id,
-        typeOfScrap: typeToEdit.typeOfScrap,
+        treatmentProcessId: typeToEdit.treatmentProcessId,
+        machineName: typeToEdit.machineName,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Scrap type with ID ${id} not found for editing.`);
+      console.error(`Treatment Machine with ID ${id} not found for editing.`);
     }
   };
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this scrap type?"
+      "Are you sure you want to delete this Treatment Machine?"
     );
 
     if (!isConfirmed) {
@@ -103,13 +124,13 @@ const ScrapTypes = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/scrapType/${id}`, {
+      await axios.delete(`${apiUrl}/treatmentMachine/${id}`, {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = scrapTypes.filter((type) => type.id !== id);
-      setScrapTypes(updatedData);
-      setSuccessMessage("Scrap Type deleted successfully!");
+      const updatedData = treatmentMachines.filter((type) => type.id !== id);
+      setTreatmentMachines(updatedData);
+      setSuccessMessage("Treatment Machine deleted successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -120,10 +141,8 @@ const ScrapTypes = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { plateNumber, requestDetails } = formData;
-
-    // Check if all required fields are filled
-    if (!plateNumber || !requestDetails) {
+    const { treatmentProcessId, machineName } = formData;
+    if (!treatmentProcessId || !machineName) {
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;
@@ -133,24 +152,50 @@ const ScrapTypes = ({ user }) => {
       let response;
 
       if (formData.id) {
-        // Update existing scrap type
+        // Update existing treatment machine
         response = await axios.put(
-          `${apiUrl}//scrapType/${formData.id}`,
+          `${apiUrl}/treatmentMachine/${formData.id}`,
           formData
         );
 
-        const updatedData = response.data.scrapTypes;
+        if (response && Array.isArray(response.data.treatmentMachines)) {
+          const flattenedData = response.data.treatmentMachines.map(
+            (machine) => ({
+              ...machine,
+              treatmentProcess: machine.TreatmentProcess
+                ? machine.TreatmentProcess.treatmentProcess
+                : null,
+            })
+          );
 
-        setScrapTypes(updatedData);
-        setSuccessMessage("Scrap Type updated successfully!");
+          setTreatmentMachines(flattenedData);
+          setSuccessMessage("Treatment Machine updated successfully!");
+        } else {
+          console.error(
+            "treatmentMachineResponse is undefined or not an array"
+          );
+        }
       } else {
-        // Add new scrap type
-        response = await axios.post(`${apiUrl}/scrapType`, formData);
+        // Add new treatment machine
+        response = await axios.post(`${apiUrl}/treatmentMachine`, formData);
 
-        const updatedData = response.data.scrapTypes;
+        if (response && Array.isArray(response.data.treatmentMachines)) {
+          const flattenedData = response.data.treatmentMachines.map(
+            (machine) => ({
+              ...machine,
+              treatmentProcess: machine.TreatmentProcess
+                ? machine.TreatmentProcess.treatmentProcess
+                : null,
+            })
+          );
 
-        setScrapTypes(updatedData);
-        setSuccessMessage("Scrap Type added successfully!");
+          setTreatmentMachines(flattenedData);
+          setSuccessMessage("Treatment Machine added successfully!");
+        } else {
+          console.error(
+            "treatmentMachineResponse is undefined or not an array"
+          );
+        }
       }
 
       setShowSuccessMessage(true);
@@ -168,8 +213,17 @@ const ScrapTypes = ({ user }) => {
 
   const columns = [
     {
-      field: "typeOfScrap",
-      headerName: "Type of Scrap",
+      field: "machineName",
+      headerName: "Machine Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "treatmentProcess",
+      headerName: "Treatment Process",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -178,7 +232,7 @@ const ScrapTypes = ({ user }) => {
     },
   ];
 
-  if (user.userType === 5) {
+  if (user.userType === 6) {
     columns.push(
       {
         field: "edit",
@@ -218,8 +272,8 @@ const ScrapTypes = ({ user }) => {
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
-        <Header title="Scrap Types" subtitle="List of Scrap Types" />
-        {user.userType === 5 && (
+        <Header title="Treatment Machines" subtitle="List of Machines" />
+        {user.userType === 6 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
               <PostAddIcon sx={{ fontSize: "40px" }} />
@@ -237,7 +291,7 @@ const ScrapTypes = ({ user }) => {
 
       <CustomDataGridStyles>
         <DataGrid
-          rows={scrapTypes ? scrapTypes : []}
+          rows={treatmentMachines ? treatmentMachines : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
@@ -267,15 +321,42 @@ const ScrapTypes = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Scrap Type" : "Add New Scrap Type"}
+            {formData.id
+              ? "Update Treatment Machine"
+              : "Add New Treatment Machine"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
+          <FormControl fullWidth>
+            <InputLabel
+              id={`treatmentProcess-type-select-label`}
+              style={{
+                color: colors.grey[100],
+              }}
+            >
+              Treatment Process
+            </InputLabel>
+            <Select
+              labelId={`treatmentProcess-type-select-label`}
+              name="treatmentProcessId"
+              value={formData.treatmentProcessId}
+              onChange={handleInputChange}
+              label="Treatment Process"
+              fullWidth
+              required
+            >
+              {treatmentProcesses.map((treatmentProcess) => (
+                <MenuItem key={treatmentProcess.id} value={treatmentProcess.id}>
+                  {treatmentProcess.treatmentProcess}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
-            label="Type of Scrap"
-            name="typeOfScrap"
-            value={formData.typeOfScrap}
+            label="Machine Name"
+            name="machineName"
+            value={formData.machineName}
             onChange={handleInputChange}
             fullWidth
             required
@@ -300,7 +381,7 @@ const ScrapTypes = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Scrap Type" : "Add Scrap Type"}
+            {formData.id ? "Update" : "Add"}
           </Button>
         </Box>
       </Modal>
@@ -308,4 +389,4 @@ const ScrapTypes = ({ user }) => {
   );
 };
 
-export default ScrapTypes;
+export default TreatmentMachine;

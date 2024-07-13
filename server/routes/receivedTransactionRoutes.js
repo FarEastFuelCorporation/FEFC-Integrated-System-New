@@ -1,4 +1,4 @@
-// routes/receivingTransactionRoutes.js
+// routes/receivedTransactionRoutes.js
 
 const express = require("express");
 const router = express.Router();
@@ -7,7 +7,7 @@ const {
   getReceivedTransactionsController,
   updateReceivedTransactionController,
   deleteReceivedTransactionController,
-} = require("../controllers/receivingTransactionController");
+} = require("../controllers/receivedTransactionController");
 
 // Create Received Transaction route
 router.post("/", createReceivedTransactionController);

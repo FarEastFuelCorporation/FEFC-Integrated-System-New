@@ -1,4 +1,4 @@
-// controllers/sortingTransactionController.js
+// controllers/treatedTransactionController.js
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
@@ -16,138 +16,22 @@ const SortedTransaction = require("../models/SortedTransaction");
 const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
 const ScrapType = require("../models/ScrapType");
+const TreatedTransaction = require("../models/TreatedTransaction");
 
 // Utility function to fetch pending transactions
 async function fetchPendingTransactions() {
-  return await ReceivedTransaction.findAll({
+  return await SortedTransaction.findAll({
     attributes: [
       "id",
-      "dispatchedTransactionId",
-      "receivedDate",
-      "receivedTime",
-      "pttNo",
-      "manifestNo",
-      "pullOutFormNo",
-      "manifestWeight",
-      "clientWeight",
-      "grossWeight",
-      "tareWeight",
-      "netWeight",
+      "receivedTransactionId",
+      "sortedDate",
+      "sortedTime",
+      "totalSortedWeight",
+      "discrepancyWeight",
       "remarks",
       "createdBy",
       "createdAt",
     ],
-    include: [
-      {
-        model: DispatchedTransaction,
-        as: "DispatchedTransaction",
-        attributes: [
-          "id",
-          "scheduledTransactionId",
-          "vehicleId",
-          "driverId",
-          "helperId",
-          "isDispatched",
-          "dispatchedDate",
-          "dispatchedTime",
-          "remarks",
-          "createdBy",
-          "createdAt",
-        ],
-        include: [
-          {
-            model: ScheduledTransaction,
-            as: "ScheduledTransaction",
-            attributes: [
-              "id",
-              "bookedTransactionId",
-              "scheduledDate",
-              "scheduledTime",
-              "remarks",
-              "createdBy",
-              "createdAt",
-            ],
-            include: [
-              {
-                model: BookedTransaction,
-                as: "BookedTransaction",
-                attributes: [
-                  "transactionId",
-                  "haulingDate",
-                  "haulingTime",
-                  "remarks",
-                  "statusId",
-                  "createdAt",
-                ],
-                include: [
-                  {
-                    model: QuotationWaste,
-                    as: "QuotationWaste",
-                    attributes: ["wasteName"],
-                  },
-                  {
-                    model: QuotationTransportation,
-                    as: "QuotationTransportation",
-                    attributes: ["id", "vehicleTypeId"],
-                    include: [
-                      {
-                        model: VehicleType,
-                        as: "VehicleType",
-                        attributes: ["typeOfVehicle"],
-                      },
-                    ],
-                  },
-                  {
-                    model: Client,
-                    as: "Client",
-                    attributes: ["clientId", "clientName"],
-                  },
-                ],
-              },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
-              },
-            ],
-          },
-          {
-            model: Employee,
-            as: "EmployeeDriver",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Vehicle,
-            as: "Vehicle",
-            attributes: ["plateNumber"],
-          },
-        ],
-      },
-      {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
-    ],
-    where: {
-      id: {
-        [Op.notIn]: literal(
-          "(SELECT `receivedTransactionId` FROM `SortedTransactions` WHERE `deletedAt` IS NULL)"
-        ),
-      },
-    },
-    order: [["id", "DESC"]],
-  });
-}
-
-// Utility function to fetch finished transactions
-async function fetchFinishedTransactions() {
-  return await SortedTransaction.findAll({
     include: [
       {
         model: ReceivedTransaction,
@@ -270,6 +154,50 @@ async function fetchFinishedTransactions() {
       {
         model: SortedWasteTransaction,
         as: "SortedWasteTransaction",
+        attributes: {
+          include: [
+            [
+              sequelize.literal(`
+                (
+                  SELECT COALESCE(SUM(weight), 0)
+                  FROM TreatedTransactions
+                  WHERE sortedWasteTransactionId = SortedWasteTransaction.id AND deletedAt IS NULL
+                )
+              `),
+              "treatedWeight",
+            ],
+          ],
+        },
+        where: sequelize.where(
+          sequelize.literal(`
+            (
+              SELECT COALESCE(SUM(weight), 0)
+              FROM TreatedTransactions
+              WHERE sortedWasteTransactionId = SortedWasteTransaction.id AND deletedAt IS NULL
+            )
+          `),
+          {
+            [Op.lt]: sequelize.col("SortedTransaction.totalSortedWeight"),
+          }
+        ),
+        include: [
+          {
+            model: TreatedTransaction,
+            as: "TreatedTransaction",
+            attributes: [
+              "id",
+              "sortedWasteTransactionId",
+              "treatmentProcessId",
+              "treatmentMachineId",
+              "weight",
+              "treatedDate",
+              "treatedTime",
+              "remarks",
+              "createdBy",
+              "createdAt",
+            ],
+          },
+        ],
       },
       {
         model: SortedScrapTransaction,
@@ -287,25 +215,234 @@ async function fetchFinishedTransactions() {
         attributes: ["firstName", "lastName"],
       },
     ],
+    order: [["id", "DESC"]],
+  });
+}
+
+// Utility function to fetch finished transactions
+async function fetchFinishedTransactions() {
+  return await TreatedTransaction.findAll({
+    attributes: [
+      "id",
+      "sortedWasteTransactionId",
+      "treatmentProcessId",
+      "treatmentMachineId",
+      "treatedDate",
+      "treatedTime",
+      "weight",
+      "remarks",
+      "createdBy",
+      "createdAt",
+    ],
+    include: [
+      {
+        model: SortedWasteTransaction,
+        as: "SortedWasteTransaction",
+        include: [
+          {
+            model: SortedTransaction,
+            as: "SortedTransaction",
+            attributes: [
+              "id",
+              "receivedTransactionId",
+              "sortedDate",
+              "sortedTime",
+              "totalSortedWeight",
+              "discrepancyWeight",
+              "remarks",
+              "createdBy",
+              "createdAt",
+            ],
+            include: [
+              {
+                model: ReceivedTransaction,
+                as: "ReceivedTransaction",
+                attributes: [
+                  "id",
+                  "dispatchedTransactionId",
+                  "receivedDate",
+                  "receivedTime",
+                  "pttNo",
+                  "manifestNo",
+                  "pullOutFormNo",
+                  "manifestWeight",
+                  "clientWeight",
+                  "grossWeight",
+                  "tareWeight",
+                  "netWeight",
+                  "remarks",
+                  "createdBy",
+                  "createdAt",
+                ],
+                include: [
+                  {
+                    model: DispatchedTransaction,
+                    as: "DispatchedTransaction",
+                    attributes: [
+                      "id",
+                      "scheduledTransactionId",
+                      "vehicleId",
+                      "driverId",
+                      "helperId",
+                      "isDispatched",
+                      "dispatchedDate",
+                      "dispatchedTime",
+                      "remarks",
+                      "createdBy",
+                      "createdAt",
+                    ],
+                    include: [
+                      {
+                        model: ScheduledTransaction,
+                        as: "ScheduledTransaction",
+                        attributes: [
+                          "id",
+                          "bookedTransactionId",
+                          "scheduledDate",
+                          "scheduledTime",
+                          "remarks",
+                          "createdBy",
+                          "createdAt",
+                        ],
+                        include: [
+                          {
+                            model: BookedTransaction,
+                            as: "BookedTransaction",
+                            attributes: [
+                              "transactionId",
+                              "haulingDate",
+                              "haulingTime",
+                              "remarks",
+                              "statusId",
+                              "createdAt",
+                            ],
+                            include: [
+                              {
+                                model: QuotationWaste,
+                                as: "QuotationWaste",
+                                attributes: ["wasteName"],
+                              },
+                              {
+                                model: QuotationTransportation,
+                                as: "QuotationTransportation",
+                                attributes: ["id", "vehicleTypeId"],
+                                include: [
+                                  {
+                                    model: VehicleType,
+                                    as: "VehicleType",
+                                    attributes: ["typeOfVehicle"],
+                                  },
+                                ],
+                              },
+                              {
+                                model: Client,
+                                as: "Client",
+                                attributes: ["clientId", "clientName"],
+                              },
+                            ],
+                          },
+                          {
+                            model: Employee,
+                            as: "Employee",
+                            attributes: ["firstName", "lastName"],
+                          },
+                        ],
+                      },
+                      {
+                        model: Employee,
+                        as: "EmployeeDriver",
+                        attributes: ["firstName", "lastName"],
+                      },
+                      {
+                        model: Employee,
+                        as: "Employee",
+                        attributes: ["firstName", "lastName"],
+                      },
+                      {
+                        model: Vehicle,
+                        as: "Vehicle",
+                        attributes: ["plateNumber"],
+                      },
+                    ],
+                  },
+                  {
+                    model: Employee,
+                    as: "Employee",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
+              {
+                model: SortedWasteTransaction,
+                as: "SortedWasteTransaction",
+                attributes: {
+                  include: [
+                    [
+                      sequelize.literal(`
+                      (
+                        SELECT COALESCE(SUM(weight), 0)
+                        FROM TreatedTransactions
+                        WHERE sortedWasteTransactionId = SortedWasteTransaction.id AND deletedAt IS NULL
+                      )
+                    `),
+                      "treatedWeight",
+                    ],
+                  ],
+                },
+                include: [
+                  {
+                    model: TreatedTransaction,
+                    as: "TreatedTransaction",
+                    attributes: [
+                      "id",
+                      "sortedWasteTransactionId",
+                      "treatmentProcessId",
+                      "treatmentMachineId",
+                      "weight",
+                      "treatedDate",
+                      "treatedTime",
+                      "remarks",
+                      "createdBy",
+                      "createdAt",
+                    ],
+                  },
+                ],
+              },
+              {
+                model: SortedScrapTransaction,
+                as: "SortedScrapTransaction",
+                include: [
+                  {
+                    model: ScrapType,
+                    as: "ScrapType",
+                  },
+                ],
+              },
+              {
+                model: Employee,
+                as: "Employee",
+                attributes: ["firstName", "lastName"],
+              },
+            ],
+            order: [["id", "DESC"]],
+          },
+        ],
+      },
+    ],
 
     order: [["id", "DESC"]],
   });
 }
 
-// Create Sorted Transaction controller
-async function createSortedTransactionController(req, res) {
+// Create Treated Transaction controller
+async function createTreatedTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      receivedTransactionId,
-      sortedDate,
-      sortedTime,
-      totalSortedWeight,
-      discrepancyWeight,
-      sortedWastes,
-      sortedScraps,
+      sortedWasteTransactionId,
+      treatedWastes,
       remarks,
       statusId,
       createdBy,
@@ -404,8 +541,8 @@ async function createSortedTransactionController(req, res) {
   }
 }
 
-// Get Sorted Transactions controller
-async function getSortedTransactionsController(req, res) {
+// Get Treated Transactions controller
+async function getTreatedTransactionsController(req, res) {
   try {
     // Fetch pending and finished transactions
     const pendingTransactions = await fetchPendingTransactions();
@@ -418,8 +555,8 @@ async function getSortedTransactionsController(req, res) {
   }
 }
 
-// Update Sorted Transaction controller
-async function updateSortedTransactionController(req, res) {
+// Update Treated Transaction controller
+async function updateTreatedTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
     const id = req.params.id;
@@ -577,8 +714,8 @@ async function updateSortedTransactionController(req, res) {
   }
 }
 
-// Delete Sorted Transaction controller
-async function deleteSortedTransactionController(req, res) {
+// Delete Treated Transaction controller
+async function deleteTreatedTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy, bookedTransactionId } = req.body;
@@ -628,8 +765,8 @@ async function deleteSortedTransactionController(req, res) {
 }
 
 module.exports = {
-  createSortedTransactionController,
-  getSortedTransactionsController,
-  updateSortedTransactionController,
-  deleteSortedTransactionController,
+  createTreatedTransactionController,
+  getTreatedTransactionsController,
+  updateTreatedTransactionController,
+  deleteTreatedTransactionController,
 };

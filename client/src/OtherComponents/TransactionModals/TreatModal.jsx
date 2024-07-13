@@ -7,10 +7,10 @@ import {
   TextField,
   Button,
   Grid,
-  IconButton,
   FormControl,
   InputLabel,
   Select,
+  IconButton,
   MenuItem,
 } from "@mui/material";
 import axios from "axios";
@@ -27,27 +27,35 @@ const TreatModal = ({
   handleFormSubmit,
   errorMessage,
   showErrorMessage,
-  setIsDiscrepancy,
-  isDiscrepancy,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [quotations, setQuotations] = useState([]);
-  const [scrapTypes, setScrapTypes] = useState([]);
+  const [treatmentProcesses, setTreatmentProcesses] = useState([]);
+  const [treatmentMachines, setTreatmentMachines] = useState([]);
+  const [totalWeight, setTotalWeight] = useState(0);
+  const [totalTreatedWeight, setTotalTreatedWeight] = useState(0);
 
+  if (formData.waste) {
+  }
   useEffect(() => {
     if (open) {
       const fetchData = async () => {
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
-          const [quotationsResponse, scrapTypesResponse] = await Promise.all([
-            axios.get(`${apiUrl}/quotation/${formData.clientId}`),
-            axios.get(`${apiUrl}/scrapType`),
-          ]);
-          console.log(formData.clientId);
-          console.log(quotationsResponse.data.quotations);
-          setQuotations(quotationsResponse.data.quotations);
-          setScrapTypes(scrapTypesResponse.data.scrapTypes);
+          const [treatmentProcessesResponse, treatmentMachinesResponse] =
+            await Promise.all([
+              axios.get(`${apiUrl}/treatmentProcess`),
+              axios.get(`${apiUrl}/treatmentMachine`),
+            ]);
+
+          setTreatmentProcesses(
+            treatmentProcessesResponse.data.treatmentProcesses
+          );
+          setTreatmentMachines(
+            treatmentMachinesResponse.data.treatmentMachines
+          );
+          setTotalWeight(formData.waste.weight);
+          setTotalTreatedWeight(calculateTotalWeight(formData.treatedWastes));
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -55,159 +63,108 @@ const TreatModal = ({
 
       fetchData();
     }
-  }, [open, formData.clientId]);
+  }, [open, formData.clientId, formData.waste.weight, formData.treatedWastes]);
 
-  useEffect(() => {
-    const totalSortedWeight = calculateTotalSortedWeight(
-      formData.sortedWastes,
-      formData.sortedScraps
-    );
-    const discrepancyWeight = calculateDiscrepancyWeight(
-      parseFloat(formData.batchWeight || 0),
-      totalSortedWeight
-    );
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      totalSortedWeight,
-      discrepancyWeight,
-    }));
-    if (discrepancyWeight === 0) {
-      setIsDiscrepancy(false);
-    } else {
-      setIsDiscrepancy(true);
+  const formatWeight = (weight) => {
+    // Check if weight is NaN
+    if (isNaN(weight)) {
+      return ""; // Return empty string if weight is NaN
     }
-  }, [
-    formData.sortedWastes,
-    formData.sortedScraps,
-    formData.batchWeight,
-    setFormData,
-    setIsDiscrepancy,
-  ]);
 
-  const calculateTotalSortedWeight = (sortedWastes, sortedScraps) => {
-    const totalSortedWasteWeight = sortedWastes.reduce((total, waste) => {
-      return total + parseFloat(waste.weight || 0);
-    }, 0);
-
-    const totalSortedScrapWeight = sortedScraps.reduce((total, scrap) => {
-      return total + parseFloat(scrap.weight || 0);
-    }, 0);
-
-    return totalSortedWasteWeight + totalSortedScrapWeight;
+    // Format the number if it's a valid number
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(weight);
   };
 
-  const calculateDiscrepancyWeight = (batchWeight, totalSortedWeight) => {
-    return batchWeight - totalSortedWeight;
-  };
-
-  const handleWasteChange = (index, field, value) => {
-    const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
-      i === index ? { ...waste, [field]: value } : waste
+  // Function to calculate the total weight
+  const calculateTotalWeight = (treatedWastes) => {
+    return treatedWastes.reduce(
+      (total, waste) => total + parseFloat(waste.weight || 0),
+      0
     );
-    setFormData({
-      ...formData,
-      sortedWastes: updatedSortedWastes,
+  };
+
+  const handleTreatmentProcessChange = (index, value) => {
+    // Filter the treatment machines based on the selected treatment process
+    const filteredMachines = treatmentMachines.filter(
+      (machine) => machine.TreatmentProcess.id === value
+    );
+    setFormData((prevFormData) => {
+      const updatedTreatedWastes = [...prevFormData.treatedWastes];
+      updatedTreatedWastes[index].treatmentProcessId = value;
+      updatedTreatedWastes[index].filteredMachines = filteredMachines; // Store the filtered machines in formData for later use
+
+      return {
+        ...prevFormData,
+        treatedWastes: updatedTreatedWastes,
+      };
     });
   };
 
-  const handleWasteCodeChange = (index, value) => {
-    let selectedWasteType = null;
-
-    // Find the selected waste type in the nested QuotationWaste array
-    for (let quotation of quotations) {
-      selectedWasteType = quotation.QuotationWaste.find(
-        (waste) => waste.id === value
-      );
-      if (selectedWasteType) break;
-    }
-
-    if (selectedWasteType) {
-      const updatedWastes = formData.sortedWastes.map((waste, i) =>
-        i === index
-          ? {
-              ...waste,
-              quotationWasteId: value,
-              wasteName: selectedWasteType.wasteName, // Updated to use wasteName
-            }
-          : waste
-      );
-      handleInputChange({
-        target: { name: "sortedWastes", value: updatedWastes },
-      });
-    } else {
-      console.warn(`No waste type found for id: ${value}`);
-    }
-  };
-
-  const handleScrapChange = (index, field, value) => {
-    const updatedSortedScraps = formData.sortedScraps.map((scrap, i) =>
-      i === index ? { ...scrap, [field]: value } : scrap
-    );
-    setFormData({
-      ...formData,
-      sortedScraps: updatedSortedScraps,
+  const handleTreatmentMachineChange = (index, value) => {
+    setFormData((prevFormData) => {
+      const updatedTreatedWastes = [...prevFormData.treatedWastes];
+      updatedTreatedWastes[index].treatmentMachineId = value;
+      return {
+        ...prevFormData,
+        treatedWastes: updatedTreatedWastes,
+      };
     });
   };
 
-  const handleScrapTypeChange = (index, value) => {
-    const selectedScrapType = scrapTypes.find((scrap) => scrap.id === value);
+  const handleWeightChange = (index, field, value) => {
+    setFormData((prevFormData) => {
+      const updatedTreatedWastes = [...prevFormData.treatedWastes];
+      updatedTreatedWastes[index][field] = value;
 
-    if (selectedScrapType) {
-      const updatedScraps = formData.sortedScraps.map((scrap, i) =>
-        i === index
-          ? {
-              ...scrap,
-              scrapTypeId: value,
-            }
-          : scrap
-      );
-      handleInputChange({
-        target: { name: "sortedScraps", value: updatedScraps },
-      });
-    } else {
-      console.warn(`No scrap type found for id: ${value}`);
-    }
+      // Calculate the total weight
+      const newTotalWeight = calculateTotalWeight(updatedTreatedWastes);
+      setTotalTreatedWeight(newTotalWeight);
+
+      return {
+        ...prevFormData,
+        treatedWastes: updatedTreatedWastes,
+      };
+    });
   };
 
   const addWasteField = () => {
+    const newWasteField = {
+      quotationWasteId: "",
+      treatmentProcessId: "",
+      wasteName: "",
+      weight: 0,
+      formNo: "",
+    };
+
+    const newTreatedWastes = [...formData.treatedWastes, newWasteField];
+
     setFormData({
       ...formData,
-      sortedWastes: [
-        ...formData.sortedWastes,
-        {
-          quotationWasteId: "",
-          treatmentProcessId: "",
-          wasteName: "",
-          weight: 0,
-          formNo: "",
-        },
-      ],
+      treatedWastes: newTreatedWastes,
     });
+
+    // Recalculate the total weight
+    setTotalTreatedWeight(calculateTotalWeight(newTreatedWastes));
   };
 
   const removeWasteField = (index) => {
-    const newSortedWastes = formData.sortedWastes.filter((_, i) => i !== index);
-    setFormData({ ...formData, sortedWastes: newSortedWastes });
-  };
+    const newTreatedWastes = formData.treatedWastes.filter(
+      (_, i) => i !== index
+    );
 
-  const addScrapField = () => {
     setFormData({
       ...formData,
-      sortedScraps: [
-        ...formData.sortedScraps,
-        {
-          scrapTypeId: "",
-          weight: 0,
-        },
-      ],
+      treatedWastes: newTreatedWastes,
     });
+
+    // Recalculate the total weight
+    setTotalTreatedWeight(calculateTotalWeight(newTreatedWastes));
   };
 
-  const removeScrapField = (index) => {
-    const newSortedScraps = formData.sortedScraps.filter((_, i) => i !== index);
-    setFormData({ ...formData, sortedScraps: newSortedScraps });
-  };
-
+  console.log(formData);
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -232,161 +189,112 @@ const TreatModal = ({
         }}
       >
         <Typography variant="h6" component="h2">
-          {formData.id ? "Update Sorted Transaction" : "Sort Transaction"}
+          {formData.id ? "Update Treated Transaction" : "Treatment Transaction"}
         </Typography>
         <Typography variant="h6" component="h2" color="error">
           {showErrorMessage && errorMessage}
         </Typography>
-        <div style={{ width: "100%", display: "flex", gap: "20px" }}>
-          <TextField
-            label="Sort Date"
-            name="sortedDate"
-            value={formData.sortedDate}
-            onChange={handleInputChange}
-            fullWidth
-            type="date"
-            required
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Sort Time"
-            name="sortedTime"
-            value={formData.sortedTime}
-            onChange={handleInputChange}
-            fullWidth
-            type="time"
-            required
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-        </div>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <TextField
-              label="Batch Weight"
-              name={`batchWeight`}
-              value={formData.batchWeight}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "end",
+          }}
+        >
+          <Typography variant="h5">
+            {formData.waste ? formData.waste.wasteName : ""}
+          </Typography>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Box
+              sx={{
+                padding: "5px",
+                borderRadius: "5px",
+                backgroundColor:
+                  totalTreatedWeight === totalWeight
+                    ? colors.greenAccent[700]
+                    : "red",
+                color: "white",
               }}
-              autoComplete="off"
-              disabled
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              label="Total Sorted Weight"
-              name={`totalSortedWeight`}
-              value={formData.totalSortedWeight}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-              disabled
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              label="Discrepancy Weight"
-              name={`discrepancyWeight`}
-              value={formData.discrepancyWeight}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-              disabled
-            />
-          </Grid>
-        </Grid>
-        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "20px" }}>
-          Sorted Wastes
-        </Typography>
-        {formData.sortedWastes.map((waste, index) => (
+            >
+              <Typography variant="h6">
+                {formatWeight(totalTreatedWeight)} Kg Treated /
+                {formatWeight(totalWeight)} Kg
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+        {formData.treatedWastes.map((waste, index) => (
           <Box>
             <Typography variant="subtitle2" gutterBottom>
               Waste Entry #{index + 1}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <FormControl fullWidth>
                   <InputLabel
-                    id={`waste-type-select-label-${index}`}
+                    id={`treatmentProcess-type-select-label-${index}`}
                     style={{
                       color: colors.grey[100],
                     }}
                   >
-                    Category
+                    Treatment Process
                   </InputLabel>
                   <Select
-                    labelId={`waste-type-select-label-${index}`}
-                    name={`sortedWastes[${index}].quotationWasteId`}
-                    value={waste.quotationWasteId}
+                    labelId={`treatmentProcess-type-select-label-${index}`}
+                    name={`treatedWastes[${index}].treatmentProcessId`}
+                    value={waste.treatmentProcessId}
                     onChange={(e) =>
-                      handleWasteCodeChange(index, e.target.value)
+                      handleTreatmentProcessChange(index, e.target.value)
                     }
-                    label="Category"
+                    label="treatmentProcess"
                     fullWidth
                     required
                   >
-                    {quotations.map((quotation) =>
-                      quotation.QuotationWaste.map((waste) => (
-                        <MenuItem key={waste.id} value={waste.id}>
-                          {waste.wasteName}
-                        </MenuItem>
-                      ))
-                    )}
+                    {treatmentProcesses.map((process) => (
+                      <MenuItem key={process.id} value={process.id}>
+                        {process.treatmentProcess}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  label="Waste Name"
-                  name="wasteName"
-                  value={waste.wasteName}
-                  onChange={(e) =>
-                    handleWasteChange(index, "wasteName", e.target.value)
-                  }
-                  fullWidth
-                  required
-                  InputLabelProps={{
-                    style: {
+              <Grid item xs={3}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id={`treatmentMachine-type-select-label-${index}`}
+                    style={{
                       color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
+                    }}
+                  >
+                    Treatment Machine
+                  </InputLabel>
+                  <Select
+                    labelId={`treatmentMachine-type-select-label-${index}`}
+                    name={`treatedWastes[${index}].treatmentMachineId`}
+                    value={waste.treatmentMachineId}
+                    onChange={(e) =>
+                      handleTreatmentMachineChange(index, e.target.value)
+                    }
+                    label="treatmentMachine"
+                    fullWidth
+                    required
+                  >
+                    {waste.filteredMachines &&
+                      waste.filteredMachines.map((machine) => (
+                        <MenuItem key={machine.id} value={machine.id}>
+                          {machine.machineName}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
               </Grid>
-
               <Grid item xs={1.5}>
                 <TextField
                   label="Weight"
                   name="weight"
                   value={waste.weight}
                   onChange={(e) =>
-                    handleWasteChange(index, "weight", e.target.value)
+                    handleWeightChange(index, "weight", e.target.value)
                   }
                   type="number"
                   fullWidth
@@ -399,16 +307,35 @@ const TreatModal = ({
                   autoComplete="off"
                 />
               </Grid>
+              <Grid item xs={2}>
+                <TextField
+                  label="Sort Date"
+                  name="sortedDate"
+                  value={formData.sortedDate}
+                  onChange={handleInputChange}
+                  fullWidth
+                  type="date"
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
               <Grid item xs={1.5}>
                 <TextField
-                  label="Form No"
-                  name="formNo"
-                  value={waste.formNo}
-                  onChange={(e) =>
-                    handleWasteChange(index, "formNo", e.target.value)
-                  }
+                  label="Sort Time"
+                  name="sortedTime"
+                  value={formData.sortedTime}
+                  onChange={handleInputChange}
                   fullWidth
+                  type="time"
+                  required
                   InputLabelProps={{
+                    shrink: true,
                     style: {
                       color: colors.grey[100],
                     },
@@ -432,95 +359,19 @@ const TreatModal = ({
             <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
           </IconButton>
         </Box>
-        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "20px" }}>
-          Sorted Scraps
-        </Typography>
-        {formData.sortedScraps.map((scrap, index) => (
-          <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              Scrap Entry #{index + 1}
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={8}>
-                <FormControl fullWidth>
-                  <InputLabel
-                    id={`scrap-type-select-label-${index}`}
-                    style={{
-                      color: colors.grey[100],
-                    }}
-                  >
-                    Category
-                  </InputLabel>
-                  <Select
-                    labelId={`scrap-type-select-label-${index}`}
-                    name={`sortedWastes[${index}].scrapTypeId`}
-                    value={scrap.scrapTypeId}
-                    onChange={(e) =>
-                      handleScrapTypeChange(index, e.target.value)
-                    }
-                    label="Category"
-                    fullWidth
-                    required
-                  >
-                    {scrapTypes.map((scrapType) => (
-                      <MenuItem key={scrapType.id} value={scrapType.id}>
-                        {scrapType.typeOfScrap}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={1.5}>
-                <TextField
-                  label="Weight"
-                  name="weight"
-                  value={scrap.weight}
-                  onChange={(e) =>
-                    handleScrapChange(index, "weight", e.target.value)
-                  }
-                  type="number"
-                  fullWidth
-                  InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
-              </Grid>
-              <Grid item xs={1.5}></Grid>
-              <Grid item xs={1}>
-                <IconButton
-                  color="error"
-                  onClick={() => removeScrapField(index)}
-                >
-                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
-                </IconButton>
-              </Grid>
-            </Grid>
-          </Box>
-        ))}
-        <Box display="flex" justifyContent="center" mt={2}>
-          <IconButton color="success" onClick={addScrapField}>
-            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
-          </IconButton>
-        </Box>
-        {isDiscrepancy && (
-          <TextField
-            label="Discrepancy Remarks"
-            name="remarks"
-            value={formData.remarks}
-            onChange={handleInputChange}
-            fullWidth
-            required={isDiscrepancy}
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-        )}
+        <TextField
+          label="Remarks"
+          name="remarks"
+          value={formData.remarks}
+          onChange={handleInputChange}
+          fullWidth
+          InputLabelProps={{
+            style: {
+              color: colors.grey[100],
+            },
+          }}
+          autoComplete="off"
+        />
         <TextField
           label="Status Id"
           name="statusId"
@@ -540,7 +391,7 @@ const TreatModal = ({
           style={{ display: "none" }}
         />
         <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-          {formData.id ? "Update" : "Sort"}
+          {formData.id ? "Update" : "Treat"}
         </Button>
       </Box>
     </Modal>

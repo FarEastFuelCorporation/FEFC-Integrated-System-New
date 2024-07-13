@@ -135,7 +135,7 @@ const VehicleTypes = ({ user }) => {
       if (formData.id) {
         // Update existing vehicle type
         response = await axios.put(
-          `${apiUrl}//vehicleType/${formData.id}`,
+          `${apiUrl}/vehicleType/${formData.id}`,
           formData
         );
 

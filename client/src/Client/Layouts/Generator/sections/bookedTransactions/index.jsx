@@ -135,7 +135,7 @@ const Transactions = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle type?"
+      "Are you sure you want to delete this Book Transaction?"
     );
 
     if (!isConfirmed) {
@@ -149,7 +149,7 @@ const Transactions = ({ user }) => {
 
       const updatedData = pendingTransactions.filter((type) => type.id !== id);
       setPendingTransactions(updatedData);
-      setSuccessMessage("Booked Transaction deleted successfully!");
+      setSuccessMessage("Booked Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -192,12 +192,12 @@ const Transactions = ({ user }) => {
         );
 
         processDataBookedTransaction(response);
-        setSuccessMessage("Booked Transaction updated successfully!");
+        setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
         response = await axios.post(`${apiUrl}/bookedTransaction`, formData);
 
         processDataBookedTransaction(response);
-        setSuccessMessage("Booked Transaction successfully!");
+        setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
 
       setShowSuccessMessage(true);

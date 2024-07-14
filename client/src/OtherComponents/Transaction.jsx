@@ -84,9 +84,9 @@ const Transaction = ({
                 </Typography>
                 {selectedTab === 0 ? (
                   <Box>
-                    {!Number.isInteger(user.userType) ? (
-                      <Box></Box>
-                    ) : (
+                    {!(
+                      Number.isInteger(user.userType) && user.userType === 6
+                    ) && (
                       <Button
                         onClick={() => handleOpenModal(row)}
                         sx={{

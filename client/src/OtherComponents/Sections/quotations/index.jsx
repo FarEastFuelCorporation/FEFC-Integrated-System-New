@@ -151,7 +151,7 @@ const Quotations = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this client?"
+      "Are you sure you want to delete this Quotation?"
     );
 
     if (!isConfirmed) {
@@ -167,7 +167,7 @@ const Quotations = ({ user }) => {
         (quotation) => quotation.id !== id
       );
       setQuotationsData(quotations);
-      setSuccessMessage("Quotation deleted successfully!");
+      setSuccessMessage("Quotation Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -206,7 +206,7 @@ const Quotations = ({ user }) => {
               : null, // Convert timestamp to yyyy-mm-dd format
           }));
           setQuotationsData(flattenedData);
-          setSuccessMessage("Quotation updated successfully!");
+          setSuccessMessage("Quotation Updated Successfully!");
         } else {
           console.error(
             "quotations or quotations.quotations is undefined or not an array"
@@ -232,7 +232,7 @@ const Quotations = ({ user }) => {
               : null, // Convert timestamp to yyyy-mm-dd format
           }));
           setQuotationsData(flattenedData);
-          setSuccessMessage("Quotation added successfully!");
+          setSuccessMessage("Quotation Added Successfully!");
         }
       }
 

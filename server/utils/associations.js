@@ -26,6 +26,7 @@ const ScrapType = require("../models/ScrapType");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
 const TreatmentMachine = require("../models/TreatmentMachine");
 const TreatedTransaction = require("../models/TreatedTransaction");
+const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -459,15 +460,67 @@ SortedScrapTransaction.belongsTo(ScrapType, {
   onDelete: "CASCADE",
 });
 
-SortedWasteTransaction.hasMany(TreatedTransaction, {
+SortedTransaction.hasMany(TreatedTransaction, {
   as: "TreatedTransaction",
+  foreignKey: "sortedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatedTransaction.belongsTo(SortedTransaction, {
+  as: "SortedTransaction",
+  foreignKey: "sortedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+TreatedTransaction.hasMany(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
+  foreignKey: "treatedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatedWasteTransaction.belongsTo(TreatedTransaction, {
+  as: "TreatedTransaction",
+  foreignKey: "treatedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+SortedWasteTransaction.hasMany(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
   foreignKey: "sortedWasteTransactionId",
   sourceKey: "id",
   onDelete: "CASCADE",
 });
-TreatedTransaction.belongsTo(SortedWasteTransaction, {
+TreatedWasteTransaction.belongsTo(SortedWasteTransaction, {
   as: "SortedWasteTransaction",
   foreignKey: "sortedWasteTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+TreatedWasteTransaction.hasMany(TreatmentProcess, {
+  as: "TreatmentProcess",
+  foreignKey: "treatmentProcessId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatmentProcess.belongsTo(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
+  foreignKey: "treatmentProcessId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+TreatedWasteTransaction.hasMany(TreatmentMachine, {
+  as: "TreatmentMachine",
+  foreignKey: "treatmentMachineId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatmentMachine.belongsTo(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
+  foreignKey: "treatmentMachineId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

@@ -130,7 +130,7 @@ const TreatmentMachine = ({ user }) => {
 
       const updatedData = treatmentMachines.filter((type) => type.id !== id);
       setTreatmentMachines(updatedData);
-      setSuccessMessage("Treatment Machine deleted successfully!");
+      setSuccessMessage("Treatment Machine Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -169,7 +169,7 @@ const TreatmentMachine = ({ user }) => {
           );
 
           setTreatmentMachines(flattenedData);
-          setSuccessMessage("Treatment Machine updated successfully!");
+          setSuccessMessage("Treatment Machine Updated Successfully!");
         } else {
           console.error(
             "treatmentMachineResponse is undefined or not an array"
@@ -190,7 +190,7 @@ const TreatmentMachine = ({ user }) => {
           );
 
           setTreatmentMachines(flattenedData);
-          setSuccessMessage("Treatment Machine added successfully!");
+          setSuccessMessage("Treatment Machine Added Successfully!");
         } else {
           console.error(
             "treatmentMachineResponse is undefined or not an array"

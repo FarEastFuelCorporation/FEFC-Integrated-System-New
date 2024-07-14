@@ -607,7 +607,7 @@ const SortedTransactions = ({ user }) => {
   const handleDeleteClick = async (row) => {
     console.log(row);
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Received Transaction?"
+      "Are you sure you want to delete this Sorted Transaction?"
     );
 
     if (!isConfirmed) {
@@ -677,11 +677,11 @@ const SortedTransactions = ({ user }) => {
         );
 
         processData(response);
-        setSuccessMessage("Update Received Transaction successfully!");
+        setSuccessMessage("Sorted Transaction Updated Successfully!");
       } else {
         response = await axios.post(`${apiUrl}/sortedTransaction`, formData);
         processData(response);
-        setSuccessMessage("Receive Transaction successfully!");
+        setSuccessMessage("Sorted Transaction Submitted Successfully!");
       }
 
       setShowSuccessMessage(true);

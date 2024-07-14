@@ -263,7 +263,7 @@ const ScheduledTransactions = ({ user }) => {
       );
 
       processData(response);
-      setSuccessMessage("Scheduled Transaction deleted successfully!");
+      setSuccessMessage("Scheduled Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -292,12 +292,12 @@ const ScheduledTransactions = ({ user }) => {
         );
 
         processData(response);
-        setSuccessMessage("Update Scheduled Transaction successfully!");
+        setSuccessMessage("Scheduled Transaction Updated Successfully!");
       } else {
         console.log(formData);
         response = await axios.post(`${apiUrl}/scheduledTransaction`, formData);
         processData(response);
-        setSuccessMessage("Scheduled Transaction successfully!");
+        setSuccessMessage("Scheduled Transaction Submitted Successfully!");
       }
 
       setShowSuccessMessage(true);

@@ -95,7 +95,7 @@ const VehicleTypes = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle type?"
+      "Are you sure you want to delete this Vehicle Type?"
     );
 
     if (!isConfirmed) {
@@ -109,7 +109,7 @@ const VehicleTypes = ({ user }) => {
 
       const updatedData = vehicleTypes.filter((type) => type.id !== id);
       setVehicleTypes(updatedData);
-      setSuccessMessage("Vehicle Type deleted successfully!");
+      setSuccessMessage("Vehicle Type Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -142,7 +142,7 @@ const VehicleTypes = ({ user }) => {
         const updatedData = response.data.vehicleTypes;
 
         setVehicleTypes(updatedData);
-        setSuccessMessage("Vehicle Type updated successfully!");
+        setSuccessMessage("Vehicle Type Updated Successfully!");
       } else {
         // Add new vehicle type
         response = await axios.post(`${apiUrl}/vehicleType`, formData);
@@ -150,7 +150,7 @@ const VehicleTypes = ({ user }) => {
         const updatedData = response.data.vehicleTypes;
 
         setVehicleTypes(updatedData);
-        setSuccessMessage("Vehicle Type added successfully!");
+        setSuccessMessage("Vehicle Type Added Successfully!");
       }
 
       setShowSuccessMessage(true);

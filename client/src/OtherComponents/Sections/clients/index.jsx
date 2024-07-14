@@ -107,7 +107,7 @@ const Clients = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this client?"
+      "Are you sure you want to delete this Client?"
     );
 
     if (!isConfirmed) {
@@ -121,7 +121,7 @@ const Clients = ({ user }) => {
 
       const updatedData = clientData.filter((client) => client.id !== id);
       setClientData(updatedData);
-      setSuccessMessage("Client deleted successfully!");
+      setSuccessMessage("Client Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -182,7 +182,7 @@ const Clients = ({ user }) => {
 
         if (clientRecords && Array.isArray(clientRecords.clients)) {
           setClientData(clientRecords.clients);
-          setSuccessMessage("Client updated successfully!");
+          setSuccessMessage("Client Updated Successfully!");
         } else {
           console.error(
             "clientRecords or clientRecords.clients is undefined or not an array"
@@ -196,7 +196,7 @@ const Clients = ({ user }) => {
 
         if (clientRecords && Array.isArray(clientRecords.clients)) {
           setClientData(clientRecords.clients);
-          setSuccessMessage("Client added successfully!");
+          setSuccessMessage("Client Added Successfully!");
         } else {
           console.error(
             "clientRecords or clientRecords.clients is undefined or not an array"

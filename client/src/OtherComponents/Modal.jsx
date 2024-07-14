@@ -17,7 +17,9 @@ const Modal = ({
   handleInputChange,
   handleFormSubmit,
   errorMessage,
+  setErrorMessage,
   showErrorMessage,
+  setShowErrorMessage,
   setIsDiscrepancy,
   isDiscrepancy,
 }) => {
@@ -114,9 +116,9 @@ const Modal = ({
           handleInputChange={handleInputChange}
           handleFormSubmit={handleFormSubmit}
           errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
           showErrorMessage={showErrorMessage}
-          setIsDiscrepancy={setIsDiscrepancy}
-          isDiscrepancy={isDiscrepancy}
+          setShowErrorMessage={setShowErrorMessage}
         />
       );
       break;

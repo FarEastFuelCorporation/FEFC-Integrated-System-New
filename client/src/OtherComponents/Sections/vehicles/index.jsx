@@ -136,7 +136,7 @@ const Vehicles = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle?"
+      "Are you sure you want to delete this Vehicle?"
     );
 
     if (!isConfirmed) {
@@ -150,7 +150,7 @@ const Vehicles = ({ user }) => {
 
       const updatedData = vehicleData.filter((vehicle) => vehicle.id !== id);
       setVehicleData(updatedData);
-      setSuccessMessage("Vehicle deleted successfully!");
+      setSuccessMessage("Vehicle Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -198,7 +198,7 @@ const Vehicles = ({ user }) => {
           }));
 
           setVehicleData(flattenedData);
-          setSuccessMessage("Vehicle updated successfully!");
+          setSuccessMessage("Vehicle Updated Successfully!");
         } else {
           console.error(
             "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
@@ -219,7 +219,7 @@ const Vehicles = ({ user }) => {
           }));
 
           setVehicleData(flattenedData);
-          setSuccessMessage("Vehicle added successfully!");
+          setSuccessMessage("Vehicle Added Successfully!");
         } else {
           console.error(
             "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"

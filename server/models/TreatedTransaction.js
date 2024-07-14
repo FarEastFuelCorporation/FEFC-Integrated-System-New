@@ -13,28 +13,8 @@ const TreatedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    sortedWasteTransactionId: {
+    sortedTransactionId: {
       type: DataTypes.UUID,
-      allowNull: false,
-    },
-    treatmentProcessId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    treatmentMachineId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    treatedDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    treatedTime: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
-    weight: {
-      type: DataTypes.FLOAT,
       allowNull: false,
     },
     remarks: {

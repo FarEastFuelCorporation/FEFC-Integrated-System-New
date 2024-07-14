@@ -529,7 +529,7 @@ const ReceivedTransactions = ({ user }) => {
       );
 
       processData(response);
-      setSuccessMessage("Received Transaction deleted successfully!");
+      setSuccessMessage("Received Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -584,11 +584,11 @@ const ReceivedTransactions = ({ user }) => {
         );
 
         processData(response);
-        setSuccessMessage("Update Received Transaction successfully!");
+        setSuccessMessage("Received Transaction Updated Successfully!");
       } else {
         response = await axios.post(`${apiUrl}/receivedTransaction`, formData);
         processData(response);
-        setSuccessMessage("Receive Transaction successfully!");
+        setSuccessMessage("Receive Transaction Submitted Successfully!");
       }
 
       setShowSuccessMessage(true);

@@ -87,7 +87,7 @@ const TreatmentProcess = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this treatment process?"
+      "Are you sure you want to delete this Treatment Process?"
     );
 
     if (!isConfirmed) {
@@ -101,7 +101,7 @@ const TreatmentProcess = ({ user }) => {
 
       const updatedData = treatmentProcess.filter((waste) => waste.id !== id);
       setTreatmentProcess(updatedData);
-      setSuccessMessage("Treatment Process deleted successfully!");
+      setSuccessMessage("Treatment Process Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -134,7 +134,7 @@ const TreatmentProcess = ({ user }) => {
         const updatedData = response.data.treatmentProcesses;
 
         setTreatmentProcess(updatedData);
-        setSuccessMessage("Treatment Process updated successfully!");
+        setSuccessMessage("Treatment Process Updated Successfully!");
       } else {
         // Add new type of waste
         response = await axios.post(`${apiUrl}/treatmentProcess`, formData);
@@ -142,7 +142,7 @@ const TreatmentProcess = ({ user }) => {
         const updatedData = response.data.treatmentProcesses;
         console.log(updatedData);
         setTreatmentProcess(updatedData);
-        setSuccessMessage("Type of waste added successfully!");
+        setSuccessMessage("TreatmentProcess Added Successfully!");
       }
 
       setShowSuccessMessage(true);

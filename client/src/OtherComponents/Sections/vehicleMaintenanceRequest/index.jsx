@@ -133,7 +133,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this vehicle maintenance request?"
+      "Are you sure you want to delete this Vehicle Maintenance Request?"
     );
 
     if (!isConfirmed) {
@@ -149,7 +149,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
         (request) => request.id !== id
       );
       setVehicleRequests(updatedData);
-      setSuccessMessage("Vehicle maintenance request deleted successfully!");
+      setSuccessMessage("Vehicle Maintenance Request Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -194,7 +194,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
 
           setVehicleRequests(flattenedData);
           setSuccessMessage(
-            "Vehicle maintenance request updated successfully!"
+            "Vehicle Maintenance Request Updated Successfully!"
           );
         } else {
           console.error(
@@ -222,7 +222,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
           );
 
           setVehicleRequests(flattenedData);
-          setSuccessMessage("Vehicle maintenance request added successfully!");
+          setSuccessMessage("Vehicle Maintenance Request Added Successfully!");
         } else {
           console.error(
             "response or vehicleMaintenanceRequests is undefined or not an array"

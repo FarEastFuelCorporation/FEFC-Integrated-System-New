@@ -95,7 +95,7 @@ const ScrapTypes = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this scrap type?"
+      "Are you sure you want to delete this Scrap Type?"
     );
 
     if (!isConfirmed) {
@@ -109,7 +109,7 @@ const ScrapTypes = ({ user }) => {
 
       const updatedData = scrapTypes.filter((type) => type.id !== id);
       setScrapTypes(updatedData);
-      setSuccessMessage("Scrap Type deleted successfully!");
+      setSuccessMessage("Scrap Type Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -142,7 +142,7 @@ const ScrapTypes = ({ user }) => {
         const updatedData = response.data.scrapTypes;
 
         setScrapTypes(updatedData);
-        setSuccessMessage("Scrap Type updated successfully!");
+        setSuccessMessage("Scrap Type Updated Successfully!");
       } else {
         // Add new scrap type
         response = await axios.post(`${apiUrl}/scrapType`, formData);
@@ -150,7 +150,7 @@ const ScrapTypes = ({ user }) => {
         const updatedData = response.data.scrapTypes;
 
         setScrapTypes(updatedData);
-        setSuccessMessage("Scrap Type added successfully!");
+        setSuccessMessage("Scrap Type Added Successfully!");
       }
 
       setShowSuccessMessage(true);

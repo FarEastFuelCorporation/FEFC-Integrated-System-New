@@ -122,7 +122,7 @@ const TypeOfWastes = ({ user }) => {
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this type of waste?"
+      "Are you sure you want to delete this Type Of Waste?"
     );
 
     if (!isConfirmed) {
@@ -136,7 +136,7 @@ const TypeOfWastes = ({ user }) => {
 
       const updatedData = typeOfWastes.filter((waste) => waste.id !== id);
       setTypeOfWastes(updatedData);
-      setSuccessMessage("Type of waste deleted successfully!");
+      setSuccessMessage("Type Of Waste Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
       console.error("Error:", error);
@@ -188,7 +188,7 @@ const TypeOfWastes = ({ user }) => {
           );
 
           setTypeOfWastes(flattenedData);
-          setSuccessMessage("Type of waste updated successfully!");
+          setSuccessMessage("Type Of Waste Updated Successfully!");
         } else {
           console.error(
             "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
@@ -214,7 +214,7 @@ const TypeOfWastes = ({ user }) => {
           );
 
           setTypeOfWastes(flattenedData);
-          setSuccessMessage("Type of waste added successfully!");
+          setSuccessMessage("Type Of Waste Added Successfully!");
         } else {
           console.error(
             "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"

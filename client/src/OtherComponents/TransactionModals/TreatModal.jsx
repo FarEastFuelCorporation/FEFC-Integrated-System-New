@@ -23,10 +23,11 @@ const TreatModal = ({
   onClose,
   formData,
   setFormData,
-  handleInputChange,
   handleFormSubmit,
   errorMessage,
+  setErrorMessage,
   showErrorMessage,
+  setShowErrorMessage,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -35,8 +36,6 @@ const TreatModal = ({
   const [totalWeight, setTotalWeight] = useState(0);
   const [totalTreatedWeight, setTotalTreatedWeight] = useState(0);
 
-  if (formData.waste) {
-  }
   useEffect(() => {
     if (open) {
       const fetchData = async () => {
@@ -55,7 +54,10 @@ const TreatModal = ({
             treatmentMachinesResponse.data.treatmentMachines
           );
           setTotalWeight(formData.waste.weight);
-          setTotalTreatedWeight(calculateTotalWeight(formData.treatedWastes));
+          setTotalTreatedWeight(
+            formData.waste.treatedWeight +
+              calculateTotalWeight(formData.treatedWastes)
+          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -63,7 +65,19 @@ const TreatModal = ({
 
       fetchData();
     }
-  }, [open, formData.clientId, formData.waste.weight, formData.treatedWastes]);
+    if (!open) {
+      setErrorMessage("");
+      setShowErrorMessage(false);
+    }
+  }, [
+    open,
+    formData.clientId,
+    formData.waste.weight,
+    formData.treatedWastes,
+    setErrorMessage,
+    setShowErrorMessage,
+    formData.waste.treatedWeight,
+  ]);
 
   const formatWeight = (weight) => {
     // Check if weight is NaN
@@ -84,6 +98,19 @@ const TreatModal = ({
       (total, waste) => total + parseFloat(waste.weight || 0),
       0
     );
+  };
+
+  const handleInputChange = (e, index, name) => {
+    const { value } = e.target;
+    const updatedTreatedWastes = [...formData.treatedWastes];
+    updatedTreatedWastes[index] = {
+      ...updatedTreatedWastes[index],
+      [name]: value,
+    };
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      treatedWastes: updatedTreatedWastes,
+    }));
   };
 
   const handleTreatmentProcessChange = (index, value) => {
@@ -117,10 +144,16 @@ const TreatModal = ({
   const handleWeightChange = (index, field, value) => {
     setFormData((prevFormData) => {
       const updatedTreatedWastes = [...prevFormData.treatedWastes];
+      const currentWeight = parseFloat(updatedTreatedWastes[index][field] || 0);
+      const newValue = parseFloat(value);
+
+      // Update the weight of the specified waste
       updatedTreatedWastes[index][field] = value;
 
-      // Calculate the total weight
-      const newTotalWeight = calculateTotalWeight(updatedTreatedWastes);
+      // Calculate the total weight including the current and new value
+      const newTotalWeight = totalTreatedWeight - currentWeight + newValue;
+
+      // Update the total treated weight state
       setTotalTreatedWeight(newTotalWeight);
 
       return {
@@ -132,11 +165,11 @@ const TreatModal = ({
 
   const addWasteField = () => {
     const newWasteField = {
-      quotationWasteId: "",
+      treatedDate: null,
+      treatedTime: null,
       treatmentProcessId: "",
-      wasteName: "",
+      treatmentMachineId: "",
       weight: 0,
-      formNo: "",
     };
 
     const newTreatedWastes = [...formData.treatedWastes, newWasteField];
@@ -291,7 +324,7 @@ const TreatModal = ({
               <Grid item xs={1.5}>
                 <TextField
                   label="Weight"
-                  name="weight"
+                  name={`treatedWastes[${index}].weight`}
                   value={waste.weight}
                   onChange={(e) =>
                     handleWeightChange(index, "weight", e.target.value)
@@ -309,10 +342,10 @@ const TreatModal = ({
               </Grid>
               <Grid item xs={2}>
                 <TextField
-                  label="Sort Date"
-                  name="sortedDate"
-                  value={formData.sortedDate}
-                  onChange={handleInputChange}
+                  label="Treated Date"
+                  name={`treatedWastes[${index}].treatedDate`}
+                  value={waste.treatedDate}
+                  onChange={(e) => handleInputChange(e, index, "treatedDate")}
                   fullWidth
                   type="date"
                   required
@@ -327,10 +360,10 @@ const TreatModal = ({
               </Grid>
               <Grid item xs={1.5}>
                 <TextField
-                  label="Sort Time"
-                  name="sortedTime"
-                  value={formData.sortedTime}
-                  onChange={handleInputChange}
+                  label="Treated Time"
+                  name={`treatedWastes[${index}].treatedTime`}
+                  value={waste.treatedTime}
+                  onChange={(e) => handleInputChange(e, index, "treatedTime")}
                   fullWidth
                   type="time"
                   required

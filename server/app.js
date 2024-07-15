@@ -94,6 +94,7 @@ const dispatchedTransactionRoutes = require("./routes/dispatchedTransactionRoute
 const receivedTransactionRoutes = require("./routes/receivedTransactionRoutes");
 const sortedTransactionRoutes = require("./routes/sortedTransactionRoutes");
 const treatedTransactionRoutes = require("./routes/treatedTransactionRoutes");
+const certifiedTransactionRoutes = require("./routes/certifiedTransactionRoutes");
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const employeeRoutes = require("./routes/employeeRoutes");
 const { error404Controller } = require("./controllers/othersController");
@@ -117,6 +118,7 @@ app.use("/dispatchedTransaction", dispatchedTransactionRoutes);
 app.use("/receivedTransaction", receivedTransactionRoutes);
 app.use("/sortedTransaction", sortedTransactionRoutes);
 app.use("/treatedTransaction", treatedTransactionRoutes);
+app.use("/certifiedTransaction", certifiedTransactionRoutes);
 app.use("/hrDashboard", hrDashboardRoutes);
 app.use("/employee", employeeRoutes);
 

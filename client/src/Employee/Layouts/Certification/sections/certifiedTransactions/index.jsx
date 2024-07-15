@@ -7,7 +7,7 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 
-const TreatedTransactions = ({ user }) => {
+const CertifiedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialFormData = {
@@ -257,7 +257,7 @@ const TreatedTransactions = ({ user }) => {
     const fetchData = async () => {
       try {
         const [dispatchResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/treatedTransaction`),
+          axios.get(`${apiUrl}/certifiedTransaction`),
           axios.get(`${apiUrl}/employee`),
         ]);
 
@@ -515,4 +515,4 @@ const TreatedTransactions = ({ user }) => {
   );
 };
 
-export default TreatedTransactions;
+export default CertifiedTransactions;

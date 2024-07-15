@@ -26,6 +26,7 @@ const CertificationSidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
+      "/dashboard/transactions": "Transactions",
       "/dashboard/clients": "Clients",
       "/dashboard/treatmentProcess": "Treatment Process",
       "/dashboard/typeOfWastes": "Waste Types",
@@ -171,6 +172,13 @@ const CertificationSidebar = ({ user }) => {
               title="Dashboard"
               to=""
               icon={<HomeOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Transactions"
+              to="transactions"
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

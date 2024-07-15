@@ -1,4 +1,4 @@
-// controllers/treatedTransactionController.js
+// controllers/certifiedTransactionController.js
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
@@ -123,13 +123,13 @@ async function fetchPendingTransactions() {
           include: [
             [
               sequelize.literal(`
-                (
-                  SELECT COALESCE(SUM(TreatedWasteTransaction.weight), 0)
-                  FROM TreatedWasteTransactions AS TreatedWasteTransaction
-                  WHERE TreatedWasteTransaction.sortedWasteTransactionId = SortedWasteTransaction.id
-                  AND TreatedWasteTransaction.deletedAt IS NULL
-                )
-              `),
+                    (
+                      SELECT COALESCE(SUM(TreatedWasteTransaction.weight), 0)
+                      FROM TreatedWasteTransactions AS TreatedWasteTransaction
+                      WHERE TreatedWasteTransaction.sortedWasteTransactionId = SortedWasteTransaction.id
+                      AND TreatedWasteTransaction.deletedAt IS NULL
+                    )
+                  `),
               "treatedWeight",
             ],
           ],
@@ -147,17 +147,6 @@ async function fetchPendingTransactions() {
               {
                 model: TreatmentMachine,
                 as: "TreatmentMachine",
-              },
-              {
-                model: TreatedTransaction,
-                as: "TreatedTransaction",
-                include: [
-                  {
-                    model: Employee,
-                    as: "Employee",
-                    attributes: ["firstName", "lastName"],
-                  },
-                ],
               },
             ],
           },
@@ -180,29 +169,25 @@ async function fetchPendingTransactions() {
         ],
       },
       {
-        model: TreatedTransaction,
-        as: "TreatedTransaction",
-      },
-      {
         model: Employee,
         as: "Employee",
         attributes: ["firstName", "lastName"],
       },
     ],
     where: sequelize.literal(`
-      EXISTS (
-        SELECT 1
-        FROM SortedWasteTransactions AS swt
-        LEFT JOIN (
-          SELECT sortedWasteTransactionId, COALESCE(SUM(weight), 0) AS totalTreatedWeight
-          FROM TreatedWasteTransactions
-          WHERE deletedAt IS NULL  -- Exclude deleted TreatedWasteTransactions
-          GROUP BY sortedWasteTransactionId
-        ) AS twt ON swt.id = twt.sortedWasteTransactionId
-        WHERE swt.sortedTransactionId = SortedTransaction.id
-        AND COALESCE(twt.totalTreatedWeight, 0) < swt.weight
-      )
-    `),
+          NOT EXISTS (
+            SELECT 1
+            FROM SortedWasteTransactions AS swt
+            LEFT JOIN (
+              SELECT sortedWasteTransactionId, COALESCE(SUM(weight), 0) AS totalTreatedWeight
+              FROM TreatedWasteTransactions
+              WHERE deletedAt IS NULL
+              GROUP BY sortedWasteTransactionId
+            ) AS twt ON swt.id = twt.sortedWasteTransactionId
+            WHERE swt.sortedTransactionId = SortedTransaction.id
+            AND COALESCE(twt.totalTreatedWeight, 0) != swt.weight
+          )
+        `),
     order: [["id", "DESC"]],
   });
 }
@@ -334,17 +319,6 @@ async function fetchFinishedTransactions() {
                 model: TreatmentMachine,
                 as: "TreatmentMachine",
               },
-              {
-                model: TreatedTransaction,
-                as: "TreatedTransaction",
-                include: [
-                  {
-                    model: Employee,
-                    as: "Employee",
-                    attributes: ["firstName", "lastName"],
-                  },
-                ],
-              },
             ],
           },
         ],
@@ -389,8 +363,8 @@ async function fetchFinishedTransactions() {
   });
 }
 
-// Create Treated Transaction controller
-async function createTreatedTransactionController(req, res) {
+// Create Certified Transaction controller
+async function createCertifiedTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
@@ -467,8 +441,8 @@ async function createTreatedTransactionController(req, res) {
   }
 }
 
-// Get Treated Transactions controller
-async function getTreatedTransactionsController(req, res) {
+// Get Certified Transactions controller
+async function getCertifiedTransactionsController(req, res) {
   try {
     // Fetch pending and finished transactions
     const pendingTransactions = await fetchPendingTransactions();
@@ -481,8 +455,8 @@ async function getTreatedTransactionsController(req, res) {
   }
 }
 
-// Delete Treated Transaction controller
-async function deleteTreatedTransactionController(req, res) {
+// Delete Certified Transaction controller
+async function deleteCertifiedTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy, bookedTransactionId } = req.body;
@@ -533,7 +507,7 @@ async function deleteTreatedTransactionController(req, res) {
 }
 
 module.exports = {
-  createTreatedTransactionController,
-  getTreatedTransactionsController,
-  deleteTreatedTransactionController,
+  createCertifiedTransactionController,
+  getCertifiedTransactionsController,
+  deleteCertifiedTransactionController,
 };

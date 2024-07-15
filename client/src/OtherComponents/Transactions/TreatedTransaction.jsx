@@ -7,23 +7,15 @@ import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 
-const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
+const TreatedTransaction = ({
+  row,
+  handleOpenModal,
+  handleDeleteClick,
+  user,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {
-    statusId,
-    sortedCreatedDate,
-    sortedCreatedTime,
-    sortedDate,
-    sortedTime,
-    netWeight,
-    totalSortedWeight,
-    discrepancyWeight,
-    sortedRemarks,
-    sortedWasteTransaction,
-    sortedScrapTransaction,
-    sortedCreatedBy,
-  } = row;
+  const { sortedWasteTransaction, totalSortedWeight, statusId } = row;
 
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -48,11 +40,95 @@ const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
     }).format(weight);
   };
 
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "2-digit" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
       {params.value}
     </div>
   );
+
+  const renderCellWithFormattedDate = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {formatDate(params.value)}
+    </div>
+  );
+
+  function getLatestTreatedDateAndTime(sortedWasteTransactions) {
+    let latestTreatedDate = null;
+    let latestTreatedTime = null;
+
+    if (sortedWasteTransactions && Array.isArray(sortedWasteTransactions)) {
+      sortedWasteTransactions.forEach((transaction) => {
+        if (
+          transaction &&
+          transaction.TreatedWasteTransaction &&
+          Array.isArray(transaction.TreatedWasteTransaction)
+        ) {
+          transaction.TreatedWasteTransaction.forEach((treated) => {
+            if (treated && treated.treatedDate && treated.treatedTime) {
+              if (!latestTreatedDate && !latestTreatedTime) {
+                latestTreatedDate = treated.treatedDate;
+                latestTreatedTime = treated.treatedTime;
+              } else {
+                const isLaterDate =
+                  treated.treatedDate.localeCompare(latestTreatedDate) > 0;
+                const isSameDateAndLaterTime =
+                  treated.treatedDate === latestTreatedDate &&
+                  treated.treatedTime.localeCompare(latestTreatedTime) > 0;
+
+                if (isLaterDate || isSameDateAndLaterTime) {
+                  latestTreatedDate = treated.treatedDate;
+                  latestTreatedTime = treated.treatedTime;
+                }
+              }
+            }
+          });
+        }
+      });
+    }
+
+    return { latestTreatedDate, latestTreatedTime };
+  }
+
+  const { latestTreatedDate, latestTreatedTime } = getLatestTreatedDateAndTime(
+    sortedWasteTransaction
+  );
+
+  function consolidateEmployeeNames(sortedWasteTransactions) {
+    const employeeNames = new Set();
+
+    if (sortedWasteTransactions && Array.isArray(sortedWasteTransactions)) {
+      sortedWasteTransactions.forEach((sortedTransaction) => {
+        if (
+          sortedTransaction &&
+          Array.isArray(sortedTransaction.TreatedWasteTransaction)
+        ) {
+          sortedTransaction.TreatedWasteTransaction.forEach(
+            (treatedWasteTransaction) => {
+              if (
+                treatedWasteTransaction &&
+                treatedWasteTransaction.TreatedTransaction &&
+                treatedWasteTransaction.TreatedTransaction.Employee
+              ) {
+                const { firstName, lastName } =
+                  treatedWasteTransaction.TreatedTransaction.Employee;
+                if (firstName && lastName) {
+                  employeeNames.add(`${firstName} ${lastName}`);
+                }
+              }
+            }
+          );
+        }
+      });
+    }
+    return Array.from(employeeNames);
+  }
+
+  const employeeNames = consolidateEmployeeNames(sortedWasteTransaction);
 
   const columns = [
     {
@@ -62,7 +138,7 @@ const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: renderCellWithWrapText,
+      renderCell: renderCellWithFormattedDate,
     },
     {
       field: "treatedTime",
@@ -74,7 +150,7 @@ const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "treatmentProcessId",
+      field: "treatmentProcess",
       headerName: "Treatment Process",
       headerAlign: "center",
       align: "center",
@@ -83,7 +159,7 @@ const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "treatmentMachineId",
+      field: "machineName",
       headerName: "Treatment Machine",
       headerAlign: "center",
       align: "center",
@@ -104,160 +180,44 @@ const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
         </div>
       ),
     },
-    {
+  ];
+
+  if (user.userType === 6) {
+    columns.push({
       field: "delete",
       headerName: "Delete",
       headerAlign: "center",
       align: "center",
       sortable: false,
-      width: 100,
+      width: 60,
       renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
+        <IconButton color="error" onClick={() => handleDeleteClick(params.row)}>
           <DeleteIcon />
         </IconButton>
       ),
-    },
-  ];
+    });
+  }
 
   return (
-    <Box>
-      {statusId === 5 ? (
-        <Box sx={{ my: 3, position: "relative" }}>
-          <CircleLogo pending={true}>
-            <FactoryIcon
-              sx={{
-                fontSize: "30px",
-                color: `${colors.grey[500]}`,
-              }}
-            />
-          </CircleLogo>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+    <Box sx={{ my: 3, position: "relative" }}>
+      <CircleLogo pending={statusId === 5 && true}>
+        <FactoryIcon
+          sx={{
+            fontSize: "30px",
+            color: `${statusId === 5 ? colors.grey[500] : colors.grey[100]}`,
+          }}
+        />
+      </CircleLogo>
+      <Box>
+        {statusId === 5 ? (
+          <Box>
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
               For Treatment
             </Typography>
-          </Box>
-          <Typography variant="h5">Pending</Typography>
-          {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
-            sortedWasteTransaction.map((waste, index) => (
-              <Box key={index}>
-                {console.log(waste)}
-                {console.log(waste.TreatedWasteTransaction)}
-                <Box
-                  sx={{
-                    my: 2,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "end",
-                  }}
-                >
-                  <Typography variant="h5">
-                    Waste Name: {waste.wasteName}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 2 }}>
-                    <Button
-                      sx={{
-                        backgroundColor: `${colors.greenAccent[700]}`,
-                        color: `${colors.grey[100]}`,
-                      }}
-                      onClick={() => handleOpenModal(row, waste)}
-                    >
-                      Treat
-                    </Button>
-                    <Box
-                      sx={{
-                        padding: "5px",
-                        borderRadius: "5px",
-                        backgroundColor:
-                          sortedWasteTransaction[index].treatedWeight ===
-                          waste.weight
-                            ? colors.greenAccent[700]
-                            : "red",
-                        color: "white",
-                      }}
-                    >
-                      <Typography variant="h6">
-                        {formatWeight(
-                          sortedWasteTransaction[index].treatedWeight
-                        )}{" "}
-                        Kg Treated /{formatWeight(waste.weight)} Kg
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-                <DataGrid
-                  sx={{
-                    "& .MuiDataGrid-root": {
-                      border: "none",
-                      width: "100%",
-                    },
-                    "& .MuiDataGrid-overlayWrapper": {
-                      minHeight: "52px",
-                    },
-                    "& .name-column--cell": {
-                      color: colors.greenAccent[300],
-                    },
-                    "& .MuiDataGrid-columnHeaders": {
-                      backgroundColor: colors.blueAccent[700],
-                      borderBottom: "none",
-                    },
-                    "& .MuiDataGrid-columnHeaderTitle": {
-                      whiteSpace: "normal !important",
-                      wordWrap: "break-word !important",
-                      lineHeight: "1.2 !important",
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                      backgroundColor: colors.primary[400],
-                    },
-                    "& .MuiDataGrid-toolbarContainer": {
-                      display: "none",
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                      display: "none",
-                    },
-                  }}
-                  rows={
-                    waste.TreatedWasteTransaction
-                      ? waste.TreatedWasteTransaction
-                      : []
-                  }
-                  columns={columns}
-                  components={{ Toolbar: GridToolbar }}
-                  getRowId={(row) => (row.id ? row.id : [])}
-                  localeText={{ noRowsLabel: "No Treated Transactions" }}
-                  initialState={{
-                    sortModel: [
-                      { field: "treatedDate", sort: "asc" },
-                      { field: "treatedTime", sort: "asc" },
-                    ],
-                  }}
-                />
-              </Box>
-            ))
-          ) : (
-            <Typography variant="h5">No Sorted Waste Transactions</Typography>
-          )}
 
-          <br />
-          <hr />
-        </Box>
-      ) : (
-        <Box sx={{ my: 3, position: "relative" }}>
-          <CircleLogo>
-            <FactoryIcon
-              sx={{
-                fontSize: "30px",
-                color: `${colors.grey[100]}`,
-              }}
-            />
-          </CircleLogo>
+            <Typography variant="h5">Pending</Typography>
+          </Box>
+        ) : (
           <Box
             sx={{
               display: "flex",
@@ -268,69 +228,137 @@ const TreatedTransaction = ({ row, handleDeleteClick, handleOpenModal }) => {
               Treated
             </Typography>
             <Typography variant="h5">
-              {sortedCreatedDate} {sortedCreatedTime}
+              {`${latestTreatedDate.split("T")[0]} ${latestTreatedTime}`}
             </Typography>
           </Box>
-          {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
-            sortedWasteTransaction.map((waste, index) => (
-              <Box key={index} sx={{ my: 2 }}>
-                <Typography variant="h5">Item {index + 1}</Typography>
-                <Typography variant="h5">
-                  Waste Name: {waste.wasteName}
-                </Typography>
-                <Typography variant="h5">
-                  Weight: {formatWeight(waste.weight)} Kg
-                </Typography>
-                <Typography variant="h5">Form No: {waste.formNo}</Typography>
+        )}
+      </Box>
+      {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
+        sortedWasteTransaction.map((waste, index) => (
+          <Box key={index} sx={{ my: 2 }}>
+            <Box
+              sx={{
+                my: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "end",
+              }}
+            >
+              <Typography variant="h5">
+                Waste Name: {waste.wasteName}
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                {sortedWasteTransaction[index].treatedWeight !==
+                  waste.weight && (
+                  <Button
+                    sx={{
+                      backgroundColor: `${colors.greenAccent[700]}`,
+                      color: `${colors.grey[100]}`,
+                    }}
+                    onClick={() => handleOpenModal(row, waste)}
+                  >
+                    Treat
+                  </Button>
+                )}
+
+                <Box
+                  sx={{
+                    padding: "5px",
+                    borderRadius: "5px",
+                    backgroundColor:
+                      sortedWasteTransaction[index].treatedWeight ===
+                      waste.weight
+                        ? colors.greenAccent[700]
+                        : "red",
+                    color: "white",
+                  }}
+                >
+                  <Typography variant="h6">
+                    {formatWeight(sortedWasteTransaction[index].treatedWeight)}{" "}
+                    Kg Treated /{formatWeight(waste.weight)} Kg
+                  </Typography>
+                </Box>
               </Box>
-            ))
-          ) : (
-            <Typography variant="h5">No Sorted Waste Transactions</Typography>
-          )}
-          {sortedScrapTransaction && sortedScrapTransaction.length > 0 ? (
-            sortedScrapTransaction.map((scrap, index) => (
-              <Box key={index} sx={{ my: 2 }}>
-                <Typography variant="h5">Scrap {index + 1}</Typography>
-                <Typography variant="h5">
-                  Waste Name: {scrap.ScrapType.typeOfScrap}
-                </Typography>
-                <Typography variant="h5">
-                  Weight: {formatWeight(scrap.weight)} Kg
-                </Typography>
-              </Box>
-            ))
-          ) : (
-            <Typography variant="h5">No Sorted Waste Transactions</Typography>
-          )}
+            </Box>
+            <DataGrid
+              sx={{
+                "& .MuiDataGrid-root": {
+                  border: "none",
+                  width: "100%",
+                },
+                "& .MuiDataGrid-overlayWrapper": {
+                  minHeight: "52px",
+                },
+                "& .name-column--cell": {
+                  color: colors.greenAccent[300],
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: colors.blueAccent[700],
+                  borderBottom: "none",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  whiteSpace: "normal !important",
+                  wordWrap: "break-word !important",
+                  lineHeight: "1.2 !important",
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                  backgroundColor: colors.primary[400],
+                },
+                "& .MuiDataGrid-toolbarContainer": {
+                  display: "none",
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  display: "none",
+                },
+              }}
+              rows={
+                waste.TreatedWasteTransaction
+                  ? waste.TreatedWasteTransaction
+                  : []
+              }
+              columns={columns}
+              components={{ Toolbar: GridToolbar }}
+              getRowId={(row) => (row.id ? row.id : [])}
+              localeText={{ noRowsLabel: "No Treated Transactions" }}
+              initialState={{
+                sortModel: [
+                  { field: "treatedDate", sort: "asc" },
+                  { field: "treatedTime", sort: "asc" },
+                  { field: "machineName", sort: "asc" },
+                ],
+              }}
+            />
+          </Box>
+        ))
+      ) : (
+        <Typography variant="h5">No Sorted Waste Transactions</Typography>
+      )}
+      {statusId === 6 && (
+        <Box>
+          {" "}
           <Typography variant="h5">
-            Sorted Date:{" "}
-            {sortedDate
-              ? format(new Date(sortedDate), "MMMM dd, yyyy")
+            Finished Treatment Date:{" "}
+            {latestTreatedDate
+              ? format(new Date(latestTreatedDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Sorted Time:{" "}
-            {sortedTime
-              ? format(parseTimeString(sortedTime), "hh:mm aa")
+            Finished Treatment Time:{" "}
+            {latestTreatedTime
+              ? format(parseTimeString(latestTreatedTime), "hh:mm aa")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Net Weight: {formatWeight(netWeight)} Kg
+            Total Treated Weight: {formatWeight(totalSortedWeight)} Kg
           </Typography>
-          <Typography variant="h5">
-            Total Sorted Weight: {formatWeight(totalSortedWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
-            Discrepancy Weight: {formatWeight(discrepancyWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
-            Discrepancy Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
-          </Typography>
-          <Typography variant="h5">Sorted By: {sortedCreatedBy}</Typography>
-          <br />
-          <hr />
+          {/* <Typography variant="h5">
+        Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
+      </Typography> */}
+          <Typography variant="h5">Treated By: {employeeNames}</Typography>
         </Box>
       )}
+      <br />
+      <hr />
     </Box>
   );
 };

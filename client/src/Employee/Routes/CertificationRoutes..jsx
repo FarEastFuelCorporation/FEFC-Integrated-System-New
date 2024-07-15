@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../Layouts/Certification/sections/dashboard";
+import CertifiedTransactions from "../Layouts/Certification/sections/certifiedTransactions";
 import Clients from "../../OtherComponents/Sections/clients";
 import TreatmentProcess from "../../OtherComponents/Sections/treatmentProcess";
 import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
@@ -16,6 +17,10 @@ const CertificationRoutes = ({ user }) => (
     <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="clients" element={<Clients user={user} />} />
+      <Route
+        path="transactions"
+        element={<CertifiedTransactions user={user} />}
+      />
       <Route
         path="treatmentProcess"
         element={<TreatmentProcess user={user} />}

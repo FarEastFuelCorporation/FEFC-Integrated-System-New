@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
+import ApprovalIcon from "@mui/icons-material/Approval";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 
-const SortedTransaction = ({ row }) => {
+const CertifiedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const {
@@ -22,7 +22,6 @@ const SortedTransaction = ({ row }) => {
     SortedScrapTransaction,
     sortedCreatedBy,
   } = row;
-
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
     const date = new Date();
@@ -42,10 +41,10 @@ const SortedTransaction = ({ row }) => {
 
   return (
     <Box>
-      {statusId === 4 ? (
+      {statusId === 6 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <SwapVertIcon
+            <ApprovalIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -59,7 +58,7 @@ const SortedTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Sorting
+              For Certification
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -69,7 +68,7 @@ const SortedTransaction = ({ row }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <SwapVertIcon
+            <ApprovalIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -83,7 +82,7 @@ const SortedTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Sorted
+              Certified
             </Typography>
             <Typography variant="h5">
               {sortedCreatedDate} {sortedCreatedTime}
@@ -149,4 +148,4 @@ const SortedTransaction = ({ row }) => {
   );
 };
 
-export default SortedTransaction;
+export default CertifiedTransaction;

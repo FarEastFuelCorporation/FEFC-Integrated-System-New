@@ -18,7 +18,7 @@ import { tokens } from "../../theme";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
-const TreatModal = ({
+const CertifyModal = ({
   open,
   onClose,
   formData,
@@ -430,4 +430,4 @@ const TreatModal = ({
   );
 };
 
-export default TreatModal;
+export default CertifyModal;

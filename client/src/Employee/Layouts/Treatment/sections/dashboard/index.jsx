@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
-import Header from "../Header";
+import Header from "../../../../../OtherComponents/Header";
 import { tokens } from "../../../../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 

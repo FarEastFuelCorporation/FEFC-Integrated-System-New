@@ -25,6 +25,7 @@ import DispatchedTransaction from "./Transactions/DispatchedTransaction";
 import ReceivedTransaction from "./Transactions/ReceivedTransaction";
 import SortedTransaction from "./Transactions/SortedTransaction";
 import TreatedTransaction from "./Transactions/TreatedTransaction";
+import CertifiedTransaction from "./Transactions/CertifiedTransaction";
 
 const Transaction = ({
   user,
@@ -44,6 +45,9 @@ const Transaction = ({
   };
 
   const transactions =
+    selectedTab === 0 ? pendingTransactions : finishedTransactions;
+
+  const tabs =
     selectedTab === 0 ? pendingTransactions : finishedTransactions;
 
   return (
@@ -99,14 +103,18 @@ const Transaction = ({
                     )}
                   </Box>
                 ) : (
-                  <div style={{ display: "flex" }}>
-                    <IconButton onClick={() => handleEditClick(row)}>
-                      <EditIcon sx={{ color: "#ff9800" }} />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteClick(row)}>
-                      <DeleteIcon sx={{ color: "#f44336" }} />
-                    </IconButton>
-                  </div>
+                  <Box>
+                    {!(user.userType === 6) && (
+                      <div style={{ display: "flex" }}>
+                        <IconButton onClick={() => handleEditClick(row)}>
+                          <EditIcon sx={{ color: "#ff9800" }} />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteClick(row)}>
+                          <DeleteIcon sx={{ color: "#f44336" }} />
+                        </IconButton>
+                      </div>
+                    )}
+                  </Box>
                 )}
               </AccordionSummary>
               <CustomAccordionDetails>
@@ -118,8 +126,17 @@ const Transaction = ({
                 {row.statusId >= 5 && (
                   <TreatedTransaction
                     row={row}
-                    handleDeleteClick={handleDeleteClick}
                     handleOpenModal={handleOpenModal}
+                    handleDeleteClick={handleDeleteClick}
+                    user={user}
+                  />
+                )}
+                {row.statusId >= 6 && (
+                  <CertifiedTransaction
+                    row={row}
+                    handleOpenModal={handleOpenModal}
+                    handleDeleteClick={handleDeleteClick}
+                    user={user}
                   />
                 )}
               </CustomAccordionDetails>

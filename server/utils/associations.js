@@ -499,27 +499,27 @@ TreatedWasteTransaction.belongsTo(SortedWasteTransaction, {
   onDelete: "CASCADE",
 });
 
-TreatedWasteTransaction.hasMany(TreatmentProcess, {
-  as: "TreatmentProcess",
+TreatmentProcess.hasMany(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
   foreignKey: "treatmentProcessId",
   sourceKey: "id",
   onDelete: "CASCADE",
 });
-TreatmentProcess.belongsTo(TreatedWasteTransaction, {
-  as: "TreatedWasteTransaction",
+TreatedWasteTransaction.belongsTo(TreatmentProcess, {
+  as: "TreatmentProcess",
   foreignKey: "treatmentProcessId",
   targetKey: "id",
   onDelete: "CASCADE",
 });
 
-TreatedWasteTransaction.hasMany(TreatmentMachine, {
-  as: "TreatmentMachine",
+TreatmentMachine.hasMany(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
   foreignKey: "treatmentMachineId",
   sourceKey: "id",
   onDelete: "CASCADE",
 });
-TreatmentMachine.belongsTo(TreatedWasteTransaction, {
-  as: "TreatedWasteTransaction",
+TreatedWasteTransaction.belongsTo(TreatmentMachine, {
+  as: "TreatmentMachine",
   foreignKey: "treatmentMachineId",
   targetKey: "id",
   onDelete: "CASCADE",

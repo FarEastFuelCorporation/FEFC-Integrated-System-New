@@ -20,6 +20,7 @@ const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const TreatmentProcess = require("../models/TreatmentProcess");
 const TreatmentMachine = require("../models/TreatmentMachine");
+const Attachment = require("../models/Attachment");
 
 // Utility function to fetch pending transactions
 async function fetchPendingTransactions() {
@@ -82,6 +83,17 @@ async function fetchPendingTransactions() {
                         model: Client,
                         as: "Client",
                         attributes: ["clientId", "clientName"],
+                      },
+                      {
+                        model: Attachment,
+                        as: "Attachment",
+                        include: [
+                          {
+                            model: Employee,
+                            as: "Employee",
+                            attributes: ["firstName", "lastName"],
+                          },
+                        ],
                       },
                     ],
                   },
@@ -254,6 +266,17 @@ async function fetchFinishedTransactions() {
                         as: "Client",
                         attributes: ["clientId", "clientName"],
                       },
+                      {
+                        model: Attachment,
+                        as: "Attachment",
+                        include: [
+                          {
+                            model: Employee,
+                            as: "Employee",
+                            attributes: ["firstName", "lastName"],
+                          },
+                        ],
+                      },
                     ],
                   },
                   {
@@ -363,7 +386,7 @@ async function fetchFinishedTransactions() {
   });
 }
 
-// Create Certified Transaction controller
+// Create Attachment controller
 async function createCertifiedTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
@@ -441,7 +464,7 @@ async function createCertifiedTransactionController(req, res) {
   }
 }
 
-// Get Certified Transactions controller
+// Get Attachments controller
 async function getCertifiedTransactionsController(req, res) {
   try {
     // Fetch pending and finished transactions
@@ -455,7 +478,7 @@ async function getCertifiedTransactionsController(req, res) {
   }
 }
 
-// Delete Certified Transaction controller
+// Delete Attachment Transaction controller
 async function deleteCertifiedTransactionController(req, res) {
   try {
     const id = req.params.id;

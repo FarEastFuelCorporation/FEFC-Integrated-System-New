@@ -14,6 +14,7 @@ const CustomDataGridStyles = ({ children }) => {
         "& .MuiDataGrid-root": {
           border: "none",
           width: "100%",
+          color: colors.grey[100],
         },
         "& .name-column--cell": {
           color: colors.greenAccent[300],

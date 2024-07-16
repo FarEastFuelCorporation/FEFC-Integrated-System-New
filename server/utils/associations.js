@@ -27,6 +27,7 @@ const SortedScrapTransaction = require("../models/SortedScrapTransaction");
 const TreatmentMachine = require("../models/TreatmentMachine");
 const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
+const Attachment = require("../models/Attachment");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -93,6 +94,19 @@ Employee.belongsToMany(EmployeeRole, {
   foreignKey: "employeeId",
   otherKey: "employeeRoleId",
   as: "EmployeeRoles",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(Attachment, {
+  as: "Attachment",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+Attachment.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
   onDelete: "CASCADE",
 });
 
@@ -337,6 +351,19 @@ BookedTransaction.hasMany(ScheduledTransaction, {
   onDelete: "CASCADE",
 });
 ScheduledTransaction.belongsTo(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BookedTransaction.hasMany(Attachment, {
+  as: "Attachment",
+  foreignKey: "bookedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+Attachment.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
   targetKey: "id",

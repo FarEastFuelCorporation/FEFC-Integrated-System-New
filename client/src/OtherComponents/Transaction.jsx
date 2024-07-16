@@ -26,28 +26,33 @@ import ReceivedTransaction from "./Transactions/ReceivedTransaction";
 import SortedTransaction from "./Transactions/SortedTransaction";
 import TreatedTransaction from "./Transactions/TreatedTransaction";
 import CertifiedTransaction from "./Transactions/CertifiedTransaction";
+import Attachments from "./Attachments";
 
 const Transaction = ({
   user,
   buttonText,
   pendingTransactions,
   finishedTransactions,
+  attachmentData,
   handleOpenModal,
+  handleOpenAttachmentModal,
   handleEditClick,
   handleDeleteClick,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedSubTab, setSelectedSubTab] = useState(0);
 
-  const handleChange = (event, newValue) => {
+  const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
-  const transactions =
-    selectedTab === 0 ? pendingTransactions : finishedTransactions;
+  const handleChangeSubTab = (event, newValue) => {
+    setSelectedSubTab(newValue);
+  };
 
-  const tabs =
+  const transactions =
     selectedTab === 0 ? pendingTransactions : finishedTransactions;
 
   return (
@@ -55,7 +60,7 @@ const Transaction = ({
       <Card>
         <Tabs
           value={selectedTab}
-          onChange={handleChange}
+          onChange={handleChangeTab}
           sx={{
             "& .Mui-selected": {
               backgroundColor: colors.greenAccent[400],
@@ -117,13 +122,13 @@ const Transaction = ({
                   </Box>
                 )}
               </AccordionSummary>
+
               <CustomAccordionDetails>
-                <BookedTransaction row={row} />
-                {row.statusId >= 1 && <ScheduledTransaction row={row} />}
-                {row.statusId >= 2 && <DispatchedTransaction row={row} />}
-                {row.statusId >= 3 && <ReceivedTransaction row={row} />}
-                {row.statusId >= 4 && <SortedTransaction row={row} />}
-                {row.statusId >= 5 && (
+                {user.userType === 2 && <ScheduledTransaction row={row} />}
+                {user.userType === 3 && <DispatchedTransaction row={row} />}
+                {user.userType === 4 && <ReceivedTransaction row={row} />}
+                {user.userType === 5 && <SortedTransaction row={row} />}
+                {user.userType === 6 && (
                   <TreatedTransaction
                     row={row}
                     handleOpenModal={handleOpenModal}
@@ -131,7 +136,7 @@ const Transaction = ({
                     user={user}
                   />
                 )}
-                {row.statusId >= 6 && (
+                {user.userType === 7 && (
                   <CertifiedTransaction
                     row={row}
                     handleOpenModal={handleOpenModal}
@@ -140,6 +145,53 @@ const Transaction = ({
                   />
                 )}
               </CustomAccordionDetails>
+              <Tabs
+                value={selectedSubTab}
+                onChange={handleChangeSubTab}
+                sx={{
+                  "& .Mui-selected": {
+                    backgroundColor: colors.greenAccent[400],
+                    boxShadow: "none",
+                    borderBottom: `1px solid ${colors.grey[100]}`,
+                  },
+                }}
+              >
+                <Tab label="Tracking" />
+                <Tab label="Attachments" />
+              </Tabs>
+              {selectedSubTab === 0 ? (
+                <CustomAccordionDetails>
+                  {row.statusId >= 7 && (
+                    <CertifiedTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 6 && (
+                    <TreatedTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 5 && <SortedTransaction row={row} />}
+                  {row.statusId >= 4 && <ReceivedTransaction row={row} />}
+                  {row.statusId >= 3 && <DispatchedTransaction row={row} />}
+                  {row.statusId >= 2 && <ScheduledTransaction row={row} />}
+                  {row.statusId >= 1 && <BookedTransaction row={row} />}
+                </CustomAccordionDetails>
+              ) : (
+                <Box>
+                  <Attachments
+                    row={row}
+                    handleOpenAttachmentModal={handleOpenAttachmentModal}
+                    user={user}
+                  />
+                </Box>
+              )}
             </Accordion>
           ))}
         </CustomAccordionStyles>

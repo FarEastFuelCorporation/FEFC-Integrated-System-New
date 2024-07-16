@@ -6,7 +6,6 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
-import AttachmentModal from "../../../../../OtherComponents/TransactionModals/AttachmentModal";
 
 const CertifiedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -30,14 +29,6 @@ const CertifiedTransactions = ({ user }) => {
     createdBy: user.id,
   };
 
-  const initialAttachmentFormData = {
-    id: "",
-    bookedTransactionId: "",
-    fileName: "",
-    attachment: "",
-    createdBy: user.id,
-  };
-
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [responseData, setResponseData] = useState([]);
@@ -48,13 +39,6 @@ const CertifiedTransactions = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [openAttachmentModal, setOpenAttachmentModal] = useState(false);
-  const [attachmentFormData, setAttachmentFormData] = useState(
-    initialAttachmentFormData
-  );
-  const [attachmentData, setAttachmentData] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileName, setFileName] = useState("");
 
   const processTransactionItem = (sortItem, employeeData) => {
     const receiveItem = sortItem.ReceivedTransaction;
@@ -284,16 +268,13 @@ const CertifiedTransactions = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [dispatchResponse, employeeResponse, attachmentResponse] =
-          await Promise.all([
-            axios.get(`${apiUrl}/certifiedTransaction`),
-            axios.get(`${apiUrl}/employee`),
-            axios.get(`${apiUrl}/attachment`),
-          ]);
+        const [certifiedResponse, employeeResponse] = await Promise.all([
+          axios.get(`${apiUrl}/certifiedTransaction`),
+          axios.get(`${apiUrl}/employee`),
+        ]);
 
-        setResponseData(dispatchResponse);
+        setResponseData(certifiedResponse);
         setEmployeeData(employeeResponse.data.employees);
-        setAttachmentData(attachmentResponse.data.attachments);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -308,17 +289,15 @@ const CertifiedTransactions = ({ user }) => {
     }
   }, [responseData, processData]);
 
-  const handleOpenModal = (row, waste) => {
+  const handleOpenModal = (row) => {
     setFormData({
       row: row,
-      waste: waste,
       isFinished: false,
       id: "",
       bookedTransactionId:
         row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
           .bookedTransactionId,
       sortedTransactionId: row.id,
-      sortedWasteTransactionId: waste.id,
       treatedWastes: [
         {
           treatedDate: null,
@@ -501,85 +480,6 @@ const CertifiedTransactions = ({ user }) => {
     return updatedFormData;
   };
 
-  const handleOpenAttachmentModal = (row) => {
-    console.log(row);
-    setAttachmentFormData({
-      id: "",
-      bookedTransactionId:
-        row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
-          .bookedTransactionId,
-      fileName: "",
-      attachment: "",
-      createdBy: user.id,
-    });
-    setOpenAttachmentModal(true);
-  };
-
-  const handleCloseAttachmentModal = () => {
-    setOpenAttachmentModal(false);
-    clearAttachmentFormData();
-  };
-
-  const clearAttachmentFormData = () => {
-    setAttachmentFormData(initialAttachmentFormData);
-    setFileName("");
-  };
-
-  const handleAttachmentFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setFileName(file.name);
-    }
-  };
-
-  const handleAttachmentInputChange = (e) => {
-    const { name, value } = e.target;
-    setAttachmentFormData({ ...attachmentFormData, [name]: value });
-  };
-
-  const handleAttachmentFormSubmit = async (e) => {
-    e.preventDefault();
-
-    attachmentFormData.attachment = selectedFile;
-
-    // Perform client-side validation
-    const { fileName, attachment } = attachmentFormData;
-
-    // Check if all required fields are filled
-    if (!fileName || !attachment) {
-      console.log("error");
-      setErrorMessage("Please fill all required fields.");
-      setShowErrorMessage(true);
-      return;
-    }
-
-    try {
-      let response;
-
-      if (!attachmentFormData.id) {
-        const newFormData = new FormData();
-        newFormData.append(
-          "bookedTransactionId",
-          attachmentFormData.bookedTransactionId
-        );
-        newFormData.append("fileName", attachmentFormData.fileName);
-        newFormData.append("attachment", attachmentFormData.attachment);
-        newFormData.append("createdBy", attachmentFormData.createdBy);
-
-        // Add new attachment
-        response = await axios.post(`${apiUrl}/attachment`, newFormData);
-
-        setSuccessMessage("Attachment Added Successfully!");
-      }
-
-      setShowSuccessMessage(true);
-      handleCloseAttachmentModal();
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
@@ -604,10 +504,10 @@ const CertifiedTransactions = ({ user }) => {
         buttonText={"Certify"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
-        attachmentData={attachmentData}
         handleOpenModal={handleOpenModal}
-        handleOpenAttachmentModal={handleOpenAttachmentModal}
         handleDeleteClick={handleDeleteClick}
+        setSuccessMessage={setSuccessMessage}
+        setShowSuccessMessage={setShowSuccessMessage}
       />
       <Modal
         user={user}
@@ -617,21 +517,6 @@ const CertifiedTransactions = ({ user }) => {
         setFormData={setFormData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
-        errorMessage={errorMessage}
-        setErrorMessage={setErrorMessage}
-        showErrorMessage={showErrorMessage}
-        setShowErrorMessage={setShowErrorMessage}
-      />
-      <AttachmentModal
-        user={user}
-        open={openAttachmentModal}
-        onClose={handleCloseAttachmentModal}
-        attachmentFormData={attachmentFormData}
-        setAttachmentFormData={setAttachmentFormData}
-        handleAttachmentFileChange={handleAttachmentFileChange}
-        fileName={fileName}
-        handleAttachmentInputChange={handleAttachmentInputChange}
-        handleAttachmentFormSubmit={handleAttachmentFormSubmit}
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}
         showErrorMessage={showErrorMessage}

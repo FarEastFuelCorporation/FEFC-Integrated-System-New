@@ -5,6 +5,8 @@ import DispatchModal from "./TransactionModals/DispatchModal";
 import ReceiveModal from "./TransactionModals/ReceiveModal";
 import SortModal from "./TransactionModals/SortModal";
 import TreatModal from "./TransactionModals/TreatModal";
+import AttachmentModal from "./TransactionModals/AttachmentModal";
+import CertifyModal from "./TransactionModals/CertifyModal";
 
 const Modal = ({
   user,
@@ -122,6 +124,24 @@ const Modal = ({
         />
       );
       break;
+    case 7:
+      ModalComponent = (
+        <CertifyModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          showErrorMessage={showErrorMessage}
+          setShowErrorMessage={setShowErrorMessage}
+        />
+      );
+      break;
     default:
       ModalComponent = (
         <BookModal
@@ -136,6 +156,11 @@ const Modal = ({
         />
       );
   }
+
+  <AttachmentModal
+    errorMessage={errorMessage}
+    showErrorMessage={showErrorMessage}
+  />;
 
   return <div>{ModalComponent}</div>;
 };

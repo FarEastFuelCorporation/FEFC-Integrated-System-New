@@ -1,18 +1,138 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, useTheme, IconButton, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
+import axios from "axios";
 import { tokens } from "../theme";
+import AttachmentModal from "./TransactionModals/AttachmentModal";
 
 const Attachments = ({
   row,
   user,
-  handleOpenAttachmentModal,
-  attachmentData,
+  setSuccessMessage,
+  setShowSuccessMessage,
 }) => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const initialAttachmentFormData = {
+    id: "",
+    bookedTransactionId: "",
+    fileName: "",
+    attachment: "",
+    createdBy: user.id,
+  };
+
+  const [openAttachmentModal, setOpenAttachmentModal] = useState(false);
+  const [attachmentFormData, setAttachmentFormData] = useState(
+    initialAttachmentFormData
+  );
+  const [attachmentData, setAttachmentData] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
+  useEffect(() => {
+    if (row && row.Attachment) {
+      setAttachmentData(row.Attachment);
+    }
+  }, [row]);
+
+  const handleCloseAttachmentModal = () => {
+    setOpenAttachmentModal(false);
+    clearAttachmentFormData();
+  };
+
+  const clearAttachmentFormData = () => {
+    setAttachmentFormData(initialAttachmentFormData);
+    setFileName("");
+  };
+
+  const handleOpenAttachmentModal = (row) => {
+    console.log(row);
+    setAttachmentFormData({
+      id: "",
+      bookedTransactionId:
+        row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
+          .bookedTransactionId,
+      fileName: "",
+      attachment: "",
+      createdBy: user.id,
+    });
+    setOpenAttachmentModal(true);
+  };
+
+  const handleAttachmentFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFileName(file.name);
+    }
+  };
+
+  const handleAttachmentInputChange = (e) => {
+    const { name, value } = e.target;
+    setAttachmentFormData({ ...attachmentFormData, [name]: value });
+  };
+
+  const handleAttachmentFormSubmit = async (e) => {
+    e.preventDefault();
+
+    attachmentFormData.attachment = selectedFile;
+
+    // Perform client-side validation
+    const { fileName, attachment } = attachmentFormData;
+
+    // Check if all required fields are filled
+    if (!fileName || !attachment) {
+      console.log("error");
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
+    try {
+      let response;
+
+      if (!attachmentFormData.id) {
+        const newFormData = new FormData();
+        newFormData.append(
+          "bookedTransactionId",
+          attachmentFormData.bookedTransactionId
+        );
+        newFormData.append("fileName", attachmentFormData.fileName);
+        newFormData.append("attachment", attachmentFormData.attachment);
+        newFormData.append("createdBy", attachmentFormData.createdBy);
+
+        // Add new attachment
+        response = await axios.post(`${apiUrl}/attachment`, newFormData);
+
+        const newAttachmentData = response.data.newAttachment;
+
+        // Process the new attachment to include attachmentCreatedBy
+        const processedNewAttachment = {
+          ...newAttachmentData,
+          attachmentCreatedBy: `${newAttachmentData.Employee.firstName} ${newAttachmentData.Employee.lastName}`,
+        };
+
+        // Update the attachmentData with the new processed attachment
+        setAttachmentData((prevAttachmentData) => [
+          ...prevAttachmentData,
+          processedNewAttachment,
+        ]);
+
+        setSuccessMessage("Attachment Added Successfully!");
+      }
+
+      setShowSuccessMessage(true);
+      handleCloseAttachmentModal();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
@@ -20,13 +140,48 @@ const Attachments = ({
     </div>
   );
 
-  console.log(row);
-  console.log(row.Attachment);
-
   const columns = [
     {
-      field: "upload",
-      headerName: "Upload",
+      field: "fileName",
+      headerName: "File Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "attachmentCreatedBy",
+      headerName: "Uploaded By",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "createdAt",
+      headerName: "Timestamp",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => {
+        const timestamp = new Date(params.value);
+        const formattedTimestamp = timestamp.toLocaleString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        });
+        return <div>{formattedTimestamp}</div>;
+      },
+    },
+    {
+      field: "view",
+      headerName: "View File",
       headerAlign: "center",
       align: "center",
       sortable: false,
@@ -36,7 +191,6 @@ const Attachments = ({
           sx={{ color: colors.greenAccent[400], fontSize: "large" }}
           onClick={() => {
             const attachment = params.row.attachment; // Access the longblob data
-            const fileName = params.row.fileName; // Assuming fileName is in the row data
 
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
@@ -82,48 +236,42 @@ const Attachments = ({
         </IconButton>
       ),
     },
-    {
-      field: "fileName",
-      headerName: "Remarks",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "attachmentCreatedBy",
-      headerName: "Uploaded By",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "createdAt",
-      headerName: "Timestamp",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => {
-        const timestamp = new Date(params.value);
-        const formattedTimestamp = timestamp.toLocaleString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        });
-        return <div>{formattedTimestamp}</div>;
-      },
-    },
   ];
 
   return (
-    <Box>
+    <Box
+      sx={{
+        backgroundColor: colors.primary[400],
+        boxShadow: "none",
+        borderBottom: `1px solid ${colors.grey[200]}`,
+        "&:before": {
+          display: "none",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          mx: 2,
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => {
+            handleOpenAttachmentModal(row);
+          }}
+          sx={{
+            my: 2,
+            backgroundColor: `${colors.greenAccent[700]}`,
+            color: `${colors.grey[100]}`,
+          }}
+        >
+          Upload File
+        </Button>
+      </Box>
       <DataGrid
         sx={{
           "& .MuiDataGrid-root": {
@@ -156,7 +304,7 @@ const Attachments = ({
             display: "none",
           },
         }}
-        rows={row.Attachment ? row.Attachment : []}
+        rows={attachmentData ? attachmentData : []}
         columns={columns}
         components={{ Toolbar: GridToolbar }}
         getRowId={(row) => (row.id ? row.id : [])}
@@ -170,6 +318,21 @@ const Attachments = ({
         }}
       />
       <br />
+      <AttachmentModal
+        user={user}
+        open={openAttachmentModal}
+        onClose={handleCloseAttachmentModal}
+        attachmentFormData={attachmentFormData}
+        setAttachmentFormData={setAttachmentFormData}
+        handleAttachmentFileChange={handleAttachmentFileChange}
+        fileName={fileName}
+        handleAttachmentInputChange={handleAttachmentInputChange}
+        handleAttachmentFormSubmit={handleAttachmentFormSubmit}
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
+        showErrorMessage={showErrorMessage}
+        setShowErrorMessage={setShowErrorMessage}
+      />
     </Box>
   );
 };

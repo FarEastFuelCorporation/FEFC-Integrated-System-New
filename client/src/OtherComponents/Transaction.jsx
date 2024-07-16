@@ -33,11 +33,11 @@ const Transaction = ({
   buttonText,
   pendingTransactions,
   finishedTransactions,
-  attachmentData,
   handleOpenModal,
-  handleOpenAttachmentModal,
   handleEditClick,
   handleDeleteClick,
+  setSuccessMessage,
+  setShowSuccessMessage,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -187,7 +187,8 @@ const Transaction = ({
                 <Box>
                   <Attachments
                     row={row}
-                    handleOpenAttachmentModal={handleOpenAttachmentModal}
+                    setSuccessMessage={setSuccessMessage}
+                    setShowSuccessMessage={setShowSuccessMessage}
                     user={user}
                   />
                 </Box>

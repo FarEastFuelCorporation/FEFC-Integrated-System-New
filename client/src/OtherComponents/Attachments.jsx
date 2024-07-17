@@ -194,7 +194,22 @@ const Attachments = ({
 
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
-              const blob = new Blob([byteArray], { type: "application/pdf" }); // Adjust the MIME type as necessary
+
+              // Determine the MIME type based on the file's magic number (first few bytes)
+              let mimeType = "application/octet-stream"; // Default MIME type
+              const magicNumbers = byteArray.slice(0, 4).join(",");
+
+              // Common magic numbers
+              if (magicNumbers.startsWith("255,216,255")) {
+                mimeType = "image/jpeg";
+              } else if (magicNumbers.startsWith("137,80,78,71")) {
+                mimeType = "image/png";
+              } else if (magicNumbers.startsWith("37,80,68,70")) {
+                mimeType = "application/pdf";
+              }
+              // Add more magic numbers as necessary
+
+              const blob = new Blob([byteArray], { type: mimeType });
               const url = URL.createObjectURL(blob); // Create an object URL from the Blob
               window.open(url, "_blank"); // Open the URL in a new tab
             }
@@ -220,7 +235,22 @@ const Attachments = ({
 
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
-              const blob = new Blob([byteArray], { type: "application/pdf" }); // Adjust the MIME type as necessary
+
+              // Determine the MIME type based on the file's magic number (first few bytes)
+              let mimeType = "application/octet-stream"; // Default MIME type
+              const magicNumbers = byteArray.slice(0, 4).join(",");
+              console.log(magicNumbers);
+              // Common magic numbers
+              if (magicNumbers.startsWith("255,216,255")) {
+                mimeType = "image/jpeg";
+              } else if (magicNumbers.startsWith("137,80,78,71")) {
+                mimeType = "image/png";
+              } else if (magicNumbers.startsWith("37,80,68,70")) {
+                mimeType = "application/pdf";
+              }
+              // Add more magic numbers as necessary
+
+              const blob = new Blob([byteArray], { type: mimeType });
               const url = URL.createObjectURL(blob); // Create an object URL from the Blob
 
               const link = document.createElement("a");
@@ -228,7 +258,7 @@ const Attachments = ({
               link.setAttribute("download", fileName); // Use the file name for the download
               document.body.appendChild(link);
               link.click();
-              link.parentNode.removeChild(link);
+              document.body.removeChild(link);
             }
           }}
         >
@@ -304,17 +334,13 @@ const Attachments = ({
             display: "none",
           },
         }}
-        rows={attachmentData ? attachmentData : []}
+        rows={attachmentData || []}
         columns={columns}
         components={{ Toolbar: GridToolbar }}
-        getRowId={(row) => (row.id ? row.id : [])}
-        localeText={{ noRowsLabel: "No Files Uploded" }}
+        getRowId={(row) => row.id}
+        localeText={{ noRowsLabel: "No Files Uploaded" }}
         initialState={{
-          sortModel: [
-            { field: "treatedDate", sort: "asc" },
-            { field: "treatedTime", sort: "asc" },
-            { field: "machineName", sort: "asc" },
-          ],
+          sortModel: [{ field: "createdAt", sort: "asc" }],
         }}
       />
       <br />

@@ -8,6 +8,7 @@ import {
   Button,
 } from "@mui/material";
 import { tokens } from "../../theme";
+import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
 
 const CertifyModal = ({
   open,
@@ -37,104 +38,113 @@ const CertifyModal = ({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        component="form"
-        onSubmit={handleFormSubmit}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 1000,
-          maxHeight: "80vh",
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          overflowY: "scroll",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-      >
-        <Typography variant="h6" component="h2">
-          {formData.id ? "Update Certified Transaction" : "Certify Transaction"}
-        </Typography>
-        <Typography variant="h6" component="h2" color="error">
-          {showErrorMessage && errorMessage}
-        </Typography>
-        <div style={{ width: "100%", display: "flex", gap: "20px" }}>
-          <TextField
-            label="Certified Date"
-            name="certifiedDate"
-            value={formData.certifiedDate}
-            onChange={handleInputChange}
-            fullWidth
-            type="date"
-            required
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Certified Time"
-            name="certifiedTime"
-            value={formData.certifiedTime}
-            onChange={handleInputChange}
-            fullWidth
-            type="time"
-            required
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-        </div>
-        <TextField
-          label="Remarks"
-          name="remarks"
-          value={formData.remarks}
-          onChange={handleInputChange}
-          fullWidth
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
+    <Box>
+      <Modal open={open} onClose={onClose}>
+        <Box
+          component="form"
+          onSubmit={handleFormSubmit}
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 1000,
+            maxHeight: "80vh",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
-          autoComplete="off"
-        />
-        <TextField
-          label="Status Id"
-          name="statusId"
-          value={formData.statusId}
-          onChange={handleInputChange}
-          fullWidth
-          autoComplete="off"
-          style={{ display: "none" }}
-        />
-        <TextField
-          label="Created By"
-          name="createdBy"
-          value={formData.createdBy}
-          onChange={handleInputChange}
-          fullWidth
-          autoComplete="off"
-          style={{ display: "none" }}
-        />
-        <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-          {formData.id ? "Update" : "Certify"}
-        </Button>
-      </Box>
-    </Modal>
+        >
+          <Typography variant="h6" component="h2">
+            {formData.id
+              ? "Update Certified Transaction"
+              : "Certify Transaction"}
+          </Typography>
+          <Typography variant="h6" component="h2" color="error">
+            {showErrorMessage && errorMessage}
+          </Typography>
+          <div style={{ width: "100%", display: "flex", gap: "20px" }}>
+            <TextField
+              label="Certified Date"
+              name="certifiedDate"
+              value={formData.certifiedDate}
+              onChange={handleInputChange}
+              fullWidth
+              type="date"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+            <TextField
+              label="Certified Time"
+              name="certifiedTime"
+              value={formData.certifiedTime}
+              onChange={handleInputChange}
+              fullWidth
+              type="time"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </div>
+          <TextField
+            label="Remarks"
+            name="remarks"
+            value={formData.remarks}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Status Id"
+            name="statusId"
+            value={formData.statusId}
+            onChange={handleInputChange}
+            fullWidth
+            autoComplete="off"
+            style={{ display: "none" }}
+          />
+          <TextField
+            label="Created By"
+            name="createdBy"
+            value={formData.createdBy}
+            onChange={handleInputChange}
+            fullWidth
+            autoComplete="off"
+            style={{ display: "none" }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleFormSubmit}
+          >
+            {formData.id ? "Update" : "Certify"}
+          </Button>
+        </Box>
+      </Modal>
+      <CertificateOfDestruction />
+    </Box>
   );
 };
 

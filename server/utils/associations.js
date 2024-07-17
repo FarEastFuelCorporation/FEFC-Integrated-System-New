@@ -28,6 +28,7 @@ const TreatmentMachine = require("../models/TreatmentMachine");
 const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const Attachment = require("../models/Attachment");
+const CertifiedTransaction = require("../models/CertifiedTransaction");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -548,6 +549,19 @@ TreatmentMachine.hasMany(TreatedWasteTransaction, {
 TreatedWasteTransaction.belongsTo(TreatmentMachine, {
   as: "TreatmentMachine",
   foreignKey: "treatmentMachineId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+SortedTransaction.hasMany(CertifiedTransaction, {
+  as: "CertifiedTransaction",
+  foreignKey: "sortedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CertifiedTransaction.belongsTo(SortedTransaction, {
+  as: "SortedTransaction",
+  foreignKey: "sortedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

@@ -1,7 +1,9 @@
 // config/database.js
 
 const { Sequelize } = require("sequelize");
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT, // Change this to your database dialect (e.g., mysql, postgres, etc.)

@@ -143,7 +143,7 @@ const CertifyModal = ({
           </Button>
         </Box>
       </Modal>
-      <CertificateOfDestruction />
+      {/* <CertificateOfDestruction /> */}
     </Box>
   );
 };

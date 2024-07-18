@@ -34,17 +34,17 @@ const SortedTransaction = ({ row }) => {
     return date;
   };
 
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "2-digit" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
   const formatWeight = (weight) => {
     return new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(weight);
   };
+
+  // const formatDate = (dateString) => {
+  //   const options = { year: "numeric", month: "long", day: "2-digit" };
+  //   return new Date(dateString).toLocaleDateString(undefined, options);
+  // };
 
   // const renderCellWithWrapText = (params) => (
   //   <div className={"wrap-text"} style={{ textAlign: "center" }}>

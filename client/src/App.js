@@ -45,7 +45,7 @@ const App = () => {
       .finally(() => {
         setLoading(false); // Set loading to false after the request completes (success or error)
       });
-  }, [apiUrl]);
+  }, [apiUrl, navigate]);
 
   if (loading) {
     return <LoadingSpinner theme={theme} />;

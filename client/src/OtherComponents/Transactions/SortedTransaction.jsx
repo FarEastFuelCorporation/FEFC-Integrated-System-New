@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
@@ -58,57 +58,57 @@ const SortedTransaction = ({ row }) => {
     </div>
   );
 
-  const columns = [
-    {
-      field: "treatedDate",
-      headerName: "Treated Date",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithFormattedDate,
-    },
-    {
-      field: "treatedTime",
-      headerName: "Treated Time",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "treatmentProcess",
-      headerName: "Treatment Process",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "machineName",
-      headerName: "Treatment Machine",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "weight",
-      headerName: "Weight",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => (
-        <div className={"wrap-text"} style={{ textAlign: "center" }}>
-          {formatWeight(params.value)}
-        </div>
-      ),
-    },
-  ];
+  // const columns = [
+  //   {
+  //     field: "treatedDate",
+  //     headerName: "Treated Date",
+  //     headerAlign: "center",
+  //     align: "center",
+  //     flex: 1,
+  //     minWidth: 150,
+  //     renderCell: renderCellWithFormattedDate,
+  //   },
+  //   {
+  //     field: "treatedTime",
+  //     headerName: "Treated Time",
+  //     headerAlign: "center",
+  //     align: "center",
+  //     flex: 1,
+  //     minWidth: 150,
+  //     renderCell: renderCellWithWrapText,
+  //   },
+  //   {
+  //     field: "treatmentProcess",
+  //     headerName: "Treatment Process",
+  //     headerAlign: "center",
+  //     align: "center",
+  //     flex: 1,
+  //     minWidth: 150,
+  //     renderCell: renderCellWithWrapText,
+  //   },
+  //   {
+  //     field: "machineName",
+  //     headerName: "Treatment Machine",
+  //     headerAlign: "center",
+  //     align: "center",
+  //     flex: 1,
+  //     minWidth: 150,
+  //     renderCell: renderCellWithWrapText,
+  //   },
+  //   {
+  //     field: "weight",
+  //     headerName: "Weight",
+  //     headerAlign: "center",
+  //     align: "center",
+  //     flex: 1,
+  //     minWidth: 150,
+  //     renderCell: (params) => (
+  //       <div className={"wrap-text"} style={{ textAlign: "center" }}>
+  //         {formatWeight(params.value)}
+  //       </div>
+  //     ),
+  //   },
+  // ];
 
   return (
     <Box>

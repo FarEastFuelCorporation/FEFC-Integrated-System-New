@@ -46,17 +46,17 @@ const SortedTransaction = ({ row }) => {
     }).format(weight);
   };
 
-  const renderCellWithWrapText = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {params.value}
-    </div>
-  );
+  // const renderCellWithWrapText = (params) => (
+  //   <div className={"wrap-text"} style={{ textAlign: "center" }}>
+  //     {params.value}
+  //   </div>
+  // );
 
-  const renderCellWithFormattedDate = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {formatDate(params.value)}
-    </div>
-  );
+  // const renderCellWithFormattedDate = (params) => (
+  //   <div className={"wrap-text"} style={{ textAlign: "center" }}>
+  //     {formatDate(params.value)}
+  //   </div>
+  // );
 
   // const columns = [
   //   {

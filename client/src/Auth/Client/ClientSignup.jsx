@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const ClientSignup = ({ onLogin }) => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const [clientId, setClientId] = useState("");
   const [clientUsername, setClientUsername] = useState("");
@@ -17,7 +18,7 @@ const ClientSignup = ({ onLogin }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/clientSignup",
+        `${apiUrl}/clientSignup`,
         { clientId, clientUsername, password },
         { withCredentials: true }
       );

@@ -91,7 +91,7 @@ async function createEmployeeSignupController(req, res) {
 // Create Employee Login controller
 async function createEmployeeLoginController(req, res) {
   const { employeeUsername, password } = req.body;
-
+  console.log("pass");
   try {
     // Find the user with the provided employee ID
     const user = await User.findOne({ where: { employeeUsername } });

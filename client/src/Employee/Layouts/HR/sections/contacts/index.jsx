@@ -1,13 +1,145 @@
 import { useState, useEffect } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, IconButton, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import PostAddIcon from "@mui/icons-material/PostAdd";
 import Header from "../Header";
+import axios from "axios";
 import { tokens } from "../../../../../theme";
+import EmployeeRecordModal from "../../../../../OtherComponents/Modals/EmployeeRecordModal";
 
-const Contacts = () => {
+const Contacts = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const initialFormData = {
+    id: "",
+    employeeId: "",
+    gender: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    spouseSurname: "",
+    createdBy: user.id,
+  };
+
+  const [openModal, setOpenModal] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
+  const [employeeData, setEmployeeData] = useState([]);
+  const [gender, setGender] = useState(formData.gender || "");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/hrDashboard/employee`);
+        const employeeRecords = await response.json();
+        const data = await employeeRecords.employeeRecords;
+        const rowsWithId = data.map((row, index) => ({
+          ...row,
+          id: index + 1,
+        }));
+        const rowsPadded = rowsWithId.map((row) => ({
+          ...row,
+          employeeId: row["employeeId"].toString().padStart(5, "0"),
+        }));
+        setEmployeeData(rowsPadded);
+      } catch (error) {
+        console.error("Error fetching employeeData:", error);
+      }
+    };
+
+    fetchData();
+  }, [apiUrl]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    clearFormData();
+  };
+
+  const clearFormData = () => {
+    setFormData(initialFormData);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    // Perform client-side validation
+    const { treatmentProcessId, machineName } = formData;
+    if (!treatmentProcessId || !machineName) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
+    // try {
+    //   let response;
+
+    //   if (formData.id) {
+    //     // Update existing treatment machine
+    //     response = await axios.put(
+    //       `${apiUrl}/treatmentMachine/${formData.id}`,
+    //       formData
+    //     );
+
+    //     if (response && Array.isArray(response.data.treatmentMachines)) {
+    //       const flattenedData = response.data.treatmentMachines.map(
+    //         (machine) => ({
+    //           ...machine,
+    //           treatmentProcess: machine.TreatmentProcess
+    //             ? machine.TreatmentProcess.treatmentProcess
+    //             : null,
+    //         })
+    //       );
+
+    //       setTreatmentMachines(flattenedData);
+    //       setSuccessMessage("Treatment Machine Updated Successfully!");
+    //     } else {
+    //       console.error(
+    //         "treatmentMachineResponse is undefined or not an array"
+    //       );
+    //     }
+    //   } else {
+    //     // Add new treatment machine
+    //     response = await axios.post(`${apiUrl}/treatmentMachine`, formData);
+
+    //     if (response && Array.isArray(response.data.treatmentMachines)) {
+    //       const flattenedData = response.data.treatmentMachines.map(
+    //         (machine) => ({
+    //           ...machine,
+    //           treatmentProcess: machine.TreatmentProcess
+    //             ? machine.TreatmentProcess.treatmentProcess
+    //             : null,
+    //         })
+    //       );
+
+    //       setTreatmentMachines(flattenedData);
+    //       setSuccessMessage("Treatment Machine Added Successfully!");
+    //     } else {
+    //       console.error(
+    //         "treatmentMachineResponse is undefined or not an array"
+    //       );
+    //     }
+    //   }
+
+    //   setShowSuccessMessage(true);
+    //   handleCloseModal();
+    // } catch (error) {
+    //   console.error("Error:", error);
+    // }
+  };
 
   const columns = [
     { field: "employeeId", headerName: "Employee ID" },
@@ -79,37 +211,21 @@ const Contacts = () => {
     { field: "submittedBy", headerName: "Submitted By" },
   ];
 
-  const [employeeData, setEmployeeData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/hrDashboard/employee`);
-        const employeeRecords = await response.json();
-        const data = await employeeRecords.employeeRecords;
-        const rowsWithId = data.map((row, index) => ({
-          ...row,
-          id: index + 1,
-        }));
-        const rowsPadded = rowsWithId.map((row) => ({
-          ...row,
-          employeeId: row["employeeId"].toString().padStart(5, "0"),
-        }));
-        setEmployeeData(rowsPadded);
-      } catch (error) {
-        console.error("Error fetching employeeData:", error);
-      }
-    };
-
-    fetchData();
-  }, [apiUrl]);
-
   return (
     <Box p="20px" width="100% !important">
-      <Header
-        title="Employee Records"
-        subtitle="List of Employee for Future Reference"
-      />
+      <Box display="flex" justifyContent="space-between">
+        <Header
+          title="Employee Records"
+          subtitle="List of Employee for Future Reference"
+        />
+        {user.userType === 9 && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
+      </Box>
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -147,6 +263,15 @@ const Contacts = () => {
           components={{ Toolbar: GridToolbar }}
         />
       </Box>
+      <EmployeeRecordModal
+        openModal={openModal}
+        handleCloseModal={handleCloseModal}
+        handleInputChange={handleInputChange}
+        formData={formData}
+        handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
+      />
     </Box>
   );
 };

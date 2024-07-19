@@ -16,7 +16,6 @@ const EmployeeLogin = ({ onLogin }) => {
     setError(null);
 
     try {
-      console.log(`${apiUrl}/employeeLogin ${employeeUsername} ${password}`);
       const response = await axios.post(
         `${apiUrl}/employeeLogin`,
         { employeeUsername, password },

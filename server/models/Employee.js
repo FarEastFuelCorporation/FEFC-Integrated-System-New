@@ -28,7 +28,7 @@ const Employee = sequelize.define(
     affix: {
       type: DataTypes.STRING,
     },
-    gender: {
+    2: {
       type: DataTypes.STRING,
       allowNull: false,
     },

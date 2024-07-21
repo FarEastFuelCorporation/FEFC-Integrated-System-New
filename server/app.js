@@ -80,7 +80,7 @@ app.get("/api/session", (req, res) => {
 // Include your routes
 const authRoutes = require("./routes/auth");
 const othersRoutes = require("./routes/others");
-const locationApiRoutes = require("./routes/locationApiRoutes");
+const geoTableRoutes = require("./routes/geoTableRoutes");
 const requestsRoutes = require("./routes/requests");
 const clientRoutes = require("./routes/clientRoutes");
 const quotationRoutes = require("./routes/quotationRoutes");
@@ -106,7 +106,7 @@ const sequelize = require("./config/database");
 
 app.use(authRoutes);
 app.use(othersRoutes);
-app.use(locationApiRoutes);
+app.use("/geoTable", geoTableRoutes);
 app.use("/request", requestsRoutes);
 app.use("/client", clientRoutes);
 app.use("/quotation", quotationRoutes);

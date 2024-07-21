@@ -29,6 +29,7 @@ const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const Attachment = require("../models/Attachment");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
+const GeoTable = require("../models/GeoTable");
 
 // Define associations
 Client.hasMany(ClientUser, {
@@ -578,4 +579,5 @@ module.exports = {
   Client,
   TransactionStatus,
   VehicleLog,
+  GeoTable,
 };

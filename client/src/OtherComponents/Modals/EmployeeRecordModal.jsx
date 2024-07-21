@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Modal,
@@ -19,8 +19,6 @@ import {
 import axios from "axios";
 import { tokens } from "../../theme";
 
-const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
-
 const EmployeeRecordModal = ({
   openModal,
   handleCloseModal,
@@ -30,169 +28,71 @@ const EmployeeRecordModal = ({
   errorMessage,
   showErrorMessage,
 }) => {
-  const provincesList = [
-    "Abra",
-    "Agusan del Norte",
-    "Agusan del Sur",
-    "Aklan",
-    "Albay",
-    "Antique",
-    "Apayao",
-    "Aurora",
-    "Basilan",
-    "Bataan",
-    "Batanes",
-    "Batangas",
-    "Benguet",
-    "Biliran",
-    "Bohol",
-    "Bukidnon",
-    "Bulacan",
-    "Cagayan",
-    "Camarines Norte",
-    "Camarines Sur",
-    "Camiguin",
-    "Capiz",
-    "Catanduanes",
-    "Cavite",
-    "Cebu",
-    "Cotabato",
-    "Davao de Oro",
-    "Davao del Norte",
-    "Davao del Sur",
-    "Davao Occidental",
-    "Davao Oriental",
-    "Dinagat Islands",
-    "Eastern Samar",
-    "Guimaras",
-    "Ifugao",
-    "Ilocos Norte",
-    "Ilocos Sur",
-    "Iloilo",
-    "Isabela",
-    "Kalinga",
-    "Kamisar",
-    "La Union",
-    "Laguna",
-    "Lanao del Norte",
-    "Lanao del Sur",
-    "Leyte",
-    "Maguindanao",
-    "Marinduque",
-    "Masbate",
-    "Metro Manila",
-    "Misamis Occidental",
-    "Misamis Oriental",
-    "Mountain Province",
-    "Negros Occidental",
-    "Negros Oriental",
-    "Northern Samar",
-    "Nueva Ecija",
-    "Nueva Vizcaya",
-    "Occidental Mindoro",
-    "Oriental Mindoro",
-    "Palawan",
-    "Pampanga",
-    "Pangasinan",
-    "Quezon",
-    "Quirino",
-    "Rizal",
-    "Romblon",
-    "Samar",
-    "Sarangani",
-    "Siquijor",
-    "Sorsogon",
-    "Southern Leyte",
-    "Sultan Kudarat",
-    "Sulu",
-    "Surigao del Norte",
-    "Surigao del Sur",
-    "Tarlac",
-    "Tawi-Tawi",
-    "Zambales",
-    "Zamboanga del Norte",
-    "Zamboanga del Sur",
-    "Zamboanga Sibugay",
-  ];
-
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  console.log(API_KEY);
   const [currentStep, setCurrentStep] = useState(0);
   const [gender, setGender] = useState(formData.gender);
   const [civilStatus, setCivilStatus] = useState(formData.civilStatus);
-
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
-  const [provinces, setProvinces] = useState(provincesList);
+  const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
-  const [barangays, setBarangays] = useState([]);
+  const [barangays, setBaranggays] = useState([]);
 
-  const fetchOptions = useCallback(
-    async (input, level, setState, additionalParams = {}) => {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const queryParams = new URLSearchParams({
-          input,
-          level,
-          ...additionalParams,
-        });
-        const response = await axios.get(
-          `${apiUrl}/api/autocomplete?${queryParams}`
-        );
+        const response = await axios.get(`${apiUrl}/geoTable/province`);
 
-        if (response.data && response.data.predictions) {
-          const formattedOptions = response.data.predictions.map(
-            (prediction) => ({
-              label: prediction.structured_formatting.main_text,
-              place_id: prediction.place_id,
-            })
-          );
-          console.log(formattedOptions);
-          setState(formattedOptions);
-        }
+        console.log(response.data.provinces);
+        setProvinces(response.data.provinces);
       } catch (error) {
-        console.error(`Error fetching ${level} options:`, error);
-      }
-    },
-    [apiUrl]
-  );
-
-  useEffect(() => {
-    // Fetch initial provinces in the Philippines
-    const fetchProvinces = async () => {
-      await fetchOptions(
-        "Philippines",
-        "administrative_area_level_1",
-        setProvinces
-      );
-    };
-    fetchProvinces();
-  }, [fetchOptions]);
-
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (selectedProvince) {
-        await fetchOptions("", "locality", setCities, {
-          province_id: selectedProvince.place_id,
-        });
-        setSelectedCity(null);
-        setBarangays([]);
+        console.error("Error fetching province:", error);
       }
     };
-    fetchCities();
-  }, [selectedProvince, fetchOptions]);
+
+    fetchData();
+  }, [apiUrl]);
 
   useEffect(() => {
-    const fetchBarangays = async () => {
-      if (selectedCity) {
-        await fetchOptions("", "sublocality_level_1", setBarangays, {
-          city_id: selectedCity.place_id,
-        });
-      }
-    };
-    fetchBarangays();
-  }, [selectedCity, fetchOptions]);
+    if (selectedProvince) {
+      const fetchCities = async () => {
+        try {
+          const response = await axios.get(
+            `${apiUrl}/geoTable/city/${selectedProvince}`
+          );
+          console.log(response.data.cities);
+          setCities(response.data.cities);
+        } catch (error) {
+          console.error("Error fetching cities:", error);
+        }
+      };
+
+      fetchCities();
+    }
+  }, [selectedProvince, apiUrl]);
+
+  useEffect(() => {
+    if (selectedCity) {
+      const fetchBaranggays = async () => {
+        try {
+          const response = await axios.get(
+            `${apiUrl}/geoTable/baranggays/${selectedCity}`
+          );
+          console.log(response.data.baranggays);
+          setBaranggays(response.data.baranggays);
+        } catch (error) {
+          console.error("Error fetching baranggays:", error);
+        }
+      };
+
+      fetchBaranggays();
+    } else {
+      // Clear barangays if no city is selected
+      setBaranggays([]);
+    }
+  }, [selectedCity, apiUrl]);
 
   const handleGenderChange = (event) => {
     const selectedGender = event.target.value;
@@ -435,7 +335,7 @@ const EmployeeRecordModal = ({
             <Grid container spacing={2} mb={2}>
               <Grid item xs={4}>
                 <Autocomplete
-                  options={provincesList}
+                  options={provinces}
                   value={selectedProvince}
                   onChange={(event, newValue) => {
                     setSelectedProvince(newValue);
@@ -458,7 +358,6 @@ const EmployeeRecordModal = ({
               <Grid item xs={4}>
                 <Autocomplete
                   options={cities}
-                  getOptionLabel={(option) => option.label}
                   value={selectedCity}
                   onChange={(event, newValue) => {
                     setSelectedCity(newValue);
@@ -482,17 +381,16 @@ const EmployeeRecordModal = ({
               <Grid item xs={4}>
                 <Autocomplete
                   options={barangays}
-                  getOptionLabel={(option) => option.label}
                   value={formData.barangay}
                   onChange={(event, newValue) => {
                     handleInputChange({
-                      target: { name: "barangay", value: newValue },
+                      target: { name: "baranggay", value: newValue },
                     });
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Barangay"
+                      label="Baranggay"
                       fullWidth
                       InputLabelProps={{
                         style: {
@@ -506,20 +404,61 @@ const EmployeeRecordModal = ({
                 />
               </Grid>
             </Grid>
+            <Grid container spacing={2} mb={2}>
+              <Grid item xs={6}>
+                <TextField
+                  label="Street"
+                  name="street"
+                  value={formData.street}
+                  onChange={handleInputChange}
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  label="Subdivision/Village"
+                  name="subdivisionVillage"
+                  value={formData.subdivisionVillage}
+                  onChange={handleInputChange}
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+            </Grid>
           </Box>
         );
       case 2:
         return (
           <Box>
-            <Typography>Review & Submit</Typography>
-            <pre>{JSON.stringify(formData, null, 2)}</pre>
+            <Typography variant="h6" gutterBottom>
+              Review your details:
+            </Typography>
+            {/* Add review details here */}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={handleFormSubmit}
+            >
+              Submit
+            </Button>
           </Box>
         );
       default:
         return null;
     }
   };
-
   return (
     <Box>
       <Modal open={openModal} onClose={handleCloseModal}>

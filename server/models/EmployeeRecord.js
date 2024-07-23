@@ -17,15 +17,43 @@ const EmployeeRecord = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    certifiedDate: {
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    middleName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    husbandSurname: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    affix: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    civilStatus: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    birthday: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    certifiedTime: {
-      type: DataTypes.TIME,
-      allowNull: false,
+    birthPlace: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    remarks: {
+    bloodType: {
       type: DataTypes.STRING,
       allowNull: true,
     },

@@ -9,7 +9,7 @@ const GeoTable = sequelize.define("GeoTable", {
     allowNull: false,
     primaryKey: true,
   },
-  baranggay: {
+  barangay: {
     type: DataTypes.STRING,
     allowNull: false,
   },

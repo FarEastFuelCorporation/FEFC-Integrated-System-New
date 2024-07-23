@@ -15,11 +15,15 @@ const Contacts = ({ user }) => {
   const initialFormData = {
     id: "",
     employeeId: "",
-    gender: "",
     firstName: "",
     middleName: "",
     lastName: "",
-    spouseSurname: "",
+    husbandSurname: "",
+    gender: "",
+    civilStatus: "",
+    birthday: "",
+    birthPlace: "",
+    bloodType: "",
     createdBy: user.id,
   };
 
@@ -70,6 +74,9 @@ const Contacts = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(e);
+    console.log(name);
+    console.log(value);
     setFormData({ ...formData, [name]: value });
   };
 

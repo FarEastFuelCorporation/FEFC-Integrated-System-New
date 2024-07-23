@@ -5,16 +5,16 @@ const router = express.Router();
 const {
   getProvincesController,
   getCitiesController,
-  getBaranggaysController,
+  getBarangaysController,
 } = require("../controllers/geoTableController");
 
 // Get Provinces route
 router.get("/province", getProvincesController);
 
 // Get Provinces route
-router.get("/cities/:province", getCitiesController);
+router.get("/citY/:province", getCitiesController);
 
 // Get Provinces route
-router.get("/baranggays/:city", getBaranggaysController);
+router.get("/barangay/:city", getBarangaysController);
 
 module.exports = router;

@@ -34,65 +34,92 @@ const EmployeeRecordModal = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [gender, setGender] = useState(formData.gender);
   const [civilStatus, setCivilStatus] = useState(formData.civilStatus);
-  const [selectedProvince, setSelectedProvince] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
-  const [barangays, setBaranggays] = useState([]);
+  const [barangays, setBarangays] = useState([]);
+  const [otherCities, setOtherCities] = useState([]);
+  const [otherBarangays, setOtherBarangays] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${apiUrl}/geoTable/province`);
-
         console.log(response.data.provinces);
         setProvinces(response.data.provinces);
       } catch (error) {
-        console.error("Error fetching province:", error);
+        console.error("Error fetching provinces:", error);
       }
     };
-
     fetchData();
   }, [apiUrl]);
 
-  useEffect(() => {
-    if (selectedProvince) {
-      const fetchCities = async () => {
-        try {
-          const response = await axios.get(
-            `${apiUrl}/geoTable/city/${selectedProvince}`
-          );
-          console.log(response.data.cities);
-          setCities(response.data.cities);
-        } catch (error) {
-          console.error("Error fetching cities:", error);
-        }
-      };
-
-      fetchCities();
-    }
-  }, [selectedProvince, apiUrl]);
-
-  useEffect(() => {
-    if (selectedCity) {
-      const fetchBaranggays = async () => {
-        try {
-          const response = await axios.get(
-            `${apiUrl}/geoTable/baranggays/${selectedCity}`
-          );
-          console.log(response.data.baranggays);
-          setBaranggays(response.data.baranggays);
-        } catch (error) {
-          console.error("Error fetching baranggays:", error);
-        }
-      };
-
-      fetchBaranggays();
+  const fetchCities = async (province) => {
+    if (province) {
+      try {
+        const response = await axios.get(`${apiUrl}/geoTable/city/${province}`);
+        console.log(response.data.cities);
+        setCities(response.data.cities);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
     } else {
-      // Clear barangays if no city is selected
-      setBaranggays([]);
+      setCities([]);
+      setBarangays([]);
     }
-  }, [selectedCity, apiUrl]);
+    formData.municipality = null;
+    formData.barangay = null;
+  };
+
+  const fetchBarangays = async (municipality) => {
+    if (municipality) {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/geoTable/barangay/${municipality}`
+        );
+        console.log(response.data.barangays);
+        setBarangays(response.data.barangays);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    } else {
+      setBarangays([]);
+    }
+    formData.barangay = null;
+  };
+
+  const fetchOtherCities = async (province) => {
+    if (province) {
+      try {
+        const response = await axios.get(`${apiUrl}/geoTable/city/${province}`);
+        console.log(response.data.cities);
+        setOtherCities(response.data.cities);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    } else {
+      setOtherCities([]);
+      setBarangays([]);
+    }
+    formData.otherMunicipality = null;
+    formData.otherBarangay = null;
+  };
+
+  const fetchOtherBarangays = async (municipality) => {
+    if (municipality) {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/geoTable/barangay/${municipality}`
+        );
+        console.log(response.data.barangays);
+        setOtherBarangays(response.data.barangays);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    } else {
+      setOtherBarangays([]);
+    }
+    formData.otherBarangay = null;
+  };
 
   const handleGenderChange = (event) => {
     const selectedGender = event.target.value;
@@ -116,7 +143,8 @@ const EmployeeRecordModal = ({
 
   const steps = [
     "Personal Information",
-    "Additional Details",
+    "Employment Details",
+    "Family Background",
     "Review & Submit",
   ];
 
@@ -126,7 +154,7 @@ const EmployeeRecordModal = ({
         return (
           <Box>
             <Grid container spacing={2} mb={2}>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <TextField
                   label="Employee Id"
                   name="employeeId"
@@ -135,20 +163,17 @@ const EmployeeRecordModal = ({
                   fullWidth
                   required
                   InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <FormControl fullWidth>
                   <InputLabel
                     id="gender-select-label"
-                    style={{
-                      color: colors.grey[100],
-                    }}
+                    style={{ color: colors.grey[100] }}
+                    required
                   >
                     Gender
                   </InputLabel>
@@ -159,7 +184,6 @@ const EmployeeRecordModal = ({
                     onChange={handleGenderChange}
                     label="Gender"
                     fullWidth
-                    required
                     disabled={!!formData.id}
                   >
                     <MenuItem value={"Male"}>Male</MenuItem>
@@ -167,13 +191,12 @@ const EmployeeRecordModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <FormControl fullWidth>
                   <InputLabel
                     id="civilStatus-select-label"
-                    style={{
-                      color: colors.grey[100],
-                    }}
+                    style={{ color: colors.grey[100] }}
+                    required
                   >
                     Civil Status
                   </InputLabel>
@@ -184,7 +207,6 @@ const EmployeeRecordModal = ({
                     onChange={handleCivilStatusChange}
                     label="civilStatus"
                     fullWidth
-                    required
                   >
                     <MenuItem value={"Single"}>Single</MenuItem>
                     <MenuItem value={"Married"}>Married</MenuItem>
@@ -197,7 +219,7 @@ const EmployeeRecordModal = ({
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={2}>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <TextField
                   label="First Name"
                   name="firstName"
@@ -206,14 +228,12 @@ const EmployeeRecordModal = ({
                   fullWidth
                   required
                   InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <TextField
                   label="Middle Name"
                   name="middleName"
@@ -221,14 +241,12 @@ const EmployeeRecordModal = ({
                   onChange={handleInputChange}
                   fullWidth
                   InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <TextField
                   label="Last Name"
                   name="lastName"
@@ -237,34 +255,44 @@ const EmployeeRecordModal = ({
                   fullWidth
                   required
                   InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
               </Grid>
               {gender === "Female" &&
-                (civilStatus === "Married" || civilStatus === "Widow") && (
-                  <Grid item xs={3}>
-                    <TextField
-                      label="Spouse Surname"
-                      name="spouseSurname"
-                      value={formData.spouseSurname}
-                      onChange={handleInputChange}
-                      fullWidth
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                      autoComplete="off"
-                    />
-                  </Grid>
-                )}
+              (civilStatus === "Married" || civilStatus === "Widow") ? (
+                <Grid item xs={12} md={6} lg={3}>
+                  <TextField
+                    label="Husband's Surname"
+                    name="husbandSurname"
+                    value={formData.husbandSurname}
+                    onChange={handleInputChange}
+                    fullWidth
+                    InputLabelProps={{
+                      style: { color: colors.grey[100] },
+                    }}
+                    autoComplete="off"
+                  />
+                </Grid>
+              ) : (
+                <Grid item xs={12} md={6} lg={3}>
+                  <TextField
+                    label="Affix"
+                    name="affix"
+                    value={formData.affix}
+                    onChange={handleInputChange}
+                    fullWidth
+                    InputLabelProps={{
+                      style: { color: colors.grey[100] },
+                    }}
+                    autoComplete="off"
+                  />
+                </Grid>
+              )}
             </Grid>
             <Grid container spacing={2} mb={2}>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <TextField
                   label="Birthday"
                   name="birthday"
@@ -275,9 +303,7 @@ const EmployeeRecordModal = ({
                   required
                   InputLabelProps={{
                     shrink: true,
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
@@ -289,21 +315,18 @@ const EmployeeRecordModal = ({
                   value={formData.birthPlace}
                   onChange={handleInputChange}
                   fullWidth
+                  required
                   InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} md={6} lg={3}>
                 <FormControl fullWidth>
                   <InputLabel
                     id="bloodType-select-label"
-                    style={{
-                      color: colors.grey[100],
-                    }}
+                    style={{ color: colors.grey[100] }}
                   >
                     Blood Type
                   </InputLabel>
@@ -323,8 +346,244 @@ const EmployeeRecordModal = ({
                     <MenuItem value={"AB-"}>AB-</MenuItem>
                     <MenuItem value={"O+"}>O+</MenuItem>
                     <MenuItem value={"O-"}>O-</MenuItem>
+                    <MenuItem value={"UNKNOWN"}>Unknown</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
+            </Grid>
+            <Typography variant="subtitle2" gutterBottom>
+              Present Address
+            </Typography>
+            <Grid container spacing={2} mb={2}>
+              <Grid item xs={12} md={6} lg={3}>
+                <Autocomplete
+                  id="province-select"
+                  options={provinces}
+                  value={formData.province}
+                  onChange={(event, newValue) => {
+                    fetchCities(newValue);
+                    handleInputChange({
+                      target: { name: "province", value: newValue },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Province"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      fullWidth
+                      required
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Autocomplete
+                  id="city-select"
+                  options={cities}
+                  value={formData.municipality}
+                  onChange={(event, newValue) => {
+                    fetchBarangays(newValue);
+                    handleInputChange({
+                      target: { name: "municipality", value: newValue },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="City/Municipality"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      fullWidth
+                      required
+                    />
+                  )}
+                  disabled={!formData.province}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Autocomplete
+                  id="barangay-select"
+                  options={barangays}
+                  value={formData.barangay}
+                  onChange={(event, newValue) => {
+                    handleInputChange({
+                      target: { name: "barangay", value: newValue },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Barangay"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      fullWidth
+                      required
+                    />
+                  )}
+                  disabled={!formData.municipality}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <TextField
+                  label="House No./Street Name/"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+            </Grid>
+            <Typography variant="subtitle2" gutterBottom>
+              Other Address
+            </Typography>
+            <Grid container spacing={2} mb={2}>
+              <Grid item xs={12} md={6} lg={3}>
+                <Autocomplete
+                  id="province-select"
+                  options={provinces}
+                  value={formData.otherProvince}
+                  onChange={(event, newValue) => {
+                    fetchOtherCities(newValue);
+                    handleInputChange({
+                      target: {
+                        name: "otherProvince",
+                        value: newValue,
+                      },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Province"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      fullWidth
+                      required
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Autocomplete
+                  id="city-select"
+                  options={otherCities}
+                  value={formData.otherMunicipality}
+                  onChange={(event, newValue) => {
+                    fetchOtherBarangays(newValue);
+                    handleInputChange({
+                      target: { name: "otherMunicipality", value: newValue },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="City/Municipality"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      fullWidth
+                      required
+                    />
+                  )}
+                  disabled={!formData.otherProvince}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Autocomplete
+                  id="barangay-select"
+                  options={otherBarangays}
+                  value={formData.otherBarangay}
+                  onChange={(event, newValue) => {
+                    handleInputChange({
+                      target: {
+                        name: "otherBarangay",
+                        value: newValue,
+                      },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Barangay"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      fullWidth
+                      required
+                    />
+                  )}
+                  disabled={!formData.otherMunicipality}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <TextField
+                  label="House No./Street Name/"
+                  name="otherAddress"
+                  value={formData.otherAddress}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+            </Grid>
+            <Typography variant="subtitle2" gutterBottom>
+              Contact Information
+            </Typography>
+            <Grid container spacing={2} mb={2}>
+              <Grid item xs={12} md={6} lg={4}>
+                <TextField
+                  label="Mobile Number"
+                  name="mobileNumber"
+                  value={formData.mobileNumber}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={4}>
+                <TextField
+                  label="Landline Number"
+                  name="landlineNumber"
+                  value={formData.landlineNumber}
+                  onChange={handleInputChange}
+                  fullWidth
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={4}>
+                <TextField
+                  label="Email Address"
+                  name="emailAddress"
+                  value={formData.emailAddress}
+                  onChange={handleInputChange}
+                  fullWidth
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
               </Grid>
             </Grid>
           </Box>
@@ -332,108 +591,70 @@ const EmployeeRecordModal = ({
       case 1:
         return (
           <Box>
+            {" "}
             <Grid container spacing={2} mb={2}>
-              <Grid item xs={4}>
-                <Autocomplete
-                  options={provinces}
-                  value={selectedProvince}
-                  onChange={(event, newValue) => {
-                    setSelectedProvince(newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Province"
-                      fullWidth
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                      autoComplete="off"
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Autocomplete
-                  options={cities}
-                  value={selectedCity}
-                  onChange={(event, newValue) => {
-                    setSelectedCity(newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="City"
-                      fullWidth
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                      autoComplete="off"
-                    />
-                  )}
-                  disabled={!selectedProvince}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Autocomplete
-                  options={barangays}
-                  value={formData.barangay}
-                  onChange={(event, newValue) => {
-                    handleInputChange({
-                      target: { name: "baranggay", value: newValue },
-                    });
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Baranggay"
-                      fullWidth
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                      autoComplete="off"
-                    />
-                  )}
-                  disabled={!selectedCity}
-                />
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={6}>
+              <Grid item xs={12} md={6} lg={3}>
                 <TextField
-                  label="Street"
-                  name="street"
-                  value={formData.street}
+                  label="Employee Id"
+                  name="employeeId"
+                  value={formData.employeeId}
                   onChange={handleInputChange}
                   fullWidth
+                  required
                   InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+                    style: { color: colors.grey[100] },
                   }}
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Subdivision/Village"
-                  name="subdivisionVillage"
-                  value={formData.subdivisionVillage}
-                  onChange={handleInputChange}
-                  fullWidth
-                  InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
+              <Grid item xs={12} md={6} lg={3}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id="gender-select-label"
+                    style={{ color: colors.grey[100] }}
+                    required
+                  >
+                    Gender
+                  </InputLabel>
+                  <Select
+                    labelId="gender-select-label"
+                    name="gender"
+                    value={gender}
+                    onChange={handleGenderChange}
+                    label="Gender"
+                    fullWidth
+                    disabled={!!formData.id}
+                  >
+                    <MenuItem value={"Male"}>Male</MenuItem>
+                    <MenuItem value={"Female"}>Female</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id="civilStatus-select-label"
+                    style={{ color: colors.grey[100] }}
+                    required
+                  >
+                    Civil Status
+                  </InputLabel>
+                  <Select
+                    labelId="civilStatus-select-label"
+                    name="civilStatus"
+                    value={civilStatus}
+                    onChange={handleCivilStatusChange}
+                    label="civilStatus"
+                    fullWidth
+                  >
+                    <MenuItem value={"Single"}>Single</MenuItem>
+                    <MenuItem value={"Married"}>Married</MenuItem>
+                    <MenuItem value={gender === "Male" ? "Widower" : "Widow"}>
+                      {gender === "Male" ? "Widower" : "Widow"}
+                    </MenuItem>
+                    <MenuItem value={"Live-in"}>Live-in</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
           </Box>
@@ -442,23 +663,61 @@ const EmployeeRecordModal = ({
         return (
           <Box>
             <Typography variant="h6" gutterBottom>
-              Review your details:
+              Review your information before submitting:
             </Typography>
-            {/* Add review details here */}
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              onClick={handleFormSubmit}
-            >
-              Submit
-            </Button>
+            {/* Display form data for review */}
+            <Typography variant="body1">
+              <strong>Employee Id:</strong> {formData.employeeId}
+            </Typography>
+            <Typography variant="body1">
+              <strong>First Name:</strong> {formData.firstName}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Middle Name:</strong> {formData.middleName}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Last Name:</strong> {formData.lastName}
+            </Typography>
+            {gender === "Female" &&
+              (civilStatus === "Married" || civilStatus === "Widow") && (
+                <Typography variant="body1">
+                  <strong>Spouse Surname:</strong> {formData.spouseSurname}
+                </Typography>
+              )}
+            <Typography variant="body1">
+              <strong>Gender:</strong> {gender}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Civil Status:</strong> {civilStatus}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Birthday:</strong> {formData.birthday}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Place of Birth:</strong> {formData.birthPlace}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Blood Type:</strong> {formData.bloodType}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Address:</strong> {formData.address}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Province:</strong> {formData.province?.province}
+            </Typography>
+            <Typography variant="body1">
+              <strong>City:</strong> {formData.municipality?.city}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Barangay:</strong> {formData.barangay}
+            </Typography>
           </Box>
         );
       default:
         return null;
     }
   };
+
   return (
     <Box>
       <Modal open={openModal} onClose={handleCloseModal}>
@@ -467,11 +726,11 @@ const EmployeeRecordModal = ({
           onSubmit={handleFormSubmit}
           sx={{
             position: "absolute",
-            top: "50%",
+            top: "10%",
             left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 1000,
-            height: 500,
+            transform: "translate(-50%)",
+            width: "75vw",
+            minHeight: 500,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,

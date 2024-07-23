@@ -15,7 +15,6 @@ async function getProvincesController(req, res) {
     });
     // Format the result to return only the unique province names
     const uniqueProvinces = provinces.map((item) => item.province);
-    console.log(uniqueProvinces);
 
     res.json({ provinces: uniqueProvinces });
   } catch (error) {
@@ -51,7 +50,6 @@ async function getCitiesController(req, res) {
 
     // Format the result to return only the unique province names
     const options = cities.map((item) => item.municipality);
-    console.log(options);
 
     res.status(200).json({ cities: options });
   } catch (error) {
@@ -61,7 +59,7 @@ async function getCitiesController(req, res) {
 }
 
 // Get Provinces controller
-async function getBaranggaysController(req, res) {
+async function getBarangaysController(req, res) {
   try {
     const { city } = req.params;
 
@@ -70,25 +68,24 @@ async function getBaranggaysController(req, res) {
     }
 
     // Fetch cities based on the provided province
-    const baranggays = await GeoTable.findAll({
+    const barangays = await GeoTable.findAll({
       where: { municipality: city },
       attributes: [
-        [sequelize.fn("DISTINCT", sequelize.col("baranggay")), "baranggay"],
+        [sequelize.fn("DISTINCT", sequelize.col("barangay")), "barangay"],
       ],
-      order: [["baranggay", "ASC"]],
+      order: [["barangay", "ASC"]],
     });
 
-    if (!baranggays.length) {
+    if (!barangays.length) {
       return res
         .status(404)
-        .send("No baranggays found for the specified province");
+        .send("No barangays found for the specified province");
     }
 
     // Format the result to return only the unique province names
-    const options = baranggays.map((item) => item.baranggay);
-    console.log(options);
+    const options = barangays.map((item) => item.barangay);
 
-    res.status(200).json({ baranggays: options });
+    res.status(200).json({ barangays: options });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -98,5 +95,5 @@ async function getBaranggaysController(req, res) {
 module.exports = {
   getProvincesController,
   getCitiesController,
-  getBaranggaysController,
+  getBarangaysController,
 };

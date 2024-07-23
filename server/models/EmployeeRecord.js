@@ -39,11 +39,11 @@ const EmployeeRecord = sequelize.define(
     },
     gender: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     civilStatus: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     birthday: {
       type: DataTypes.DATE,
@@ -55,7 +55,63 @@ const EmployeeRecord = sequelize.define(
     },
     bloodType: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    province: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    municipality: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    barangay: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    otherProvince: {
+      type: DataTypes.STRING,
       allowNull: true,
+    },
+    otherMunicipality: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    otherBarangay: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    otherAddress: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    mobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    landlineNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    emailAddress: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    designation: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    department: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    immediateHeadId: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,

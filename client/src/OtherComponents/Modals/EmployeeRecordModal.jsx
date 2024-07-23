@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { tokens } from "../../theme";
+import CustomStepIcon from "../CustomStepIcon";
 
 const EmployeeRecordModal = ({
   openModal,
@@ -39,13 +40,17 @@ const EmployeeRecordModal = ({
   const [barangays, setBarangays] = useState([]);
   const [otherCities, setOtherCities] = useState([]);
   const [otherBarangays, setOtherBarangays] = useState([]);
+  const [employeesData, setEmployeesData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/geoTable/province`);
-        console.log(response.data.provinces);
-        setProvinces(response.data.provinces);
+        const [provinceResponse, employeeResponse] = await Promise.all([
+          axios.get(`${apiUrl}/geoTable/province`),
+          axios.get(`${apiUrl}/employee`),
+        ]);
+        setProvinces(provinceResponse.data.provinces);
+        setEmployeesData(employeeResponse.data.employees);
       } catch (error) {
         console.error("Error fetching provinces:", error);
       }
@@ -593,11 +598,75 @@ const EmployeeRecordModal = ({
           <Box>
             {" "}
             <Grid container spacing={2} mb={2}>
+              <Grid item xs={12} md={6} lg={4}>
+                <TextField
+                  label="Designation"
+                  name="designation"
+                  value={formData.designation}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={4}>
+                <TextField
+                  label="Department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={4}>
+                <Autocomplete
+                  options={employeesData}
+                  getOptionLabel={(option) =>
+                    option.employeeId === ""
+                      ? ""
+                      : `${option.firstName} ${option.lastName}`
+                  }
+                  value={formData.immediateHeadId}
+                  onChange={(event, newValue) => {
+                    handleInputChange({
+                      target: {
+                        name: "immediateHeadId",
+                        value: newValue ? newValue : "",
+                      },
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Choose Employee"
+                      name="immediateHeadId"
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                      autoComplete="off"
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} mb={2}>
               <Grid item xs={12} md={6} lg={3}>
                 <TextField
-                  label="Employee Id"
-                  name="employeeId"
-                  value={formData.employeeId}
+                  label="TIN ID #"
+                  name="tinId"
+                  value={formData.tinId}
                   onChange={handleInputChange}
                   fullWidth
                   required
@@ -608,53 +677,46 @@ const EmployeeRecordModal = ({
                 />
               </Grid>
               <Grid item xs={12} md={6} lg={3}>
-                <FormControl fullWidth>
-                  <InputLabel
-                    id="gender-select-label"
-                    style={{ color: colors.grey[100] }}
-                    required
-                  >
-                    Gender
-                  </InputLabel>
-                  <Select
-                    labelId="gender-select-label"
-                    name="gender"
-                    value={gender}
-                    onChange={handleGenderChange}
-                    label="Gender"
-                    fullWidth
-                    disabled={!!formData.id}
-                  >
-                    <MenuItem value={"Male"}>Male</MenuItem>
-                    <MenuItem value={"Female"}>Female</MenuItem>
-                  </Select>
-                </FormControl>
+                <TextField
+                  label="Philhealth ID #"
+                  name="philhealthId"
+                  value={formData.philhealthId}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
               </Grid>
               <Grid item xs={12} md={6} lg={3}>
-                <FormControl fullWidth>
-                  <InputLabel
-                    id="civilStatus-select-label"
-                    style={{ color: colors.grey[100] }}
-                    required
-                  >
-                    Civil Status
-                  </InputLabel>
-                  <Select
-                    labelId="civilStatus-select-label"
-                    name="civilStatus"
-                    value={civilStatus}
-                    onChange={handleCivilStatusChange}
-                    label="civilStatus"
-                    fullWidth
-                  >
-                    <MenuItem value={"Single"}>Single</MenuItem>
-                    <MenuItem value={"Married"}>Married</MenuItem>
-                    <MenuItem value={gender === "Male" ? "Widower" : "Widow"}>
-                      {gender === "Male" ? "Widower" : "Widow"}
-                    </MenuItem>
-                    <MenuItem value={"Live-in"}>Live-in</MenuItem>
-                  </Select>
-                </FormControl>
+                <TextField
+                  label="SSS ID #"
+                  name="sssId"
+                  value={formData.sssId}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <TextField
+                  label="Pag-ibig ID #"
+                  name="pagibigId"
+                  value={formData.pagibigId}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: { color: colors.grey[100] },
+                  }}
+                  autoComplete="off"
+                />
               </Grid>
             </Grid>
           </Box>
@@ -745,7 +807,9 @@ const EmployeeRecordModal = ({
           <Stepper activeStep={currentStep} alternativeLabel>
             {steps.map((label) => (
               <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+                <StepLabel StepIconComponent={CustomStepIcon}>
+                  {label}
+                </StepLabel>
               </Step>
             ))}
           </Stepper>

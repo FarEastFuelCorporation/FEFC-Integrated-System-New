@@ -85,10 +85,6 @@ const EmployeeRecord = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    otherAddress: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     mobileNumber: {
       type: DataTypes.STRING,
       allowNull: false,

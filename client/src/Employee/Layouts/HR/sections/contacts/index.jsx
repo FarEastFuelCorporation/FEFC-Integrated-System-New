@@ -24,6 +24,18 @@ const Contacts = ({ user }) => {
     birthday: "",
     birthPlace: "",
     bloodType: "",
+    province: "",
+    municipality: "",
+    address: "",
+    otherProvince: "",
+    otherMunicipality: "",
+    otherBarangay: "",
+    mobileNumber: "",
+    landlineNumber: "",
+    emailAddress: "",
+    designation: "",
+    department: "",
+    immediateHeadId: "",
     createdBy: user.id,
   };
 

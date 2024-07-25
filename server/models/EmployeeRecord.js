@@ -17,6 +17,11 @@ const EmployeeRecord = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    employeeStatus: {
+      type: DataTypes.ENUM,
+      values: ["ACTIVE", "INACTIVE"],
+      defaultValue: "ACTIVE",
+    },
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -46,7 +51,7 @@ const EmployeeRecord = sequelize.define(
       allowNull: false,
     },
     birthday: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     birthPlace: {
@@ -54,6 +59,18 @@ const EmployeeRecord = sequelize.define(
       allowNull: true,
     },
     bloodType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    ethnicOrigin: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    citizenship: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    religion: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -85,6 +102,10 @@ const EmployeeRecord = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    otherAddress: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     mobileNumber: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -97,17 +118,153 @@ const EmployeeRecord = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    dateHire: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    employeeType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    payrollType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    salaryType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     designation: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
-    department: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    departmentId: {
+      type: DataTypes.UUID,
+      allowNull: false,
     },
     immediateHeadId: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    tinId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    philhealthId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    sssId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    pagibigId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    fathersName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    fathersReligion: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    fathersAddress: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    fathersMobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    mothersName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    mothersReligion: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    mothersAddress: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    mothersMobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    spouseName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    spouseReligion: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    spouseAddress: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    spouseMobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    educationalAttainment: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    schoolName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    course: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    level: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    year: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    referenceName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    referenceAddress: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    referenceMobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    emergencyName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    emergencyAddress: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    emergencyMobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    picture: {
+      type: DataTypes.BLOB("long"),
+      allowNull: true,
+    },
+    signature: {
+      type: DataTypes.BLOB("long"),
+      allowNull: true,
+    },
+    emergencyMobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,

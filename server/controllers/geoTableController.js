@@ -23,7 +23,35 @@ async function getProvincesController(req, res) {
   }
 }
 
-// Get Provinces controller
+// Get All Cities controller
+async function getAllCitiesController(req, res) {
+  try {
+    // Fetch all cities
+    const cities = await GeoTable.findAll({
+      attributes: [
+        [
+          sequelize.fn("DISTINCT", sequelize.col("municipality")),
+          "municipality",
+        ],
+      ],
+      order: [["municipality", "ASC"]],
+    });
+
+    if (!cities.length) {
+      return res.status(404).send("No cities found for the specified province");
+    }
+
+    // Format the result to return only the unique province names
+    const options = cities.map((item) => item.municipality);
+
+    res.status(200).json({ cities: options });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get Cities controller
 async function getCitiesController(req, res) {
   try {
     const { province } = req.params;
@@ -58,7 +86,7 @@ async function getCitiesController(req, res) {
   }
 }
 
-// Get Provinces controller
+// Get Barangays controller
 async function getBarangaysController(req, res) {
   try {
     const { city } = req.params;
@@ -94,6 +122,7 @@ async function getBarangaysController(req, res) {
 
 module.exports = {
   getProvincesController,
+  getAllCitiesController,
   getCitiesController,
   getBarangaysController,
 };

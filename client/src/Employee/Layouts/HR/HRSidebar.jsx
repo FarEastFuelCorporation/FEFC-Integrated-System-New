@@ -7,8 +7,6 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -54,10 +52,8 @@ const HRSidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
-      "/dashboard/team": "Manage Team",
+      "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
-      "/dashboard/invoices": "Invoice Balances",
-      "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
@@ -211,8 +207,8 @@ const HRSidebar = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Manage Team"
-              to="team"
+              title="Departments"
+              to="departments"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -224,13 +220,6 @@ const HRSidebar = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Invoice Balances"
-              to="invoices"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -238,13 +227,6 @@ const HRSidebar = ({ user }) => {
             >
               Pages
             </Typography>
-            <Item
-              title="Profile Form"
-              to="form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Item
               title="Calendar"
               to="calendar"

@@ -30,8 +30,23 @@ const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const Attachment = require("../models/Attachment");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const GeoTable = require("../models/GeoTable");
+const Department = require("../models/Department");
+const EmployeeRecord = require("../models/EmployeeRecord");
 
 // Define associations
+Department.hasMany(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "departmentId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+EmployeeRecord.belongsTo(Department, {
+  as: "Department",
+  foreignKey: "departmentId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 Client.hasMany(ClientUser, {
   as: "ClientUser",
   foreignKey: "clientId",

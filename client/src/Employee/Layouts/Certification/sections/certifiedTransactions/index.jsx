@@ -415,7 +415,7 @@ const CertifiedTransactions = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    
     // Perform client-side validation
     if (!validateForm()) {
       return;

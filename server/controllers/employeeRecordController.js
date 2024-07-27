@@ -297,8 +297,12 @@ async function updateEmployeeRecordController(req, res) {
       payrollType: toUpperCase(payrollType),
       salaryType: toUpperCase(salaryType),
       designation: toUpperCase(designation),
-      departmentId: departmentId,
-      immediateHeadId: immediateHeadId,
+      departmentId: departmentId.departmentId
+        ? departmentId.departmentId
+        : departmentId,
+      immediateHeadId: immediateHeadId.immediateHeadId
+        ? immediateHeadId.immediateHeadId
+        : immediateHeadId,
       tinId: toUpperCase(tinId),
       philhealthId: toUpperCase(philhealthId),
       sssId: toUpperCase(sssId),

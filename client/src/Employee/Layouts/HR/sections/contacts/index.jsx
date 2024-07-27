@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import Header from "../Header";
 import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
-import { tokens } from "../../../../../theme";
 import EmployeeRecordModal from "../../../../../OtherComponents/Modals/EmployeeRecordModal";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
+import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import EmployeeProfileModal from "../../../../../OtherComponents/Modals/EmployeeProfileModal";
 
 const Contacts = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const initialFormData = {
     id: "",
@@ -81,14 +80,33 @@ const Contacts = ({ user }) => {
     createdBy: user.id,
   };
 
+  const initialAttachmentFormData = {
+    id: "",
+    employeeId: "",
+    fileName: "",
+    attachment: "",
+    createdBy: user.id,
+  };
+
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [employeeRecords, setEmployeeRecord] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const [gender, setGender] = useState(formData.gender);
+  const [civilStatus, setCivilStatus] = useState(formData.civilStatus);
   const [pictureFile, setPictureFile] = useState(null);
   const [pictureFileName, setPictureFileName] = useState("");
   const [signatureFile, setSignatureFile] = useState(null);
   const [signatureFileName, setSignatureFileName] = useState("");
+  const [departments, setDepartments] = useState([]);
+
+  const [openAttachmentModal, setOpenAttachmentModal] = useState(false);
+  const [attachmentFormData, setAttachmentFormData] = useState(
+    initialAttachmentFormData
+  );
+  const [attachmentData, setAttachmentData] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -98,12 +116,14 @@ const Contacts = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [employeeRecordResponse] = await Promise.all([
+        const [employeeRecordResponse, departmentResponse] = await Promise.all([
           axios.get(`${apiUrl}/employeeRecord`),
+          axios.get(`${apiUrl}/department`),
         ]);
 
         console.log(employeeRecordResponse.data.employeeRecords);
         setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
+        setDepartments(departmentResponse.data.departments);
       } catch (error) {
         console.error("Error fetching employeeData:", error);
       }
@@ -132,6 +152,12 @@ const Contacts = ({ user }) => {
 
   const handleEditClick = (id) => {
     const employeeRecord = employeeRecords.find((record) => record.id === id);
+
+    setGender(employeeRecord.gender);
+    setCivilStatus(employeeRecord.civilStatus);
+
+    console.log(employeeRecord.departmentId);
+    console.log(employeeRecord.immediateHeadId);
     if (employeeRecord) {
       setFormData({
         id: employeeRecord.id,
@@ -208,6 +234,18 @@ const Contacts = ({ user }) => {
     } else {
       console.error(`Employee Record with ID ${id} not found for editing.`);
     }
+  };
+
+  const handleGenderChange = (event) => {
+    const selectedGender = event.target.value;
+    setGender(selectedGender);
+    handleInputChange(event);
+  };
+
+  const handleCivilStatusChange = (event) => {
+    const selectedCivilStatus = event.target.value;
+    setCivilStatus(selectedCivilStatus);
+    handleInputChange(event);
   };
 
   const handlePictureChange = (event) => {
@@ -431,10 +469,17 @@ const Contacts = ({ user }) => {
       formDataToSend.append("payrollType", formData.payrollType);
       formDataToSend.append("salaryType", formData.salaryType);
       formDataToSend.append("designation", formData.designation);
-      formDataToSend.append("departmentId", formData.departmentId.id);
+      formDataToSend.append(
+        "departmentId",
+        formData.departmentId.id
+          ? formData.departmentId.id
+          : formData.departmentId
+      );
       formDataToSend.append(
         "immediateHeadId",
         formData.immediateHeadId.employeeId
+          ? formData.immediateHeadId.employeeId
+          : formData.immediateHeadId
       );
       formDataToSend.append("tinId", formData.tinId);
       formDataToSend.append("philhealthId", formData.philhealthId);
@@ -528,15 +573,16 @@ const Contacts = ({ user }) => {
       field: "employeeId",
       headerName: "Employee ID",
       width: 80,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "picture",
       headerName: "Picture",
-      headerAlign: "center",
       align: "center",
       sortable: false,
       width: 70,
+      headerAlign: "center",
       renderCell: (params) => {
         // Check if params.value is valid
         if (params.value && params.value.data && params.value.type) {
@@ -580,330 +626,96 @@ const Contacts = ({ user }) => {
       field: "employeeStatus",
       headerName: "Status",
       width: 80,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "firstName",
       headerName: "First Name",
-      width: 150,
+      width: 100,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "middleName",
       headerName: "Middle Name",
-      width: 150,
+      width: 90,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "lastName",
       headerName: "Last Name",
-      width: 150,
+      width: 100,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "husbandSurname",
       headerName: "Husband Surname",
-      width: 150,
+      width: 100,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "affix",
       headerName: "Affix",
-      width: 120,
+      width: 50,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "gender",
       headerName: "Gender",
-      width: 120,
+      width: 80,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "civilStatus",
       headerName: "Civil Status",
-      width: 150,
+      width: 100,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "birthday",
       headerName: "Birthday",
-      width: 150,
+      width: 100,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "dateHire",
       headerName: "Date Hire",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "birthPlace",
-      headerName: "Birth Place",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "bloodType",
-      headerName: "Blood Type",
-      width: 120,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "ethnicOrigin",
-      headerName: "Ethnic Origin",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "citizenship",
-      headerName: "Citizenship",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "religion",
-      headerName: "Religion",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "province",
-      headerName: "Province",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "municipality",
-      headerName: "Municipality",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "barangay",
-      headerName: "Barangay",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "address",
-      headerName: "Address",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "otherProvince",
-      headerName: "Other Province",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "otherMunicipality",
-      headerName: "Other Municipality",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "otherBarangay",
-      headerName: "Other Barangay",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "mobileNumber",
-      headerName: "Mobile Number",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "landlineNumber",
-      headerName: "Landline Number",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "emailAddress",
-      headerName: "Email Address",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "employeeType",
-      headerName: "Employee Type",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "payrollType",
-      headerName: "Payroll Type",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "salaryType",
-      headerName: "Salary Type",
-      width: 150,
+      width: 100,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
       headerName: "Designation",
       width: 150,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "departmentId",
-      headerName: "Department ID",
+      headerName: "Department",
       width: 150,
-      renderCell: renderCellWithWrapText,
+      headerAlign: "center",
+      renderCell: (params) => {
+        const department = departments.find(
+          (department) => department.id === params.value
+        );
+        return department ? department.department : "(No Data)";
+      },
     },
     {
-      field: "immediateHeadId",
-      headerName: "Immediate Head ID",
+      field: "mobileNumber",
+      headerName: "Moblie Number",
       width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "tinId",
-      headerName: "TIN ID",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "philhealthId",
-      headerName: "PhilHealth ID",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "sssId",
-      headerName: "SSS ID",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "pagibigId",
-      headerName: "Pag-IBIG ID",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fathersName",
-      headerName: "Father's Name",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fathersReligion",
-      headerName: "Father's Religion",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fathersAddress",
-      headerName: "Father's Address",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fathersMobileNumber",
-      headerName: "Father's Mobile Number",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "mothersName",
-      headerName: "Mother's Name",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "mothersReligion",
-      headerName: "Mother's Religion",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "mothersAddress",
-      headerName: "Mother's Address",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "mothersMobileNumber",
-      headerName: "Mother's Mobile Number",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "spouseName",
-      headerName: "Spouse Name",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "spouseReligion",
-      headerName: "Spouse Religion",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "spouseAddress",
-      headerName: "Spouse Address",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "spouseMobileNumber",
-      headerName: "Spouse Mobile Number",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "educationalAttainment",
-      headerName: "Educational Attainment",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "schoolName",
-      headerName: "School Name",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "course",
-      headerName: "Course",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "level",
-      headerName: "Level",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "year",
-      headerName: "Year",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "emergencyName",
-      headerName: "Emergency Name",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "emergencyAddress",
-      headerName: "Emergency Address",
-      width: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "emergencyMobileNumber",
-      headerName: "Emergency Mobile Number",
-      width: 150,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
   ];
@@ -927,6 +739,19 @@ const Contacts = ({ user }) => {
     });
   }
 
+  const [open, setOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  const handleRowClick = (params) => {
+    setSelectedRow(params.row);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedRow(null);
+  };
+
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
@@ -948,49 +773,24 @@ const Contacts = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        width="100% !important"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-            width: "100%",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${colors.grey[100]} !important`,
-          },
-        }}
-      >
+      <CustomDataGridStyles>
         <DataGrid
           rows={employeeRecords ? employeeRecords : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
+          onRowClick={handleRowClick}
         />
-      </Box>
+      </CustomDataGridStyles>
       <EmployeeRecordModal
         openModal={openModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}
         formData={formData}
         clearFormData={clearFormData}
+        handleGenderChange={handleGenderChange}
+        gender={gender}
+        handleCivilStatusChange={handleCivilStatusChange}
+        civilStatus={civilStatus}
         handlePictureChange={handlePictureChange}
         pictureFileName={pictureFileName}
         handleSignatureChange={handleSignatureChange}
@@ -1000,6 +800,11 @@ const Contacts = ({ user }) => {
         handleFormSubmit={handleFormSubmit}
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
+      />
+      <EmployeeProfileModal
+        selectedRow={selectedRow}
+        open={open}
+        handleClose={handleClose}
       />
     </Box>
   );

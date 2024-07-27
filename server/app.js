@@ -102,6 +102,7 @@ const certifiedTransactionRoutes = require("./routes/certifiedTransactionRoutes"
 const hrDashboardRoutes = require("./routes/hr_dashboard");
 const employeeRoutes = require("./routes/employeeRoutes");
 const employeeRecordRoutes = require("./routes/employeeRecordRoutes");
+const employeeAttachmentRoutes = require("./routes/employeeAttachmentRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
 const { error404Controller } = require("./controllers/othersController");
 const sequelize = require("./config/database");
@@ -130,6 +131,7 @@ app.use("/certifiedTransaction", certifiedTransactionRoutes);
 app.use("/hrDashboard", hrDashboardRoutes);
 app.use("/employee", employeeRoutes);
 app.use("/employeeRecord", employeeRecordRoutes);
+app.use("/employeeAttachment", employeeAttachmentRoutes);
 app.use("/department", departmentRoutes);
 
 app.use(express.json()); // Middleware to parse JSON request bodies

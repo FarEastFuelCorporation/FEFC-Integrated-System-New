@@ -23,11 +23,6 @@ const CustomDataGridStyles = ({ children }) => {
           backgroundColor: colors.blueAccent[700],
           borderBottom: "none",
         },
-        "& .MuiDataGrid-columnHeaderTitle": {
-          whiteSpace: "normal !important",
-          wordWrap: "break-word !important",
-          lineHeight: "1.2 !important",
-        },
         "& .MuiDataGrid-virtualScroller": {
           backgroundColor: colors.primary[400],
         },
@@ -37,6 +32,19 @@ const CustomDataGridStyles = ({ children }) => {
         },
         "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
           color: `${colors.grey[100]} !important`,
+        },
+        "& .MuiDataGrid-columnHeader": {
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+          lineHeight: "1.2 !important", // Adjust line height as needed
+        },
+        "& .MuiDataGrid-columnHeaderTitle": {
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+          textAlign: "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         },
       }}
     >

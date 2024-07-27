@@ -32,6 +32,7 @@ const CertifiedTransaction = require("../models/CertifiedTransaction");
 const GeoTable = require("../models/GeoTable");
 const Department = require("../models/Department");
 const EmployeeRecord = require("../models/EmployeeRecord");
+const EmployeeAttachment = require("../models/EmployeeAttachment");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {

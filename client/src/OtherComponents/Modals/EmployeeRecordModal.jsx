@@ -26,6 +26,10 @@ const EmployeeRecordModal = ({
   handleInputChange,
   formData,
   clearFormData,
+  gender,
+  handleGenderChange,
+  handleCivilStatusChange,
+  civilStatus,
   handlePictureChange,
   pictureFileName,
   handleSignatureChange,
@@ -39,8 +43,6 @@ const EmployeeRecordModal = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [gender, setGender] = useState(formData.gender);
-  const [civilStatus, setCivilStatus] = useState(formData.civilStatus);
   const [allCities, setAllCities] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
@@ -144,18 +146,6 @@ const EmployeeRecordModal = ({
     formData.otherBarangay = null;
   };
 
-  const handleGenderChange = (event) => {
-    const selectedGender = event.target.value;
-    setGender(selectedGender);
-    handleInputChange(event);
-  };
-
-  const handleCivilStatusChange = (event) => {
-    const selectedCivilStatus = event.target.value;
-    setCivilStatus(selectedCivilStatus);
-    handleInputChange(event);
-  };
-
   const handleNext = () => {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   };
@@ -170,8 +160,8 @@ const EmployeeRecordModal = ({
     "Family Background",
     "Educational Background",
     "Character Reference",
-    "Upload Files",
     "Notify In Case of Emergency",
+    "Upload Files",
   ];
 
   return (
@@ -253,7 +243,6 @@ const EmployeeRecordModal = ({
                         onChange={handleGenderChange}
                         label="Gender"
                         fullWidth
-                        disabled={!!formData.id}
                       >
                         <MenuItem value={"MALE"}>MALE</MenuItem>
                         <MenuItem value={"FEMALE"}>FEMALE</MenuItem>

@@ -12,7 +12,7 @@ const {
 // Create Attachment route
 router.post("/", upload.single("attachment"), createAttachmentController);
 
-// Get Attachment route
+// Get Attachments route
 router.get("/", getAttachmentsController);
 
 module.exports = router;

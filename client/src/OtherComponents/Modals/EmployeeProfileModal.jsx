@@ -13,11 +13,17 @@ import {
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { format } from "date-fns";
 import axios from "axios";
+import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
 import { tokens } from "../../theme";
 
-const EmployeeProfileModal = ({ selectedRow, open, handleClose }) => {
+const EmployeeProfileModal = ({
+  selectedRow,
+  open,
+  handleClose,
+  handleEditClick,
+}) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -390,6 +396,14 @@ const EmployeeProfileModal = ({ selectedRow, open, handleClose }) => {
               >
                 Employee Profile
               </Typography>
+              <IconButton
+                color="warning"
+                onClick={() => handleEditClick(selectedRow.id)}
+                sx={{ position: "absolute", right: 20, top: 20 }}
+              >
+                <EditIcon />
+                Edit
+              </IconButton>
               <Box padding={1} sx={{ position: "relative" }}>
                 <Box
                   sx={{

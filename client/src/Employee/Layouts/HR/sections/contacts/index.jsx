@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import Header from "../Header";
 import axios from "axios";
-import EditIcon from "@mui/icons-material/Edit";
 import EmployeeRecordModal from "../../../../../OtherComponents/Modals/EmployeeRecordModal";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
@@ -695,7 +694,8 @@ const Contacts = ({ user }) => {
     {
       field: "designation",
       headerName: "Designation",
-      width: 150,
+      minWidth: 150,
+      flex: 1,
       headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
@@ -719,25 +719,6 @@ const Contacts = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
   ];
-
-  if (user.userType === 9) {
-    columns.push({
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
-    });
-  }
 
   const [open, setOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -778,7 +759,7 @@ const Contacts = ({ user }) => {
           rows={employeeRecords ? employeeRecords : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
-          onRowClick={handleRowClick}
+          {...(user.userType === 9 && { onRowClick: handleRowClick })}
         />
       </CustomDataGridStyles>
       <EmployeeRecordModal
@@ -804,7 +785,9 @@ const Contacts = ({ user }) => {
       <EmployeeProfileModal
         selectedRow={selectedRow}
         open={open}
+        openModal={openModal}
         handleClose={handleClose}
+        handleEditClick={handleEditClick}
       />
     </Box>
   );

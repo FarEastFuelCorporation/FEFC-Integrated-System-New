@@ -35,7 +35,7 @@ const DispatchedTransaction = sequelize.define(
       defaultValue: false,
     },
     dispatchedDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     dispatchedTime: {

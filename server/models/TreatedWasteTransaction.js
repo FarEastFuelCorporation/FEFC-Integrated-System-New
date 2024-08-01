@@ -34,7 +34,7 @@ const TreatedWasteTransaction = sequelize.define(
       allowNull: false,
     },
     treatedDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     treatedTime: {

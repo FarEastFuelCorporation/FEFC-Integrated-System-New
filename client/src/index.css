@@ -127,3 +127,13 @@ body,
   white-space: normal !important;
   word-wrap: break-word !important;
 }
+
+/* TableStyles.css */
+
+.table-container,
+.table,
+.table-row,
+.table-cell {
+  background-color: white;
+  color: black;
+}

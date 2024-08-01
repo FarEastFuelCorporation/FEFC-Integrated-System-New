@@ -18,7 +18,7 @@ const ScheduledTransaction = sequelize.define(
       allowNull: false,
     },
     scheduledDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     scheduledTime: {

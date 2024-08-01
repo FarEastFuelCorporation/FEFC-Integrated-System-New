@@ -11,13 +11,15 @@ import {
   Paper,
   Button,
 } from "@mui/material";
+import QRCode from "qrcode.react";
 import letterhead from "../../images/letterhead.jpg";
 import pco_signature from "../../images/pco_signature.png";
 import pm_signature from "../../images/pm_signature.png";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-const Certificate = () => {
+const CertificateOfDestruction = ({ row }) => {
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const certificateRef = useRef();
   const [pageCount, setPageCount] = useState(1);
 
@@ -78,9 +80,82 @@ const Certificate = () => {
     });
   };
 
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "2-digit" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", options);
+  };
+
+  const formatNumber = (amount) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  const totalWeight = row.sortedWasteTransaction.reduce((total, waste) => {
+    // Add the weight of the current waste to the total
+    return total + (parseFloat(waste.weight) || 0); // parseFloat to ensure it's a number
+  }, 0);
+
+  const getLatestTreatedDate = (transactions) => {
+    return transactions.reduce((latest, waste) => {
+      if (waste.TreatedWasteTransaction.length > 0) {
+        const latestInWaste = waste.TreatedWasteTransaction.reduce(
+          (latestDate, transaction) => {
+            const treatedDate = new Date(transaction.treatedDate);
+            return treatedDate > new Date(latestDate)
+              ? treatedDate
+              : new Date(latestDate);
+          },
+          new Date(0)
+        );
+        return latestInWaste > new Date(latest)
+          ? latestInWaste
+          : new Date(latest);
+      }
+      return new Date(latest);
+    }, new Date(0));
+  };
+
+  const formatDateWithSuffix = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+
+    // Determine suffix
+    const suffix = (day) => {
+      if (day >= 11 && day <= 13) return "th"; // Special case for 11th, 12th, 13th
+      switch (day % 10) {
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
+      }
+    };
+
+    const suffixStr = suffix(day);
+
+    // Return an object with day, suffix, and the rest of the date string
+    return {
+      day: day,
+      suffix: suffixStr,
+      dateString: `day of ${month} ${year}`,
+    };
+  };
+
+  const qrCodeURL = `${REACT_APP_API_URL}/certificate/${row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction.bookedTransactionId}`;
+
+  console.log(qrCodeURL);
   return (
     <Box>
-      <Button variant="contained" color="primary" onClick={handleDownloadPDF}>
+      <Button variant="contained" color="secondary" onClick={handleDownloadPDF}>
         Download Certificate
       </Button>
       <Box
@@ -91,6 +166,7 @@ const Certificate = () => {
           minHeight: "1056px", // Ensure at least one page height
           width: "816px",
           backgroundColor: "white",
+          color: "black",
         }}
       >
         <Box
@@ -158,7 +234,7 @@ const Certificate = () => {
                 margin: "0px 0px 8px",
               }}
             >
-              Company Name
+              {row.clientName}
             </Typography>
             <Typography
               id="table_company_address"
@@ -169,7 +245,10 @@ const Certificate = () => {
                 margin: 0,
               }}
             >
-              Company Address
+              {
+                row.ReceivedTransaction.DispatchedTransaction
+                  .ScheduledTransaction.BookedTransaction.Client.address
+              }
             </Typography>
           </Box>
           <Typography
@@ -193,29 +272,189 @@ const Certificate = () => {
                 backgroundColor: "white",
                 color: "black !important",
               },
+              fontFamily: "Times New Roman",
+              backgroundColor: "white",
             }}
           >
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
-                <TableRow sx={{ border: "white" }}>
-                  <TableCell align="center">Column 1</TableCell>
-                  <TableCell align="center">Column 2</TableCell>
-                  <TableCell align="center">Column 3</TableCell>
-                  <TableCell align="center">Column 4</TableCell>
-                  <TableCell align="center">Column 5</TableCell>
-                  <TableCell align="center">Column 6</TableCell>
+                <TableRow sx={{ border: "black" }}>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "4px",
+                      border: "2px solid black",
+                      color: "black",
+                    }}
+                  >
+                    Date Hauled
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "4px",
+                      borderTop: "2px solid black",
+                      borderRight: "2px solid black",
+                      borderBottom: "2px solid black",
+                      color: "black",
+                    }}
+                  >
+                    Class and Description of Waste
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "4px",
+                      borderTop: "2px solid black",
+                      borderRight: "2px solid black",
+                      borderBottom: "2px solid black",
+                      color: "black",
+                    }}
+                  >
+                    Waste Code
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "4px",
+                      borderTop: "2px solid black",
+                      borderRight: "2px solid black",
+                      borderBottom: "2px solid black",
+                      color: "black",
+                    }}
+                  >
+                    Quantity
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "4px",
+                      borderTop: "2px solid black",
+                      borderRight: "2px solid black",
+                      borderBottom: "2px solid black",
+                      color: "black",
+                    }}
+                  >
+                    Destruction Process
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      padding: "4px",
+                      borderTop: "2px solid black",
+                      borderRight: "2px solid black",
+                      borderBottom: "2px solid black",
+                      color: "black",
+                    }}
+                  >
+                    Date of Completion
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* Example of more rows */}
-                {[...Array(5).keys()].map((index) => (
-                  <TableRow key={index} sx={{ border: "white" }}>
-                    <TableCell align="center">Data {index + 1}</TableCell>
-                    <TableCell align="center">Data {index + 2}</TableCell>
-                    <TableCell align="center">Data {index + 3}</TableCell>
-                    <TableCell align="center">Data {index + 4}</TableCell>
-                    <TableCell align="center">Data {index + 5}</TableCell>
-                    <TableCell align="center">Data {index + 6}</TableCell>
+                {row.sortedWasteTransaction.map((waste, index) => (
+                  <TableRow key={index} sx={{ border: "black" }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "4px",
+                        border: "2px solid black",
+                        color: "black",
+                      }}
+                    >
+                      {formatDate(row.haulingDate)}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "4px",
+                        borderTop: "2px solid black",
+                        borderRight: "2px solid black",
+                        borderBottom: "2px solid black",
+                        color: "black",
+                      }}
+                    >
+                      {waste.wasteName}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "4px",
+                        borderTop: "2px solid black",
+                        borderRight: "2px solid black",
+                        borderBottom: "2px solid black",
+                        color: "black",
+                      }}
+                    >
+                      {
+                        row.ReceivedTransaction.DispatchedTransaction
+                          .ScheduledTransaction.BookedTransaction.QuotationWaste
+                          .TypeOfWaste.wasteCode
+                      }
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "4px",
+                        borderTop: "2px solid black",
+                        borderRight: "2px solid black",
+                        borderBottom: "2px solid black",
+                        color: "black",
+                      }}
+                    >
+                      {`${formatNumber(waste.weight)} ${
+                        row.ReceivedTransaction.DispatchedTransaction
+                          .ScheduledTransaction.BookedTransaction.QuotationWaste
+                          .unit
+                      }`}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "4px",
+                        borderTop: "2px solid black",
+                        borderRight: "2px solid black",
+                        borderBottom: "2px solid black",
+                        color: "black",
+                      }}
+                    >
+                      {
+                        waste.TreatedWasteTransaction[0].TreatmentProcess
+                          .treatmentProcess
+                      }
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        padding: "4px",
+                        borderTop: "2px solid black",
+                        borderRight: "2px solid black",
+                        borderBottom: "2px solid black",
+                        color: "black",
+                      }}
+                    >
+                      {waste.TreatedWasteTransaction.reduce(
+                        (latest, transaction) => {
+                          const treatedDate = new Date(transaction.treatedDate);
+                          return treatedDate > new Date(latest)
+                            ? formatDate(transaction.treatedDate)
+                            : formatDate(latest);
+                        },
+                        new Date(0)
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -228,13 +467,20 @@ const Certificate = () => {
                 "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
               fontSize: "14px",
               textAlign: "justify",
-              marginTop: 2,
+              marginTop: 1,
             }}
           >
-            A Total of 4,396.00 Kgs. That is/are transported by{" "}
-            <b>FAR EAST FUEL CORPORATION</b> to our TSD facility located at No.
-            888 Purok 5, Irabagon St., Barangay Anyatam, San Ildefonso, Bulacan
-            with <b>TSD No. OL-TR-R3-14-000152.</b>
+            A Total of{" "}
+            <b>
+              {`${formatNumber(totalWeight)} ${
+                row.ReceivedTransaction.DispatchedTransaction
+                  .ScheduledTransaction.BookedTransaction.QuotationWaste.unit
+              }`}
+            </b>{" "}
+            That is/are transported by <b>FAR EAST FUEL CORPORATION</b> to our
+            TSD facility located at No. 888 Purok 5, Irabagon St., Barangay
+            Anyatam, San Ildefonso, Bulacan with{" "}
+            <b>TSD No. OL-TR-R3-14-000152.</b>
           </Typography>
           <Box sx={{ display: "flex", mt: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -242,10 +488,14 @@ const Certificate = () => {
             </Typography>
             <Typography
               variant="h6"
-              sx={{ fontWeight: "bold", margin: "0 5px" }}
+              sx={{ fontWeight: "bold", marginLeft: "5px" }}
               id="certification"
             >
-              Date
+              {
+                formatDateWithSuffix(
+                  getLatestTreatedDate(row.sortedWasteTransaction)
+                ).day
+              }
             </Typography>
             <Typography
               sx={{
@@ -257,14 +507,22 @@ const Certificate = () => {
               }}
               id="certification2"
             >
-              Month
+              {
+                formatDateWithSuffix(
+                  getLatestTreatedDate(row.sortedWasteTransaction)
+                ).suffix
+              }
             </Typography>
             <Typography
               variant="h6"
               sx={{ fontWeight: "bold" }}
               id="certification3"
             >
-              Year
+              {
+                formatDateWithSuffix(
+                  getLatestTreatedDate(row.sortedWasteTransaction)
+                ).dateString
+              }
             </Typography>
           </Box>
           <Typography variant="h6" sx={{ marginTop: 2 }}>
@@ -273,9 +531,9 @@ const Certificate = () => {
           <Box
             sx={{
               position: "relative",
-              width: "660px",
+              width: "700px",
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: "320px 1fr 210px",
               textAlign: "center",
               marginTop: 4,
             }}
@@ -316,7 +574,10 @@ const Certificate = () => {
               />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", paddingRight: "50px" }}
+              >
                 <u>CRIS DURAN</u>
               </Typography>
               <Typography
@@ -324,6 +585,7 @@ const Certificate = () => {
                   fontFamily:
                     "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
                   fontSize: "13px",
+                  paddingRight: "50px",
                 }}
               >
                 Plant Manager
@@ -335,18 +597,23 @@ const Certificate = () => {
                 sx={{
                   position: "absolute",
                   top: "-70px",
-                  left: "420px",
+                  left: "310px",
                   width: "150px",
                 }}
               />
             </Box>
-          </Box>
-          <Box sx={{ marginTop: 2 }}>
-            <Typography sx={{ fontSize: "10px" }}>
-              Not Valid Without FEFC Dry Seal.
-            </Typography>
-            <Typography sx={{ fontSize: "10px" }}>Cc</Typography>
-            <Typography sx={{ fontSize: "10px" }}>DENR-EMB R3</Typography>
+            <Box sx={{ marginTop: -2, display: "flex" }}>
+              <QRCode value={qrCodeURL} size={80} />
+              <Box>
+                <Typography sx={{ fontSize: "10px" }}>
+                  This is a computer generated certificate.
+                </Typography>
+                <Typography sx={{ fontSize: "10px" }}>
+                  To verify the authenticity of this file, kindly scan the
+                  generated QR Code using your QR Code scanner / reader
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -354,4 +621,4 @@ const Certificate = () => {
   );
 };
 
-export default Certificate;
+export default CertificateOfDestruction;

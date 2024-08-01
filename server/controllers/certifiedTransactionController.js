@@ -21,6 +21,7 @@ const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const TreatmentProcess = require("../models/TreatmentProcess");
 const TreatmentMachine = require("../models/TreatmentMachine");
 const Attachment = require("../models/Attachment");
+const TypeOfWaste = require("../models/TypeOfWaste");
 
 // Utility function to fetch pending transactions
 async function fetchPendingTransactions() {
@@ -65,7 +66,14 @@ async function fetchPendingTransactions() {
                       {
                         model: QuotationWaste,
                         as: "QuotationWaste",
-                        attributes: ["wasteName"],
+                        attributes: ["wasteName", "unit"],
+                        include: [
+                          {
+                            model: TypeOfWaste,
+                            as: "TypeOfWaste",
+                            attributes: ["wasteCode"],
+                          },
+                        ],
                       },
                       {
                         model: QuotationTransportation,
@@ -82,7 +90,7 @@ async function fetchPendingTransactions() {
                       {
                         model: Client,
                         as: "Client",
-                        attributes: ["clientId", "clientName"],
+                        attributes: ["clientId", "clientName", "address"],
                       },
                       {
                         model: Attachment,

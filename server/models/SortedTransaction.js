@@ -18,7 +18,7 @@ const SortedTransaction = sequelize.define(
       allowNull: false,
     },
     sortedDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     sortedTime: {

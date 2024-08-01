@@ -30,7 +30,7 @@ const ReceivedTransaction = sequelize.define(
       allowNull: true,
     },
     receivedDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     receivedTime: {

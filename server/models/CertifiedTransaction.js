@@ -18,7 +18,7 @@ const CertifiedTransaction = sequelize.define(
       allowNull: false,
     },
     certifiedDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     certifiedTime: {

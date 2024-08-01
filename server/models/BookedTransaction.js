@@ -26,7 +26,7 @@ const BookedTransaction = sequelize.define(
       allowNull: false,
     },
     haulingDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     haulingTime: {

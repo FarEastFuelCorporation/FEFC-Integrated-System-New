@@ -273,7 +273,7 @@ const EmployeeRecordModal = ({
                         >
                           {gender === "MALE" ? "WIDOWER" : "WIDOW"}
                         </MenuItem>
-                        <MenuItem value={"Live-in"}>Live-in</MenuItem>
+                        <MenuItem value={"LIVE-IN"}>LIVE-IN</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>

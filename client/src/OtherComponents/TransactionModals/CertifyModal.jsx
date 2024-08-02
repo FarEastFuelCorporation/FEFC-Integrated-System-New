@@ -2,6 +2,11 @@ import React from "react";
 import {
   Box,
   Modal,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Typography,
   useTheme,
   TextField,
@@ -103,6 +108,32 @@ const CertifyModal = ({
               autoComplete="off"
             />
           </div>
+          <Grid item xs={12} md={6} lg={3}>
+            <FormControl fullWidth>
+              <InputLabel
+                id="typeOfCertificate-select-label"
+                style={{ color: colors.grey[100] }}
+                required
+              >
+                Type of Certificate
+              </InputLabel>
+              <Select
+                labelId="typeOfCertificate-select-label"
+                name="typeOfCertificate"
+                value={formData.civilStatus}
+                onChange={handleInputChange}
+                label="typeOfCertificate"
+                fullWidth
+              >
+                <MenuItem value={"CERTIFICATE OF DESTRUCTION"}>
+                  CERTIFICATE OF DESTRUCTION
+                </MenuItem>
+                <MenuItem value={"CERTIFICATE OF DISPOSAL"}>
+                  CERTIFICATE OF DISPOSAL
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
           <TextField
             label="Remarks"
             name="remarks"

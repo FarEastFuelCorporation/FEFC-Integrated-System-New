@@ -179,6 +179,7 @@ const SortModal = ({
           treatmentProcessId: "",
           wasteName: "",
           weight: 0,
+          clientWeight: 0,
           formNo: "",
         },
       ],
@@ -218,7 +219,7 @@ const SortModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 1000,
+          width: 1200,
           maxHeight: "80vh",
           bgcolor: "background.paper",
           boxShadow: 24,
@@ -330,7 +331,7 @@ const SortModal = ({
               Waste Entry #{index + 1}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item xs={3.5}>
                 <FormControl fullWidth>
                   <InputLabel
                     id={`waste-type-select-label-${index}`}
@@ -361,7 +362,7 @@ const SortModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3.5}>
                 <TextField
                   label="Waste Name"
                   name="wasteName"
@@ -379,7 +380,6 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
-
               <Grid item xs={1.5}>
                 <TextField
                   label="Weight"
@@ -387,6 +387,25 @@ const SortModal = ({
                   value={waste.weight}
                   onChange={(e) =>
                     handleWasteChange(index, "weight", e.target.value)
+                  }
+                  type="number"
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={1.5}>
+                <TextField
+                  label="Client Weight"
+                  name="clientWeight"
+                  value={waste.clientWeight}
+                  onChange={(e) =>
+                    handleWasteChange(index, "clientWeight", e.target.value)
                   }
                   type="number"
                   fullWidth
@@ -416,7 +435,7 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={0.5}>
                 <IconButton
                   color="error"
                   onClick={() => removeWasteField(index)}

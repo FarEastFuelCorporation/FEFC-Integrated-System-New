@@ -193,6 +193,19 @@ TreatedTransaction.belongsTo(Employee, {
   onDelete: "CASCADE",
 });
 
+Employee.hasMany(CertifiedTransaction, {
+  as: "CertifiedTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+CertifiedTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
 VehicleType.hasMany(Vehicle, {
   as: "Vehicle",
   foreignKey: "vehicleTypeId",

@@ -29,6 +29,10 @@ const SortedWasteTransaction = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    clientWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
     formNo: {
       type: DataTypes.STRING,
       allowNull: true,

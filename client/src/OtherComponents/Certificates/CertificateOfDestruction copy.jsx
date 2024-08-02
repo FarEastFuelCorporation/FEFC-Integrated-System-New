@@ -18,8 +18,14 @@ import pm_signature from "../../images/pm_signature.png";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+const modifyApiUrlPort = (url) => {
+  const portPattern = /:(3001)$/;
+  return url.replace(portPattern, ":3000");
+};
+
 const CertificateOfDestruction = ({ row }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
   const [pageCount, setPageCount] = useState(1);
 
@@ -150,9 +156,8 @@ const CertificateOfDestruction = ({ row }) => {
     };
   };
 
-  const qrCodeURL = `${REACT_APP_API_URL}/certificate/${row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction.bookedTransactionId}`;
+  const qrCodeURL = `${apiUrl}/certificate/${row.CertifiedTransaction[0].id}`;
 
-  console.log(qrCodeURL);
   return (
     <Box>
       <Button variant="contained" color="secondary" onClick={handleDownloadPDF}>

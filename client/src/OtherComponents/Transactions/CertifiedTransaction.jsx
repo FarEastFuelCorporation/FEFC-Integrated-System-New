@@ -10,17 +10,12 @@ const CertifiedTransaction = ({ row }) => {
   const colors = tokens(theme.palette.mode);
   const {
     statusId,
-    sortedCreatedDate,
-    sortedCreatedTime,
-    sortedDate,
-    sortedTime,
-    netWeight,
-    totalSortedWeight,
-    discrepancyWeight,
-    sortedRemarks,
-    SortedWasteTransaction,
-    SortedScrapTransaction,
-    sortedCreatedBy,
+    certifiedCreatedDate,
+    certifiedCreatedTime,
+    certifiedDate,
+    certifiedTime,
+    certifiedRemarks,
+    certifiedCreatedBy,
   } = row;
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -30,13 +25,6 @@ const CertifiedTransaction = ({ row }) => {
     date.setSeconds(0);
     date.setMilliseconds(0);
     return date;
-  };
-
-  const formatWeight = (weight) => {
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(weight);
   };
 
   return (
@@ -85,61 +73,27 @@ const CertifiedTransaction = ({ row }) => {
               Certified
             </Typography>
             <Typography variant="h5">
-              {sortedCreatedDate} {sortedCreatedTime}
+              {certifiedCreatedDate} {certifiedCreatedTime}
             </Typography>
           </Box>
-          {SortedWasteTransaction &&
-            SortedWasteTransaction.length > 0 &&
-            SortedWasteTransaction.map((waste, index) => (
-              <Box key={index} sx={{ my: 2 }}>
-                <Typography variant="h5">Item {index + 1}</Typography>
-                <Typography variant="h5">
-                  Waste Name: {waste.wasteName}
-                </Typography>
-                <Typography variant="h5">
-                  Weight: {formatWeight(waste.weight)} Kg
-                </Typography>
-                <Typography variant="h5">Form No: {waste.formNo}</Typography>
-              </Box>
-            ))}
-          {SortedScrapTransaction &&
-            SortedScrapTransaction.length > 0 &&
-            SortedScrapTransaction.map((scrap, index) => (
-              <Box key={index} sx={{ my: 2 }}>
-                <Typography variant="h5">Scrap {index + 1}</Typography>
-                <Typography variant="h5">
-                  Waste Name: {scrap.ScrapType.typeOfScrap}
-                </Typography>
-                <Typography variant="h5">
-                  Weight: {formatWeight(scrap.weight)} Kg
-                </Typography>
-              </Box>
-            ))}
           <Typography variant="h5">
-            Sorted Date:{" "}
-            {sortedDate
-              ? format(new Date(sortedDate), "MMMM dd, yyyy")
+            Certified Date:{" "}
+            {certifiedDate
+              ? format(new Date(certifiedDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Sorted Time:{" "}
-            {sortedTime
-              ? format(parseTimeString(sortedTime), "hh:mm aa")
+            Certified Time:{" "}
+            {certifiedTime
+              ? format(parseTimeString(certifiedTime), "hh:mm aa")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Net Weight: {formatWeight(netWeight)} Kg
+            Remarks: {certifiedRemarks ? certifiedRemarks : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Total Sorted Weight: {formatWeight(totalSortedWeight)} Kg
+            Certified By: {certifiedCreatedBy}
           </Typography>
-          <Typography variant="h5">
-            Discrepancy Weight: {formatWeight(discrepancyWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
-            Discrepancy Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
-          </Typography>
-          <Typography variant="h5">Sorted By: {sortedCreatedBy}</Typography>
           <br />
           <hr />
         </Box>

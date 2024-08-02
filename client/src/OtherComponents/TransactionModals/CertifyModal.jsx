@@ -29,16 +29,12 @@ const CertifyModal = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const handleInputChange = (e, index, name) => {
-    const { value } = e.target;
-    const updatedTreatedWastes = [...formData.treatedWastes];
-    updatedTreatedWastes[index] = {
-      ...updatedTreatedWastes[index],
-      [name]: value,
-    };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData((prevFormData) => ({
       ...prevFormData,
-      treatedWastes: updatedTreatedWastes,
+      [name]: value,
     }));
   };
 
@@ -108,31 +104,55 @@ const CertifyModal = ({
               autoComplete="off"
             />
           </div>
-          <Grid item xs={12} md={6} lg={3}>
-            <FormControl fullWidth>
-              <InputLabel
-                id="typeOfCertificate-select-label"
-                style={{ color: colors.grey[100] }}
-                required
-              >
-                Type of Certificate
-              </InputLabel>
-              <Select
-                labelId="typeOfCertificate-select-label"
-                name="typeOfCertificate"
-                value={formData.civilStatus}
-                onChange={handleInputChange}
-                label="typeOfCertificate"
-                fullWidth
-              >
-                <MenuItem value={"CERTIFICATE OF DESTRUCTION"}>
-                  CERTIFICATE OF DESTRUCTION
-                </MenuItem>
-                <MenuItem value={"CERTIFICATE OF DISPOSAL"}>
-                  CERTIFICATE OF DISPOSAL
-                </MenuItem>
-              </Select>
-            </FormControl>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6} lg={6}>
+              <FormControl fullWidth>
+                <InputLabel
+                  id="typeOfCertificate-select-label"
+                  style={{ color: colors.grey[100] }}
+                  required
+                >
+                  Type of Certificate
+                </InputLabel>
+                <Select
+                  labelId="typeOfCertificate-select-label"
+                  name="typeOfCertificate"
+                  value={formData.typeOfCertificate}
+                  onChange={handleInputChange}
+                  label="typeOfCertificate"
+                  fullWidth
+                >
+                  <MenuItem value={"CERTIFICATE OF DESTRUCTION"}>
+                    CERTIFICATE OF DESTRUCTION
+                  </MenuItem>
+                  <MenuItem value={"CERTIFICATE OF DISPOSAL"}>
+                    CERTIFICATE OF DISPOSAL
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6} lg={6}>
+              <FormControl fullWidth>
+                <InputLabel
+                  id="typeOfWeight-select-label"
+                  style={{ color: colors.grey[100] }}
+                  required
+                >
+                  Type of Certificate
+                </InputLabel>
+                <Select
+                  labelId="typeOfWeight-select-label"
+                  name="typeOfWeight"
+                  value={formData.typeOfWeight}
+                  onChange={handleInputChange}
+                  label="typeOfCertificate"
+                  fullWidth
+                >
+                  <MenuItem value={"CLIENT WEIGHT"}>CLIENT WEIGHT</MenuItem>
+                  <MenuItem value={"SORTED WEIGHT"}>SORTED WEIGHT</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
           <TextField
             label="Remarks"

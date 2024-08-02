@@ -8,13 +8,13 @@ const {
   deleteCertifiedTransactionController,
 } = require("../controllers/certifiedTransactionController");
 
-// Create Sorted Transaction route
+// Create Certified Transaction route
 router.post("/", createCertifiedTransactionController);
 
-// Get Sorted Transactions route
+// Get Certified Transactions route
 router.get("/", getCertifiedTransactionsController);
 
-// Delete Sorted Transaction route
+// Delete Certified Transaction route
 router.delete("/:id", deleteCertifiedTransactionController);
 
 module.exports = router;

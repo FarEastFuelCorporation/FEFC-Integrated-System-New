@@ -25,6 +25,14 @@ const CertifiedTransaction = sequelize.define(
       type: DataTypes.TIME,
       allowNull: false,
     },
+    typeOfCertificate: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    typeOfWeight: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

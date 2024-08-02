@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../../../../../OtherComponents/Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -6,26 +6,22 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const CertifiedTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const certificateRef = useRef();
+  const [pageCount, setPageCount] = useState(1);
 
   const initialFormData = {
-    waste: [],
     id: "",
     bookedTransactionId: "",
-    sortedWasteTransactionId: "",
-    treatedWastes: [
-      {
-        treatedDate: null,
-        treatedTime: null,
-        treatmentProcessId: "",
-        treatmentMachineId: "",
-        weight: 0,
-      },
-    ],
+    sortedTransactionId: "",
+    typeOfCertificate: "",
+    typeOfWeight: "",
     remarks: "",
-    statusId: 6,
+    statusId: 7,
     createdBy: user.id,
   };
 
@@ -41,6 +37,7 @@ const CertifiedTransactions = ({ user }) => {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const processTransactionItem = (sortItem, employeeData) => {
+    const certifiedItem = sortItem.CertifiedTransaction[0];
     const receiveItem = sortItem.ReceivedTransaction;
     const dispatchItem = receiveItem.DispatchedTransaction;
     const scheduledItem = dispatchItem.ScheduledTransaction;
@@ -66,12 +63,14 @@ const CertifiedTransactions = ({ user }) => {
     const dispatchedCreatedDate = parseDate(dispatchItem.createdAt);
     const receivedCreatedDate = parseDate(receiveItem.createdAt);
     const sortedCreatedDate = parseDate(sortItem.createdAt);
+    const certifiedCreatedDate = parseDate(certifiedItem.createdAt);
 
     const haulingTime = parseTime(bookItem.haulingTime);
     const scheduledTime = parseTime(scheduledItem.scheduledTime);
     const dispatchedTime = parseTime(dispatchItem.dispatchedTime);
     const receivedTime = parseTime(receiveItem.receivedTime);
     const sortedTime = parseTime(sortItem.sortedTime);
+    const certifiedTime = parseTime(certifiedItem.certifiedTime);
 
     const bookedCreatedTime = bookedCreatedDate
       ? bookedCreatedDate.toISOString().split("T")[1].slice(0, 8)
@@ -88,6 +87,9 @@ const CertifiedTransactions = ({ user }) => {
     const sortedCreatedTime = sortedCreatedDate
       ? sortedCreatedDate.toISOString().split("T")[1].slice(0, 8)
       : null;
+    const certifiedCreatedTime = certifiedCreatedDate
+      ? certifiedCreatedDate.toISOString().split("T")[1].slice(0, 8)
+      : null;
 
     const scheduledCreatedBy =
       scheduledItem.Employee.firstName + " " + scheduledItem.Employee.lastName;
@@ -100,6 +102,9 @@ const CertifiedTransactions = ({ user }) => {
 
     const sortedCreatedBy =
       sortItem.Employee.firstName + " " + sortItem.Employee.lastName;
+
+    const certifiedCreatedBy =
+      certifiedItem.Employee.firstName + " " + certifiedItem.Employee.lastName;
 
     const helperIdsArray = dispatchItem.helperId
       .split(",")
@@ -167,6 +172,7 @@ const CertifiedTransactions = ({ user }) => {
         ? receivedDate.toISOString().split("T")[0]
         : null,
       sortedDate: sortedDate ? sortedDate.toISOString().split("T")[0] : null,
+      certifiedDate: certifiedItem ? certifiedItem.certifiedDate : null,
       haulingTime: haulingTime
         ? haulingTime.toISOString().split("T")[1].slice(0, 5)
         : null,
@@ -181,6 +187,9 @@ const CertifiedTransactions = ({ user }) => {
         : null,
       sortedTime: sortedTime
         ? sortedTime.toISOString().split("T")[1].slice(0, 5)
+        : null,
+      certifiedTime: certifiedTime
+        ? certifiedTime.toISOString().split("T")[1].slice(0, 5)
         : null,
       bookedCreatedDate: bookedCreatedDate
         ? bookedCreatedDate.toISOString().split("T")[0]
@@ -197,11 +206,15 @@ const CertifiedTransactions = ({ user }) => {
       sortedCreatedDate: sortedCreatedDate
         ? sortedCreatedDate.toISOString().split("T")[0]
         : null,
+      certifiedCreatedDate: certifiedCreatedDate
+        ? certifiedCreatedDate.toISOString().split("T")[0]
+        : null,
       bookedCreatedTime: bookedCreatedTime,
       scheduledCreatedTime: scheduledCreatedTime,
       dispatchedCreatedTime: dispatchedCreatedTime,
       receivedCreatedTime: receivedCreatedTime,
       sortedCreatedTime: sortedCreatedTime,
+      certifiedCreatedTime: certifiedCreatedTime,
       clientName: bookItem.Client ? bookItem.Client.clientName : null,
       wasteName: bookItem.QuotationWaste
         ? bookItem.QuotationWaste.wasteName
@@ -222,6 +235,7 @@ const CertifiedTransactions = ({ user }) => {
       scheduledRemarks: scheduledItem.remarks,
       receivedRemarks: receiveItem.remarks,
       sortedRemarks: sortItem.remarks,
+      certifiedRemarks: certifiedItem.remarks,
       pttNo: receiveItem.pttNo,
       manifestNo: receiveItem.manifestNo,
       pullOutFormNo: receiveItem.pullOutFormNo,
@@ -234,6 +248,18 @@ const CertifiedTransactions = ({ user }) => {
       dispatchedCreatedBy: dispatchedCreatedBy,
       receivedCreatedBy: receivedCreatedBy,
       sortedCreatedBy: sortedCreatedBy,
+      certifiedCreatedBy: certifiedCreatedBy,
+      SortedWasteTransaction: sortItem.SortedWasteTransaction.map(
+        (transaction) => ({
+          ...transaction,
+          sortedDate: sortedDate
+            ? sortedDate.toISOString().split("T")[0]
+            : null,
+          sortedTime: sortedTime
+            ? sortedTime.toISOString().split("T")[1].slice(0, 5)
+            : null,
+        })
+      ),
       sortedWasteTransaction: updatedSortedWasteTransactions,
       sortedScrapTransaction: sortItem.SortedScrapTransaction,
       Attachment: updatedAttachments,
@@ -291,24 +317,15 @@ const CertifiedTransactions = ({ user }) => {
 
   const handleOpenModal = (row) => {
     setFormData({
-      row: row,
-      isFinished: false,
       id: "",
       bookedTransactionId:
         row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
           .bookedTransactionId,
       sortedTransactionId: row.id,
-      treatedWastes: [
-        {
-          treatedDate: null,
-          treatedTime: null,
-          treatmentProcessId: "",
-          treatmentMachineId: "",
-          weight: 0,
-        },
-      ],
+      typeOfCertificate: "",
+      typeOfWeight: "",
       remarks: "",
-      statusId: 6,
+      statusId: 7,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -364,42 +381,29 @@ const CertifiedTransactions = ({ user }) => {
       validationErrors.push("Booked Transaction ID is required.");
     }
 
-    // Validate sortedWasteTransactionId
-    if (!formData.sortedWasteTransactionId) {
-      validationErrors.push("Sorted Waste Transaction ID is required.");
+    // Validate sortedTransactionId
+    if (!formData.sortedTransactionId) {
+      validationErrors.push("Sorted Transaction ID is required.");
     }
 
-    // Validate treatedWastes
-    if (!formData.treatedWastes || formData.treatedWastes.length === 0) {
-      validationErrors.push("At least one treated waste entry is required.");
-    } else {
-      formData.treatedWastes.forEach((waste, index) => {
-        if (!waste.treatmentProcessId) {
-          validationErrors.push(
-            `Treatment Process is required for waste entry #${index + 1}.`
-          );
-        }
-        if (!waste.treatmentMachineId) {
-          validationErrors.push(
-            `Treatment Machine is required for waste entry #${index + 1}.`
-          );
-        }
-        if (!waste.treatedDate) {
-          validationErrors.push(
-            `Treated Date is required for waste entry #${index + 1}.`
-          );
-        }
-        if (!waste.treatedTime) {
-          validationErrors.push(
-            `Treated Time is required for waste entry #${index + 1}.`
-          );
-        }
-        if (waste.weight <= 0) {
-          validationErrors.push(
-            `Weight must be greater than zero for waste entry #${index + 1}.`
-          );
-        }
-      });
+    // Validate certifiedDate
+    if (!formData.certifiedDate) {
+      validationErrors.push("Certified Date is required.");
+    }
+
+    // Validate certifiedTime
+    if (!formData.certifiedTime) {
+      validationErrors.push("Certified Time is required.");
+    }
+
+    // Validate typeOfCertificate
+    if (!formData.typeOfCertificate) {
+      validationErrors.push("Type of Certificate is required.");
+    }
+
+    // Validate typeOfWeight
+    if (!formData.typeOfWeight) {
+      validationErrors.push("Type of Weight is required.");
     }
 
     if (validationErrors.length > 0) {
@@ -422,16 +426,12 @@ const CertifiedTransactions = ({ user }) => {
     }
 
     try {
-      const updatedFormData = updateIsFinished(formData);
       let response;
-
+      console.log(formData);
       if (!formData.id) {
-        response = await axios.post(
-          `${apiUrl}/treatedTransaction`,
-          updatedFormData
-        );
+        response = await axios.post(`${apiUrl}/certifiedTransaction`, formData);
         processData(response);
-        setSuccessMessage("Treated Transaction Submitted Successfully!");
+        setSuccessMessage("Certified Transaction Submitted Successfully!");
       }
 
       setShowSuccessMessage(true);
@@ -441,43 +441,50 @@ const CertifiedTransactions = ({ user }) => {
     }
   };
 
-  const updateIsFinished = (formData) => {
-    const updatedFormData = { ...formData };
+  const handleDownloadPDF = () => {
+    const input = certificateRef.current;
+    const pageHeight = 1056;
+    const pageWidth = 816;
+    const margin = 10;
 
-    // Calculate total treated weight from treatedWastes array
-    let totalTreatedWeight = formData.treatedWastes.reduce(
-      (total, waste) => total + parseFloat(waste.weight || 0),
-      0
-    );
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [pageWidth, pageHeight], // Page size in px
+      });
 
-    totalTreatedWeight += formData.waste.treatedWeight;
+      let yPosition = 0;
+      let contentHeight = input.offsetHeight;
 
-    // Update sortedWasteTransaction with the total treated weight
-    if (
-      updatedFormData.row &&
-      updatedFormData.row.sortedWasteTransaction &&
-      updatedFormData.sortedWasteTransactionId
-    ) {
-      updatedFormData.row.sortedWasteTransaction =
-        updatedFormData.row.sortedWasteTransaction.map((item) => {
-          if (item.id === updatedFormData.sortedWasteTransactionId) {
-            return {
-              ...item,
-              treatedWeight: totalTreatedWeight,
-            };
-          }
-          return item;
-        });
+      for (let i = 0; i < pageCount; i++) {
+        if (i > 0) {
+          pdf.addPage();
+        }
 
-      // Check if all sortedWasteTransaction items are fully treated
-      const isAllTreated = updatedFormData.row.sortedWasteTransaction.every(
-        (item) => item.treatedWeight === item.weight
-      );
-      console.log("isAllTreated:", isAllTreated);
-      updatedFormData.isFinished = isAllTreated;
-    }
+        const pageContentHeight = Math.min(pageHeight, contentHeight);
 
-    return updatedFormData;
+        // Add background image for each page
+        pdf.addImage(
+          imgData,
+          "PNG",
+          0,
+          -(i * pageHeight),
+          pageWidth,
+          pageHeight
+        );
+
+        // Add page number
+        const pageNumber = `Page ${i + 1}/${pageCount}`;
+        pdf.setFontSize(12);
+        pdf.text(pageNumber, pageWidth - 50, pageHeight - 10);
+
+        contentHeight -= pageHeight;
+      }
+
+      pdf.save("certificate.pdf");
+    });
   };
 
   return (
@@ -504,6 +511,7 @@ const CertifiedTransactions = ({ user }) => {
         buttonText={"Certify"}
         pendingTransactions={pendingTransactions}
         finishedTransactions={finishedTransactions}
+        handleDownloadPDF={handleDownloadPDF}
         handleOpenModal={handleOpenModal}
         handleDeleteClick={handleDeleteClick}
         setSuccessMessage={setSuccessMessage}

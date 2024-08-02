@@ -197,19 +197,12 @@ async function fetchPendingTransactions() {
       },
     ],
     where: sequelize.literal(`
-          NOT EXISTS (
-            SELECT 1
-            FROM SortedWasteTransactions AS swt
-            LEFT JOIN (
-              SELECT sortedWasteTransactionId, COALESCE(SUM(weight), 0) AS totalTreatedWeight
-              FROM TreatedWasteTransactions
-              WHERE deletedAt IS NULL
-              GROUP BY sortedWasteTransactionId
-            ) AS twt ON swt.id = twt.sortedWasteTransactionId
-            WHERE swt.sortedTransactionId = SortedTransaction.id
-            AND COALESCE(twt.totalTreatedWeight, 0) != swt.weight
-          )
-        `),
+      SortedTransaction.id NOT IN (
+        SELECT sortedTransactionId
+        FROM CertifiedTransactions
+        WHERE sortedTransactionId IS NOT NULL
+      )
+    `),
     order: [["id", "DESC"]],
   });
 }
@@ -257,7 +250,14 @@ async function fetchFinishedTransactions() {
                       {
                         model: QuotationWaste,
                         as: "QuotationWaste",
-                        attributes: ["wasteName"],
+                        attributes: ["wasteName", "unit"],
+                        include: [
+                          {
+                            model: TypeOfWaste,
+                            as: "TypeOfWaste",
+                            attributes: ["wasteCode"],
+                          },
+                        ],
                       },
                       {
                         model: QuotationTransportation,
@@ -274,7 +274,7 @@ async function fetchFinishedTransactions() {
                       {
                         model: Client,
                         as: "Client",
-                        attributes: ["clientId", "clientName"],
+                        attributes: ["clientId", "clientName", "address"],
                       },
                       {
                         model: Attachment,
@@ -328,13 +328,13 @@ async function fetchFinishedTransactions() {
           include: [
             [
               sequelize.literal(`
-                (
-                  SELECT COALESCE(SUM(TreatedWasteTransaction.weight), 0)
-                  FROM TreatedWasteTransactions AS TreatedWasteTransaction
-                  WHERE TreatedWasteTransaction.sortedWasteTransactionId = SortedWasteTransaction.id
-                  AND TreatedWasteTransaction.deletedAt IS NULL
-                )
-              `),
+                    (
+                      SELECT COALESCE(SUM(TreatedWasteTransaction.weight), 0)
+                      FROM TreatedWasteTransactions AS TreatedWasteTransaction
+                      WHERE TreatedWasteTransaction.sortedWasteTransactionId = SortedWasteTransaction.id
+                      AND TreatedWasteTransaction.deletedAt IS NULL
+                    )
+                  `),
               "treatedWeight",
             ],
           ],
@@ -374,43 +374,49 @@ async function fetchFinishedTransactions() {
         ],
       },
       {
+        model: CertifiedTransaction,
+        as: "CertifiedTransaction",
+        attributes: {
+          exclude: ["updatedAt", "updatedBy", "deletedAt", "deletedBy"],
+        },
+        include: [
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      },
+      {
         model: Employee,
         as: "Employee",
         attributes: ["firstName", "lastName"],
       },
     ],
     where: sequelize.literal(`
-      NOT EXISTS (
-        SELECT 1
-        FROM SortedWasteTransactions AS swt
-        LEFT JOIN (
-          SELECT sortedWasteTransactionId, COALESCE(SUM(weight), 0) AS totalTreatedWeight
-          FROM TreatedWasteTransactions
-          WHERE deletedAt IS NULL
-          GROUP BY sortedWasteTransactionId
-        ) AS twt ON swt.id = twt.sortedWasteTransactionId
-        WHERE swt.sortedTransactionId = SortedTransaction.id
-        AND COALESCE(twt.totalTreatedWeight, 0) != swt.weight
+      SortedTransaction.id IN (
+        SELECT sortedTransactionId
+        FROM CertifiedTransactions
+        WHERE sortedTransactionId IS NOT NULL
       )
     `),
     order: [["id", "DESC"]],
   });
 }
 
-// Create Attachment controller
+// Create Certified Transaction controller
 async function createCertifiedTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
     let {
-      isFinished,
       bookedTransactionId,
       sortedTransactionId,
-      sortedWasteTransactionId,
-      treatedWastes,
-      remarks,
       certifiedDate,
       certifiedTime,
+      typeOfCertificate,
+      typeOfWeight,
+      remarks,
       statusId,
       createdBy,
     } = req.body;
@@ -419,42 +425,28 @@ async function createCertifiedTransactionController(req, res) {
       remarks = remarks.toUpperCase();
     }
     // Create CertifiedTransaction entry
-    const newCertifiedTransaction = await CertifiedTransaction.create(
+    await CertifiedTransaction.create(
       {
         sortedTransactionId,
+        certifiedDate,
+        certifiedTime,
+        typeOfCertificate,
+        typeOfWeight,
         remarks,
         createdBy,
       },
       { transaction: transaction }
     );
     // Adding treated wastes to TreatedWasteTransaction table
-    if (treatedWastes && treatedWastes.length > 0) {
-      const treatedWastePromises = treatedWastes.map((waste) => {
-        return TreatedWasteTransaction.create(
-          {
-            treatedTransactionId: newTreatedTransaction.id,
-            sortedWasteTransactionId,
-            treatmentProcessId: waste.treatmentProcessId,
-            treatmentMachineId: waste.treatmentMachineId,
-            weight: waste.weight,
-            treatedDate: waste.treatedDate,
-            treatedTime: waste.treatedTime,
-          },
-          { transaction: transaction }
-        );
-      });
-      await Promise.all(treatedWastePromises);
-    }
+
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       { transaction }
     );
     if (updatedBookedTransaction) {
-      // Update booked transaction attributes if isFinished is true
-      if (isFinished) {
-        updatedBookedTransaction.statusId = statusId;
-        await updatedBookedTransaction.save({ transaction });
-      }
+      updatedBookedTransaction.statusId = statusId;
+      await updatedBookedTransaction.save({ transaction });
+
       // Commit the transaction
       await transaction.commit();
       // Fetch pending and finished transactions
@@ -477,7 +469,7 @@ async function createCertifiedTransactionController(req, res) {
   }
 }
 
-// Get Attachments controller
+// Get Certified Transactions controller
 async function getCertifiedTransactionsController(req, res) {
   try {
     // Fetch pending and finished transactions
@@ -491,7 +483,7 @@ async function getCertifiedTransactionsController(req, res) {
   }
 }
 
-// Delete Attachment Transaction controller
+// Delete Certified Transaction controller
 async function deleteCertifiedTransactionController(req, res) {
   try {
     const id = req.params.id;

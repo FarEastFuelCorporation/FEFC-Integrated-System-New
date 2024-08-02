@@ -228,7 +228,7 @@ const TreatedTransaction = ({
               Treated
             </Typography>
             <Typography variant="h5">
-              {`${latestTreatedDate.split("T")[0]} ${latestTreatedTime}`}
+              {`${latestTreatedDate} ${latestTreatedTime}`}
             </Typography>
           </Box>
         )}

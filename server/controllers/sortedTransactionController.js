@@ -346,6 +346,7 @@ async function createSortedTransactionController(req, res) {
             quotationWasteId: waste.quotationWasteId,
             wasteName: wasteName,
             weight: waste.weight,
+            clientWeight: waste.clientWeight,
             formNo: waste.formNo,
           },
           { transaction: transaction }
@@ -434,7 +435,6 @@ async function updateSortedTransactionController(req, res) {
       sortedWastes,
       sortedScraps,
       remarks,
-      statusId,
       createdBy,
     } = req.body;
 
@@ -495,6 +495,7 @@ async function updateSortedTransactionController(req, res) {
               quotationWasteId: waste.quotationWasteId,
               wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
               weight: waste.weight,
+              weight: waste.clientWeight,
               formNo: waste.formNo,
             },
             { where: { id: waste.id }, transaction }

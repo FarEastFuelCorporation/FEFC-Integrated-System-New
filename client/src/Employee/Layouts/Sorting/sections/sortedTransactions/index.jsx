@@ -25,6 +25,7 @@ const SortedTransactions = ({ user }) => {
         quotationWasteId: "",
         wasteName: "",
         weight: 0,
+        clientWeight: 0,
         formNo: "",
       },
     ],
@@ -493,6 +494,17 @@ const SortedTransactions = ({ user }) => {
               dispatchedCreatedBy: dispatchedCreatedBy,
               receivedCreatedBy: receivedCreatedBy,
               sortedCreatedBy: sortedCreatedBy,
+              SortedWasteTransaction: sortItem.SortedWasteTransaction.map(
+                (transaction) => ({
+                  ...transaction,
+                  sortedDate: sortedDate
+                    ? sortedDate.toISOString().split("T")[0]
+                    : null,
+                  sortedTime: sortedTime
+                    ? sortedTime.toISOString().split("T")[1].slice(0, 5)
+                    : null,
+                })
+              ),
             };
           }
         );
@@ -546,6 +558,7 @@ const SortedTransactions = ({ user }) => {
           quotationWasteId: "",
           wasteName: "",
           weight: 0,
+          clientWeight: 0,
           formNo: "",
         },
       ],
@@ -657,7 +670,10 @@ const SortedTransactions = ({ user }) => {
       (sortedWastes &&
         sortedWastes.some(
           (waste) =>
-            !waste.weight || !waste.quotationWasteId || !waste.wasteName
+            !waste.weight ||
+            !waste.clientWeight ||
+            !waste.quotationWasteId ||
+            !waste.wasteName
         )) ||
       (sortedScraps &&
         sortedScraps.some((scrap) => !scrap.weight || !scrap.scrapTypeId)) ||

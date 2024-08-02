@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import "font-awesome/css/font-awesome.min.css";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import axios from "axios";
 
 import Navbar from "./OtherComponents/Navbar";
@@ -11,13 +17,15 @@ import Login from "./Auth/Login";
 import Signup from "./Auth/Signup";
 import Dashboard from "./OtherComponents/Dashboard";
 import LoadingSpinner from "./OtherComponents/LoadingSpinner";
+import Certificate from "./OtherComponents/Certificates/Certificate";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [user, setUser] = useState(null); // State to hold user information
-  const [loading, setLoading] = useState(true); // State to indicate loading
+  const [loading, setLoading] = useState(false); // State to indicate loading
   const [theme, colorMode] = useMode();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Function to update user information after successful login
   const handleLogin = (userData) => {
@@ -30,22 +38,24 @@ const App = () => {
     setUser(updatedUser);
   };
 
-  // Function to fetch session data on initial load
+  // Function to fetch session data if the current route is "/dashboard"
   useEffect(() => {
-    setLoading(true); // Set loading to true before making the request
-    axios
-      .get(`${apiUrl}/api/session`, { withCredentials: true })
-      .then((response) => {
-        setUser(response.data.user);
-      })
-      .catch((error) => {
-        console.error("Error fetching session data:", error);
-        navigate("/login");
-      })
-      .finally(() => {
-        setLoading(false); // Set loading to false after the request completes (success or error)
-      });
-  }, [apiUrl, navigate]);
+    if (location.pathname.startsWith("/dashboard")) {
+      setLoading(true); // Set loading to true before making the request
+      axios
+        .get(`${apiUrl}/api/session`, { withCredentials: true })
+        .then((response) => {
+          setUser(response.data.user);
+        })
+        .catch((error) => {
+          console.error("Error fetching session data:", error);
+          navigate("/login");
+        })
+        .finally(() => {
+          setLoading(false); // Set loading to false after the request completes (success or error)
+        });
+    }
+  }, [location.pathname, apiUrl, navigate]);
 
   if (loading) {
     return <LoadingSpinner theme={theme} />;
@@ -58,6 +68,7 @@ const App = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          {/* <Route path="/certificate/:id" element={<Certificate />} /> */}
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           {user ? (

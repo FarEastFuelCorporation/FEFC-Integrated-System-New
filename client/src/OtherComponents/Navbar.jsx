@@ -20,6 +20,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Navbar = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -34,10 +35,13 @@ const Navbar = () => {
     location.pathname === "/login" ||
     location.pathname === "/";
 
+  const segments = location.pathname.split("/");
+  const client = segments[1] === "certificate";
+
   const handleLogout = async () => {
     try {
       // Make a request to logout endpoint
-      const response = await axios.get("http://localhost:3001/logout", {
+      const response = await axios.get(`${apiUrl}/logout`, {
         withCredentials: true, // send cookies if any
       });
 
@@ -91,7 +95,7 @@ const Navbar = () => {
             )}
           </IconButton>
         </Box>
-        {!isAuthPage ? (
+        {!isAuthPage && !client ? (
           <Box display="flex" gap={2}>
             <Button onClick={handleLogout} color="inherit">
               <Typography variant="h5">Logout</Typography>

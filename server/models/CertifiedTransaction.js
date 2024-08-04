@@ -13,8 +13,16 @@ const CertifiedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
+    bookedTransactionId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     sortedTransactionId: {
       type: DataTypes.UUID,
+      allowNull: false,
+    },
+    certificateNumber: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     certifiedDate: {

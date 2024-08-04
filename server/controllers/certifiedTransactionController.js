@@ -23,6 +23,7 @@ const TreatmentMachine = require("../models/TreatmentMachine");
 const Attachment = require("../models/Attachment");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
+const generateCertificateNumber = require("../utils/generateCertificateNumber");
 
 // Utility function to fetch pending transactions
 async function fetchPendingTransactions() {
@@ -424,10 +425,15 @@ async function createCertifiedTransactionController(req, res) {
     if (remarks) {
       remarks = remarks.toUpperCase();
     }
+
+    const certificateNumber = await generateCertificateNumber();
+
     // Create CertifiedTransaction entry
     await CertifiedTransaction.create(
       {
+        bookedTransactionId,
         sortedTransactionId,
+        certificateNumber,
         certifiedDate,
         certifiedTime,
         typeOfCertificate,

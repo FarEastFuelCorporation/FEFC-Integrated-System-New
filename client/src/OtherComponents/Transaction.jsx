@@ -27,7 +27,6 @@ import SortedTransaction from "./Transactions/SortedTransaction";
 import TreatedTransaction from "./Transactions/TreatedTransaction";
 import CertifiedTransaction from "./Transactions/CertifiedTransaction";
 import Attachments from "./Attachments";
-import CertificateOfDestruction from "./Certificates/Certificate";
 
 const Transaction = ({
   user,
@@ -170,7 +169,6 @@ const Transaction = ({
                       user={user}
                     />
                   )}
-                  <CertificateOfDestruction row={row} />
                   {row.statusId >= 6 && (
                     <TreatedTransaction
                       row={row}

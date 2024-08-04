@@ -4,6 +4,7 @@ import ApprovalIcon from "@mui/icons-material/Approval";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
+import CertificateOfDestruction from "../Certificates/CertificateOfDestruction";
 
 const CertifiedTransaction = ({ row }) => {
   const theme = useTheme();
@@ -94,6 +95,7 @@ const CertifiedTransaction = ({ row }) => {
           <Typography variant="h5">
             Certified By: {certifiedCreatedBy}
           </Typography>
+          <CertificateOfDestruction row={row} />
           <br />
           <hr />
         </Box>

@@ -68,7 +68,7 @@ const App = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          {/* <Route path="/certificate/:id" element={<Certificate />} /> */}
+          <Route path="/certificate/:id" element={<Certificate />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           {user ? (

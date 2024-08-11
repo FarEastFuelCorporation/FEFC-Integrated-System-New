@@ -164,6 +164,8 @@ const EmployeeRecordModal = ({
     "Upload Files",
   ];
 
+  console.log(departments);
+
   return (
     <Box>
       <Modal open={openModal} onClose={handleCloseModal}>
@@ -853,7 +855,7 @@ const EmployeeRecordModal = ({
                         handleInputChange({
                           target: {
                             name: "departmentId",
-                            value: newValue,
+                            value: newValue ? newValue.id : "",
                           },
                         });
                       }}
@@ -890,7 +892,7 @@ const EmployeeRecordModal = ({
                         handleInputChange({
                           target: {
                             name: "immediateHeadId",
-                            value: newValue ? newValue : "",
+                            value: newValue ? newValue.employeeId : "",
                           },
                         });
                       }}

@@ -15,6 +15,7 @@ const EmployeeRecord = sequelize.define(
     },
     employeeId: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: false,
     },
     employeeStatus: {

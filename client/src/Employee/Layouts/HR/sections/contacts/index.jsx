@@ -562,7 +562,7 @@ const Contacts = ({ user }) => {
   };
 
   const renderCellWithWrapText = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+    <div className={"wrap-text"} style={{ textAlign: "center", width: "100%" }}>
       {params.value}
     </div>
   );

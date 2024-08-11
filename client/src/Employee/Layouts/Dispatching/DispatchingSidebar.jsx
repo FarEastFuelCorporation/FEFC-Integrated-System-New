@@ -25,6 +25,7 @@ const DispatchingSidebar = ({ user }) => {
     () => ({
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
+      "/dashboard/vehicleLocation": "Vehicle Location",
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/vehicleMaintenanceRequests": "Vehicle Maintenance Request",
@@ -176,6 +177,13 @@ const DispatchingSidebar = ({ user }) => {
             <Item
               title="Transactions"
               to="transactions"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Vehicle Location"
+              to="vehicleLocation"
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}

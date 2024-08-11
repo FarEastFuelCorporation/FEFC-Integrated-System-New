@@ -699,19 +699,14 @@ const EmployeeProfileModal = ({
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={3}>
                         <Typography variant="h3">Department:</Typography>
-                      </Grid>{" "}
+                      </Grid>
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.departmentId
-                            ? (() => {
-                                const department = departments.find(
-                                  (department) =>
-                                    department.id === selectedRow.departmentId
-                                );
-                                return department
-                                  ? department.department
-                                  : "(No Data)";
-                              })()
+                            ? departments.find(
+                                (department) =>
+                                  department.id === selectedRow.departmentId
+                              )?.department || "(No Data)"
                             : "(No Data)"}
                         </Typography>
                       </Grid>
@@ -719,20 +714,29 @@ const EmployeeProfileModal = ({
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={3}>
                         <Typography variant="h3">Immediate Head:</Typography>
-                      </Grid>{" "}
+                      </Grid>
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.immediateHeadId
-                            ? (() => {
-                                const immediateHead = employeesData.find(
-                                  (employee) =>
-                                    employee.employeeId ===
-                                    selectedRow.immediateHeadId
-                                );
-                                return immediateHead
-                                  ? `${immediateHead.firstName} ${immediateHead.lastName}`
-                                  : "(No Data)";
-                              })()
+                            ? employeesData.find(
+                                (employee) =>
+                                  employee.employeeId ===
+                                  selectedRow.immediateHeadId
+                              )
+                              ? `${
+                                  employeesData.find(
+                                    (employee) =>
+                                      employee.employeeId ===
+                                      selectedRow.immediateHeadId
+                                  )?.firstName || ""
+                                } ${
+                                  employeesData.find(
+                                    (employee) =>
+                                      employee.employeeId ===
+                                      selectedRow.immediateHeadId
+                                  )?.lastName || ""
+                                }`
+                              : "(No Data)"
                             : "(No Data)"}
                         </Typography>
                       </Grid>
@@ -951,15 +955,19 @@ const EmployeeProfileModal = ({
                         {" "}
                         <Grid container spacing={2} mt={2}>
                           <Grid item xs={12} md={6} lg={3}>
-                            <Typography variant="h3">Mother's Name:</Typography>
+                            <Typography variant="h3">
+                              {selectedRow.gender === "MALE"
+                                ? "Wife's Name:"
+                                : "Husband's Name:"}
+                            </Typography>
                           </Grid>{" "}
                           <Grid item xs={12} md={6} lg={9}>
                             <Typography
                               variant="h3"
                               sx={{ fontWeight: "bold" }}
                             >
-                              {selectedRow.mothersName
-                                ? selectedRow.mothersName
+                              {selectedRow.spouseName
+                                ? selectedRow.spouseName
                                 : "(No Data)"}
                             </Typography>
                           </Grid>
@@ -973,8 +981,8 @@ const EmployeeProfileModal = ({
                               variant="h3"
                               sx={{ fontWeight: "bold" }}
                             >
-                              {selectedRow.mothersAddress
-                                ? selectedRow.mothersAddress
+                              {selectedRow.spouseAddress
+                                ? selectedRow.spouseAddress
                                 : "(No Data)"}
                             </Typography>
                           </Grid>
@@ -988,8 +996,8 @@ const EmployeeProfileModal = ({
                               variant="h3"
                               sx={{ fontWeight: "bold" }}
                             >
-                              {selectedRow.mothersMobileNumber
-                                ? selectedRow.mothersMobileNumber
+                              {selectedRow.spouseMobileNumber
+                                ? selectedRow.spouseMobileNumber
                                 : "(No Data)"}
                             </Typography>
                           </Grid>
@@ -1003,8 +1011,8 @@ const EmployeeProfileModal = ({
                               variant="h3"
                               sx={{ fontWeight: "bold" }}
                             >
-                              {selectedRow.mothersReligion
-                                ? selectedRow.mothersReligion
+                              {selectedRow.spouseReligion
+                                ? selectedRow.spouseReligion
                                 : "(No Data)"}
                             </Typography>
                           </Grid>

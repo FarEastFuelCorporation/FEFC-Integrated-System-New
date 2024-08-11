@@ -2,7 +2,7 @@
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-require("events").EventEmitter.defaultMaxListeners = 25;
+require("events").EventEmitter.defaultMaxListeners = 50;
 
 const express = require("express");
 const session = require("express-session");
@@ -11,10 +11,16 @@ const cors = require("cors");
 const path = require("path");
 const bodyParser = require("body-parser");
 
+const http = require("http");
+const socketIo = require("socket.io");
+
 // Import utility functions and models
 require("./utils/associations");
 
 const app = express();
+
+const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(
   cors({
@@ -46,7 +52,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Use express-session middleware
@@ -58,6 +64,8 @@ app.use(
     cookie: { secure: process.env.COOKIE === "true" }, // Use secure: true in production with HTTPS
   })
 );
+
+app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Middleware to check authentication
 const { isAuthenticated } = require("./middlewares/auth");
@@ -75,6 +83,19 @@ app.get("/api/session", (req, res) => {
   } else {
     res.status(401).json({ error: "Not authenticated" });
   }
+});
+
+app.post("/gpsdata", (req, res) => {
+  const gpsData = req.body.gpsData;
+
+  if (!gpsData) {
+    return res.status(400).send("GPS data is missing");
+  }
+
+  // Emit GPS data to all connected clients
+  io.emit("gpsUpdate", gpsData);
+
+  res.status(200).send("GPS data received");
 });
 
 // Include your routes
@@ -136,7 +157,6 @@ app.use("/employeeRecord", employeeRecordRoutes);
 app.use("/employeeAttachment", employeeAttachmentRoutes);
 app.use("/department", departmentRoutes);
 
-app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(error404Controller);
 
 // Function to initialize the application

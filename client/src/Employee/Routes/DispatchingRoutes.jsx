@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import UserDashboard from "../../OtherComponents/UserDashboard";
 import Dashboard from "../../Employee/Layouts/Dispatching/sections/dashboard";
 import DispatchedTransactions from "../Layouts/Dispatching/sections/dispatchedTransactions";
+import VehicleLocation from "../Layouts/Dispatching/sections/vehicleLocation";
 import VehicleTypes from "../../OtherComponents/Sections/vehicleTypes";
 import Vehicles from "../../OtherComponents/Sections/vehicles";
 import VehicleMaintenanceRequest from "../../OtherComponents/Sections/vehicleMaintenanceRequest";
@@ -20,6 +21,7 @@ const DispatchingRoutes = ({ user }) => (
         path="transactions"
         element={<DispatchedTransactions user={user} />}
       />
+      <Route path="vehicleLocation" element={<VehicleLocation user={user} />} />
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />
       <Route

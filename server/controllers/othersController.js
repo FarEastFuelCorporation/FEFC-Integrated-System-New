@@ -10,7 +10,7 @@ async function homeController(req, res) {
       pageTitle: "FAR EAST FUEL CORPORATION",
       username,
     };
-    res.render("home", viewsData);
+    // res.render("home", viewsData);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

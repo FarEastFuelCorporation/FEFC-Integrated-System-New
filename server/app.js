@@ -12,7 +12,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 
 const http = require("http");
-const socketIo = require("socket.io");
+const WebSocket = require("ws");
 
 // Import utility functions and models
 require("./utils/associations");
@@ -20,7 +20,16 @@ require("./utils/associations");
 const app = express();
 
 const server = http.createServer(app);
-const io = socketIo(server);
+const wss = new WebSocket.Server({ server });
+
+// WebSocket connection handling
+wss.on("connection", (ws) => {
+  console.log("New WebSocket connection");
+
+  ws.on("message", (message) => {
+    console.log("Received message:", message);
+  });
+});
 
 app.use(
   cors({
@@ -32,9 +41,6 @@ app.use(
 // Set up storage for multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-// Set up EJS as the view engine
-app.set("view engine", "ejs");
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -92,10 +98,49 @@ app.post("/gpsdata", (req, res) => {
     return res.status(400).send("GPS data is missing");
   }
 
-  // Emit GPS data to all connected clients
-  io.emit("gpsUpdate", gpsData);
+  // Parse the NMEA GPRMC string to extract latitude and longitude
+  const gpsParts = gpsData.split(",");
 
-  res.status(200).send("GPS data received");
+  if (gpsParts.length < 12 || gpsParts[2] !== "A") {
+    return res.status(400).send("Invalid GPS data");
+  }
+
+  const latRaw = gpsParts[3];
+  const latHemisphere = gpsParts[4];
+  const lngRaw = gpsParts[5];
+  const lngHemisphere = gpsParts[6];
+
+  // Convert latitude and longitude to decimal format
+  const latDegrees = parseInt(latRaw.substring(0, 2), 10);
+  const latMinutes = parseFloat(latRaw.substring(2));
+  let latitude = latDegrees + latMinutes / 60.0;
+  if (latHemisphere === "S") latitude = -latitude;
+
+  const lngDegrees = parseInt(lngRaw.substring(0, 3), 10);
+  const lngMinutes = parseFloat(lngRaw.substring(3));
+  let longitude = lngDegrees + lngMinutes / 60.0;
+  if (lngHemisphere === "W") longitude = -longitude;
+
+  const location = {
+    latitude,
+    longitude,
+  };
+
+  // Broadcast the GPS data to all WebSocket clients
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(location));
+    }
+  });
+
+  console.log(
+    `GPS data received and processed. Lat: ${location.latitude}, Long: ${location.longitude}`
+  );
+  res
+    .status(200)
+    .send(
+      `GPS data received and processed. Lat: ${location.latitude}, Long: ${location.longitude}`
+    );
 });
 
 // Include your routes

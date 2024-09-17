@@ -84,6 +84,7 @@ app.use("/hr_Dashboard/*", isAuthenticated);
 
 // Route to check authentication status
 app.get("/api/session", (req, res) => {
+  console.log("Session data:", req.session);
   if (req.session.user) {
     res.status(200).json({ user: req.session.user });
   } else {

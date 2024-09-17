@@ -40,11 +40,13 @@ const App = () => {
 
   // Function to fetch session data if the current route is "/dashboard"
   useEffect(() => {
-    if (location.pathname.startsWith("/dashboard")) {
-      setLoading(true); // Set loading to true before making the request
+    // Only fetch session data if user is not already set
+    if (!user && location.pathname.startsWith("/dashboard")) {
+      setLoading(true);
       axios
         .get(`${apiUrl}/api/session`, { withCredentials: true })
         .then((response) => {
+          console.log("Session data fetched:", response.data);
           setUser(response.data.user);
         })
         .catch((error) => {
@@ -52,10 +54,10 @@ const App = () => {
           navigate("/login");
         })
         .finally(() => {
-          setLoading(false); // Set loading to false after the request completes (success or error)
+          setLoading(false);
         });
     }
-  }, [location.pathname, apiUrl, navigate]);
+  }, [location.pathname, apiUrl, navigate, user]);
 
   if (loading) {
     return <LoadingSpinner theme={theme} />;

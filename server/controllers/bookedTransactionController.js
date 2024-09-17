@@ -2,11 +2,20 @@
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
+const DispatchedTransaction = require("../models/DispatchedTransaction");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
+const ReceivedTransaction = require("../models/ReceivedTransaction");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
+const SortedTransaction = require("../models/SortedTransaction");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
 const generateTransactionId = require("../utils/generateTransactionId");
+const {
+  getPendingTransactions,
+  getFinishedTransactions,
+} = require("../utils/getBookedTransactions");
+const statusId = 1;
 
 // Create Booked Transaction controller
 async function createBookedTransactionController(req, res) {
@@ -88,37 +97,13 @@ async function createBookedTransactionController(req, res) {
 // Get Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
   try {
-    // Fetch all bookedTransactions from the database
-    const bookedTransactions = await BookedTransaction.findAll({
-      attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
-      include: [
-        {
-          model: QuotationWaste,
-          as: "QuotationWaste",
-          attributes: ["wasteName"],
-        },
-        {
-          model: QuotationTransportation,
-          as: "QuotationTransportation",
-          attributes: ["id", "vehicleTypeId"],
-          include: [
-            {
-              model: VehicleType,
-              as: "VehicleType",
-              attributes: ["typeOfVehicle"],
-            },
-          ],
-        },
-        {
-          model: Client,
-          as: "Client",
-          attributes: ["clientId", "clientName"],
-        },
-      ],
-      order: [["transactionId", "DESC"]],
-    });
+    // Get pending transactions
+    const pendingTransactions = await getPendingTransactions(statusId);
 
-    res.json({ bookedTransactions });
+    // Get finished transactions (statusId greater than the given value)
+    const finishedTransactions = await getFinishedTransactions(statusId);
+
+    res.json({ pendingTransactions, finishedTransactions });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

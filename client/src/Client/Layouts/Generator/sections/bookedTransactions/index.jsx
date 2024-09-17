@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -6,23 +6,27 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
+import useProcessTransaction from "../../../../../OtherComponents/ProcessTransaction";
 
-const Transactions = ({ user }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
+const BookedTransactions = ({ user }) => {
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
-  const initialFormData = {
-    id: "",
-    quotationWasteId: "",
-    quotationTransportationId: "",
-    haulingDate: "",
-    haulingTime: "",
-    pttNo: "",
-    manifestNo: "",
-    pullOutFormNo: "",
-    remarks: "",
-    statusId: 1,
-    createdBy: user.id,
-  };
+  const initialFormData = useMemo(
+    () => ({
+      id: "",
+      quotationWasteId: "",
+      quotationTransportationId: "",
+      haulingDate: "",
+      haulingTime: "",
+      pttNo: "",
+      manifestNo: "",
+      pullOutFormNo: "",
+      remarks: "",
+      statusId: 1,
+      createdBy: user.id,
+    }),
+    [user.id]
+  );
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
@@ -32,134 +36,85 @@ const Transactions = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const { processDataTransaction } = useProcessTransaction();
 
-  const processDataBookedTransaction = (response) => {
-    const transactions = response.data;
-    if (transactions && Array.isArray(transactions.bookedTransactions)) {
-      const flattenedData = transactions.bookedTransactions.map((item) => {
-        const haulingDate = item.haulingDate
-          ? new Date(item.haulingDate)
-          : null;
-        const createdDate = item.createdAt ? new Date(item.createdAt) : null;
-        let haulingTime = null;
-        let createdTime = null;
-        if (item.haulingTime) {
-          const [hours, minutes, seconds] = item.haulingTime.split(":");
-          haulingTime = new Date(Date.UTC(1970, 0, 1, hours, minutes, seconds)); // Create a date using UTC
-        }
-        if (createdDate) {
-          createdTime = createdDate.toISOString().split("T")[1].slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-        }
-
-        return {
-          ...item,
-          haulingDate: haulingDate
-            ? haulingDate.toISOString().split("T")[0]
-            : null,
-          haulingTime: haulingTime
-            ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-            : null,
-          createdDate: createdDate
-            ? createdDate.toISOString().split("T")[0]
-            : null,
-          createdTime: createdTime,
-          wasteName: item.QuotationWaste ? item.QuotationWaste.wasteName : null,
-          vehicleType: item.QuotationTransportation
-            ? item.QuotationTransportation.VehicleType.typeOfVehicle
-            : null,
-        };
-      });
-
-      setPendingTransactions(flattenedData);
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    try {
+      const bookedTransactionResponse = await axios.get(
+        `${apiUrl}/bookedTransaction`
+      );
+      console.log(bookedTransactionResponse);
+      // For pending transactions
+      processDataTransaction(
+        bookedTransactionResponse.data.pendingTransactions,
+        setPendingTransactions
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  };
+  }, [apiUrl, processDataTransaction]);
 
+  // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const bookedTransactionResponse = await axios.get(
-          `${apiUrl}/bookedTransaction`
-        );
-
-        processDataBookedTransaction(bookedTransactionResponse);
-        setFinishedTransactions([]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
+    console.log("Fetching data");
     fetchData();
-  }, [apiUrl, user.id]);
+  }, [fetchData]);
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
+  const handleOpenModal = () => setOpenModal(true);
 
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
   };
 
-  const clearFormData = () => {
-    setFormData(initialFormData);
-  };
+  const clearFormData = () => setFormData(initialFormData);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
-  const handleEditClick = (row) => {
-    const typeToEdit = pendingTransactions.find((type) => type.id === row.id);
-    if (typeToEdit) {
-      setFormData({
-        id: typeToEdit.id,
-        quotationWasteId: typeToEdit.quotationWasteId,
-        quotationTransportationId: typeToEdit.quotationTransportationId,
-        haulingDate: typeToEdit.haulingDate,
-        haulingTime: typeToEdit.haulingTime,
-        pttNo: typeToEdit.pttNo,
-        manifestNo: typeToEdit.manifestNo,
-        pullOutFormNo: typeToEdit.pullOutFormNo,
-        remarks: typeToEdit.remarks,
-        statusId: 1,
-        createdBy: user.id,
-      });
-      handleOpenModal();
-    } else {
-      console.error(
-        `Booked Transaction with ID ${row.id} not found for editing.`
-      );
-    }
-  };
+  const handleEditClick = useCallback(
+    (row) => {
+      const typeToEdit = pendingTransactions.find((type) => type.id === row.id);
+      if (typeToEdit) {
+        setFormData({
+          ...typeToEdit,
+          statusId: 1,
+          createdBy: user.id,
+        });
+        handleOpenModal();
+      } else {
+        console.error(
+          `Booked Transaction with ID ${row.id} not found for editing.`
+        );
+      }
+    },
+    [pendingTransactions, user.id]
+  );
 
   const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Book Transaction?"
-    );
+    if (
+      window.confirm("Are you sure you want to delete this Book Transaction?")
+    ) {
+      try {
+        await axios.delete(`${apiUrl}/bookedTransaction/${id}`, {
+          data: { deletedBy: user.id },
+        });
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
-    try {
-      await axios.delete(`${apiUrl}/bookedTransaction/${id}`, {
-        data: { deletedBy: user.id },
-      });
-
-      const updatedData = pendingTransactions.filter((type) => type.id !== id);
-      setPendingTransactions(updatedData);
-      setSuccessMessage("Booked Transaction Deleted Successfully!");
-      setShowSuccessMessage(true);
-    } catch (error) {
-      console.error("Error:", error);
+        setPendingTransactions((prev) => prev.filter((type) => type.id !== id));
+        setSuccessMessage("Booked Transaction Deleted Successfully!");
+        setShowSuccessMessage(true);
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Perform client-side validation
     const {
       haulingDate,
       haulingTime,
@@ -190,16 +145,13 @@ const Transactions = ({ user }) => {
           `${apiUrl}/bookedTransaction/${formData.id}`,
           formData
         );
-
-        processDataBookedTransaction(response);
         setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
         response = await axios.post(`${apiUrl}/bookedTransaction`, formData);
-
-        processDataBookedTransaction(response);
         setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
 
+      processDataTransaction(response);
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -248,4 +200,4 @@ const Transactions = ({ user }) => {
   );
 };
 
-export default Transactions;
+export default BookedTransactions;

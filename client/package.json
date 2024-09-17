@@ -35,6 +35,7 @@
     "jspdf": "^2.5.1",
     "loglevel": "^1.9.1",
     "mdb-react-ui-kit": "^7.2.0",
+    "moment-timezone": "^0.5.45",
     "pdfjs-dist": "^4.5.136",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",

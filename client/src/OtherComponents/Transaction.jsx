@@ -43,7 +43,6 @@ const Transaction = ({
   const colors = tokens(theme.palette.mode);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedSubTab, setSelectedSubTab] = useState(0);
-
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
@@ -93,19 +92,18 @@ const Transaction = ({
                 </Typography>
                 {selectedTab === 0 ? (
                   <Box>
-                    {!(
-                      Number.isInteger(user.userType) && user.userType === 6
-                    ) && (
-                      <Button
-                        onClick={() => handleOpenModal(row)}
-                        sx={{
-                          backgroundColor: `${colors.greenAccent[700]}`,
-                          color: `${colors.grey[100]}`,
-                        }}
-                      >
-                        {buttonText}
-                      </Button>
-                    )}
+                    {!Number.isInteger(user.userType) &&
+                      user.userType === 6 && (
+                        <Button
+                          onClick={() => handleOpenModal(row)}
+                          sx={{
+                            backgroundColor: `${colors.greenAccent[700]}`,
+                            color: `${colors.grey[100]}`,
+                          }}
+                        >
+                          {buttonText}
+                        </Button>
+                      )}
                   </Box>
                 ) : (
                   <Box>

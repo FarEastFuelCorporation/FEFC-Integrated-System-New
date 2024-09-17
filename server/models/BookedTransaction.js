@@ -33,18 +33,6 @@ const BookedTransaction = sequelize.define(
       type: DataTypes.TIME,
       allowNull: false,
     },
-    pttNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    manifestNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    pullOutFormNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     statusId: {
       type: DataTypes.INTEGER,
       allowNull: false,

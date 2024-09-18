@@ -1,20 +1,8 @@
 // controllers/bookedTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
-const Client = require("../models/Client");
-const DispatchedTransaction = require("../models/DispatchedTransaction");
-const QuotationTransportation = require("../models/QuotationTransportation");
-const QuotationWaste = require("../models/QuotationWaste");
-const ReceivedTransaction = require("../models/ReceivedTransaction");
-const ScheduledTransaction = require("../models/ScheduledTransaction");
-const SortedTransaction = require("../models/SortedTransaction");
-const TypeOfWaste = require("../models/TypeOfWaste");
-const VehicleType = require("../models/VehicleType");
 const generateTransactionId = require("../utils/generateTransactionId");
-const {
-  getPendingTransactions,
-  getFinishedTransactions,
-} = require("../utils/getBookedTransactions");
+const { fetchData } = require("../utils/getBookedTransactions");
 const statusId = 1;
 
 // Create Booked Transaction controller
@@ -55,38 +43,14 @@ async function createBookedTransactionController(req, res) {
       createdBy,
     });
 
-    // Fetch all bookedTransactions from the database
-    const bookedTransactions = await BookedTransaction.findAll({
-      attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
-      include: [
-        {
-          model: QuotationWaste,
-          as: "QuotationWaste",
-          attributes: ["wasteName"],
-        },
-        {
-          model: QuotationTransportation,
-          as: "QuotationTransportation",
-          attributes: ["id", "vehicleTypeId"],
-          include: [
-            {
-              model: VehicleType,
-              as: "VehicleType",
-              attributes: ["typeOfVehicle"],
-            },
-          ],
-        },
-        {
-          model: Client,
-          as: "Client",
-          attributes: ["clientId", "clientName"],
-        },
-      ],
-      order: [["transactionId", "DESC"]],
-    });
+    // fetch transactions
+    const data = await fetchData(statusId);
 
-    // Respond with the newly created client data
-    res.status(201).json({ bookedTransactions });
+    res.status(201).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -97,13 +61,14 @@ async function createBookedTransactionController(req, res) {
 // Get Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
   try {
-    // Get pending transactions
-    const pendingTransactions = await getPendingTransactions(statusId);
+    // fetch transactions
+    const data = await fetchData(statusId);
 
-    // Get finished transactions (statusId greater than the given value)
-    const finishedTransactions = await getFinishedTransactions(statusId);
-
-    res.json({ pendingTransactions, finishedTransactions });
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -153,38 +118,15 @@ async function updateBookedTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedBookedTransaction.save();
 
-      // Fetch all bookedTransactions from the database
-      const bookedTransactions = await BookedTransaction.findAll({
-        attributes: ["transactionId", "haulingDate", "haulingTime", "remarks"],
-        include: [
-          {
-            model: QuotationWaste,
-            as: "QuotationWaste",
-            attributes: ["wasteName"],
-          },
-          {
-            model: QuotationTransportation,
-            as: "QuotationTransportation",
-            attributes: ["id", "vehicleTypeId"],
-            include: [
-              {
-                model: VehicleType,
-                as: "VehicleType",
-                attributes: ["typeOfVehicle"],
-              },
-            ],
-          },
-          {
-            model: Client,
-            as: "Client",
-            attributes: ["clientId", "clientName"],
-          },
-        ],
-        order: [["transactionId", "DESC"]],
-      });
+      // fetch transactions
+      const data = await fetchData(statusId);
 
       // Respond with the updated booked transaction data
-      res.json({ bookedTransactions });
+      res.status(200).json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If booked transaction with the specified ID was not found
       res

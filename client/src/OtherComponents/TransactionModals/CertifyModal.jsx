@@ -13,7 +13,7 @@ import {
   Button,
 } from "@mui/material";
 import { tokens } from "../../theme";
-import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
+// import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
 
 const CertifyModal = ({
   open,

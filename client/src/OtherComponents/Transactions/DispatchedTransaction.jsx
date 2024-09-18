@@ -1,57 +1,63 @@
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
+import axios from "axios";
+import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
+import { timestampDate, parseTimeString } from "../Functions";
 
 const DispatchedTransaction = ({ row }) => {
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {
-    statusId,
-    dispatchedCreatedDate,
-    dispatchedCreatedTime,
-    dispatchedDate,
-    dispatchedTime,
-    vehicleType,
-    driverName,
-    plateNumber,
-    dispatchedRemarks,
-    dispatchedCreatedBy,
-  } = row;
-  const parseTimeString = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
-  };
+
+  const [employeeData, setEmployeeData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(`${apiUrl}/employee`);
+        setEmployeeData(data.employees);
+      } catch (error) {
+        console.error("Error fetching employee data:", error);
+      }
+    };
+    fetchData();
+  }, [apiUrl]);
+
+  // Extract dispatched transaction data
+  const dispatchedTransaction =
+    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0] || {};
+  const dispatcher = dispatchedTransaction.Employee || {};
+
+  // Helper extraction
+  const helperIdsArray =
+    dispatchedTransaction.helperId?.split(",").map((id) => id.trim()) || [];
+
+  const helper =
+    helperIdsArray
+      .map((helperId) => {
+        const employee = employeeData.find(
+          (emp) => emp.employeeId === helperId
+        );
+        return employee ? `${employee.firstName} ${employee.lastName}` : null;
+      })
+      .filter(Boolean)
+      .join(", ") || "No Helper";
 
   return (
     <Box>
-      {statusId === 2 ? (
+      {row.statusId === 2 ? (
         <Box sx={{ my: 3, position: "relative" }}>
-          <CircleLogo pending={true}>
+          <CircleLogo pending>
             <LocalShippingIcon
-              sx={{
-                fontSize: "30px",
-                color: `${colors.grey[500]}`,
-              }}
+              sx={{ fontSize: "30px", color: colors.grey[500] }}
             />
           </CircleLogo>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Dispatching
-            </Typography>
-          </Box>
+          <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
+            For Dispatching
+          </Typography>
           <Typography variant="h5">Pending</Typography>
           <br />
           <hr />
@@ -60,48 +66,59 @@ const DispatchedTransaction = ({ row }) => {
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
             <LocalShippingIcon
-              sx={{
-                fontSize: "30px",
-                color: `${colors.grey[100]}`,
-              }}
+              sx={{ fontSize: "30px", color: colors.grey[100] }}
             />
           </CircleLogo>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
               Dispatched
             </Typography>
             <Typography variant="h5">
-              {dispatchedCreatedDate} {dispatchedCreatedTime}
+              {dispatchedTransaction.createdAt
+                ? timestampDate(dispatchedTransaction.createdAt)
+                : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
             Dispatched Date:{" "}
-            {dispatchedDate
-              ? format(new Date(dispatchedDate), "MMMM dd, yyyy")
+            {dispatchedTransaction.dispatchedDate
+              ? format(
+                  new Date(dispatchedTransaction.dispatchedDate),
+                  "MMMM dd, yyyy"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Dispatched Time:{" "}
-            {dispatchedTime
-              ? format(parseTimeString(dispatchedTime), "hh:mm aa")
+            {dispatchedTransaction.dispatchedTime
+              ? format(
+                  parseTimeString(dispatchedTransaction.dispatchedTime),
+                  "hh:mm aa"
+                )
               : "Pending"}
           </Typography>
-          <Typography variant="h5">Vehicle Type: {vehicleType}</Typography>
-          <Typography variant="h5">Plate Number: {plateNumber}</Typography>
-          <Typography variant="h5">Driver: {driverName}</Typography>
           <Typography variant="h5">
-            Helper(s): {row.helper ? row.helper : "No Helper"}
+            Vehicle Type:{" "}
+            {dispatchedTransaction.Vehicle.VehicleType?.typeOfVehicle || "N/A"}
           </Typography>
           <Typography variant="h5">
-            Remarks: {dispatchedRemarks ? dispatchedRemarks : "NO REMARKS"}
+            Plate Number: {dispatchedTransaction.Vehicle.plateNumber || "N/A"}
           </Typography>
           <Typography variant="h5">
-            Dispatched By: {dispatchedCreatedBy}
+            Driver:{" "}
+            {`${dispatchedTransaction.EmployeeDriver.firstName || ""} ${
+              dispatchedTransaction.EmployeeDriver.lastName || ""
+            }`}
+          </Typography>
+          <Typography variant="h5">Helper(s): {helper}</Typography>
+          <Typography variant="h5">
+            Remarks: {dispatchedTransaction.remarks || "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">
+            Dispatched By:{" "}
+            {`${dispatchedTransaction.Employee.firstName || ""} ${
+              dispatchedTransaction.Employee.lastName || ""
+            }`}
           </Typography>
           <br />
           <hr />

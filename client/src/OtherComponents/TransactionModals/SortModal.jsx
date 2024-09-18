@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Modal,
@@ -100,74 +100,85 @@ const SortModal = ({
     return batchWeight - totalSortedWeight;
   };
 
-  const handleWasteChange = (index, field, value) => {
-    const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
-      i === index ? { ...waste, [field]: value } : waste
-    );
-    setFormData({
-      ...formData,
-      sortedWastes: updatedSortedWastes,
-    });
-  };
-
-  const handleWasteCodeChange = (index, value) => {
-    let selectedWasteType = null;
-
-    // Find the selected waste type in the nested QuotationWaste array
-    for (let quotation of quotations) {
-      selectedWasteType = quotation.QuotationWaste.find(
-        (waste) => waste.id === value
+  const handleWasteChange = useCallback(
+    (index, field, value) => {
+      const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
+        i === index ? { ...waste, [field]: value } : waste
       );
-      if (selectedWasteType) break;
-    }
-
-    if (selectedWasteType) {
-      const updatedWastes = formData.sortedWastes.map((waste, i) =>
-        i === index
-          ? {
-              ...waste,
-              quotationWasteId: value,
-              wasteName: selectedWasteType.wasteName, // Updated to use wasteName
-            }
-          : waste
-      );
-      handleInputChange({
-        target: { name: "sortedWastes", value: updatedWastes },
+      setFormData({
+        ...formData,
+        sortedWastes: updatedSortedWastes,
       });
-    } else {
-      console.warn(`No waste type found for id: ${value}`);
-    }
-  };
+    },
+    [formData, setFormData]
+  );
 
-  const handleScrapChange = (index, field, value) => {
-    const updatedSortedScraps = formData.sortedScraps.map((scrap, i) =>
-      i === index ? { ...scrap, [field]: value } : scrap
-    );
-    setFormData({
-      ...formData,
-      sortedScraps: updatedSortedScraps,
-    });
-  };
+  const handleWasteCodeChange = useCallback(
+    (index, value) => {
+      let selectedWasteType = null;
 
-  const handleScrapTypeChange = (index, value) => {
-    const selectedScrapType = scrapTypes.find((scrap) => scrap.id === value);
+      for (let quotation of quotations) {
+        selectedWasteType = quotation.QuotationWaste.find(
+          (waste) => waste.id === value
+        );
+        if (selectedWasteType) break;
+      }
 
-    if (selectedScrapType) {
-      const updatedScraps = formData.sortedScraps.map((scrap, i) =>
-        i === index
-          ? {
-              ...scrap,
-              scrapTypeId: value,
-            }
-          : scrap
+      if (selectedWasteType) {
+        const updatedWastes = formData.sortedWastes.map((waste, i) =>
+          i === index
+            ? {
+                ...waste,
+                quotationWasteId: value,
+                wasteName: selectedWasteType.wasteName,
+              }
+            : waste
+        );
+        handleInputChange({
+          target: { name: "sortedWastes", value: updatedWastes },
+        });
+      } else {
+        console.warn(`No waste type found for id: ${value}`);
+      }
+    },
+    [quotations, formData, handleInputChange]
+  );
+
+  const handleScrapChange = useCallback(
+    (index, field, value) => {
+      const updatedSortedScraps = formData.sortedScraps.map((scrap, i) =>
+        i === index ? { ...scrap, [field]: value } : scrap
       );
-      handleInputChange({
-        target: { name: "sortedScraps", value: updatedScraps },
+      setFormData({
+        ...formData,
+        sortedScraps: updatedSortedScraps,
       });
-    } else {
-      console.warn(`No scrap type found for id: ${value}`);
-    }
-  };
+    },
+    [formData, setFormData]
+  );
+
+  const handleScrapTypeChange = useCallback(
+    (index, value) => {
+      const selectedScrapType = scrapTypes.find((scrap) => scrap.id === value);
+
+      if (selectedScrapType) {
+        const updatedScraps = formData.sortedScraps.map((scrap, i) =>
+          i === index
+            ? {
+                ...scrap,
+                scrapTypeId: value,
+              }
+            : scrap
+        );
+        handleInputChange({
+          target: { name: "sortedScraps", value: updatedScraps },
+        });
+      } else {
+        console.warn(`No scrap type found for id: ${value}`);
+      }
+    },
+    [scrapTypes, formData, handleInputChange]
+  );
 
   const addWasteField = () => {
     setFormData({
@@ -326,7 +337,7 @@ const SortModal = ({
           Sorted Wastes
         </Typography>
         {formData.sortedWastes.map((waste, index) => (
-          <Box>
+          <Box key={index}>
             <Typography variant="subtitle2" gutterBottom>
               Waste Entry #{index + 1}
             </Typography>
@@ -455,7 +466,7 @@ const SortModal = ({
           Sorted Scraps
         </Typography>
         {formData.sortedScraps.map((scrap, index) => (
-          <Box>
+          <Box key={index}>
             <Typography variant="subtitle2" gutterBottom>
               Scrap Entry #{index + 1}
             </Typography>

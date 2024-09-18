@@ -79,13 +79,13 @@ const Contacts = ({ user }) => {
     createdBy: user.id,
   };
 
-  const initialAttachmentFormData = {
-    id: "",
-    employeeId: "",
-    fileName: "",
-    attachment: "",
-    createdBy: user.id,
-  };
+  // const initialAttachmentFormData = {
+  //   id: "",
+  //   employeeId: "",
+  //   fileName: "",
+  //   attachment: "",
+  //   createdBy: user.id,
+  // };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
@@ -99,13 +99,13 @@ const Contacts = ({ user }) => {
   const [signatureFileName, setSignatureFileName] = useState("");
   const [departments, setDepartments] = useState([]);
 
-  const [openAttachmentModal, setOpenAttachmentModal] = useState(false);
-  const [attachmentFormData, setAttachmentFormData] = useState(
-    initialAttachmentFormData
-  );
-  const [attachmentData, setAttachmentData] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileName, setFileName] = useState("");
+  // const [openAttachmentModal, setOpenAttachmentModal] = useState(false);
+  // const [attachmentFormData, setAttachmentFormData] = useState(
+  //   initialAttachmentFormData
+  // );
+  // const [attachmentData, setAttachmentData] = useState([]);
+  // const [selectedFile, setSelectedFile] = useState(null);
+  // const [fileName, setFileName] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);

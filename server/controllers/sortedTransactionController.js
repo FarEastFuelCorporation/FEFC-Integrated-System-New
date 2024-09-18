@@ -2,295 +2,12 @@
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
-const Client = require("../models/Client");
-const Employee = require("../models/Employee");
-const QuotationTransportation = require("../models/QuotationTransportation");
-const QuotationWaste = require("../models/QuotationWaste");
-const ScheduledTransaction = require("../models/ScheduledTransaction");
-const DispatchedTransaction = require("../models/DispatchedTransaction");
-const VehicleType = require("../models/VehicleType");
-const { Op, literal } = require("sequelize");
-const Vehicle = require("../models/Vehicle");
-const ReceivedTransaction = require("../models/ReceivedTransaction");
 const SortedTransaction = require("../models/SortedTransaction");
 const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
 const ScrapType = require("../models/ScrapType");
-
-// Utility function to fetch pending transactions
-async function fetchPendingTransactions() {
-  return await ReceivedTransaction.findAll({
-    attributes: [
-      "id",
-      "dispatchedTransactionId",
-      "receivedDate",
-      "receivedTime",
-      "pttNo",
-      "manifestNo",
-      "pullOutFormNo",
-      "manifestWeight",
-      "clientWeight",
-      "grossWeight",
-      "tareWeight",
-      "netWeight",
-      "remarks",
-      "createdBy",
-      "createdAt",
-    ],
-    include: [
-      {
-        model: DispatchedTransaction,
-        as: "DispatchedTransaction",
-        attributes: [
-          "id",
-          "scheduledTransactionId",
-          "vehicleId",
-          "driverId",
-          "helperId",
-          "isDispatched",
-          "dispatchedDate",
-          "dispatchedTime",
-          "remarks",
-          "createdBy",
-          "createdAt",
-        ],
-        include: [
-          {
-            model: ScheduledTransaction,
-            as: "ScheduledTransaction",
-            attributes: [
-              "id",
-              "bookedTransactionId",
-              "scheduledDate",
-              "scheduledTime",
-              "remarks",
-              "createdBy",
-              "createdAt",
-            ],
-            include: [
-              {
-                model: BookedTransaction,
-                as: "BookedTransaction",
-                attributes: [
-                  "transactionId",
-                  "haulingDate",
-                  "haulingTime",
-                  "remarks",
-                  "statusId",
-                  "createdAt",
-                ],
-                include: [
-                  {
-                    model: QuotationWaste,
-                    as: "QuotationWaste",
-                    attributes: ["wasteName"],
-                  },
-                  {
-                    model: QuotationTransportation,
-                    as: "QuotationTransportation",
-                    attributes: ["id", "vehicleTypeId"],
-                    include: [
-                      {
-                        model: VehicleType,
-                        as: "VehicleType",
-                        attributes: ["typeOfVehicle"],
-                      },
-                    ],
-                  },
-                  {
-                    model: Client,
-                    as: "Client",
-                    attributes: ["clientId", "clientName"],
-                  },
-                ],
-              },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
-              },
-            ],
-          },
-          {
-            model: Employee,
-            as: "EmployeeDriver",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Vehicle,
-            as: "Vehicle",
-            attributes: ["plateNumber"],
-          },
-        ],
-      },
-      {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
-    ],
-    where: {
-      id: {
-        [Op.notIn]: literal(
-          "(SELECT `receivedTransactionId` FROM `SortedTransactions` WHERE `deletedAt` IS NULL)"
-        ),
-      },
-    },
-    order: [["id", "DESC"]],
-  });
-}
-
-// Utility function to fetch finished transactions
-async function fetchFinishedTransactions() {
-  return await SortedTransaction.findAll({
-    include: [
-      {
-        model: ReceivedTransaction,
-        as: "ReceivedTransaction",
-        attributes: [
-          "id",
-          "dispatchedTransactionId",
-          "receivedDate",
-          "receivedTime",
-          "pttNo",
-          "manifestNo",
-          "pullOutFormNo",
-          "manifestWeight",
-          "clientWeight",
-          "grossWeight",
-          "tareWeight",
-          "netWeight",
-          "remarks",
-          "createdBy",
-          "createdAt",
-        ],
-        include: [
-          {
-            model: DispatchedTransaction,
-            as: "DispatchedTransaction",
-            attributes: [
-              "id",
-              "scheduledTransactionId",
-              "vehicleId",
-              "driverId",
-              "helperId",
-              "isDispatched",
-              "dispatchedDate",
-              "dispatchedTime",
-              "remarks",
-              "createdBy",
-              "createdAt",
-            ],
-            include: [
-              {
-                model: ScheduledTransaction,
-                as: "ScheduledTransaction",
-                attributes: [
-                  "id",
-                  "bookedTransactionId",
-                  "scheduledDate",
-                  "scheduledTime",
-                  "remarks",
-                  "createdBy",
-                  "createdAt",
-                ],
-                include: [
-                  {
-                    model: BookedTransaction,
-                    as: "BookedTransaction",
-                    attributes: [
-                      "transactionId",
-                      "haulingDate",
-                      "haulingTime",
-                      "remarks",
-                      "statusId",
-                      "createdAt",
-                    ],
-                    include: [
-                      {
-                        model: QuotationWaste,
-                        as: "QuotationWaste",
-                        attributes: ["wasteName"],
-                      },
-                      {
-                        model: QuotationTransportation,
-                        as: "QuotationTransportation",
-                        attributes: ["id", "vehicleTypeId"],
-                        include: [
-                          {
-                            model: VehicleType,
-                            as: "VehicleType",
-                            attributes: ["typeOfVehicle"],
-                          },
-                        ],
-                      },
-                      {
-                        model: Client,
-                        as: "Client",
-                        attributes: ["clientId", "clientName"],
-                      },
-                    ],
-                  },
-                  {
-                    model: Employee,
-                    as: "Employee",
-                    attributes: ["firstName", "lastName"],
-                  },
-                ],
-              },
-              {
-                model: Employee,
-                as: "EmployeeDriver",
-                attributes: ["firstName", "lastName"],
-              },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
-              },
-              {
-                model: Vehicle,
-                as: "Vehicle",
-                attributes: ["plateNumber"],
-              },
-            ],
-          },
-          {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
-        ],
-      },
-      {
-        model: SortedWasteTransaction,
-        as: "SortedWasteTransaction",
-      },
-      {
-        model: SortedScrapTransaction,
-        as: "SortedScrapTransaction",
-        include: [
-          {
-            model: ScrapType,
-            as: "ScrapType",
-          },
-        ],
-      },
-      {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
-    ],
-
-    order: [["id", "DESC"]],
-  });
-}
+const { fetchData } = require("../utils/getBookedTransactions");
+const statusId = 4;
 
 // Create Sorted Transaction controller
 async function createSortedTransactionController(req, res) {
@@ -386,12 +103,15 @@ async function createSortedTransactionController(req, res) {
       // Commit the transaction
       await transaction.commit();
 
-      // Fetch pending and finished transactions
-      const pendingTransactions = await fetchPendingTransactions();
-      const finishedTransactions = await fetchFinishedTransactions();
+      // fetch transactions
+      const data = await fetchData(statusId);
 
       // Respond with the updated data
-      res.json({ pendingTransactions, finishedTransactions });
+      res.status(200).json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If booked transaction with the specified ID was not found
       res
@@ -408,11 +128,15 @@ async function createSortedTransactionController(req, res) {
 // Get Sorted Transactions controller
 async function getSortedTransactionsController(req, res) {
   try {
-    // Fetch pending and finished transactions
-    const pendingTransactions = await fetchPendingTransactions();
-    const finishedTransactions = await fetchFinishedTransactions();
+    // fetch transactions
+    const data = await fetchData(statusId);
 
-    res.json({ pendingTransactions, finishedTransactions });
+    // Respond with the updated data
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -555,15 +279,18 @@ async function updateSortedTransactionController(req, res) {
         ...deleteScrapPromises,
       ]);
 
-      // Fetch pending and finished transactions
-      const pendingTransactions = await fetchPendingTransactions();
-      const finishedTransactions = await fetchFinishedTransactions();
-
-      // Respond with the updated data
-      res.json({ pendingTransactions, finishedTransactions });
-
       // Commit the transaction
       await transaction.commit();
+
+      // fetch transactions
+      const data = await fetchData(statusId);
+
+      // Respond with the updated data
+      res.status(200).json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If sorted transaction with the specified ID was not found
       res
@@ -609,12 +336,15 @@ async function deleteSortedTransactionController(req, res) {
       // Soft delete the sorted transaction (sets deletedAt timestamp)
       await sortedTransactionToDelete.destroy();
 
-      // Fetch pending and finished transactions
-      const pendingTransactions = await fetchPendingTransactions();
-      const finishedTransactions = await fetchFinishedTransactions();
+      // fetch transactions
+      const data = await fetchData(statusId);
 
       // Respond with the updated data
-      res.json({ pendingTransactions, finishedTransactions });
+      res.status(200).json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If sorted transaction with the specified ID was not found
       res

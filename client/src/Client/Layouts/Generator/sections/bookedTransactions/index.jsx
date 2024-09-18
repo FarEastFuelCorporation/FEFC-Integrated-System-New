@@ -6,7 +6,6 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
-import useProcessTransaction from "../../../../../OtherComponents/ProcessTransaction";
 
 const BookedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -31,12 +30,12 @@ const BookedTransactions = ({ user }) => {
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [pendingTransactions, setPendingTransactions] = useState([]);
+  const [inProgressTransactions, setInProgressTransactions] = useState([]);
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const { processDataTransaction } = useProcessTransaction();
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -45,15 +44,25 @@ const BookedTransactions = ({ user }) => {
         `${apiUrl}/bookedTransaction`
       );
       console.log(bookedTransactionResponse);
+
       // For pending transactions
-      processDataTransaction(
-        bookedTransactionResponse.data.pendingTransactions,
-        setPendingTransactions
+      setPendingTransactions(
+        bookedTransactionResponse.data.pendingTransactions
+      );
+
+      // For in progress transactions
+      setInProgressTransactions(
+        bookedTransactionResponse.data.inProgressTransactions
+      );
+
+      // For finished transactions
+      setFinishedTransactions(
+        bookedTransactionResponse.data.finishedTransactions
       );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl, processDataTransaction]);
+  }, [apiUrl]);
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
@@ -94,16 +103,18 @@ const BookedTransactions = ({ user }) => {
     [pendingTransactions, user.id]
   );
 
-  const handleDeleteClick = async (id) => {
+  const handleDeleteClick = async (row) => {
     if (
       window.confirm("Are you sure you want to delete this Book Transaction?")
     ) {
       try {
-        await axios.delete(`${apiUrl}/bookedTransaction/${id}`, {
+        await axios.delete(`${apiUrl}/bookedTransaction/${row.id}`, {
           data: { deletedBy: user.id },
         });
 
-        setPendingTransactions((prev) => prev.filter((type) => type.id !== id));
+        setPendingTransactions((prev) =>
+          prev.filter((type) => type.id !== row.id)
+        );
         setSuccessMessage("Booked Transaction Deleted Successfully!");
         setShowSuccessMessage(true);
       } catch (error) {
@@ -138,20 +149,17 @@ const BookedTransactions = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
-        response = await axios.put(
-          `${apiUrl}/bookedTransaction/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/bookedTransaction/${formData.id}`, formData);
+
         setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
-        response = await axios.post(`${apiUrl}/bookedTransaction`, formData);
+        await axios.post(`${apiUrl}/bookedTransaction`, formData);
         setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
 
-      processDataTransaction(response);
+      fetchData();
+
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -181,6 +189,7 @@ const BookedTransactions = ({ user }) => {
       <Transaction
         user={user}
         pendingTransactions={pendingTransactions}
+        inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
         handleEditClick={handleEditClick}

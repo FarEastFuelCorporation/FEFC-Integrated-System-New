@@ -1,36 +1,44 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
+import { timestampDate, parseTimeString, formatWeight } from "../Functions";
 
 const SortedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {
-    statusId,
-    sortedCreatedDate,
-    sortedCreatedTime,
-    netWeight,
-    totalSortedWeight,
-    discrepancyWeight,
-    sortedRemarks,
-    SortedWasteTransaction,
-    SortedScrapTransaction,
-    sortedCreatedBy,
-  } = row;
+
+  // Extract received transaction data
+  const sortedTransaction =
+    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+      .ReceivedTransaction?.[0].SortedTransaction?.[0] || {};
+
+  // Extract received transaction data
+  const receivedTransaction =
+    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+      .ReceivedTransaction?.[0] || {};
+
+  const sortedWasteTransaction = sortedTransaction.SortedWasteTransaction
+    ? sortedTransaction.SortedWasteTransaction.map((item) => ({
+        ...item,
+        sortedDate: sortedTransaction.sortedDate,
+        sortedTime: sortedTransaction.sortedTime,
+      }))
+    : [];
+
+  const sortedScrapTransaction = sortedTransaction.SortedScrapTransaction
+    ? sortedTransaction.SortedScrapTransaction.map((item) => ({
+        ...item,
+        sortedDate: sortedTransaction.sortedDate,
+        sortedTime: sortedTransaction.sortedTime,
+      }))
+    : [];
 
   const formatTimeToHHMMSS = (timeString) => {
     const [hours, minutes] = timeString.split(":");
     return `${hours}:${minutes}:00`;
-  };
-
-  const formatWeight = (weight) => {
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(weight);
   };
 
   const formatDate = (dateString) => {
@@ -114,7 +122,7 @@ const SortedTransaction = ({ row }) => {
 
   return (
     <Box>
-      {statusId === 4 ? (
+      {row.statusId === 4 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <SwapVertIcon
@@ -158,10 +166,12 @@ const SortedTransaction = ({ row }) => {
               Sorted
             </Typography>
             <Typography variant="h5">
-              {sortedCreatedDate} {sortedCreatedTime}
+              {sortedTransaction.createdAt
+                ? timestampDate(sortedTransaction.createdAt)
+                : ""}
             </Typography>
           </Box>
-          {SortedWasteTransaction && SortedWasteTransaction.length > 0 && (
+          {sortedWasteTransaction && sortedWasteTransaction.length > 0 && (
             <DataGrid
               sx={{
                 "& .MuiDataGrid-root": {
@@ -193,7 +203,7 @@ const SortedTransaction = ({ row }) => {
                   display: "none",
                 },
               }}
-              rows={SortedWasteTransaction ? SortedWasteTransaction : []}
+              rows={sortedWasteTransaction ? sortedWasteTransaction : []}
               columns={columns}
               components={{ Toolbar: GridToolbar }}
               getRowId={(row) => (row.id ? row.id : [])}
@@ -207,7 +217,7 @@ const SortedTransaction = ({ row }) => {
               }}
             />
           )}
-          {SortedScrapTransaction && SortedScrapTransaction.length > 0 && (
+          {sortedScrapTransaction && sortedScrapTransaction.length > 0 && (
             <DataGrid
               sx={{
                 "& .MuiDataGrid-root": {
@@ -239,7 +249,7 @@ const SortedTransaction = ({ row }) => {
                   display: "none",
                 },
               }}
-              rows={SortedScrapTransaction ? SortedScrapTransaction : []}
+              rows={sortedScrapTransaction ? sortedScrapTransaction : []}
               columns={columns}
               components={{ Toolbar: GridToolbar }}
               getRowId={(row) => (row.id ? row.id : [])}
@@ -255,18 +265,28 @@ const SortedTransaction = ({ row }) => {
           )}
           <br />
           <Typography variant="h5">
-            Batch Weight: {formatWeight(netWeight)} Kg
+            Batch Weight: {formatWeight(receivedTransaction.netWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Total Sorted Weight: {formatWeight(totalSortedWeight)} Kg
+            Total Sorted Weight:{" "}
+            {formatWeight(sortedTransaction.totalSortedWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Discrepancy Weight: {formatWeight(discrepancyWeight)} Kg
+            Discrepancy Weight:{" "}
+            {formatWeight(sortedTransaction.discrepancyWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Discrepancy Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
+            Discrepancy Remarks:{" "}
+            {sortedTransaction.remarks
+              ? sortedTransaction.remarks
+              : "NO REMARKS"}
           </Typography>
-          <Typography variant="h5">Sorted By: {sortedCreatedBy}</Typography>
+          <Typography variant="h5">
+            Sorted By:{" "}
+            {`${sortedTransaction.Employee.firstName || ""} ${
+              sortedTransaction.Employee.lastName || ""
+            }`}
+          </Typography>
           <br />
           <hr />
         </Box>

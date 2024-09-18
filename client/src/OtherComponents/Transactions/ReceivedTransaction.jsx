@@ -1,50 +1,23 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
+import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
+import { timestampDate, parseTimeString, formatWeight } from "../Functions";
 
 const ReceivedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {
-    statusId,
-    receivedCreatedDate,
-    receivedCreatedTime,
-    receivedDate,
-    receivedTime,
-    pttNo,
-    manifestNo,
-    pullOutFormNo,
-    manifestWeight,
-    clientWeight,
-    grossWeight,
-    tareWeight,
-    netWeight,
-    receivedRemarks,
-    receivedCreatedBy,
-  } = row;
-  const parseTimeString = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
-  };
 
-  const formatWeight = (weight) => {
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(weight);
-  };
+  // Extract received transaction data
+  const receivedTransaction =
+    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+      .ReceivedTransaction?.[0] || {};
 
   return (
     <Box>
-      {statusId === 3 ? (
+      {row.statusId === 3 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <LocalShippingIcon
@@ -88,51 +61,78 @@ const ReceivedTransaction = ({ row }) => {
               Received
             </Typography>
             <Typography variant="h5">
-              {receivedCreatedDate} {receivedCreatedTime}
+              {receivedTransaction.createdAt
+                ? timestampDate(receivedTransaction.createdAt)
+                : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
             Received Date:{" "}
-            {receivedDate
-              ? format(new Date(receivedDate), "MMMM dd, yyyy")
+            {receivedTransaction.receivedDate
+              ? format(
+                  new Date(receivedTransaction.receivedDate),
+                  "MMMM dd, yyyy"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Received Time:{" "}
-            {receivedTime
-              ? format(parseTimeString(receivedTime), "hh:mm aa")
+            {receivedTransaction.receivedTime
+              ? format(
+                  parseTimeString(receivedTransaction.receivedTime),
+                  "hh:mm aa"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Permit To Transport No: {pttNo ? pttNo : "N/A"}
+            Permit To Transport No:{" "}
+            {receivedTransaction.pttNo ? receivedTransaction.pttNo : "N/A"}
           </Typography>
           <Typography variant="h5">
-            PTT No: {manifestNo ? manifestNo : "N/A"}
+            PTT No:{" "}
+            {receivedTransaction.manifestNo
+              ? receivedTransaction.manifestNo
+              : "N/A"}
           </Typography>
           <Typography variant="h5">
-            Pull Out Form No: {pullOutFormNo ? pullOutFormNo : "N/A"}
+            Pull Out Form No:{" "}
+            {receivedTransaction.pullOutFormNo
+              ? receivedTransaction.pullOutFormNo
+              : "N/A"}
           </Typography>
           <Typography variant="h5">
             Manifest Weight:{" "}
-            {manifestWeight ? `${formatWeight(manifestWeight)} Kg` : "N/A"}
+            {receivedTransaction.manifestWeight
+              ? `${formatWeight(receivedTransaction.manifestWeight)} Kg`
+              : "N/A"}
           </Typography>
           <Typography variant="h5">
             Client Weight:{" "}
-            {clientWeight ? `${formatWeight(clientWeight)} Kg` : "N/A"}
+            {receivedTransaction.clientWeight
+              ? `${formatWeight(receivedTransaction.clientWeight)} Kg`
+              : "N/A"}
           </Typography>
           <Typography variant="h5">
-            Gross Weight: {formatWeight(grossWeight)} Kg
+            Gross Weight: {formatWeight(receivedTransaction.grossWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Tare Weight: {formatWeight(tareWeight)} Kg
+            Tare Weight: {formatWeight(receivedTransaction.tareWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Net Weight: {formatWeight(netWeight)} Kg
+            Net Weight: {formatWeight(receivedTransaction.netWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Remarks: {receivedRemarks ? receivedRemarks : "NO REMARKS"}
+            Remarks:{" "}
+            {receivedTransaction.receivedRemarks
+              ? receivedTransaction.receivedRemarks
+              : "NO REMARKS"}
           </Typography>
-          <Typography variant="h5">Received By: {receivedCreatedBy}</Typography>
+          <Typography variant="h5">
+            Received By:{" "}
+            {`${receivedTransaction.Employee.firstName || ""} ${
+              receivedTransaction.Employee.lastName || ""
+            }`}
+          </Typography>
           <br />
           <hr />
         </Box>

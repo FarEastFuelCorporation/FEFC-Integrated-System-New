@@ -1,119 +1,9 @@
 // controllers/scheduledTransactionController.js
 
 const BookedTransaction = require("../models/BookedTransaction");
-const Client = require("../models/Client");
-const Employee = require("../models/Employee");
-const QuotationTransportation = require("../models/QuotationTransportation");
-const QuotationWaste = require("../models/QuotationWaste");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
-const VehicleType = require("../models/VehicleType");
-const { Op, literal } = require("sequelize");
-
-// Utility function to fetch pending transactions
-async function fetchPendingTransactions() {
-  return await BookedTransaction.findAll({
-    attributes: [
-      "id",
-      "transactionId",
-      "haulingDate",
-      "haulingTime",
-      "remarks",
-      "statusId",
-      "createdAt",
-    ],
-    where: {
-      id: {
-        [Op.notIn]: literal(
-          "(SELECT `bookedTransactionId` FROM `ScheduledTransactions` WHERE `deletedAt` IS NULL)"
-        ),
-      },
-    },
-    include: [
-      {
-        model: QuotationWaste,
-        as: "QuotationWaste",
-        attributes: ["wasteName"],
-      },
-      {
-        model: QuotationTransportation,
-        as: "QuotationTransportation",
-        attributes: ["id", "vehicleTypeId"],
-        include: [
-          {
-            model: VehicleType,
-            as: "VehicleType",
-            attributes: ["typeOfVehicle"],
-          },
-        ],
-      },
-      {
-        model: Client,
-        as: "Client",
-        attributes: ["clientId", "clientName"],
-      },
-    ],
-    order: [["transactionId", "DESC"]],
-  });
-}
-
-// Utility function to fetch finished transactions
-async function fetchFinishedTransactions() {
-  return await ScheduledTransaction.findAll({
-    attributes: [
-      "id",
-      "bookedTransactionId",
-      "scheduledDate",
-      "scheduledTime",
-      "remarks",
-      "createdBy",
-      "createdAt",
-    ],
-    include: [
-      {
-        model: BookedTransaction,
-        as: "BookedTransaction",
-        attributes: [
-          "transactionId",
-          "haulingDate",
-          "haulingTime",
-          "remarks",
-          "statusId",
-          "createdAt",
-        ],
-        include: [
-          {
-            model: QuotationWaste,
-            as: "QuotationWaste",
-            attributes: ["wasteName"],
-          },
-          {
-            model: QuotationTransportation,
-            as: "QuotationTransportation",
-            attributes: ["id", "vehicleTypeId"],
-            include: [
-              {
-                model: VehicleType,
-                as: "VehicleType",
-                attributes: ["typeOfVehicle"],
-              },
-            ],
-          },
-          {
-            model: Client,
-            as: "Client",
-            attributes: ["clientId", "clientName"],
-          },
-        ],
-        order: [["transactionId", "DESC"]],
-      },
-      {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
-    ],
-  });
-}
+const { fetchData } = require("../utils/getBookedTransactions");
+const statusId = 1;
 
 // Create Scheduled Transaction controller
 async function createScheduledTransactionController(req, res) {
@@ -152,12 +42,15 @@ async function createScheduledTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedBookedTransaction.save();
 
-      // Fetch pending and finished transactions
-      const pendingTransactions = await fetchPendingTransactions();
-      const finishedTransactions = await fetchFinishedTransactions();
+      // fetch transactions
+      const data = await fetchData(statusId);
 
       // Respond with the updated data
-      res.json({ pendingTransactions, finishedTransactions });
+      res.status(200).json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If booked transaction with the specified ID was not found
       res
@@ -174,11 +67,14 @@ async function createScheduledTransactionController(req, res) {
 // Get Scheduled Transactions controller
 async function getScheduledTransactionsController(req, res) {
   try {
-    // Fetch pending and finished transactions
-    const pendingTransactions = await fetchPendingTransactions();
-    const finishedTransactions = await fetchFinishedTransactions();
+    // fetch transactions
+    const data = await fetchData(statusId);
 
-    res.json({ pendingTransactions, finishedTransactions });
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -217,12 +113,15 @@ async function updateScheduledTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedScheduledTransaction.save();
 
-      // Fetch pending and finished transactions
-      const pendingTransactions = await fetchPendingTransactions();
-      const finishedTransactions = await fetchFinishedTransactions();
+      // fetch transactions
+      const data = await fetchData(statusId);
 
       // Respond with the updated data
-      res.json({ pendingTransactions, finishedTransactions });
+      res.json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If scheduled transaction with the specified ID was not found
       res
@@ -267,12 +166,15 @@ async function deleteScheduledTransactionController(req, res) {
       // Soft delete the scheduled transaction (sets deletedAt timestamp)
       await scheduledTransactionToDelete.destroy();
 
-      // Fetch pending and finished transactions
-      const pendingTransactions = await fetchPendingTransactions();
-      const finishedTransactions = await fetchFinishedTransactions();
+      // fetch transactions
+      const data = await fetchData(statusId);
 
       // Respond with the updated data
-      res.json({ pendingTransactions, finishedTransactions });
+      res.status(200).json({
+        pendingTransactions: data.pending,
+        inProgressTransactions: data.inProgress,
+        finishedTransactions: data.finished,
+      });
     } else {
       // If scheduled transaction with the specified ID was not found
       res

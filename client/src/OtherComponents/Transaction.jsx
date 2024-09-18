@@ -32,6 +32,7 @@ const Transaction = ({
   user,
   buttonText,
   pendingTransactions,
+  inProgressTransactions,
   finishedTransactions,
   handleOpenModal,
   handleEditClick,
@@ -52,7 +53,11 @@ const Transaction = ({
   };
 
   const transactions =
-    selectedTab === 0 ? pendingTransactions : finishedTransactions;
+    selectedTab === 0
+      ? pendingTransactions
+      : selectedTab === 1
+      ? inProgressTransactions
+      : finishedTransactions;
 
   return (
     <Box mt="40px">
@@ -69,6 +74,7 @@ const Transaction = ({
           }}
         >
           <Tab label="Pending" />
+          <Tab label="In Progress" />
           <Tab label="Finished" />
         </Tabs>
         <CustomAccordionStyles>
@@ -92,18 +98,40 @@ const Transaction = ({
                 </Typography>
                 {selectedTab === 0 ? (
                   <Box>
-                    {!Number.isInteger(user.userType) &&
-                      user.userType === 6 && (
-                        <Button
-                          onClick={() => handleOpenModal(row)}
-                          sx={{
-                            backgroundColor: `${colors.greenAccent[700]}`,
-                            color: `${colors.grey[100]}`,
-                          }}
-                        >
-                          {buttonText}
-                        </Button>
-                      )}
+                    {Number.isInteger(user.userType) && (
+                      <Button
+                        onClick={() => handleOpenModal(row)}
+                        sx={{
+                          backgroundColor: `${colors.greenAccent[700]}`,
+                          color: `${colors.grey[100]}`,
+                        }}
+                      >
+                        {buttonText}
+                      </Button>
+                    )}
+                    {!Number.isInteger(user.userType) && (
+                      <div style={{ display: "flex" }}>
+                        <IconButton onClick={() => handleEditClick(row)}>
+                          <EditIcon sx={{ color: "#ff9800" }} />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteClick(row)}>
+                          <DeleteIcon sx={{ color: "#f44336" }} />
+                        </IconButton>
+                      </div>
+                    )}
+                  </Box>
+                ) : selectedTab === 1 ? (
+                  <Box>
+                    {Number.isInteger(user.userType) && (
+                      <div style={{ display: "flex" }}>
+                        <IconButton onClick={() => handleEditClick(row)}>
+                          <EditIcon sx={{ color: "#ff9800" }} />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteClick(row)}>
+                          <DeleteIcon sx={{ color: "#f44336" }} />
+                        </IconButton>
+                      </div>
+                    )}
                   </Box>
                 ) : (
                   <Box>

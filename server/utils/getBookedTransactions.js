@@ -97,6 +97,11 @@ const getIncludeOptions = () => [
             model: Vehicle,
             as: "Vehicle",
             attributes: ["plateNumber"],
+            include: {
+              model: VehicleType,
+              as: "VehicleType",
+              attributes: ["typeOfVehicle"],
+            },
           },
         ],
       },
@@ -125,8 +130,8 @@ const getPendingTransactions = async (statusId) => {
   }
 };
 
-// Get Finished Transactions (where statusId is greater than given value)
-const getFinishedTransactions = async (statusId) => {
+// Get In Progress Transactions (where statusId is greater than given value)
+const getInProgressTransactions = async (statusId) => {
   try {
     const bookedTransactions = await BookedTransaction.findAll({
       where: {
@@ -140,12 +145,51 @@ const getFinishedTransactions = async (statusId) => {
 
     return bookedTransactions;
   } catch (error) {
-    console.error("Error fetching finished transactions:", error);
+    console.error("Error fetching in progress transactions:", error);
     throw error; // Re-throw error to handle it in the calling function
   }
 };
 
+// Get In Finished Transactions (where statusId is greater than given value)
+const getFinishedTransactions = async () => {
+  try {
+    const bookedTransactions = await BookedTransaction.findAll({
+      where: {
+        statusId: 9,
+      },
+      include: getIncludeOptions(),
+      order: [["transactionId", "DESC"]],
+    });
+
+    return bookedTransactions;
+  } catch (error) {
+    console.error("Error fetching in progress transactions:", error);
+    throw error; // Re-throw error to handle it in the calling function
+  }
+};
+
+const fetchData = async (statusId) => {
+  try {
+    // Fetch all transactions concurrently
+    const [pendingTransactions, inProgressTransactions, finishedTransactions] =
+      await Promise.all([
+        getPendingTransactions(statusId),
+        getInProgressTransactions(statusId),
+        getFinishedTransactions(statusId),
+      ]);
+
+    // Return the results as an object or process them as needed
+    return {
+      pending: pendingTransactions,
+      inProgress: inProgressTransactions,
+      finished: finishedTransactions,
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 module.exports = {
-  getPendingTransactions,
-  getFinishedTransactions,
+  fetchData,
 };

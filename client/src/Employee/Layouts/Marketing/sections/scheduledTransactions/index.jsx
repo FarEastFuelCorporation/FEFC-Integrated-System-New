@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -8,8 +8,7 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 
 const ScheduledTransactions = ({ user }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-  console.log(user.userType);
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
     id: "",
@@ -23,180 +22,45 @@ const ScheduledTransactions = ({ user }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [responseData, setResponseData] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
+  const [inProgressTransactions, setInProgressTransactions] = useState([]);
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  const processData = useCallback((response) => {
-    const transactions = response.data;
-
-    if (transactions && Array.isArray(transactions.pendingTransactions)) {
-      const flattenedPendingData = transactions.pendingTransactions.map(
-        (bookItem) => {
-          const haulingDate = bookItem.haulingDate
-            ? new Date(bookItem.haulingDate)
-            : null;
-          const bookedCreatedDate = bookItem.createdAt
-            ? new Date(bookItem.createdAt)
-            : null;
-          let haulingTime = null;
-          let bookedCreatedTime = null;
-          if (bookItem.haulingTime) {
-            const [hours, minutes, seconds] = bookItem.haulingTime.split(":");
-            haulingTime = new Date(
-              Date.UTC(1970, 0, 1, hours, minutes, seconds)
-            ); // Create a date using UTC
-          }
-          if (bookedCreatedDate) {
-            bookedCreatedTime = bookedCreatedDate
-              .toISOString()
-              .split("T")[1]
-              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-          }
-
-          return {
-            ...bookItem,
-            haulingDate: haulingDate
-              ? haulingDate.toISOString().split("T")[0]
-              : null,
-            haulingTime: haulingTime
-              ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-              : null,
-            bookedCreatedDate: bookedCreatedDate
-              ? bookedCreatedDate.toISOString().split("T")[0]
-              : null,
-            bookedCreatedTime: bookedCreatedTime,
-            clientName: bookItem.Client ? bookItem.Client.clientName : null,
-            wasteName: bookItem.QuotationWaste
-              ? bookItem.QuotationWaste.wasteName
-              : null,
-            vehicleType: bookItem.QuotationTransportation
-              ? bookItem.QuotationTransportation.VehicleType.typeOfVehicle
-              : null,
-            bookedRemarks: bookItem.remarks,
-          };
-        }
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    try {
+      const scheduledTransactionResponse = await axios.get(
+        `${apiUrl}/scheduledTransaction`
       );
 
-      setPendingTransactions(flattenedPendingData);
-    }
-
-    if (transactions && Array.isArray(transactions.finishedTransactions)) {
-      const flattenedFinishedData = transactions.finishedTransactions.map(
-        (scheduledItem) => {
-          const item = scheduledItem.BookedTransaction;
-          const haulingDate = item.haulingDate
-            ? new Date(item.haulingDate)
-            : null;
-          const scheduledDate = scheduledItem.scheduledDate
-            ? new Date(scheduledItem.scheduledDate)
-            : null;
-          const bookedCreatedDate = item.createdAt
-            ? new Date(item.createdAt)
-            : null;
-          const scheduledCreatedDate = scheduledItem.createdAt
-            ? new Date(scheduledItem.createdAt)
-            : null;
-          let haulingTime = null;
-          let scheduledTime = null;
-          let bookedCreatedTime = null;
-          let scheduledCreatedTime = null;
-          if (item.haulingTime) {
-            const [hours, minutes, seconds] = item.haulingTime.split(":");
-            haulingTime = new Date(
-              Date.UTC(1970, 0, 1, hours, minutes, seconds)
-            ); // Create a date using UTC
-          }
-          if (scheduledItem.scheduledTime) {
-            const [hours, minutes, seconds] =
-              scheduledItem.scheduledTime.split(":");
-            scheduledTime = new Date(
-              Date.UTC(1970, 0, 1, hours, minutes, seconds)
-            ); // Create a date using UTC
-          }
-          if (bookedCreatedDate) {
-            bookedCreatedTime = bookedCreatedDate
-              .toISOString()
-              .split("T")[1]
-              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-          }
-          if (scheduledCreatedDate) {
-            scheduledCreatedTime = scheduledCreatedDate
-              .toISOString()
-              .split("T")[1]
-              .slice(0, 8); // Extract HH:mm:ss from createdAt timestamp
-          }
-
-          const createdBy =
-            scheduledItem.Employee.firstName +
-            " " +
-            scheduledItem.Employee.lastName;
-
-          return {
-            ...scheduledItem,
-            haulingDate: haulingDate
-              ? haulingDate.toISOString().split("T")[0]
-              : null,
-            scheduledDate: scheduledDate
-              ? scheduledDate.toISOString().split("T")[0]
-              : null,
-            haulingTime: haulingTime
-              ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-              : null,
-            scheduledTime: scheduledTime
-              ? scheduledTime.toISOString().split("T")[1].slice(0, 5)
-              : null,
-            bookedCreatedDate: bookedCreatedDate
-              ? bookedCreatedDate.toISOString().split("T")[0]
-              : null,
-            scheduledCreatedDate: scheduledCreatedDate
-              ? scheduledCreatedDate.toISOString().split("T")[0]
-              : null,
-            bookedCreatedTime: bookedCreatedTime,
-            scheduledCreatedTime: scheduledCreatedTime,
-            clientName: item.Client ? item.Client.clientName : null,
-            wasteName: item.QuotationWaste
-              ? item.QuotationWaste.wasteName
-              : null,
-            transactionId: item.transactionId ? item.transactionId : null,
-            vehicleType: item.QuotationTransportation
-              ? item.QuotationTransportation.VehicleType.typeOfVehicle
-              : null,
-            bookedRemarks: item.remarks,
-            statusId: item.statusId,
-            createdBy: createdBy,
-            scheduledRemarks: scheduledItem.remarks,
-          };
-        }
+      // For pending transactions
+      setPendingTransactions(
+        scheduledTransactionResponse.data.pendingTransactions
       );
 
-      setFinishedTransactions(flattenedFinishedData);
-    }
-  }, []);
+      // For in progress transactions
+      setInProgressTransactions(
+        scheduledTransactionResponse.data.inProgressTransactions
+      );
 
+      // For finished transactions
+      setFinishedTransactions(
+        scheduledTransactionResponse.data.finishedTransactions
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [apiUrl]);
+
+  // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/scheduledTransaction`);
-        console.log(response);
-        setResponseData(response);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
+    console.log("Fetching data");
     fetchData();
-  }, [apiUrl, user.id]);
-
-  useEffect(() => {
-    if (responseData) {
-      processData(responseData);
-    }
-  }, [responseData, processData]);
+  }, [fetchData]);
 
   const handleOpenModal = (row) => {
     setFormData({
@@ -226,16 +90,20 @@ const ScheduledTransactions = ({ user }) => {
   };
 
   const handleEditClick = (row) => {
-    const typeToEdit = finishedTransactions.find((type) => type.id === row.id);
+    const typeToEdit = inProgressTransactions.find(
+      (type) => type.id === row.id
+    );
 
     if (typeToEdit) {
+      const scheduledTransaction = typeToEdit.ScheduledTransaction?.[0];
+
       setFormData({
-        id: typeToEdit.id,
-        bookedTransactionId: typeToEdit.bookedTransactionId,
-        scheduledDate: typeToEdit.scheduledDate,
-        scheduledTime: typeToEdit.scheduledTime,
-        remarks: typeToEdit.remarks,
-        statusId: 2,
+        id: scheduledTransaction?.id,
+        bookedTransactionId: typeToEdit.id,
+        scheduledDate: scheduledTransaction?.scheduledDate,
+        scheduledTime: scheduledTransaction?.scheduledTime,
+        remarks: scheduledTransaction?.remarks,
+        statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
 
@@ -255,14 +123,17 @@ const ScheduledTransactions = ({ user }) => {
     }
 
     try {
-      const response = await axios.delete(
-        `${apiUrl}/scheduledTransaction/${row.id}`,
+      // Make the delete request
+      await axios.delete(
+        `${apiUrl}/scheduledTransaction/${row.ScheduledTransaction[0].id}`,
         {
           data: { deletedBy: user.id },
         }
       );
 
-      processData(response);
+      fetchData();
+
+      // Display success message
       setSuccessMessage("Scheduled Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -283,22 +154,18 @@ const ScheduledTransactions = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
-        response = await axios.put(
+        await axios.put(
           `${apiUrl}/scheduledTransaction/${formData.id}`,
           formData
         );
-
-        processData(response);
         setSuccessMessage("Scheduled Transaction Updated Successfully!");
       } else {
-        console.log(formData);
-        response = await axios.post(`${apiUrl}/scheduledTransaction`, formData);
-        processData(response);
+        await axios.post(`${apiUrl}/scheduledTransaction`, formData);
         setSuccessMessage("Scheduled Transaction Submitted Successfully!");
       }
+
+      fetchData();
 
       setShowSuccessMessage(true);
       handleCloseModal();
@@ -330,6 +197,7 @@ const ScheduledTransactions = ({ user }) => {
         user={user}
         buttonText={"Schedule"}
         pendingTransactions={pendingTransactions}
+        inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
         handleEditClick={handleEditClick}

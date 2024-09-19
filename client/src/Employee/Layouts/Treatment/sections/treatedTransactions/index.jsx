@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../../../../../OtherComponents/Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -8,7 +8,7 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 
 const TreatedTransactions = ({ user }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
     waste: [],
@@ -17,8 +17,8 @@ const TreatedTransactions = ({ user }) => {
     sortedWasteTransactionId: "",
     treatedWastes: [
       {
-        treatedDate: null,
-        treatedTime: null,
+        treatedDate: "",
+        treatedTime: "",
         treatmentProcessId: "",
         treatmentMachineId: "",
         weight: 0,
@@ -31,251 +31,47 @@ const TreatedTransactions = ({ user }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [responseData, setResponseData] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
+  const [inProgressTransactions, setInProgressTransactions] = useState([]);
   const [finishedTransactions, setFinishedTransactions] = useState([]);
-  const [employeeData, setEmployeeData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  const processTransactionItem = (sortItem, employeeData) => {
-    const receiveItem = sortItem.ReceivedTransaction;
-    const dispatchItem = receiveItem.DispatchedTransaction;
-    const scheduledItem = dispatchItem.ScheduledTransaction;
-    const bookItem = scheduledItem.BookedTransaction;
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    try {
+      const treatedTransactionResponse = await axios.get(
+        `${apiUrl}/treatedTransaction`
+      );
 
-    const parseDate = (dateString) =>
-      dateString ? new Date(dateString) : null;
-    const parseTime = (timeString) => {
-      if (timeString) {
-        const [hours, minutes, seconds] = timeString.split(":");
-        return new Date(Date.UTC(1970, 0, 1, hours, minutes, seconds));
-      }
-      return null;
-    };
+      console.log(treatedTransactionResponse);
 
-    const haulingDate = parseDate(bookItem.haulingDate);
-    const scheduledDate = parseDate(scheduledItem.scheduledDate);
-    const dispatchedDate = parseDate(dispatchItem.dispatchedDate);
-    const receivedDate = parseDate(receiveItem.receivedDate);
-    const sortedDate = parseDate(sortItem.sortedDate);
-    const bookedCreatedDate = parseDate(bookItem.createdAt);
-    const scheduledCreatedDate = parseDate(scheduledItem.createdAt);
-    const dispatchedCreatedDate = parseDate(dispatchItem.createdAt);
-    const receivedCreatedDate = parseDate(receiveItem.createdAt);
-    const sortedCreatedDate = parseDate(sortItem.createdAt);
+      // For pending transactions
+      setPendingTransactions(
+        treatedTransactionResponse.data.pendingTransactions
+      );
 
-    const haulingTime = parseTime(bookItem.haulingTime);
-    const scheduledTime = parseTime(scheduledItem.scheduledTime);
-    const dispatchedTime = parseTime(dispatchItem.dispatchedTime);
-    const receivedTime = parseTime(receiveItem.receivedTime);
-    const sortedTime = parseTime(sortItem.sortedTime);
+      // For in progress transactions
+      setInProgressTransactions(
+        treatedTransactionResponse.data.inProgressTransactions
+      );
 
-    const bookedCreatedTime = bookedCreatedDate
-      ? bookedCreatedDate.toISOString().split("T")[1].slice(0, 8)
-      : null;
-    const scheduledCreatedTime = scheduledCreatedDate
-      ? scheduledCreatedDate.toISOString().split("T")[1].slice(0, 8)
-      : null;
-    const dispatchedCreatedTime = dispatchedCreatedDate
-      ? dispatchedCreatedDate.toISOString().split("T")[1].slice(0, 8)
-      : null;
-    const receivedCreatedTime = receivedCreatedDate
-      ? receivedCreatedDate.toISOString().split("T")[1].slice(0, 8)
-      : null;
-    const sortedCreatedTime = sortedCreatedDate
-      ? sortedCreatedDate.toISOString().split("T")[1].slice(0, 8)
-      : null;
-
-    const scheduledCreatedBy =
-      scheduledItem.Employee.firstName + " " + scheduledItem.Employee.lastName;
-
-    const dispatchedCreatedBy =
-      dispatchItem.Employee.firstName + " " + dispatchItem.Employee.lastName;
-
-    const receivedCreatedBy =
-      receiveItem.Employee.firstName + " " + receiveItem.Employee.lastName;
-
-    const sortedCreatedBy =
-      sortItem.Employee.firstName + " " + sortItem.Employee.lastName;
-
-    const helperIdsArray = dispatchItem.helperId
-      .split(",")
-      .map((id) => id.trim());
-
-    const helper = helperIdsArray
-      .map((helperId) => {
-        const employee = employeeData.find(
-          (emp) => emp.employeeId === helperId
-        );
-        return employee ? `${employee.firstName} ${employee.lastName}` : null;
-      })
-      .filter((name) => name !== null)
-      .join(", ");
-
-    const updatedSortedWasteTransactions = sortItem.SortedWasteTransaction.map(
-      (sortedWasteTransaction) => {
-        const updatedTreatedWasteTransactions =
-          sortedWasteTransaction.TreatedWasteTransaction.map(
-            (treatedWasteTransaction) => {
-              const machineName =
-                treatedWasteTransaction.TreatmentMachine?.machineName || "";
-              const treatmentProcess =
-                treatedWasteTransaction.TreatmentProcess?.treatmentProcess ||
-                "";
-              const bookedTransactionId = scheduledItem.bookedTransactionId;
-
-              return {
-                ...treatedWasteTransaction,
-                machineName,
-                treatmentProcess,
-                bookedTransactionId,
-              };
-            }
-          );
-
-        return {
-          ...sortedWasteTransaction,
-          TreatedWasteTransaction: updatedTreatedWasteTransactions,
-        };
-      }
-    );
-
-    return {
-      ...sortItem,
-      haulingDate: haulingDate ? haulingDate.toISOString().split("T")[0] : null,
-      scheduledDate: scheduledDate
-        ? scheduledDate.toISOString().split("T")[0]
-        : null,
-      dispatchedDate: dispatchedDate
-        ? dispatchedDate.toISOString().split("T")[0]
-        : null,
-      receivedDate: receivedDate
-        ? receivedDate.toISOString().split("T")[0]
-        : null,
-      sortedDate: sortedDate ? sortedDate.toISOString().split("T")[0] : null,
-      haulingTime: haulingTime
-        ? haulingTime.toISOString().split("T")[1].slice(0, 5)
-        : null,
-      scheduledTime: scheduledTime
-        ? scheduledTime.toISOString().split("T")[1].slice(0, 5)
-        : null,
-      dispatchedTime: dispatchedTime
-        ? dispatchedTime.toISOString().split("T")[1].slice(0, 5)
-        : null,
-      receivedTime: receivedTime
-        ? receivedTime.toISOString().split("T")[1].slice(0, 5)
-        : null,
-      sortedTime: sortedTime
-        ? sortedTime.toISOString().split("T")[1].slice(0, 5)
-        : null,
-      bookedCreatedDate: bookedCreatedDate
-        ? bookedCreatedDate.toISOString().split("T")[0]
-        : null,
-      scheduledCreatedDate: scheduledCreatedDate
-        ? scheduledCreatedDate.toISOString().split("T")[0]
-        : null,
-      dispatchedCreatedDate: dispatchedCreatedDate
-        ? dispatchedCreatedDate.toISOString().split("T")[0]
-        : null,
-      receivedCreatedDate: receivedCreatedDate
-        ? receivedCreatedDate.toISOString().split("T")[0]
-        : null,
-      sortedCreatedDate: sortedCreatedDate
-        ? sortedCreatedDate.toISOString().split("T")[0]
-        : null,
-      bookedCreatedTime: bookedCreatedTime,
-      scheduledCreatedTime: scheduledCreatedTime,
-      dispatchedCreatedTime: dispatchedCreatedTime,
-      receivedCreatedTime: receivedCreatedTime,
-      sortedCreatedTime: sortedCreatedTime,
-      clientName: bookItem.Client ? bookItem.Client.clientName : null,
-      wasteName: bookItem.QuotationWaste
-        ? bookItem.QuotationWaste.wasteName
-        : null,
-      transactionId: bookItem.transactionId ? bookItem.transactionId : null,
-      vehicleType: bookItem.QuotationTransportation
-        ? bookItem.QuotationTransportation.VehicleType.typeOfVehicle
-        : null,
-      vehicleTypeId: bookItem.QuotationTransportation
-        ? bookItem.QuotationTransportation.vehicleTypeId
-        : null,
-      statusId: bookItem.statusId,
-      plateNumber: dispatchItem.Vehicle.plateNumber,
-      driverName: `${dispatchItem.EmployeeDriver.firstName} ${dispatchItem.EmployeeDriver.lastName}`,
-      helper: helper,
-      bookedRemarks: bookItem.remarks,
-      dispatchedRemarks: dispatchItem.remarks,
-      scheduledRemarks: scheduledItem.remarks,
-      receivedRemarks: receiveItem.remarks,
-      sortedRemarks: sortItem.remarks,
-      pttNo: receiveItem.pttNo,
-      manifestNo: receiveItem.manifestNo,
-      pullOutFormNo: receiveItem.pullOutFormNo,
-      manifestWeight: receiveItem.manifestWeight,
-      clientWeight: receiveItem.clientWeight,
-      grossWeight: receiveItem.grossWeight,
-      tareWeight: receiveItem.tareWeight,
-      netWeight: receiveItem.netWeight,
-      scheduledCreatedBy: scheduledCreatedBy,
-      dispatchedCreatedBy: dispatchedCreatedBy,
-      receivedCreatedBy: receivedCreatedBy,
-      sortedCreatedBy: sortedCreatedBy,
-      sortedWasteTransaction: updatedSortedWasteTransactions,
-      sortedScrapTransaction: sortItem.SortedScrapTransaction,
-    };
-  };
-
-  const processData = useCallback(
-    (response) => {
-      const transactions = response.data;
-
-      if (transactions) {
-        if (Array.isArray(transactions.pendingTransactions)) {
-          const flattenedPendingData = transactions.pendingTransactions.map(
-            (sortItem) => processTransactionItem(sortItem, employeeData)
-          );
-          console.log(flattenedPendingData);
-          setPendingTransactions(flattenedPendingData);
-        }
-
-        if (Array.isArray(transactions.finishedTransactions)) {
-          const flattenedFinishedData = transactions.finishedTransactions.map(
-            (sortItem) => processTransactionItem(sortItem, employeeData)
-          );
-          console.log(flattenedFinishedData);
-          setFinishedTransactions(flattenedFinishedData);
-        }
-      }
-    },
-    [employeeData]
-  );
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [dispatchResponse, employeeResponse] = await Promise.all([
-          axios.get(`${apiUrl}/treatedTransaction`),
-          axios.get(`${apiUrl}/employee`),
-        ]);
-
-        setResponseData(dispatchResponse);
-        setEmployeeData(employeeResponse.data.employees);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [apiUrl, user.id]);
-
-  useEffect(() => {
-    if (responseData) {
-      processData(responseData);
+      // For finished transactions
+      setFinishedTransactions(
+        treatedTransactionResponse.data.finishedTransactions
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, [responseData, processData]);
+  }, [apiUrl]);
+
+  // Fetch data when component mounts or apiUrl/processDataTransaction changes
+  useEffect(() => {
+    console.log("Fetching data");
+    fetchData();
+  }, [fetchData]);
 
   const handleOpenModal = (row, waste) => {
     console.log(row);
@@ -284,15 +80,15 @@ const TreatedTransactions = ({ user }) => {
       waste: waste,
       isFinished: false,
       id: "",
-      bookedTransactionId:
-        row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
-          .bookedTransactionId,
-      sortedTransactionId: row.id,
+      bookedTransactionId: row.id,
+      sortedTransactionId:
+        row.ScheduledTransaction[0].DispatchedTransaction[0]
+          .ReceivedTransaction[0].SortedTransaction[0].id,
       sortedWasteTransactionId: waste.id,
       treatedWastes: [
         {
-          treatedDate: null,
-          treatedTime: null,
+          treatedDate: "",
+          treatedTime: "",
           treatmentProcessId: "",
           treatmentMachineId: "",
           weight: 0,
@@ -329,17 +125,15 @@ const TreatedTransactions = ({ user }) => {
     }
 
     try {
-      const response = await axios.delete(
-        `${apiUrl}/treatedTransaction/${row.id}`,
-        {
-          data: {
-            deletedBy: user.id,
-            bookedTransactionId: row.bookedTransactionId,
-          },
-        }
-      );
-      console.log();
-      processData(response);
+      await axios.delete(`${apiUrl}/treatedTransaction/${row.id}`, {
+        data: {
+          deletedBy: user.id,
+          bookedTransactionId: row.bookedTransactionId,
+        },
+      });
+
+      fetchData();
+
       setSuccessMessage("Treated Waste Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -414,16 +208,13 @@ const TreatedTransactions = ({ user }) => {
 
     try {
       const updatedFormData = updateIsFinished(formData);
-      let response;
 
       if (!formData.id) {
-        response = await axios.post(
-          `${apiUrl}/treatedTransaction`,
-          updatedFormData
-        );
-        processData(response);
+        await axios.post(`${apiUrl}/treatedTransaction`, updatedFormData);
         setSuccessMessage("Treated Transaction Submitted Successfully!");
       }
+
+      fetchData();
 
       setShowSuccessMessage(true);
       handleCloseModal();
@@ -494,6 +285,7 @@ const TreatedTransactions = ({ user }) => {
         user={user}
         buttonText={"Treat"}
         pendingTransactions={pendingTransactions}
+        inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
         handleDeleteClick={handleDeleteClick}

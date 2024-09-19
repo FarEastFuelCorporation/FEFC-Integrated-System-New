@@ -355,7 +355,7 @@ const SortModal = ({
                   <Select
                     labelId={`waste-type-select-label-${index}`}
                     name={`sortedWastes[${index}].quotationWasteId`}
-                    value={waste.quotationWasteId}
+                    value={waste.quotationWasteId || ""}
                     onChange={(e) =>
                       handleWasteCodeChange(index, e.target.value)
                     }

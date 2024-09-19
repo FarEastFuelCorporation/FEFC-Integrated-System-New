@@ -15,7 +15,43 @@ const TreatedTransaction = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { sortedWasteTransaction, totalSortedWeight, statusId } = row;
+  const sortedWasteTransaction =
+    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
+      .SortedTransaction[0].SortedWasteTransaction;
+
+  // Loop through each SortedWasteTransaction
+  sortedWasteTransaction.forEach((sortedTransaction) => {
+    let treatedWeight = 0; // Initialize total treated weight
+
+    // Check if the TreatedWasteTransaction exists and is an array
+    if (Array.isArray(sortedTransaction.TreatedWasteTransaction)) {
+      // Update each TreatedWasteTransaction by adding machineName and treatmentProcess
+      sortedTransaction.TreatedWasteTransaction =
+        sortedTransaction.TreatedWasteTransaction.map((treatedTransaction) => {
+          // Add weight to the total treatedWeight
+          treatedWeight += treatedTransaction.weight || 0; // Add weight, default to 0 if undefined
+
+          if (treatedTransaction.TreatmentMachine) {
+            return {
+              ...treatedTransaction,
+              machineName: treatedTransaction.TreatmentMachine.machineName, // Add machineName attribute
+              treatmentProcess:
+                treatedTransaction.TreatmentMachine.TreatmentProcess
+                  .treatmentProcess, // Add treatmentProcess attribute
+            };
+          }
+          return treatedTransaction; // Return as is if no TreatmentMachine is present
+        });
+    }
+
+    // Add the treatedWeight to the SortedWasteTransaction
+    sortedTransaction.treatedWeight = treatedWeight;
+  });
+
+  const totalSortedWeight = sortedWasteTransaction
+    .map((transaction) => transaction.weight || 0)
+    .reduce((total, weight) => total + weight, 0); // Sum the weights using reduce
+  const statusId = row.statusId;
 
   const parseTimeString = (timeString) => {
     const [hours, minutes] = timeString.split(":");

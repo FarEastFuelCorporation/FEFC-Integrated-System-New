@@ -98,7 +98,7 @@ const Transaction = ({
                 </Typography>
                 {selectedTab === 0 ? (
                   <Box>
-                    {Number.isInteger(user.userType) && (
+                    {Number.isInteger(user.userType) && user.userType !== 6 && (
                       <Button
                         onClick={() => handleOpenModal(row)}
                         sx={{
@@ -122,7 +122,7 @@ const Transaction = ({
                   </Box>
                 ) : selectedTab === 1 ? (
                   <Box>
-                    {Number.isInteger(user.userType) && (
+                    {Number.isInteger(user.userType) && user.userType !== 6 && (
                       <div style={{ display: "flex" }}>
                         <IconButton onClick={() => handleEditClick(row)}>
                           <EditIcon sx={{ color: "#ff9800" }} />

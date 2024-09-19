@@ -256,7 +256,7 @@ const TreatModal = ({
           </Box>
         </Box>
         {formData.treatedWastes.map((waste, index) => (
-          <Box>
+          <Box key={index}>
             <Typography variant="subtitle2" gutterBottom>
               Waste Entry #{index + 1}
             </Typography>

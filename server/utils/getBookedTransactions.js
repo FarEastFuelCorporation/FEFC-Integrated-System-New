@@ -68,6 +68,42 @@ const getIncludeOptions = () => [
                     model: SortedWasteTransaction,
                     as: "SortedWasteTransaction",
                     required: false,
+                    include: [
+                      {
+                        model: TreatedWasteTransaction,
+                        as: "TreatedWasteTransaction",
+                        required: false,
+                        include: [
+                          {
+                            model: TreatmentMachine,
+                            as: "TreatmentMachine",
+                            required: false,
+                            include: [
+                              {
+                                model: TreatmentProcess,
+                                as: "TreatmentProcess",
+                                required: false,
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  {
+                    model: SortedScrapTransaction,
+                    as: "SortedScrapTransaction",
+                    required: false,
+                    include: {
+                      model: ScrapType,
+                      as: "ScrapType",
+                      required: false,
+                    },
+                  },
+                  {
+                    model: TreatedTransaction,
+                    as: "TreatedTransaction",
+                    required: false,
                   },
                   {
                     model: Employee,

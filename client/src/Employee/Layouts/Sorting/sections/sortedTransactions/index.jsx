@@ -151,8 +151,22 @@ const SortedTransactions = ({ user }) => {
         totalSortedWeight: sortedTransaction.totalSortedWeight,
         discrepancyWeight: sortedTransaction.discrepancyWeight,
         sortedWastes: sortedTransaction.SortedWasteTransaction
-          ? sortedTransaction.SortedWasteTransaction
-          : [],
+          ? sortedTransaction.SortedWasteTransaction.map((waste) => ({
+              quotationWasteId: waste.quotationWasteId || "",
+              wasteName: waste.wasteName || "",
+              weight: waste.weight || 0,
+              clientWeight: waste.clientWeight || 0,
+              formNo: waste.formNo || "",
+            }))
+          : [
+              {
+                quotationWasteId: "",
+                wasteName: "",
+                weight: 0,
+                clientWeight: 0,
+                formNo: "",
+              },
+            ],
         sortedScraps: sortedTransaction.SortedScrapTransaction
           ? sortedTransaction.SortedScrapTransaction
           : [],
@@ -180,14 +194,15 @@ const SortedTransactions = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/sortedTransaction/${row.id}`, {
-        data: {
-          deletedBy: user.id,
-          bookedTransactionId:
-            row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
-              .bookedTransactionId,
-        },
-      });
+      await axios.delete(
+        `${apiUrl}/sortedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
+        {
+          data: {
+            deletedBy: user.id,
+            bookedTransactionId: row.id,
+          },
+        }
+      );
 
       fetchData();
       setSuccessMessage("Received Transaction deleted successfully!");

@@ -5,7 +5,6 @@ const BookedTransaction = require("../models/BookedTransaction");
 const SortedTransaction = require("../models/SortedTransaction");
 const SortedWasteTransaction = require("../models/SortedWasteTransaction");
 const SortedScrapTransaction = require("../models/SortedScrapTransaction");
-const ScrapType = require("../models/ScrapType");
 const { fetchData } = require("../utils/getBookedTransactions");
 const statusId = 4;
 
@@ -162,6 +161,8 @@ async function updateSortedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
+    console.log(req.body);
+
     if (remarks) {
       remarks = remarks.toUpperCase();
     }
@@ -219,7 +220,7 @@ async function updateSortedTransactionController(req, res) {
               quotationWasteId: waste.quotationWasteId,
               wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
               weight: waste.weight,
-              weight: waste.clientWeight,
+              clientWeight: waste.clientWeight,
               formNo: waste.formNo,
             },
             { where: { id: waste.id }, transaction }
@@ -232,6 +233,7 @@ async function updateSortedTransactionController(req, res) {
               quotationWasteId: waste.quotationWasteId,
               wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
               weight: waste.weight,
+              clientWeight: waste.clientWeight,
               formNo: waste.formNo,
             },
             { transaction }

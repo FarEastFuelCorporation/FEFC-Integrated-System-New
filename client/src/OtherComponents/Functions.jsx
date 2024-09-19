@@ -16,6 +16,9 @@ export const parseTimeString = (timeString) => {
 };
 
 export const formatWeight = (weight) => {
+  if (weight === "N/A" || weight === 0) {
+    return "N/A";
+  }
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

@@ -55,9 +55,7 @@ const Attachments = ({
     console.log(row);
     setAttachmentFormData({
       id: "",
-      bookedTransactionId:
-        row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
-          .bookedTransactionId,
+      bookedTransactionId: row.id,
       fileName: "",
       attachment: "",
       createdBy: user.id,

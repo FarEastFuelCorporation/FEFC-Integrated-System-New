@@ -1,10 +1,12 @@
 // utils/getBookedTransactions
 
+const { Op } = require("sequelize"); // Import Sequelize operators
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
+const TypeOfWaste = require("../models/TypeOfWaste");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
 const VehicleType = require("../models/VehicleType");
@@ -18,14 +20,19 @@ const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const TreatmentProcess = require("../models/TreatmentProcess");
 const TreatmentMachine = require("../models/TreatmentMachine");
-const { Op } = require("sequelize"); // Import Sequelize operators
+const CertifiedTransaction = require("../models/CertifiedTransaction");
+const Attachment = require("../models/Attachment");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
   {
     model: QuotationWaste,
     as: "QuotationWaste",
-    attributes: ["wasteName"],
+    include: {
+      model: TypeOfWaste,
+      as: "TypeOfWaste",
+      attributes: ["wasteCode"],
+    },
   },
   {
     model: QuotationTransportation,
@@ -42,7 +49,11 @@ const getIncludeOptions = () => [
   {
     model: Client,
     as: "Client",
-    attributes: ["clientId", "clientName"],
+  },
+  {
+    model: Attachment,
+    as: "Attachment",
+    required: false,
   },
   {
     model: ScheduledTransaction,
@@ -63,6 +74,7 @@ const getIncludeOptions = () => [
                 model: SortedTransaction,
                 as: "SortedTransaction",
                 required: false,
+                paranoid: true,
                 include: [
                   {
                     model: SortedWasteTransaction,
@@ -86,6 +98,17 @@ const getIncludeOptions = () => [
                               },
                             ],
                           },
+                          {
+                            model: TreatedTransaction,
+                            as: "TreatedTransaction",
+                            required: false,
+                            paranoid: true,
+                            include: {
+                              model: Employee,
+                              as: "Employee",
+                              attributes: ["firstName", "lastName"],
+                            },
+                          },
                         ],
                       },
                     ],
@@ -104,6 +127,17 @@ const getIncludeOptions = () => [
                     model: TreatedTransaction,
                     as: "TreatedTransaction",
                     required: false,
+                    paranoid: true,
+                  },
+                  {
+                    model: CertifiedTransaction,
+                    as: "CertifiedTransaction",
+                    required: false,
+                    include: {
+                      model: Employee,
+                      as: "Employee",
+                      attributes: ["firstName", "lastName"],
+                    },
                   },
                   {
                     model: Employee,

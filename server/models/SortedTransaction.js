@@ -33,6 +33,11 @@ const SortedTransaction = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    isFinishTreated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

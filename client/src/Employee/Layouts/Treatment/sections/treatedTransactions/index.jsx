@@ -209,6 +209,8 @@ const TreatedTransactions = ({ user }) => {
     try {
       const updatedFormData = updateIsFinished(formData);
 
+      console.log(updatedFormData);
+
       if (!formData.id) {
         await axios.post(`${apiUrl}/treatedTransaction`, updatedFormData);
         setSuccessMessage("Treated Transaction Submitted Successfully!");
@@ -223,43 +225,101 @@ const TreatedTransactions = ({ user }) => {
     }
   };
 
-  const updateIsFinished = (formData) => {
-    const updatedFormData = { ...formData };
+  // const updateIsFinished = (formData) => {
+  //   const updatedFormData = { ...formData };
 
-    // Calculate total treated weight from treatedWastes array
-    let totalTreatedWeight = formData.treatedWastes.reduce(
-      (total, waste) => total + parseFloat(waste.weight || 0),
+  //   // Calculate total treated weight from treatedWastes array
+  //   let totalTreatedWeight = formData.treatedWastes.reduce(
+  //     (total, waste) => total + parseFloat(waste.weight || 0),
+  //     0
+  //   );
+
+  //   totalTreatedWeight += formData.waste.treatedWeight;
+
+  //   // Update sortedWasteTransaction with the total treated weight
+  //   if (
+  //     updatedFormData.row &&
+  //     updatedFormData.row.sortedWasteTransaction &&
+  //     updatedFormData.sortedWasteTransactionId
+  //   ) {
+  //     updatedFormData.row.sortedWasteTransaction =
+  //       updatedFormData.row.sortedWasteTransaction.map((item) => {
+  //         if (item.id === updatedFormData.sortedWasteTransactionId) {
+  //           return {
+  //             ...item,
+  //             treatedWeight: totalTreatedWeight,
+  //           };
+  //         }
+  //         return item;
+  //       });
+
+  //     // Check if all sortedWasteTransaction items are fully treated
+  //     const isAllTreated = updatedFormData.row.sortedWasteTransaction.every(
+  //       (item) => item.treatedWeight === item.weight
+  //     );
+  //     console.log("isAllTreated:", isAllTreated);
+  //     updatedFormData.isFinished = isAllTreated;
+  //   }
+
+  //   return updatedFormData;
+  // };
+
+  const updateIsFinished = (formData) => {
+    // Extract relevant data from the formData object
+    const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
+    if (!scheduledTransaction) return;
+
+    const dispatchedTransaction =
+      scheduledTransaction?.DispatchedTransaction?.[0];
+    if (!dispatchedTransaction) return;
+
+    const receivedTransaction = dispatchedTransaction?.ReceivedTransaction?.[0];
+    if (!receivedTransaction) return;
+
+    const sortedTransaction = receivedTransaction?.SortedTransaction?.[0];
+    if (!sortedTransaction) return;
+
+    // Calculate the total weight from all SortedWasteTransaction objects
+    const sortedWasteTransactions =
+      sortedTransaction?.SortedWasteTransaction || [];
+    const totalSortedWeight = sortedWasteTransactions.reduce(
+      (total, wasteTransaction) => {
+        // Convert weight to a number and sum it
+        return (
+          total +
+          (wasteTransaction.weight ? Number(wasteTransaction.weight) : 0)
+        );
+      },
       0
     );
 
-    totalTreatedWeight += formData.waste.treatedWeight;
+    // Calculate the total treatedWeight from all SortedWasteTransaction objects
+    let totalTreatedWeight = sortedWasteTransactions.reduce(
+      (total, wasteTransaction) => {
+        return (
+          total +
+          (wasteTransaction.treatedWeight
+            ? Number(wasteTransaction.treatedWeight)
+            : 0)
+        );
+      },
+      0
+    );
 
-    // Update sortedWasteTransaction with the total treated weight
-    if (
-      updatedFormData.row &&
-      updatedFormData.row.sortedWasteTransaction &&
-      updatedFormData.sortedWasteTransactionId
-    ) {
-      updatedFormData.row.sortedWasteTransaction =
-        updatedFormData.row.sortedWasteTransaction.map((item) => {
-          if (item.id === updatedFormData.sortedWasteTransactionId) {
-            return {
-              ...item,
-              treatedWeight: totalTreatedWeight,
-            };
-          }
-          return item;
-        });
+    // Also add the weight from treatedWastes array in formData
+    const treatedWastes = formData.treatedWastes || [];
+    totalTreatedWeight += treatedWastes.reduce((total, treatedWaste) => {
+      return total + (treatedWaste.weight ? Number(treatedWaste.weight) : 0);
+    }, 0);
 
-      // Check if all sortedWasteTransaction items are fully treated
-      const isAllTreated = updatedFormData.row.sortedWasteTransaction.every(
-        (item) => item.treatedWeight === item.weight
-      );
-      console.log("isAllTreated:", isAllTreated);
-      updatedFormData.isFinished = isAllTreated;
-    }
+    // Update isFinished if totalSortedWeight matches totalTreatedWeight
+    const isFinished = totalSortedWeight === totalTreatedWeight;
 
-    return updatedFormData;
+    // Return the updated formData with the isFinished flag
+    return {
+      ...formData,
+      isFinished,
+    };
   };
 
   return (

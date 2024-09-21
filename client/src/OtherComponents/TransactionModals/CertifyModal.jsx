@@ -138,7 +138,7 @@ const CertifyModal = ({
                   style={{ color: colors.grey[100] }}
                   required
                 >
-                  Type of Certificate
+                  Type of Weight
                 </InputLabel>
                 <Select
                   labelId="typeOfWeight-select-label"

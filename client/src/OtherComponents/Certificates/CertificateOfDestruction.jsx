@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef } from "react";
 import {
   Box,
   Typography,
@@ -27,24 +27,19 @@ const CertificateOfDestruction = ({ row }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
-  const [pageCount, setPageCount] = useState(1);
 
-  useEffect(() => {
-    // Calculate page count based on content height
-    const input = certificateRef.current;
-    if (input) {
-      const contentHeight = input.offsetHeight;
-      const pageHeight = 1056;
-      const calculatedPageCount = Math.ceil(contentHeight / pageHeight) || 1; // Ensure at least one page
-      setPageCount(calculatedPageCount);
-    }
-  }, []);
+  const certifiedTransaction =
+    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
+      .SortedTransaction[0].CertifiedTransaction[0];
+
+  const sortedWasteTransaction =
+    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
+      .SortedTransaction[0].SortedWasteTransaction;
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;
     const pageWidth = 816;
-    const margin = 10;
 
     html2canvas(input, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
@@ -54,36 +49,12 @@ const CertificateOfDestruction = ({ row }) => {
         format: [pageWidth, pageHeight], // Page size in px
       });
 
-      let yPosition = 0;
-      let contentHeight = input.offsetHeight;
+      // Add the captured image to the PDF
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
 
-      for (let i = 0; i < pageCount; i++) {
-        if (i > 0) {
-          pdf.addPage();
-        }
-
-        const pageContentHeight = Math.min(pageHeight, contentHeight);
-
-        // Add background image for each page
-        pdf.addImage(
-          imgData,
-          "PNG",
-          0,
-          -(i * pageHeight),
-          pageWidth,
-          pageHeight
-        );
-
-        // Add page number
-        const pageNumber = `Page ${i + 1}/${pageCount}`;
-        pdf.setFontSize(12);
-        pdf.text(pageNumber, pageWidth - 50, pageHeight - 10);
-
-        contentHeight -= pageHeight;
-      }
-
+      // Save the generated PDF
       pdf.save(
-        `${row.CertifiedTransaction[0].certificateNumber}-${row.clientName}.pdf`
+        `${certifiedTransaction.certificateNumber}-${row.Client.clientName}.pdf`
       );
     });
   };
@@ -102,7 +73,7 @@ const CertificateOfDestruction = ({ row }) => {
     }).format(amount);
   };
 
-  const totalWeight = row.sortedWasteTransaction.reduce((total, waste) => {
+  const totalWeight = sortedWasteTransaction.reduce((total, waste) => {
     // Add the weight of the current waste to the total
     return total + (parseFloat(waste.weight) || 0); // parseFloat to ensure it's a number
   }, 0);
@@ -158,7 +129,7 @@ const CertificateOfDestruction = ({ row }) => {
     };
   };
 
-  const qrCodeURL = `${apiUrl}/certificate/${row.CertifiedTransaction[0].id}`;
+  const qrCodeURL = `${apiUrl}/certificate/${certifiedTransaction.id}`;
 
   const generatePDFContent = () => (
     <Box
@@ -212,7 +183,7 @@ const CertificateOfDestruction = ({ row }) => {
             C. No.{" "}
           </Typography>
           <Typography id="df_no" sx={{ fontWeight: "bold" }}>
-            {row.CertifiedTransaction[0].certificateNumber}
+            {certifiedTransaction.certificateNumber}
           </Typography>
         </Box>
         <Box sx={{ textAlign: "justify", mt: 2 }}>
@@ -238,7 +209,7 @@ const CertificateOfDestruction = ({ row }) => {
               margin: "0px 0px 8px",
             }}
           >
-            {row.clientName}
+            {row.Client.clientName}
           </Typography>
           <Typography
             id="table_company_address"
@@ -249,10 +220,7 @@ const CertificateOfDestruction = ({ row }) => {
               margin: 0,
             }}
           >
-            {
-              row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
-                .BookedTransaction.Client.address
-            }
+            {row.Client.address}
           </Typography>
         </Box>
         <Typography
@@ -368,7 +336,7 @@ const CertificateOfDestruction = ({ row }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {row.sortedWasteTransaction.map((waste, index) => (
+              {sortedWasteTransaction.map((waste, index) => (
                 <TableRow key={index} sx={{ border: "black" }}>
                   <TableCell
                     align="center"
@@ -402,11 +370,7 @@ const CertificateOfDestruction = ({ row }) => {
                       color: "black",
                     }}
                   >
-                    {
-                      row.ReceivedTransaction.DispatchedTransaction
-                        .ScheduledTransaction.BookedTransaction.QuotationWaste
-                        .TypeOfWaste.wasteCode
-                    }
+                    {row.QuotationWaste.TypeOfWaste.wasteCode}
                   </TableCell>
                   <TableCell
                     align="center"
@@ -418,11 +382,7 @@ const CertificateOfDestruction = ({ row }) => {
                       color: "black",
                     }}
                   >
-                    {`${formatNumber(waste.weight)} ${
-                      row.ReceivedTransaction.DispatchedTransaction
-                        .ScheduledTransaction.BookedTransaction.QuotationWaste
-                        .unit
-                    }`}
+                    {`${formatNumber(waste.weight)} ${row.QuotationWaste.unit}`}
                   </TableCell>
                   <TableCell
                     align="center"
@@ -435,8 +395,8 @@ const CertificateOfDestruction = ({ row }) => {
                     }}
                   >
                     {
-                      waste.TreatedWasteTransaction[0].TreatmentProcess
-                        .treatmentProcess
+                      waste.TreatedWasteTransaction[0].TreatmentMachine
+                        .TreatmentProcess.treatmentProcess
                     }
                   </TableCell>
                   <TableCell
@@ -475,12 +435,7 @@ const CertificateOfDestruction = ({ row }) => {
           }}
         >
           A Total of{" "}
-          <b>
-            {`${formatNumber(totalWeight)} ${
-              row.ReceivedTransaction.DispatchedTransaction.ScheduledTransaction
-                .BookedTransaction.QuotationWaste.unit
-            }`}
-          </b>{" "}
+          <b>{`${formatNumber(totalWeight)} ${row.QuotationWaste.unit}`}</b>{" "}
           That is/are transported by <b>FAR EAST FUEL CORPORATION</b> to our TSD
           facility located at No. 888 Purok 5, Irabagon St., Barangay Anyatam,
           San Ildefonso, Bulacan with <b>TSD No. OL-TR-R3-14-000152.</b>
@@ -495,9 +450,8 @@ const CertificateOfDestruction = ({ row }) => {
             id="certification"
           >
             {
-              formatDateWithSuffix(
-                getLatestTreatedDate(row.sortedWasteTransaction)
-              ).day
+              formatDateWithSuffix(getLatestTreatedDate(sortedWasteTransaction))
+                .day
             }
           </Typography>
           <Typography
@@ -511,9 +465,8 @@ const CertificateOfDestruction = ({ row }) => {
             id="certification2"
           >
             {
-              formatDateWithSuffix(
-                getLatestTreatedDate(row.sortedWasteTransaction)
-              ).suffix
+              formatDateWithSuffix(getLatestTreatedDate(sortedWasteTransaction))
+                .suffix
             }
           </Typography>
           <Typography
@@ -522,9 +475,8 @@ const CertificateOfDestruction = ({ row }) => {
             id="certification3"
           >
             {
-              formatDateWithSuffix(
-                getLatestTreatedDate(row.sortedWasteTransaction)
-              ).dateString
+              formatDateWithSuffix(getLatestTreatedDate(sortedWasteTransaction))
+                .dateString
             }
           </Typography>
         </Box>

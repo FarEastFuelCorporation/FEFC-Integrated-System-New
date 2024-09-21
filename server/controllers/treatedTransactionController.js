@@ -2,10 +2,11 @@
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
+const SortedTransaction = require("../models/SortedTransaction");
 const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
-const statusId = 5;
+const transactionStatusId = 5;
 
 // Create Treated Transaction controller
 async function createTreatedTransactionController(req, res) {
@@ -22,7 +23,7 @@ async function createTreatedTransactionController(req, res) {
       statusId,
       createdBy,
     } = req.body;
-    console.log(req.body);
+    console.log("logger:" + req.body);
     if (remarks) {
       remarks = remarks.toUpperCase();
     }
@@ -30,6 +31,7 @@ async function createTreatedTransactionController(req, res) {
     const newTreatedTransaction = await TreatedTransaction.create(
       {
         sortedTransactionId,
+        isFinished,
         remarks,
         createdBy,
       },
@@ -53,21 +55,31 @@ async function createTreatedTransactionController(req, res) {
       });
       await Promise.all(treatedWastePromises);
     }
+
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       { transaction }
     );
+
+    const sortedTransactionToUpdate = await SortedTransaction.findByPk(
+      sortedTransactionId,
+      { transaction }
+    );
+
     if (updatedBookedTransaction) {
       // Update booked transaction attributes if isFinished is true
       if (isFinished) {
         updatedBookedTransaction.statusId = statusId;
         await updatedBookedTransaction.save({ transaction });
+
+        sortedTransactionToUpdate.isFinishTreated = isFinished;
+        await sortedTransactionToUpdate.save({ transaction });
       }
       // Commit the transaction
       await transaction.commit();
 
       // fetch transactions
-      const data = await fetchData(statusId);
+      const data = await fetchData(transactionStatusId);
 
       // Respond with the updated data
       res.status(200).json({
@@ -94,7 +106,7 @@ async function createTreatedTransactionController(req, res) {
 async function getTreatedTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(statusId);
+    const data = await fetchData(transactionStatusId);
 
     // Respond with the updated data
     res.status(200).json({
@@ -115,46 +127,78 @@ async function deleteTreatedTransactionController(req, res) {
     const { deletedBy, bookedTransactionId } = req.body;
 
     console.log(bookedTransactionId);
-
     console.log("Soft deleting sorted transaction with ID:", id);
 
-    // Find the sorted transaction by UUID (id)
+    // Find the treated waste transaction by UUID (id)
     const treatedWasteTransactionToDelete =
       await TreatedWasteTransaction.findByPk(id);
 
-    if (treatedWasteTransactionToDelete) {
-      // Update the deletedBy field
-      treatedWasteTransactionToDelete.updatedBy = deletedBy;
-      treatedWasteTransactionToDelete.deletedBy = deletedBy;
-      await treatedWasteTransactionToDelete.save();
-
-      const updatedBookedTransaction = await BookedTransaction.findByPk(
-        bookedTransactionId
-      );
-      console.log(updatedBookedTransaction);
-
-      updatedBookedTransaction.statusId = 5;
-
-      await updatedBookedTransaction.save();
-
-      // Soft delete the sorted transaction (sets deletedAt timestamp)
-      await treatedWasteTransactionToDelete.destroy();
-
-      // fetch transactions
-      const data = await fetchData(statusId);
-
-      // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
-      });
-    } else {
-      // If sorted transaction with the specified ID was not found
-      res
+    if (!treatedWasteTransactionToDelete) {
+      return res
         .status(404)
-        .json({ message: `Sorted Transaction with ID ${id} not found` });
+        .json({ message: `Treated Waste Transaction with ID ${id} not found` });
     }
+
+    // Find the associated treated transaction
+    const treatedTransactionToDelete = await TreatedTransaction.findByPk(
+      treatedWasteTransactionToDelete.treatedTransactionId
+    );
+
+    if (!treatedTransactionToDelete) {
+      return res.status(404).json({ message: `Treated Transaction not found` });
+    }
+
+    // Find the associated sorted transaction
+    const sortedTransactionToUpdate = await SortedTransaction.findByPk(
+      treatedTransactionToDelete.sortedTransactionId
+    );
+
+    if (!sortedTransactionToUpdate) {
+      return res.status(404).json({ message: `Sorted Transaction not found` });
+    }
+
+    // Find other TreatedWasteTransaction records associated with this treated transaction
+    const otherTreatedWasteTransactions = await TreatedWasteTransaction.findAll(
+      {
+        where: { treatedTransactionId: treatedTransactionToDelete.id },
+      }
+    );
+
+    // Soft delete logic
+    if (otherTreatedWasteTransactions.length === 1) {
+      // This means there is no other associated TreatedWasteTransaction, so we can delete the TreatedTransaction
+      treatedTransactionToDelete.updatedBy = deletedBy;
+      treatedTransactionToDelete.deletedBy = deletedBy;
+      await treatedTransactionToDelete.save();
+
+      // Update the sorted transaction's isFinished status
+      sortedTransactionToUpdate.isFinished = false;
+      await sortedTransactionToUpdate.save();
+
+      // Soft delete the TreatedTransaction
+      await treatedTransactionToDelete.destroy();
+    }
+
+    // Update the booked transaction status
+    const updatedBookedTransaction = await BookedTransaction.findByPk(
+      bookedTransactionId
+    );
+
+    updatedBookedTransaction.statusId = 5;
+    await updatedBookedTransaction.save();
+
+    // Soft delete the TreatedWasteTransaction
+    await treatedWasteTransactionToDelete.destroy();
+
+    // Fetch transactions
+    const data = await fetchData(transactionStatusId);
+
+    // Respond with the updated data
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     // Handle errors
     console.error("Error soft-deleting sorted transaction:", error);

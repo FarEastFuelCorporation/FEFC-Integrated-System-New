@@ -5,32 +5,19 @@ import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 import CertificateOfDestruction from "../Certificates/CertificateOfDestruction";
+import { timestampDate, parseTimeString } from "../Functions";
 
-const CertifiedTransaction = ({ row }) => {
+const CertifiedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {
-    statusId,
-    certifiedCreatedDate,
-    certifiedCreatedTime,
-    certifiedDate,
-    certifiedTime,
-    certifiedRemarks,
-    certifiedCreatedBy,
-  } = row;
-  const parseTimeString = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
-  };
+
+  const certifiedTransaction =
+    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
+      .SortedTransaction[0].CertifiedTransaction[0];
 
   return (
     <Box>
-      {statusId === 6 ? (
+      {row.statusId === 6 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <ApprovalIcon
@@ -74,28 +61,42 @@ const CertifiedTransaction = ({ row }) => {
               Certified
             </Typography>
             <Typography variant="h5">
-              {certifiedCreatedDate} {certifiedCreatedTime}
+              {certifiedTransaction.createdAt
+                ? timestampDate(certifiedTransaction.createdAt)
+                : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
             Certified Date:{" "}
-            {certifiedDate
-              ? format(new Date(certifiedDate), "MMMM dd, yyyy")
+            {certifiedTransaction.certifiedDate
+              ? format(
+                  new Date(certifiedTransaction.certifiedDate),
+                  "MMMM dd, yyyy"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Certified Time:{" "}
-            {certifiedTime
-              ? format(parseTimeString(certifiedTime), "hh:mm aa")
+            {certifiedTransaction.certifiedTime
+              ? format(
+                  parseTimeString(certifiedTransaction.certifiedTime),
+                  "hh:mm aa"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Remarks: {certifiedRemarks ? certifiedRemarks : "NO REMARKS"}
+            Remarks:{" "}
+            {certifiedTransaction.remarks
+              ? certifiedTransaction.remarks
+              : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Certified By: {certifiedCreatedBy}
+            Certified By:{" "}
+            {`${certifiedTransaction.Employee.firstName || ""} ${
+              certifiedTransaction.Employee.lastName || ""
+            }`}
           </Typography>
-          <CertificateOfDestruction row={row} />
+          {user.userType === 7 && <CertificateOfDestruction row={row} />}
           <br />
           <hr />
         </Box>

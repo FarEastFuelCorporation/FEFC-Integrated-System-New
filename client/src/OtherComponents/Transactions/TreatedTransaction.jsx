@@ -6,6 +6,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
+import {
+  timestampDate,
+  parseTimeString,
+  formatWeight,
+  formatWeightWithNA,
+} from "../Functions";
 
 const TreatedTransaction = ({
   row,
@@ -15,9 +21,16 @@ const TreatedTransaction = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const sortedTransaction =
+    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
+      .SortedTransaction;
+
   const sortedWasteTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
       .SortedTransaction[0].SortedWasteTransaction;
+
+  // Get the bookedTransactionId from ScheduledTransaction
+  const bookedTransactionId = row.ScheduledTransaction[0].bookedTransactionId;
 
   // Loop through each SortedWasteTransaction
   sortedWasteTransaction.forEach((sortedTransaction) => {
@@ -25,7 +38,7 @@ const TreatedTransaction = ({
 
     // Check if the TreatedWasteTransaction exists and is an array
     if (Array.isArray(sortedTransaction.TreatedWasteTransaction)) {
-      // Update each TreatedWasteTransaction by adding machineName and treatmentProcess
+      // Update each TreatedWasteTransaction by adding machineName, treatmentProcess, and bookedTransactionId
       sortedTransaction.TreatedWasteTransaction =
         sortedTransaction.TreatedWasteTransaction.map((treatedTransaction) => {
           // Add weight to the total treatedWeight
@@ -38,6 +51,7 @@ const TreatedTransaction = ({
               treatmentProcess:
                 treatedTransaction.TreatmentMachine.TreatmentProcess
                   .treatmentProcess, // Add treatmentProcess attribute
+              bookedTransactionId: bookedTransactionId, // Add bookedTransactionId attribute
             };
           }
           return treatedTransaction; // Return as is if no TreatmentMachine is present
@@ -51,30 +65,12 @@ const TreatedTransaction = ({
   const totalSortedWeight = sortedWasteTransaction
     .map((transaction) => transaction.weight || 0)
     .reduce((total, weight) => total + weight, 0); // Sum the weights using reduce
+
+  const totalTreatedWeight = sortedWasteTransaction
+    .map((transaction) => transaction.treatedWeight || 0)
+    .reduce((total, treatedWeight) => total + treatedWeight, 0); // Sum the weights using reduce
+
   const statusId = row.statusId;
-
-  const parseTimeString = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
-  };
-
-  const formatWeight = (weight) => {
-    // Check if weight is NaN
-    if (isNaN(weight)) {
-      return ""; // Return empty string if weight is NaN
-    }
-
-    // Format the number if it's a valid number
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(weight);
-  };
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "2-digit" };
@@ -130,9 +126,40 @@ const TreatedTransaction = ({
     return { latestTreatedDate, latestTreatedTime };
   }
 
+  function getLatestTreatedDateAndTimeSubmitted(sortedTransaction) {
+    let latestTreatedDateTime = null;
+
+    if (sortedTransaction && Array.isArray(sortedTransaction)) {
+      sortedTransaction.forEach((transaction) => {
+        if (
+          transaction &&
+          transaction.TreatedTransaction &&
+          Array.isArray(transaction.TreatedTransaction)
+        ) {
+          transaction.TreatedTransaction.forEach((treated) => {
+            if (treated && treated.createdAt) {
+              // If no latestTreatedDateTime or the current treated.createdAt is later, update it
+              if (
+                !latestTreatedDateTime ||
+                new Date(treated.createdAt) > new Date(latestTreatedDateTime)
+              ) {
+                latestTreatedDateTime = treated.createdAt;
+              }
+            }
+          });
+        }
+      });
+    }
+
+    return { latestTreatedDateTime };
+  }
+
   const { latestTreatedDate, latestTreatedTime } = getLatestTreatedDateAndTime(
     sortedWasteTransaction
   );
+
+  const { latestTreatedDateTime } =
+    getLatestTreatedDateAndTimeSubmitted(sortedTransaction);
 
   function consolidateEmployeeNames(sortedWasteTransactions) {
     const employeeNames = new Set();
@@ -212,7 +239,7 @@ const TreatedTransaction = ({
       minWidth: 150,
       renderCell: (params) => (
         <div className={"wrap-text"} style={{ textAlign: "center" }}>
-          {formatWeight(params.value)}
+          {formatWeightWithNA(params.value)}
         </div>
       ),
     },
@@ -264,7 +291,9 @@ const TreatedTransaction = ({
               Treated
             </Typography>
             <Typography variant="h5">
-              {`${latestTreatedDate} ${latestTreatedTime}`}
+              {latestTreatedDateTime
+                ? timestampDate(latestTreatedDateTime)
+                : ""}
             </Typography>
           </Box>
         )}
@@ -369,30 +398,37 @@ const TreatedTransaction = ({
       ) : (
         <Typography variant="h5">No Sorted Waste Transactions</Typography>
       )}
-      {statusId === 6 && (
-        <Box>
-          {" "}
-          <Typography variant="h5">
-            Finished Treatment Date:{" "}
-            {latestTreatedDate
-              ? format(new Date(latestTreatedDate), "MMMM dd, yyyy")
-              : "Pending"}
-          </Typography>
-          <Typography variant="h5">
-            Finished Treatment Time:{" "}
-            {latestTreatedTime
-              ? format(parseTimeString(latestTreatedTime), "hh:mm aa")
-              : "Pending"}
-          </Typography>
-          <Typography variant="h5">
-            Total Treated Weight: {formatWeight(totalSortedWeight)} Kg
-          </Typography>
-          {/* <Typography variant="h5">
+      <Box>
+        {" "}
+        <Typography variant="h5">
+          Finished Treatment Date:{" "}
+          {sortedTransaction[0].isFinishTreated
+            ? latestTreatedDate &&
+              format(new Date(latestTreatedDate), "MMMM dd, yyyy")
+            : totalTreatedWeight > 0
+            ? "In Progress"
+            : "Pending"}
+        </Typography>
+        <Typography variant="h5">
+          Finished Treatment Time:{" "}
+          {sortedTransaction[0].isFinishTreated
+            ? latestTreatedDate &&
+              format(parseTimeString(latestTreatedTime), "hh:mm aa")
+            : totalTreatedWeight > 0
+            ? "In Progress"
+            : "Pending"}
+        </Typography>
+        <Typography variant="h5">
+          Total Sorted Weight: {formatWeight(totalSortedWeight)} Kg
+        </Typography>
+        <Typography variant="h5">
+          Total Treated Weight: {formatWeight(totalTreatedWeight)} Kg
+        </Typography>
+        {/* <Typography variant="h5">
         Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
       </Typography> */}
-          <Typography variant="h5">Treated By: {employeeNames}</Typography>
-        </Box>
-      )}
+        <Typography variant="h5">Treated By: {employeeNames}</Typography>
+      </Box>
       <br />
       <hr />
     </Box>

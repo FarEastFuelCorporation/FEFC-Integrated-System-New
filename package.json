@@ -1,9 +1,7 @@
 {
   "scripts": {
-    "start": "concurrently \"npm run client\" \"npm run server\"",
-    "client": "cd client && PORT=3000 npm start",
-    "server": "cd server && PORT=3001 npm start",
-    "heroku-postbuild": "cd client && npm install && cd ../server && npm install && npm install nodemon --save"
+    "start": "cd server && npm start", // Only start the server
+    "heroku-postbuild": "cd client && npm install && npm run build && cd ../server && npm install" // Build the client on Heroku
   },
   "dependencies": {
     "concurrently": "^8.2.2",

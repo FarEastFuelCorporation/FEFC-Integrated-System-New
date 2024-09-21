@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "cd server && npm start", // Only start the server
+    "start": "cd server && npm start",
     "heroku-postbuild": "cd client && npm install && npm run build && cd ../server && npm install" // Build the client on Heroku
   },
   "dependencies": {

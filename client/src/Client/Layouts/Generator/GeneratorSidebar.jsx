@@ -79,7 +79,7 @@ const GeneratorSidebar = ({ user }) => {
     const currentTitle = pathToTitleMap[location.pathname] || "Dashboard";
     setSelected(currentTitle);
   }, [location, pathToTitleMap]);
-
+  console.log(user);
   useEffect(() => {
     if (
       user &&
@@ -90,11 +90,19 @@ const GeneratorSidebar = ({ user }) => {
       const clientPictureData = new Uint8Array(
         user.clientDetails.clientPicture.data
       );
+
+      console.log(user.clientDetails.clientPicture.data);
+      console.log(clientPictureData);
+
       const blob = new Blob([clientPictureData], {
         type: user.clientDetails.clientPicture.type,
       });
+
+      console.log(blob);
+
       const reader = new FileReader();
       reader.onload = () => {
+        console.log(reader.result);
         setProfilePictureSrc(reader.result);
       };
       reader.onerror = () => {
@@ -107,9 +115,12 @@ const GeneratorSidebar = ({ user }) => {
     }
   }, [user]);
 
+  console.log(profilePictureSrc);
+
   const initializeClientDetails = useCallback(() => {
     const { clientDetails } = user || {};
     setClientDetails({
+      id: clientDetails?.id || "",
       clientId: clientDetails?.clientId || "",
       clientName: clientDetails?.clientName || "",
       address: clientDetails?.address || "",
@@ -178,22 +189,18 @@ const GeneratorSidebar = ({ user }) => {
       );
       formDataToSend.append("clientPicture", clientDetails.clientPicture);
       formDataToSend.append("submittedBy", clientDetails.submittedBy);
-
+      console.log(selectedFile);
       // Add clientPicture if it's selected
       if (selectedFile) {
         formDataToSend.append("clientPicture", selectedFile);
       }
-
       // Update existing client
-      await axios.put(
-        `${apiUrl}/client/${clientDetails.clientId}`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      console.log(formDataToSend);
+      await axios.put(`${apiUrl}/client/${clientDetails.id}`, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       // Update the profile picture source if a new file was uploaded
       if (selectedFile) {

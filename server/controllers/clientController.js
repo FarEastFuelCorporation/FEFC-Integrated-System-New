@@ -97,13 +97,17 @@ async function updateClientController(req, res) {
       createdBy,
     } = req.body;
 
+    console.log("req.body", req.body);
+
     let clientPicture = null;
     if (req.file) {
       clientPicture = req.file.buffer;
     }
 
+    console.log(clientPicture);
+
     // Find the client by UUID (id) and update it
-    const updatedClient = await Client.findOne({ id });
+    const updatedClient = await Client.findByPk(id);
 
     if (updatedClient) {
       // Update client attributes

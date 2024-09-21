@@ -148,6 +148,12 @@ async function getQuotationsController(req, res) {
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
+          include: [
+            {
+              model: VehicleType,
+              as: "VehicleType",
+            },
+          ],
         },
         {
           model: Client,

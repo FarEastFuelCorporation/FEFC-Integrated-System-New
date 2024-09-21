@@ -1,5 +1,3 @@
-// models/EmployeeRecord.js
-
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
@@ -9,7 +7,7 @@ const EmployeeRecord = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: () => uuidv4(), // Generate UUID automatically
+      defaultValue: () => uuidv4(),
       allowNull: false,
       primaryKey: true,
     },
@@ -24,31 +22,31 @@ const EmployeeRecord = sequelize.define(
       defaultValue: "ACTIVE",
     },
     firstName: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: false,
     },
     middleName: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: true,
     },
     lastName: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: false,
     },
     husbandSurname: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: true,
     },
     affix: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: true,
     },
     gender: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(10), // Adjusted length
       allowNull: false,
     },
     civilStatus: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(10), // Adjusted length
       allowNull: false,
     },
     birthday: {
@@ -56,67 +54,47 @@ const EmployeeRecord = sequelize.define(
       allowNull: false,
     },
     birthPlace: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: true,
     },
     bloodType: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(3), // Adjusted length
       allowNull: false,
     },
     ethnicOrigin: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: true,
     },
     citizenship: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     religion: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     province: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     municipality: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     barangay: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     address: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: false,
-    },
-    otherProvince: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    otherMunicipality: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    otherBarangay: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    otherAddress: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     mobileNumber: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(15), // Adjusted length
       allowNull: false,
     },
-    landlineNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     emailAddress: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: true,
     },
     dateHire: {
@@ -124,136 +102,40 @@ const EmployeeRecord = sequelize.define(
       allowNull: false,
     },
     employeeType: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     payrollType: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     salaryType: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50), // Adjusted length
       allowNull: false,
     },
     designation: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: false,
     },
     departmentId: {
       type: DataTypes.UUID,
       allowNull: false,
     },
-    immediateHeadId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     tinId: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20), // Adjusted length
       allowNull: false,
     },
     philhealthId: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20), // Adjusted length
       allowNull: false,
     },
     sssId: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20), // Adjusted length
       allowNull: false,
     },
     pagibigId: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20), // Adjusted length
       allowNull: false,
-    },
-    fathersName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    fathersReligion: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    fathersAddress: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    fathersMobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mothersName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mothersReligion: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mothersAddress: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mothersMobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    spouseName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    spouseReligion: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    spouseAddress: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    spouseMobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    educationalAttainment: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    schoolName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    course: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    level: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    year: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    referenceName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    referenceAddress: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    referenceMobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    emergencyName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    emergencyAddress: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    emergencyMobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     picture: {
       type: DataTypes.BLOB("long"),
@@ -263,16 +145,12 @@ const EmployeeRecord = sequelize.define(
       type: DataTypes.BLOB("long"),
       allowNull: true,
     },
-    emergencyMobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
     createdBy: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: false,
     },
     updatedAt: {
@@ -280,22 +158,20 @@ const EmployeeRecord = sequelize.define(
       allowNull: false,
     },
     updatedBy: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: true,
     },
-    // Paranoid option for soft deletion
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
     },
     deletedBy: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100), // Adjusted length
       allowNull: true,
     },
   },
   {
-    // Enable soft deletion (paranoid mode)
     paranoid: true,
   }
 );

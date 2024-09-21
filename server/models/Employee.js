@@ -16,17 +16,17 @@ const Employee = sequelize.define(
       allowNull: false,
     },
     middleName: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     spouseName: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     affix: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     gender: {
       type: DataTypes.STRING,
@@ -40,7 +40,7 @@ const Employee = sequelize.define(
       type: DataTypes.DATEONLY,
     },
     birthPlace: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     mobileNo: {
       type: DataTypes.STRING,
@@ -53,19 +53,19 @@ const Employee = sequelize.define(
       allowNull: false,
     },
     permanentAddress: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     otherAddress: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     motherMaidenName: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     educationalAttainment: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     course: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     yearGraduate: {
       type: DataTypes.STRING,
@@ -143,11 +143,11 @@ const Employee = sequelize.define(
       type: DataTypes.DATEONLY,
     },
     reasonOfResignation: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     picture: {
       type: DataTypes.STRING,
-      allowNull: true, // Adjust the allowNull based on your requirements
+      allowNull: true, // Adjust based on your requirements
     },
     submittedBy: {
       type: DataTypes.STRING,

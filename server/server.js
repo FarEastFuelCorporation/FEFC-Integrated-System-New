@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const app = require("./app");
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 24156;
 
 // Start the server
 app.listen(port, () => {

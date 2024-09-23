@@ -79,6 +79,10 @@ app.use(
   })
 );
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the API!");
+});
+
 app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Middleware to check authentication

@@ -1,287 +1,156 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
+// models/employee.js
 
-const EmployeeRecord = sequelize.define(
-  "EmployeeRecord",
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database"); // Adjust the path accordingly
+
+const Employee = sequelize.define(
+  "Employee",
   {
-    id: {
-      type: DataTypes.CHAR(36),
-      defaultValue: () => uuidv4(),
+    employeeId: {
+      type: DataTypes.STRING(50),
       allowNull: false,
       primaryKey: true,
     },
-    employeeId: {
-      type: DataTypes.STRING(10),
-      unique: true,
-      allowNull: false,
-    },
-    employeeStatus: {
-      type: DataTypes.ENUM,
-      values: ["ACTIVE", "INACTIVE"],
-      defaultValue: "ACTIVE",
-    },
     firstName: {
-      type: DataTypes.STRING(50), // Increased size
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
     middleName: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: true,
+      type: DataTypes.STRING(50), // Changed to STRING(50)
     },
     lastName: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    husbandSurname: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: true,
-    },
-    affix: {
-      type: DataTypes.STRING(10),
-      allowNull: true,
-    },
-    gender: {
-      type: DataTypes.ENUM,
-      values: ["Male", "Female", "Other"],
-      allowNull: false,
-    },
-    civilStatus: {
-      type: DataTypes.ENUM,
-      values: ["Single", "Married", "Widowed", "Divorced"],
-      allowNull: false,
-    },
-    birthday: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    birthPlace: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: true,
-    },
-    bloodType: {
-      type: DataTypes.STRING(3),
-      allowNull: false,
-    },
-    citizenship: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    religion: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    province: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    municipality: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    barangay: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    address: {
-      type: DataTypes.TEXT, // Changed to TEXT
-      allowNull: false,
-    },
-    otherProvince: {
       type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    otherMunicipality: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    otherBarangay: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    otherAddress: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    mobileNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    landlineNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
-    },
-    emailAddress: {
-      type: DataTypes.STRING(100), // Increased size
-      allowNull: true,
-    },
-    dateHire: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    employeeType: {
-      type: DataTypes.STRING(20), // Increased size
-      allowNull: false,
-    },
-    payrollType: {
-      type: DataTypes.STRING(20), // Increased size
-      allowNull: false,
-    },
-    salaryType: {
-      type: DataTypes.STRING(20), // Increased size
-      allowNull: false,
-    },
-    designation: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    departmentId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    immediateHeadId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    tinId: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    philhealthId: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    sssId: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    pagibigId: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    fathersName: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    fathersReligion: {
-      type: DataTypes.STRING(50), // Increased size
-      allowNull: false,
-    },
-    fathersAddress: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    fathersMobileNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    mothersName: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
-    mothersReligion: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
-    mothersAddress: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    mothersMobileNumber: {
-      type: DataTypes.STRING(20),
       allowNull: false,
     },
     spouseName: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
+    },
+    affix: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
+    },
+    gender: {
       type: DataTypes.STRING(50),
-      allowNull: true,
+      allowNull: false,
     },
-    spouseReligion: {
+    civilStatus: {
       type: DataTypes.STRING(50),
-      allowNull: true,
+      allowNull: false,
     },
-    spouseAddress: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    birthDate: {
+      type: DataTypes.DATEONLY,
     },
-    spouseMobileNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
+    birthPlace: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
+    },
+    mobileNo: {
+      type: DataTypes.STRING(50),
+    },
+    emailAddress: {
+      type: DataTypes.STRING(50),
+    },
+    nationality: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    permanentAddress: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
+    },
+    otherAddress: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
+    },
+    motherMaidenName: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
     },
     educationalAttainment: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    schoolName: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
+      type: DataTypes.STRING(50), // Changed to STRING(50)
     },
     course: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
+    },
+    yearGraduate: {
       type: DataTypes.STRING(50),
-      allowNull: true,
     },
-    level: {
+    tinNo: {
       type: DataTypes.STRING(50),
-      allowNull: true,
     },
-    year: {
-      type: DataTypes.STRING(10),
-      allowNull: true,
-    },
-    referenceName: {
+    sssGsisNo: {
       type: DataTypes.STRING(50),
-      allowNull: true,
     },
-    referenceAddress: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    referenceMobileNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
-    },
-    emergencyName: {
+    philhealthNo: {
       type: DataTypes.STRING(50),
-      allowNull: true,
     },
-    emergencyAddress: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    pagIbigNo: {
+      type: DataTypes.STRING(50),
     },
-    emergencyMobileNumber: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
+    driversLicenseNo: {
+      type: DataTypes.STRING(50),
+    },
+    nbiNo: {
+      type: DataTypes.STRING(50),
+    },
+    policeClearanceNo: {
+      type: DataTypes.STRING(50),
+    },
+    cedulaNo: {
+      type: DataTypes.STRING(50),
+    },
+    dateHire: {
+      type: DataTypes.DATEONLY,
+    },
+    employeeType: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    payrollType: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    salaryType: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    employeeStatus: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    department: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    designation: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    dailyRate: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    dayAllowance: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    nightAllowance: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    timeIn: {
+      type: DataTypes.STRING(50),
+    },
+    timeOut: {
+      type: DataTypes.STRING(50),
+    },
+    dateOfResignation: {
+      type: DataTypes.DATEONLY,
+    },
+    reasonOfResignation: {
+      type: DataTypes.STRING(50), // Changed to STRING(50)
     },
     picture: {
-      type: DataTypes.BLOB("long"),
-      allowNull: true,
-    },
-    signature: {
-      type: DataTypes.BLOB("long"),
-      allowNull: true,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    createdBy: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true, // Adjust based on your requirements
     },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedBy: {
+    submittedBy: {
       type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    deletedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    deletedBy: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
     },
   },
   {
@@ -289,4 +158,4 @@ const EmployeeRecord = sequelize.define(
   }
 );
 
-module.exports = EmployeeRecord;
+module.exports = Employee;

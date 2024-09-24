@@ -5,6 +5,8 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import BuildIcon from "@mui/icons-material/Build";
@@ -173,20 +175,15 @@ const DispatchingSidebar = ({ user }) => {
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Transactions"
               to="transactions"
-              icon={<FormatListBulletedIcon />}
+              icon={<PointOfSaleIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
-            <Item
-              title="Vehicle Location"
-              to="vehicleLocation"
-              icon={<FormatListBulletedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -196,11 +193,20 @@ const DispatchingSidebar = ({ user }) => {
               Data
             </Typography>
             <Item
+              title="Vehicle Location"
+              to="vehicleLocation"
+              icon={<LocationOnIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
               title="Type Of Vehicles"
               to="vehicleTypes"
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Vehicles"
@@ -208,6 +214,7 @@ const DispatchingSidebar = ({ user }) => {
               icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Vehicle Maintenance Request"
@@ -215,6 +222,7 @@ const DispatchingSidebar = ({ user }) => {
               icon={<BuildIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -229,13 +237,15 @@ const DispatchingSidebar = ({ user }) => {
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
-            <Item
+            {/* <Item
               title="FAQ Page"
               to="faq"
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -250,6 +260,7 @@ const DispatchingSidebar = ({ user }) => {
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Pie Chart"
@@ -257,6 +268,7 @@ const DispatchingSidebar = ({ user }) => {
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Line Chart"
@@ -264,7 +276,8 @@ const DispatchingSidebar = ({ user }) => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+              collapsed={isCollapsed}
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

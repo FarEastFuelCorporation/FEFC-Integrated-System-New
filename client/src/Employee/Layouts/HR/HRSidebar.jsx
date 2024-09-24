@@ -198,6 +198,7 @@ const HRSidebar = ({ user }) => {
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -212,6 +213,7 @@ const HRSidebar = ({ user }) => {
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Employee Records"
@@ -219,6 +221,7 @@ const HRSidebar = ({ user }) => {
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -233,6 +236,7 @@ const HRSidebar = ({ user }) => {
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="FAQ Page"
@@ -240,6 +244,7 @@ const HRSidebar = ({ user }) => {
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -254,6 +259,7 @@ const HRSidebar = ({ user }) => {
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Pie Chart"
@@ -261,6 +267,7 @@ const HRSidebar = ({ user }) => {
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Line Chart"
@@ -268,6 +275,7 @@ const HRSidebar = ({ user }) => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
           </Box>
         </Menu>

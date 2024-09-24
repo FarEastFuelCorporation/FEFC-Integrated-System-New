@@ -5,6 +5,7 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
@@ -170,13 +171,15 @@ const ReceivingDashboard = ({ user }) => {
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Transactions"
               to="transactions"
-              icon={<FormatListBulletedIcon />}
+              icon={<PointOfSaleIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -191,6 +194,7 @@ const ReceivingDashboard = ({ user }) => {
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Vehicles"
@@ -198,6 +202,7 @@ const ReceivingDashboard = ({ user }) => {
               icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -212,13 +217,15 @@ const ReceivingDashboard = ({ user }) => {
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
-            <Item
+            {/* <Item
               title="FAQ Page"
               to="faq"
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -233,6 +240,7 @@ const ReceivingDashboard = ({ user }) => {
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Pie Chart"
@@ -240,6 +248,7 @@ const ReceivingDashboard = ({ user }) => {
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Line Chart"
@@ -247,7 +256,8 @@ const ReceivingDashboard = ({ user }) => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+              collapsed={isCollapsed}
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

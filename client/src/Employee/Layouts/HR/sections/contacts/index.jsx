@@ -154,6 +154,8 @@ const Contacts = ({ user }) => {
 
     setGender(employeeRecord.gender);
     setCivilStatus(employeeRecord.civilStatus);
+    setPictureFileName("");
+    setSignatureFile("");
 
     console.log(employeeRecord.departmentId);
     console.log(employeeRecord.immediateHeadId);

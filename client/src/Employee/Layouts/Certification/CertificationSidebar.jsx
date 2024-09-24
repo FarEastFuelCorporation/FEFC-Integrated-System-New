@@ -5,8 +5,10 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import RecyclingIcon from "@mui/icons-material/Recycling";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -174,13 +176,15 @@ const CertificationSidebar = ({ user }) => {
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Transactions"
               to="transactions"
-              icon={<FormatListBulletedIcon />}
+              icon={<PointOfSaleIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -195,6 +199,7 @@ const CertificationSidebar = ({ user }) => {
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Treatment Process"
@@ -202,13 +207,15 @@ const CertificationSidebar = ({ user }) => {
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
-              title="Waste Types"
+              title="Type of Wastes"
               to="typeOfWastes"
-              icon={<FormatListBulletedIcon />}
+              icon={<RecyclingIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -223,13 +230,15 @@ const CertificationSidebar = ({ user }) => {
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
-            <Item
+            {/* <Item
               title="FAQ Page"
               to="faq"
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -244,6 +253,7 @@ const CertificationSidebar = ({ user }) => {
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Pie Chart"
@@ -251,6 +261,7 @@ const CertificationSidebar = ({ user }) => {
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Line Chart"
@@ -258,7 +269,8 @@ const CertificationSidebar = ({ user }) => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+              collapsed={isCollapsed}
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

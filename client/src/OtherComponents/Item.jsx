@@ -7,7 +7,7 @@ import log from "loglevel";
 
 log.setLevel("info");
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, selected, setSelected, collapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -20,23 +20,27 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 
   return (
     <MenuItem
-      active={selected === title} // Apply 'active' prop based on selected state
+      active={selected === title}
       style={{
         color: colors.grey[100],
         backgroundColor:
-          selected === title ? colors.primary[500] : "transparent", // Apply background color based on active state
+          selected === title ? colors.primary[500] : "transparent",
+        display: "flex",
+        alignItems: "center",
       }}
       onClick={handleClick}
       icon={icon}
     >
-      <Typography
-        style={{
-          whiteSpace: "normal", // Allow text to wrap
-          wordBreak: "break-word", // Break long words
-        }}
-      >
-        {title}
-      </Typography>
+      {!collapsed && (
+        <Typography
+          style={{
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+          }}
+        >
+          {title}
+        </Typography>
+      )}
     </MenuItem>
   );
 };

@@ -45,14 +45,6 @@ const upload = multer({ storage: storage });
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Serve static files from the React app located outside the server directory
-app.use(express.static(path.join(__dirname, "../client/build")));
-
-// Handle React routing, return all requests to React app
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-});
-
 // Serve Bootstrap files from the 'node_modules' folder
 app.use(
   "/bootstrap",
@@ -216,6 +208,14 @@ app.use("/employeeAttachment", employeeAttachmentRoutes);
 app.use("/department", departmentRoutes);
 
 app.use(error404Controller);
+
+// Serve static files from the React app located outside the server directory
+app.use(express.static(path.join(__dirname, "../client/build")));
+
+// Handle React routing, return all requests to React app
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+});
 
 // Function to initialize the application
 async function initializeApp() {

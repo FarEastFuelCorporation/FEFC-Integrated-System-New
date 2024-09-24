@@ -54,6 +54,7 @@ const Clients = ({ user }) => {
         const clientRecords = response.data;
 
         console.log(apiUrl);
+        console.log(axios.get(`${apiUrl}/client`));
         console.log(clientRecords.clients);
 
         if (clientRecords && Array.isArray(clientRecords.clients)) {

@@ -11,7 +11,7 @@ const LandingPage = () => {
         />
         <h1>
           FAR EAST FUEL CORPORATION <br />
-          <i>INTEGRATED MANAGEMENT SYSTEM</i>
+          <i>INTEGRATED SYSTEM</i>
         </h1>
       </div>
     </div>

@@ -70,7 +70,6 @@ const EmployeeRecordModal = ({
         setProvinces(provinceResponse.data.provinces);
         setEmployeesData(employeeResponse.data.employees);
         setDepartments(departmentResponse.data.departments);
-        console.log(departmentResponse.data.departments);
       } catch (error) {
         console.error("Error fetching provinces:", error);
       }
@@ -84,7 +83,6 @@ const EmployeeRecordModal = ({
         const response = await axios.get(
           `${apiUrl}/api/geoTable/city/${province}`
         );
-        console.log(response.data.cities);
         setCities(response.data.cities);
       } catch (error) {
         console.error("Error fetching cities:", error);
@@ -103,7 +101,6 @@ const EmployeeRecordModal = ({
         const response = await axios.get(
           `${apiUrl}/api/geoTable/barangay/${municipality}`
         );
-        console.log(response.data.barangays);
         setBarangays(response.data.barangays);
       } catch (error) {
         console.error("Error fetching cities:", error);
@@ -120,7 +117,6 @@ const EmployeeRecordModal = ({
         const response = await axios.get(
           `${apiUrl}/api/geoTable/city/${province}`
         );
-        console.log(response.data.cities);
         setOtherCities(response.data.cities);
       } catch (error) {
         console.error("Error fetching cities:", error);
@@ -139,7 +135,6 @@ const EmployeeRecordModal = ({
         const response = await axios.get(
           `${apiUrl}/api/geoTable/barangay/${municipality}`
         );
-        console.log(response.data.barangays);
         setOtherBarangays(response.data.barangays);
       } catch (error) {
         console.error("Error fetching cities:", error);
@@ -167,8 +162,6 @@ const EmployeeRecordModal = ({
     "Notify In Case of Emergency",
     "Upload Files",
   ];
-
-  console.log(departments);
 
   return (
     <Box>

@@ -12,113 +12,113 @@ const Employee = sequelize.define(
       primaryKey: true,
     },
     firstName: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     middleName: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     lastName: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     spouseName: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     affix: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     gender: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     civilStatus: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     birthDate: {
       type: DataTypes.DATEONLY,
     },
     birthPlace: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     mobileNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     emailAddress: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     nationality: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     permanentAddress: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     otherAddress: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     motherMaidenName: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     educationalAttainment: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     course: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     yearGraduate: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     tinNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     sssGsisNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     philhealthNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     pagIbigNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     driversLicenseNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     nbiNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     policeClearanceNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     cedulaNo: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     dateHire: {
       type: DataTypes.DATEONLY,
     },
     employeeType: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     payrollType: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     salaryType: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     employeeStatus: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     department: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     designation: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     dailyRate: {
@@ -134,23 +134,23 @@ const Employee = sequelize.define(
       allowNull: false,
     },
     timeIn: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     timeOut: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
     dateOfResignation: {
       type: DataTypes.DATEONLY,
     },
     reasonOfResignation: {
-      type: DataTypes.STRING(50), // Changed to STRING(50)
+      type: DataTypes.TEXT, // Changed to TEXT
     },
     picture: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
       allowNull: true, // Adjust based on your requirements
     },
     submittedBy: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.TEXT,
     },
   },
   {

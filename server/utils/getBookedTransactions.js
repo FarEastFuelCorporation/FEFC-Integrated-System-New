@@ -54,6 +54,11 @@ const getIncludeOptions = () => [
     model: Attachment,
     as: "Attachment",
     required: false,
+    include: {
+      model: Employee,
+      as: "Employee",
+      attributes: ["firstName", "lastName"],
+    },
   },
   {
     model: ScheduledTransaction,

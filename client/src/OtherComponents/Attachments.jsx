@@ -35,9 +35,17 @@ const Attachments = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
+  console.log(row);
+
   useEffect(() => {
     if (row && row.Attachment) {
-      setAttachmentData(row.Attachment);
+      const mappedAttachmentData = row.Attachment.map((attachment) => ({
+        ...attachment,
+        attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
+      }));
+      setAttachmentData(mappedAttachmentData); // Update state with mapped data
+    } else {
+      setAttachmentData([]); // Clear attachment data if no attachments
     }
   }, [row]);
 

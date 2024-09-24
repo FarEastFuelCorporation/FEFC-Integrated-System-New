@@ -4,6 +4,7 @@ import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
+import Badge from "@mui/material/Badge";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -190,7 +191,7 @@ const MarketingSidebar = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            />
+            ></Item>
             <Typography
               variant="h6"
               color={colors.grey[300]}

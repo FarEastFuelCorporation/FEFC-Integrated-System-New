@@ -1,17 +1,19 @@
 // components/Quotations.js
 
 import React, { useState, useEffect } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Modal } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
 import axios from "axios";
 import { format } from "date-fns";
 import Header from "../../Header";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import QuotationFormModal from "../../Modals/QuotationFormModal";
+import QuotationForm from "../../Quotations/QuotationForm";
 
 const Quotations = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -59,6 +61,8 @@ const Quotations = ({ user }) => {
   };
 
   const [openModal, setOpenModal] = useState(false);
+  const [openQuotationModal, setOpenQuotationModal] = useState(false);
+  const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [quotationsData, setQuotationsData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
@@ -119,6 +123,19 @@ const Quotations = ({ user }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleDownloadClick = (id) => {
+    const quotationToDownload = quotationsData.find(
+      (quotation) => quotation.id === id
+    );
+    setSelectedQuotation(quotationToDownload); // Set the selected quotation
+    // setOpenQuotationModal(true); // Open the modal
+  };
+
+  const handleCloseQuotationModal = () => {
+    setOpenQuotationModal(false);
+    setSelectedQuotation("");
   };
 
   const handleEditClick = (id) => {
@@ -363,6 +380,22 @@ const Quotations = ({ user }) => {
   if (user.userType === 2) {
     columns.push(
       {
+        field: "download",
+        headerName: "Download",
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        width: 80,
+        renderCell: (params) => (
+          <IconButton
+            color="secondary"
+            onClick={() => handleDownloadClick(params.row.id)}
+          >
+            <DownloadIcon sx={{ fontSize: "2rem" }} />
+          </IconButton>
+        ),
+      },
+      {
         field: "edit",
         headerName: "Edit",
         headerAlign: "center",
@@ -436,6 +469,18 @@ const Quotations = ({ user }) => {
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
       />
+      <Modal open={openQuotationModal} onClose={handleCloseQuotationModal}>
+        <div
+          style={{
+            padding: "20px",
+            background: "white",
+            margin: "10% auto",
+            width: "80%",
+          }}
+        >
+          <QuotationForm quotation={selectedQuotation} />
+        </div>
+      </Modal>
     </Box>
   );
 };

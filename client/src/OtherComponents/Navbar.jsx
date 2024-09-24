@@ -98,7 +98,6 @@ const Navbar = () => {
         {!isAuthPage && !client ? (
           <Box display="flex" gap={2}>
             <Button onClick={handleLogout} color="inherit">
-              <Typography variant="h5">Logout</Typography>
               <Typography variant="h5" style={{ marginLeft: "10px" }}>
                 <i className="fa-solid fa-right-from-bracket"></i>
               </Typography>

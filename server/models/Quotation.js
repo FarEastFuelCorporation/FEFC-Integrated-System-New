@@ -23,7 +23,7 @@ const Quotation = sequelize.define(
     },
     validity: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     clientId: {
       type: DataTypes.STRING,

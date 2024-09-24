@@ -35,8 +35,6 @@ const Attachments = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  console.log(row);
-
   useEffect(() => {
     if (row && row.Attachment) {
       const mappedAttachmentData = row.Attachment.map((attachment) => ({
@@ -60,7 +58,6 @@ const Attachments = ({
   };
 
   const handleOpenAttachmentModal = (row) => {
-    console.log(row);
     setAttachmentFormData({
       id: "",
       bookedTransactionId: row.id,
@@ -94,7 +91,6 @@ const Attachments = ({
 
     // Check if all required fields are filled
     if (!fileName || !attachment) {
-      console.log("error");
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;
@@ -245,7 +241,6 @@ const Attachments = ({
               // Determine the MIME type based on the file's magic number (first few bytes)
               let mimeType = "application/octet-stream"; // Default MIME type
               const magicNumbers = byteArray.slice(0, 4).join(",");
-              console.log(magicNumbers);
               // Common magic numbers
               if (magicNumbers.startsWith("255,216,255")) {
                 mimeType = "image/jpeg";

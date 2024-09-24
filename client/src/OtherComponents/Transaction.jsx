@@ -10,6 +10,7 @@ import {
   Tab,
 } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
+import Badge from "@mui/material/Badge";
 import { format } from "date-fns";
 import {
   CustomAccordionDetails,
@@ -59,6 +60,17 @@ const Transaction = ({
       ? inProgressTransactions
       : finishedTransactions;
   console.log();
+
+  const pendingCount = pendingTransactions.filter(
+    (transaction) => transaction.statusId === 1
+  ).length;
+  const inProgressCount = inProgressTransactions.filter(
+    (transaction) => transaction.statusId === 2
+  ).length;
+  const finishedCount = finishedTransactions.filter(
+    (transaction) => transaction.statusId === 3
+  ).length;
+
   return (
     <Box mt="40px">
       <Card>
@@ -71,11 +83,53 @@ const Transaction = ({
               boxShadow: "none",
               borderBottom: `1px solid ${colors.grey[100]}`,
             },
+            "& .MuiTab-root > span": {
+              paddingRight: "10px",
+            },
           }}
         >
-          <Tab label="Pending" />
-          <Tab label="In Progress" />
-          <Tab label="Finished" />
+          <Tab
+            label={
+              <Badge
+                badgeContent={pendingCount}
+                color="danger"
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                Pending
+              </Badge>
+            }
+          />
+          <Tab
+            label={
+              <Badge
+                badgeContent={inProgressCount}
+                color="warning"
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                In Progress
+              </Badge>
+            }
+          />
+          <Tab
+            label={
+              <Badge
+                badgeContent={finishedCount}
+                color="success"
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                Finished
+              </Badge>
+            }
+          />
         </Tabs>
         <CustomAccordionStyles>
           {transactions.map((row) => (

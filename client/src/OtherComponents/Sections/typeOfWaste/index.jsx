@@ -48,7 +48,6 @@ const TypeOfWastes = ({ user }) => {
       try {
         const response = await axios.get(`${apiUrl}/api/typeOfWaste`);
         const typeOfWastesRecords = response.data;
-        console.log(typeOfWastesRecords.typeOfWastes);
         if (
           typeOfWastesRecords &&
           Array.isArray(typeOfWastesRecords.typeOfWastes)
@@ -62,7 +61,6 @@ const TypeOfWastes = ({ user }) => {
             })
           );
 
-          console.log(flattenedData);
           setTypeOfWastes(flattenedData);
 
           const treatmentProcessResponse = await axios.get(

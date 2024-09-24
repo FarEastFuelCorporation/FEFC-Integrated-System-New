@@ -9,7 +9,6 @@ import { timestampDate, parseTimeString } from "../Functions";
 const BookedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  console.log(row);
   return (
     <Box sx={{ my: 3, position: "relative" }}>
       <CircleLogo>

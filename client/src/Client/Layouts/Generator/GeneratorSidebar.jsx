@@ -358,14 +358,14 @@ const GeneratorSidebar = ({ user }) => {
             >
               Pages
             </Typography>
-            <Item
+            {/* <Item
               title="Profile Form"
               to="form"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            />
+            /> */}
             <Item
               title="Calendar"
               to="calendar"
@@ -374,7 +374,7 @@ const GeneratorSidebar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-            <Item
+            {/* <Item
               title="FAQ Page"
               to="faq"
               icon={<HelpOutlinedIcon />}
@@ -413,7 +413,7 @@ const GeneratorSidebar = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            />
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

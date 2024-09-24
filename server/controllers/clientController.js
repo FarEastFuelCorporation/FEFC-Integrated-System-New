@@ -7,7 +7,7 @@ const generateClientId = require("../utils/generateClientId");
 async function createClientController(req, res) {
   try {
     // Extracting data from the request body
-    const {
+    let {
       clientName,
       address,
       natureOfBusiness,
@@ -24,6 +24,14 @@ async function createClientController(req, res) {
     if (req.file) {
       clientPicture = req.file.buffer;
     }
+
+    clientName = clientName ? clientName.toUpperCase() : "";
+    address = address ? address.toUpperCase() : "";
+    billerName = billerName ? billerName.toUpperCase() : "";
+    billerAddress = billerAddress ? billerAddress.toUpperCase() : "";
+    billerContactPerson = billerContactPerson
+      ? billerContactPerson.toUpperCase()
+      : "";
 
     // Generate a new client ID based on the client type
     const clientId = await generateClientId(clientType);
@@ -84,7 +92,7 @@ async function updateClientController(req, res) {
     const id = req.params.id;
     console.log("Updating client with ID:", id);
 
-    const {
+    let {
       clientName,
       address,
       natureOfBusiness,
@@ -104,7 +112,13 @@ async function updateClientController(req, res) {
       clientPicture = req.file.buffer;
     }
 
-    console.log(clientPicture);
+    clientName = clientName ? clientName.toUpperCase() : "";
+    address = address ? address.toUpperCase() : "";
+    billerName = billerName ? billerName.toUpperCase() : "";
+    billerAddress = billerAddress ? billerAddress.toUpperCase() : "";
+    billerContactPerson = billerContactPerson
+      ? billerContactPerson.toUpperCase()
+      : "";
 
     // Find the client by UUID (id) and update it
     const updatedClient = await Client.findByPk(id);

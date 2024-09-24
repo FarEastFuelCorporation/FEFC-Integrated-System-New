@@ -150,6 +150,9 @@ const Transaction = ({
               </AccordionSummary>
 
               <CustomAccordionDetails>
+                {!Number.isInteger(user.userType) && (
+                  <BookedTransaction row={row} />
+                )}
                 {user.userType === 2 && <ScheduledTransaction row={row} />}
                 {user.userType === 3 && <DispatchedTransaction row={row} />}
                 {user.userType === 4 && <ReceivedTransaction row={row} />}

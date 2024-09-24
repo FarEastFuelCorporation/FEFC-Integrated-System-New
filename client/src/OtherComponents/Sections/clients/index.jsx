@@ -53,6 +53,9 @@ const Clients = ({ user }) => {
         const response = await axios.get(`${apiUrl}/client`);
         const clientRecords = response.data;
 
+        console.log(apiUrl);
+        console.log(clientRecords.clients);
+
         if (clientRecords && Array.isArray(clientRecords.clients)) {
           setClientData(clientRecords.clients);
         } else {

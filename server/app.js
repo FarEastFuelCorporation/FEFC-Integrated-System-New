@@ -71,10 +71,6 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the API!");
-});
-
 app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Middleware to check authentication
@@ -221,7 +217,7 @@ app.get("*", (req, res) => {
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
-    await sequelize.sync({ alter: false });
+    // await sequelize.sync({ alter: false });
     console.log("Models synced successfully.");
   } catch (error) {
     console.error("Error syncing models:", error);

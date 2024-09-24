@@ -58,7 +58,7 @@ const Transaction = ({
       : selectedTab === 1
       ? inProgressTransactions
       : finishedTransactions;
-
+  console.log();
   return (
     <Box mt="40px">
       <Card>
@@ -91,7 +91,7 @@ const Transaction = ({
                   ) : (
                     <Box>
                       {" - "}
-                      {row.clientName} {" - "}
+                      {row.Client.clientName} {" - "}
                       {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
                     </Box>
                   )}

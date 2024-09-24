@@ -9,7 +9,7 @@ import { timestampDate, parseTimeString } from "../Functions";
 const BookedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  console.log(row);
   return (
     <Box sx={{ my: 3, position: "relative" }}>
       <CircleLogo>
@@ -34,13 +34,13 @@ const BookedTransaction = ({ row }) => {
         </Typography>
       </Box>
       <Typography variant="h5">
-        Hauling Date:
+        Hauling Date:{" "}
         {row.haulingDate
           ? format(new Date(row.haulingDate), "MMMM dd, yyyy")
           : ""}
       </Typography>
       <Typography variant="h5">
-        Hauling Time:
+        Hauling Time:{" "}
         {row.haulingTime
           ? format(parseTimeString(row.haulingTime), "hh:mm aa")
           : ""}
@@ -51,8 +51,8 @@ const BookedTransaction = ({ row }) => {
       </Typography>
       <Typography variant="h5">
         Vehicle Type:{" "}
-        {row.QuotationTransportation.vehicleType
-          ? row.QuotationTransportation.vehicleType
+        {row.QuotationTransportation.VehicleType.typeOfVehicle
+          ? row.QuotationTransportation.VehicleType.typeOfVehicle
           : ""}
       </Typography>
       <Typography variant="h5">

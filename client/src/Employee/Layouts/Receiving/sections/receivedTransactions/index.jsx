@@ -44,7 +44,7 @@ const ReceivedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const receivedTransactionResponse = await axios.get(
-        `${apiUrl}/receivedTransaction`
+        `${apiUrl}/api/receivedTransaction`
       );
 
       console.log(receivedTransactionResponse);
@@ -162,7 +162,7 @@ const ReceivedTransactions = ({ user }) => {
 
     try {
       await axios.delete(
-        `${apiUrl}/receivedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].id}`,
+        `${apiUrl}/api/receivedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,
@@ -221,13 +221,13 @@ const ReceivedTransactions = ({ user }) => {
     try {
       if (formData.id) {
         await axios.put(
-          `${apiUrl}/receivedTransaction/${formData.id}`,
+          `${apiUrl}/api/receivedTransaction/${formData.id}`,
           formData
         );
 
         setSuccessMessage("Received Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/receivedTransaction`, formData);
+        await axios.post(`${apiUrl}/api/receivedTransaction`, formData);
 
         setSuccessMessage("Receive Transaction Submitted Successfully!");
       }

@@ -106,7 +106,7 @@ const Attachments = ({
         newFormData.append("createdBy", attachmentFormData.createdBy);
 
         // Add new attachment
-        response = await axios.post(`${apiUrl}/attachment`, newFormData);
+        response = await axios.post(`${apiUrl}/api/attachment`, newFormData);
 
         const newAttachmentData = response.data.newAttachment;
 

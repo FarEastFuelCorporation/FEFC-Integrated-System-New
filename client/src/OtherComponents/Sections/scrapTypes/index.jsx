@@ -41,7 +41,7 @@ const ScrapTypes = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/scrapType`);
+        const response = await axios.get(`${apiUrl}/api/scrapType`);
         setScrapTypes(response.data.scrapTypes);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -103,7 +103,7 @@ const ScrapTypes = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/scrapType/${id}`, {
+      await axios.delete(`${apiUrl}/api/scrapType/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -135,7 +135,7 @@ const ScrapTypes = ({ user }) => {
       if (formData.id) {
         // Update existing scrap type
         response = await axios.put(
-          `${apiUrl}/scrapType/${formData.id}`,
+          `${apiUrl}/api/scrapType/${formData.id}`,
           formData
         );
 
@@ -145,7 +145,7 @@ const ScrapTypes = ({ user }) => {
         setSuccessMessage("Scrap Type Updated Successfully!");
       } else {
         // Add new scrap type
-        response = await axios.post(`${apiUrl}/scrapType`, formData);
+        response = await axios.post(`${apiUrl}/api/scrapType`, formData);
 
         const updatedData = response.data.scrapTypes;
 

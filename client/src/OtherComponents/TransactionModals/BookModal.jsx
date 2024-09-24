@@ -63,7 +63,7 @@ const BookModal = ({
     const fetchData = async () => {
       try {
         const quotationResponse = await axios.get(
-          `${apiUrl}/quotation/${user.id}`
+          `${apiUrl}/api/quotation/${user.id}`
         );
 
         processDataQuotations(quotationResponse);

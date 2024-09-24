@@ -35,7 +35,7 @@ const CertifiedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const treatedTransactionResponse = await axios.get(
-        `${apiUrl}/certifiedTransaction`
+        `${apiUrl}/api/certifiedTransaction`
       );
 
       console.log(treatedTransactionResponse);
@@ -108,7 +108,7 @@ const CertifiedTransactions = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/certifiedTransaction/${row.id}`, {
+      await axios.delete(`${apiUrl}/api/certifiedTransaction/${row.id}`, {
         data: {
           deletedBy: user.id,
           bookedTransactionId: row.bookedTransactionId,
@@ -179,7 +179,7 @@ const CertifiedTransactions = ({ user }) => {
     try {
       console.log(formData);
       if (!formData.id) {
-        await axios.post(`${apiUrl}/certifiedTransaction`, formData);
+        await axios.post(`${apiUrl}/api/certifiedTransaction`, formData);
 
         setSuccessMessage("Certified Transaction Submitted Successfully!");
       }

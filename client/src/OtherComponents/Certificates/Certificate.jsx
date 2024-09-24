@@ -24,7 +24,7 @@ const Certificate = () => {
     const fetchData = async () => {
       try {
         const certificateResponse = await axios.get(
-          `${apiUrl}/certificate/${id}`
+          `${apiUrl}/api/certificate/${id}`
         );
         const attachment = certificateResponse.data.certificateAttachment;
         console.log("Fetched attachment:", attachment);

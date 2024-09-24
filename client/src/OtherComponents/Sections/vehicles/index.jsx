@@ -48,7 +48,7 @@ const Vehicles = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/vehicle`);
+        const response = await axios.get(`${apiUrl}/api/vehicle`);
         const vehicleRecords = response.data;
 
         if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
@@ -67,7 +67,9 @@ const Vehicles = ({ user }) => {
           );
         }
 
-        const vehicleTypeResponse = await axios.get(`${apiUrl}/vehicleType`);
+        const vehicleTypeResponse = await axios.get(
+          `${apiUrl}/api/vehicleType`
+        );
         const sortedVehicleTypes = vehicleTypeResponse.data.vehicleTypes.sort(
           (a, b) => {
             if (a.typeOfVehicle < b.typeOfVehicle) {
@@ -144,7 +146,7 @@ const Vehicles = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/vehicle/${id}`, {
+      await axios.delete(`${apiUrl}/api/vehicle/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -183,7 +185,7 @@ const Vehicles = ({ user }) => {
       if (formData.id) {
         // Update existing vehicle
         response = await axios.put(
-          `${apiUrl}/vehicle/${formData.id}`,
+          `${apiUrl}/api/vehicle/${formData.id}`,
           formData
         );
 
@@ -206,7 +208,7 @@ const Vehicles = ({ user }) => {
         }
       } else {
         // Add new vehicle
-        response = await axios.post(`${apiUrl}/vehicle`, formData);
+        response = await axios.post(`${apiUrl}/api/vehicle`, formData);
 
         const vehicleRecords = response.data;
 

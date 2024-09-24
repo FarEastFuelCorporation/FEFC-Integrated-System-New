@@ -18,7 +18,7 @@ const EmployeeSignup = ({ onLogin }) => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/employeeSignup`,
+        `${apiUrl}/api/employeeSignup`,
         { employeeId, employeeUsername, password },
         { withCredentials: true }
       );

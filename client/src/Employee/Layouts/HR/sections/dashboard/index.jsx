@@ -36,7 +36,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/hrDashboard/employee`);
+        const response = await fetch(`${apiUrl}/api/hrDashboard/employee`);
         const data = await response.json();
 
         setRegularEmployeeCount(data.regularEmployeeCount);

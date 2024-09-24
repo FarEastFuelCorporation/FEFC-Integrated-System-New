@@ -12,9 +12,9 @@ const PieChart = () => {
   useEffect(() => {
     const fetchDepartmentCounts = async () => {
       try {
-        const response = await fetch(`${apiUrl}/hrDashboard/employee`);
+        const response = await fetch(`${apiUrl}/api/hrDashboard/employee`);
         const data = await response.json();
-        console.log(`${apiUrl}/hrDashboard/employee`);
+        console.log(`${apiUrl}/api/hrDashboard/employee`);
         const departmentCounts = data.departmentCounts; // Assuming departmentCounts is directly in response.data
         console.log(departmentCounts);
 

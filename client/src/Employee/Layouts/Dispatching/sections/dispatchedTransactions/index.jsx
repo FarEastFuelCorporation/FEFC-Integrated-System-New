@@ -40,7 +40,7 @@ const DispatchedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const dispatchedTransactionResponse = await axios.get(
-        `${apiUrl}/dispatchedTransaction`
+        `${apiUrl}/api/dispatchedTransaction`
       );
 
       // For pending transactions
@@ -154,7 +154,7 @@ const DispatchedTransactions = ({ user }) => {
 
     try {
       await axios.delete(
-        `${apiUrl}/dispatchedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].id}`,
+        `${apiUrl}/api/dispatchedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].id}`,
         {
           data: {
             deletedBy: user.id,
@@ -208,13 +208,13 @@ const DispatchedTransactions = ({ user }) => {
 
         if (formData.id) {
           await axios.put(
-            `${apiUrl}/dispatchedTransaction/${formData.id}`,
+            `${apiUrl}/api/dispatchedTransaction/${formData.id}`,
             formData
           );
 
           setSuccessMessage("Update Dispatched Transaction successfully!");
         } else {
-          await axios.post(`${apiUrl}/dispatchedTransaction`, formData);
+          await axios.post(`${apiUrl}/api/dispatchedTransaction`, formData);
 
           setSuccessMessage("Dispatch Transaction successfully!");
         }

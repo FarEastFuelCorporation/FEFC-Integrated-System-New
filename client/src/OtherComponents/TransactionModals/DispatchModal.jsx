@@ -32,8 +32,8 @@ const DispatchModal = ({
     const fetchData = async () => {
       try {
         const [employeeResponse, vehicleResponse] = await Promise.all([
-          axios.get(`${apiUrl}/employee`),
-          axios.get(`${apiUrl}/vehicle/${formData.vehicleTypeId}`),
+          axios.get(`${apiUrl}/api/employee`),
+          axios.get(`${apiUrl}/api/vehicle/${formData.vehicleTypeId}`),
         ]);
 
         setEmployeesData(employeeResponse.data.employees);

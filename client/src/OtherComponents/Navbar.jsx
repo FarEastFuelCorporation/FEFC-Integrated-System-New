@@ -41,7 +41,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       // Make a request to logout endpoint
-      const response = await axios.get(`${apiUrl}/logout`, {
+      const response = await axios.get(`${apiUrl}/api/logout`, {
         withCredentials: true, // send cookies if any
       });
 

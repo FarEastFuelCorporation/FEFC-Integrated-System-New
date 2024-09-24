@@ -43,9 +43,11 @@ const EmployeeProfileModal = ({
           departmentResponse,
           employeeAttachmentResponse,
         ] = await Promise.all([
-          axios.get(`${apiUrl}/employee`),
-          axios.get(`${apiUrl}/department`),
-          axios.get(`${apiUrl}/employeeAttachment/${selectedRow.employeeId}`),
+          axios.get(`${apiUrl}/api/employee`),
+          axios.get(`${apiUrl}/api/department`),
+          axios.get(
+            `${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`
+          ),
         ]);
         setEmployeesData(employeeResponse.data.employees);
         setDepartments(departmentResponse.data.departments);

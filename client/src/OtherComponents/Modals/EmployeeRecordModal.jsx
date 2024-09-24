@@ -61,10 +61,10 @@ const EmployeeRecordModal = ({
           employeeResponse,
           departmentResponse,
         ] = await Promise.all([
-          axios.get(`${apiUrl}/geoTable/city`),
-          axios.get(`${apiUrl}/geoTable/province`),
-          axios.get(`${apiUrl}/employee`),
-          axios.get(`${apiUrl}/department`),
+          axios.get(`${apiUrl}/api/geoTable/city`),
+          axios.get(`${apiUrl}/api/geoTable/province`),
+          axios.get(`${apiUrl}/api/employee`),
+          axios.get(`${apiUrl}/api/department`),
         ]);
         setAllCities(allCitiesResponse.data.cities);
         setProvinces(provinceResponse.data.provinces);
@@ -81,7 +81,9 @@ const EmployeeRecordModal = ({
   const fetchCities = async (province) => {
     if (province) {
       try {
-        const response = await axios.get(`${apiUrl}/geoTable/city/${province}`);
+        const response = await axios.get(
+          `${apiUrl}/api/geoTable/city/${province}`
+        );
         console.log(response.data.cities);
         setCities(response.data.cities);
       } catch (error) {
@@ -99,7 +101,7 @@ const EmployeeRecordModal = ({
     if (municipality) {
       try {
         const response = await axios.get(
-          `${apiUrl}/geoTable/barangay/${municipality}`
+          `${apiUrl}/api/geoTable/barangay/${municipality}`
         );
         console.log(response.data.barangays);
         setBarangays(response.data.barangays);
@@ -115,7 +117,9 @@ const EmployeeRecordModal = ({
   const fetchOtherCities = async (province) => {
     if (province) {
       try {
-        const response = await axios.get(`${apiUrl}/geoTable/city/${province}`);
+        const response = await axios.get(
+          `${apiUrl}/api/geoTable/city/${province}`
+        );
         console.log(response.data.cities);
         setOtherCities(response.data.cities);
       } catch (error) {
@@ -133,7 +137,7 @@ const EmployeeRecordModal = ({
     if (municipality) {
       try {
         const response = await axios.get(
-          `${apiUrl}/geoTable/barangay/${municipality}`
+          `${apiUrl}/api/geoTable/barangay/${municipality}`
         );
         console.log(response.data.barangays);
         setOtherBarangays(response.data.barangays);

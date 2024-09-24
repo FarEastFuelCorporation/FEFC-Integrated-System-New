@@ -73,9 +73,9 @@ const Quotations = ({ user }) => {
           user.userType === "TRP" ||
           user.userType === "IFM"
         ) {
-          response = await axios.get(`${apiUrl}/quotation/${user.id}`);
+          response = await axios.get(`${apiUrl}/api/quotation/${user.id}`);
         } else {
-          response = await axios.get(`${apiUrl}/quotation`);
+          response = await axios.get(`${apiUrl}/api/quotation`);
         }
         const quotations = response.data;
 
@@ -159,7 +159,7 @@ const Quotations = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/quotation/${id}`, {
+      await axios.delete(`${apiUrl}/api/quotation/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -186,7 +186,7 @@ const Quotations = ({ user }) => {
 
         // Update existing quotation
         response = await axios.put(
-          `${apiUrl}/quotation/${formData.id}`,
+          `${apiUrl}/api/quotation/${formData.id}`,
           formData
         );
 
@@ -214,7 +214,7 @@ const Quotations = ({ user }) => {
         }
       } else {
         // Add new quotation
-        response = await axios.post(`${apiUrl}/quotation`, formData);
+        response = await axios.post(`${apiUrl}/api/quotation`, formData);
 
         const quotations = response.data;
 

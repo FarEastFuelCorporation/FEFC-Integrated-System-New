@@ -79,7 +79,7 @@ const GeneratorSidebar = ({ user }) => {
     const currentTitle = pathToTitleMap[location.pathname] || "Dashboard";
     setSelected(currentTitle);
   }, [location, pathToTitleMap]);
-  console.log(user);
+
   useEffect(() => {
     if (
       user &&
@@ -91,18 +91,12 @@ const GeneratorSidebar = ({ user }) => {
         user.clientDetails.clientPicture.data
       );
 
-      console.log(user.clientDetails.clientPicture.data);
-      console.log(clientPictureData);
-
       const blob = new Blob([clientPictureData], {
         type: user.clientDetails.clientPicture.type,
       });
 
-      console.log(blob);
-
       const reader = new FileReader();
       reader.onload = () => {
-        console.log(reader.result);
         setProfilePictureSrc(reader.result);
       };
       reader.onerror = () => {
@@ -114,8 +108,6 @@ const GeneratorSidebar = ({ user }) => {
       setProfilePictureSrc("/assets/unknown.png");
     }
   }, [user]);
-
-  console.log(profilePictureSrc);
 
   const initializeClientDetails = useCallback(() => {
     const { clientDetails } = user || {};
@@ -189,18 +181,20 @@ const GeneratorSidebar = ({ user }) => {
       );
       formDataToSend.append("clientPicture", clientDetails.clientPicture);
       formDataToSend.append("submittedBy", clientDetails.submittedBy);
-      console.log(selectedFile);
       // Add clientPicture if it's selected
       if (selectedFile) {
         formDataToSend.append("clientPicture", selectedFile);
       }
       // Update existing client
-      console.log(formDataToSend);
-      await axios.put(`${apiUrl}/client/${clientDetails.id}`, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.put(
+        `${apiUrl}/api/client/${clientDetails.id}`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       // Update the profile picture source if a new file was uploaded
       if (selectedFile) {
@@ -331,6 +325,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
 
             <Typography
@@ -346,6 +341,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Quotations"
@@ -353,6 +349,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Typography
               variant="h6"
@@ -367,6 +364,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Calendar"
@@ -374,6 +372,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="FAQ Page"
@@ -381,6 +380,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<HelpOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
 
             <Typography
@@ -396,6 +396,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Pie Chart"
@@ -403,6 +404,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<PieChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
             <Item
               title="Line Chart"
@@ -410,6 +412,7 @@ const GeneratorSidebar = ({ user }) => {
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              collapsed={isCollapsed}
             />
           </Box>
         </Menu>

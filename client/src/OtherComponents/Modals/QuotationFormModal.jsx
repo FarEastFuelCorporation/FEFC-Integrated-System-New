@@ -49,9 +49,9 @@ const QuotationFormModal = ({
           const apiUrl = process.env.REACT_APP_API_URL;
           const [clientsResponse, wasteTypesResponse, vehicleTypesResponse] =
             await Promise.all([
-              axios.get(`${apiUrl}/client`),
-              axios.get(`${apiUrl}/typeOfWaste`),
-              axios.get(`${apiUrl}/vehicleType`),
+              axios.get(`${apiUrl}/api/client`),
+              axios.get(`${apiUrl}/api/typeOfWaste`),
+              axios.get(`${apiUrl}/api/vehicleType`),
             ]);
 
           setClients(clientsResponse.data.clients);

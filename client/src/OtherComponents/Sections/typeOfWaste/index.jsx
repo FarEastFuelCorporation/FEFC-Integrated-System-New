@@ -46,7 +46,7 @@ const TypeOfWastes = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/typeOfWaste`);
+        const response = await axios.get(`${apiUrl}/api/typeOfWaste`);
         const typeOfWastesRecords = response.data;
         console.log(typeOfWastesRecords.typeOfWastes);
         if (
@@ -66,7 +66,7 @@ const TypeOfWastes = ({ user }) => {
           setTypeOfWastes(flattenedData);
 
           const treatmentProcessResponse = await axios.get(
-            `${apiUrl}/treatmentProcess`
+            `${apiUrl}/api/treatmentProcess`
           );
           const treatmentProcessRecords =
             treatmentProcessResponse.data.treatmentProcesses;
@@ -130,7 +130,7 @@ const TypeOfWastes = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/typeOfWaste/${id}`, {
+      await axios.delete(`${apiUrl}/api/typeOfWaste/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -168,7 +168,7 @@ const TypeOfWastes = ({ user }) => {
       if (formData.id) {
         // Update existing type of waste
         response = await axios.put(
-          `${apiUrl}/typeOfWaste/${formData.id}`,
+          `${apiUrl}/api/typeOfWaste/${formData.id}`,
           formData
         );
 
@@ -196,7 +196,7 @@ const TypeOfWastes = ({ user }) => {
         }
       } else {
         // Add new type of waste
-        response = await axios.post(`${apiUrl}/typeOfWaste`, formData);
+        response = await axios.post(`${apiUrl}/api/typeOfWaste`, formData);
 
         const typeOfWastesRecords = response.data;
 

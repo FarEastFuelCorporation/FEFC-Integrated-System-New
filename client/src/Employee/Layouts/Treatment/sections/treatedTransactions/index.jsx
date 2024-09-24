@@ -43,7 +43,7 @@ const TreatedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const treatedTransactionResponse = await axios.get(
-        `${apiUrl}/treatedTransaction`
+        `${apiUrl}/api/treatedTransaction`
       );
 
       console.log(treatedTransactionResponse);
@@ -125,7 +125,7 @@ const TreatedTransactions = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/treatedTransaction/${row.id}`, {
+      await axios.delete(`${apiUrl}/api/treatedTransaction/${row.id}`, {
         data: {
           deletedBy: user.id,
           bookedTransactionId: row.bookedTransactionId,
@@ -212,7 +212,7 @@ const TreatedTransactions = ({ user }) => {
       console.log(updatedFormData);
 
       if (!formData.id) {
-        await axios.post(`${apiUrl}/treatedTransaction`, updatedFormData);
+        await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
         setSuccessMessage("Treated Transaction Submitted Successfully!");
       }
 

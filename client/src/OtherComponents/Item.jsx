@@ -13,7 +13,6 @@ const Item = ({ title, to, icon, selected, setSelected, collapsed }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    log.info(`Navigating to ${to}`);
     setSelected(title);
     navigate(to);
   };

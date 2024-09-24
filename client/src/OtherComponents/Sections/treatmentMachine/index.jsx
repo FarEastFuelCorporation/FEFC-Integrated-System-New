@@ -48,8 +48,8 @@ const TreatmentMachine = ({ user }) => {
       try {
         const [treatmentProcessResponse, treatmentMachineResponse] =
           await Promise.all([
-            axios.get(`${apiUrl}/treatmentProcess`),
-            axios.get(`${apiUrl}/treatmentMachine`),
+            axios.get(`${apiUrl}/api/treatmentProcess`),
+            axios.get(`${apiUrl}/api/treatmentMachine`),
           ]);
 
         if (
@@ -124,7 +124,7 @@ const TreatmentMachine = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/treatmentMachine/${id}`, {
+      await axios.delete(`${apiUrl}/api/treatmentMachine/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -154,7 +154,7 @@ const TreatmentMachine = ({ user }) => {
       if (formData.id) {
         // Update existing treatment machine
         response = await axios.put(
-          `${apiUrl}/treatmentMachine/${formData.id}`,
+          `${apiUrl}/api/treatmentMachine/${formData.id}`,
           formData
         );
 
@@ -177,7 +177,7 @@ const TreatmentMachine = ({ user }) => {
         }
       } else {
         // Add new treatment machine
-        response = await axios.post(`${apiUrl}/treatmentMachine`, formData);
+        response = await axios.post(`${apiUrl}/api/treatmentMachine`, formData);
 
         if (response && Array.isArray(response.data.treatmentMachines)) {
           const flattenedData = response.data.treatmentMachines.map(

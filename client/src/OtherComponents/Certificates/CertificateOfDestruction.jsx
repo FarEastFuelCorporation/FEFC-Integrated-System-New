@@ -129,7 +129,7 @@ const CertificateOfDestruction = ({ row }) => {
     };
   };
 
-  const qrCodeURL = `${apiUrl}/certificate/${certifiedTransaction.id}`;
+  const qrCodeURL = `${apiUrl}/api/certificate/${certifiedTransaction.id}`;
 
   const generatePDFContent = () => (
     <Box

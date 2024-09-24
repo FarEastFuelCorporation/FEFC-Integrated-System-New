@@ -17,12 +17,10 @@ const ClientLogin = ({ onLogin }) => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/clientLogin`,
+        `${apiUrl}/api/clientLogin`,
         { clientUsername, password },
         { withCredentials: true }
       );
-
-      console.log("Server response:", response.data); // Log the server response
 
       const { user } = response.data;
       onLogin(user); // Update user state in App component

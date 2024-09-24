@@ -17,7 +17,7 @@ const DispatchedTransaction = ({ row }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get(`${apiUrl}/employee`);
+        const { data } = await axios.get(`${apiUrl}/api/employee`);
         setEmployeeData(data.employees);
       } catch (error) {
         console.error("Error fetching employee data:", error);

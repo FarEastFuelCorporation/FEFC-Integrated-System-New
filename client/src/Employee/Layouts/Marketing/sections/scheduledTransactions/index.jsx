@@ -34,7 +34,7 @@ const ScheduledTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const scheduledTransactionResponse = await axios.get(
-        `${apiUrl}/scheduledTransaction`
+        `${apiUrl}/api/scheduledTransaction`
       );
 
       // For pending transactions
@@ -125,7 +125,7 @@ const ScheduledTransactions = ({ user }) => {
     try {
       // Make the delete request
       await axios.delete(
-        `${apiUrl}/scheduledTransaction/${row.ScheduledTransaction[0].id}`,
+        `${apiUrl}/api/scheduledTransaction/${row.ScheduledTransaction[0].id}`,
         {
           data: { deletedBy: user.id },
         }
@@ -156,12 +156,12 @@ const ScheduledTransactions = ({ user }) => {
     try {
       if (formData.id) {
         await axios.put(
-          `${apiUrl}/scheduledTransaction/${formData.id}`,
+          `${apiUrl}/api/scheduledTransaction/${formData.id}`,
           formData
         );
         setSuccessMessage("Scheduled Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/scheduledTransaction`, formData);
+        await axios.post(`${apiUrl}/api/scheduledTransaction`, formData);
         setSuccessMessage("Scheduled Transaction Submitted Successfully!");
       }
 

@@ -50,11 +50,11 @@ const Clients = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/client`);
+        const response = await axios.get(`${apiUrl}/api/client`);
         const clientRecords = response.data;
 
         console.log(apiUrl);
-        console.log(axios.get(`${apiUrl}/client`));
+        console.log(axios.get(`${apiUrl}/api/client`));
         console.log(clientRecords.clients);
 
         if (clientRecords && Array.isArray(clientRecords.clients)) {
@@ -119,7 +119,7 @@ const Clients = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/client/${id}`, {
+      await axios.delete(`${apiUrl}/api/client/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -178,7 +178,7 @@ const Clients = ({ user }) => {
       if (formData.id) {
         // Update existing client
         response = await axios.put(
-          `${apiUrl}/client/${formData.id}`,
+          `${apiUrl}/api/client/${formData.id}`,
           formDataToSend
         );
 
@@ -194,7 +194,7 @@ const Clients = ({ user }) => {
         }
       } else {
         // Add new client
-        response = await axios.post(`${apiUrl}/client`, formDataToSend);
+        response = await axios.post(`${apiUrl}/api/client`, formDataToSend);
 
         const clientRecords = response.data;
 

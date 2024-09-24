@@ -41,7 +41,7 @@ const Departments = ({ user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/department`);
+        const response = await axios.get(`${apiUrl}/api/department`);
         setDepartments(response.data.departments);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -103,7 +103,7 @@ const Departments = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/department/${id}`, {
+      await axios.delete(`${apiUrl}/api/department/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -135,7 +135,7 @@ const Departments = ({ user }) => {
       if (formData.id) {
         // Update existing department
         response = await axios.put(
-          `${apiUrl}/department/${formData.id}`,
+          `${apiUrl}/api/department/${formData.id}`,
           formData
         );
 
@@ -145,7 +145,7 @@ const Departments = ({ user }) => {
         setSuccessMessage("Department Updated Successfully!");
       } else {
         // Add new department
-        response = await axios.post(`${apiUrl}/department`, formData);
+        response = await axios.post(`${apiUrl}/api/department`, formData);
 
         const updatedData = response.data.departments;
 

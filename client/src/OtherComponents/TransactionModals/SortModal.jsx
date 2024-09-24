@@ -41,8 +41,8 @@ const SortModal = ({
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
           const [quotationsResponse, scrapTypesResponse] = await Promise.all([
-            axios.get(`${apiUrl}/quotation/${formData.clientId}`),
-            axios.get(`${apiUrl}/scrapType`),
+            axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
+            axios.get(`${apiUrl}/api/scrapType`),
           ]);
           console.log(formData.clientId);
           console.log(quotationsResponse.data.quotations);

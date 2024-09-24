@@ -46,7 +46,6 @@ const App = () => {
       axios
         .get(`${apiUrl}/api/session`, { withCredentials: true })
         .then((response) => {
-          console.log("Session data fetched:", response.data);
           setUser(response.data.user);
         })
         .catch((error) => {

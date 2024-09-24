@@ -43,8 +43,8 @@ const TreatModal = ({
           const apiUrl = process.env.REACT_APP_API_URL;
           const [treatmentProcessesResponse, treatmentMachinesResponse] =
             await Promise.all([
-              axios.get(`${apiUrl}/treatmentProcess`),
-              axios.get(`${apiUrl}/treatmentMachine`),
+              axios.get(`${apiUrl}/api/treatmentProcess`),
+              axios.get(`${apiUrl}/api/treatmentMachine`),
             ]);
 
           setTreatmentProcesses(

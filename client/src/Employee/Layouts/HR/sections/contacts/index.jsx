@@ -116,8 +116,8 @@ const Contacts = ({ user }) => {
     const fetchData = async () => {
       try {
         const [employeeRecordResponse, departmentResponse] = await Promise.all([
-          axios.get(`${apiUrl}/employeeRecord`),
-          axios.get(`${apiUrl}/department`),
+          axios.get(`${apiUrl}/api/employeeRecord`),
+          axios.get(`${apiUrl}/api/department`),
         ]);
 
         console.log(employeeRecordResponse.data.employeeRecords);
@@ -539,7 +539,7 @@ const Contacts = ({ user }) => {
       if (formData.id) {
         // Update existing employee record
         response = await axios.put(
-          `${apiUrl}/employeeRecord/${formData.id}`,
+          `${apiUrl}/api/employeeRecord/${formData.id}`,
           formDataToSend
         );
         console.log(response.data.employeeRecord);
@@ -547,7 +547,10 @@ const Contacts = ({ user }) => {
         setSuccessMessage("Employee Record Updated Successfully!");
       } else {
         // Add new employee record
-        response = await axios.post(`${apiUrl}/employeeRecord`, formDataToSend);
+        response = await axios.post(
+          `${apiUrl}/api/employeeRecord`,
+          formDataToSend
+        );
         setEmployeeRecord(response.data.employeeRecords);
         setSuccessMessage("Employee Record Added Successfully!");
       }

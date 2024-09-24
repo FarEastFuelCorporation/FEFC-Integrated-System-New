@@ -41,9 +41,8 @@ const BookedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const bookedTransactionResponse = await axios.get(
-        `${apiUrl}/bookedTransaction`
+        `${apiUrl}/api/bookedTransaction`
       );
-      console.log(bookedTransactionResponse);
 
       // For pending transactions
       setPendingTransactions(
@@ -66,7 +65,6 @@ const BookedTransactions = ({ user }) => {
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    console.log("Fetching data");
     fetchData();
   }, [fetchData]);
 
@@ -108,7 +106,7 @@ const BookedTransactions = ({ user }) => {
       window.confirm("Are you sure you want to delete this Book Transaction?")
     ) {
       try {
-        await axios.delete(`${apiUrl}/bookedTransaction/${row.id}`, {
+        await axios.delete(`${apiUrl}/api/bookedTransaction/${row.id}`, {
           data: { deletedBy: user.id },
         });
 
@@ -150,11 +148,14 @@ const BookedTransactions = ({ user }) => {
 
     try {
       if (formData.id) {
-        await axios.put(`${apiUrl}/bookedTransaction/${formData.id}`, formData);
+        await axios.put(
+          `${apiUrl}/api/bookedTransaction/${formData.id}`,
+          formData
+        );
 
         setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/bookedTransaction`, formData);
+        await axios.post(`${apiUrl}/api/bookedTransaction`, formData);
         setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
 

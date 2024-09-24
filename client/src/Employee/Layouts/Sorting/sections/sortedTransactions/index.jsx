@@ -50,7 +50,7 @@ const SortedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       const sortedTransactionResponse = await axios.get(
-        `${apiUrl}/sortedTransaction`
+        `${apiUrl}/api/sortedTransaction`
       );
 
       console.log(sortedTransactionResponse);
@@ -195,7 +195,7 @@ const SortedTransactions = ({ user }) => {
 
     try {
       await axios.delete(
-        `${apiUrl}/sortedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
+        `${apiUrl}/api/sortedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,
@@ -250,11 +250,14 @@ const SortedTransactions = ({ user }) => {
     try {
       console.log(formData);
       if (formData.id) {
-        await axios.put(`${apiUrl}/sortedTransaction/${formData.id}`, formData);
+        await axios.put(
+          `${apiUrl}/api/sortedTransaction/${formData.id}`,
+          formData
+        );
 
         setSuccessMessage("Sorted Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/sortedTransaction`, formData);
+        await axios.post(`${apiUrl}/api/sortedTransaction`, formData);
 
         setSuccessMessage("Sorted Transaction Submitted Successfully!");
       }

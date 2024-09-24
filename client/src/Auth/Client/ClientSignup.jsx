@@ -18,7 +18,7 @@ const ClientSignup = ({ onLogin }) => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/clientSignup`,
+        `${apiUrl}/api/clientSignup`,
         { clientId, clientUsername, password },
         { withCredentials: true }
       );

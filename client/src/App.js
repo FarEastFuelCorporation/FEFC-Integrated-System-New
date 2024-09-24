@@ -22,7 +22,7 @@ import Certificate from "./OtherComponents/Certificates/Certificate";
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [user, setUser] = useState(null); // State to hold user information
-  const [loading, setLoading] = useState(false); // State to indicate loading
+  const [loading, setLoading] = useState(true); // Start loading as true
   const [theme, colorMode] = useMode();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,33 +31,40 @@ const App = () => {
   const handleLogin = (userData) => {
     setUser(userData);
     navigate("/dashboard");
-    setLoading(false); // Set loading to false after user data is set and navigation is done
+    setLoading(false);
   };
 
   const handleUpdateUser = (updatedUser) => {
     setUser(updatedUser);
   };
 
-  // Function to fetch session data if the current route is "/dashboard"
+  // Function to fetch session data when the app loads
   useEffect(() => {
-    // Only fetch session data if user is not already set
-    if (!user && location.pathname.startsWith("/dashboard")) {
-      setLoading(true);
-      axios
-        .get(`${apiUrl}/api/session`, { withCredentials: true })
-        .then((response) => {
-          console.log("Session data fetched:", response.data);
-          setUser(response.data.user);
-        })
-        .catch((error) => {
-          console.error("Error fetching session data:", error);
-          navigate("/login");
-        })
-        .finally(() => {
-          setLoading(false);
+    const fetchSessionData = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/session`, {
+          withCredentials: true,
         });
+        console.log("Session data fetched:", response.data);
+        setUser(response.data.user); // Set user data from session
+      } catch (error) {
+        console.error("Error fetching session data:", error);
+        // If there is an error (user not logged in), navigate to login
+        if (location.pathname.startsWith("/dashboard")) {
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false); // Set loading to false after fetching
+      }
+    };
+
+    // Fetch session data only if user is not already set
+    if (!user) {
+      fetchSessionData();
+    } else {
+      setLoading(false); // No need to load again if user is already set
     }
-  }, [location.pathname, apiUrl, navigate, user]);
+  }, [apiUrl, navigate, user, location.pathname]);
 
   if (loading) {
     return <LoadingSpinner theme={theme} />;

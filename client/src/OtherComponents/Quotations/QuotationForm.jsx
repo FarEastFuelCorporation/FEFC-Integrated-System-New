@@ -787,6 +787,10 @@ const QuotationForm = ({ row }) => {
             <Box mt={3}>
               <Box>
                 <Box></Box>
+                <SignatureComponent
+                  signature={quotationData.IdInformation.signature}
+                  style={{ top: "-40px", left: "30px" }}
+                />
                 <Typography
                   fontWeight="bold"
                   textDecoration=""
@@ -794,10 +798,6 @@ const QuotationForm = ({ row }) => {
                   position="relative"
                   sx={{ textDecoration: "underline" }}
                 >
-                  <SignatureComponent
-                    signature={quotationData.IdInformation.signature}
-                    style={{ top: "-40px", left: "30px" }}
-                  />
                   {quotationData.IdInformation.first_name}{" "}
                   {quotationData.IdInformation.last_name}
                 </Typography>
@@ -811,6 +811,7 @@ const QuotationForm = ({ row }) => {
               Checked By:
             </Typography>
             <Box mt={3}>
+              <SignatureComponent signature={accountingManagerSignature} />
               <Typography
                 fontWeight="bold"
                 id="noted_user"
@@ -818,7 +819,6 @@ const QuotationForm = ({ row }) => {
                 position="relative"
                 sx={{ textDecoration: "underline" }}
               >
-                <SignatureComponent signature={accountingManagerSignature} />
                 DAISY CARDINEZ
               </Typography>
             </Box>
@@ -829,6 +829,7 @@ const QuotationForm = ({ row }) => {
               Checked By:
             </Typography>
             <Box mt={3}>
+              <SignatureComponent signature={vicePresidentSignature} />
               <Typography
                 fontWeight="bold"
                 id="noted_user"
@@ -836,7 +837,6 @@ const QuotationForm = ({ row }) => {
                 position="relative"
                 sx={{ textDecoration: "underline" }}
               >
-                <SignatureComponent signature={vicePresidentSignature} />
                 EXEQUIEL DE VERA
               </Typography>
             </Box>

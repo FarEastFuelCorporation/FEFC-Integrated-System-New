@@ -144,6 +144,17 @@ async function getQuotationsController(req, res) {
         {
           model: QuotationWaste,
           as: "QuotationWaste",
+          include: [
+            {
+              model: TypeOfWaste,
+              as: "TypeOfWaste",
+              attributes: ["wasteCode"],
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
+            },
+          ],
         },
         {
           model: QuotationTransportation,
@@ -152,6 +163,10 @@ async function getQuotationsController(req, res) {
             {
               model: VehicleType,
               as: "VehicleType",
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
             },
           ],
         },

@@ -27,6 +27,8 @@ const BookedTransactions = ({ user }) => {
     [user.id]
   );
 
+  console.log(user);
+
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [pendingTransactions, setPendingTransactions] = useState([]);
@@ -40,8 +42,12 @@ const BookedTransactions = ({ user }) => {
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
+      console.log(user.id);
       const bookedTransactionResponse = await axios.get(
-        `${apiUrl}/api/bookedTransaction`
+        `${apiUrl}/api/bookedTransaction`,
+        {
+          params: { user: user.id },
+        }
       );
 
       // For pending transactions
@@ -61,7 +67,7 @@ const BookedTransactions = ({ user }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl]);
+  }, [apiUrl, user.id]);
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {

@@ -125,10 +125,13 @@ const Quotations = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleDownloadClick = (id) => {
+  const handleDownloadClick = (row) => {
+    console.log(row);
+    console.log(row.QuotationWaste[0].quotationId);
     const quotationToDownload = quotationsData.find(
-      (quotation) => quotation.id === id
+      (quotation) => quotation.id === row.QuotationWaste[0].quotationId
     );
+    console.log(quotationToDownload);
     setSelectedQuotation(quotationToDownload); // Set the selected quotation
     // setOpenQuotationModal(true); // Open the modal
   };
@@ -390,7 +393,7 @@ const Quotations = ({ user }) => {
         renderCell: (params) => (
           <IconButton
             color="secondary"
-            onClick={() => handleDownloadClick(params.row.id)}
+            onClick={() => handleDownloadClick(params.row)}
           >
             <DownloadIcon sx={{ fontSize: "2rem" }} />
           </IconButton>
@@ -479,7 +482,7 @@ const Quotations = ({ user }) => {
             width: "80%",
           }}
         >
-          <QuotationForm quotation={selectedQuotation} />
+          <QuotationForm row={selectedQuotation} />
         </div>
       </Modal>
     </Box>

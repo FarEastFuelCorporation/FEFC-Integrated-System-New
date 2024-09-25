@@ -31,3 +31,15 @@ export const formatWeightWithNA = (weight) => {
     maximumFractionDigits: 2,
   }).format(weight);
 };
+
+export const formatDate = (date) => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+};
+
+export const formatDateFull = (date) => {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+};

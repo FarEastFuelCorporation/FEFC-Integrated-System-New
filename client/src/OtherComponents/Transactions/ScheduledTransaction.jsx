@@ -39,8 +39,10 @@ const ScheduledTransaction = ({ row }) => {
 
       {row.statusId === 1 ? (
         <>
-          {renderStatusHeader("For Schedule")}
-          {renderDetail("Status", "Pending")}
+          <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
+            For Schedule
+          </Typography>
+          <Typography variant="h5">Pending</Typography>
         </>
       ) : (
         <>

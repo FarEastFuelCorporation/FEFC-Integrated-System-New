@@ -190,10 +190,17 @@ const getIncludeOptions = () => [
 ];
 
 // Get Pending Transactions (where statusId equals given value)
-const getPendingTransactions = async (statusId) => {
+const getPendingTransactions = async (statusId, user = null) => {
   try {
+    // Build the where clause dynamically
+    const whereConditions = { statusId }; // Always include statusId
+
+    // If user is provided, add user-specific condition (e.g., createdBy)
+    if (user) {
+      whereConditions.createdBy = user;
+    }
     const bookedTransactions = await BookedTransaction.findAll({
-      where: { statusId }, // Use the statusId parameter dynamically
+      where: whereConditions,
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
     });
@@ -206,14 +213,21 @@ const getPendingTransactions = async (statusId) => {
 };
 
 // Get In Progress Transactions (where statusId is greater than given value)
-const getInProgressTransactions = async (statusId) => {
+const getInProgressTransactions = async (statusId, user = null) => {
   try {
-    const bookedTransactions = await BookedTransaction.findAll({
-      where: {
-        statusId: {
-          [Op.gt]: statusId, // Status ID greater than the given value
-        },
+    // Build the base where conditions
+    const whereConditions = {
+      statusId: {
+        [Op.gt]: statusId, // Status ID greater than the given value
       },
+    };
+
+    // If user is provided, add the condition for createdBy (or whatever the user field is)
+    if (user) {
+      whereConditions.createdBy = user;
+    }
+    const bookedTransactions = await BookedTransaction.findAll({
+      where: whereConditions,
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
     });
@@ -226,7 +240,7 @@ const getInProgressTransactions = async (statusId) => {
 };
 
 // Get In Finished Transactions (where statusId is greater than given value)
-const getFinishedTransactions = async () => {
+const getFinishedTransactions = async (user = null) => {
   try {
     const bookedTransactions = await BookedTransaction.findAll({
       where: {
@@ -243,14 +257,14 @@ const getFinishedTransactions = async () => {
   }
 };
 
-const fetchData = async (statusId) => {
+const fetchData = async (statusId, user = null) => {
   try {
     // Fetch all transactions concurrently
     const [pendingTransactions, inProgressTransactions, finishedTransactions] =
       await Promise.all([
-        getPendingTransactions(statusId),
-        getInProgressTransactions(statusId),
-        getFinishedTransactions(statusId),
+        getPendingTransactions(statusId, user),
+        getInProgressTransactions(statusId, user),
+        getFinishedTransactions(user),
       ]);
 
     // Return the results as an object or process them as needed

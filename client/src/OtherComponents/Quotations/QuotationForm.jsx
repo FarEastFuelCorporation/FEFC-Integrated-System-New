@@ -17,6 +17,7 @@ import pco_signature from "../../images/pco_signature.png";
 import pm_signature from "../../images/pm_signature.png";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { formatDateFull } from "../Functions";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
@@ -27,6 +28,16 @@ const QuotationForm = ({ row }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
+
+  console.log(row);
+
+  const quotationData = row.QuotationWaste[0].Quotation;
+
+  const today = new Date();
+
+  // Get the date one month from today
+  const datePlusOneMonth = new Date();
+  datePlusOneMonth.setMonth(today.getMonth() + 1);
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
@@ -49,7 +60,7 @@ const QuotationForm = ({ row }) => {
     });
   };
 
-  //   const qrCodeURL = `${apiUrl}/api/certificate/${certifiedTransaction.id}`;
+  const qrCodeURL = `${apiUrl}/api/quotation/${quotationData.id}`;
 
   const generatePDFContent = () => (
     <Box
@@ -107,89 +118,88 @@ const QuotationForm = ({ row }) => {
           </Box>
           <Box display="flex" gap="20px">
             <Box>
-              <Typography variant="h6" fontStyle="italic">
+              <Typography variant="h6" fontStyle="italic" textAlign="center">
                 Quotation Number
               </Typography>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                id="qlf_form_no_container"
-              ></Typography>
-              <Typography variant="h6" fontStyle="italic">
+              <Typography variant="h6" fontWeight="bold" textAlign="center">
+                {quotationData.quotationCode}
+              </Typography>
+              <Typography variant="h6" fontStyle="italic" textAlign="center">
                 Date
               </Typography>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                id="date_made_container"
-              ></Typography>
+              <Typography variant="h6" fontWeight="bold" textAlign="center">
+                {formatDateFull(today)}
+              </Typography>
             </Box>
             <Box>
-              <Typography variant="h6" fontStyle="italic">
+              <Typography variant="h6" fontStyle="italic" textAlign="center">
                 Revision Number
               </Typography>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                id="revision_number_container"
-              ></Typography>
-              <Typography variant="h6" fontStyle="italic">
+              <Typography variant="h6" fontWeight="bold" textAlign="center">
+                {quotationData.revisionNumber}
+              </Typography>
+              <Typography variant="h6" fontStyle="italic" textAlign="center">
                 Valid Until
               </Typography>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                id="valid_until_container"
-              ></Typography>
+              <Typography variant="h6" fontWeight="bold" textAlign="center">
+                {formatDateFull(datePlusOneMonth)}
+              </Typography>
             </Box>
           </Box>
         </Box>
 
         {/* Customer Summary */}
-        <Box className="customer_summary" mt={4}>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">
+        <Box mt={4} display="grid" gridTemplateColumns="50% 50%">
+          <Box sx={{ height: "100%", border: "1px solid black", padding: 1 }}>
+            <Typography variant="h5" fontWeight="bold" textAlign="center">
               MAIN OFFICE ADDRESS
             </Typography>
-            <Typography
-              id="client_name_container"
-              fontWeight="bold"
-            ></Typography>
-            <Typography id="address_container" fontSize="10px"></Typography>
-            <Typography id="tin_id_container" fontSize="10px"></Typography>
-            <Typography
-              id="nature_of_business_container"
-              fontSize="10px"
-            ></Typography>
+            <Typography fontWeight="bold">{row.Client.clientName}</Typography>
+            <Typography fontSize="12px">{row.Client.address}</Typography>
+            <Typography fontSize="12px"></Typography>
             <Box display="flex" fontSize="10px">
-              <Typography>Contact #:</Typography>
+              <Typography>
+                {row.Client.contactNumber
+                  ? "Contact #: " + row.Client.contactNumber
+                  : ""}
+              </Typography>
               <Typography id="contact_number" pl={1}></Typography>
             </Box>
           </Box>
 
-          <Box mt={2}>
-            <Typography variant="h5" fontWeight="bold">
+          <Box
+            sx={{
+              height: "100%",
+              border: "1px solid black",
+              borderLeft: "none",
+              padding: 1,
+            }}
+          >
+            <Typography variant="h5" fontWeight="bold" textAlign="center">
               FIELD OFFICE ADDRESS
             </Typography>
-            <Typography
-              id="client_name_container2"
-              fontWeight="bold"
-            ></Typography>
-            <Typography id="address_container2" fontSize="10px"></Typography>
-            <Typography id="tin_id_container2" fontSize="10px"></Typography>
-            <Typography
-              id="nature_of_business_container2"
-              fontSize="10px"
-            ></Typography>
+            <Typography fontWeight="bold">{row.Client.billerName}</Typography>
+            <Typography fontWeight="bold">
+              {row.Client.billerContactPerson}
+            </Typography>
+            <Typography fontSize="12px">{row.Client.billerAddress}</Typography>
+            <Typography fontSize="12px"></Typography>
+            <Box display="flex" fontSize="10px">
+              <Typography>
+                {row.Client.billerContactNumber
+                  ? "Contact #: " + row.Client.billerContactNumber
+                  : ""}
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
         {/* Scope of Work */}
-        <Box className="scope" mt={4}>
-          <Typography variant="h5" fontWeight="bold">
+        <Box sx={{ border: "1px solid black", padding: 0.5 }}>
+          <Typography variant="h5" fontWeight="bold" textAlign="center">
             SCOPE OF WORK
           </Typography>
-          <Typography id="scope_of_work_input"></Typography>
+          <Typography>{quotationData.scopeOfWork}</Typography>
         </Box>
 
         {/* Account Details */}
@@ -320,6 +330,7 @@ const QuotationForm = ({ row }) => {
               ></Typography>
             </Box>
             <Typography>General Manager</Typography>
+            <QRCode value={qrCodeURL} size={80} />
           </Box>
         </Box>
       </Box>

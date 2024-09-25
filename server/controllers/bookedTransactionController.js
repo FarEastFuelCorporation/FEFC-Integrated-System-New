@@ -61,8 +61,10 @@ async function createBookedTransactionController(req, res) {
 // Get Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
   try {
+    const { user } = req.query;
+
     // fetch transactions
-    const data = await fetchData(statusId);
+    const data = await fetchData(statusId, user);
 
     res.status(200).json({
       pendingTransactions: data.pending,

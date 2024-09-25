@@ -379,7 +379,7 @@ async function deleteQuotationController(req, res) {
 
     // Find the client by UUID (id)
     const quotationToDelete = await Quotation.findByPk(id);
-    console.log(quotationToDelete);
+
     if (quotationToDelete) {
       // Soft delete the client (sets deletedAt timestamp)
       await quotationToDelete.destroy();

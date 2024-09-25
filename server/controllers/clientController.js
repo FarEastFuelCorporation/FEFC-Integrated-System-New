@@ -164,7 +164,7 @@ async function deleteClientController(req, res) {
     console.log("Soft deleting client with ID:", id);
 
     // Find the client by UUID (id)
-    const clientToDelete = await Client.findOne({ id });
+    const clientToDelete = await Client.findByPk(id);
 
     if (clientToDelete) {
       // Update the deletedBy field

@@ -208,6 +208,7 @@ const QuotationForm = forwardRef(({ row }, ref) => {
                       borderRight: "none",
                       color: "black",
                       textAlign: "center",
+                      width: "40px",
                     }}
                   >
                     Item
@@ -234,6 +235,7 @@ const QuotationForm = forwardRef(({ row }, ref) => {
                       borderRight: "none",
                       color: "black",
                       textAlign: "center",
+                      width: "40px",
                     }}
                   >
                     Qty.
@@ -430,6 +432,7 @@ const QuotationForm = forwardRef(({ row }, ref) => {
                       borderRight: "none",
                       color: "black",
                       textAlign: "center",
+                      width: "40px",
                     }}
                   >
                     Item
@@ -469,6 +472,7 @@ const QuotationForm = forwardRef(({ row }, ref) => {
                       borderRight: "none",
                       color: "black",
                       textAlign: "center",
+                      width: "40px",
                     }}
                   >
                     Qty.

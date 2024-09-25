@@ -20,14 +20,13 @@ async function createDocumentController(req, res) {
     }
 
     // Create Document entry
-    const newDocumentData = await Document.create({
+    await Document.create({
       fileName,
       attachment,
       createdBy,
     });
 
-    // Retrieve the newDocument with the associated Employee data
-    const newDocument = await Document.findByPk(newDocumentData.id, {
+    const documents = await Document.findAll({
       include: [
         {
           model: Employee,
@@ -36,8 +35,8 @@ async function createDocumentController(req, res) {
         },
       ],
     });
-    // Respond with the updated data
-    res.status(201).json({ newDocument });
+
+    res.status(200).json({ documents }); // Send the documents directly in the response
   } catch (error) {
     // Handling errors
     console.error("Error:", error);

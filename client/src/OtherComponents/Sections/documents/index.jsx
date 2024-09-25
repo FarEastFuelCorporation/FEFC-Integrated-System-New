@@ -125,19 +125,15 @@ const Documents = ({ user }) => {
         // Add new attachment
         response = await axios.post(`${apiUrl}/api/document`, newFormData);
 
-        const newAttachmentData = response.data.newAttachment;
+        // Map over the fetched data to add the attachmentCreatedBy field
+        const mappedAttachmentData = response.data.documents.map(
+          (attachment) => ({
+            ...attachment,
+            attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
+          })
+        );
 
-        // Process the new attachment to include attachmentCreatedBy
-        const processedNewAttachment = {
-          ...newAttachmentData,
-          attachmentCreatedBy: `${newAttachmentData.Employee.firstName} ${newAttachmentData.Employee.lastName}`,
-        };
-
-        // Update the attachmentData with the new processed attachment
-        setAttachmentData((prevAttachmentData) => [
-          ...prevAttachmentData,
-          processedNewAttachment,
-        ]);
+        setAttachmentData(mappedAttachmentData);
 
         setSuccessMessage("Attachment Added Successfully!");
       }
@@ -322,7 +318,7 @@ const Documents = ({ user }) => {
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
-        <Header title="Waste Types" subtitle="List of Waste Types" />
+        <Header title="Documnets" subtitle="List of FEFC Documents" />
         {user.userType === 2 && (
           <Box display="flex">
             <IconButton onClick={handleOpenAttachmentModal}>

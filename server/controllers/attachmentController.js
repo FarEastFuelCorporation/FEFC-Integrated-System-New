@@ -56,7 +56,6 @@ async function getAttachmentsController(req, res) {
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
-    await transaction.rollback();
     res.status(500).json({ message: "Internal server error" });
   }
 }

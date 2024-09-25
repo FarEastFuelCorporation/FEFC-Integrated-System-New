@@ -7,6 +7,7 @@ import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
 import Quotations from "../../OtherComponents/Sections/quotations";
 import ScheduledTransactions from "../../Employee/Layouts/Marketing/sections/scheduledTransactions";
 import Commissions from "../../OtherComponents/Sections/commissions";
+import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../../Employee/Layouts/Marketing/sections/calendar";
 import FAQ from "../../Employee/Layouts/Marketing/sections/faq";
 import Bar from "../../Employee/Layouts/Marketing/sections/bar";
@@ -26,6 +27,7 @@ const MarketingRoutes = ({ user }) => (
         element={<ScheduledTransactions user={user} />}
       />
       <Route path="commissions" element={<Commissions />} />
+      <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />

@@ -34,6 +34,7 @@ const Department = require("../models/Department");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const EmployeeAttachment = require("../models/EmployeeAttachment");
 const IdInformation = require("../models/IdInformation");
+const Document = require("../models/Document");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -129,6 +130,17 @@ Employee.hasMany(Attachment, {
   sourceKey: "employeeId",
 });
 Attachment.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(Document, {
+  as: "Document",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+Document.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",

@@ -11,6 +11,7 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import PaidIcon from "@mui/icons-material/Paid";
+import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -35,6 +36,7 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
       "/dashboard/commissions": "Commissions",
+      "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
@@ -227,6 +229,14 @@ const MarketingSidebar = ({ user }) => {
               title="Commissions"
               to="commissions"
               icon={<PaidIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Documents"
+              to="documents"
+              icon={<TopicIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

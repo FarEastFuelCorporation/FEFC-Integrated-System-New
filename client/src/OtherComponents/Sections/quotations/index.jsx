@@ -134,10 +134,12 @@ const Quotations = ({ user }) => {
     console.log(quotationToDownload);
     setSelectedQuotation(quotationToDownload); // Set the selected quotation
     setOpenQuotationModal(true); // Open the modal
+    console.log(openQuotationModal);
   };
 
   const handleCloseQuotationModal = () => {
     setOpenQuotationModal(false);
+    console.log(openQuotationModal);
     setSelectedQuotation("");
   };
 

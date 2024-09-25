@@ -784,24 +784,20 @@ const QuotationForm = ({ row }) => {
             <Typography variant="h6" pl={2}>
               Prepared By:
             </Typography>
-            <Box mt={3}>
-              <Box>
-                <Box></Box>
-                <SignatureComponent
-                  signature={quotationData.IdInformation.signature}
-                  style={{ top: "-40px", left: "30px" }}
-                />
-                <Typography
-                  fontWeight="bold"
-                  textDecoration=""
-                  textAlign="center"
-                  position="relative"
-                  sx={{ textDecoration: "underline" }}
-                >
-                  {quotationData.IdInformation.first_name}{" "}
-                  {quotationData.IdInformation.last_name}
-                </Typography>
-              </Box>
+            <Box mt={3} position="relative">
+              <SignatureComponent
+                signature={quotationData.IdInformation.signature}
+                style={{ top: "-40px", left: "30px" }}
+              />
+              <Typography
+                fontWeight="bold"
+                textDecoration=""
+                textAlign="center"
+                sx={{ textDecoration: "underline" }}
+              >
+                {quotationData.IdInformation.first_name}{" "}
+                {quotationData.IdInformation.last_name}
+              </Typography>
               <Typography textAlign="center">Marketing Staff / CSR</Typography>
             </Box>
           </Box>
@@ -810,13 +806,12 @@ const QuotationForm = ({ row }) => {
             <Typography variant="h6" pl={2}>
               Checked By:
             </Typography>
-            <Box mt={3}>
+            <Box mt={3} position="relative">
               <SignatureComponent signature={accountingManagerSignature} />
               <Typography
                 fontWeight="bold"
                 id="noted_user"
                 textAlign="center"
-                position="relative"
                 sx={{ textDecoration: "underline" }}
               >
                 DAISY CARDINEZ
@@ -828,13 +823,12 @@ const QuotationForm = ({ row }) => {
             <Typography variant="h6" pl={2}>
               Checked By:
             </Typography>
-            <Box mt={3}>
+            <Box mt={3} position="relative">
               <SignatureComponent signature={vicePresidentSignature} />
               <Typography
                 fontWeight="bold"
                 id="noted_user"
                 textAlign="center"
-                position="relative"
                 sx={{ textDecoration: "underline" }}
               >
                 EXEQUIEL DE VERA

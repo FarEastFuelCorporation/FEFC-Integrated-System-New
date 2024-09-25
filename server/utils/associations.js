@@ -33,6 +33,7 @@ const GeoTable = require("../models/GeoTable");
 const Department = require("../models/Department");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const EmployeeAttachment = require("../models/EmployeeAttachment");
+const IdInformation = require("../models/IdInformation");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -91,13 +92,11 @@ Employee.hasMany(VehicleMaintenanceRequest, {
   as: "VehicleMaintenanceRequest",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 VehicleMaintenanceRequest.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 EmployeeRole.belongsToMany(Employee, {
@@ -105,105 +104,100 @@ EmployeeRole.belongsToMany(Employee, {
   foreignKey: "employeeRoleId",
   otherKey: "employeeId",
   as: "Employees",
-  onDelete: "CASCADE",
 });
 Employee.belongsToMany(EmployeeRole, {
   through: EmployeeRolesEmployee,
   foreignKey: "employeeId",
   otherKey: "employeeRoleId",
   as: "EmployeeRoles",
-  onDelete: "CASCADE",
+});
+
+IdInformation.hasMany(Quotation, {
+  as: "Quotation",
+  foreignKey: "createdBy",
+  sourceKey: "employee_id",
+});
+Quotation.belongsTo(IdInformation, {
+  as: "IdInformation",
+  foreignKey: "createdBy",
+  targetKey: "employee_id",
 });
 
 Employee.hasMany(Attachment, {
   as: "Attachment",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 Attachment.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 Employee.hasMany(ScheduledTransaction, {
   as: "ScheduledTransaction",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 ScheduledTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 Employee.hasMany(DispatchedTransaction, {
   as: "DispatchedTransaction",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 DispatchedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 Employee.hasMany(ReceivedTransaction, {
   as: "ReceivedTransaction",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 ReceivedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 Employee.hasMany(SortedTransaction, {
   as: "SortedTransaction",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 SortedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 Employee.hasMany(TreatedTransaction, {
   as: "TreatedTransaction",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 TreatedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 Employee.hasMany(CertifiedTransaction, {
   as: "CertifiedTransaction",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 CertifiedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 VehicleType.hasMany(Vehicle, {
@@ -431,13 +425,11 @@ Employee.hasMany(DispatchedTransaction, {
   as: "DispatchedTransactionDriver",
   foreignKey: "driverId",
   sourceKey: "employeeId",
-  onDelete: "CASCADE",
 });
 DispatchedTransaction.belongsTo(Employee, {
   as: "EmployeeDriver",
   foreignKey: "driverId",
   targetKey: "employeeId",
-  onDelete: "CASCADE",
 });
 
 DispatchedTransaction.hasMany(ReceivedTransaction, {

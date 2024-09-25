@@ -1,6 +1,8 @@
 // controllers/quotationControllers.js
 
 const Client = require("../models/Client");
+const Employee = require("../models/Employee");
+const IdInformation = require("../models/IdInformation");
 const Quotation = require("../models/Quotation");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
@@ -174,6 +176,11 @@ async function getQuotationsController(req, res) {
           model: Client,
           as: "Client",
         },
+        {
+          model: IdInformation,
+          as: "IdInformation",
+          attributes: ["first_name", "last_name", "signature"],
+        },
       ],
       where: {
         status: "active",
@@ -202,6 +209,11 @@ async function getQuotationController(req, res) {
             {
               model: TypeOfWaste,
               as: "TypeOfWaste",
+              attributes: ["wasteCode"],
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
             },
           ],
         },
@@ -213,11 +225,20 @@ async function getQuotationController(req, res) {
               model: VehicleType,
               as: "VehicleType",
             },
+            {
+              model: Quotation,
+              as: "Quotation",
+            },
           ],
         },
         {
           model: Client,
           as: "Client",
+        },
+        {
+          model: IdInformation,
+          as: "IdInformation",
+          attributes: ["first_name", "last_name", "signature"],
         },
       ],
       where: {

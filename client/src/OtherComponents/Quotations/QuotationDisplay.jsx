@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Typography,
@@ -13,27 +13,19 @@ import QRCode from "qrcode.react";
 import letterhead from "../../images/letterhead.jpg";
 import accountingManagerSignature from "../../images/CARDINEZ_DAISY.png";
 import vicePresidentSignature from "../../images/DE_VERA_EXEQUIEL.png";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { formatDateFull, formatNumber } from "../Functions";
 import SignatureComponent from "../SignatureComponent ";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
-const modifyApiUrlPort = (url) => {
-  const portPattern = /:(3001)$/;
-  return url.replace(portPattern, ":3000");
-};
-
-const QuotationForm = ({ row }) => {
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-  const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
-  const certificateRef = useRef();
-
-  console.log(row);
-
-  const quotationData = row;
-  const clientData = row.Client;
-  const quotationWaste = row.QuotationWaste;
-  const quotationTransportation = row.QuotationTransportation;
+const QuotationDisplay = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const { id } = useParams(); // Extracting ID from the URL
+  const [quotationData, setQuotationData] = useState(null);
+  const [clientData, setClientData] = useState(null);
+  const [quotationWaste, setQuotationWaste] = useState(null);
+  const [quotationTransportation, setQuotationTransportation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const today = new Date();
 
@@ -41,35 +33,50 @@ const QuotationForm = ({ row }) => {
   const datePlusOneMonth = new Date();
   datePlusOneMonth.setMonth(today.getMonth() + 1);
 
-  const handleDownloadPDF = () => {
-    const input = certificateRef.current;
-    const pageHeight = 1056;
-    const pageWidth = 816;
+  useEffect(() => {
+    const fetchQuotation = async () => {
+      try {
+        console.log("Fetching quotation...");
+        const response = await axios.get(`${apiUrl}/api/quotationForm/${id}`);
+        console.log("Fetched Quotation Data:", response.data.quotation);
 
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [pageWidth, pageHeight], // Page size in px
-      });
+        // Ensure this data exists before setting
+        if (response.data.quotation) {
+          setQuotationData(response.data.quotation);
+        } else {
+          console.warn("Quotation data is undefined.");
+        }
+      } catch (error) {
+        console.error("Error fetching the quotation:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      // Add the captured image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+    fetchQuotation();
+  }, [id, apiUrl]);
 
-      // Save the generated PDF
-      pdf.save(
-        `${quotationData.quotationCode}-${quotationData.revisionNumber}-${clientData.clientName}.pdf`
-      );
-    });
-  };
+  useEffect(() => {
+    if (quotationData) {
+      console.log("Updated Quotation Data:", quotationData); // This should log the updated value
+      setClientData(quotationData.Client);
+      setQuotationWaste(quotationData.QuotationWaste);
+      setQuotationTransportation(quotationData.QuotationTransportation);
+    }
+  }, [quotationData]); // This effect runs when quotationData changes
 
-  const qrCodeURL = `${apiUrl}/quotationForm/${quotationData.id}`;
-  console.log(qrCodeURL);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!quotationData) {
+    return <div>No quotation found.</div>;
+  }
+
+  const qrCodeURL = `${apiUrl}/api/quotationForm/${quotationData.id}`;
 
   const generatePDFContent = () => (
     <Box
-      ref={certificateRef}
       sx={{
         position: "relative",
         minHeight: "1056px", // Ensure at least one page height
@@ -189,7 +196,9 @@ const QuotationForm = ({ row }) => {
                 padding: 1,
               }}
             >
-              <Typography fontWeight="bold">{clientData.billerName}</Typography>
+              <Typography fontWeight="bold">
+                {clientData.billerName ? clientData.billerName : ""}
+              </Typography>
               <Typography fontWeight="bold">
                 {clientData.billerContactPerson}
               </Typography>
@@ -873,13 +882,19 @@ const QuotationForm = ({ row }) => {
   );
 
   return (
-    <Box sx={{ overflow: "scroll" }}>
-      {generatePDFContent()}
-      <Button variant="contained" color="secondary" onClick={handleDownloadPDF}>
-        Download Quotation
-      </Button>
+    <Box
+      sx={{
+        marginTop: "100px",
+      }}
+    >
+      {/* Conditional rendering of generatePDFContent() */}
+      {clientData ? (
+        generatePDFContent() // Call only if quotationData is available
+      ) : (
+        <Typography variant="h6">No quotation data available</Typography>
+      )}
     </Box>
   );
 };
 
-export default QuotationForm;
+export default QuotationDisplay;

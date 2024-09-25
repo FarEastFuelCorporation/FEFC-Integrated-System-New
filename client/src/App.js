@@ -18,6 +18,7 @@ import Signup from "./Auth/Signup";
 import Dashboard from "./OtherComponents/Dashboard";
 import LoadingSpinner from "./OtherComponents/LoadingSpinner";
 import Certificate from "./OtherComponents/Certificates/Certificate";
+import QuotationDisplay from "./OtherComponents/Quotations/QuotationDisplay";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -72,6 +73,7 @@ const App = () => {
           <Route path="/certificate/:id" element={<Certificate />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
+          <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
           {user ? (
             <Route
               path="/dashboard/*"

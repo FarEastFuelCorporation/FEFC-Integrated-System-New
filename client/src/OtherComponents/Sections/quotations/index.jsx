@@ -133,7 +133,7 @@ const Quotations = ({ user }) => {
     );
     console.log(quotationToDownload);
     setSelectedQuotation(quotationToDownload); // Set the selected quotation
-    // setOpenQuotationModal(true); // Open the modal
+    setOpenQuotationModal(true); // Open the modal
   };
 
   const handleCloseQuotationModal = () => {

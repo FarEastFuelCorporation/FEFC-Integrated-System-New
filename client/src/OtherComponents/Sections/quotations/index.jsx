@@ -167,6 +167,7 @@ const Quotations = ({ user }) => {
   };
 
   const handleDeleteClick = async (id) => {
+    console.log(id);
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Quotation?"
     );

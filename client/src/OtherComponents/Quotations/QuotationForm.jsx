@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { forwardRef } from "react";
 import {
   Box,
   Typography,
@@ -13,8 +13,6 @@ import QRCode from "qrcode.react";
 import letterhead from "../../images/letterhead.jpg";
 import accountingManagerSignature from "../../images/CARDINEZ_DAISY.png";
 import vicePresidentSignature from "../../images/DE_VERA_EXEQUIEL.png";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { formatDateFull, formatNumber } from "../Functions";
 import SignatureComponent from "../SignatureComponent ";
 
@@ -23,10 +21,9 @@ const modifyApiUrlPort = (url) => {
   return url.replace(portPattern, ":3000");
 };
 
-const QuotationForm = ({ row }) => {
+const QuotationForm = forwardRef(({ row }, ref) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
-  const certificateRef = useRef();
 
   console.log(row);
 
@@ -41,35 +38,12 @@ const QuotationForm = ({ row }) => {
   const datePlusOneMonth = new Date();
   datePlusOneMonth.setMonth(today.getMonth() + 1);
 
-  const handleDownloadPDF = () => {
-    const input = certificateRef.current;
-    const pageHeight = 1056;
-    const pageWidth = 816;
-
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [pageWidth, pageHeight], // Page size in px
-      });
-
-      // Add the captured image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-
-      // Save the generated PDF
-      pdf.save(
-        `${quotationData.quotationCode}-${quotationData.revisionNumber}-${clientData.clientName}.pdf`
-      );
-    });
-  };
-
   const qrCodeURL = `${apiUrl}/quotationForm/${quotationData.id}`;
   console.log(qrCodeURL);
 
   const generatePDFContent = () => (
     <Box
-      ref={certificateRef}
+      ref={ref}
       sx={{
         position: "relative",
         minHeight: "1056px", // Ensure at least one page height
@@ -866,14 +840,7 @@ const QuotationForm = ({ row }) => {
     </Box>
   );
 
-  return (
-    <Box sx={{ overflow: "scroll" }}>
-      {generatePDFContent()}
-      <Button variant="contained" color="secondary" onClick={handleDownloadPDF}>
-        Download Quotation
-      </Button>
-    </Box>
-  );
-};
+  return <>{generatePDFContent()}</>;
+});
 
 export default QuotationForm;

@@ -1,6 +1,6 @@
 // components/Quotations.js
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, IconButton, Modal } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -9,6 +9,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import axios from "axios";
 import { format } from "date-fns";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import Header from "../../Header";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
@@ -16,6 +18,7 @@ import QuotationFormModal from "../../Modals/QuotationFormModal";
 import QuotationForm from "../../Quotations/QuotationForm";
 
 const Quotations = ({ user }) => {
+  const certificateRef = useRef();
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialFormData = {
@@ -133,14 +136,33 @@ const Quotations = ({ user }) => {
     );
     console.log(quotationToDownload);
     setSelectedQuotation(quotationToDownload); // Set the selected quotation
-    setOpenQuotationModal(true); // Open the modal
-    console.log(openQuotationModal);
+    // Use a timeout to allow the component to render before downloading
+    setTimeout(() => {
+      handleDownloadPDF(quotationToDownload);
+    }, 1000); // Adjust the delay as needed
   };
 
-  const handleCloseQuotationModal = () => {
-    setOpenQuotationModal(false);
-    console.log(openQuotationModal);
-    setSelectedQuotation("");
+  const handleDownloadPDF = (quotationData) => {
+    const input = certificateRef.current;
+    const pageHeight = 1056;
+    const pageWidth = 816;
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [pageWidth, pageHeight], // Page size in px
+      });
+
+      // Add the captured image to the PDF
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+
+      // Save the generated PDF
+      pdf.save(
+        `${quotationData.quotationCode}-${quotationData.revisionNumber}-${quotationData.Client.clientName}.pdf`
+      );
+    });
   };
 
   const handleEditClick = (id) => {
@@ -475,18 +497,11 @@ const Quotations = ({ user }) => {
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
       />
-      <Modal open={openQuotationModal} onClose={handleCloseQuotationModal}>
-        <div
-          style={{
-            padding: "20px",
-            background: "white",
-            margin: "10% auto",
-            width: "80%",
-          }}
-        >
-          <QuotationForm row={selectedQuotation} />
-        </div>
-      </Modal>
+      {selectedQuotation && (
+        <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+          <QuotationForm ref={certificateRef} row={selectedQuotation} />
+        </Box>
+      )}
     </Box>
   );
 };

@@ -11,6 +11,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
@@ -32,6 +33,7 @@ const DispatchingSidebar = ({ user }) => {
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/vehicleMaintenanceRequests": "Vehicle Maintenance Request",
       "/dashboard/calendar": "Calendar",
+      "/dashboard/switchUser": "Switch User",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
       "/dashboard/pie": "Pie Chart",
@@ -235,6 +237,14 @@ const DispatchingSidebar = ({ user }) => {
               title="Calendar"
               to="calendar"
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Switch User"
+              to="switchUser"
+              icon={<AccountCircleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

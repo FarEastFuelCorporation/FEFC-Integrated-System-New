@@ -8,6 +8,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
@@ -55,6 +56,7 @@ const HRSidebar = ({ user }) => {
       "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
       "/dashboard/calendar": "Calendar",
+      "/dashboard/switchUser": "Switch User",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
       "/dashboard/pie": "Pie Chart",
@@ -234,6 +236,14 @@ const HRSidebar = ({ user }) => {
               title="Calendar"
               to="calendar"
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Switch User"
+              to="switchUser"
+              icon={<AccountCircleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

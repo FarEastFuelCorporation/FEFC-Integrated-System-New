@@ -6,6 +6,7 @@ const router = express.Router();
 // Include your routes
 const authRoutes = require("./auth");
 const othersRoutes = require("./others");
+const switchUserRoutes = require("./switchUserRoutes");
 const geoTableRoutes = require("./geoTableRoutes");
 const requestsRoutes = require("./requests");
 const clientRoutes = require("./clientRoutes");
@@ -47,6 +48,7 @@ router.get("/session", (req, res) => {
 
 router.use(authRoutes);
 router.use(othersRoutes);
+router.use("/switchUser", switchUserRoutes);
 router.use("/geoTable", geoTableRoutes);
 router.use("/request", requestsRoutes);
 router.use("/client", clientRoutes);

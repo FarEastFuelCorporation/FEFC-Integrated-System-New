@@ -3,7 +3,7 @@
 const Client = require("../models/Client");
 const ClientUser = require("../models/ClientUser");
 const Employee = require("../models/Employee");
-const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee ");
+const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee");
 const IdInformation = require("../models/IdInformation");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");

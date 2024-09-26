@@ -1,6 +1,5 @@
 // controllers/dispatchedTransactionController.js
 
-const BookedTransaction = require("../models/BookedTransaction");
 const Department = require("../models/Department");
 
 // Create Department controller

@@ -9,14 +9,19 @@ import FAQ from "../../Employee/Layouts/HR/sections/faq";
 import Bar from "../../Employee/Layouts/HR/sections/bar";
 import Pie from "../../Employee/Layouts/HR/sections/pie";
 import Line from "../../Employee/Layouts/HR/sections/line";
+import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 
-const HRRoutes = ({ user }) => (
+const HRRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="departments" element={<Departments user={user} />} />
       <Route path="employee" element={<Contacts user={user} />} />
       <Route path="calendar" element={<Calendar />} />
+      <Route
+        path="switchUser"
+        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
+      />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />
       <Route path="pie" element={<Pie />} />

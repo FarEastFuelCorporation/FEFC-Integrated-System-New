@@ -2,6 +2,8 @@
 
 const Employee = require("../models/Employee");
 const EmployeeRole = require("../models/EmployeeRole");
+const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee");
+const EmployeeRolesOtherRole = require("../models/EmployeeRolesOtherRole");
 const User = require("../models/User");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const TreatmentProcess = require("../models/TreatmentProcess");
@@ -10,7 +12,6 @@ const Vehicle = require("../models/Vehicle");
 const Client = require("../models/Client");
 const TransactionStatus = require("../models/TransactionStatus");
 const VehicleLog = require("../models/VehicleLog");
-const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee ");
 const Quotation = require("../models/Quotation");
 const QuotationWaste = require("../models/QuotationWaste");
 const QuotationTransportation = require("../models/QuotationTransportation");
@@ -86,6 +87,32 @@ User.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "employeeId",
   targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(EmployeeRolesOtherRole, {
+  as: "EmployeeRolesOtherRole",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeRolesOtherRole.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+EmployeeRole.hasMany(EmployeeRolesOtherRole, {
+  as: "EmployeeRolesOtherRole",
+  foreignKey: "employeeRoleId",
+  sourceKey: "employeeRoleId",
+  onDelete: "CASCADE",
+});
+EmployeeRolesOtherRole.belongsTo(EmployeeRole, {
+  as: "EmployeeRole",
+  foreignKey: "employeeRoleId",
+  targetKey: "employeeRoleId",
   onDelete: "CASCADE",
 });
 

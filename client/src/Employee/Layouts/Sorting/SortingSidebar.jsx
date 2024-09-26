@@ -9,6 +9,7 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
@@ -27,6 +28,7 @@ const SortingSidebar = ({ user }) => {
       "/dashboard/transactions": "Transactions",
       "/dashboard/scrapTypes": "Type Of Scraps",
       "/dashboard/calendar": "Calendar",
+      "/dashboard/switchUser": "Switch User",
       "/dashboard/faq": "FAQ Page",
       "/dashboard/bar": "Bar Chart",
       "/dashboard/pie": "Pie Chart",
@@ -206,6 +208,14 @@ const SortingSidebar = ({ user }) => {
               title="Calendar"
               to="calendar"
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Switch User"
+              to="switchUser"
+              icon={<AccountCircleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

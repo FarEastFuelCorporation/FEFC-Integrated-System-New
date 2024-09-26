@@ -9,16 +9,16 @@ const {
   deleteDepartmentController,
 } = require("../controllers/departmentController");
 
-// Create Dispatched Transaction route
+// Create Department route
 router.post("/", createDepartmentController);
 
-// Get Dispatched Transactions route
+// Get Department route
 router.get("/", getDepartmentsController);
 
-// Update Dispatched Transaction route
+// Update Department route
 router.put("/:id", updateDepartmentController);
 
-// Delete Dispatched Transaction route
+// Delete Department route
 router.delete("/:id", deleteDepartmentController);
 
 module.exports = router;

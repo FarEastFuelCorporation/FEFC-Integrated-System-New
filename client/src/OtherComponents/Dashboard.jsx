@@ -23,49 +23,49 @@ const Dashboard = ({ user, onUpdateUser }) => {
     case "IFM":
       return (
         <RoleProtectedRoute user={user} allowedRoles={[user.userType]}>
-          <MarketingRoutes user={user} />
+          <MarketingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 2:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[2]}>
-          <MarketingRoutes user={user} />
+          <MarketingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 3:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[3]}>
-          <DispatchingRoutes user={user} />
+          <DispatchingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 4:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[4]}>
-          <ReceivingRoutes user={user} />
+          <ReceivingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 5:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[5]}>
-          <SortingRoutes user={user} />
+          <SortingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 6:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[6]}>
-          <TreatmentRoutes user={user} />
+          <TreatmentRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 7:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[7]}>
-          <CertificationRoutes user={user} />
+          <CertificationRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 9:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[9]}>
-          <HRRoutes user={user} />
+          <HRRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     default:

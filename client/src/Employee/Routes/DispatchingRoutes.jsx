@@ -12,8 +12,9 @@ import FAQ from "../../Employee/Layouts/Dispatching/sections/faq";
 import Bar from "../../Employee/Layouts/Dispatching/sections/bar";
 import Pie from "../../Employee/Layouts/Dispatching/sections/pie";
 import Line from "../../Employee/Layouts/Dispatching/sections/line";
+import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 
-const DispatchingRoutes = ({ user }) => (
+const DispatchingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
@@ -29,6 +30,10 @@ const DispatchingRoutes = ({ user }) => (
         element={<VehicleMaintenanceRequest user={user} />}
       />
       <Route path="calendar" element={<Calendar />} />
+      <Route
+        path="switchUser"
+        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
+      />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />
       <Route path="pie" element={<Pie />} />

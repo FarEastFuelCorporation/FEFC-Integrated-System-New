@@ -9,8 +9,9 @@ import FAQ from "../Layouts/Treatment/sections/faq";
 import Bar from "../Layouts/Treatment/sections/bar";
 import Pie from "../Layouts/Treatment/sections/pie";
 import Line from "../Layouts/Treatment/sections/line";
+import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 
-const TreatmentRoutes = ({ user }) => (
+const TreatmentRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     <Route path="/" element={<UserDashboard user={user} />}>
       <Route path="" element={<Dashboard />} />
@@ -23,6 +24,10 @@ const TreatmentRoutes = ({ user }) => (
         element={<TreatmentMachine user={user} />}
       />
       <Route path="calendar" element={<Calendar />} />
+      <Route
+        path="switchUser"
+        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
+      />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />
       <Route path="pie" element={<Pie />} />

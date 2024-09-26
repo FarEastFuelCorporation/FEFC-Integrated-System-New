@@ -13,8 +13,9 @@ import FAQ from "../../Employee/Layouts/Marketing/sections/faq";
 import Bar from "../../Employee/Layouts/Marketing/sections/bar";
 import Pie from "../../Employee/Layouts/Marketing/sections/pie";
 import Line from "../../Employee/Layouts/Marketing/sections/line";
+import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 
-const MarketingRoutes = ({ user }) => (
+const MarketingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserDashboard user={user} />}>
@@ -29,6 +30,10 @@ const MarketingRoutes = ({ user }) => (
       <Route path="commissions" element={<Commissions />} />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
+      <Route
+        path="switchUser"
+        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
+      />
       <Route path="faq" element={<FAQ />} />
       <Route path="bar" element={<Bar />} />
       <Route path="pie" element={<Pie />} />

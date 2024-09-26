@@ -145,8 +145,9 @@ const Transaction = ({
                   ) : (
                     <Box>
                       {" - "}
-                      {row.Client.clientName} {" - "}
                       {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+                      {" - "}
+                      {row.Client.clientName}
                     </Box>
                   )}
                 </Typography>

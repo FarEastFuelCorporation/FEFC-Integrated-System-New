@@ -289,40 +289,40 @@ const Documents = ({ user }) => {
         </IconButton>
       ),
     },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) =>
-        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
-          <IconButton
-            color="warning"
-            // onClick={() => handleEditClick(params.row.id)} // Assuming you have a handleEditClick function
-          >
-            <EditIcon />
-          </IconButton>
-        ) : null, // Return null if the condition is not met
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) =>
-        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
-          >
-            <DeleteIcon />
-          </IconButton>
-        ) : null, // Return null if the condition is not met
-    },
+    // {
+    //   field: "edit",
+    //   headerName: "Edit",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 60,
+    //   renderCell: (params) =>
+    //     params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+    //       <IconButton
+    //         color="warning"
+    //         // onClick={() => handleEditClick(params.row.id)} // Assuming you have a handleEditClick function
+    //       >
+    //         <EditIcon />
+    //       </IconButton>
+    //     ) : null, // Return null if the condition is not met
+    // },
+    // {
+    //   field: "delete",
+    //   headerName: "Delete",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 60,
+    //   renderCell: (params) =>
+    //     params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+    //       <IconButton
+    //         color="error"
+    //         onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+    //       >
+    //         <DeleteIcon />
+    //       </IconButton>
+    //     ) : null, // Return null if the condition is not met
+    // },
   ];
 
   return (

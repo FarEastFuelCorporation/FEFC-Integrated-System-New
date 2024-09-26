@@ -8,6 +8,7 @@ import EmployeeRecordModal from "../../../../../OtherComponents/Modals/EmployeeR
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import EmployeeProfileModal from "../../../../../OtherComponents/Modals/EmployeeProfileModal";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const Contacts = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -79,14 +80,6 @@ const Contacts = ({ user }) => {
     createdBy: user.id,
   };
 
-  // const initialAttachmentFormData = {
-  //   id: "",
-  //   employeeId: "",
-  //   fileName: "",
-  //   attachment: "",
-  //   createdBy: user.id,
-  // };
-
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [employeeRecords, setEmployeeRecord] = useState([]);
@@ -98,14 +91,7 @@ const Contacts = ({ user }) => {
   const [signatureFile, setSignatureFile] = useState(null);
   const [signatureFileName, setSignatureFileName] = useState("");
   const [departments, setDepartments] = useState([]);
-
-  // const [openAttachmentModal, setOpenAttachmentModal] = useState(false);
-  // const [attachmentFormData, setAttachmentFormData] = useState(
-  //   initialAttachmentFormData
-  // );
-  // const [attachmentData, setAttachmentData] = useState([]);
-  // const [selectedFile, setSelectedFile] = useState(null);
-  // const [fileName, setFileName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -123,6 +109,7 @@ const Contacts = ({ user }) => {
         console.log(employeeRecordResponse.data.employeeRecords);
         setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
         setDepartments(departmentResponse.data.departments);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching employeeData:", error);
       }
@@ -740,6 +727,7 @@ const Contacts = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header
           title="Employee Records"

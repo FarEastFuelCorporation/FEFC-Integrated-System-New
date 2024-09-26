@@ -17,6 +17,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const TreatmentProcess = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,19 +38,23 @@ const TreatmentProcess = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/treatmentProcess`);
+      setTreatmentProcess(response.data.treatmentProcesses);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching treatmentProcess:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/treatmentProcess`);
-        setTreatmentProcess(response.data.treatmentProcesses);
-      } catch (error) {
-        console.error("Error fetching treatmentProcess:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -99,8 +104,7 @@ const TreatmentProcess = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = treatmentProcess.filter((waste) => waste.id !== id);
-      setTreatmentProcess(updatedData);
+      fetchData();
       setSuccessMessage("Treatment Process Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -112,8 +116,6 @@ const TreatmentProcess = ({ user }) => {
     e.preventDefault();
 
     try {
-      let response;
-
       // Perform client-side validation
       const { treatmentProcess } = formData;
 
@@ -125,26 +127,21 @@ const TreatmentProcess = ({ user }) => {
       }
 
       if (formData.id) {
-        // Update existing type of waste
-        response = await axios.put(
+        // Update existing treatmentProcess
+        await axios.put(
           `${apiUrl}/api/treatmentProcess/${formData.id}`,
           formData
         );
 
-        const updatedData = response.data.treatmentProcesses;
-
-        setTreatmentProcess(updatedData);
         setSuccessMessage("Treatment Process Updated Successfully!");
       } else {
-        // Add new type of waste
-        response = await axios.post(`${apiUrl}/api/treatmentProcess`, formData);
+        // Add new treatmentProcess
+        await axios.post(`${apiUrl}/api/treatmentProcess`, formData);
 
-        const updatedData = response.data.treatmentProcesses;
-        console.log(updatedData);
-        setTreatmentProcess(updatedData);
         setSuccessMessage("TreatmentProcess Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -209,6 +206,7 @@ const TreatmentProcess = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header
           title="Treatment Process"

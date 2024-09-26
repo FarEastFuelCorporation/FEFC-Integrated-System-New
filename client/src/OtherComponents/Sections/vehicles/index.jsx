@@ -18,6 +18,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const Vehicles = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -44,51 +45,47 @@ const Vehicles = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/vehicle`);
+      const vehicleRecords = response.data;
+
+      const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
+        ...vehicle,
+        typeOfVehicle: vehicle.VehicleType
+          ? vehicle.VehicleType.typeOfVehicle
+          : null,
+      }));
+
+      // Set state with vehicles including typeOfVehicle
+      setVehicleData(flattenedData);
+
+      const vehicleTypeResponse = await axios.get(`${apiUrl}/api/vehicleType`);
+      const sortedVehicleTypes = vehicleTypeResponse.data.vehicleTypes.sort(
+        (a, b) => {
+          if (a.typeOfVehicle < b.typeOfVehicle) {
+            return -1;
+          }
+          if (a.typeOfVehicle > b.typeOfVehicle) {
+            return 1;
+          }
+          return 0;
+        }
+      );
+      setVehicleTypes(sortedVehicleTypes);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/vehicle`);
-        const vehicleRecords = response.data;
-
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
-
-          // Set state with vehicles including typeOfVehicle
-          setVehicleData(flattenedData);
-        } else {
-          console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
-          );
-        }
-
-        const vehicleTypeResponse = await axios.get(
-          `${apiUrl}/api/vehicleType`
-        );
-        const sortedVehicleTypes = vehicleTypeResponse.data.vehicleTypes.sort(
-          (a, b) => {
-            if (a.typeOfVehicle < b.typeOfVehicle) {
-              return -1;
-            }
-            if (a.typeOfVehicle > b.typeOfVehicle) {
-              return 1;
-            }
-            return 0;
-          }
-        );
-        setVehicleTypes(sortedVehicleTypes);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -150,8 +147,7 @@ const Vehicles = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = vehicleData.filter((vehicle) => vehicle.id !== id);
-      setVehicleData(updatedData);
+      fetchData();
       setSuccessMessage("Vehicle Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -180,53 +176,16 @@ const Vehicles = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing vehicle
-        response = await axios.put(
-          `${apiUrl}/api/vehicle/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/api/vehicle/${formData.id}`, formData);
 
-        const vehicleRecords = response.data;
-
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
-
-          setVehicleData(flattenedData);
-          setSuccessMessage("Vehicle Updated Successfully!");
-        } else {
-          console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Vehicle Updated Successfully!");
       } else {
         // Add new vehicle
-        response = await axios.post(`${apiUrl}/api/vehicle`, formData);
+        await axios.post(`${apiUrl}/api/vehicle`, formData);
 
-        const vehicleRecords = response.data;
-
-        if (vehicleRecords && Array.isArray(vehicleRecords.vehicles)) {
-          const flattenedData = vehicleRecords.vehicles.map((vehicle) => ({
-            ...vehicle,
-            typeOfVehicle: vehicle.VehicleType
-              ? vehicle.VehicleType.typeOfVehicle
-              : null,
-          }));
-
-          setVehicleData(flattenedData);
-          setSuccessMessage("Vehicle Added Successfully!");
-        } else {
-          console.error(
-            "vehicleRecords or vehicleRecords.vehicles is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Vehicle Added Successfully!");
       }
 
       setShowSuccessMessage(true);
@@ -325,6 +284,7 @@ const Vehicles = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Vehicles" subtitle="List of Vehicles" />
         <Box display="flex">

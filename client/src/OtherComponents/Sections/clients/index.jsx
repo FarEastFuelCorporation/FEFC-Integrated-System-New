@@ -18,6 +18,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const Clients = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -46,27 +47,24 @@ const Clients = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/client`);
+
+      setClientData(response.data.clients);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching clientData:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/client`);
-        const clientRecords = response.data;
-
-        if (clientRecords && Array.isArray(clientRecords.clients)) {
-          setClientData(clientRecords.clients);
-        } else {
-          console.error(
-            "clientRecords or clientRecords.clients is undefined or not an array"
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching clientData:", error);
-      }
-    };
-
-    fetchData();
-  }, [apiUrl]);
+    fetchData(); // Call fetchData within useEffect
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -119,8 +117,7 @@ const Clients = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = clientData.filter((client) => client.id !== id);
-      setClientData(updatedData);
+      fetchData();
       setSuccessMessage("Client Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
@@ -169,41 +166,19 @@ const Clients = ({ user }) => {
         formDataToSend.append("clientPicture", selectedFile);
       }
 
-      let response;
-
       if (formData.id) {
         // Update existing client
-        response = await axios.put(
-          `${apiUrl}/api/client/${formData.id}`,
-          formDataToSend
-        );
+        await axios.put(`${apiUrl}/api/client/${formData.id}`, formDataToSend);
 
-        const clientRecords = response.data;
-
-        if (clientRecords && Array.isArray(clientRecords.clients)) {
-          setClientData(clientRecords.clients);
-          setSuccessMessage("Client Updated Successfully!");
-        } else {
-          console.error(
-            "clientRecords or clientRecords.clients is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Client Updated Successfully!");
       } else {
         // Add new client
-        response = await axios.post(`${apiUrl}/api/client`, formDataToSend);
+        await axios.post(`${apiUrl}/api/client`, formDataToSend);
 
-        const clientRecords = response.data;
-
-        if (clientRecords && Array.isArray(clientRecords.clients)) {
-          setClientData(clientRecords.clients);
-          setSuccessMessage("Client Added Successfully!");
-        } else {
-          console.error(
-            "clientRecords or clientRecords.clients is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Client Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -356,6 +331,7 @@ const Clients = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Clients" subtitle="List of Clients" />
         {user.userType === 2 && (

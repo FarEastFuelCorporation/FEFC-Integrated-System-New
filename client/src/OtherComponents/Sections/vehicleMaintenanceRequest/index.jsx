@@ -19,6 +19,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const VehicleMaintenanceRequest = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -41,52 +42,47 @@ const VehicleMaintenanceRequest = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${apiUrl}/api/vehicleMaintenanceRequest`
+      );
+
+      const flattenedData = response.data.vehicleMaintenanceRequests.map(
+        (item) => ({
+          ...item,
+          createdByName: item.Employee
+            ? item.Employee.firstName + " " + item.Employee.lastName
+            : null,
+        })
+      );
+
+      setVehicleRequests(flattenedData);
+
+      const vehicleResponse = await axios.get(`${apiUrl}/api/vehicle`);
+      const sortedVehicles = vehicleResponse.data.vehicles.sort((a, b) => {
+        if (a.plateNumber < b.plateNumber) {
+          return -1;
+        }
+        if (a.plateNumber > b.plateNumber) {
+          return 1;
+        }
+        return 0;
+      });
+      setVehicles(sortedVehicles);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${apiUrl}/api/vehicleMaintenanceRequest`
-        );
-
-        if (
-          response &&
-          Array.isArray(response.data.vehicleMaintenanceRequests)
-        ) {
-          const flattenedData = response.data.vehicleMaintenanceRequests.map(
-            (item) => ({
-              ...item,
-              createdByName: item.Employee
-                ? item.Employee.firstName + " " + item.Employee.lastName
-                : null,
-            })
-          );
-
-          setVehicleRequests(flattenedData);
-        } else {
-          console.error(
-            "response or vehicleMaintenanceRequests is undefined or not an array"
-          );
-        }
-
-        const vehicleResponse = await axios.get(`${apiUrl}/api/vehicle`);
-        const sortedVehicles = vehicleResponse.data.vehicles.sort((a, b) => {
-          if (a.plateNumber < b.plateNumber) {
-            return -1;
-          }
-          if (a.plateNumber > b.plateNumber) {
-            return 1;
-          }
-          return 0;
-        });
-        setVehicles(sortedVehicles);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -147,10 +143,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = vehicleRequests.filter(
-        (request) => request.id !== id
-      );
-      setVehicleRequests(updatedData);
+      fetchData();
       setSuccessMessage("Vehicle Maintenance Request Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -172,64 +165,19 @@ const VehicleMaintenanceRequest = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing vehicle maintenance request
-        response = await axios.put(
+        await axios.put(
           `${apiUrl}/api/vehicleMaintenanceRequest/${formData.id}`,
           formData
         );
 
-        if (
-          response &&
-          Array.isArray(response.data.vehicleMaintenanceRequests)
-        ) {
-          const flattenedData = response.data.vehicleMaintenanceRequests.map(
-            (item) => ({
-              ...item,
-              createdByName: item.Employee
-                ? item.Employee.firstName + " " + item.Employee.lastName
-                : null,
-            })
-          );
-
-          setVehicleRequests(flattenedData);
-          setSuccessMessage(
-            "Vehicle Maintenance Request Updated Successfully!"
-          );
-        } else {
-          console.error(
-            "response or vehicleMaintenanceRequests is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Vehicle Maintenance Request Updated Successfully!");
       } else {
         // Add new vehicle maintenance request
-        response = await axios.post(
-          `${apiUrl}/api/vehicleMaintenanceRequest`,
-          formData
-        );
+        await axios.post(`${apiUrl}/api/vehicleMaintenanceRequest`, formData);
 
-        if (
-          response &&
-          Array.isArray(response.data.vehicleMaintenanceRequests)
-        ) {
-          const flattenedData = response.data.vehicleMaintenanceRequests.map(
-            (item) => ({
-              ...item,
-              createdByName: item.Employee
-                ? item.Employee.firstName + " " + item.Employee.lastName
-                : null,
-            })
-          );
-
-          setVehicleRequests(flattenedData);
-          setSuccessMessage("Vehicle Maintenance Request Added Successfully!");
-        } else {
-          console.error(
-            "response or vehicleMaintenanceRequests is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Vehicle Maintenance Request Added Successfully!");
       }
 
       setShowSuccessMessage(true);
@@ -325,6 +273,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header
           title="Vehicle Maintenance Requests"

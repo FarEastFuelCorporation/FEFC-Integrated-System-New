@@ -21,6 +21,7 @@ import axios from "axios";
 import { tokens } from "../../../theme";
 import SuccessMessage from "../../SuccessMessage";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const TreatmentMachine = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -42,44 +43,38 @@ const TreatmentMachine = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [treatmentProcessResponse, treatmentMachineResponse] =
+        await Promise.all([
+          axios.get(`${apiUrl}/api/treatmentProcess`),
+          axios.get(`${apiUrl}/api/treatmentMachine`),
+        ]);
+
+      const flattenedData = treatmentMachineResponse.data.treatmentMachines.map(
+        (machine) => ({
+          ...machine,
+          treatmentProcess: machine.TreatmentProcess
+            ? machine.TreatmentProcess.treatmentProcess
+            : null,
+        })
+      );
+
+      setTreatmentMachines(flattenedData);
+      setTreatmentProcesses(treatmentProcessResponse.data.treatmentProcesses);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [treatmentProcessResponse, treatmentMachineResponse] =
-          await Promise.all([
-            axios.get(`${apiUrl}/api/treatmentProcess`),
-            axios.get(`${apiUrl}/api/treatmentMachine`),
-          ]);
-
-        if (
-          treatmentMachineResponse &&
-          Array.isArray(treatmentMachineResponse.data.treatmentMachines)
-        ) {
-          const flattenedData =
-            treatmentMachineResponse.data.treatmentMachines.map((machine) => ({
-              ...machine,
-              treatmentProcess: machine.TreatmentProcess
-                ? machine.TreatmentProcess.treatmentProcess
-                : null,
-            }));
-
-          // Set state with vehicles including typeOfVehicle
-          setTreatmentMachines(flattenedData);
-        } else {
-          console.error(
-            "treatmentMachineResponse is undefined or not an array"
-          );
-        }
-
-        setTreatmentProcesses(treatmentProcessResponse.data.treatmentProcesses);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -128,8 +123,7 @@ const TreatmentMachine = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = treatmentMachines.filter((type) => type.id !== id);
-      setTreatmentMachines(updatedData);
+      fetchData();
       setSuccessMessage("Treatment Machine Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -149,55 +143,21 @@ const TreatmentMachine = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing treatment machine
-        response = await axios.put(
+        await axios.put(
           `${apiUrl}/api/treatmentMachine/${formData.id}`,
           formData
         );
-
-        if (response && Array.isArray(response.data.treatmentMachines)) {
-          const flattenedData = response.data.treatmentMachines.map(
-            (machine) => ({
-              ...machine,
-              treatmentProcess: machine.TreatmentProcess
-                ? machine.TreatmentProcess.treatmentProcess
-                : null,
-            })
-          );
-
-          setTreatmentMachines(flattenedData);
-          setSuccessMessage("Treatment Machine Updated Successfully!");
-        } else {
-          console.error(
-            "treatmentMachineResponse is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Treatment Machine Updated Successfully!");
       } else {
         // Add new treatment machine
-        response = await axios.post(`${apiUrl}/api/treatmentMachine`, formData);
+        await axios.post(`${apiUrl}/api/treatmentMachine`, formData);
 
-        if (response && Array.isArray(response.data.treatmentMachines)) {
-          const flattenedData = response.data.treatmentMachines.map(
-            (machine) => ({
-              ...machine,
-              treatmentProcess: machine.TreatmentProcess
-                ? machine.TreatmentProcess.treatmentProcess
-                : null,
-            })
-          );
-
-          setTreatmentMachines(flattenedData);
-          setSuccessMessage("Treatment Machine Added Successfully!");
-        } else {
-          console.error(
-            "treatmentMachineResponse is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Treatment Machine Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -271,6 +231,7 @@ const TreatmentMachine = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Treatment Machines" subtitle="List of Machines" />
         {user.userType === 6 && (

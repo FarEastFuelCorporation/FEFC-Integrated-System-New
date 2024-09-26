@@ -16,6 +16,7 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import QuotationFormModal from "../../Modals/QuotationFormModal";
 import QuotationForm from "../../Quotations/QuotationForm";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const Quotations = ({ user }) => {
   const certificateRef = useRef();
@@ -64,54 +65,50 @@ const Quotations = ({ user }) => {
   };
 
   const [openModal, setOpenModal] = useState(false);
-  const [openQuotationModal, setOpenQuotationModal] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [quotationsData, setQuotationsData] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      let response;
+      if (
+        user.userType === "GEN" ||
+        user.userType === "TRP" ||
+        user.userType === "IFM"
+      ) {
+        response = await axios.get(`${apiUrl}/api/quotation/${user.id}`);
+      } else {
+        response = await axios.get(`${apiUrl}/api/quotation`);
+      }
+
+      const flattenedData = response.data.quotations.map((item) => ({
+        ...item,
+        clientPicture: item.Client ? item.Client.clientPicture : null,
+        clientName: item.Client ? item.Client.clientName : null,
+        quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
+        quotationTransportation: item.QuotationTransportation
+          ? item.QuotationTransportation
+          : [],
+        validity: item.validity
+          ? new Date(item.validity).toISOString().split("T")[0]
+          : null, // Convert timestamp to yyyy-mm-dd format
+      }));
+
+      setQuotationsData(flattenedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching quotationsData:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let response;
-        if (
-          user.userType === "GEN" ||
-          user.userType === "TRP" ||
-          user.userType === "IFM"
-        ) {
-          response = await axios.get(`${apiUrl}/api/quotation/${user.id}`);
-        } else {
-          response = await axios.get(`${apiUrl}/api/quotation`);
-        }
-        const quotations = response.data;
-
-        if (quotations && Array.isArray(quotations.quotations)) {
-          const flattenedData = quotations.quotations.map((item) => ({
-            ...item,
-            clientPicture: item.Client ? item.Client.clientPicture : null,
-            clientName: item.Client ? item.Client.clientName : null,
-            quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
-            quotationTransportation: item.QuotationTransportation
-              ? item.QuotationTransportation
-              : [],
-            validity: item.validity
-              ? new Date(item.validity).toISOString().split("T")[0]
-              : null, // Convert timestamp to yyyy-mm-dd format
-          }));
-          setQuotationsData(flattenedData);
-        } else {
-          console.error(
-            "quotations or quotations.quotations is undefined or not an array"
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching quotationsData:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl, user.id, user.userType]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -208,10 +205,7 @@ const Quotations = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const quotations = quotationsData.filter(
-        (quotation) => quotation.id !== id
-      );
-      setQuotationsData(quotations);
+      fetchData();
       setSuccessMessage("Quotation Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
@@ -222,65 +216,19 @@ const Quotations = ({ user }) => {
     e.preventDefault();
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-
-      let response;
-
       if (formData.id) {
-        console.log(formData);
-
         // Update existing quotation
-        response = await axios.put(
-          `${apiUrl}/api/quotation/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/api/quotation/${formData.id}`, formData);
 
-        const quotations = response.data;
-
-        if (quotations && Array.isArray(quotations.quotations)) {
-          const flattenedData = quotations.quotations.map((item) => ({
-            ...item,
-            clientPicture: item.Client ? item.Client.clientPicture : null,
-            clientName: item.Client ? item.Client.clientName : null,
-            quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
-            quotationTransportation: item.QuotationTransportation
-              ? item.QuotationTransportation
-              : [],
-            validity: item.validity
-              ? new Date(item.validity).toISOString().split("T")[0]
-              : null, // Convert timestamp to yyyy-mm-dd format
-          }));
-          setQuotationsData(flattenedData);
-          setSuccessMessage("Quotation Updated Successfully!");
-        } else {
-          console.error(
-            "quotations or quotations.quotations is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Quotation Updated Successfully!");
       } else {
         // Add new quotation
-        response = await axios.post(`${apiUrl}/api/quotation`, formData);
+        await axios.post(`${apiUrl}/api/quotation`, formData);
 
-        const quotations = response.data;
-
-        if (quotations && Array.isArray(quotations.quotations)) {
-          const flattenedData = quotations.quotations.map((item) => ({
-            ...item,
-            clientPicture: item.Client ? item.Client.clientPicture : null,
-            clientName: item.Client ? item.Client.clientName : null,
-            quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
-            quotationTransportation: item.QuotationTransportation
-              ? item.QuotationTransportation
-              : [],
-            validity: item.validity
-              ? new Date(item.validity).toISOString().split("T")[0]
-              : null, // Convert timestamp to yyyy-mm-dd format
-          }));
-          setQuotationsData(flattenedData);
-          setSuccessMessage("Quotation Added Successfully!");
-        }
+        setSuccessMessage("Quotation Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -460,6 +408,7 @@ const Quotations = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important">
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Quotations" subtitle="List of Quotations" />
         {user.userType === 2 && (

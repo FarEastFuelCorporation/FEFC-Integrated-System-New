@@ -18,6 +18,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const SwitchUsers = ({ user, onUpdateUser }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -30,10 +31,12 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         // Replace `user.id` with the actual ID
         const response = await axios.get(`${apiUrl}/api/switchUser/${user.id}`);
         console.log(response.data.employeeRolesOtherRole);
@@ -43,6 +46,7 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
         }));
 
         setEmployeeRoles(mappedData);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -87,19 +91,13 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
 
   const handleSwitchRole = async (row) => {
     try {
-      console.log(row.employeeRoleId);
+      setLoading(true);
       // Assuming you have an API endpoint to switch roles
       const response = await axios.put(`${apiUrl}/api/switchUser/${user.id}`, {
         roleId: row.employeeRoleId, // Example role data
       });
 
-      console.log(response.data.employeeRolesEmployee.employeeRoleId);
-
-      user.userType = row.employeeRoleId;
-
       if (response.status === 200) {
-        console.log("Role switched successfully");
-
         // Update the user object with the new role
         const updatedUser = { ...user, userType: row.employeeRoleId };
 
@@ -109,6 +107,7 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
         // Redirect to the /dashboard route after successful role switch
         navigate("/dashboard");
       }
+      setLoading(false);
     } catch (error) {
       console.error("Error switching role:", error);
     }
@@ -151,6 +150,7 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="User Role" subtitle="List of User roles" />
       </Box>

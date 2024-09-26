@@ -14,6 +14,7 @@ import {
   faUserPen,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const Dashboard = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -66,18 +67,9 @@ const Dashboard = () => {
     fetchData();
   }, [apiUrl]);
 
-  if (loading) {
-    return (
-      <Box m="20px">
-        <Typography variant="h4" color={colors.grey[100]}>
-          Loading...
-        </Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box m="20px">
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your Dashboard" />
         <Button

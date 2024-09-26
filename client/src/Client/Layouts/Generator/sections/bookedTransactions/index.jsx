@@ -6,6 +6,7 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const BookedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -38,11 +39,12 @@ const BookedTransactions = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
-      console.log(user.id);
+      setLoading(true);
       const bookedTransactionResponse = await axios.get(
         `${apiUrl}/api/bookedTransaction`,
         {
@@ -67,6 +69,8 @@ const BookedTransactions = ({ user }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+
+    setLoading(false);
   }, [apiUrl, user.id]);
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
@@ -116,9 +120,7 @@ const BookedTransactions = ({ user }) => {
           data: { deletedBy: user.id },
         });
 
-        setPendingTransactions((prev) =>
-          prev.filter((type) => type.id !== row.id)
-        );
+        fetchData();
         setSuccessMessage("Booked Transaction Deleted Successfully!");
         setShowSuccessMessage(true);
       } catch (error) {
@@ -176,6 +178,7 @@ const BookedTransactions = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
         {user.userType === "GEN" && (

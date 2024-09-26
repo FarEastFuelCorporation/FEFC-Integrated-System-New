@@ -1,10 +1,15 @@
 // OtherComponents/LoadingSpinner.js
 import React from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
-const LoadingSpinner = ({ theme }) => {
+const LoadingSpinner = ({ isLoading }) => {
+  const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  if (!isLoading) {
+    return null; // Don't render anything if not loading
+  }
   return (
     <Box
       sx={{

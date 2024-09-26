@@ -7,12 +7,16 @@ const upload = multer({ storage: multer.memoryStorage() });
 const {
   createDocumentController,
   getDocumentsController,
+  deleteDocumentsController,
 } = require("../controllers/documentController");
 
-// Create Attachment route
+// Create Document route
 router.post("/", upload.single("attachment"), createDocumentController);
 
-// Get Attachments route
+// Get Documents route
 router.get("/", getDocumentsController);
+
+// Delete Document route
+router.delete("/:id", deleteDocumentsController);
 
 module.exports = router;

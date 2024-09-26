@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../OtherComponents/LoadingSpinner";
 
 const ClientSignup = ({ onLogin }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -53,6 +54,7 @@ const ClientSignup = ({ onLogin }) => {
 
   return (
     <div>
+      <LoadingSpinner isLoading={loading} />
       <h2>Client Sign Up</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={submit} disabled={loading}>

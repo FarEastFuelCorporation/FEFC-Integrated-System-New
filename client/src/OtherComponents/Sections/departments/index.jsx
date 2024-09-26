@@ -17,6 +17,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const Departments = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,33 +38,27 @@ const Departments = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/department`);
+
+      setDepartments(response.data.departments);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/department`);
-        setDepartments(response.data.departments);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -107,8 +102,7 @@ const Departments = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = departments.filter((type) => type.id !== id);
-      setDepartments(updatedData);
+      fetchData();
       setSuccessMessage("Department Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -130,29 +124,19 @@ const Departments = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing department
-        response = await axios.put(
-          `${apiUrl}/api/department/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/api/department/${formData.id}`, formData);
 
-        const updatedData = response.data.departments;
-
-        setDepartments(updatedData);
         setSuccessMessage("Department Updated Successfully!");
       } else {
         // Add new department
-        response = await axios.post(`${apiUrl}/api/department`, formData);
+        await axios.post(`${apiUrl}/api/department`, formData);
 
-        const updatedData = response.data.departments;
-
-        setDepartments(updatedData);
         setSuccessMessage("Department Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -241,6 +225,7 @@ const Departments = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Departments" subtitle="List of Departments" />
         {user.userType === 9 && (

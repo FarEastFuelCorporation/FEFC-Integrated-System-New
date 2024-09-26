@@ -90,7 +90,7 @@ async function updateDepartmentController(req, res) {
   }
 }
 
-// Delete Dispatched Transaction controller
+// Delete Department controller
 async function deleteDepartmentController(req, res) {
   try {
     const id = req.params.id;

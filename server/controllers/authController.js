@@ -175,7 +175,7 @@ async function createClientSignupController(req, res) {
 
     if (existingClientUser) {
       // Employee is already registered, send an error response
-      return res.status(400).json({ error: "Employee is already registered" });
+      return res.status(400).json({ error: "Client is already registered" });
     }
 
     // Hash the password before storing it in the database

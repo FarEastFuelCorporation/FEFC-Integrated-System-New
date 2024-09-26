@@ -18,6 +18,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const TypeOfWastes = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -42,46 +43,37 @@ const TypeOfWastes = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/typeOfWaste`);
+
+      const flattenedData = response.data.typeOfWastes.map((item) => ({
+        ...item,
+        treatmentProcess: item.TreatmentProcess
+          ? item.TreatmentProcess.treatmentProcess
+          : null,
+      }));
+
+      setTypeOfWastes(flattenedData);
+
+      const treatmentProcessResponse = await axios.get(
+        `${apiUrl}/api/treatmentProcess`
+      );
+
+      setTreatmentProcess(treatmentProcessResponse.data.treatmentProcesses);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching typeOfWastes:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/typeOfWaste`);
-        const typeOfWastesRecords = response.data;
-        if (
-          typeOfWastesRecords &&
-          Array.isArray(typeOfWastesRecords.typeOfWastes)
-        ) {
-          const flattenedData = typeOfWastesRecords.typeOfWastes.map(
-            (item) => ({
-              ...item,
-              treatmentProcess: item.TreatmentProcess
-                ? item.TreatmentProcess.treatmentProcess
-                : null,
-            })
-          );
-
-          setTypeOfWastes(flattenedData);
-
-          const treatmentProcessResponse = await axios.get(
-            `${apiUrl}/api/treatmentProcess`
-          );
-          const treatmentProcessRecords =
-            treatmentProcessResponse.data.treatmentProcesses;
-
-          setTreatmentProcess(treatmentProcessRecords);
-        } else {
-          console.error(
-            "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching typeOfWastes:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -132,8 +124,7 @@ const TypeOfWastes = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = typeOfWastes.filter((waste) => waste.id !== id);
-      setTypeOfWastes(updatedData);
+      fetchData();
       setSuccessMessage("Type Of Waste Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -161,65 +152,19 @@ const TypeOfWastes = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing type of waste
-        response = await axios.put(
-          `${apiUrl}/api/typeOfWaste/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/api/typeOfWaste/${formData.id}`, formData);
 
-        const typeOfWastesRecords = response.data;
-
-        if (
-          typeOfWastesRecords &&
-          Array.isArray(typeOfWastesRecords.typeOfWastes)
-        ) {
-          const flattenedData = typeOfWastesRecords.typeOfWastes.map(
-            (item) => ({
-              ...item,
-              treatmentProcess: item.TreatmentProcess
-                ? item.TreatmentProcess.treatmentProcess
-                : null,
-            })
-          );
-
-          setTypeOfWastes(flattenedData);
-          setSuccessMessage("Type Of Waste Updated Successfully!");
-        } else {
-          console.error(
-            "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Type Of Waste Updated Successfully!");
       } else {
         // Add new type of waste
-        response = await axios.post(`${apiUrl}/api/typeOfWaste`, formData);
+        await axios.post(`${apiUrl}/api/typeOfWaste`, formData);
 
-        const typeOfWastesRecords = response.data;
-
-        if (
-          typeOfWastesRecords &&
-          Array.isArray(typeOfWastesRecords.typeOfWastes)
-        ) {
-          const flattenedData = typeOfWastesRecords.typeOfWastes.map(
-            (item) => ({
-              ...item,
-              treatmentProcess: item.TreatmentProcess
-                ? item.TreatmentProcess.treatmentProcess
-                : null,
-            })
-          );
-
-          setTypeOfWastes(flattenedData);
-          setSuccessMessage("Type Of Waste Added Successfully!");
-        } else {
-          console.error(
-            "typeOfWastesRecords or typeOfWastesRecords.typeOfWastes is undefined or not an array"
-          );
-        }
+        setSuccessMessage("Type Of Waste Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -310,6 +255,7 @@ const TypeOfWastes = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Waste Types" subtitle="List of Waste Types" />
         {user.userType === 7 && (

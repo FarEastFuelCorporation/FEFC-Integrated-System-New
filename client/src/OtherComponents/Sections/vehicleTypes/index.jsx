@@ -17,6 +17,7 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const VehicleTypes = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,19 +38,23 @@ const VehicleTypes = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/vehicleType`);
+
+      setVehicleTypes(response.data.vehicleTypes);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/vehicleType`);
-        setVehicleTypes(response.data.vehicleTypes);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -107,8 +112,7 @@ const VehicleTypes = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = vehicleTypes.filter((type) => type.id !== id);
-      setVehicleTypes(updatedData);
+      fetchData();
       setSuccessMessage("Vehicle Type Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -130,29 +134,19 @@ const VehicleTypes = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing vehicle type
-        response = await axios.put(
-          `${apiUrl}/api/vehicleType/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/api/vehicleType/${formData.id}`, formData);
 
-        const updatedData = response.data.vehicleTypes;
-
-        setVehicleTypes(updatedData);
         setSuccessMessage("Vehicle Type Updated Successfully!");
       } else {
         // Add new vehicle type
-        response = await axios.post(`${apiUrl}/api/vehicleType`, formData);
+        await axios.post(`${apiUrl}/api/vehicleType`, formData);
 
-        const updatedData = response.data.vehicleTypes;
-
-        setVehicleTypes(updatedData);
         setSuccessMessage("Vehicle Type Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -217,6 +211,7 @@ const VehicleTypes = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Vehicle Types" subtitle="List of Vehicle Types" />
         {user.userType === 3 && (

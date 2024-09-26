@@ -12,6 +12,7 @@ import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import AttachmentModal from "../../TransactionModals/AttachmentModal";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const Documents = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,28 +38,30 @@ const Documents = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/document`);
+
+      // Map over the fetched data to add the attachmentCreatedBy field
+      const mappedAttachmentData = response.data.documents.map(
+        (attachment) => ({
+          ...attachment,
+          attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
+        })
+      );
+
+      setAttachmentData(mappedAttachmentData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/document`);
-
-        // Map over the fetched data to add the attachmentCreatedBy field
-        const mappedAttachmentData = response.data.documents.map(
-          (attachment) => ({
-            ...attachment,
-            attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
-          })
-        );
-
-        setAttachmentData(mappedAttachmentData); // Update state with mapped data
-      } catch (error) {
-        console.error("Error fetching document:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleCloseAttachmentModal = () => {
     setOpenAttachmentModal(false);
@@ -110,8 +113,6 @@ const Documents = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (!attachmentFormData.id) {
         const newFormData = new FormData();
         newFormData.append(
@@ -123,23 +124,35 @@ const Documents = ({ user }) => {
         newFormData.append("createdBy", attachmentFormData.createdBy);
 
         // Add new attachment
-        response = await axios.post(`${apiUrl}/api/document`, newFormData);
-
-        // Map over the fetched data to add the attachmentCreatedBy field
-        const mappedAttachmentData = response.data.documents.map(
-          (attachment) => ({
-            ...attachment,
-            attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
-          })
-        );
-
-        setAttachmentData(mappedAttachmentData);
+        await axios.post(`${apiUrl}/api/document`, newFormData);
 
         setSuccessMessage("Attachment Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseAttachmentModal();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleDeleteClick = async (id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this Document?"
+    );
+
+    if (!isConfirmed) {
+      return; // Abort the deletion if the user cancels
+    }
+
+    try {
+      await axios.delete(`${apiUrl}/api/document`, {
+        data: { deletedBy: user.id },
+      });
+
+      fetchData();
+      setSuccessMessage("Document Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -276,47 +289,45 @@ const Documents = ({ user }) => {
         </IconButton>
       ),
     },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="warning"
+            // onClick={() => handleEditClick(params.row.id)} // Assuming you have a handleEditClick function
+          >
+            <EditIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+          >
+            <DeleteIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
+    },
   ];
-
-  // if (user.userType === 7) {
-  //   columns.push(
-  //     {
-  //       field: "edit",
-  //       headerName: "Edit",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       sortable: false,
-  //       width: 60,
-  //       renderCell: (params) => (
-  //         <IconButton
-  //           color="warning"
-  //           onClick={() => handleEditClick(params.row.id)}
-  //         >
-  //           <EditIcon />
-  //         </IconButton>
-  //       ),
-  //     },
-  //     {
-  //       field: "delete",
-  //       headerName: "Delete",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       sortable: false,
-  //       width: 60,
-  //       renderCell: (params) => (
-  //         <IconButton
-  //           color="error"
-  //           onClick={() => handleDeleteClick(params.row.id)}
-  //         >
-  //           <DeleteIcon />
-  //         </IconButton>
-  //       ),
-  //     }
-  //   );
-  // }
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Documnets" subtitle="List of FEFC Documents" />
         <Box display="flex">

@@ -17,6 +17,7 @@ import axios from "axios";
 import { tokens } from "../../../theme";
 import SuccessMessage from "../../SuccessMessage";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
+import LoadingSpinner from "../../LoadingSpinner";
 
 const ScrapTypes = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,19 +38,23 @@ const ScrapTypes = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${apiUrl}/api/scrapType`);
+
+      setScrapTypes(response.data.scrapTypes);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/scrapType`);
-        setScrapTypes(response.data.scrapTypes);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl]);
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -107,8 +112,7 @@ const ScrapTypes = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      const updatedData = scrapTypes.filter((type) => type.id !== id);
-      setScrapTypes(updatedData);
+      fetchData();
       setSuccessMessage("Scrap Type Deleted Successfully!");
       setShowSuccessMessage(true);
     } catch (error) {
@@ -130,29 +134,19 @@ const ScrapTypes = ({ user }) => {
     }
 
     try {
-      let response;
-
       if (formData.id) {
         // Update existing scrap type
-        response = await axios.put(
-          `${apiUrl}/api/scrapType/${formData.id}`,
-          formData
-        );
+        await axios.put(`${apiUrl}/api/scrapType/${formData.id}`, formData);
 
-        const updatedData = response.data.scrapTypes;
-
-        setScrapTypes(updatedData);
         setSuccessMessage("Scrap Type Updated Successfully!");
       } else {
         // Add new scrap type
-        response = await axios.post(`${apiUrl}/api/scrapType`, formData);
+        await axios.post(`${apiUrl}/api/scrapType`, formData);
 
-        const updatedData = response.data.scrapTypes;
-
-        setScrapTypes(updatedData);
         setSuccessMessage("Scrap Type Added Successfully!");
       }
 
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
     } catch (error) {
@@ -217,6 +211,7 @@ const ScrapTypes = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Scrap Types" subtitle="List of Scrap Types" />
         {user.userType === 5 && (

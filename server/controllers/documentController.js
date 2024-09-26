@@ -56,6 +56,7 @@ async function getDocumentsController(req, res) {
           attributes: ["firstName", "lastName"], // Include only necessary fields
         },
       ],
+      order: [["fileName", "ASC"]],
     });
 
     res.status(200).json({ documents }); // Send the documents directly in the response
@@ -68,7 +69,46 @@ async function getDocumentsController(req, res) {
   }
 }
 
+// Delete Document controller
+async function deleteDocumentsController(req, res) {
+  try {
+    const id = req.params.id;
+    const { deletedBy } = req.body;
+
+    console.log("Soft deleting Document with ID:", id);
+
+    // Find the Document by UUID (id)
+    const documentToDelete = await Document.findByPk(id);
+
+    if (documentToDelete) {
+      // Update the deletedBy field
+      documentToDelete.updatedBy = deletedBy;
+      documentToDelete.deletedBy = deletedBy;
+      await documentToDelete.save();
+
+      // Soft delete the Document (sets deletedAt timestamp)
+      await documentToDelete.destroy();
+
+      // Fetch all Document from the database
+      const documents = await Document.findAll({
+        order: [["department", "ASC"]],
+      });
+
+      // Respond with the updated data
+      res.json({ documents });
+    } else {
+      // If Document with the specified ID was not found
+      res.status(404).json({ message: `Document with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error soft-deleting Document:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createDocumentController,
   getDocumentsController,
+  deleteDocumentsController,
 };

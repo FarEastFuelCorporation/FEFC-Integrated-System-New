@@ -7,7 +7,7 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -27,6 +27,7 @@ const TreatmentSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
       "/dashboard/treatmentMachines": "Treatment Machines",
+      "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
       "/dashboard/faq": "FAQ Page",
@@ -194,6 +195,14 @@ const TreatmentSidebar = ({ user }) => {
               title="Treatment Machines"
               to="treatmentMachines"
               icon={<SettingsSuggestIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Documents"
+              to="documents"
+              icon={<TopicIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

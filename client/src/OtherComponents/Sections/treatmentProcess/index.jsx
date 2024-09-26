@@ -210,7 +210,10 @@ const TreatmentProcess = ({ user }) => {
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
-        <Header title="Vehicle Types" subtitle="List of Vehicle Types" />
+        <Header
+          title="Treatment Process"
+          subtitle="List of Treatment Process"
+        />
         {user.userType === 7 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>

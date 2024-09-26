@@ -9,6 +9,7 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RecyclingIcon from "@mui/icons-material/Recycling";
+import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -33,6 +34,7 @@ const CertificationSidebar = ({ user }) => {
       "/dashboard/clients": "Clients",
       "/dashboard/treatmentProcess": "Treatment Process",
       "/dashboard/typeOfWastes": "Waste Types",
+      "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
       "/dashboard/faq": "FAQ Page",
@@ -215,6 +217,14 @@ const CertificationSidebar = ({ user }) => {
               title="Type of Wastes"
               to="typeOfWastes"
               icon={<RecyclingIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Documents"
+              to="documents"
+              icon={<TopicIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

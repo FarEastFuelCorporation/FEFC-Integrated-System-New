@@ -10,6 +10,7 @@ import Bar from "../Layouts/Sorting/sections/bar";
 import Pie from "../Layouts/Sorting/sections/pie";
 import Line from "../Layouts/Sorting/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import Documents from "../../OtherComponents/Sections/documents";
 
 const SortingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -18,6 +19,7 @@ const SortingRoutes = ({ user, onUpdateUser }) => (
       <Route path="" element={<Dashboard />} />
       <Route path="transactions" element={<SortedTransactions user={user} />} />
       <Route path="scrapTypes" element={<ScrapTypes user={user} />} />
+      <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"

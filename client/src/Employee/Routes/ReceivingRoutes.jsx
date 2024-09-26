@@ -11,6 +11,7 @@ import Bar from "../../Employee/Layouts/Receiving/sections/bar";
 import Pie from "../../Employee/Layouts/Receiving/sections/pie";
 import Line from "../../Employee/Layouts/Receiving/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import Documents from "../../OtherComponents/Sections/documents";
 
 const ReceivingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -22,6 +23,7 @@ const ReceivingRoutes = ({ user, onUpdateUser }) => (
       />
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />
+      <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"

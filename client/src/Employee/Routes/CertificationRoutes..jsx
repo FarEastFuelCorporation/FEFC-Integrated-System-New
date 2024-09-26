@@ -12,6 +12,7 @@ import Bar from "../Layouts/Certification/sections/bar";
 import Pie from "../Layouts/Certification/sections/pie";
 import Line from "../Layouts/Certification/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import Documents from "../../OtherComponents/Sections/documents";
 
 const CertificationRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -27,6 +28,7 @@ const CertificationRoutes = ({ user, onUpdateUser }) => (
         element={<TreatmentProcess user={user} />}
       />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
+      <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"

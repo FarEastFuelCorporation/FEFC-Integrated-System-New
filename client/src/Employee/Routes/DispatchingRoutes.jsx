@@ -13,6 +13,7 @@ import Bar from "../../Employee/Layouts/Dispatching/sections/bar";
 import Pie from "../../Employee/Layouts/Dispatching/sections/pie";
 import Line from "../../Employee/Layouts/Dispatching/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import Documents from "../../OtherComponents/Sections/documents";
 
 const DispatchingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -29,6 +30,7 @@ const DispatchingRoutes = ({ user, onUpdateUser }) => (
         path="vehicleMaintenanceRequests"
         element={<VehicleMaintenanceRequest user={user} />}
       />
+      <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"

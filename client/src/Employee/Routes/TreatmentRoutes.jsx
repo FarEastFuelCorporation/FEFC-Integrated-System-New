@@ -10,6 +10,7 @@ import Bar from "../Layouts/Treatment/sections/bar";
 import Pie from "../Layouts/Treatment/sections/pie";
 import Line from "../Layouts/Treatment/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import Documents from "../../OtherComponents/Sections/documents";
 
 const TreatmentRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -23,6 +24,7 @@ const TreatmentRoutes = ({ user, onUpdateUser }) => (
         path="treatmentMachines"
         element={<TreatmentMachine user={user} />}
       />
+      <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"

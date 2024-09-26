@@ -10,6 +10,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import BuildIcon from "@mui/icons-material/Build";
+import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -32,6 +33,7 @@ const DispatchingSidebar = ({ user }) => {
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/vehicleMaintenanceRequests": "Vehicle Maintenance Request",
+      "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
       "/dashboard/faq": "FAQ Page",
@@ -222,6 +224,14 @@ const DispatchingSidebar = ({ user }) => {
               title="Vehicle Maintenance Request"
               to="vehicleMaintenanceRequests"
               icon={<BuildIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Documents"
+              to="documents"
+              icon={<TopicIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

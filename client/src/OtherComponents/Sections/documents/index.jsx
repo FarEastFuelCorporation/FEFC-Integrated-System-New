@@ -319,13 +319,11 @@ const Documents = ({ user }) => {
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">
         <Header title="Documnets" subtitle="List of FEFC Documents" />
-        {user.userType === 2 && (
-          <Box display="flex">
-            <IconButton onClick={handleOpenAttachmentModal}>
-              <PostAddIcon sx={{ fontSize: "40px" }} />
-            </IconButton>
-          </Box>
-        )}
+        <Box display="flex">
+          <IconButton onClick={handleOpenAttachmentModal}>
+            <PostAddIcon sx={{ fontSize: "40px" }} />
+          </IconButton>
+        </Box>
       </Box>
 
       {showSuccessMessage && (

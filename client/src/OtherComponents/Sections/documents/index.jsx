@@ -242,14 +242,19 @@ const Documents = ({ user }) => {
           return <div></div>; // Return empty div for null
         }
 
-        const { years, months, days } = calculateRemainingTime(expirationDate);
+        const { years, months, days, isExpired } =
+          calculateRemainingTime(expirationDate);
 
         // Determine the display value
         let displayValue;
-        if (years < 0 || months < 0 || days < 0) {
-          displayValue = `${Math.abs(years * 365 + months * 30 + days)} Day${
-            Math.abs(years * 365 + months * 30 + days) === 1 ? "" : "s"
-          } Expired`; // Show number of days expired
+        if (isExpired) {
+          displayValue = `${
+            years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
+          }${
+            months > 0
+              ? months + " Month" + (months === 1 ? "" : "s") + ", "
+              : ""
+          }${days} Day${days === 1 ? "" : "s"} Expired`;
         } else if (years === 0 && months === 0 && days === 0) {
           displayValue = "Expires Today"; // Show if it expires today
         } else {

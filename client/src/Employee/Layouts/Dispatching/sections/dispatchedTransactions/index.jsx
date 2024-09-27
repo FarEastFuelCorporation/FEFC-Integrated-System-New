@@ -6,6 +6,7 @@ import Header from "../../../../../OtherComponents/Header";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const DispatchedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -35,10 +36,12 @@ const DispatchedTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
+      setLoading(true);
       const dispatchedTransactionResponse = await axios.get(
         `${apiUrl}/api/dispatchedTransaction`
       );
@@ -57,6 +60,7 @@ const DispatchedTransactions = ({ user }) => {
       setFinishedTransactions(
         dispatchedTransactionResponse.data.finishedTransactions
       );
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -231,6 +235,7 @@ const DispatchedTransactions = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
         {user.userType === "GEN" && (

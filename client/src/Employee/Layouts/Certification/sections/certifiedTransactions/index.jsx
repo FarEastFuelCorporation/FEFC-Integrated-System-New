@@ -6,6 +6,7 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const CertifiedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -30,10 +31,12 @@ const CertifiedTransactions = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
+      setLoading(true);
       const treatedTransactionResponse = await axios.get(
         `${apiUrl}/api/certifiedTransaction`
       );
@@ -54,6 +57,7 @@ const CertifiedTransactions = ({ user }) => {
       setFinishedTransactions(
         treatedTransactionResponse.data.finishedTransactions
       );
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -195,6 +199,7 @@ const CertifiedTransactions = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
         {user.userType === "GEN" && (

@@ -6,6 +6,7 @@ import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const SortedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -45,10 +46,12 @@ const SortedTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [isDiscrepancy, setIsDiscrepancy] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
+      setLoading(true);
       const sortedTransactionResponse = await axios.get(
         `${apiUrl}/api/sortedTransaction`
       );
@@ -69,6 +72,7 @@ const SortedTransactions = ({ user }) => {
       setFinishedTransactions(
         sortedTransactionResponse.data.finishedTransactions
       );
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -273,6 +277,7 @@ const SortedTransactions = ({ user }) => {
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+      <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
         {user.userType === "GEN" && (

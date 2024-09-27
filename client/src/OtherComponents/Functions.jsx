@@ -47,6 +47,30 @@ export const formatDate = (date) => {
 };
 
 export const formatDateFull = (date) => {
+  // Check if date is null, undefined, or invalid
+  if (!date || isNaN(new Date(date).getTime())) {
+    return "N/A";
+  }
+
   const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Intl.DateTimeFormat("en-US", options).format(date);
+  return new Intl.DateTimeFormat("en-US", options).format(new Date(date));
+};
+
+export const calculateRemainingDays = (expirationDate) => {
+  if (expirationDate === null) {
+    return null; // Handle invalid dates
+  } else if (!expirationDate || isNaN(new Date(expirationDate).getTime())) {
+    return "N/A"; // Handle invalid dates
+  }
+
+  const currentDate = new Date();
+  const expiration = new Date(expirationDate);
+
+  // Calculate the difference in time (milliseconds)
+  const timeDiff = expiration.getTime() - currentDate.getTime();
+
+  // Convert milliseconds to days
+  const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+  return daysRemaining; // Return the remaining days (negative if expired)
 };

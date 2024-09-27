@@ -11,8 +11,9 @@ import Header from "../../Header";
 import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
-import AttachmentModal from "../../TransactionModals/AttachmentModal";
+import DocumentModal from "../../TransactionModals/DocumentModal";
 import LoadingSpinner from "../../LoadingSpinner";
+import { calculateRemainingDays, formatDateFull } from "../../Functions";
 
 const Documents = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -22,6 +23,7 @@ const Documents = ({ user }) => {
   const initialAttachmentFormData = {
     id: "",
     fileName: "",
+    expirationDate: "",
     attachment: "",
     createdBy: user.id,
   };
@@ -50,6 +52,7 @@ const Documents = ({ user }) => {
         (attachment) => ({
           ...attachment,
           attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
+          remainingDays: calculateRemainingDays(attachment.expirationDate), // Calculate remaining days and add to row
         })
       );
 
@@ -73,11 +76,11 @@ const Documents = ({ user }) => {
     setFileName("");
   };
 
-  const handleOpenAttachmentModal = (row) => {
+  const handleOpenAttachmentModal = () => {
     setAttachmentFormData({
       id: "",
-      bookedTransactionId: row.id,
       fileName: "",
+      expirationDate: "",
       attachment: "",
       createdBy: user.id,
     });
@@ -97,43 +100,27 @@ const Documents = ({ user }) => {
     setAttachmentFormData({ ...attachmentFormData, [name]: value });
   };
 
-  const handleAttachmentFormSubmit = async (e) => {
-    e.preventDefault();
+  const handleEditClick = (row) => {
+    const typeToEdit = attachmentData.find((type) => type.id === row.id);
+    console.log(row);
+    if (typeToEdit) {
+      setFileName(typeToEdit.fileName);
+      setSelectedFile(typeToEdit.attachment);
+      setAttachmentFormData({
+        id: typeToEdit.id,
+        fileName: typeToEdit.fileName,
+        expirationDate: typeToEdit.expirationDate
+          ? typeToEdit.expirationDate
+          : "",
+        attachment: typeToEdit.attachment,
+        createdBy: user.id,
+      });
 
-    attachmentFormData.attachment = selectedFile;
-
-    // Perform client-side validation
-    const { fileName, attachment } = attachmentFormData;
-
-    // Check if all required fields are filled
-    if (!fileName || !attachment) {
-      setErrorMessage("Please fill all required fields.");
-      setShowErrorMessage(true);
-      return;
-    }
-
-    try {
-      if (!attachmentFormData.id) {
-        const newFormData = new FormData();
-        newFormData.append(
-          "bookedTransactionId",
-          attachmentFormData.bookedTransactionId
-        );
-        newFormData.append("fileName", attachmentFormData.fileName);
-        newFormData.append("attachment", attachmentFormData.attachment);
-        newFormData.append("createdBy", attachmentFormData.createdBy);
-
-        // Add new attachment
-        await axios.post(`${apiUrl}/api/document`, newFormData);
-
-        setSuccessMessage("Attachment Added Successfully!");
-      }
-
-      fetchData();
-      setShowSuccessMessage(true);
-      handleCloseAttachmentModal();
-    } catch (error) {
-      console.error("Error:", error);
+      setOpenAttachmentModal(true);
+    } else {
+      console.error(
+        `Received Transaction with ID ${row.id} not found for editing.`
+      );
     }
   };
 
@@ -147,7 +134,7 @@ const Documents = ({ user }) => {
     }
 
     try {
-      await axios.delete(`${apiUrl}/api/document`, {
+      await axios.delete(`${apiUrl}/api/document/${id}`, {
         data: { deletedBy: user.id },
       });
 
@@ -156,6 +143,53 @@ const Documents = ({ user }) => {
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const handleAttachmentFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    attachmentFormData.attachment = selectedFile;
+
+    // Perform client-side validation
+    const { fileName, attachment } = attachmentFormData;
+
+    // Check if all required fields are filled
+    if (!fileName || !attachment) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
+      return;
+    }
+
+    const newFormData = new FormData();
+
+    newFormData.append("fileName", attachmentFormData.fileName);
+    newFormData.append("expirationDate", attachmentFormData.expirationDate);
+    newFormData.append("attachment", attachmentFormData.attachment);
+    newFormData.append("createdBy", attachmentFormData.createdBy);
+
+    try {
+      if (attachmentFormData.id) {
+        // Update attachment
+        await axios.put(
+          `${apiUrl}/api/document/${attachmentFormData.id}`,
+          newFormData
+        );
+
+        setSuccessMessage("Document Updated Successfully!");
+      } else {
+        // Add new attachment
+        await axios.post(`${apiUrl}/api/document`, newFormData);
+
+        setSuccessMessage("Document Added Successfully!");
+      }
+
+      fetchData();
+      setShowSuccessMessage(true);
+      handleCloseAttachmentModal();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    setLoading(false);
   };
 
   const renderCellWithWrapText = (params) => (
@@ -170,9 +204,68 @@ const Documents = ({ user }) => {
       headerName: "File Name",
       headerAlign: "center",
       align: "center",
-      flex: 1,
+      flex: 2,
       minWidth: 150,
       renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "expirationDate",
+      headerName: "Expiration Date",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: (params) => {
+        const formattedDate = formatDateFull(params.value);
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: formattedDate })}
+          </div>
+        );
+      },
+    },
+    {
+      field: "remainingDays",
+      headerName: "Days to Expire",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => {
+        const { expirationDate } = params.row;
+
+        // Return empty string if expirationDate is null
+        if (expirationDate === null) {
+          return <div></div>; // Return empty div for null
+        }
+
+        const daysRemaining = calculateRemainingDays(expirationDate);
+
+        // Determine the display value
+        const displayValue =
+          daysRemaining < 0
+            ? `${Math.abs(daysRemaining)} Day${
+                Math.abs(daysRemaining) === 1 ? "" : "s"
+              } Expired` // Show number of days expired
+            : daysRemaining === 0
+            ? "Expires Today" // Show if it expires today
+            : `${daysRemaining} Day${daysRemaining === 1 ? "" : "s"} Remaining`; // Show number of days remaining
+
+        return <div>{displayValue}</div>;
+      },
+      sortComparator: (v1, v2) => {
+        const getDaysValue = (value) => {
+          if (value === null) return 5; // Null should be last (highest value)
+          if (value < 0) return 1; // Expired (highest priority)
+          if (value === 0) return 2; // Expires today (next in line)
+          if (value <= 90) return 3; // Near expired (next)
+          return 4; // Not expired (greater than 90 days, lowest priority)
+        };
+
+        const daysValue1 = getDaysValue(v1);
+        const daysValue2 = getDaysValue(v2);
+
+        return daysValue1 - daysValue2; // Sort based on the calculated values
+      },
     },
     {
       field: "attachmentCreatedBy",
@@ -289,40 +382,40 @@ const Documents = ({ user }) => {
         </IconButton>
       ),
     },
-    // {
-    //   field: "edit",
-    //   headerName: "Edit",
-    //   headerAlign: "center",
-    //   align: "center",
-    //   sortable: false,
-    //   width: 60,
-    //   renderCell: (params) =>
-    //     params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
-    //       <IconButton
-    //         color="warning"
-    //         // onClick={() => handleEditClick(params.row.id)} // Assuming you have a handleEditClick function
-    //       >
-    //         <EditIcon />
-    //       </IconButton>
-    //     ) : null, // Return null if the condition is not met
-    // },
-    // {
-    //   field: "delete",
-    //   headerName: "Delete",
-    //   headerAlign: "center",
-    //   align: "center",
-    //   sortable: false,
-    //   width: 60,
-    //   renderCell: (params) =>
-    //     params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
-    //       <IconButton
-    //         color="error"
-    //         onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
-    //       >
-    //         <DeleteIcon />
-    //       </IconButton>
-    //     ) : null, // Return null if the condition is not met
-    // },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row)} // Assuming you have a handleEditClick function
+          >
+            <EditIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+          >
+            <DeleteIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
+    },
   ];
 
   return (
@@ -349,14 +442,28 @@ const Documents = ({ user }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          getRowClassName={(params) => {
+            const daysRemaining = calculateRemainingDays(
+              params.row.expirationDate
+            );
+
+            if (daysRemaining !== null) {
+              if (daysRemaining < 0) {
+                return "blink-red"; // Expired
+              } else if (daysRemaining <= 90) {
+                return "blink-yellow"; // Near expired
+              }
+            }
+            return ""; // Default class if no blinking is needed
+          }}
           initialState={{
             sorting: {
-              sortModel: [{ field: "wasteCode", sort: "asc" }],
+              sortModel: [{ field: "remainingDays", sort: "asc" }], // Default sorting by remaining days
             },
           }}
         />
       </CustomDataGridStyles>
-      <AttachmentModal
+      <DocumentModal
         user={user}
         open={openAttachmentModal}
         onClose={handleCloseAttachmentModal}

@@ -15,10 +15,14 @@ const Document = sequelize.define(
     },
     fileName: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     attachment: {
       type: DataTypes.BLOB("long"),
+      allowNull: false,
+    },
+    expirationDate: {
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
     createdAt: {

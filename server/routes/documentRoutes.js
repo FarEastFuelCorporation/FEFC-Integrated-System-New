@@ -7,6 +7,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const {
   createDocumentController,
   getDocumentsController,
+  updateDocumentController,
   deleteDocumentsController,
 } = require("../controllers/documentController");
 
@@ -15,6 +16,9 @@ router.post("/", upload.single("attachment"), createDocumentController);
 
 // Get Documents route
 router.get("/", getDocumentsController);
+
+// Update Client route
+router.put("/:id", upload.single("attachment"), updateDocumentController);
 
 // Delete Document route
 router.delete("/:id", deleteDocumentsController);

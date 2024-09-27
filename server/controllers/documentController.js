@@ -7,7 +7,7 @@ const Employee = require("../models/Employee");
 async function createDocumentController(req, res) {
   try {
     // Extracting data from the request body
-    let { fileName, createdBy } = req.body;
+    let { fileName, expirationDate, createdBy } = req.body;
     console.log(req.body);
 
     if (fileName) {
@@ -22,6 +22,7 @@ async function createDocumentController(req, res) {
     // Create Document entry
     await Document.create({
       fileName,
+      expirationDate,
       attachment,
       createdBy,
     });
@@ -34,6 +35,7 @@ async function createDocumentController(req, res) {
           attributes: ["firstName", "lastName"], // Include only necessary fields
         },
       ],
+      order: [["fileName", "ASC"]],
     });
 
     res.status(200).json({ documents }); // Send the documents directly in the response
@@ -69,6 +71,64 @@ async function getDocumentsController(req, res) {
   }
 }
 
+// Update Document controller
+async function updateDocumentController(req, res) {
+  try {
+    // Extracting document ID from request parameters
+    const { id } = req.params;
+    // Extracting data from the request body
+    let { fileName, expirationDate, createdBy } = req.body;
+
+    console.log(req.body);
+
+    if (fileName) {
+      fileName = fileName.toUpperCase(); // Optionally format the file name
+    }
+
+    let attachment = null;
+    if (req.file) {
+      attachment = req.file.buffer; // Store the uploaded file if available
+    }
+
+    // Find the existing document
+    const document = await Document.findByPk(id);
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    // Update the document fields
+    document.fileName = fileName || document.fileName;
+    document.expirationDate = expirationDate || document.expirationDate;
+    document.createdBy = createdBy || document.createdBy;
+
+    // Update attachment only if a new file is uploaded
+    if (attachment) {
+      document.attachment = attachment;
+    }
+
+    // Save the updated document
+    await document.save();
+
+    // Fetch updated document with associated Employee details
+    const documents = await Document.findAll({
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"], // Include only necessary fields
+        },
+      ],
+      order: [["fileName", "ASC"]],
+    });
+
+    res.status(200).json({ documents }); // Send the documents directly in the response
+  } catch (error) {
+    // Handling errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 // Delete Document controller
 async function deleteDocumentsController(req, res) {
   try {
@@ -91,11 +151,17 @@ async function deleteDocumentsController(req, res) {
 
       // Fetch all Document from the database
       const documents = await Document.findAll({
-        order: [["department", "ASC"]],
+        include: [
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"], // Include only necessary fields
+          },
+        ],
+        order: [["fileName", "ASC"]],
       });
 
-      // Respond with the updated data
-      res.json({ documents });
+      res.status(200).json({ documents }); // Send the documents directly in the response
     } else {
       // If Document with the specified ID was not found
       res.status(404).json({ message: `Document with ID ${id} not found` });
@@ -110,5 +176,6 @@ async function deleteDocumentsController(req, res) {
 module.exports = {
   createDocumentController,
   getDocumentsController,
+  updateDocumentController,
   deleteDocumentsController,
 };

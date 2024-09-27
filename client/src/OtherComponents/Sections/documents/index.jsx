@@ -422,7 +422,7 @@ const Documents = ({ user }) => {
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
-        <Header title="Documnets" subtitle="List of FEFC Documents" />
+        <Header title="Documents" subtitle="List of FEFC Documents" />
         <Box display="flex">
           <IconButton onClick={handleOpenAttachmentModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />

@@ -74,3 +74,15 @@ export const calculateRemainingDays = (expirationDate) => {
 
   return daysRemaining; // Return the remaining days (negative if expired)
 };
+
+export function calculateRemainingTime(expirationDate) {
+  const now = new Date();
+  const expiration = new Date(expirationDate);
+  const totalDays = Math.floor((expiration - now) / (1000 * 60 * 60 * 24));
+
+  const years = Math.floor(totalDays / 365);
+  const months = Math.floor((totalDays % 365) / 30);
+  const days = totalDays % 30;
+
+  return { years, months, days };
+}

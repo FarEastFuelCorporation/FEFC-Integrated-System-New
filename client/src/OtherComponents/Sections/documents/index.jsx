@@ -13,7 +13,11 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import DocumentModal from "../../TransactionModals/DocumentModal";
 import LoadingSpinner from "../../LoadingSpinner";
-import { calculateRemainingDays, formatDateFull } from "../../Functions";
+import {
+  calculateRemainingDays,
+  calculateRemainingTime,
+  formatDateFull,
+} from "../../Functions";
 
 const Documents = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -238,17 +242,25 @@ const Documents = ({ user }) => {
           return <div></div>; // Return empty div for null
         }
 
-        const daysRemaining = calculateRemainingDays(expirationDate);
+        const { years, months, days } = calculateRemainingTime(expirationDate);
 
         // Determine the display value
-        const displayValue =
-          daysRemaining < 0
-            ? `${Math.abs(daysRemaining)} Day${
-                Math.abs(daysRemaining) === 1 ? "" : "s"
-              } Expired` // Show number of days expired
-            : daysRemaining === 0
-            ? "Expires Today" // Show if it expires today
-            : `${daysRemaining} Day${daysRemaining === 1 ? "" : "s"} Remaining`; // Show number of days remaining
+        let displayValue;
+        if (years < 0 || months < 0 || days < 0) {
+          displayValue = `${Math.abs(years * 365 + months * 30 + days)} Day${
+            Math.abs(years * 365 + months * 30 + days) === 1 ? "" : "s"
+          } Expired`; // Show number of days expired
+        } else if (years === 0 && months === 0 && days === 0) {
+          displayValue = "Expires Today"; // Show if it expires today
+        } else {
+          displayValue = `${
+            years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
+          }${
+            months > 0
+              ? months + " Month" + (months === 1 ? "" : "s") + ", "
+              : ""
+          }${days} Day${days === 1 ? "" : "s"} Remaining`; // Show years, months, and days remaining
+        }
 
         return <div>{displayValue}</div>;
       },
@@ -267,6 +279,7 @@ const Documents = ({ user }) => {
         return daysValue1 - daysValue2; // Sort based on the calculated values
       },
     },
+
     {
       field: "attachmentCreatedBy",
       headerName: "Uploaded By",
@@ -293,7 +306,11 @@ const Documents = ({ user }) => {
           minute: "numeric",
           hour12: true,
         });
-        return <div>{formattedTimestamp}</div>;
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: formattedTimestamp })}
+          </div>
+        );
       },
     },
     {

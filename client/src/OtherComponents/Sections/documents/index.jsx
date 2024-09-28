@@ -272,7 +272,11 @@ const Documents = ({ user }) => {
           }${days} Day${days === 1 ? "" : "s"} Remaining`; // Show years, months, and days remaining
         }
 
-        return <div>{displayValue}</div>;
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: displayValue })}
+          </div>
+        );
       },
       sortComparator: (v1, v2) => {
         const getDaysValue = (value) => {

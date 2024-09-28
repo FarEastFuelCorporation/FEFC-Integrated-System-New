@@ -113,12 +113,14 @@ const Clients = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/client/${id}`, {
         data: { deletedBy: user.id },
       });
 
       fetchData();
       setSuccessMessage("Client Deleted Successfully!");
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -153,6 +155,7 @@ const Clients = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       const formDataToSend = new FormData();
       formDataToSend.append("clientName", formData.clientName);
       formDataToSend.append("address", formData.address);
@@ -181,6 +184,8 @@ const Clients = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

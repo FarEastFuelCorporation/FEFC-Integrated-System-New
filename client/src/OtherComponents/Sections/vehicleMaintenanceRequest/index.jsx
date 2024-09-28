@@ -139,6 +139,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/vehicleMaintenanceRequest/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -146,6 +147,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
       fetchData();
       setSuccessMessage("Vehicle Maintenance Request Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -165,6 +167,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing vehicle maintenance request
         await axios.put(
@@ -182,6 +185,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

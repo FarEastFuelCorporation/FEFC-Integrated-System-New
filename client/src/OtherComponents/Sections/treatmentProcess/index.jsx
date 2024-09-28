@@ -100,6 +100,7 @@ const TreatmentProcess = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/treatmentProcess/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -107,6 +108,7 @@ const TreatmentProcess = ({ user }) => {
       fetchData();
       setSuccessMessage("Treatment Process Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -116,6 +118,7 @@ const TreatmentProcess = ({ user }) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       // Perform client-side validation
       const { treatmentProcess } = formData;
 
@@ -144,6 +147,7 @@ const TreatmentProcess = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

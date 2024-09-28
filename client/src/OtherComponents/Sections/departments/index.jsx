@@ -98,6 +98,7 @@ const Departments = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/department/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -105,6 +106,7 @@ const Departments = ({ user }) => {
       fetchData();
       setSuccessMessage("Department Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -124,6 +126,7 @@ const Departments = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing department
         await axios.put(`${apiUrl}/api/department/${formData.id}`, formData);
@@ -139,6 +142,7 @@ const Departments = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

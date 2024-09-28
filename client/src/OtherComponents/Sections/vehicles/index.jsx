@@ -143,6 +143,7 @@ const Vehicles = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/vehicle/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -150,6 +151,7 @@ const Vehicles = ({ user }) => {
       fetchData();
       setSuccessMessage("Vehicle Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -176,6 +178,7 @@ const Vehicles = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing vehicle
         await axios.put(`${apiUrl}/api/vehicle/${formData.id}`, formData);
@@ -190,6 +193,7 @@ const Vehicles = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

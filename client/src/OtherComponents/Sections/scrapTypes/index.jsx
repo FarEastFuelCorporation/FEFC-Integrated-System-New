@@ -108,6 +108,7 @@ const ScrapTypes = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/scrapType/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -115,6 +116,7 @@ const ScrapTypes = ({ user }) => {
       fetchData();
       setSuccessMessage("Scrap Type Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -134,6 +136,7 @@ const ScrapTypes = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing scrap type
         await axios.put(`${apiUrl}/api/scrapType/${formData.id}`, formData);
@@ -149,6 +152,7 @@ const ScrapTypes = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

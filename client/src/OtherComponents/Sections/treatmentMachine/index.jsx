@@ -119,6 +119,7 @@ const TreatmentMachine = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/treatmentMachine/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -126,6 +127,7 @@ const TreatmentMachine = ({ user }) => {
       fetchData();
       setSuccessMessage("Treatment Machine Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -143,6 +145,7 @@ const TreatmentMachine = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing treatment machine
         await axios.put(
@@ -160,6 +163,7 @@ const TreatmentMachine = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

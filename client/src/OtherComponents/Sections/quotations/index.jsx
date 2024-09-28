@@ -302,12 +302,14 @@ const Quotations = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/quotation/${id}`, {
         data: { deletedBy: user.id },
       });
 
       fetchData();
       setSuccessMessage("Quotation Deleted Successfully!");
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -317,6 +319,7 @@ const Quotations = ({ user }) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing quotation
         await axios.put(`${apiUrl}/api/quotation/${formData.id}`, formData);
@@ -332,6 +335,7 @@ const Quotations = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

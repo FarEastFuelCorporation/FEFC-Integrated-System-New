@@ -61,6 +61,11 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
 
   // Recalculate height and generate content whenever row or heights change
   useEffect(() => {
+    // Reset states when the row changes
+    setPagesContent([]);
+    setHeightsReady(false);
+    setIsDoneCalculation(false);
+
     calculateRemainingHeight();
   }, [row]);
 

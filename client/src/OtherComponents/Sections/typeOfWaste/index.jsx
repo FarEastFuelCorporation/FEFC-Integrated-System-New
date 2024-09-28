@@ -120,6 +120,7 @@ const TypeOfWastes = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/typeOfWaste/${id}`, {
         data: { deletedBy: user.id },
       });
@@ -127,6 +128,7 @@ const TypeOfWastes = ({ user }) => {
       fetchData();
       setSuccessMessage("Type Of Waste Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -152,6 +154,7 @@ const TypeOfWastes = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         // Update existing type of waste
         await axios.put(`${apiUrl}/api/typeOfWaste/${formData.id}`, formData);
@@ -167,6 +170,7 @@ const TypeOfWastes = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

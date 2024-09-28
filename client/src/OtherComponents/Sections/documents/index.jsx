@@ -138,12 +138,15 @@ const Documents = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/document/${id}`, {
         data: { deletedBy: user.id },
       });
 
       fetchData();
       setSuccessMessage("Document Deleted Successfully!");
+
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -172,6 +175,7 @@ const Documents = ({ user }) => {
     newFormData.append("createdBy", attachmentFormData.createdBy);
 
     try {
+      setLoading(true);
       if (attachmentFormData.id) {
         // Update attachment
         await axios.put(
@@ -190,6 +194,7 @@ const Documents = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseAttachmentModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

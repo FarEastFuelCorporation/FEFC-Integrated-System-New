@@ -68,7 +68,6 @@ const DispatchedTransactions = ({ user }) => {
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    console.log("Fetching data");
     fetchData();
   }, [fetchData]);
 
@@ -147,7 +146,6 @@ const DispatchedTransactions = ({ user }) => {
   };
 
   const handleDeleteClick = async (row) => {
-    console.log(row);
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Dispatched Transaction?"
     );
@@ -157,6 +155,7 @@ const DispatchedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(
         `${apiUrl}/api/dispatchedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].id}`,
         {
@@ -171,6 +170,7 @@ const DispatchedTransactions = ({ user }) => {
 
       setSuccessMessage("Dispatched Transaction deleted successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -205,6 +205,7 @@ const DispatchedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (!formData.driverId) {
         setError("Driver selection is required.");
       } else {
@@ -227,6 +228,7 @@ const DispatchedTransactions = ({ user }) => {
 
         setShowSuccessMessage(true);
         handleCloseModal();
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error:", error);

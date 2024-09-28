@@ -98,23 +98,23 @@ const Contacts = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [employeeRecordResponse, departmentResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/employeeRecord`),
+        axios.get(`${apiUrl}/api/department`),
+      ]);
+
+      setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
+      setDepartments(departmentResponse.data.departments);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching employeeData:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [employeeRecordResponse, departmentResponse] = await Promise.all([
-          axios.get(`${apiUrl}/api/employeeRecord`),
-          axios.get(`${apiUrl}/api/department`),
-        ]);
-
-        console.log(employeeRecordResponse.data.employeeRecords);
-        setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
-        setDepartments(departmentResponse.data.departments);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching employeeData:", error);
-      }
-    };
-
     fetchData();
   }, [apiUrl]);
 
@@ -144,8 +144,6 @@ const Contacts = ({ user }) => {
     setPictureFileName("");
     setSignatureFile("");
 
-    console.log(employeeRecord.departmentId);
-    console.log(employeeRecord.immediateHeadId);
     if (employeeRecord) {
       setFormData({
         id: employeeRecord.id,
@@ -240,8 +238,6 @@ const Contacts = ({ user }) => {
     const file = event.target.files[0];
     if (file) {
       setPictureFile(file);
-      console.log(file);
-      console.log(file.name);
       setPictureFileName(file.name);
     }
   };
@@ -406,7 +402,6 @@ const Contacts = ({ user }) => {
       setShowErrorMessage(true);
       return false;
     }
-    console.log(errors);
     setShowErrorMessage(false);
     setErrorMessage("");
     return true;
@@ -414,15 +409,13 @@ const Contacts = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log("pass");
-
     // Perform client-side validation
     if (!validateForm()) {
       return;
     }
-    console.log(formData);
 
     try {
+      setLoading(true);
       const formDataToSend = new FormData();
 
       // Append form data fields to FormData object
@@ -520,32 +513,29 @@ const Contacts = ({ user }) => {
       if (signatureFile) {
         formDataToSend.append("signature", signatureFile);
       }
-      console.log(formDataToSend);
-      let response;
 
       if (formData.id) {
         // Update existing employee record
-        response = await axios.put(
+        await axios.put(
           `${apiUrl}/api/employeeRecord/${formData.id}`,
           formDataToSend
         );
-        console.log(response.data.employeeRecord);
-        setEmployeeRecord(response.data.employeeRecords);
+
         setSuccessMessage("Employee Record Updated Successfully!");
       } else {
         // Add new employee record
-        response = await axios.post(
-          `${apiUrl}/api/employeeRecord`,
-          formDataToSend
-        );
-        setEmployeeRecord(response.data.employeeRecords);
+        await axios.post(`${apiUrl}/api/employeeRecord`, formDataToSend);
+
         setSuccessMessage("Employee Record Added Successfully!");
       }
 
+      fetchData();
       clearFormData();
       setErrorMessage("");
       setShowSuccessMessage(true);
       handleCloseModal();
+
+      setLoading(false);
     } catch (error) {
       // Handle any unexpected errors
       console.error("Error submitting form:", error);

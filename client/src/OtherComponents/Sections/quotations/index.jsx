@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, IconButton, Modal } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import PageviewIcon from "@mui/icons-material/Pageview";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -71,6 +72,11 @@ const Quotations = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isContentReady, setIsContentReady] = useState(false);
+  const [isDownloadContentReady, setDownloadIsContentReady] = useState(false);
+  const [isDownload, setIsDownload] = useState(false);
+
+  const [showQuotationForm, setShowQuotationForm] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -125,42 +131,138 @@ const Quotations = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleViewClick = (row) => {
+    setLoading(true);
+    const quotationToView = quotationsData.find(
+      (quotation) => quotation.id === row.QuotationWaste[0].quotationId
+    );
+    console.log("handleViewClick press", quotationToView); // Debugging line
+    setSelectedQuotation(quotationToView); // Set the selected quotation
+
+    setIsDownload(false);
+    // Set the flag to show the form
+    setShowQuotationForm(true);
+
+    setLoading(false);
+  };
+
+  const handleViewPDF = () => {
+    const input = certificateRef.current;
+    console.log("handleViewPDF press: ", input); // Debugging line
+    const pageHeight = 1056;
+    const pageWidth = 816;
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [pageWidth, pageHeight], // Page size in px
+    });
+
+    // Function to process and add each page
+    const processPage = (pageIndex, pages) => {
+      if (pageIndex >= pages.length) {
+        // All pages are processed, generate the PDF
+        const pdfOutput = pdf.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfOutput);
+        window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
+        return;
+      }
+
+      // Capture the content of the current page using html2canvas
+      html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+
+        if (pageIndex === 0) {
+          // Add the first page
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        } else {
+          // Add subsequent pages
+          pdf.addPage([pageWidth, pageHeight]);
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        }
+
+        // Process the next page
+        processPage(pageIndex + 1, pages);
+      });
+    };
+
+    // Break the content into multiple pages if needed
+    const pages = Array.from(input.children); // Assuming each page is a child of input
+    processPage(0, pages); // Start processing pages from the first one
+  };
+
+  useEffect(() => {
+    console.log("isContentReady", isContentReady);
+    if (isContentReady) {
+      handleViewPDF();
+    }
+  }, [isContentReady]);
+
   const handleDownloadClick = (row) => {
-    console.log(row);
-    console.log(row.QuotationWaste[0].quotationId);
     const quotationToDownload = quotationsData.find(
       (quotation) => quotation.id === row.QuotationWaste[0].quotationId
     );
-    console.log(quotationToDownload);
     setSelectedQuotation(quotationToDownload); // Set the selected quotation
     // Use a timeout to allow the component to render before downloading
-    setTimeout(() => {
+
+    setIsDownload(true);
+    // Set the flag to show the form
+    setShowQuotationForm(true);
+
+    if (showQuotationForm) {
       handleDownloadPDF(quotationToDownload);
-    }, 1000); // Adjust the delay as needed
+    }
   };
 
   const handleDownloadPDF = (quotationData) => {
+    console.log("handleDownloadPDF");
     const input = certificateRef.current;
     const pageHeight = 1056;
     const pageWidth = 816;
-
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [pageWidth, pageHeight], // Page size in px
-      });
-
-      // Add the captured image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-
-      // Save the generated PDF
-      pdf.save(
-        `${quotationData.quotationCode}-${quotationData.revisionNumber}-${quotationData.Client.clientName}.pdf`
-      );
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [pageWidth, pageHeight], // Page size in px
     });
+
+    // Function to process and add each page
+    const processPage = (pageIndex, pages) => {
+      if (pageIndex >= pages.length) {
+        // All pages are processed, save the PDF
+        pdf.save(
+          `${quotationData.quotationCode}-${quotationData.revisionNumber}-${quotationData.Client.clientName}.pdf`
+        );
+        return;
+      }
+
+      // Capture the content of the current page using html2canvas
+      html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+
+        if (pageIndex === 0) {
+          // Add the first page
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        } else {
+          // Add subsequent pages
+          pdf.addPage([pageWidth, pageHeight]);
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        }
+
+        // Process the next page
+        processPage(pageIndex + 1, pages);
+      });
+    };
+
+    // Break the content into multiple pages if needed
+    const pages = Array.from(input.children); // Assuming each page is a child of input
+    processPage(0, pages); // Start processing pages from the first one
   };
+
+  useEffect(() => {
+    console.log("isDownloadContentReady", isDownloadContentReady);
+    if (isDownloadContentReady) {
+      handleDownloadPDF(selectedQuotation);
+    }
+  }, [isDownloadContentReady]);
 
   const handleEditClick = (id) => {
     const quotationToEdit = quotationsData.find(
@@ -191,7 +293,6 @@ const Quotations = ({ user }) => {
   };
 
   const handleDeleteClick = async (id) => {
-    console.log(id);
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Quotation?"
     );
@@ -351,26 +452,42 @@ const Quotations = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
     },
+    {
+      field: "view",
+      headerName: "View File",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 80,
+      renderCell: (params) => (
+        <IconButton
+          color="secondary"
+          onClick={() => handleViewClick(params.row)}
+        >
+          <PageviewIcon sx={{ fontSize: "2rem" }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "download",
+      headerName: "Download",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 80,
+      renderCell: (params) => (
+        <IconButton
+          color="secondary"
+          onClick={() => handleDownloadClick(params.row)}
+        >
+          <DownloadIcon sx={{ fontSize: "2rem" }} />
+        </IconButton>
+      ),
+    },
   ];
 
   if (user.userType === 2) {
     columns.push(
-      {
-        field: "download",
-        headerName: "Download",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 80,
-        renderCell: (params) => (
-          <IconButton
-            color="secondary"
-            onClick={() => handleDownloadClick(params.row)}
-          >
-            <DownloadIcon sx={{ fontSize: "2rem" }} />
-          </IconButton>
-        ),
-      },
       {
         field: "edit",
         headerName: "Edit",
@@ -446,9 +563,15 @@ const Quotations = ({ user }) => {
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
       />
-      {selectedQuotation && (
+      {showQuotationForm && (
         <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
-          <QuotationForm ref={certificateRef} row={selectedQuotation} />
+          <QuotationForm
+            ref={certificateRef}
+            row={selectedQuotation}
+            setIsContentReady={
+              isDownload ? setDownloadIsContentReady : setIsContentReady
+            }
+          />
         </Box>
       )}
     </Box>

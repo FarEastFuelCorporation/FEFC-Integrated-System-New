@@ -126,6 +126,7 @@ const ScheduledTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       // Make the delete request
       await axios.delete(
         `${apiUrl}/api/scheduledTransaction/${row.ScheduledTransaction[0].id}`,
@@ -139,6 +140,7 @@ const ScheduledTransactions = ({ user }) => {
       // Display success message
       setSuccessMessage("Scheduled Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -157,6 +159,7 @@ const ScheduledTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         await axios.put(
           `${apiUrl}/api/scheduledTransaction/${formData.id}`,
@@ -172,6 +175,8 @@ const ScheduledTransactions = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

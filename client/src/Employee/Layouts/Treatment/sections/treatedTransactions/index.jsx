@@ -49,8 +49,6 @@ const TreatedTransactions = ({ user }) => {
         `${apiUrl}/api/treatedTransaction`
       );
 
-      console.log(treatedTransactionResponse);
-
       // For pending transactions
       setPendingTransactions(
         treatedTransactionResponse.data.pendingTransactions
@@ -73,12 +71,10 @@ const TreatedTransactions = ({ user }) => {
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    console.log("Fetching data");
     fetchData();
   }, [fetchData]);
 
   const handleOpenModal = (row, waste) => {
-    console.log(row);
     setFormData({
       row: row,
       waste: waste,
@@ -129,6 +125,7 @@ const TreatedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/treatedTransaction/${row.id}`, {
         data: {
           deletedBy: user.id,
@@ -140,6 +137,7 @@ const TreatedTransactions = ({ user }) => {
 
       setSuccessMessage("Treated Waste Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -204,16 +202,14 @@ const TreatedTransactions = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     // Perform client-side validation
     if (!validateForm()) {
       return;
     }
 
     try {
+      setLoading(true);
       const updatedFormData = updateIsFinished(formData);
-
-      console.log(updatedFormData);
 
       if (!formData.id) {
         await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
@@ -224,6 +220,7 @@ const TreatedTransactions = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -261,7 +258,6 @@ const TreatedTransactions = ({ user }) => {
   //     const isAllTreated = updatedFormData.row.sortedWasteTransaction.every(
   //       (item) => item.treatedWeight === item.weight
   //     );
-  //     console.log("isAllTreated:", isAllTreated);
   //     updatedFormData.isFinished = isAllTreated;
   //   }
 

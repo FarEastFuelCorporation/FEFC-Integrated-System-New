@@ -56,8 +56,6 @@ const SortedTransactions = ({ user }) => {
         `${apiUrl}/api/sortedTransaction`
       );
 
-      console.log(sortedTransactionResponse);
-
       // For pending transactions
       setPendingTransactions(
         sortedTransactionResponse.data.pendingTransactions
@@ -80,7 +78,6 @@ const SortedTransactions = ({ user }) => {
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    console.log("Fetching data");
     fetchData();
   }, [fetchData]);
 
@@ -139,7 +136,6 @@ const SortedTransactions = ({ user }) => {
       const sortedTransaction =
         typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
           .ReceivedTransaction?.[0].SortedTransaction?.[0] || {};
-      console.log(sortedTransaction);
       setFormData({
         id: sortedTransaction.id,
         clientId: typeToEdit.Client.clientId,
@@ -188,7 +184,6 @@ const SortedTransactions = ({ user }) => {
   };
 
   const handleDeleteClick = async (row) => {
-    console.log(row);
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Sorted Transaction?"
     );
@@ -198,6 +193,7 @@ const SortedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(
         `${apiUrl}/api/sortedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
         {
@@ -211,6 +207,7 @@ const SortedTransactions = ({ user }) => {
       fetchData();
       setSuccessMessage("Received Transaction deleted successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -252,7 +249,7 @@ const SortedTransactions = ({ user }) => {
       return;
     }
     try {
-      console.log(formData);
+      setLoading(true);
       if (formData.id) {
         await axios.put(
           `${apiUrl}/api/sortedTransaction/${formData.id}`,
@@ -270,6 +267,8 @@ const SortedTransactions = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

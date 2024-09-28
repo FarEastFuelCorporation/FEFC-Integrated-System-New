@@ -50,8 +50,6 @@ const ReceivedTransactions = ({ user }) => {
         `${apiUrl}/api/receivedTransaction`
       );
 
-      console.log(receivedTransactionResponse);
-
       // For pending transactions
       setPendingTransactions(
         receivedTransactionResponse.data.pendingTransactions
@@ -74,7 +72,6 @@ const ReceivedTransactions = ({ user }) => {
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    console.log("Fetching data");
     fetchData();
   }, [fetchData]);
 
@@ -155,7 +152,6 @@ const ReceivedTransactions = ({ user }) => {
   };
 
   const handleDeleteClick = async (row) => {
-    console.log(row);
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Received Transaction?"
     );
@@ -165,6 +161,7 @@ const ReceivedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(
         `${apiUrl}/api/receivedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].id}`,
         {
@@ -179,6 +176,7 @@ const ReceivedTransactions = ({ user }) => {
 
       setSuccessMessage("Received Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -223,6 +221,7 @@ const ReceivedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         await axios.put(
           `${apiUrl}/api/receivedTransaction/${formData.id}`,
@@ -240,6 +239,7 @@ const ReceivedTransactions = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

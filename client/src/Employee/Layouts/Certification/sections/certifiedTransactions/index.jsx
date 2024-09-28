@@ -41,8 +41,6 @@ const CertifiedTransactions = ({ user }) => {
         `${apiUrl}/api/certifiedTransaction`
       );
 
-      console.log(treatedTransactionResponse);
-
       // For pending transactions
       setPendingTransactions(
         treatedTransactionResponse.data.pendingTransactions
@@ -65,7 +63,6 @@ const CertifiedTransactions = ({ user }) => {
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {
-    console.log("Fetching data");
     fetchData();
   }, [fetchData]);
 
@@ -112,6 +109,7 @@ const CertifiedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       await axios.delete(`${apiUrl}/api/certifiedTransaction/${row.id}`, {
         data: {
           deletedBy: user.id,
@@ -123,6 +121,8 @@ const CertifiedTransactions = ({ user }) => {
 
       setSuccessMessage("Treated Waste Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
+
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -181,7 +181,7 @@ const CertifiedTransactions = ({ user }) => {
     }
 
     try {
-      console.log(formData);
+      setLoading(true);
       if (!formData.id) {
         await axios.post(`${apiUrl}/api/certifiedTransaction`, formData);
 
@@ -192,6 +192,8 @@ const CertifiedTransactions = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

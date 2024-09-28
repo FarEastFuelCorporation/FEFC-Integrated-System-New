@@ -28,8 +28,6 @@ const BookedTransactions = ({ user }) => {
     [user.id]
   );
 
-  console.log(user);
-
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [pendingTransactions, setPendingTransactions] = useState([]);
@@ -116,6 +114,7 @@ const BookedTransactions = ({ user }) => {
       window.confirm("Are you sure you want to delete this Book Transaction?")
     ) {
       try {
+        setLoading(true);
         await axios.delete(`${apiUrl}/api/bookedTransaction/${row.id}`, {
           data: { deletedBy: user.id },
         });
@@ -123,6 +122,7 @@ const BookedTransactions = ({ user }) => {
         fetchData();
         setSuccessMessage("Booked Transaction Deleted Successfully!");
         setShowSuccessMessage(true);
+        setLoading(false);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -155,6 +155,7 @@ const BookedTransactions = ({ user }) => {
     }
 
     try {
+      setLoading(true);
       if (formData.id) {
         await axios.put(
           `${apiUrl}/api/bookedTransaction/${formData.id}`,
@@ -171,6 +172,7 @@ const BookedTransactions = ({ user }) => {
 
       setShowSuccessMessage(true);
       handleCloseModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }

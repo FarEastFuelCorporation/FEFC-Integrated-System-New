@@ -28,6 +28,7 @@ import SortedTransaction from "./Transactions/SortedTransaction";
 import TreatedTransaction from "./Transactions/TreatedTransaction";
 import CertifiedTransaction from "./Transactions/CertifiedTransaction";
 import Attachments from "./Attachments";
+import BilledTransaction from "./Transactions/BilledTransaction";
 
 const Transaction = ({
   user,
@@ -228,6 +229,14 @@ const Transaction = ({
                     user={user}
                   />
                 )}
+                {user.userType === 8 && (
+                  <BilledTransaction
+                    row={row}
+                    handleOpenModal={handleOpenModal}
+                    handleDeleteClick={handleDeleteClick}
+                    user={user}
+                  />
+                )}
               </CustomAccordionDetails>
               <Tabs
                 value={selectedSubTab}
@@ -247,6 +256,14 @@ const Transaction = ({
                 <CustomAccordionDetails>
                   {Number.isInteger(user.userType) ? (
                     <>
+                      {row.statusId >= 8 && (
+                        <BilledTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                       {row.statusId >= 7 && (
                         <CertifiedTransaction
                           row={row}

@@ -36,6 +36,7 @@ const EmployeeRecord = require("../models/EmployeeRecord");
 const EmployeeAttachment = require("../models/EmployeeAttachment");
 const IdInformation = require("../models/IdInformation");
 const Document = require("../models/Document");
+const BilledTransaction = require("../models/BilledTransaction");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -234,6 +235,17 @@ Employee.hasMany(CertifiedTransaction, {
   sourceKey: "employeeId",
 });
 CertifiedTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(BilledTransaction, {
+  as: "BilledTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+BilledTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
@@ -636,6 +648,19 @@ BookedTransaction.hasMany(CertifiedTransaction, {
 CertifiedTransaction.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BilledTransaction.hasMany(CertifiedTransaction, {
+  as: "CertifiedTransaction",
+  foreignKey: "certifiedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CertifiedTransaction.belongsTo(BilledTransaction, {
+  as: "BilledTransaction",
+  foreignKey: "certifiedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

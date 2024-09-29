@@ -10,6 +10,7 @@ import HRRoutes from "../Employee/Routes/HRRoutes";
 import RoleProtectedRoute from "../OtherComponents/RoleProtectedRoute";
 import SortingRoutes from "../Employee/Routes/SortingRoutes";
 import TreatmentRoutes from "../Employee/Routes/TreatmentRoutes";
+import BillingRoutes from "../Employee/Routes/BillingRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -60,6 +61,12 @@ const Dashboard = ({ user, onUpdateUser }) => {
       return (
         <RoleProtectedRoute user={user} allowedRoles={[7]}>
           <CertificationRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 8:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[8]}>
+          <BillingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 9:

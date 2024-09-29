@@ -1,0 +1,110 @@
+import React from "react";
+import { Box, Typography, useTheme } from "@mui/material";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import { CircleLogo } from "../CustomAccordionStyles";
+import { format } from "date-fns";
+import { tokens } from "../../theme";
+import CertificateOfDestruction from "../Certificates/CertificateOfDestruction";
+import { timestampDate, parseTimeString } from "../Functions";
+
+const BilledTransaction = ({ row, user }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
+  console.log(row);
+
+  const certifiedTransaction =
+    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
+      .SortedTransaction[0].CertifiedTransaction[0];
+
+  return (
+    <Box>
+      {row.statusId === 7 ? (
+        <Box sx={{ my: 3, position: "relative" }}>
+          <CircleLogo pending={true}>
+            <ReceiptIcon
+              sx={{
+                fontSize: "30px",
+                color: `${colors.grey[500]}`,
+              }}
+            />
+          </CircleLogo>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
+              For Billing
+            </Typography>
+          </Box>
+          <Typography variant="h5">Pending</Typography>
+          <br />
+          <hr />
+        </Box>
+      ) : (
+        <Box sx={{ my: 3, position: "relative" }}>
+          <CircleLogo>
+            <ReceiptIcon
+              sx={{
+                fontSize: "30px",
+                color: `${colors.grey[100]}`,
+              }}
+            />
+          </CircleLogo>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
+              Billed
+            </Typography>
+            <Typography variant="h5">
+              {certifiedTransaction.createdAt
+                ? timestampDate(certifiedTransaction.createdAt)
+                : ""}
+            </Typography>
+          </Box>
+          <Typography variant="h5">
+            Certified Date:{" "}
+            {certifiedTransaction.certifiedDate
+              ? format(
+                  new Date(certifiedTransaction.certifiedDate),
+                  "MMMM dd, yyyy"
+                )
+              : "Pending"}
+          </Typography>
+          <Typography variant="h5">
+            Certified Time:{" "}
+            {certifiedTransaction.certifiedTime
+              ? format(
+                  parseTimeString(certifiedTransaction.certifiedTime),
+                  "hh:mm aa"
+                )
+              : "Pending"}
+          </Typography>
+          <Typography variant="h5">
+            Remarks:{" "}
+            {certifiedTransaction.remarks
+              ? certifiedTransaction.remarks
+              : "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">
+            Submitted By:{" "}
+            {`${certifiedTransaction.Employee.firstName || ""} ${
+              certifiedTransaction.Employee.lastName || ""
+            }`}
+          </Typography>
+          <CertificateOfDestruction row={row} />
+          <br />
+          <hr />
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+export default BilledTransaction;

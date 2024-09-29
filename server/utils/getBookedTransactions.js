@@ -22,6 +22,7 @@ const TreatmentProcess = require("../models/TreatmentProcess");
 const TreatmentMachine = require("../models/TreatmentMachine");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const Attachment = require("../models/Attachment");
+const BilledTransaction = require("../models/BilledTransaction");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -138,11 +139,23 @@ const getIncludeOptions = () => [
                     model: CertifiedTransaction,
                     as: "CertifiedTransaction",
                     required: false,
-                    include: {
-                      model: Employee,
-                      as: "Employee",
-                      attributes: ["firstName", "lastName"],
-                    },
+                    include: [
+                      {
+                        model: Employee,
+                        as: "Employee",
+                        attributes: ["firstName", "lastName"],
+                      },
+                      {
+                        model: BilledTransaction,
+                        as: "BilledTransaction",
+                        required: false,
+                        include: {
+                          model: Employee,
+                          as: "Employee",
+                          attributes: ["firstName", "lastName"],
+                        },
+                      },
+                    ],
                   },
                   {
                     model: Employee,

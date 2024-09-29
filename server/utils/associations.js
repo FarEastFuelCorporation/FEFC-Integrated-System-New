@@ -627,6 +627,19 @@ CertifiedTransaction.belongsTo(SortedTransaction, {
   onDelete: "CASCADE",
 });
 
+BookedTransaction.hasMany(CertifiedTransaction, {
+  as: "CertifiedTransaction",
+  foreignKey: "bookedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CertifiedTransaction.belongsTo(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 // Export the associations
 module.exports = {
   Employee,

@@ -91,12 +91,12 @@ const CertifiedTransaction = ({ row, user }) => {
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Certified By:{" "}
+            Submitted By:{" "}
             {`${certifiedTransaction.Employee.firstName || ""} ${
               certifiedTransaction.Employee.lastName || ""
             }`}
           </Typography>
-          {user.userType === 7 && <CertificateOfDestruction row={row} />}
+          <CertificateOfDestruction row={row} />
           <br />
           <hr />
         </Box>

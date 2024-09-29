@@ -149,7 +149,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
             };
 
             const getCellStyle = (isLastCell, width) => ({
-              padding: "4px",
+              padding: "2px",
               border: "1px solid black",
               borderTop: "none",
               borderRight: isLastCell ? "1px solid black" : "none",

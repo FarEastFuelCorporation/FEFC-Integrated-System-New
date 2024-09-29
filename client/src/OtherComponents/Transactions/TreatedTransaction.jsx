@@ -427,7 +427,7 @@ const TreatedTransaction = ({
         {/* <Typography variant="h5">
         Remarks: {sortedRemarks ? sortedRemarks : "NO REMARKS"}
       </Typography> */}
-        <Typography variant="h5">Treated By: {employeeNames}</Typography>
+        <Typography variant="h5">Submitted By: {employeeNames}</Typography>
       </Box>
       <br />
       <hr />

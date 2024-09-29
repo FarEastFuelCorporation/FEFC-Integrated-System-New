@@ -96,3 +96,54 @@ export function calculateRemainingTime(expirationDate) {
 
   return { years, months, days, isExpired, totalDays };
 }
+
+export const getLatestTreatedDate = (transactions) => {
+  return transactions.reduce((latest, waste) => {
+    if (waste.TreatedWasteTransaction.length > 0) {
+      const latestInWaste = waste.TreatedWasteTransaction.reduce(
+        (latestDate, transaction) => {
+          const treatedDate = new Date(transaction.treatedDate);
+          return treatedDate > new Date(latestDate)
+            ? treatedDate
+            : new Date(latestDate);
+        },
+        new Date(0)
+      );
+      return latestInWaste > new Date(latest)
+        ? latestInWaste
+        : new Date(latest);
+    }
+    return new Date(latest);
+  }, new Date(0));
+};
+
+export const formatDateWithSuffix = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+
+  // Determine suffix
+  const suffix = (day) => {
+    if (day >= 11 && day <= 13) return "th"; // Special case for 11th, 12th, 13th
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
+  const suffixStr = suffix(day);
+
+  // Return an object with day, suffix, and the rest of the date string
+  return {
+    day: day,
+    suffix: suffixStr,
+    dateString: `day of ${month} ${year}`,
+  };
+};

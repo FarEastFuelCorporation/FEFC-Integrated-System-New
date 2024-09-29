@@ -71,9 +71,9 @@ const App = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/certificate/:id" element={<Certificate />} />
+          <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
-          <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
           {user ? (
             <Route
               path="/dashboard/*"

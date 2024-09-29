@@ -281,4 +281,5 @@ const fetchData = async (statusId, user = null) => {
 
 module.exports = {
   fetchData,
+  getIncludeOptions,
 };

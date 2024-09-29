@@ -18,6 +18,7 @@ const Certificate = () => {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const certificateResponse = await axios.get(
         `${apiUrl}/api/certificate/${id}`
       );
@@ -27,9 +28,7 @@ const Certificate = () => {
       );
 
       // Set a timeout of 5 seconds before setting loading to false
-      setTimeout(() => {
-        setLoading(false);
-      }, 5000); // 5000 ms = 5 seconds
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -41,7 +40,7 @@ const Certificate = () => {
 
   return (
     <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "center" }}>
-      {loading && <LoadingSpinner />}
+      <LoadingSpinner isLoading={loading} />
       {quotationData ? (
         <CertificateOfDestruction row={quotationData} verify={true} />
       ) : (

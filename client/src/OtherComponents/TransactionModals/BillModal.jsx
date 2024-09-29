@@ -22,21 +22,11 @@ const BillModal = ({
   setFormData,
   handleFormSubmit,
   errorMessage,
-  setErrorMessage,
   showErrorMessage,
-  setShowErrorMessage,
+  refs,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
 
   return (
     <Box>
@@ -63,19 +53,15 @@ const BillModal = ({
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id
-              ? "Update Certified Transaction"
-              : "Certify Transaction"}
+            {formData.id ? "Update Billed Transaction" : "Billing Transaction"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
-              label="Certified Date"
-              name="certifiedDate"
-              value={formData.certifiedDate}
-              onChange={handleInputChange}
+              label="Billed Date"
+              inputRef={refs.billedDateRef}
               fullWidth
               type="date"
               required
@@ -88,10 +74,8 @@ const BillModal = ({
               autoComplete="off"
             />
             <TextField
-              label="Certified Time"
-              name="certifiedTime"
-              value={formData.certifiedTime}
-              onChange={handleInputChange}
+              label="Billed Time"
+              inputRef={refs.billedTimeRef}
               fullWidth
               type="time"
               required
@@ -103,62 +87,24 @@ const BillModal = ({
               }}
               autoComplete="off"
             />
+            <TextField
+              label="Service Invoice Number"
+              inputRef={refs.serviceInvoiceNumberRef}
+              fullWidth
+              type="text"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
           </div>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6} lg={6}>
-              <FormControl fullWidth>
-                <InputLabel
-                  id="typeOfCertificate-select-label"
-                  style={{ color: colors.grey[100] }}
-                  required
-                >
-                  Type of Certificate
-                </InputLabel>
-                <Select
-                  labelId="typeOfCertificate-select-label"
-                  name="typeOfCertificate"
-                  value={formData.typeOfCertificate}
-                  onChange={handleInputChange}
-                  label="typeOfCertificate"
-                  fullWidth
-                >
-                  <MenuItem value={"CERTIFICATE OF DESTRUCTION"}>
-                    CERTIFICATE OF DESTRUCTION
-                  </MenuItem>
-                  <MenuItem value={"CERTIFICATE OF DISPOSAL"}>
-                    CERTIFICATE OF DISPOSAL
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6}>
-              <FormControl fullWidth>
-                <InputLabel
-                  id="typeOfWeight-select-label"
-                  style={{ color: colors.grey[100] }}
-                  required
-                >
-                  Type of Weight
-                </InputLabel>
-                <Select
-                  labelId="typeOfWeight-select-label"
-                  name="typeOfWeight"
-                  value={formData.typeOfWeight}
-                  onChange={handleInputChange}
-                  label="typeOfCertificate"
-                  fullWidth
-                >
-                  <MenuItem value={"CLIENT WEIGHT"}>CLIENT WEIGHT</MenuItem>
-                  <MenuItem value={"SORTED WEIGHT"}>SORTED WEIGHT</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
           <TextField
             label="Remarks"
-            name="remarks"
-            value={formData.remarks}
-            onChange={handleInputChange}
+            inputRef={refs.remarksRef}
             fullWidth
             InputLabelProps={{
               style: {
@@ -171,7 +117,6 @@ const BillModal = ({
             label="Status Id"
             name="statusId"
             value={formData.statusId}
-            onChange={handleInputChange}
             fullWidth
             autoComplete="off"
             style={{ display: "none" }}
@@ -180,7 +125,6 @@ const BillModal = ({
             label="Created By"
             name="createdBy"
             value={formData.createdBy}
-            onChange={handleInputChange}
             fullWidth
             autoComplete="off"
             style={{ display: "none" }}
@@ -190,7 +134,7 @@ const BillModal = ({
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update" : "Certify"}
+            {formData.id ? "Update" : "Bill"}
           </Button>
         </Box>
       </Modal>

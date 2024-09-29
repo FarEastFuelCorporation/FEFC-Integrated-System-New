@@ -7,6 +7,7 @@ import SortModal from "./TransactionModals/SortModal";
 import TreatModal from "./TransactionModals/TreatModal";
 import AttachmentModal from "./TransactionModals/AttachmentModal";
 import CertifyModal from "./TransactionModals/CertifyModal";
+import BillModal from "./TransactionModals/BillModal";
 
 const Modal = ({
   user,
@@ -24,6 +25,7 @@ const Modal = ({
   setShowErrorMessage,
   setIsDiscrepancy,
   isDiscrepancy,
+  refs,
 }) => {
   let ModalComponent;
   switch (user.userType) {
@@ -139,6 +141,25 @@ const Modal = ({
           setErrorMessage={setErrorMessage}
           showErrorMessage={showErrorMessage}
           setShowErrorMessage={setShowErrorMessage}
+        />
+      );
+      break;
+    case 8:
+      ModalComponent = (
+        <BillModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          showErrorMessage={showErrorMessage}
+          setShowErrorMessage={setShowErrorMessage}
+          refs={refs}
         />
       );
       break;

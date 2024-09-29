@@ -15,6 +15,9 @@ const CertifiedTransactions = ({ user }) => {
     id: "",
     bookedTransactionId: "",
     sortedTransactionId: "",
+    certificateNumber: "",
+    certifiedDate: "",
+    certifiedTime: "",
     typeOfCertificate: "",
     typeOfWeight: "",
     remarks: "",
@@ -37,23 +40,23 @@ const CertifiedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const treatedTransactionResponse = await axios.get(
+      const certifiedTransactionResponse = await axios.get(
         `${apiUrl}/api/certifiedTransaction`
       );
 
       // For pending transactions
       setPendingTransactions(
-        treatedTransactionResponse.data.pendingTransactions
+        certifiedTransactionResponse.data.pendingTransactions
       );
 
       // For in progress transactions
       setInProgressTransactions(
-        treatedTransactionResponse.data.inProgressTransactions
+        certifiedTransactionResponse.data.inProgressTransactions
       );
 
       // For finished transactions
       setFinishedTransactions(
-        treatedTransactionResponse.data.finishedTransactions
+        certifiedTransactionResponse.data.finishedTransactions
       );
       setLoading(false);
     } catch (error) {
@@ -99,27 +102,66 @@ const CertifiedTransactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleEditClick = (row) => {
+    const typeToEdit = inProgressTransactions.find(
+      (type) => type.id === row.id
+    );
+
+    if (typeToEdit) {
+      const certifiedTransaction =
+        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
+          ?.CertifiedTransaction?.[0] || {};
+
+      setFormData({
+        id: certifiedTransaction.id,
+        bookedTransactionId: typeToEdit.id,
+        sortedTransactionId:
+          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
+        certificateNumber: certifiedTransaction.certificateNumber,
+        certifiedDate: certifiedTransaction.certifiedDate,
+        certifiedTime: certifiedTransaction.certifiedTime,
+        typeOfCertificate: certifiedTransaction.typeOfCertificate,
+        typeOfWeight: certifiedTransaction.typeOfWeight,
+        remarks: certifiedTransaction.remarks,
+        statusId: typeToEdit.statusId,
+        createdBy: user.id,
+      });
+
+      setOpenModal(true);
+    } else {
+      console.error(
+        `Dispatched Transaction with ID ${row.id} not found for editing.`
+      );
+    }
+  };
+
   const handleDeleteClick = async (row) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Treated Waste Transaction?"
+      "Are you sure you want to delete this Certified Transaction?"
     );
 
     if (!isConfirmed) {
       return; // Abort the deletion if the user cancels
     }
-
+    console.log(row);
+    console.log(row.bookedTransactionId);
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/certifiedTransaction/${row.id}`, {
-        data: {
-          deletedBy: user.id,
-          bookedTransactionId: row.bookedTransactionId,
-        },
-      });
+      await axios.delete(
+        `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].id}`,
+        {
+          data: {
+            deletedBy: user.id,
+            bookedTransactionId: row.id,
+          },
+        }
+      );
 
       fetchData();
 
-      setSuccessMessage("Treated Waste Transaction Deleted Successfully!");
+      setSuccessMessage("Certified Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
 
       setLoading(false);
@@ -182,7 +224,14 @@ const CertifiedTransactions = ({ user }) => {
 
     try {
       setLoading(true);
-      if (!formData.id) {
+      if (formData.id) {
+        await axios.put(
+          `${apiUrl}/api/certifiedTransaction/${formData.id}`,
+          formData
+        );
+
+        setSuccessMessage("Certified Transaction Updated Successfully!");
+      } else {
         await axios.post(`${apiUrl}/api/certifiedTransaction`, formData);
 
         setSuccessMessage("Certified Transaction Submitted Successfully!");
@@ -226,6 +275,7 @@ const CertifiedTransactions = ({ user }) => {
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
+        handleEditClick={handleEditClick}
         handleDeleteClick={handleDeleteClick}
         setSuccessMessage={setSuccessMessage}
         setShowSuccessMessage={setShowSuccessMessage}

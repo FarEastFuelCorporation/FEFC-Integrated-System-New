@@ -14,18 +14,18 @@ import {
 import letterhead from "../../images/letterhead.jpg";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import CertificateOfDestructionHeader from "./CertificateOfDestructionHeader";
+import CertificateOfDestructionHeader from "../Certificates/CertificateOfDestructionHeader";
 import {
   CertificateOfDestructionFooter1,
   CertificateOfDestructionFooter2,
-} from "./CertificateOfDestructionFooter";
+} from "../Certificates/CertificateOfDestructionFooter";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
   return url.replace(portPattern, ":3000");
 };
 
-const CertificateOfDestruction = ({ row, verify = null }) => {
+const BillingStatementForm = ({ row, verify = null }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
@@ -216,7 +216,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
           color="secondary"
           onClick={handleDownloadPDF}
         >
-          Download Certificate
+          Download Billing Statement
         </Button>
       )}
 
@@ -225,4 +225,4 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   );
 };
 
-export default CertificateOfDestruction;
+export default BillingStatementForm;

@@ -60,7 +60,6 @@ const Transaction = ({
       : selectedTab === 1
       ? inProgressTransactions
       : finishedTransactions;
-  console.log();
 
   const pendingCount = pendingTransactions.filter(
     (transaction) => transaction.statusId === 1
@@ -288,6 +287,14 @@ const Transaction = ({
                     </>
                   ) : (
                     <>
+                      {row.statusId >= 7 && (
+                        <BilledTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                       {row.statusId >= 6 && (
                         <CertifiedTransaction
                           row={row}

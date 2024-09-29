@@ -652,16 +652,21 @@ CertifiedTransaction.belongsTo(BookedTransaction, {
   onDelete: "CASCADE",
 });
 
-BilledTransaction.hasMany(CertifiedTransaction, {
-  as: "CertifiedTransaction",
-  foreignKey: "certifiedTransactionId",
-  sourceKey: "id",
+// BilledTransaction belongs to many CertifiedTransaction through BilledCertified
+BilledTransaction.belongsToMany(CertifiedTransaction, {
+  through: "BilledCertified", // Junction table
+  as: "CertifiedTransaction", // Alias for the CertifiedTransactions
+  foreignKey: "billedTransactionId", // Foreign key on the junction table
+  otherKey: "certifiedTransactionId", // The other key on the junction table
   onDelete: "CASCADE",
 });
-CertifiedTransaction.belongsTo(BilledTransaction, {
-  as: "BilledTransaction",
-  foreignKey: "certifiedTransactionId",
-  targetKey: "id",
+
+// CertifiedTransaction belongs to many BilledTransaction through BilledCertified
+CertifiedTransaction.belongsToMany(BilledTransaction, {
+  through: "BilledCertified", // Junction table
+  as: "BilledTransaction", // Alias for the BilledTransactions
+  foreignKey: "certifiedTransactionId", // Foreign key on the junction table
+  otherKey: "billedTransactionId", // The other key on the junction table
   onDelete: "CASCADE",
 });
 

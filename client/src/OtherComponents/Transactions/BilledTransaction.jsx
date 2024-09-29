@@ -4,14 +4,12 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
-import CertificateOfDestruction from "../Certificates/CertificateOfDestruction";
+import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 import { timestampDate, parseTimeString } from "../Functions";
 
 const BilledTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  console.log(row);
 
   const certifiedTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
@@ -69,7 +67,7 @@ const BilledTransaction = ({ row, user }) => {
             </Typography>
           </Box>
           <Typography variant="h5">
-            Certified Date:{" "}
+            Billed Date:{" "}
             {certifiedTransaction.certifiedDate
               ? format(
                   new Date(certifiedTransaction.certifiedDate),
@@ -78,7 +76,7 @@ const BilledTransaction = ({ row, user }) => {
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Certified Time:{" "}
+            Billed Time:{" "}
             {certifiedTransaction.certifiedTime
               ? format(
                   parseTimeString(certifiedTransaction.certifiedTime),
@@ -98,7 +96,7 @@ const BilledTransaction = ({ row, user }) => {
               certifiedTransaction.Employee.lastName || ""
             }`}
           </Typography>
-          <CertificateOfDestruction row={row} />
+          <BillingStatementForm row={row} />
           <br />
           <hr />
         </Box>

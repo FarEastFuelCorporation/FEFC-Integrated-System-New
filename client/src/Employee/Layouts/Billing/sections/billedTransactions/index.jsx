@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../../../../../OtherComponents/Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -11,14 +17,23 @@ import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 const BilledTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
+  // Create refs for the input fields
+  const billedDateRef = useRef();
+  const billedTimeRef = useRef();
+  const serviceInvoiceNumberRef = useRef();
+  const remarksRef = useRef();
+
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    sortedTransactionId: "",
-    typeOfCertificate: "",
-    typeOfWeight: "",
+    certifiedTransactionId: "",
+    billingNumber: "",
+    billedDate: "",
+    billedTime: "",
+    serviceInvoiceNumber: "",
+    billedAmount: 0,
     remarks: "",
-    statusId: 7,
+    statusId: 8,
     createdBy: user.id,
   };
 
@@ -37,23 +52,23 @@ const BilledTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const treatedTransactionResponse = await axios.get(
+      const billedTransactionResponse = await axios.get(
         `${apiUrl}/api/billedTransaction`
       );
 
       // For pending transactions
       setPendingTransactions(
-        treatedTransactionResponse.data.pendingTransactions
+        billedTransactionResponse.data.pendingTransactions
       );
 
       // For in progress transactions
       setInProgressTransactions(
-        treatedTransactionResponse.data.inProgressTransactions
+        billedTransactionResponse.data.inProgressTransactions
       );
-
+      console.log(billedTransactionResponse.data.inProgressTransactions);
       // For finished transactions
       setFinishedTransactions(
-        treatedTransactionResponse.data.finishedTransactions
+        billedTransactionResponse.data.finishedTransactions
       );
       setLoading(false);
     } catch (error) {
@@ -70,16 +85,18 @@ const BilledTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      sortedTransactionId:
+      certifiedTransactionId: [
         row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].id,
-      certificateNumber: "",
-      certifiedDate: "",
-      certifiedTime: "",
-      typeOfCertificate: "",
-      typeOfWeight: "",
+          .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
+          .id,
+      ],
+      billingNumber: "",
+      billedDate: "",
+      billedTime: "",
+      serviceInvoiceNumber: "",
+      billedAmount: 0,
       remarks: "",
-      statusId: 7,
+      statusId: 8,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -99,9 +116,45 @@ const BilledTransactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleEditClick = (row) => {
+    const typeToEdit = inProgressTransactions.find(
+      (type) => type.id === row.id
+    );
+
+    if (typeToEdit) {
+      const certifiedTransaction =
+        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
+          ?.CertifiedTransaction?.[0] || {};
+
+      setFormData({
+        id: certifiedTransaction.id,
+        bookedTransactionId: typeToEdit.id,
+        sortedTransactionId: [
+          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
+        ],
+        certificateNumber: certifiedTransaction.certificateNumber,
+        certifiedDate: certifiedTransaction.certifiedDate,
+        certifiedTime: certifiedTransaction.certifiedTime,
+        typeOfCertificate: certifiedTransaction.typeOfCertificate,
+        typeOfWeight: certifiedTransaction.typeOfWeight,
+        remarks: certifiedTransaction.remarks,
+        statusId: typeToEdit.statusId,
+        createdBy: user.id,
+      });
+
+      setOpenModal(true);
+    } else {
+      console.error(
+        `Dispatched Transaction with ID ${row.id} not found for editing.`
+      );
+    }
+  };
+
   const handleDeleteClick = async (row) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Treated Waste Transaction?"
+      "Are you sure you want to delete this Billed Transaction?"
     );
 
     if (!isConfirmed) {
@@ -110,16 +163,19 @@ const BilledTransactions = ({ user }) => {
 
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/certifiedTransaction/${row.id}`, {
-        data: {
-          deletedBy: user.id,
-          bookedTransactionId: row.bookedTransactionId,
-        },
-      });
+      await axios.delete(
+        `${apiUrl}/api/billedTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.id}`,
+        {
+          data: {
+            deletedBy: user.id,
+            bookedTransactionId: row.id,
+          },
+        }
+      );
 
       fetchData();
 
-      setSuccessMessage("Treated Waste Transaction Deleted Successfully!");
+      setSuccessMessage("Billed Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
 
       setLoading(false);
@@ -128,37 +184,22 @@ const BilledTransactions = ({ user }) => {
     }
   };
 
-  const validateForm = () => {
+  const validateForm = (data) => {
     let validationErrors = [];
 
-    // Validate bookedTransactionId
-    if (!formData.bookedTransactionId) {
-      validationErrors.push("Booked Transaction ID is required.");
+    // Validate billedDate
+    if (!data.billedDate) {
+      validationErrors.push("Billed Date is required.");
     }
 
-    // Validate sortedTransactionId
-    if (!formData.sortedTransactionId) {
-      validationErrors.push("Sorted Transaction ID is required.");
+    // Validate billedTime
+    if (!data.billedTime) {
+      validationErrors.push("Billed Time is required.");
     }
 
-    // Validate certifiedDate
-    if (!formData.certifiedDate) {
-      validationErrors.push("Certified Date is required.");
-    }
-
-    // Validate certifiedTime
-    if (!formData.certifiedTime) {
-      validationErrors.push("Certified Time is required.");
-    }
-
-    // Validate typeOfCertificate
-    if (!formData.typeOfCertificate) {
-      validationErrors.push("Type of Certificate is required.");
-    }
-
-    // Validate typeOfWeight
-    if (!formData.typeOfWeight) {
-      validationErrors.push("Type of Weight is required.");
+    // Validate serviceInvoiceNumber
+    if (!data.serviceInvoiceNumber) {
+      validationErrors.push("Service Invoice Number is required.");
     }
 
     if (validationErrors.length > 0) {
@@ -175,17 +216,34 @@ const BilledTransactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    // Set formData from refs before validation
+    const updatedFormData = {
+      ...formData,
+      billedDate: billedDateRef.current.value,
+      billedTime: billedTimeRef.current.value,
+      serviceInvoiceNumber: serviceInvoiceNumberRef.current.value,
+      remarks: remarksRef.current.value,
+    };
+
     // Perform client-side validation
-    if (!validateForm()) {
+    if (!validateForm(updatedFormData)) {
       return;
     }
 
     try {
       setLoading(true);
-      if (!formData.id) {
-        await axios.post(`${apiUrl}/api/certifiedTransaction`, formData);
 
-        setSuccessMessage("Certified Transaction Submitted Successfully!");
+      if (formData.id) {
+        await axios.put(
+          `${apiUrl}/api/billedTransaction/${formData.id}`,
+          formData
+        );
+
+        setSuccessMessage("Billed Transaction Updated Successfully!");
+      } else {
+        await axios.post(`${apiUrl}/api/billedTransaction`, formData);
+
+        setSuccessMessage("Billed Transaction Submitted Successfully!");
       }
 
       fetchData();
@@ -226,6 +284,7 @@ const BilledTransactions = ({ user }) => {
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
         handleOpenModal={handleOpenModal}
+        handleEditClick={handleEditClick}
         handleDeleteClick={handleDeleteClick}
         setSuccessMessage={setSuccessMessage}
         setShowSuccessMessage={setShowSuccessMessage}
@@ -242,6 +301,12 @@ const BilledTransactions = ({ user }) => {
         setErrorMessage={setErrorMessage}
         showErrorMessage={showErrorMessage}
         setShowErrorMessage={setShowErrorMessage}
+        refs={{
+          billedDateRef,
+          billedTimeRef,
+          serviceInvoiceNumberRef,
+          remarksRef,
+        }}
       />
     </Box>
   );

@@ -129,7 +129,7 @@ const TreatedTransactions = ({ user }) => {
       await axios.delete(`${apiUrl}/api/treatedTransaction/${row.id}`, {
         data: {
           deletedBy: user.id,
-          bookedTransactionId: row.bookedTransactionId,
+          bookedTransactionId: row.id,
         },
       });
 

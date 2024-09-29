@@ -4,8 +4,9 @@ const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
-const generateCertificateNumber = require("../utils/generateCertificateNumber");
+const generateBillingNumber = require("../utils/generateBillingNumber");
 const { fetchData } = require("../utils/getBookedTransactions");
+const BilledCertified = require("./BilledCertified");
 const transactionStatusId = 7;
 
 // Create Billed Transaction controller
@@ -15,43 +16,62 @@ async function createBilledTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      sortedTransactionId,
+      certifiedTransactionIds, // Expecting an array of CertifiedTransaction IDs
       billedDate,
       billedTime,
-      typeOfCertificate,
-      typeOfWeight,
+      serviceInvoiceNumber,
+      billedAmount,
       remarks,
       statusId,
       createdBy,
     } = req.body;
-    console.log(req.body);
+
+    console.log("req.body", req.body);
+
     if (remarks) {
       remarks = remarks.toUpperCase();
     }
 
-    const certificateNumber = await generateCertificateNumber();
+    const billingNumber = await generateBillingNumber();
 
     // Create BilledTransaction entry
-    await BilledTransaction.create(
+    const billedTransaction = await BilledTransaction.create(
       {
         bookedTransactionId,
-        sortedTransactionId,
-        certificateNumber,
+        billingNumber,
         billedDate,
         billedTime,
-        typeOfCertificate,
-        typeOfWeight,
+        serviceInvoiceNumber,
+        billedAmount,
         remarks,
         createdBy,
       },
-      { transaction: transaction }
+      { transaction }
     );
-    // Adding treated wastes to TreatedWasteTransaction table
 
+    // Link CertifiedTransactions with the newly created BilledTransaction using BilledCertified
+    if (certifiedTransactionIds && certifiedTransactionIds.length > 0) {
+      // Create entries in the BilledCertified join table
+      const billedCertified = await Promise.all(
+        certifiedTransactionIds.map(async (certifiedId) => {
+          await BilledCertified.create(
+            {
+              billedTransactionId: billedTransaction.id,
+              certifiedTransactionId: certifiedId,
+            },
+            { transaction }
+          );
+        })
+      );
+      console.log("billedCertified", billedCertified);
+    }
+
+    // Update the status of the booked transaction
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       { transaction }
     );
+
     if (updatedBookedTransaction) {
       updatedBookedTransaction.statusId = statusId;
       await updatedBookedTransaction.save({ transaction });
@@ -59,8 +79,8 @@ async function createBilledTransactionController(req, res) {
       // Commit the transaction
       await transaction.commit();
 
-      // fetch transactions
-      const data = await fetchData(transactionStatusId);
+      // Fetch updated transaction data
+      const data = await fetchData(statusId);
 
       // Respond with the updated data
       res.status(200).json({

@@ -28,10 +28,10 @@ const Certificate = () => {
       );
 
       // Set a timeout of 5 seconds before setting loading to false
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {

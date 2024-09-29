@@ -22,9 +22,7 @@ const CertifyModal = ({
   setFormData,
   handleFormSubmit,
   errorMessage,
-  setErrorMessage,
   showErrorMessage,
-  setShowErrorMessage,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);

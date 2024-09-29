@@ -13,10 +13,6 @@ const BilledTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    certifiedTransactionId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
     billingNumber: {
       type: DataTypes.STRING,
       allowNull: false,

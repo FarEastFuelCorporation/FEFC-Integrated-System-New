@@ -101,6 +101,79 @@ async function getCertifiedTransactionsController(req, res) {
   }
 }
 
+// Update Certified Transaction controller
+async function updateCertifiedTransactionController(req, res) {
+  try {
+    const id = req.params.id;
+    console.log("Updating certified transaction with ID:", id);
+
+    const transaction = await sequelize.transaction(); // Start a transaction
+    try {
+      // Extracting data from the request body
+      const {
+        bookedTransactionId,
+        sortedTransactionId,
+        certifiedDate,
+        certifiedTime,
+        typeOfCertificate,
+        typeOfWeight,
+        remarks,
+        statusId,
+        createdBy,
+      } = req.body;
+
+      // Uppercase the remarks if present
+      const updatedRemarks = remarks ? remarks.toUpperCase() : null;
+
+      // Find the certified transaction by UUID (id)
+      const certifiedTransaction = await CertifiedTransaction.findByPk(id);
+
+      if (certifiedTransaction) {
+        // Update certified transaction attributes
+        certifiedTransaction.bookedTransactionId = bookedTransactionId;
+        certifiedTransaction.sortedTransactionId = sortedTransactionId;
+        certifiedTransaction.certifiedDate = certifiedDate;
+        certifiedTransaction.certifiedTime = certifiedTime;
+        certifiedTransaction.typeOfCertificate = typeOfCertificate;
+        certifiedTransaction.typeOfWeight = typeOfWeight;
+        certifiedTransaction.remarks = updatedRemarks;
+        certifiedTransaction.statusId = statusId;
+        certifiedTransaction.updatedBy = createdBy;
+
+        // Save the updated certified transaction
+        await certifiedTransaction.save({ transaction });
+
+        // Fetch updated data after the save operation (you may want to modify this)
+        const data = await fetchData(statusId);
+
+        // Commit the transaction
+        await transaction.commit();
+
+        // Respond with the updated data
+        res.status(200).json({
+          pendingTransactions: data.pending,
+          inProgressTransactions: data.inProgress,
+          finishedTransactions: data.finished,
+        });
+      } else {
+        // If certified transaction with the specified ID was not found
+        await transaction.rollback();
+        res
+          .status(404)
+          .json({ message: `Certified Transaction with ID ${id} not found` });
+      }
+    } catch (error) {
+      // Rollback the transaction in case of any error
+      await transaction.rollback();
+      console.error("Error updating certified transaction:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  } catch (error) {
+    console.error("Error starting transaction:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 // Delete Certified Transaction controller
 async function deleteCertifiedTransactionController(req, res) {
   try {
@@ -109,29 +182,30 @@ async function deleteCertifiedTransactionController(req, res) {
 
     console.log(bookedTransactionId);
 
-    console.log("Soft deleting sorted transaction with ID:", id);
+    console.log("Soft deleting certified transaction with ID:", id);
 
-    // Find the sorted transaction by UUID (id)
-    const treatedWasteTransactionToDelete =
-      await TreatedWasteTransaction.findByPk(id);
+    // Find the certified transaction by UUID (id)
+    const certifiedTransactionToDelete = await CertifiedTransaction.findByPk(
+      id
+    );
 
-    if (treatedWasteTransactionToDelete) {
+    if (certifiedTransactionToDelete) {
       // Update the deletedBy field
-      treatedWasteTransactionToDelete.updatedBy = deletedBy;
-      treatedWasteTransactionToDelete.deletedBy = deletedBy;
-      await treatedWasteTransactionToDelete.save();
+      certifiedTransactionToDelete.updatedBy = deletedBy;
+      certifiedTransactionToDelete.deletedBy = deletedBy;
+      await certifiedTransactionToDelete.save();
 
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         bookedTransactionId
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = 5;
+      updatedBookedTransaction.statusId = 6;
 
       await updatedBookedTransaction.save();
 
-      // Soft delete the sorted transaction (sets deletedAt timestamp)
-      await treatedWasteTransactionToDelete.destroy();
+      // Soft delete the certified transaction (sets deletedAt timestamp)
+      await certifiedTransactionToDelete.destroy();
 
       // fetch transactions
       const data = await fetchData(transactionStatusId);
@@ -143,14 +217,14 @@ async function deleteCertifiedTransactionController(req, res) {
         finishedTransactions: data.finished,
       });
     } else {
-      // If sorted transaction with the specified ID was not found
+      // If certified transaction with the specified ID was not found
       res
         .status(404)
-        .json({ message: `Sorted Transaction with ID ${id} not found` });
+        .json({ message: `Certified Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error soft-deleting sorted transaction:", error);
+    console.error("Error soft-deleting certified transaction:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -158,5 +232,6 @@ async function deleteCertifiedTransactionController(req, res) {
 module.exports = {
   createCertifiedTransactionController,
   getCertifiedTransactionsController,
+  updateCertifiedTransactionController,
   deleteCertifiedTransactionController,
 };

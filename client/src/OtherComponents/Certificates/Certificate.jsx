@@ -22,65 +22,20 @@ const Certificate = () => {
         `${apiUrl}/api/certificate/${id}`
       );
 
-      // const attachment = certificateResponse.data.certificateAttachment;
-      // console.log("Fetched attachment:", attachment);
-
-      // if (!attachment || !attachment.attachment.data) {
-      //   console.error("Attachment data is missing.");
-      //   setLoading(false);
-      //   return;
-      // }
-
       setQuotationData(
         certificateResponse.data.certifiedTransaction.BookedTransaction
       );
 
-      // const byteArray = new Uint8Array(attachment.attachment.data);
-      // const base64String = btoa(
-      //   byteArray.reduce((data, byte) => data + String.fromCharCode(byte), "")
-      // );
-
-      // const magicNumbers = byteArray.slice(0, 4).join(",");
-      // let mimeType = "application/octet-stream";
-
-      // if (magicNumbers.startsWith("255,216,255")) {
-      //   mimeType = "image/jpeg";
-      //   setFileSrc(`data:${mimeType};base64,${base64String}`);
-      // } else if (magicNumbers.startsWith("137,80,78,71")) {
-      //   mimeType = "image/png";
-      //   setFileSrc(`data:${mimeType};base64,${base64String}`);
-      // } else if (magicNumbers.startsWith("37,80,68,70")) {
-      //   mimeType = "application/pdf";
-      //   convertPdfToImage(byteArray);
-      // }
-      setLoading(false);
+      // Set a timeout of 5 seconds before setting loading to false
+      setTimeout(() => {
+        setLoading(false);
+      }, 5000); // 5000 ms = 5 seconds
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    // const convertPdfToImage = async (pdfData) => {
-    //   const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    //   const page = await pdf.getPage(1);
-    //   const scale = 0.75;
-    //   const viewport = page.getViewport({ scale });
-
-    //   const canvas = document.createElement("canvas");
-    //   const context = canvas.getContext("2d");
-    //   canvas.width = viewport.width;
-    //   canvas.height = viewport.height;
-
-    //   const renderContext = {
-    //     canvasContext: context,
-    //     viewport: viewport,
-    //   };
-
-    //   await page.render(renderContext).promise;
-    //   const imageUrl = canvas.toDataURL("image/png");
-    //   setFileSrc(imageUrl);
-    // };
-
     fetchData();
   }, [apiUrl, id]);
 

@@ -280,11 +280,9 @@ const Documents = ({ user }) => {
       },
       sortComparator: (v1, v2) => {
         const getDaysValue = (value) => {
-          if (value === null) return 5; // Null should be last (highest value)
-          if (value < 0) return 1; // Expired (highest priority)
-          if (value === 0) return 2; // Expires today (next in line)
-          if (value <= 90) return 3; // Near expired (next)
-          return 4; // Not expired (greater than 90 days, lowest priority)
+          if (value === null) return 1000000; // Null should be last (highest value)
+
+          return value;
         };
 
         const daysValue1 = getDaysValue(v1);

@@ -94,5 +94,5 @@ export function calculateRemainingTime(expirationDate) {
   const months = Math.floor((absoluteDays % 365) / 30);
   const days = absoluteDays % 30;
 
-  return { years, months, days, isExpired };
+  return { years, months, days, isExpired, totalDays };
 }

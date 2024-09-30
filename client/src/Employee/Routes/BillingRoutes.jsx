@@ -5,7 +5,7 @@ import Dashboard from "../Layouts/Billing/sections/dashboard";
 import Clients from "../../OtherComponents/Sections/clients";
 import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
 import BilledTransactions from "../Layouts/Billing/sections/billedTransactions";
-import Commissions from "../../OtherComponents/Sections/commissions";
+import Quotations from "../../OtherComponents/Sections/quotations";
 import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../Layouts/Billing/sections/calendar";
 import FAQ from "../Layouts/Billing/sections/faq";
@@ -22,7 +22,7 @@ const BillingRoutes = ({ user, onUpdateUser }) => (
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
       <Route path="transactions" element={<BilledTransactions user={user} />} />
-      <Route path="commissions" element={<Commissions />} />
+      <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

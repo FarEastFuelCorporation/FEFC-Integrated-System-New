@@ -38,7 +38,6 @@ const getIncludeOptions = () => [
   {
     model: QuotationTransportation,
     as: "QuotationTransportation",
-    attributes: ["id", "vehicleTypeId"],
     include: [
       {
         model: VehicleType,
@@ -87,6 +86,10 @@ const getIncludeOptions = () => [
                     as: "SortedWasteTransaction",
                     required: false,
                     include: [
+                      {
+                        model: QuotationWaste,
+                        as: "QuotationWaste",
+                      },
                       {
                         model: TreatedWasteTransaction,
                         as: "TreatedWasteTransaction",

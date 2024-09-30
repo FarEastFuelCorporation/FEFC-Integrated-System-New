@@ -394,6 +394,19 @@ BookedTransaction.belongsTo(QuotationWaste, {
   onDelete: "CASCADE",
 });
 
+QuotationWaste.hasMany(SortedWasteTransaction, {
+  as: "SortedWasteTransaction",
+  foreignKey: "quotationWasteId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+SortedWasteTransaction.belongsTo(QuotationWaste, {
+  as: "QuotationWaste",
+  foreignKey: "quotationWasteId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 QuotationTransportation.hasMany(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "quotationTransportationId",

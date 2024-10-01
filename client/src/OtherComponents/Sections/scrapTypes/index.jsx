@@ -9,7 +9,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Header from "../../../Employee/Layouts/Sorting/sections/Header";
+import Header from "../../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";

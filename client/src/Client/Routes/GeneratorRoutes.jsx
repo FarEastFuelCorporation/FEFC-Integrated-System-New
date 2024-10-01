@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import UserDashboard from "../../OtherComponents/UserDashboard";
+import UserDashboard from "../../OtherComponents/UserSidebar";
 import Dashboard from "../../Client/Layouts/Generator/sections/dashboard";
 import BookedTransactions from "../Layouts/Generator/sections/bookedTransactions";
 import Quotations from "../../OtherComponents/Sections/quotations";

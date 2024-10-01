@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import UserDashboard from "../../OtherComponents/UserDashboard";
+import UserSidebar from "../../OtherComponents/UserSidebar";
 import Dashboard from "../../Employee/Layouts/Dispatching/sections/dashboard";
 import DispatchedTransactions from "../Layouts/Dispatching/sections/dispatchedTransactions";
 import VehicleLocation from "../Layouts/Dispatching/sections/vehicleLocation";
@@ -8,16 +8,12 @@ import VehicleTypes from "../../OtherComponents/Sections/vehicleTypes";
 import Vehicles from "../../OtherComponents/Sections/vehicles";
 import VehicleMaintenanceRequest from "../../OtherComponents/Sections/vehicleMaintenanceRequest";
 import Calendar from "../../Employee/Layouts/Dispatching/sections/calendar";
-import FAQ from "../../Employee/Layouts/Dispatching/sections/faq";
-import Bar from "../../Employee/Layouts/Dispatching/sections/bar";
-import Pie from "../../Employee/Layouts/Dispatching/sections/pie";
-import Line from "../../Employee/Layouts/Dispatching/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
 
 const DispatchingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
-    <Route path="/" element={<UserDashboard user={user} />}>
+    <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route
         path="transactions"
@@ -36,10 +32,6 @@ const DispatchingRoutes = ({ user, onUpdateUser }) => (
         path="switchUser"
         element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
       />
-      <Route path="faq" element={<FAQ />} />
-      <Route path="bar" element={<Bar />} />
-      <Route path="pie" element={<Pie />} />
-      <Route path="line" element={<Line />} />
     </Route>
   </Routes>
 );

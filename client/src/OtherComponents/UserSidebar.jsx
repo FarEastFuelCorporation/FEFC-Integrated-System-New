@@ -10,7 +10,7 @@ import CertificationSidebar from "../Employee/Layouts/Certification/Certificatio
 import HRSidebar from "../Employee/Layouts/HR/HRSidebar";
 import BillingSidebar from "../Employee/Layouts/Billing/BillingSidebar";
 
-const UserDashboard = ({ user }) => {
+const UserSidebar = ({ user }) => {
   let sidebar;
   switch (user.userType) {
     case "GEN":
@@ -39,7 +39,7 @@ const UserDashboard = ({ user }) => {
     case 8:
       sidebar = <BillingSidebar user={user} />;
       break;
-    case 9:
+    case 12:
       sidebar = <HRSidebar user={user} />;
       break;
     default:
@@ -62,4 +62,4 @@ const UserDashboard = ({ user }) => {
   );
 };
 
-export default UserDashboard;
+export default UserSidebar;

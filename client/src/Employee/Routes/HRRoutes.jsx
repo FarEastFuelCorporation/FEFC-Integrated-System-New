@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import UserDashboard from "../../OtherComponents/UserDashboard";
+import UserSidebar from "../../OtherComponents/UserSidebar";
 import Dashboard from "../../Employee/Layouts/HR/sections/dashboard";
 import Departments from "../../OtherComponents/Sections/departments";
 import Contacts from "../../Employee/Layouts/HR/sections/contacts";
@@ -14,7 +14,7 @@ import Documents from "../../OtherComponents/Sections/documents";
 
 const HRRoutes = ({ user, onUpdateUser }) => (
   <Routes>
-    <Route path="/" element={<UserDashboard user={user} />}>
+    <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="departments" element={<Departments user={user} />} />
       <Route path="employee" element={<Contacts user={user} />} />

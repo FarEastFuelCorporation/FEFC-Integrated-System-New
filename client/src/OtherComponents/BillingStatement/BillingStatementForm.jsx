@@ -15,11 +15,6 @@ import {
 import letterhead from "../../images/letterhead.jpg";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import CertificateOfDestructionHeader from "../Certificates/CertificateOfDestructionHeader";
-import {
-  CertificateOfDestructionFooter1,
-  CertificateOfDestructionFooter2,
-} from "../Certificates/CertificateOfDestructionFooter";
 import BillingStatementFooter from "./BillingStatementFooter";
 import BillingStatementHeader from "./BillingStatementHeader";
 

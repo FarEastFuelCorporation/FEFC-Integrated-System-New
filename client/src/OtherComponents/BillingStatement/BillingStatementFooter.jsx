@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import QRCode from "qrcode.react";
+import financeStaffSignature from "../../images/FLORES_FRANK.png";
 import accountingManagerSignature from "../../images/CARDINEZ_DAISY.png";
-import vicePresidentSignature from "../../images/DE_VERA_EXEQUIEL.png";
 import SignatureComponent from "../SignatureComponent ";
 
 const BillingStatementFooter = ({ quotationData, qrCodeURL }) => {
@@ -30,7 +30,7 @@ const BillingStatementFooter = ({ quotationData, qrCodeURL }) => {
           </Typography>
           <Box mt={3} position="relative">
             <SignatureComponent
-              // signature={quotationData.IdInformation.signature}
+              signature={financeStaffSignature}
               style={{ top: "-40px", left: "30px" }}
             />
             <Typography

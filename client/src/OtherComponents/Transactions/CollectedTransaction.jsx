@@ -1,13 +1,13 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import PaidIcon from "@mui/icons-material/Paid";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 import { timestampDate, parseTimeString } from "../Functions";
 
-const CollectionTransaction = ({ row, user }) => {
+const CollectedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -18,10 +18,10 @@ const CollectionTransaction = ({ row, user }) => {
 
   return (
     <Box>
-      {row.statusId === 8 ? (
+      {row.statusId === 9 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <AssignmentTurnedInIcon
+            <PaidIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -35,7 +35,7 @@ const CollectionTransaction = ({ row, user }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Billing Approval
+              For Collection
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -45,7 +45,7 @@ const CollectionTransaction = ({ row, user }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <AssignmentTurnedInIcon
+            <PaidIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -106,4 +106,4 @@ const CollectionTransaction = ({ row, user }) => {
   );
 };
 
-export default CollectionTransaction;
+export default CollectedTransaction;

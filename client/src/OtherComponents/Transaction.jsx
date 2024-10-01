@@ -30,6 +30,7 @@ import CertifiedTransaction from "./Transactions/CertifiedTransaction";
 import Attachments from "./Attachments";
 import BilledTransaction from "./Transactions/BilledTransaction";
 import BillingApprovalTransaction from "./Transactions/BillingApprovalTransaction";
+import CollectedTransaction from "./Transactions/CollectedTransaction";
 
 const Transaction = ({
   user,
@@ -245,6 +246,14 @@ const Transaction = ({
                     user={user}
                   />
                 )}
+                {user.userType === 10 && (
+                  <CollectedTransaction
+                    row={row}
+                    handleOpenModal={handleOpenModal}
+                    handleDeleteClick={handleDeleteClick}
+                    user={user}
+                  />
+                )}
               </CustomAccordionDetails>
               <Tabs
                 value={selectedSubTab}
@@ -264,6 +273,14 @@ const Transaction = ({
                 <CustomAccordionDetails>
                   {Number.isInteger(user.userType) ? (
                     <>
+                      {row.statusId >= 10 && (
+                        <CollectedTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                       {row.statusId >= 9 && (
                         <BillingApprovalTransaction
                           row={row}
@@ -304,6 +321,14 @@ const Transaction = ({
                     </>
                   ) : (
                     <>
+                      {row.statusId >= 9 && (
+                        <CollectedTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                       {row.statusId >= 8 && (
                         <BillingApprovalTransaction
                           row={row}

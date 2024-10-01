@@ -266,7 +266,7 @@ const CollectionTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Approved"}
+        buttonText={"Collected"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}

@@ -4,7 +4,7 @@ import UserSidebar from "../../OtherComponents/UserSidebar";
 import Dashboard from "../Layouts/Collection/sections/dashboard";
 import Clients from "../../OtherComponents/Sections/clients";
 import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
-import CollectionTransactions from "../Layouts/Collection/sections/collectionTransactions";
+import CollectedTransactions from "../Layouts/Collection/sections/collectedTransactions";
 import Quotations from "../../OtherComponents/Sections/quotations";
 import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../Layouts/Collection/sections/calendar";
@@ -19,7 +19,7 @@ const CollectionRoutes = ({ user, onUpdateUser }) => (
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
       <Route
         path="transactions"
-        element={<CollectionTransactions user={user} />}
+        element={<CollectedTransactions user={user} />}
       />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />

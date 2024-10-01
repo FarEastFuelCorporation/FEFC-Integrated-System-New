@@ -38,6 +38,8 @@ const IdInformation = require("../models/IdInformation");
 const Document = require("../models/Document");
 const BilledTransaction = require("../models/BilledTransaction");
 const BilledCertified = require("../models/BilledCertified");
+const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
+const CollectionTransaction = require("../models/CollectionTransaction");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -247,6 +249,17 @@ Employee.hasMany(BilledTransaction, {
   sourceKey: "employeeId",
 });
 BilledTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(BillingApprovalTransaction, {
+  as: "BillingApprovalTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+BillingApprovalTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
@@ -693,6 +706,32 @@ BookedTransaction.hasMany(BilledTransaction, {
 BilledTransaction.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BilledTransaction.hasOne(BillingApprovalTransaction, {
+  as: "BillingApprovalTransaction",
+  foreignKey: "billedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+BillingApprovalTransaction.belongsTo(BilledTransaction, {
+  as: "BilledTransaction",
+  foreignKey: "billedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BillingApprovalTransaction.hasMany(CollectionTransaction, {
+  as: "BillingApprovalTransaction",
+  foreignKey: "billedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+BillingApprovalTransaction.belongsTo(BilledTransaction, {
+  as: "BilledTransaction",
+  foreignKey: "billedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

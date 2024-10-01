@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import {
   Box,
   Table,
@@ -17,18 +17,17 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import BillingStatementFooter from "./BillingStatementFooter";
 import BillingStatementHeader from "./BillingStatementHeader";
+import { formatDate2, formatNumber } from "../Functions";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
   return url.replace(portPattern, ":3000");
 };
 
-const BillingStatementForm = ({ row, verify = null }) => {
+const BillingStatementForm = ({ row, verify = null, showButton = true }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
-
-  const [index, setIndex] = useState(0);
 
   const billedTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
@@ -41,7 +40,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
   // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
   const aggregatedWasteTransactions = Object.values(
     sortedWasteTransaction.reduce((acc, current) => {
-      const { id, weight } = current.QuotationWaste;
+      const { id } = current.QuotationWaste;
 
       // If the `QuotationWaste.id` is already in the accumulator, add the weight
       if (acc[id]) {
@@ -108,27 +107,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
       // Save the generated PDF
       pdf.save(`${"B24-09-001"}-${row.Client.clientName}.pdf`);
     });
-  };
-
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "2-digit" };
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", options);
-  };
-  const formatDate2 = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate(); // Get the day of the month
-    const month = date.toLocaleString("en-US", { month: "short" }); // Get the abbreviated month
-    const year = date.getFullYear().toString().slice(-2); // Get the last two digits of the year
-    return `${day}-${month}-${year}`;
-  };
-
-  const formatNumber = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "decimal",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
   };
 
   const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;
@@ -279,7 +257,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
                 );
               })}
               {row.QuotationTransportation.mode === "CHARGE" && (
-                <TableRow key={index + 1} sx={{ border: "black" }}>
+                <TableRow key={"index" + 1} sx={{ border: "black" }}>
                   <TableCell sx={bodyCellStyles({ width: 60 })}>
                     {formatDate2(row.haulingDate)}
                   </TableCell>
@@ -334,23 +312,23 @@ const BillingStatementForm = ({ row, verify = null }) => {
           </Table>
         </TableContainer>
       </Box>
-      <BillingStatementFooter qrCodeURL={qrCodeURL} />
+      <BillingStatementFooter row={row} qrCodeURL={qrCodeURL} />
     </Box>
   );
 
   return (
     <Box>
-      {verify ? (
-        ""
-      ) : (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleDownloadPDF}
-        >
-          Download Billing Statement
-        </Button>
-      )}
+      {verify
+        ? ""
+        : showButton && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleDownloadPDF}
+            >
+              Download Billing Statement
+            </Button>
+          )}
 
       {generatePDFContent()}
     </Box>

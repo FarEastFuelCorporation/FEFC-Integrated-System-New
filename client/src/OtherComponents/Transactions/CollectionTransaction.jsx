@@ -1,28 +1,27 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import ReceiptIcon from "@mui/icons-material/Receipt";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 import { timestampDate, parseTimeString } from "../Functions";
 
-const BilledTransaction = ({ row, user }) => {
+const CollectionTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const billedTransaction =
+  const billingApprovalTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0];
-
-  const showButton = row.statusId < 8;
+      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0]
+      .BillingApprovalTransaction;
 
   return (
     <Box>
-      {row.statusId === 7 ? (
+      {row.statusId === 8 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <ReceiptIcon
+            <AssignmentTurnedInIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -36,7 +35,7 @@ const BilledTransaction = ({ row, user }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Billing
+              For Billing Approval
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -46,7 +45,7 @@ const BilledTransaction = ({ row, user }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <ReceiptIcon
+            <AssignmentTurnedInIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -60,48 +59,45 @@ const BilledTransaction = ({ row, user }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Billed
+              Billing Approved
             </Typography>
             <Typography variant="h5">
-              {billedTransaction.createdAt
-                ? timestampDate(billedTransaction.createdAt)
+              {billingApprovalTransaction.createdAt
+                ? timestampDate(billingApprovalTransaction.createdAt)
                 : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
-            Billed Date:{" "}
-            {billedTransaction.billedDate
-              ? format(new Date(billedTransaction.billedDate), "MMMM dd, yyyy")
+            Approved Date:{" "}
+            {billingApprovalTransaction.approvedDate
+              ? format(
+                  new Date(billingApprovalTransaction.approvedDate),
+                  "MMMM dd, yyyy"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Billed Time:{" "}
-            {billedTransaction.billedTime
+            Approved Time:{" "}
+            {billingApprovalTransaction.approvedTime
               ? format(
-                  parseTimeString(billedTransaction.billedTime),
+                  parseTimeString(billingApprovalTransaction.approvedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {billedTransaction.remarks
-              ? billedTransaction.remarks
-              : "NO REMARKS"}
-          </Typography>
-          <Typography variant="h5">
-            Service Invoice Number:{" "}
-            {billedTransaction.serviceInvoiceNumber
-              ? billedTransaction.serviceInvoiceNumber
+            {billingApprovalTransaction.remarks
+              ? billingApprovalTransaction.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Submitted By:{" "}
-            {`${billedTransaction.Employee.firstName || ""} ${
-              billedTransaction.Employee.lastName || ""
+            {`${billingApprovalTransaction.Employee.firstName || ""} ${
+              billingApprovalTransaction.Employee.lastName || ""
             }`}
           </Typography>
-          <BillingStatementForm row={row} showButton={showButton} />
+          <BillingStatementForm row={row} />
           <br />
           <hr />
         </Box>
@@ -110,4 +106,4 @@ const BilledTransaction = ({ row, user }) => {
   );
 };
 
-export default BilledTransaction;
+export default CollectionTransaction;

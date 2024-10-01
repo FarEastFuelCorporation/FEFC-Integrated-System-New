@@ -23,6 +23,7 @@ const TreatmentMachine = require("../models/TreatmentMachine");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const Attachment = require("../models/Attachment");
 const BilledTransaction = require("../models/BilledTransaction");
+const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -152,11 +153,23 @@ const getIncludeOptions = () => [
                         model: BilledTransaction,
                         as: "BilledTransaction",
                         required: false,
-                        include: {
-                          model: Employee,
-                          as: "Employee",
-                          attributes: ["firstName", "lastName"],
-                        },
+                        include: [
+                          {
+                            model: BillingApprovalTransaction,
+                            as: "BillingApprovalTransaction",
+                            required: false,
+                            include: {
+                              model: Employee,
+                              as: "Employee",
+                              attributes: ["firstName", "lastName"],
+                            },
+                          },
+                          {
+                            model: Employee,
+                            as: "Employee",
+                            attributes: ["firstName", "lastName"],
+                          },
+                        ],
                       },
                     ],
                   },
@@ -260,7 +273,7 @@ const getFinishedTransactions = async (user = null) => {
   try {
     const bookedTransactions = await BookedTransaction.findAll({
       where: {
-        statusId: 9,
+        statusId: 12,
       },
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],

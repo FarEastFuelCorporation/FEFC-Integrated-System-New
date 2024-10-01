@@ -14,26 +14,22 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
-const BilledTransactions = ({ user }) => {
+const BillingApprovalTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   // Create refs for the input fields
-  const billedDateRef = useRef();
-  const billedTimeRef = useRef();
-  const serviceInvoiceNumberRef = useRef();
+  const approvedDateRef = useRef();
+  const approvedTimeRef = useRef();
   const remarksRef = useRef();
 
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    certifiedTransactionId: [],
-    billingNumber: "",
-    billedDate: "",
-    billedTime: "",
-    serviceInvoiceNumber: "",
-    billedAmount: 0,
+    billedTransactionId: "",
+    approvedDate: "",
+    approvedTime: "",
     remarks: "",
-    statusId: 8,
+    statusId: 9,
     createdBy: user.id,
   };
 
@@ -53,9 +49,8 @@ const BilledTransactions = ({ user }) => {
     try {
       setLoading(true);
       const billedTransactionResponse = await axios.get(
-        `${apiUrl}/api/billedTransaction`
+        `${apiUrl}/api/billingApprovalTransaction`
       );
-
       // For pending transactions
       setPendingTransactions(
         billedTransactionResponse.data.pendingTransactions
@@ -65,7 +60,7 @@ const BilledTransactions = ({ user }) => {
       setInProgressTransactions(
         billedTransactionResponse.data.inProgressTransactions
       );
-      console.log(billedTransactionResponse.data.inProgressTransactions);
+      console.log(billedTransactionResponse.data);
       // For finished transactions
       setFinishedTransactions(
         billedTransactionResponse.data.finishedTransactions
@@ -85,18 +80,14 @@ const BilledTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      certifiedTransactionId: [
+      billedTransactionId:
         row.ScheduledTransaction[0].DispatchedTransaction[0]
           .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
-          .id,
-      ],
-      billingNumber: "",
-      billedDate: "",
-      billedTime: "",
-      serviceInvoiceNumber: "",
-      billedAmount: 0,
+          .BilledTransaction[0].id,
+      approvedDate: "",
+      approvedTime: "",
       remarks: "",
-      statusId: 8,
+      statusId: 9,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -122,31 +113,23 @@ const BilledTransactions = ({ user }) => {
     );
 
     if (typeToEdit) {
-      const billedTransaction =
+      const certifiedTransaction =
         typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
           ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0].BilledTransaction?.[0] || {};
-      console.log(
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]?.BilledCertified
-          ?.certifiedTransactionId
-      );
+          ?.CertifiedTransaction?.[0] || {};
+
       setFormData({
-        id: billedTransaction.id,
+        id: certifiedTransaction.id,
         bookedTransactionId: typeToEdit.id,
-        certifiedTransactionId: [
+        sortedTransactionId:
           typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-            ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]?.BilledCertified
-            ?.certifiedTransactionId,
-        ],
-        billingNumber: billedTransaction.billingNumber,
-        billedDate: billedTransaction.billedDate,
-        billedTime: billedTransaction.billedTime,
-        serviceInvoiceNumber: billedTransaction.serviceInvoiceNumber,
-        billedAmount: billedTransaction.billedAmount,
-        remarks: billedTransaction.remarks,
+            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
+        certificateNumber: certifiedTransaction.certificateNumber,
+        certifiedDate: certifiedTransaction.certifiedDate,
+        certifiedTime: certifiedTransaction.certifiedTime,
+        typeOfCertificate: certifiedTransaction.typeOfCertificate,
+        typeOfWeight: certifiedTransaction.typeOfWeight,
+        remarks: certifiedTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
@@ -171,7 +154,7 @@ const BilledTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billedTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.id}`,
+        `${apiUrl}/api/billingApprovalTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -182,7 +165,7 @@ const BilledTransactions = ({ user }) => {
 
       fetchData();
 
-      setSuccessMessage("Billed Transaction Deleted Successfully!");
+      setSuccessMessage("Billing Approval Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
 
       setLoading(false);
@@ -194,19 +177,14 @@ const BilledTransactions = ({ user }) => {
   const validateForm = (data) => {
     let validationErrors = [];
 
-    // Validate billedDate
-    if (!data.billedDate) {
-      validationErrors.push("Billed Date is required.");
+    // Validate approvedTime
+    if (!data.approvedDate) {
+      validationErrors.push("Approved Date is required.");
     }
 
-    // Validate billedTime
-    if (!data.billedTime) {
-      validationErrors.push("Billed Time is required.");
-    }
-
-    // Validate serviceInvoiceNumber
-    if (!data.serviceInvoiceNumber) {
-      validationErrors.push("Service Invoice Number is required.");
+    // Validate approvedTime
+    if (!data.approvedTime) {
+      validationErrors.push("Approved Time is required.");
     }
 
     if (validationErrors.length > 0) {
@@ -226,9 +204,8 @@ const BilledTransactions = ({ user }) => {
     // Set formData from refs before validation
     const updatedFormData = {
       ...formData,
-      billedDate: billedDateRef.current.value,
-      billedTime: billedTimeRef.current.value,
-      serviceInvoiceNumber: serviceInvoiceNumberRef.current.value,
+      approvedDate: approvedDateRef.current.value,
+      approvedTime: approvedTimeRef.current.value,
       remarks: remarksRef.current.value,
     };
 
@@ -242,15 +219,20 @@ const BilledTransactions = ({ user }) => {
 
       if (updatedFormData.id) {
         await axios.put(
-          `${apiUrl}/api/billedTransaction/${updatedFormData.id}`,
+          `${apiUrl}/api/billingApprovalTransaction/${updatedFormData.id}`,
           updatedFormData
         );
 
-        setSuccessMessage("Billed Transaction Updated Successfully!");
+        setSuccessMessage("Billing Approval Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/api/billedTransaction`, updatedFormData);
+        await axios.post(
+          `${apiUrl}/api/billingApprovalTransaction`,
+          updatedFormData
+        );
 
-        setSuccessMessage("Billed Transaction Submitted Successfully!");
+        setSuccessMessage(
+          "Billing Approval Transaction Submitted Successfully!"
+        );
       }
 
       fetchData();
@@ -286,7 +268,7 @@ const BilledTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Bill"}
+        buttonText={"Approved"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
@@ -309,9 +291,8 @@ const BilledTransactions = ({ user }) => {
         showErrorMessage={showErrorMessage}
         setShowErrorMessage={setShowErrorMessage}
         refs={{
-          billedDateRef,
-          billedTimeRef,
-          serviceInvoiceNumberRef,
+          approvedDateRef,
+          approvedTimeRef,
           remarksRef,
         }}
       />
@@ -319,4 +300,4 @@ const BilledTransactions = ({ user }) => {
   );
 };
 
-export default BilledTransactions;
+export default BillingApprovalTransactions;

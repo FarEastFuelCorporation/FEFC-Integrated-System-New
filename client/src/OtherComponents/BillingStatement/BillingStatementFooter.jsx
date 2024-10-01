@@ -1,14 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import QRCode from "qrcode.react";
 import financeStaffSignature from "../../images/FLORES_FRANK.png";
 import accountingManagerSignature from "../../images/CARDINEZ_DAISY.png";
+import vicePresidentSignature from "../../images/DE_VERA_EXEQUIEL.png";
 import SignatureComponent from "../SignatureComponent ";
 
-const BillingStatementFooter = ({ quotationData, qrCodeURL }) => {
+const BillingStatementFooter = ({ row, qrCodeURL }) => {
   const today = new Date();
   const datePlusOneMonth = new Date();
   datePlusOneMonth.setMonth(today.getMonth() + 1);
+
+  const [approved, setApproved] = useState(false);
+
+  // Only set approved if row.approved changes
+
+  const isApproved =
+    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+      ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
+      ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]
+      ?.BillingApprovalTransaction?.approvedDate !== undefined;
+
+  useEffect(() => {
+    setApproved(isApproved);
+  }, [isApproved]);
 
   return (
     <Box
@@ -52,7 +67,9 @@ const BillingStatementFooter = ({ quotationData, qrCodeURL }) => {
             Checked By:
           </Typography>
           <Box mt={3} position="relative">
-            {/* <SignatureComponent signature={accountingManagerSignature} /> */}
+            {approved && (
+              <SignatureComponent signature={accountingManagerSignature} />
+            )}
             <Typography
               fontWeight="bold"
               id="noted_user"
@@ -69,7 +86,9 @@ const BillingStatementFooter = ({ quotationData, qrCodeURL }) => {
             Checked By:
           </Typography>
           <Box mt={3} position="relative">
-            {/* <SignatureComponent signature={vicePresidentSignature} /> */}
+            {approved && (
+              <SignatureComponent signature={vicePresidentSignature} />
+            )}
             <Typography
               fontWeight="bold"
               id="noted_user"

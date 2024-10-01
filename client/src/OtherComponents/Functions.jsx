@@ -46,6 +46,14 @@ export const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+export const formatDate2 = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDate(); // Get the day of the month
+  const month = date.toLocaleString("en-US", { month: "short" }); // Get the abbreviated month
+  const year = date.getFullYear().toString().slice(-2); // Get the last two digits of the year
+  return `${day}-${month}-${year}`;
+};
+
 export const formatDateFull = (date) => {
   // Check if date is null, undefined, or invalid
   if (!date || isNaN(new Date(date).getTime())) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   IconButton,
@@ -40,7 +40,7 @@ const ScrapTypes = ({ user }) => {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/scrapType`);
@@ -50,11 +50,11 @@ const ScrapTypes = ({ user }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleOpenModal = () => {
     setOpenModal(true);

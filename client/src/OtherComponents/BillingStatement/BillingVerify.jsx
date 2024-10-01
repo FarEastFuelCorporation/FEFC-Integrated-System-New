@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ const BillingVerify = () => {
     navigate("/login"); // Navigate back to the previous page
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const billingResponse = await axios.get(`${apiUrl}/api/billing/${id}`);
@@ -28,11 +28,11 @@ const BillingVerify = () => {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
-  };
+  }, [apiUrl, id]);
 
   useEffect(() => {
     fetchData();
-  }, [apiUrl, id]);
+  }, [fetchData]);
 
   return (
     <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "center" }}>

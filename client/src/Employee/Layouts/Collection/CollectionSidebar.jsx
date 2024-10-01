@@ -6,15 +6,19 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+import RecyclingIcon from "@mui/icons-material/Recycling";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
+import log from "loglevel";
 
-const ReceivingDashboard = ({ user }) => {
+log.setLevel("info");
+
+const CollectionSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
@@ -22,9 +26,10 @@ const ReceivingDashboard = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
+      "/dashboard/clients": "Clients",
+      "/dashboard/typeOfWastes": "Type Of Wastes",
+      "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
-      "/dashboard/vehicleTypes": "Type Of Vehicles",
-      "/dashboard/vehicles": "Vehicles",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -80,6 +85,9 @@ const ReceivingDashboard = ({ user }) => {
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
+        "& .pro-sidebar-layout": {
+          scrollbarWidth: "none",
+        },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
         },
@@ -112,7 +120,7 @@ const ReceivingDashboard = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  RECEIVING
+                  COLLECTION
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
@@ -180,7 +188,7 @@ const ReceivingDashboard = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            />
+            ></Item>
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -189,21 +197,30 @@ const ReceivingDashboard = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Type Of Vehicles"
-              to="vehicleTypes"
-              icon={<FormatListBulletedIcon />}
+              title="Clients"
+              to="clients"
+              icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
             <Item
-              title="Vehicles"
-              to="vehicles"
-              icon={<LocalShippingIcon />}
+              title="Type Of Wastes"
+              to="typeOfWastes"
+              icon={<RecyclingIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
+            <Item
+              title="Quotations"
+              to="quotations"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+
             <Item
               title="Documents"
               to="documents"
@@ -219,6 +236,7 @@ const ReceivingDashboard = ({ user }) => {
             >
               Pages
             </Typography>
+
             <Item
               title="Calendar"
               to="calendar"
@@ -242,4 +260,4 @@ const ReceivingDashboard = ({ user }) => {
   );
 };
 
-export default ReceivingDashboard;
+export default CollectionSidebar;

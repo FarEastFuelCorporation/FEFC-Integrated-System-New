@@ -10,7 +10,7 @@ import {
 import { tokens } from "../../theme";
 // import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
 
-const BillModal = ({
+const CollectionModal = ({
   open,
   onClose,
   formData,
@@ -47,16 +47,18 @@ const BillModal = ({
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Billed Transaction" : "Billing Transaction"}
+            {formData.id
+              ? "Update Billing Approval Transaction"
+              : "Billing Approval Transaction"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
-              label="Billed Date"
-              inputRef={refs.billedDateRef}
-              defaultValue={formData.billedDate}
+              label="Approved Date"
+              inputRef={refs.approvedDateRef}
+              defaultValue={formData.approvedDate}
               fullWidth
               type="date"
               required
@@ -69,26 +71,11 @@ const BillModal = ({
               autoComplete="off"
             />
             <TextField
-              label="Billed Time"
-              inputRef={refs.billedTimeRef}
+              label="Approved Time"
+              inputRef={refs.approvedTimeRef}
               defaultValue={formData.billedTime}
               fullWidth
               type="time"
-              required
-              InputLabelProps={{
-                shrink: true,
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-            />
-            <TextField
-              label="Service Invoice Number"
-              inputRef={refs.serviceInvoiceNumberRef}
-              defaultValue={formData.serviceInvoiceNumber}
-              fullWidth
-              type="text"
               required
               InputLabelProps={{
                 shrink: true,
@@ -132,7 +119,7 @@ const BillModal = ({
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update" : "Bill"}
+            {formData.id ? "Update" : "Approved"}
           </Button>
         </Box>
       </Modal>
@@ -141,4 +128,4 @@ const BillModal = ({
   );
 };
 
-export default BillModal;
+export default CollectionModal;

@@ -9,6 +9,8 @@ import TreatmentSidebar from "../Employee/Layouts/Treatment/TreatmentSidebar";
 import CertificationSidebar from "../Employee/Layouts/Certification/CertificationSidebar";
 import HRSidebar from "../Employee/Layouts/HR/HRSidebar";
 import BillingSidebar from "../Employee/Layouts/Billing/BillingSidebar";
+import AccountingHeadSidebar from "../Employee/Layouts/AccountingHead/AccountingHeadSidebar";
+import CollectionSidebar from "../Employee/Layouts/Collection/CollectionSidebar";
 
 const UserSidebar = ({ user }) => {
   let sidebar;
@@ -38,6 +40,12 @@ const UserSidebar = ({ user }) => {
       break;
     case 8:
       sidebar = <BillingSidebar user={user} />;
+      break;
+    case 9:
+      sidebar = <AccountingHeadSidebar user={user} />;
+      break;
+    case 10:
+      sidebar = <CollectionSidebar user={user} />;
       break;
     case 12:
       sidebar = <HRSidebar user={user} />;

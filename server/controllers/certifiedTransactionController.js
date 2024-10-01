@@ -2,7 +2,6 @@
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
-const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const generateCertificateNumber = require("../utils/generateCertificateNumber");
 const { fetchData } = require("../utils/getBookedTransactions");

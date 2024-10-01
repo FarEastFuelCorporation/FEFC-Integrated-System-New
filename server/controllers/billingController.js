@@ -2,7 +2,6 @@
 
 const BilledTransaction = require("../models/BilledTransaction");
 const BookedTransaction = require("../models/BookedTransaction");
-const CertifiedTransaction = require("../models/CertifiedTransaction");
 const { getIncludeOptions } = require("../utils/getBookedTransactions");
 
 // Get Billing controller

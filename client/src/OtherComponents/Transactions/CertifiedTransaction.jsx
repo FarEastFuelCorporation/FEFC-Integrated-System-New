@@ -67,6 +67,18 @@ const CertifiedTransaction = ({ row, user }) => {
             </Typography>
           </Box>
           <Typography variant="h5">
+            Certificate Number:{" "}
+            {certifiedTransaction.certificateNumber
+              ? certifiedTransaction.certificateNumber
+              : ""}
+          </Typography>
+          <Typography variant="h5">
+            Type of Certificate:{" "}
+            {certifiedTransaction.typeOfCertificate
+              ? certifiedTransaction.typeOfCertificate
+              : ""}
+          </Typography>
+          <Typography variant="h5">
             Certified Date:{" "}
             {certifiedTransaction.certifiedDate
               ? format(
@@ -84,6 +96,7 @@ const CertifiedTransaction = ({ row, user }) => {
                 )
               : "Pending"}
           </Typography>
+
           <Typography variant="h5">
             Remarks:{" "}
             {certifiedTransaction.remarks

@@ -229,19 +229,19 @@ const BilledTransactions = ({ user }) => {
     if (!validateForm(updatedFormData)) {
       return;
     }
-
+    console.log(updatedFormData);
     try {
       setLoading(true);
 
-      if (formData.id) {
+      if (updatedFormData.id) {
         await axios.put(
-          `${apiUrl}/api/billedTransaction/${formData.id}`,
-          formData
+          `${apiUrl}/api/billedTransaction/${updatedFormData.id}`,
+          updatedFormData
         );
 
         setSuccessMessage("Billed Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/api/billedTransaction`, formData);
+        await axios.post(`${apiUrl}/api/billedTransaction`, updatedFormData);
 
         setSuccessMessage("Billed Transaction Submitted Successfully!");
       }

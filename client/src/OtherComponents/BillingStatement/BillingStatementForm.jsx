@@ -35,9 +35,9 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
   const [index, setIndex] = useState(0);
 
-  const certifiedTransaction =
+  const billedTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0];
+      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0];
 
   const sortedWasteTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
@@ -94,8 +94,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
     }
   });
 
-  console.log(aggregatedWasteTransactions);
-
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;
@@ -138,7 +136,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
     }).format(amount);
   };
 
-  const qrCodeURL = `${apiUrl}/certificate/${certifiedTransaction.id}`;
+  const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;
 
   const headerCellStyles = (isLastCell) => ({
     fontWeight: "bold",

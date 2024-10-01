@@ -19,6 +19,7 @@ import Dashboard from "./OtherComponents/Dashboard";
 import LoadingSpinner from "./OtherComponents/LoadingSpinner";
 import Certificate from "./OtherComponents/Certificates/Certificate";
 import QuotationDisplay from "./OtherComponents/Quotations/QuotationDisplay";
+import BillingVerify from "./OtherComponents/BillingStatement/BillingVerify";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -70,8 +71,9 @@ const App = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/certificate/:id" element={<Certificate />} />
           <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
+          <Route path="/certificate/:id" element={<Certificate />} />
+          <Route path="/billing/:id" element={<BillingVerify />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           {user ? (

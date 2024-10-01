@@ -11,9 +11,9 @@ const BilledTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const certifiedTransaction =
+  const billedTransaction =
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0];
+      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0];
 
   return (
     <Box>
@@ -61,39 +61,36 @@ const BilledTransaction = ({ row, user }) => {
               Billed
             </Typography>
             <Typography variant="h5">
-              {certifiedTransaction.createdAt
-                ? timestampDate(certifiedTransaction.createdAt)
+              {billedTransaction.createdAt
+                ? timestampDate(billedTransaction.createdAt)
                 : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
             Billed Date:{" "}
-            {certifiedTransaction.certifiedDate
-              ? format(
-                  new Date(certifiedTransaction.certifiedDate),
-                  "MMMM dd, yyyy"
-                )
+            {billedTransaction.billedDate
+              ? format(new Date(billedTransaction.billedDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Billed Time:{" "}
-            {certifiedTransaction.certifiedTime
+            {billedTransaction.billedTime
               ? format(
-                  parseTimeString(certifiedTransaction.certifiedTime),
+                  parseTimeString(billedTransaction.billedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {certifiedTransaction.remarks
-              ? certifiedTransaction.remarks
+            {billedTransaction.remarks
+              ? billedTransaction.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Submitted By:{" "}
-            {`${certifiedTransaction.Employee.firstName || ""} ${
-              certifiedTransaction.Employee.lastName || ""
+            {`${billedTransaction.Employee.firstName || ""} ${
+              billedTransaction.Employee.lastName || ""
             }`}
           </Typography>
           <BillingStatementForm row={row} />

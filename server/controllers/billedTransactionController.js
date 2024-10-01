@@ -6,7 +6,7 @@ const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
 const generateBillingNumber = require("../utils/generateBillingNumber");
 const { fetchData } = require("../utils/getBookedTransactions");
-const BilledCertified = require("./BilledCertified");
+const BilledCertified = require("../models/BilledCertified");
 const transactionStatusId = 7;
 
 // Create Billed Transaction controller
@@ -16,7 +16,7 @@ async function createBilledTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      certifiedTransactionIds, // Expecting an array of CertifiedTransaction IDs
+      certifiedTransactionId, // Expecting an array of CertifiedTransaction IDs
       billedDate,
       billedTime,
       serviceInvoiceNumber,
@@ -50,10 +50,10 @@ async function createBilledTransactionController(req, res) {
     );
 
     // Link CertifiedTransactions with the newly created BilledTransaction using BilledCertified
-    if (certifiedTransactionIds && certifiedTransactionIds.length > 0) {
+    if (certifiedTransactionId && certifiedTransactionId.length > 0) {
       // Create entries in the BilledCertified join table
       const billedCertified = await Promise.all(
-        certifiedTransactionIds.map(async (certifiedId) => {
+        certifiedTransactionId.map(async (certifiedId) => {
           await BilledCertified.create(
             {
               billedTransactionId: billedTransaction.id,

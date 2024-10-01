@@ -37,6 +37,7 @@ const EmployeeAttachment = require("../models/EmployeeAttachment");
 const IdInformation = require("../models/IdInformation");
 const Document = require("../models/Document");
 const BilledTransaction = require("../models/BilledTransaction");
+const BilledCertified = require("../models/BilledCertified");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -667,7 +668,7 @@ CertifiedTransaction.belongsTo(BookedTransaction, {
 
 // BilledTransaction belongs to many CertifiedTransaction through BilledCertified
 BilledTransaction.belongsToMany(CertifiedTransaction, {
-  through: "BilledCertified", // Junction table
+  through: BilledCertified, // Junction table
   as: "CertifiedTransaction", // Alias for the CertifiedTransactions
   foreignKey: "billedTransactionId", // Foreign key on the junction table
   otherKey: "certifiedTransactionId", // The other key on the junction table
@@ -676,10 +677,23 @@ BilledTransaction.belongsToMany(CertifiedTransaction, {
 
 // CertifiedTransaction belongs to many BilledTransaction through BilledCertified
 CertifiedTransaction.belongsToMany(BilledTransaction, {
-  through: "BilledCertified", // Junction table
+  through: BilledCertified, // Junction table
   as: "BilledTransaction", // Alias for the BilledTransactions
   foreignKey: "certifiedTransactionId", // Foreign key on the junction table
   otherKey: "billedTransactionId", // The other key on the junction table
+  onDelete: "CASCADE",
+});
+
+BookedTransaction.hasMany(BilledTransaction, {
+  as: "BilledTransaction",
+  foreignKey: "bookedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+BilledTransaction.belongsTo(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "bookedTransactionId",
+  targetKey: "id",
   onDelete: "CASCADE",
 });
 

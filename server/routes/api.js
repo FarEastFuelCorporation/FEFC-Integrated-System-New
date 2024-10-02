@@ -32,6 +32,7 @@ const certificateRoutes = require("./certificateRoutes");
 const billedTransactionRoutes = require("./billedTransactionRoutes");
 const billingRoutes = require("./billingRoutes");
 const billingApprovalTransactionRoutes = require("./billingApprovalTransactionRoutes");
+const billingDistributionTransactionRoutes = require("./billingDistributionTransactionRoutes");
 const collectionTransactionRoutes = require("./collectionTransactionRoutes");
 const hrDashboardRoutes = require("./hr_dashboard");
 const employeeRoutes = require("./employeeRoutes");
@@ -78,6 +79,10 @@ router.use("/certificate", certificateRoutes);
 router.use("/billedTransaction", billedTransactionRoutes);
 router.use("/billing", billingRoutes);
 router.use("/billingApprovalTransaction", billingApprovalTransactionRoutes);
+router.use(
+  "/billingDistributionTransaction",
+  billingDistributionTransactionRoutes
+);
 router.use("/collectionTransaction", collectionTransactionRoutes);
 router.use("/hrDashboard", hrDashboardRoutes);
 router.use("/employee", employeeRoutes);

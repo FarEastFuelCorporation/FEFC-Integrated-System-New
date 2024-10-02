@@ -26,6 +26,7 @@ const BilledTransaction = require("../models/BilledTransaction");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
 const Quotation = require("../models/Quotation");
+const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -163,21 +164,33 @@ const getIncludeOptions = () => [
                             required: false,
                             include: [
                               {
-                                model: Employee,
-                                as: "Employee",
-                                attributes: ["firstName", "lastName"],
-                              },
-                              {
-                                model: CollectedTransaction,
-                                as: "CollectedTransaction",
+                                model: BillingDistributionTransaction,
+                                as: "BillingDistributionTransaction",
                                 required: false,
                                 include: [
+                                  {
+                                    model: CollectedTransaction,
+                                    as: "CollectedTransaction",
+                                    required: false,
+                                    include: [
+                                      {
+                                        model: Employee,
+                                        as: "Employee",
+                                        attributes: ["firstName", "lastName"],
+                                      },
+                                    ],
+                                  },
                                   {
                                     model: Employee,
                                     as: "Employee",
                                     attributes: ["firstName", "lastName"],
                                   },
                                 ],
+                              },
+                              {
+                                model: Employee,
+                                as: "Employee",
+                                attributes: ["firstName", "lastName"],
                               },
                             ],
                           },

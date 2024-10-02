@@ -3,18 +3,22 @@
 const express = require("express");
 const router = express.Router();
 const {
-  createBillingApprovalTransactionController,
-  getBillingApprovalTransactionsController,
-  deleteBillingApprovalTransactionController,
+  createCollectedTransactionController,
+  getCollectedTransactionsController,
+  updateCollectedTransactionController,
+  deleteCollectedTransactionController,
 } = require("../controllers/collectionTransactionController");
 
-// Create Billing Approval Transaction route
-router.post("/", createBillingApprovalTransactionController);
+// Create Collected Transaction route
+router.post("/", createCollectedTransactionController);
 
-// Get Billing Approval Transactions route
-router.get("/", getBillingApprovalTransactionsController);
+// Get Collected Transactions route
+router.get("/", getCollectedTransactionsController);
 
-// Delete Billing Approval Transaction route
-router.delete("/:id", deleteBillingApprovalTransactionController);
+// Update Collected Transaction route
+router.put("/:id", updateCollectedTransactionController);
+
+// Delete Collected Transaction route
+router.delete("/:id", deleteCollectedTransactionController);
 
 module.exports = router;

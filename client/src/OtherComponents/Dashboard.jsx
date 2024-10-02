@@ -13,6 +13,7 @@ import TreatmentRoutes from "../Employee/Routes/TreatmentRoutes";
 import BillingRoutes from "../Employee/Routes/BillingRoutes";
 import AccountingHeadRoutes from "../Employee/Routes/AccountingHeadRoutes";
 import CollectionRoutes from "../Employee/Routes/CollectionRoutes";
+import MessengerRoutes from "../Employee/Routes/MessengerRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -71,16 +72,22 @@ const Dashboard = ({ user, onUpdateUser }) => {
           <BillingRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
-
     case 9:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[9]}>
           <AccountingHeadRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
+
     case 10:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[10]}>
+          <MessengerRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 11:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[11]}>
           <CollectionRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );

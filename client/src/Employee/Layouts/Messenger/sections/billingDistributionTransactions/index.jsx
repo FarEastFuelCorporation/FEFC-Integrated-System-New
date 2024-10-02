@@ -14,22 +14,23 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
-const BillingApprovalTransactions = ({ user }) => {
+const BillingDistributionTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   // Create refs for the input fields
-  const approvedDateRef = useRef();
-  const approvedTimeRef = useRef();
+  const distributedDateRef = useRef();
+  const distributedTimeRef = useRef();
   const remarksRef = useRef();
 
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    billedTransactionId: "",
-    approvedDate: "",
-    approvedTime: "",
+    billingApprovalTransactionId: "",
+    distributedDate: "",
+    distributedTime: "",
+    collectedAmount: 0,
     remarks: "",
-    statusId: 9,
+    statusId: 10,
     createdBy: user.id,
   };
 
@@ -48,22 +49,22 @@ const BillingApprovalTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const billingApprovalTransactionResponse = await axios.get(
-        `${apiUrl}/api/billingApprovalTransaction`
+      const billingDistributionTransactionResponse = await axios.get(
+        `${apiUrl}/api/billingDistributionTransaction`
       );
       // For pending transactions
       setPendingTransactions(
-        billingApprovalTransactionResponse.data.pendingTransactions
+        billingDistributionTransactionResponse.data.pendingTransactions
       );
 
       // For in progress transactions
       setInProgressTransactions(
-        billingApprovalTransactionResponse.data.inProgressTransactions
+        billingDistributionTransactionResponse.data.inProgressTransactions
       );
-      console.log(billingApprovalTransactionResponse.data);
+      console.log(billingDistributionTransactionResponse.data);
       // For finished transactions
       setFinishedTransactions(
-        billingApprovalTransactionResponse.data.finishedTransactions
+        billingDistributionTransactionResponse.data.finishedTransactions
       );
       setLoading(false);
     } catch (error) {
@@ -80,14 +81,16 @@ const BillingApprovalTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      billedTransactionId:
+      billingDistributionTransactionId:
         row.ScheduledTransaction[0].DispatchedTransaction[0]
           .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
-          .BilledTransaction[0].id,
-      approvedDate: "",
-      approvedTime: "",
+          .BilledTransaction[0].BillingApprovalTransaction
+          .BillingDistributionTransaction.id,
+      collectedDate: "",
+      collectedTime: "",
+      collectedAmount: 0,
       remarks: "",
-      statusId: 9,
+      statusId: 10,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -113,22 +116,23 @@ const BillingApprovalTransactions = ({ user }) => {
     );
 
     if (typeToEdit) {
-      const billingApprovalTransaction =
+      const billingDistributionTransaction =
         typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
           ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0].BilledTransaction?.[0]
-          .BillingApprovalTransaction || {};
+          ?.CertifiedTransaction?.[0].BilledTransaction[0]
+          .BillingApprovalTransaction.BillingDistributionTransaction || {};
 
       setFormData({
-        id: billingApprovalTransaction.id,
+        id: billingDistributionTransaction.id,
         bookedTransactionId: typeToEdit.id,
-        billedTransactionId:
+        billingApprovalTransactionId:
           typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
             ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-            .CertifiedTransaction?.[0].BilledTransaction?.[0].id,
-        approvedDate: billingApprovalTransaction.approvedDate,
-        approvedTime: billingApprovalTransaction.approvedTime,
-        remarks: billingApprovalTransaction.remarks,
+            ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]
+            .BillingApprovalTransaction.id,
+        distributedDate: billingDistributionTransaction.distributedDate,
+        distributedTime: billingDistributionTransaction.distributedTime,
+        remarks: billingDistributionTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
@@ -136,14 +140,14 @@ const BillingApprovalTransactions = ({ user }) => {
       setOpenModal(true);
     } else {
       console.error(
-        `Dispatched Transaction with ID ${row.id} not found for editing.`
+        `Billing Distribution Transaction with ID ${row.id} not found for editing.`
       );
     }
   };
 
   const handleDeleteClick = async (row) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Billing Approval Transaction?"
+      "Are you sure you want to delete this Billing Distribution Transaction?"
     );
 
     if (!isConfirmed) {
@@ -153,7 +157,7 @@ const BillingApprovalTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billingApprovalTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.id}`,
+        `${apiUrl}/api/billingDistributionTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.BillingDistributionTransaction.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -164,7 +168,9 @@ const BillingApprovalTransactions = ({ user }) => {
 
       fetchData();
 
-      setSuccessMessage("Billing Approval Transaction Deleted Successfully!");
+      setSuccessMessage(
+        "Billing Distribution Transaction Deleted Successfully!"
+      );
       setShowSuccessMessage(true);
 
       setLoading(false);
@@ -176,14 +182,14 @@ const BillingApprovalTransactions = ({ user }) => {
   const validateForm = (data) => {
     let validationErrors = [];
 
-    // Validate approvedTime
-    if (!data.approvedDate) {
-      validationErrors.push("Approved Date is required.");
+    // Validate distributedDate
+    if (!data.distributedDate) {
+      validationErrors.push("Distributed Date is required.");
     }
 
-    // Validate approvedTime
-    if (!data.approvedTime) {
-      validationErrors.push("Approved Time is required.");
+    // Validate distributedTime
+    if (!data.distributedTime) {
+      validationErrors.push("Distributed Time is required.");
     }
 
     if (validationErrors.length > 0) {
@@ -203,8 +209,8 @@ const BillingApprovalTransactions = ({ user }) => {
     // Set formData from refs before validation
     const updatedFormData = {
       ...formData,
-      approvedDate: approvedDateRef.current.value,
-      approvedTime: approvedTimeRef.current.value,
+      distributedDate: distributedDateRef.current.value,
+      distributedTime: distributedTimeRef.current.value,
       remarks: remarksRef.current.value,
     };
 
@@ -218,19 +224,21 @@ const BillingApprovalTransactions = ({ user }) => {
 
       if (updatedFormData.id) {
         await axios.put(
-          `${apiUrl}/api/billingApprovalTransaction/${updatedFormData.id}`,
-          updatedFormData
-        );
-
-        setSuccessMessage("Billing Approval Transaction Updated Successfully!");
-      } else {
-        await axios.post(
-          `${apiUrl}/api/billingApprovalTransaction`,
+          `${apiUrl}/api/billingDistributionTransaction/${updatedFormData.id}`,
           updatedFormData
         );
 
         setSuccessMessage(
-          "Billing Approval Transaction Submitted Successfully!"
+          "Billing Distribution Transaction Updated Successfully!"
+        );
+      } else {
+        await axios.post(
+          `${apiUrl}/api/billingDistributionTransaction`,
+          updatedFormData
+        );
+
+        setSuccessMessage(
+          "Billing Distribution Transaction Submitted Successfully!"
         );
       }
 
@@ -267,7 +275,7 @@ const BillingApprovalTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Approve"}
+        buttonText={"Distribute"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
@@ -290,8 +298,8 @@ const BillingApprovalTransactions = ({ user }) => {
         showErrorMessage={showErrorMessage}
         setShowErrorMessage={setShowErrorMessage}
         refs={{
-          approvedDateRef,
-          approvedTimeRef,
+          distributedDateRef,
+          distributedTimeRef,
           remarksRef,
         }}
       />
@@ -299,4 +307,4 @@ const BillingApprovalTransactions = ({ user }) => {
   );
 };
 
-export default BillingApprovalTransactions;
+export default BillingDistributionTransactions;

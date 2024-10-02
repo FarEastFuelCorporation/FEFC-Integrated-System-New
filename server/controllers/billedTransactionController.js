@@ -150,7 +150,6 @@ async function updateBilledTransactionController(req, res) {
 
       if (billedTransaction) {
         // Update billed transaction attributes
-        billedTransaction.bookedTransactionId = bookedTransactionId;
         billedTransaction.billedDate = billedDate;
         billedTransaction.billedTime = billedTime;
         billedTransaction.serviceInvoiceNumber = serviceInvoiceNumber;

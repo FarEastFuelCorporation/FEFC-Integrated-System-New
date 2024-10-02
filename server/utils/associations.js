@@ -39,6 +39,7 @@ const Document = require("../models/Document");
 const BilledTransaction = require("../models/BilledTransaction");
 const BilledCertified = require("../models/BilledCertified");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
+const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
 
 // Define associations
@@ -260,6 +261,17 @@ Employee.hasMany(BillingApprovalTransaction, {
   sourceKey: "employeeId",
 });
 BillingApprovalTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(BillingDistributionTransaction, {
+  as: "BillingDistributionTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+BillingDistributionTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
@@ -734,15 +746,28 @@ BillingApprovalTransaction.belongsTo(BilledTransaction, {
   onDelete: "CASCADE",
 });
 
-BillingApprovalTransaction.hasMany(CollectedTransaction, {
-  as: "CollectedTransaction",
-  foreignKey: "billedTransactionId",
+BillingApprovalTransaction.hasOne(BillingDistributionTransaction, {
+  as: "BillingDistributionTransaction",
+  foreignKey: "billingApprovalTransactionId",
   sourceKey: "id",
   onDelete: "CASCADE",
 });
-CollectedTransaction.belongsTo(BillingApprovalTransaction, {
+BillingDistributionTransaction.belongsTo(BillingApprovalTransaction, {
   as: "BillingApprovalTransaction",
-  foreignKey: "billedTransactionId",
+  foreignKey: "billingApprovalTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BillingDistributionTransaction.hasOne(CollectedTransaction, {
+  as: "CollectedTransaction",
+  foreignKey: "billingDistributionTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CollectedTransaction.belongsTo(BillingDistributionTransaction, {
+  as: "BillingDistributionTransaction",
+  foreignKey: "billingDistributionTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

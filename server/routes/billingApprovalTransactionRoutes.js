@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createBillingApprovalTransactionController,
   getBillingApprovalTransactionsController,
+  updateBillingApprovalTransactionController,
   deleteBillingApprovalTransactionController,
 } = require("../controllers/billingApprovalTransactionController");
 
@@ -13,6 +14,9 @@ router.post("/", createBillingApprovalTransactionController);
 
 // Get Billing Approval Transactions route
 router.get("/", getBillingApprovalTransactionsController);
+
+// Update Billing Approval Transaction route
+router.put("/:id", updateBillingApprovalTransactionController);
 
 // Delete Billing Approval Transaction route
 router.delete("/:id", deleteBillingApprovalTransactionController);

@@ -88,6 +88,33 @@ const BillingStatementForm = ({ row, verify = null }) => {
     }
   });
 
+  const transpoFee = row.QuotationTransportation.unitPrice;
+  const transpoVatCalculation = row.QuotationTransportation.vatCalculation;
+  const transpoMode = row.QuotationTransportation.mode;
+
+  const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
+    // Check if the mode is "CHARGE"
+    if (transpoMode === "CHARGE") {
+      // Add the transportation fee based on VAT calculation
+      switch (transpoVatCalculation) {
+        case "VAT EXCLUSIVE":
+          amounts.vatExclusive += transpoFee;
+          break;
+        case "VAT INCLUSIVE":
+          amounts.vatInclusive += transpoFee;
+          break;
+        case "NON VATABLE":
+          amounts.nonVatable += transpoFee;
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  // Call the function to add transportation fee
+  addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;

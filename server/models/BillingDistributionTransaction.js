@@ -1,11 +1,11 @@
-// models/CollectedTransaction.js
+// models/BillingDistributionTransaction.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const CollectedTransaction = sequelize.define(
-  "CollectedTransaction",
+const BillingDistributionTransaction = sequelize.define(
+  "BillingDistributionTransaction",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,20 +13,16 @@ const CollectedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    billingDistributionTransactionId: {
+    billingApprovalTransactionId: {
       type: DataTypes.UUID,
       allowNull: true,
     },
-    collectedDate: {
+    distributedDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    collectedTime: {
+    distributedTime: {
       type: DataTypes.TIME,
-      allowNull: false,
-    },
-    collectedAmount: {
-      type: DataTypes.FLOAT,
       allowNull: false,
     },
     remarks: {
@@ -66,4 +62,4 @@ const CollectedTransaction = sequelize.define(
   }
 );
 
-module.exports = CollectedTransaction;
+module.exports = BillingDistributionTransaction;

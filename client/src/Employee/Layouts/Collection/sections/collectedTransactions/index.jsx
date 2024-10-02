@@ -14,12 +14,13 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
-const CollectionTransactions = ({ user }) => {
+const CollectedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   // Create refs for the input fields
-  const approvedDateRef = useRef();
-  const approvedTimeRef = useRef();
+  const collectedDateRef = useRef();
+  const collectedTimeRef = useRef();
+  const collectedAmountRef = useRef();
   const remarksRef = useRef();
 
   const initialFormData = {
@@ -30,7 +31,7 @@ const CollectionTransactions = ({ user }) => {
     collectedTime: "",
     collectedAmount: 0,
     remarks: "",
-    statusId: 10,
+    statusId: 11,
     createdBy: user.id,
   };
 
@@ -49,22 +50,22 @@ const CollectionTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const billedTransactionResponse = await axios.get(
+      const collectionTransactionResponse = await axios.get(
         `${apiUrl}/api/collectionTransaction`
       );
       // For pending transactions
       setPendingTransactions(
-        billedTransactionResponse.data.pendingTransactions
+        collectionTransactionResponse.data.pendingTransactions
       );
 
       // For in progress transactions
       setInProgressTransactions(
-        billedTransactionResponse.data.inProgressTransactions
+        collectionTransactionResponse.data.inProgressTransactions
       );
-      console.log(billedTransactionResponse.data);
+      console.log(collectionTransactionResponse.data);
       // For finished transactions
       setFinishedTransactions(
-        billedTransactionResponse.data.finishedTransactions
+        collectionTransactionResponse.data.finishedTransactions
       );
       setLoading(false);
     } catch (error) {
@@ -81,15 +82,16 @@ const CollectionTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      billingApprovalTransactionId:
+      billingDistributionTransactionId:
         row.ScheduledTransaction[0].DispatchedTransaction[0]
           .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
-          .BilledTransaction[0].BillingApprovalTransaction.id,
+          .BilledTransaction[0].BillingApprovalTransaction
+          .BillingDistributionTransaction.id,
       collectedDate: "",
       collectedTime: "",
       collectedAmount: 0,
       remarks: "",
-      statusId: 9,
+      statusId: 11,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -115,23 +117,22 @@ const CollectionTransactions = ({ user }) => {
     );
 
     if (typeToEdit) {
-      const certifiedTransaction =
+      const collectedTransaction =
         typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
           ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0] || {};
+          ?.CertifiedTransaction?.[0].BilledTransaction[0]
+          .BillingApprovalTransaction.BillingDistributionTransaction
+          .CollectedTransaction || {};
 
       setFormData({
-        id: certifiedTransaction.id,
+        id: collectedTransaction.id,
         bookedTransactionId: typeToEdit.id,
-        sortedTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
-        certificateNumber: certifiedTransaction.certificateNumber,
-        certifiedDate: certifiedTransaction.certifiedDate,
-        certifiedTime: certifiedTransaction.certifiedTime,
-        typeOfCertificate: certifiedTransaction.typeOfCertificate,
-        typeOfWeight: certifiedTransaction.typeOfWeight,
-        remarks: certifiedTransaction.remarks,
+        billingApprovalTransactionId:
+          collectedTransaction.billingDistributionTransactionId,
+        collectedDate: collectedTransaction.collectedDate,
+        collectedTime: collectedTransaction.collectedTime,
+        collectedAmount: collectedTransaction.collectedAmount,
+        remarks: collectedTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
@@ -146,7 +147,7 @@ const CollectionTransactions = ({ user }) => {
 
   const handleDeleteClick = async (row) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Billed Transaction?"
+      "Are you sure you want to delete this Collected Transaction?"
     );
 
     if (!isConfirmed) {
@@ -156,7 +157,7 @@ const CollectionTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/collectionTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.id}`,
+        `${apiUrl}/api/collectionTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.BillingDistributionTransaction.CollectedTransaction.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -167,7 +168,7 @@ const CollectionTransactions = ({ user }) => {
 
       fetchData();
 
-      setSuccessMessage("Collection Transaction Deleted Successfully!");
+      setSuccessMessage("Collected Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
 
       setLoading(false);
@@ -179,14 +180,14 @@ const CollectionTransactions = ({ user }) => {
   const validateForm = (data) => {
     let validationErrors = [];
 
-    // Validate approvedTime
-    if (!data.approvedDate) {
-      validationErrors.push("Approved Date is required.");
+    // Validate collectedDate
+    if (!data.collectedDate) {
+      validationErrors.push("Collected Date is required.");
     }
 
-    // Validate approvedTime
-    if (!data.approvedTime) {
-      validationErrors.push("Approved Time is required.");
+    // Validate collectedTime
+    if (!data.collectedTime) {
+      validationErrors.push("Collected Time is required.");
     }
 
     if (validationErrors.length > 0) {
@@ -206,8 +207,9 @@ const CollectionTransactions = ({ user }) => {
     // Set formData from refs before validation
     const updatedFormData = {
       ...formData,
-      approvedDate: approvedDateRef.current.value,
-      approvedTime: approvedTimeRef.current.value,
+      collectedDate: collectedDateRef.current.value,
+      collectedTime: collectedTimeRef.current.value,
+      collectedAmount: collectedAmountRef.current.value,
       remarks: remarksRef.current.value,
     };
 
@@ -225,14 +227,14 @@ const CollectionTransactions = ({ user }) => {
           updatedFormData
         );
 
-        setSuccessMessage("Collection Transaction Updated Successfully!");
+        setSuccessMessage("Collected Transaction Updated Successfully!");
       } else {
         await axios.post(
           `${apiUrl}/api/collectionTransaction`,
           updatedFormData
         );
 
-        setSuccessMessage("Collection Transaction Submitted Successfully!");
+        setSuccessMessage("Collected Transaction Submitted Successfully!");
       }
 
       fetchData();
@@ -268,7 +270,7 @@ const CollectionTransactions = ({ user }) => {
       )}
       <Transaction
         user={user}
-        buttonText={"Collected"}
+        buttonText={"Collect"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
@@ -291,8 +293,9 @@ const CollectionTransactions = ({ user }) => {
         showErrorMessage={showErrorMessage}
         setShowErrorMessage={setShowErrorMessage}
         refs={{
-          approvedDateRef,
-          approvedTimeRef,
+          collectedDateRef,
+          collectedTimeRef,
+          collectedAmountRef,
           remarksRef,
         }}
       />
@@ -300,4 +303,4 @@ const CollectionTransactions = ({ user }) => {
   );
 };
 
-export default CollectionTransactions;
+export default CollectedTransactions;

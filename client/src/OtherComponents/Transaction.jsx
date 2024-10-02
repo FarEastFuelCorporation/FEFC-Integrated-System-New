@@ -31,6 +31,7 @@ import Attachments from "./Attachments";
 import BilledTransaction from "./Transactions/BilledTransaction";
 import BillingApprovalTransaction from "./Transactions/BillingApprovalTransaction";
 import CollectedTransaction from "./Transactions/CollectedTransaction";
+import BillingDistributionTransaction from "./Transactions/BillingDistributionTransaction";
 
 const Transaction = ({
   user,
@@ -247,6 +248,14 @@ const Transaction = ({
                   />
                 )}
                 {user.userType === 10 && (
+                  <BillingDistributionTransaction
+                    row={row}
+                    handleOpenModal={handleOpenModal}
+                    handleDeleteClick={handleDeleteClick}
+                    user={user}
+                  />
+                )}
+                {user.userType === 11 && (
                   <CollectedTransaction
                     row={row}
                     handleOpenModal={handleOpenModal}
@@ -282,7 +291,7 @@ const Transaction = ({
                         />
                       )}
                       {row.statusId >= 9 && (
-                        <BillingApprovalTransaction
+                        <BillingDistributionTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}
                           handleDeleteClick={handleDeleteClick}
@@ -290,7 +299,7 @@ const Transaction = ({
                         />
                       )}
                       {row.statusId >= 8 && (
-                        <BilledTransaction
+                        <BillingApprovalTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}
                           handleDeleteClick={handleDeleteClick}
@@ -298,7 +307,7 @@ const Transaction = ({
                         />
                       )}
                       {row.statusId >= 7 && (
-                        <CertifiedTransaction
+                        <BilledTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}
                           handleDeleteClick={handleDeleteClick}
@@ -306,6 +315,14 @@ const Transaction = ({
                         />
                       )}
                       {row.statusId >= 6 && (
+                        <CertifiedTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
+                      {row.statusId >= 5 && (
                         <TreatedTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}
@@ -313,16 +330,24 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 5 && <SortedTransaction row={row} />}
-                      {row.statusId >= 4 && <ReceivedTransaction row={row} />}
-                      {row.statusId >= 3 && <DispatchedTransaction row={row} />}
-                      {row.statusId >= 2 && <ScheduledTransaction row={row} />}
-                      {row.statusId >= 1 && <BookedTransaction row={row} />}
+                      {row.statusId >= 4 && <SortedTransaction row={row} />}
+                      {row.statusId >= 3 && <ReceivedTransaction row={row} />}
+                      {row.statusId >= 2 && <DispatchedTransaction row={row} />}
+                      {row.statusId >= 1 && <ScheduledTransaction row={row} />}
+                      {/* {row.statusId >= 1 && <BookedTransaction row={row} />} */}
                     </>
                   ) : (
                     <>
-                      {row.statusId >= 9 && (
+                      {row.statusId >= 10 && (
                         <CollectedTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
+                      {row.statusId >= 9 && (
+                        <BillingDistributionTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}
                           handleDeleteClick={handleDeleteClick}

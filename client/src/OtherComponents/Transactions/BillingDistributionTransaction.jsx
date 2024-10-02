@@ -1,13 +1,13 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import PaidIcon from "@mui/icons-material/Paid";
+import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 
-import { timestampDate, parseTimeString, formatNumber } from "../Functions";
+import { timestampDate, parseTimeString } from "../Functions";
 
-const CollectedTransaction = ({ row, user }) => {
+const BillingDistributionTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -16,30 +16,12 @@ const CollectedTransaction = ({ row, user }) => {
       .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0]
       .BillingApprovalTransaction.BillingDistributionTransaction;
 
-  const collectedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0]
-      .BillingApprovalTransaction.BillingDistributionTransaction
-      .CollectedTransaction;
-
-  // Assuming distributedDate is in a valid Date format (either Date object or string)
-  const distributedDate = new Date(
-    billingDistributionTransaction.distributedDate
-  );
-
-  // Add the terms to the distributedDate
-  const terms = parseInt(row.QuotationWaste.Quotation.termsCharge);
-
-  // Create a new Date instance for dueDate by adding terms to distributedDate
-  const dueDate = new Date(distributedDate);
-  dueDate.setDate(dueDate.getDate() + terms);
-
   return (
     <Box>
-      {row.statusId === 10 ? (
+      {row.statusId === 9 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <PaidIcon
+            <TwoWheelerIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -53,16 +35,9 @@ const CollectedTransaction = ({ row, user }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Collection
+              For Billing Distribution
             </Typography>
           </Box>
-          <Typography variant="h5">
-            Terms: {terms ? `${terms} Days` : "Pending"}
-          </Typography>
-          <Typography variant="h5">
-            Due Date:{" "}
-            {dueDate ? format(new Date(dueDate), "MMMM dd, yyyy") : "Pending"}
-          </Typography>
           <Typography variant="h5">Pending</Typography>
           <br />
           <hr />
@@ -70,7 +45,7 @@ const CollectedTransaction = ({ row, user }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <PaidIcon
+            <TwoWheelerIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -84,48 +59,44 @@ const CollectedTransaction = ({ row, user }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Collected
+              Billing Distributed
             </Typography>
             <Typography variant="h5">
-              {collectedTransaction.createdAt
-                ? timestampDate(collectedTransaction.createdAt)
+              {billingDistributionTransaction.createdAt
+                ? timestampDate(billingDistributionTransaction.createdAt)
                 : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
-            Collected Date:{" "}
-            {collectedTransaction.collectedDate
+            Distributed Date:{" "}
+            {billingDistributionTransaction.distributedDate
               ? format(
-                  new Date(collectedTransaction.collectedDate),
+                  new Date(billingDistributionTransaction.distributedDate),
                   "MMMM dd, yyyy"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Collected Time:{" "}
-            {collectedTransaction.collectedTime
+            Distributed Time:{" "}
+            {billingDistributionTransaction.distributedTime
               ? format(
-                  parseTimeString(collectedTransaction.collectedTime),
+                  parseTimeString(
+                    billingDistributionTransaction.distributedTime
+                  ),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Collected Amount:{" "}
-            {collectedTransaction.collectedAmount
-              ? formatNumber(collectedTransaction.collectedAmount)
-              : "Pending"}
-          </Typography>
-          <Typography variant="h5">
             Remarks:{" "}
-            {collectedTransaction.remarks
-              ? collectedTransaction.remarks
+            {billingDistributionTransaction.remarks
+              ? billingDistributionTransaction.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Submitted By:{" "}
-            {`${collectedTransaction.Employee.firstName || ""} ${
-              collectedTransaction.Employee.lastName || ""
+            {`${billingDistributionTransaction.Employee.firstName || ""} ${
+              billingDistributionTransaction.Employee.lastName || ""
             }`}
           </Typography>
           <br />
@@ -136,4 +107,4 @@ const CollectedTransaction = ({ row, user }) => {
   );
 };
 
-export default CollectedTransaction;
+export default BillingDistributionTransaction;

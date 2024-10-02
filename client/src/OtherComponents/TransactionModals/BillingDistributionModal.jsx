@@ -8,9 +8,8 @@ import {
   Button,
 } from "@mui/material";
 import { tokens } from "../../theme";
-// import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
 
-const BillingApprovalModal = ({
+const BillingDistributionModal = ({
   open,
   onClose,
   formData,
@@ -48,17 +47,17 @@ const BillingApprovalModal = ({
         >
           <Typography variant="h6" component="h2">
             {formData.id
-              ? "Update Billing Approval Transaction"
-              : "Billing Approval Transaction"}
+              ? "Update Billing Distribution Transaction"
+              : "Billing Distribution Transaction"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
-              label="Approved Date"
-              inputRef={refs.approvedDateRef}
-              defaultValue={formData.approvedDate}
+              label="Distribution Date"
+              inputRef={refs.distributedDateRef}
+              defaultValue={formData.distributedDate}
               fullWidth
               type="date"
               required
@@ -71,9 +70,9 @@ const BillingApprovalModal = ({
               autoComplete="off"
             />
             <TextField
-              label="Approved Time"
-              inputRef={refs.approvedTimeRef}
-              defaultValue={formData.approvedTime}
+              label="Distribution Time"
+              inputRef={refs.distributedTimeRef}
+              defaultValue={formData.distributedTime}
               fullWidth
               type="time"
               required
@@ -119,13 +118,12 @@ const BillingApprovalModal = ({
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update" : "Approved"}
+            {formData.id ? "Update" : "Distribute"}
           </Button>
         </Box>
       </Modal>
-      {/* <CertificateOfDestruction /> */}
     </Box>
   );
 };
 
-export default BillingApprovalModal;
+export default BillingDistributionModal;

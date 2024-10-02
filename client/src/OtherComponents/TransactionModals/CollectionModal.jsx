@@ -48,17 +48,17 @@ const CollectionModal = ({
         >
           <Typography variant="h6" component="h2">
             {formData.id
-              ? "Update Billing Approval Transaction"
-              : "Billing Approval Transaction"}
+              ? "Update Collected Transaction"
+              : "Collected Transaction"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
-              label="Approved Date"
-              inputRef={refs.approvedDateRef}
-              defaultValue={formData.approvedDate}
+              label="Collected Date"
+              inputRef={refs.collectedDateRef}
+              defaultValue={formData.collectedDate}
               fullWidth
               type="date"
               required
@@ -71,11 +71,26 @@ const CollectionModal = ({
               autoComplete="off"
             />
             <TextField
-              label="Approved Time"
-              inputRef={refs.approvedTimeRef}
-              defaultValue={formData.billedTime}
+              label="Collected Time"
+              inputRef={refs.collectedTimeRef}
+              defaultValue={formData.collectedTime}
               fullWidth
               type="time"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+            <TextField
+              label="Collected Amount"
+              inputRef={refs.collectedAmountRef}
+              defaultValue={formData.collectedAmount}
+              fullWidth
+              type="number"
               required
               InputLabelProps={{
                 shrink: true,
@@ -119,7 +134,7 @@ const CollectionModal = ({
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update" : "Approved"}
+            {formData.id ? "Update" : "Collect"}
           </Button>
         </Box>
       </Modal>

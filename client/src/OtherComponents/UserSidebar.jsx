@@ -11,6 +11,7 @@ import HRSidebar from "../Employee/Layouts/HR/HRSidebar";
 import BillingSidebar from "../Employee/Layouts/Billing/BillingSidebar";
 import AccountingHeadSidebar from "../Employee/Layouts/AccountingHead/AccountingHeadSidebar";
 import CollectionSidebar from "../Employee/Layouts/Collection/CollectionSidebar";
+import MessengerSidebar from "../Employee/Layouts/Messenger/MessengerSidebar";
 
 const UserSidebar = ({ user }) => {
   let sidebar;
@@ -45,6 +46,9 @@ const UserSidebar = ({ user }) => {
       sidebar = <AccountingHeadSidebar user={user} />;
       break;
     case 10:
+      sidebar = <MessengerSidebar user={user} />;
+      break;
+    case 11:
       sidebar = <CollectionSidebar user={user} />;
       break;
     case 12:

@@ -9,6 +9,8 @@ import AttachmentModal from "./TransactionModals/AttachmentModal";
 import CertifyModal from "./TransactionModals/CertifyModal";
 import BillModal from "./TransactionModals/BillModal";
 import BillingApprovalModal from "./TransactionModals/BillingApprovalModal";
+import BillingDistributionModal from "./TransactionModals/BillingDistributionModal";
+import CollectionModal from "./TransactionModals/CollectionModal";
 
 const Modal = ({
   user,
@@ -167,6 +169,44 @@ const Modal = ({
     case 9:
       ModalComponent = (
         <BillingApprovalModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          showErrorMessage={showErrorMessage}
+          setShowErrorMessage={setShowErrorMessage}
+          refs={refs}
+        />
+      );
+      break;
+    case 10:
+      ModalComponent = (
+        <BillingDistributionModal
+          user={user}
+          error={error}
+          open={open}
+          onClose={onClose}
+          formData={formData}
+          setFormData={setFormData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          showErrorMessage={showErrorMessage}
+          setShowErrorMessage={setShowErrorMessage}
+          refs={refs}
+        />
+      );
+      break;
+    case 11:
+      ModalComponent = (
+        <CollectionModal
           user={user}
           error={error}
           open={open}

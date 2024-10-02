@@ -1,21 +1,21 @@
-// controllers/billingApprovalTransactionController.js
+// controllers/billingDistributionTransactionController.js
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
-const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
-const transactionStatusId = 8;
+const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
+const transactionStatusId = 9;
 
-// Create Billing Approval Transaction controller
-async function createBillingApprovalTransactionController(req, res) {
+// Create Billing Distribution Transaction controller
+async function createBillingDistributionTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      billedTransactionId,
-      approvedDate,
-      approvedTime,
+      billingApprovalTransactionId,
+      distributedDate,
+      distributedTime,
       remarks,
       statusId,
       createdBy,
@@ -27,13 +27,13 @@ async function createBillingApprovalTransactionController(req, res) {
       remarks = remarks.toUpperCase();
     }
 
-    // Create BillingApprovalTransaction entry
-    await BillingApprovalTransaction.create(
+    // Create BillingDistributionTransaction entry
+    await BillingDistributionTransaction.create(
       {
         bookedTransactionId,
-        billedTransactionId,
-        approvedDate,
-        approvedTime,
+        billingApprovalTransactionId,
+        distributedDate,
+        distributedTime,
         remarks,
         createdBy,
       },
@@ -77,8 +77,8 @@ async function createBillingApprovalTransactionController(req, res) {
   }
 }
 
-// Get Billing Approval Transactions controller
-async function getBillingApprovalTransactionsController(req, res) {
+// Get Billing Distribution Transactions controller
+async function getBillingDistributionTransactionsController(req, res) {
   try {
     // fetch transactions
     const data = await fetchData(transactionStatusId);
@@ -95,19 +95,19 @@ async function getBillingApprovalTransactionsController(req, res) {
   }
 }
 
-// Update Billing Approval Transaction controller
-async function updateBillingApprovalTransactionController(req, res) {
-  const id = req.params.id; // Expecting the BilledTransaction ID to update
-  console.log("Updating billing approval transaction with ID:", id);
+// Update Billing Distribution Transaction controller
+async function updateBillingDistributionTransactionController(req, res) {
+  const { id } = req.params; // Expecting the billingDistributionTransactionId from params
+  console.log("Updating Billing Distribution Transaction with ID:", id);
 
   const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      billedTransactionId,
-      approvedDate,
-      approvedTime,
+      billingApprovalTransactionId,
+      distributedDate,
+      distributedTime,
       remarks,
       statusId,
       updatedBy,
@@ -119,18 +119,21 @@ async function updateBillingApprovalTransactionController(req, res) {
       remarks = remarks.toUpperCase();
     }
 
-    // Find the billing approval transaction by its billedTransactionId
-    const billingApprovalTransaction =
-      await BillingApprovalTransaction.findByPk(id, { transaction });
+    // Find the billing distribution transaction by its ID
+    const billingDistributionTransaction =
+      await BillingDistributionTransaction.findByPk(id, { transaction });
 
-    if (billingApprovalTransaction) {
-      // Update the BillingApprovalTransaction fields
-      billingApprovalTransaction.approvedDate = approvedDate;
-      billingApprovalTransaction.approvedTime = approvedTime;
-      billingApprovalTransaction.remarks = remarks;
-      billingApprovalTransaction.updatedBy = updatedBy;
+    if (billingDistributionTransaction) {
+      // Update the BillingDistributionTransaction fields
+      billingDistributionTransaction.bookedTransactionId = bookedTransactionId;
+      billingDistributionTransaction.billingApprovalTransactionId =
+        billingApprovalTransactionId;
+      billingDistributionTransaction.distributedDate = distributedDate;
+      billingDistributionTransaction.distributedTime = distributedTime;
+      billingDistributionTransaction.remarks = remarks;
+      billingDistributionTransaction.updatedBy = updatedBy;
 
-      await billingApprovalTransaction.save({ transaction });
+      await billingDistributionTransaction.save({ transaction });
 
       // Update the status of the booked transaction
       const updatedBookedTransaction = await BookedTransaction.findByPk(
@@ -162,10 +165,10 @@ async function updateBillingApprovalTransactionController(req, res) {
         });
       }
     } else {
-      // If billed transaction with the specified ID was not found
+      // If billing distribution transaction with the specified ID was not found
       await transaction.rollback();
       res.status(404).json({
-        message: `Billing Approval Transaction with ID ${billedTransactionId} not found`,
+        message: `Billing Distribution Transaction with ID ${billingDistributionTransactionId} not found`,
       });
     }
   } catch (error) {
@@ -176,37 +179,37 @@ async function updateBillingApprovalTransactionController(req, res) {
   }
 }
 
-// Delete Billing Approval Transaction controller
-async function deleteBillingApprovalTransactionController(req, res) {
+// Delete Billing Distribution Transaction controller
+async function deleteBillingDistributionTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy, bookedTransactionId } = req.body;
 
     console.log(bookedTransactionId);
 
-    console.log("Soft deleting Billing Approval transaction with ID:", id);
+    console.log("Soft deleting Billing Distribution transaction with ID:", id);
 
     // Find the billing approval transaction by UUID (id)
-    const billingApprovalTransactionToDelete =
-      await BillingApprovalTransaction.findByPk(id);
+    const billingDistributionTransactionToDelete =
+      await BillingDistributionTransaction.findByPk(id);
 
-    if (billingApprovalTransactionToDelete) {
+    if (billingDistributionTransactionToDelete) {
       // Update the deletedBy field
-      billingApprovalTransactionToDelete.updatedBy = deletedBy;
-      billingApprovalTransactionToDelete.deletedBy = deletedBy;
-      await billingApprovalTransactionToDelete.save();
+      billingDistributionTransactionToDelete.updatedBy = deletedBy;
+      billingDistributionTransactionToDelete.deletedBy = deletedBy;
+      await billingDistributionTransactionToDelete.save();
 
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         bookedTransactionId
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = 8;
+      updatedBookedTransaction.statusId = 9;
 
       await updatedBookedTransaction.save();
 
       // Soft delete the billing approval transaction (sets deletedAt timestamp)
-      await billingApprovalTransactionToDelete.destroy();
+      await billingDistributionTransactionToDelete.destroy();
 
       // fetch transactions
       const data = await fetchData(transactionStatusId);
@@ -220,7 +223,7 @@ async function deleteBillingApprovalTransactionController(req, res) {
     } else {
       // If billing approval transaction with the specified ID was not found
       res.status(404).json({
-        message: `Billing Approval Transaction with ID ${id} not found`,
+        message: `Billing Distribution Transaction with ID ${id} not found`,
       });
     }
   } catch (error) {
@@ -231,8 +234,8 @@ async function deleteBillingApprovalTransactionController(req, res) {
 }
 
 module.exports = {
-  createBillingApprovalTransactionController,
-  getBillingApprovalTransactionsController,
-  updateBillingApprovalTransactionController,
-  deleteBillingApprovalTransactionController,
+  createBillingDistributionTransactionController,
+  getBillingDistributionTransactionsController,
+  updateBillingDistributionTransactionController,
+  deleteBillingDistributionTransactionController,
 };

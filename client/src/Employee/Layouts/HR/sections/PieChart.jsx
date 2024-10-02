@@ -14,9 +14,8 @@ const PieChart = () => {
       try {
         const response = await fetch(`${apiUrl}/api/hrDashboard/employee`);
         const data = await response.json();
-        console.log(`${apiUrl}/api/hrDashboard/employee`);
+
         const departmentCounts = data.departmentCounts; // Assuming departmentCounts is directly in response.data
-        console.log(departmentCounts);
 
         // Convert the departmentCounts to the format required by the pie chart
         const formattedData = Object.keys(departmentCounts).map((key) => ({

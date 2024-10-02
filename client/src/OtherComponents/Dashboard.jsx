@@ -74,7 +74,7 @@ const Dashboard = ({ user, onUpdateUser }) => {
 
     case 9:
       return (
-        <RoleProtectedRoute user={user} allowedRoles={[10]}>
+        <RoleProtectedRoute user={user} allowedRoles={[9]}>
           <AccountingHeadRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );

@@ -17,12 +17,7 @@ import Item from "../../../OtherComponents/Item";
 import {
   HomeOutlined as HomeOutlinedIcon,
   ContactsOutlined as ContactsOutlinedIcon,
-  PersonOutlined as PersonOutlinedIcon,
   CalendarTodayOutlined as CalendarTodayOutlinedIcon,
-  HelpOutlined as HelpOutlinedIcon,
-  BarChartOutlined as BarChartOutlinedIcon,
-  PieChartOutlined as PieChartOutlinedIcon,
-  TimelineOutlined as TimelineOutlinedIcon,
   MenuOutlined as MenuOutlinedIcon,
 } from "@mui/icons-material";
 import axios from "axios";
@@ -39,12 +34,7 @@ const GeneratorSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
       "/dashboard/quotations": "Quotations",
-      "/dashboard/form": "Profile Form",
       "/dashboard/calendar": "Calendar",
-      "/dashboard/faq": "FAQ Page",
-      "/dashboard/bar": "Bar Chart",
-      "/dashboard/pie": "Pie Chart",
-      "/dashboard/line": "Line Chart",
     }),
     []
   );
@@ -358,14 +348,6 @@ const GeneratorSidebar = ({ user }) => {
             >
               Pages
             </Typography>
-            {/* <Item
-              title="Profile Form"
-              to="form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            /> */}
             <Item
               title="Calendar"
               to="calendar"
@@ -374,46 +356,6 @@ const GeneratorSidebar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-            {/* <Item
-              title="FAQ Page"
-              to="faq"
-              icon={<HelpOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Pie Chart"
-              to="pie"
-              icon={<PieChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Line Chart"
-              to="line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            /> */}
           </Box>
         </Menu>
       </ProSidebar>

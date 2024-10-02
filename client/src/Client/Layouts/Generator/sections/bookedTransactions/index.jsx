@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, IconButton } from "@mui/material";
-import Header from "../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import Header from "../../../../../OtherComponents/Header";
 
 const BookedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);

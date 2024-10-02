@@ -15,7 +15,7 @@ router.post("/", createBillingDistributionTransactionController);
 // Get Billing Distribution Transactions route
 router.get("/", getBillingDistributionTransactionsController);
 
-// Update Billing Approval Transaction route
+// Update Billing Distribution Transaction route
 router.put("/:id", updateBillingDistributionTransactionController);
 
 // Delete Billing Distribution Transaction route

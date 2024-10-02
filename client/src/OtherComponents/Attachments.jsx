@@ -6,6 +6,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import axios from "axios";
 import { tokens } from "../theme";
 import AttachmentModal from "./TransactionModals/AttachmentModal";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Attachments = ({
   row,
@@ -34,6 +35,7 @@ const Attachments = ({
   const [fileName, setFileName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   useEffect(() => {
     if (row && row.Attachment) {
@@ -97,6 +99,7 @@ const Attachments = ({
     }
 
     try {
+      setLoading(true);
       let response;
 
       if (!attachmentFormData.id) {
@@ -126,11 +129,12 @@ const Attachments = ({
           processedNewAttachment,
         ]);
 
-        setSuccessMessage("Attachment Added Successfully!");
+        // setSuccessMessage("Attachment Added Successfully!");
       }
 
-      setShowSuccessMessage(true);
+      // setShowSuccessMessage(true);
       handleCloseAttachmentModal();
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -280,6 +284,7 @@ const Attachments = ({
         },
       }}
     >
+      <LoadingSpinner isLoading={loading} />
       <Box
         sx={{
           display: "flex",

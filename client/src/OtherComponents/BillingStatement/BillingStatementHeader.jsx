@@ -33,16 +33,41 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
         </Box>
         <Box display="flex" gap="20px">
           <Box>
-            <Typography variant="h6" fontStyle="italic" textAlign="center">
+            <Typography
+              variant="h6"
+              fontStyle="italic"
+              textAlign="center"
+              sx={{ height: "16px" }}
+            >
               Billing Number
             </Typography>
-            <Typography variant="h6" fontWeight="bold" textAlign="center">
-              {row.quotationCode}
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              textAlign="center"
+              sx={{ height: "16px" }}
+            >
+              {
+                row.ScheduledTransaction[0].DispatchedTransaction[0]
+                  .ReceivedTransaction[0].SortedTransaction[0]
+                  .CertifiedTransaction[0].BilledTransaction[0].billingNumber
+              }
             </Typography>
-            <Typography variant="h6" fontStyle="italic" textAlign="center">
+            <Typography
+              mt={1}
+              variant="h6"
+              fontStyle="italic"
+              textAlign="center"
+              sx={{ height: "16px" }}
+            >
               Date
             </Typography>
-            <Typography variant="h6" fontWeight="bold" textAlign="center">
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              textAlign="center"
+              sx={{ height: "16px" }}
+            >
               {formatDateFull(today)}
             </Typography>
           </Box>

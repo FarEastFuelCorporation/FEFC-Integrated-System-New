@@ -15,8 +15,6 @@ const BilledTransaction = ({ row, user }) => {
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
       .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0];
 
-  const showButton = row.statusId < 8;
-
   return (
     <Box>
       {row.statusId === 7 ? (
@@ -101,7 +99,7 @@ const BilledTransaction = ({ row, user }) => {
               billedTransaction.Employee.lastName || ""
             }`}
           </Typography>
-          <BillingStatementForm row={row} showButton={showButton} />
+          {row.statusId === 8 && <BillingStatementForm row={row} />}
           <br />
           <hr />
         </Box>

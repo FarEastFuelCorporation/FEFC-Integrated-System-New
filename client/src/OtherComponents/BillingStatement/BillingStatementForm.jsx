@@ -24,7 +24,7 @@ const modifyApiUrlPort = (url) => {
   return url.replace(portPattern, ":3000");
 };
 
-const BillingStatementForm = ({ row, verify = null, showButton = true }) => {
+const BillingStatementForm = ({ row, verify = null }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
@@ -106,6 +106,28 @@ const BillingStatementForm = ({ row, verify = null, showButton = true }) => {
 
       // Save the generated PDF
       pdf.save(`${"B24-09-001"}-${row.Client.clientName}.pdf`);
+    });
+  };
+
+  const handleOpenPDFInNewTab = () => {
+    const input = certificateRef.current;
+    const pageHeight = 1056;
+    const pageWidth = 816;
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [pageWidth, pageHeight], // Page size in px
+      });
+
+      // Add the captured image to the PDF
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+
+      // Generate the PDF and open it in a new tab
+      const pdfUrl = pdf.output("bloburl");
+      window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
     });
   };
 
@@ -318,17 +340,21 @@ const BillingStatementForm = ({ row, verify = null, showButton = true }) => {
 
   return (
     <Box>
-      {verify
-        ? ""
-        : showButton && (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleDownloadPDF}
-            >
-              Download Billing Statement
-            </Button>
-          )}
+      {verify ? (
+        ""
+      ) : (
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={
+            row.statusId === 8 ? handleOpenPDFInNewTab : handleDownloadPDF
+          }
+        >
+          {row.statusId === 8
+            ? "View Billing Statement"
+            : "Download Billing Statement"}
+        </Button>
+      )}
 
       {generatePDFContent()}
     </Box>

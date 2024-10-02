@@ -25,11 +25,12 @@ const CollectionTransactions = ({ user }) => {
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    billedTransactionId: "",
-    approvedDate: "",
-    approvedTime: "",
+    billingApprovalTransactionId: "",
+    collectedDate: "",
+    collectedTime: "",
+    collectedAmount: 0,
     remarks: "",
-    statusId: 9,
+    statusId: 10,
     createdBy: user.id,
   };
 
@@ -80,12 +81,13 @@ const CollectionTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      billedTransactionId:
+      billingApprovalTransactionId:
         row.ScheduledTransaction[0].DispatchedTransaction[0]
           .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
-          .BilledTransaction[0].id,
-      approvedDate: "",
-      approvedTime: "",
+          .BilledTransaction[0].BillingApprovalTransaction.id,
+      collectedDate: "",
+      collectedTime: "",
+      collectedAmount: 0,
       remarks: "",
       statusId: 9,
       createdBy: user.id,

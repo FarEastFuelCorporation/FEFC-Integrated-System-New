@@ -24,17 +24,25 @@ const CertifiedTransaction = require("../models/CertifiedTransaction");
 const Attachment = require("../models/Attachment");
 const BilledTransaction = require("../models/BilledTransaction");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
+const CollectedTransaction = require("../models/CollectedTransaction");
+const Quotation = require("../models/Quotation");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
   {
     model: QuotationWaste,
     as: "QuotationWaste",
-    include: {
-      model: TypeOfWaste,
-      as: "TypeOfWaste",
-      attributes: ["wasteCode"],
-    },
+    include: [
+      {
+        model: TypeOfWaste,
+        as: "TypeOfWaste",
+        attributes: ["wasteCode"],
+      },
+      {
+        model: Quotation,
+        as: "Quotation",
+      },
+    ],
   },
   {
     model: QuotationTransportation,
@@ -145,11 +153,6 @@ const getIncludeOptions = () => [
                     required: false,
                     include: [
                       {
-                        model: Employee,
-                        as: "Employee",
-                        attributes: ["firstName", "lastName"],
-                      },
-                      {
                         model: BilledTransaction,
                         as: "BilledTransaction",
                         required: false,
@@ -158,11 +161,25 @@ const getIncludeOptions = () => [
                             model: BillingApprovalTransaction,
                             as: "BillingApprovalTransaction",
                             required: false,
-                            include: {
-                              model: Employee,
-                              as: "Employee",
-                              attributes: ["firstName", "lastName"],
-                            },
+                            include: [
+                              {
+                                model: Employee,
+                                as: "Employee",
+                                attributes: ["firstName", "lastName"],
+                              },
+                              {
+                                model: CollectedTransaction,
+                                as: "CollectedTransaction",
+                                required: false,
+                                include: [
+                                  {
+                                    model: Employee,
+                                    as: "Employee",
+                                    attributes: ["firstName", "lastName"],
+                                  },
+                                ],
+                              },
+                            ],
                           },
                           {
                             model: Employee,
@@ -170,6 +187,11 @@ const getIncludeOptions = () => [
                             attributes: ["firstName", "lastName"],
                           },
                         ],
+                      },
+                      {
+                        model: Employee,
+                        as: "Employee",
+                        attributes: ["firstName", "lastName"],
                       },
                     ],
                   },

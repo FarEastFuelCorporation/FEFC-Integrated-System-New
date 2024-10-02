@@ -15,6 +15,17 @@ const CollectedTransaction = ({ row, user }) => {
     row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
       .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0]
       .BillingApprovalTransaction;
+  console.log(row);
+
+  // Assuming approvedDate is in a valid Date format (either Date object or string)
+  const approvedDate = new Date(billingApprovalTransaction.approvedDate);
+
+  // Add the terms to the approvedDate
+  const terms = parseInt(row.QuotationWaste.Quotation.termsCharge);
+
+  // Create a new Date instance for dueDate by adding terms to approvedDate
+  const dueDate = new Date(approvedDate);
+  dueDate.setDate(dueDate.getDate() + terms);
 
   return (
     <Box>
@@ -38,6 +49,10 @@ const CollectedTransaction = ({ row, user }) => {
               For Collection
             </Typography>
           </Box>
+          <Typography variant="h5">
+            Due Date:{" "}
+            {dueDate ? format(new Date(dueDate), "MMMM dd, yyyy") : "Pending"}
+          </Typography>
           <Typography variant="h5">Pending</Typography>
           <br />
           <hr />

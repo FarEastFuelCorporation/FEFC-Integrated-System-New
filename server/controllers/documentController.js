@@ -147,7 +147,7 @@ async function updateDocumentController(req, res) {
     // Update the document fields
     document.fileName = fileName || document.fileName;
     document.expirationDate = expirationDate || document.expirationDate;
-    document.createdBy = createdBy || document.createdBy;
+    document.updatedBy = updatedBy || document.createdBy;
 
     // Update attachment only if a new file is uploaded
     if (attachment) {

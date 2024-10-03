@@ -105,30 +105,6 @@ const Documents = ({ user }) => {
     setAttachmentFormData({ ...attachmentFormData, [name]: value });
   };
 
-  const handleEditClick = (row) => {
-    const typeToEdit = attachmentData.find((type) => type.id === row.id);
-    console.log(row);
-    if (typeToEdit) {
-      setFileName(typeToEdit.fileName);
-      setSelectedFile(typeToEdit.attachment);
-      setAttachmentFormData({
-        id: typeToEdit.id,
-        fileName: typeToEdit.fileName,
-        expirationDate: typeToEdit.expirationDate
-          ? typeToEdit.expirationDate
-          : "",
-        attachment: typeToEdit.attachment,
-        createdBy: user.id,
-      });
-
-      setOpenAttachmentModal(true);
-    } else {
-      console.error(
-        `Received Transaction with ID ${row.id} not found for editing.`
-      );
-    }
-  };
-
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
       "Are you sure you want to delete this Document?"
@@ -445,7 +421,42 @@ const Documents = ({ user }) => {
         params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
           <IconButton
             color="warning"
-            onClick={() => handleEditClick(params.row)} // Assuming you have a handleEditClick function
+            onClick={async () => {
+              try {
+                const documentId = params.row.id; // Get the document ID
+
+                // Fetch the attachment from the API using the document ID
+                const response = await axios.get(
+                  `${apiUrl}/api/document/${documentId}`
+                );
+
+                const attachment = response.data.document.attachment; // Access the attachment data
+
+                const typeToEdit = attachmentData.find(
+                  (type) => type.id === params.row.id
+                );
+
+                if (typeToEdit) {
+                  setFileName(typeToEdit.fileName);
+                  setSelectedFile(attachment);
+                  setAttachmentFormData({
+                    id: typeToEdit.id,
+                    fileName: typeToEdit.fileName,
+                    expirationDate: typeToEdit.expirationDate
+                      ? typeToEdit.expirationDate
+                      : "",
+                    attachment: typeToEdit.attachment,
+                    createdBy: user.id,
+                  });
+
+                  setOpenAttachmentModal(true);
+                } else {
+                  console.error(
+                    `Document with ID ${params.row.id} not found for editing.`
+                  );
+                }
+              } catch (error) {}
+            }}
           >
             <EditIcon />
           </IconButton>

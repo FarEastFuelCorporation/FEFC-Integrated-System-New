@@ -87,6 +87,10 @@ export function calculateRemainingTime(expirationDate) {
   const now = new Date();
   const expiration = new Date(expirationDate);
 
+  // Zero out the time part to compare dates only
+  now.setHours(0, 0, 0, 0);
+  expiration.setHours(0, 0, 0, 0);
+
   // Calculate the difference in time
   const differenceInTime = expiration - now; // in milliseconds
 
@@ -96,11 +100,12 @@ export function calculateRemainingTime(expirationDate) {
   // Check if the date is expired
   const isExpired = totalDays < 0;
 
-  // If expired, calculate the absolute days
+  // Use absolute value to calculate the year/month/day breakdown
   const absoluteDays = Math.abs(totalDays);
-  const years = Math.floor(absoluteDays / 365);
-  const months = Math.floor((absoluteDays % 365) / 30);
-  const days = absoluteDays % 30;
+
+  const years = Math.floor(absoluteDays / 365); // Approximate years
+  const months = Math.floor((absoluteDays % 365) / 30); // Approximate months
+  const days = absoluteDays % 30; // Remaining days
 
   return { years, months, days, isExpired, totalDays };
 }

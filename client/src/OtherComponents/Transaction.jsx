@@ -280,116 +280,61 @@ const Transaction = ({
               </Tabs>
               {selectedSubTab === 0 ? (
                 <CustomAccordionDetails>
-                  {Number.isInteger(user.userType) ? (
+                  {row.statusId >= 10 && (
+                    <CollectedTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 9 && (
+                    <BillingDistributionTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 8 && (
+                    <BillingApprovalTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 7 && (
+                    <BilledTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 6 && (
+                    <CertifiedTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 5 && (
+                    <TreatedTransaction
+                      row={row}
+                      handleOpenModal={handleOpenModal}
+                      handleDeleteClick={handleDeleteClick}
+                      user={user}
+                    />
+                  )}
+                  {row.statusId >= 4 && <SortedTransaction row={row} />}
+                  {row.statusId >= 3 && <ReceivedTransaction row={row} />}
+                  {row.statusId >= 2 && <DispatchedTransaction row={row} />}
+                  {row.statusId >= 1 && <ScheduledTransaction row={row} />}
+                  {Number.isInteger(user.userType) && (
                     <>
-                      {row.statusId >= 10 && (
-                        <CollectedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 9 && (
-                        <BillingDistributionTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 8 && (
-                        <BillingApprovalTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 7 && (
-                        <BilledTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 6 && (
-                        <CertifiedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 5 && (
-                        <TreatedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 4 && <SortedTransaction row={row} />}
-                      {row.statusId >= 3 && <ReceivedTransaction row={row} />}
-                      {row.statusId >= 2 && <DispatchedTransaction row={row} />}
-                      {row.statusId >= 1 && <ScheduledTransaction row={row} />}
-                      {/* {row.statusId >= 1 && <BookedTransaction row={row} />} */}
-                    </>
-                  ) : (
-                    <>
-                      {row.statusId >= 10 && (
-                        <CollectedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 9 && (
-                        <BillingDistributionTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 8 && (
-                        <BillingApprovalTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 7 && (
-                        <BilledTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 6 && (
-                        <CertifiedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 5 && (
-                        <TreatedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
-                      {row.statusId >= 4 && <SortedTransaction row={row} />}
-                      {row.statusId >= 3 && <ReceivedTransaction row={row} />}
-                      {row.statusId >= 2 && <DispatchedTransaction row={row} />}
-                      {row.statusId >= 1 && <ScheduledTransaction row={row} />}
+                      <BookedTransaction row={row} />
                     </>
                   )}
                 </CustomAccordionDetails>

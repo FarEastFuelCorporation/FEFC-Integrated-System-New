@@ -217,7 +217,7 @@ const CollectedTransactions = ({ user }) => {
     if (!validateForm(updatedFormData)) {
       return;
     }
-    console.log(updatedFormData);
+
     try {
       setLoading(true);
 

@@ -69,6 +69,12 @@ const ReceivedTransaction = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: true,
     },
+    submitTo: {
+      type: DataTypes.ENUM,
+      values: ["LOGISTICS", "RECEIVING"],
+      allowNull: true,
+      // defaultValue: "LOGISTICS",
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

@@ -8,6 +8,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import RecyclingIcon from "@mui/icons-material/Recycling";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import PaidIcon from "@mui/icons-material/Paid";
 import TopicIcon from "@mui/icons-material/Topic";
@@ -29,16 +30,13 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/clients": "Clients",
       "/dashboard/typeOfWastes": "Type Of Wastes",
+      "/dashboard/thirdPartyLogistics": "Third Party Logistics",
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
       "/dashboard/commissions": "Commissions",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
-      "/dashboard/faq": "FAQ Page",
-      "/dashboard/bar": "Bar Chart",
-      "/dashboard/pie": "Pie Chart",
-      "/dashboard/line": "Line Chart",
     }),
     []
   ); // No dependencies, as this is a static object
@@ -210,6 +208,14 @@ const MarketingSidebar = ({ user }) => {
               title="Type Of Wastes"
               to="typeOfWastes"
               icon={<RecyclingIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Third Party Logistics"
+              to="thirdPartyLogistics"
+              icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

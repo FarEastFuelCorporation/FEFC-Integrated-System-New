@@ -47,27 +47,75 @@ async function createDocumentController(req, res) {
 }
 
 // Get Documents controller
+// async function getDocumentsController(req, res) {
+//   try {
+//     // Fetch all documents from the database with related Employee data
+//     const documents = await Document.findAll({
+//       include: [
+//         {
+//           model: Employee,
+//           as: "Employee",
+//           attributes: ["firstName", "lastName"], // Include only necessary fields
+//         },
+//       ],
+//       order: [["fileName", "ASC"]],
+//     });
+
+//     res.status(200).json({ documents }); // Send the documents directly in the response
+//   } catch (error) {
+//     // Log error for debugging and send a response with a message
+//     console.error("Error fetching documents:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Failed to fetch documents. Internal server error." });
+//   }
+// }
+
+// Get Documents Controller with optimized query
 async function getDocumentsController(req, res) {
   try {
-    // Fetch all documents from the database with related Employee data
+    // Fetch only the necessary metadata for the documents
     const documents = await Document.findAll({
+      attributes: { exclude: ["attachment"] },
       include: [
         {
           model: Employee,
           as: "Employee",
-          attributes: ["firstName", "lastName"], // Include only necessary fields
+          attributes: ["firstName", "lastName"], // Include only necessary employee fields
         },
       ],
       order: [["fileName", "ASC"]],
+      // limit: 20, // Optional: Implement pagination with a limit
+      // offset: req.query.page ? (req.query.page - 1) * 20 : 0, // Use pagination if page query param is provided
     });
 
-    res.status(200).json({ documents }); // Send the documents directly in the response
+    res.status(200).json({ documents });
   } catch (error) {
-    // Log error for debugging and send a response with a message
     console.error("Error fetching documents:", error);
     res
       .status(500)
       .json({ message: "Failed to fetch documents. Internal server error." });
+  }
+}
+
+// Separate controller to fetch file content
+async function getDocumentFileController(req, res) {
+  try {
+    const document = await Document.findByPk(req.params.id, {
+      attributes: ["attachment"], // Only fetch file content
+    });
+
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    // Send file content
+    res.status(200).json({ document });
+  } catch (error) {
+    console.error("Error fetching document file:", error);
+    res.status(500).json({
+      message: "Failed to fetch document file. Internal server error.",
+    });
   }
 }
 
@@ -176,6 +224,7 @@ async function deleteDocumentsController(req, res) {
 module.exports = {
   createDocumentController,
   getDocumentsController,
+  getDocumentFileController,
   updateDocumentController,
   deleteDocumentsController,
 };

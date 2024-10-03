@@ -30,7 +30,7 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/clients": "Clients",
       "/dashboard/typeOfWastes": "Type Of Wastes",
-      "/dashboard/thirdPartyLogistics": "Third Party Logistics",
+      "/dashboard/logistics": "Logistics",
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
       "/dashboard/commissions": "Commissions",
@@ -213,8 +213,8 @@ const MarketingSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
-              title="Third Party Logistics"
-              to="thirdPartyLogistics"
+              title="Logistics"
+              to="logistics"
               icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}

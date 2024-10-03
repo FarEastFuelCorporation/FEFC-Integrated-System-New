@@ -17,6 +17,10 @@ const ScheduledTransaction = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    logisticsId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     scheduledDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,

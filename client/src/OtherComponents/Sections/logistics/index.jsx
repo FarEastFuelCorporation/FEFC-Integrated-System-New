@@ -19,26 +19,28 @@ import SuccessMessage from "../../SuccessMessage";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import LoadingSpinner from "../../LoadingSpinner";
 
-const ThirdPartyLogistics = ({ user }) => {
+const Logistics = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   // Create refs for the input fields
-  const tplNameRef = useRef();
+  const logisticsNameRef = useRef();
   const addressRef = useRef();
   const contactNumberRef = useRef();
 
   const initialFormData = {
     id: "",
-    typeOfScrap: "",
+    logisticsName: "",
+    address: "",
+    contactNumber: "",
     createdBy: user.id,
   };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [thirdPartyLogistics, setThirdPartyLogistics] = useState([]);
+  const [logistics, setLogistics] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -48,9 +50,9 @@ const ThirdPartyLogistics = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/api/thirdPartyLogistics`);
+      const response = await axios.get(`${apiUrl}/api/logistics`);
 
-      setThirdPartyLogistics(response.data.thirdPartyLogistics);
+      setLogistics(response.data.logistics);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -90,27 +92,24 @@ const ThirdPartyLogistics = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const typeToEdit = thirdPartyLogistics.find((type) => type.id === id);
+    const typeToEdit = logistics.find((type) => type.id === id);
     if (typeToEdit) {
       setFormData({
         id: typeToEdit.id,
-        tplId: typeToEdit.tplId,
-        tplName: typeToEdit.tplName,
+        logisticsName: typeToEdit.logisticsName,
         address: typeToEdit.address,
         contactNumber: typeToEdit.contactNumber,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(
-        `Third Party Logistics with ID ${id} not found for editing.`
-      );
+      console.error(`Logistics with ID ${id} not found for editing.`);
     }
   };
 
   const handleDeleteClick = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Third Party Logistics?"
+      "Are you sure you want to delete this Logistics?"
     );
 
     if (!isConfirmed) {
@@ -119,12 +118,12 @@ const ThirdPartyLogistics = ({ user }) => {
 
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/thirdPartyLogistics/${id}`, {
+      await axios.delete(`${apiUrl}/api/logistics/${id}`, {
         data: { deletedBy: user.id },
       });
 
       fetchData();
-      setSuccessMessage("Third Party Logistics Deleted Successfully!");
+      setSuccessMessage("Logistics Deleted Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {
@@ -135,8 +134,8 @@ const ThirdPartyLogistics = ({ user }) => {
   const validateForm = (data) => {
     let validationErrors = [];
 
-    // Validate tplName
-    if (!data.tplName || data.tplName.trim() === "") {
+    // Validate logisticsName
+    if (!data.logisticsName || data.logisticsName.trim() === "") {
       validationErrors.push("TPL Name is required.");
     }
 
@@ -170,7 +169,7 @@ const ThirdPartyLogistics = ({ user }) => {
     // Set formData from refs before validation
     const updatedFormData = {
       ...formData,
-      tplName: tplNameRef.current.value,
+      logisticsName: logisticsNameRef.current.value,
       address: addressRef.current.value,
       contactNumber: contactNumberRef.current.value,
     };
@@ -185,16 +184,16 @@ const ThirdPartyLogistics = ({ user }) => {
       if (updatedFormData.id) {
         // Update existing third party logistics
         await axios.put(
-          `${apiUrl}/api/thirdPartyLogistics/${updatedFormData.id}`,
+          `${apiUrl}/api/logistics/${updatedFormData.id}`,
           updatedFormData
         );
 
-        setSuccessMessage("Third Party Logistics Updated Successfully!");
+        setSuccessMessage("Logistics Updated Successfully!");
       } else {
         // Add new third party logistics
-        await axios.post(`${apiUrl}/api/thirdPartyLogistics`, updatedFormData);
+        await axios.post(`${apiUrl}/api/logistics`, updatedFormData);
 
-        setSuccessMessage("Third Party Logistics Added Successfully!");
+        setSuccessMessage("Logistics Added Successfully!");
       }
 
       fetchData();
@@ -214,8 +213,8 @@ const ThirdPartyLogistics = ({ user }) => {
 
   const columns = [
     {
-      field: "tplName",
-      headerName: "Third Party Logistics",
+      field: "logisticsName",
+      headerName: "Logistics",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -275,7 +274,7 @@ const ThirdPartyLogistics = ({ user }) => {
   ];
 
   const refs = {
-    tplNameRef,
+    logisticsNameRef,
     addressRef,
     contactNumberRef,
   };
@@ -284,10 +283,7 @@ const ThirdPartyLogistics = ({ user }) => {
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
-        <Header
-          title="Third Party Logistics"
-          subtitle="List of Third Party Logistics"
-        />
+        <Header title="Logistics" subtitle="List of Logistics" />
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />
@@ -304,7 +300,7 @@ const ThirdPartyLogistics = ({ user }) => {
 
       <CustomDataGridStyles>
         <DataGrid
-          rows={thirdPartyLogistics ? thirdPartyLogistics : []}
+          rows={logistics ? logistics : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
@@ -334,17 +330,15 @@ const ThirdPartyLogistics = ({ user }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id
-              ? "Update Third Party Logistics"
-              : "Add New Third Party Logistics"}
+            {formData.id ? "Update Logistics" : "Add New Logistics"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
           <TextField
-            label="Third Party Logistics"
-            inputRef={refs.tplNameRef}
-            defaultValue={formData.tplName}
+            label="Logistics"
+            inputRef={refs.logisticsNameRef}
+            defaultValue={formData.logisticsName}
             onChange={handleInputChange}
             fullWidth
             required
@@ -405,4 +399,4 @@ const ThirdPartyLogistics = ({ user }) => {
   );
 };
 
-export default ThirdPartyLogistics;
+export default Logistics;

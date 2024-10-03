@@ -41,6 +41,7 @@ const BilledCertified = require("../models/BilledCertified");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
+const Logistics = require("../models/Logistics");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -492,6 +493,19 @@ BookedTransaction.hasMany(Attachment, {
 Attachment.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+Logistics.hasMany(ScheduledTransaction, {
+  as: "ScheduledTransaction",
+  foreignKey: "logisticsId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+ScheduledTransaction.belongsTo(Logistics, {
+  as: "Logistics",
+  foreignKey: "logisticsId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

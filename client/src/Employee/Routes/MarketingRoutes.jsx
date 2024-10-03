@@ -4,7 +4,7 @@ import UserSidebar from "../../OtherComponents/UserSidebar";
 import Dashboard from "../../Employee/Layouts/Marketing/sections/dashboard";
 import Clients from "../../OtherComponents/Sections/clients";
 import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
-import ThirdPartyLogistics from "../../OtherComponents/Sections/thirdPartyLogistics";
+import Logistics from "../../OtherComponents/Sections/logistics";
 import Quotations from "../../OtherComponents/Sections/quotations";
 import ScheduledTransactions from "../../Employee/Layouts/Marketing/sections/scheduledTransactions";
 import Commissions from "../../OtherComponents/Sections/commissions";
@@ -19,10 +19,7 @@ const MarketingRoutes = ({ user, onUpdateUser }) => (
       <Route path="" element={<Dashboard />} />
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
-      <Route
-        path="thirdPartyLogistics"
-        element={<ThirdPartyLogistics user={user} />}
-      />
+      <Route path="logistics" element={<Logistics user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route
         path="transactions"

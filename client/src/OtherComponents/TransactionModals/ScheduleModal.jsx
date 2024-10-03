@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Modal,
@@ -6,7 +6,9 @@ import {
   useTheme,
   TextField,
   Button,
+  MenuItem,
 } from "@mui/material";
+import axios from "axios";
 import { tokens } from "../../theme";
 
 const ScheduleModal = ({
@@ -20,6 +22,26 @@ const ScheduleModal = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
+
+  const [logistics, setThirdPartyLogistics] = useState([]);
+
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    try {
+      const logisticsResponse = await axios.get(`${apiUrl}/api/logistics`);
+
+      setThirdPartyLogistics(logisticsResponse.data.logistics);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [apiUrl]);
+
+  // Fetch data when component mounts or apiUrl/processDataTransaction changes
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -80,7 +102,29 @@ const ScheduleModal = ({
             }}
             autoComplete="off"
           />
-        </div>
+        </div>{" "}
+        <TextField
+          label="Logistics"
+          name="logistics"
+          value={formData.quotationWasteId}
+          onChange={handleInputChange}
+          select
+          fullWidth
+          required
+          InputLabelProps={{
+            style: {
+              color: colors.grey[100],
+            },
+          }}
+          autoComplete="off"
+        >
+          {logistics &&
+            logistics.map((logistics, index) => (
+              <MenuItem key={`${index}`} value={logistics.id}>
+                {logistics.logisticsName}
+              </MenuItem>
+            ))}
+        </TextField>
         <TextField
           label="Remarks"
           name="remarks"

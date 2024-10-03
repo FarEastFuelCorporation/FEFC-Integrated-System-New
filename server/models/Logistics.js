@@ -1,11 +1,11 @@
-// models/ThirdPartyLogistics.js
+// models/Logistics.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const ThirdPartyLogistics = sequelize.define(
-  "ThirdPartyLogistics",
+const Logistics = sequelize.define(
+  "Logistics",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,12 +13,7 @@ const ThirdPartyLogistics = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    tplId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    tplName: {
+    logisticsName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -63,4 +58,4 @@ const ThirdPartyLogistics = sequelize.define(
   }
 );
 
-module.exports = ThirdPartyLogistics;
+module.exports = Logistics;

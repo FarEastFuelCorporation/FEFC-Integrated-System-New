@@ -105,8 +105,8 @@ const ScheduleModal = ({
         </div>{" "}
         <TextField
           label="Logistics"
-          name="logistics"
-          value={formData.quotationWasteId}
+          name="logisticsId"
+          value={formData.logisticsId || ""}
           onChange={handleInputChange}
           select
           fullWidth
@@ -118,12 +118,15 @@ const ScheduleModal = ({
           }}
           autoComplete="off"
         >
-          {logistics &&
-            logistics.map((logistics, index) => (
-              <MenuItem key={`${index}`} value={logistics.id}>
-                {logistics.logisticsName}
+          {logistics && logistics.length > 0 ? (
+            logistics.map((logistic, index) => (
+              <MenuItem key={index} value={logistic.id}>
+                {logistic.logisticsName}
               </MenuItem>
-            ))}
+            ))
+          ) : (
+            <MenuItem disabled>No logistics available</MenuItem>
+          )}
         </TextField>
         <TextField
           label="Remarks"

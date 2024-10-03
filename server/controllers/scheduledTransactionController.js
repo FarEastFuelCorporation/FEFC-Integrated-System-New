@@ -11,6 +11,7 @@ async function createScheduledTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId,
+      logisticsId,
       scheduledDate,
       scheduledTime,
       remarks,
@@ -25,6 +26,7 @@ async function createScheduledTransactionController(req, res) {
     // Creating a new transaction
     await ScheduledTransaction.create({
       bookedTransactionId,
+      logisticsId,
       scheduledDate,
       scheduledTime,
       remarks,
@@ -89,6 +91,7 @@ async function updateScheduledTransactionController(req, res) {
 
     let {
       bookedTransactionId,
+      logisticsId,
       scheduledDate,
       scheduledTime,
       remarks,
@@ -105,6 +108,7 @@ async function updateScheduledTransactionController(req, res) {
     if (updatedScheduledTransaction) {
       // Update scheduled transaction attributes
       updatedScheduledTransaction.bookedTransactionId = bookedTransactionId;
+      updatedScheduledTransaction.logisticsId = logisticsId;
       updatedScheduledTransaction.scheduledDate = scheduledDate;
       updatedScheduledTransaction.scheduledTime = scheduledTime;
       updatedScheduledTransaction.remarks = remarks;

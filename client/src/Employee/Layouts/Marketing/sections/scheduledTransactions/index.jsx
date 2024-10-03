@@ -14,6 +14,7 @@ const ScheduledTransactions = ({ user }) => {
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
+    logisticsId: "",
     scheduledDate: "",
     scheduledTime: "",
     remarks: "",
@@ -69,6 +70,7 @@ const ScheduledTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
+      logisticsId: "",
       scheduledDate: "",
       scheduledTime: "",
       remarks: "",
@@ -103,6 +105,7 @@ const ScheduledTransactions = ({ user }) => {
       setFormData({
         id: scheduledTransaction?.id,
         bookedTransactionId: typeToEdit.id,
+        logisticsId: scheduledTransaction.logisticsId,
         scheduledDate: scheduledTransaction?.scheduledDate,
         scheduledTime: scheduledTransaction?.scheduledTime,
         remarks: scheduledTransaction?.remarks,

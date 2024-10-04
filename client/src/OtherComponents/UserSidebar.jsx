@@ -13,6 +13,7 @@ import AccountingHeadSidebar from "../Employee/Layouts/AccountingHead/Accounting
 import CollectionSidebar from "../Employee/Layouts/Collection/CollectionSidebar";
 import MessengerSidebar from "../Employee/Layouts/Messenger/MessengerSidebar";
 import SafetySidebar from "../Employee/Layouts/Safety/SafetySidebar";
+import WarehouseSidebar from "../Employee/Layouts/Warehouse/WarehouseSidebar";
 
 const UserSidebar = ({ user }) => {
   let sidebar;
@@ -57,6 +58,9 @@ const UserSidebar = ({ user }) => {
       break;
     case 13:
       sidebar = <SafetySidebar user={user} />;
+      break;
+    case 14:
+      sidebar = <WarehouseSidebar user={user} />;
       break;
     default:
       sidebar = <MarketingSidebar user={user} />;

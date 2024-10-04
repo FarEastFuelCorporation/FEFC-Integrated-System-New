@@ -15,6 +15,7 @@ import AccountingHeadRoutes from "../Employee/Routes/AccountingHeadRoutes";
 import CollectionRoutes from "../Employee/Routes/CollectionRoutes";
 import MessengerRoutes from "../Employee/Routes/MessengerRoutes";
 import SafetyRoutes from "../Employee/Routes/SafetyRoutes";
+import WarehouseRoutes from "../Employee/Routes/WarehouseRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -102,6 +103,12 @@ const Dashboard = ({ user, onUpdateUser }) => {
       return (
         <RoleProtectedRoute user={user} allowedRoles={[13]}>
           <SafetyRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 14:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[14]}>
+          <WarehouseRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     default:

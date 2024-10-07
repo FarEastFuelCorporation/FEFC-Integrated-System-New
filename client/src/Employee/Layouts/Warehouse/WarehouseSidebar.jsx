@@ -112,7 +112,6 @@ const WarehouseSidebar = ({ user }) => {
               </Box>
             )}
           </MenuItem>
-
           {!isCollapsed && user && profilePictureSrc && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
@@ -124,8 +123,7 @@ const WarehouseSidebar = ({ user }) => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
-              <Box textAlign="center"> 
-                
+              <Box textAlign="center">
                 <Typography
                   variant="h3"
                   color={colors.grey[100]}

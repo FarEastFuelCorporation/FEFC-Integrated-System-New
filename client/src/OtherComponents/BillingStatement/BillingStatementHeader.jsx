@@ -48,9 +48,9 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               sx={{ height: "16px" }}
             >
               {
-                row.ScheduledTransaction[0].DispatchedTransaction[0]
-                  .ReceivedTransaction[0].SortedTransaction[0]
-                  .CertifiedTransaction[0].BilledTransaction[0].billingNumber
+                row.ScheduledTransaction[0].ReceivedTransaction[0]
+                  .SortedTransaction[0].CertifiedTransaction[0]
+                  .BilledTransaction[0].billingNumber
               }
             </Typography>
             <Typography
@@ -68,7 +68,16 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {formatDateFull(today)}
+              {row.ScheduledTransaction[0].ReceivedTransaction[0]
+                .SortedTransaction[0].CertifiedTransaction[0]
+                .BilledTransaction[0].BillingApprovalTransaction.approvedDate
+                ? formatDateFull(
+                    row.ScheduledTransaction[0].ReceivedTransaction[0]
+                      .SortedTransaction[0].CertifiedTransaction[0]
+                      .BilledTransaction[0].BillingApprovalTransaction
+                      .approvedDate
+                  )
+                : ""}
             </Typography>
           </Box>
         </Box>

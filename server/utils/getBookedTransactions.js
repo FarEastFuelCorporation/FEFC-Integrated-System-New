@@ -81,105 +81,120 @@ const getIncludeOptions = () => [
         required: false,
         include: [
           {
-            model: ReceivedTransaction,
-            as: "ReceivedTransaction",
+            model: Employee,
+            as: "EmployeeDriver",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: Vehicle,
+            as: "Vehicle",
+            attributes: ["plateNumber"],
+            include: {
+              model: VehicleType,
+              as: "VehicleType",
+              attributes: ["typeOfVehicle"],
+            },
+          },
+        ],
+      },
+      {
+        model: ReceivedTransaction,
+        as: "ReceivedTransaction",
+        required: false,
+        include: [
+          {
+            model: SortedTransaction,
+            as: "SortedTransaction",
             required: false,
+            paranoid: true,
             include: [
               {
-                model: SortedTransaction,
-                as: "SortedTransaction",
+                model: SortedWasteTransaction,
+                as: "SortedWasteTransaction",
                 required: false,
-                paranoid: true,
                 include: [
                   {
-                    model: SortedWasteTransaction,
-                    as: "SortedWasteTransaction",
+                    model: QuotationWaste,
+                    as: "QuotationWaste",
+                  },
+                  {
+                    model: TreatedWasteTransaction,
+                    as: "TreatedWasteTransaction",
                     required: false,
                     include: [
                       {
-                        model: QuotationWaste,
-                        as: "QuotationWaste",
-                      },
-                      {
-                        model: TreatedWasteTransaction,
-                        as: "TreatedWasteTransaction",
+                        model: TreatmentMachine,
+                        as: "TreatmentMachine",
                         required: false,
                         include: [
                           {
-                            model: TreatmentMachine,
-                            as: "TreatmentMachine",
+                            model: TreatmentProcess,
+                            as: "TreatmentProcess",
                             required: false,
-                            include: [
-                              {
-                                model: TreatmentProcess,
-                                as: "TreatmentProcess",
-                                required: false,
-                              },
-                            ],
-                          },
-                          {
-                            model: TreatedTransaction,
-                            as: "TreatedTransaction",
-                            required: false,
-                            paranoid: true,
-                            include: {
-                              model: Employee,
-                              as: "Employee",
-                              attributes: ["firstName", "lastName"],
-                            },
                           },
                         ],
                       },
+                      {
+                        model: TreatedTransaction,
+                        as: "TreatedTransaction",
+                        required: false,
+                        paranoid: true,
+                        include: {
+                          model: Employee,
+                          as: "Employee",
+                          attributes: ["firstName", "lastName"],
+                        },
+                      },
                     ],
                   },
+                ],
+              },
+              {
+                model: SortedScrapTransaction,
+                as: "SortedScrapTransaction",
+                required: false,
+                include: {
+                  model: ScrapType,
+                  as: "ScrapType",
+                  required: false,
+                },
+              },
+              {
+                model: TreatedTransaction,
+                as: "TreatedTransaction",
+                required: false,
+                paranoid: true,
+              },
+              {
+                model: CertifiedTransaction,
+                as: "CertifiedTransaction",
+                required: false,
+                include: [
                   {
-                    model: SortedScrapTransaction,
-                    as: "SortedScrapTransaction",
-                    required: false,
-                    include: {
-                      model: ScrapType,
-                      as: "ScrapType",
-                      required: false,
-                    },
-                  },
-                  {
-                    model: TreatedTransaction,
-                    as: "TreatedTransaction",
-                    required: false,
-                    paranoid: true,
-                  },
-                  {
-                    model: CertifiedTransaction,
-                    as: "CertifiedTransaction",
+                    model: BilledTransaction,
+                    as: "BilledTransaction",
                     required: false,
                     include: [
                       {
-                        model: BilledTransaction,
-                        as: "BilledTransaction",
+                        model: BillingApprovalTransaction,
+                        as: "BillingApprovalTransaction",
                         required: false,
                         include: [
                           {
-                            model: BillingApprovalTransaction,
-                            as: "BillingApprovalTransaction",
+                            model: BillingDistributionTransaction,
+                            as: "BillingDistributionTransaction",
                             required: false,
                             include: [
                               {
-                                model: BillingDistributionTransaction,
-                                as: "BillingDistributionTransaction",
+                                model: CollectedTransaction,
+                                as: "CollectedTransaction",
                                 required: false,
                                 include: [
-                                  {
-                                    model: CollectedTransaction,
-                                    as: "CollectedTransaction",
-                                    required: false,
-                                    include: [
-                                      {
-                                        model: Employee,
-                                        as: "Employee",
-                                        attributes: ["firstName", "lastName"],
-                                      },
-                                    ],
-                                  },
                                   {
                                     model: Employee,
                                     as: "Employee",
@@ -224,27 +239,11 @@ const getIncludeOptions = () => [
           },
           {
             model: Employee,
-            as: "EmployeeDriver",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Employee,
             as: "Employee",
             attributes: ["firstName", "lastName"],
           },
-          {
-            model: Vehicle,
-            as: "Vehicle",
-            attributes: ["plateNumber"],
-            include: {
-              model: VehicleType,
-              as: "VehicleType",
-              attributes: ["typeOfVehicle"],
-            },
-          },
         ],
       },
-
       {
         model: Employee,
         as: "Employee",

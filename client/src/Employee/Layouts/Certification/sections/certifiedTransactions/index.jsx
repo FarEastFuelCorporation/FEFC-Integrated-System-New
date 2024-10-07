@@ -74,8 +74,8 @@ const CertifiedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       sortedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].id,
+        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+          .id,
       certificateNumber: "",
       certifiedDate: "",
       certifiedTime: "",
@@ -109,16 +109,15 @@ const CertifiedTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const certifiedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0] || {};
+        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0] || {};
 
       setFormData({
         id: certifiedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         sortedTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
+          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.SortedTransaction?.[0].id,
         certificateNumber: certifiedTransaction.certificateNumber,
         certifiedDate: certifiedTransaction.certifiedDate,
         certifiedTime: certifiedTransaction.certifiedTime,
@@ -150,7 +149,7 @@ const CertifiedTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].id}`,
+        `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,

@@ -81,9 +81,8 @@ const BillingApprovalTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       billedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
-          .BilledTransaction[0].id,
+        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+          .CertifiedTransaction[0].BilledTransaction[0].id,
       approvedDate: "",
       approvedTime: "",
       remarks: "",
@@ -114,18 +113,17 @@ const BillingApprovalTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const billingApprovalTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0].BilledTransaction?.[0]
-          .BillingApprovalTransaction || {};
+        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+          .BilledTransaction?.[0].BillingApprovalTransaction || {};
 
       setFormData({
         id: billingApprovalTransaction.id,
         bookedTransactionId: typeToEdit.id,
         billedTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-            .CertifiedTransaction?.[0].BilledTransaction?.[0].id,
+          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.SortedTransaction?.[0].CertifiedTransaction?.[0]
+            .BilledTransaction?.[0].id,
         approvedDate: billingApprovalTransaction.approvedDate,
         approvedTime: billingApprovalTransaction.approvedTime,
         remarks: billingApprovalTransaction.remarks,
@@ -153,7 +151,7 @@ const BillingApprovalTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billingApprovalTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.id}`,
+        `${apiUrl}/api/billingApprovalTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.id}`,
         {
           data: {
             deletedBy: user.id,

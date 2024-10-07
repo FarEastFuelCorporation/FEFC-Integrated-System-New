@@ -16,10 +16,10 @@ const BillingStatementFooter = ({ row, qrCodeURL }) => {
   // Only set approved if row.approved changes
 
   const isApproved =
-    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-      ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-      ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]
-      ?.BillingApprovalTransaction?.approvedDate !== undefined;
+    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+      ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+      ?.BilledTransaction?.[0]?.BillingApprovalTransaction?.approvedDate !==
+    undefined;
 
   useEffect(() => {
     setApproved(isApproved);

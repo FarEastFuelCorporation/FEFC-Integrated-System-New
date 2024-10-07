@@ -12,12 +12,11 @@ const ReceivedTransaction = ({ row }) => {
 
   // Extract received transaction data
   const receivedTransaction =
-    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-      .ReceivedTransaction?.[0] || {};
+    row?.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};
 
   return (
     <Box>
-      {row.statusId === 3 ? (
+      {row.statusId === 2 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <LocalShippingIcon

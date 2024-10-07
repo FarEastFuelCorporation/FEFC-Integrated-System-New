@@ -28,7 +28,7 @@ const DispatchedTransaction = ({ row }) => {
 
   // Extract dispatched transaction data
   const dispatchedTransaction =
-    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0] || {};
+    row?.ScheduledTransaction?.[0].DispatchedTransaction?.[0] || {};
   const dispatcher = dispatchedTransaction.Employee || {};
 
   // Helper extraction

@@ -47,6 +47,10 @@ const DispatchedTransactions = ({ user }) => {
       );
 
       console.log(dispatchedTransactionResponse);
+      console.log(
+        dispatchedTransactionResponse.data.pendingTransactions[0]
+          .ScheduledTransaction[0].logisticsId
+      );
 
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
@@ -60,7 +64,7 @@ const DispatchedTransactions = ({ user }) => {
               matchingLogisticsId
         );
       setPendingTransactions(filteredPendingTransactions);
-
+      console.log(filteredPendingTransactions);
       // For in-progress transactions
       const filteredInProgressTransactions =
         dispatchedTransactionResponse.data.inProgressTransactions.filter(
@@ -139,7 +143,7 @@ const DispatchedTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const dispatchedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0] || {};
+        typeToEdit.ScheduledTransaction?.[0].DispatchedTransaction?.[0] || {};
 
       setFormData({
         vehicleTypeId: typeToEdit.QuotationTransportation.vehicleTypeId,

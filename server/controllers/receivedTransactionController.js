@@ -3,7 +3,7 @@
 const BookedTransaction = require("../models/BookedTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
-const statusId = 3;
+const statusId = 2;
 
 // Create Received Transaction controller
 async function createReceivedTransactionController(req, res) {

@@ -31,12 +31,12 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   const certificateRef = useRef();
 
   const certifiedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0];
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0];
 
   const sortedWasteTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].SortedWasteTransaction;
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .SortedWasteTransaction;
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;

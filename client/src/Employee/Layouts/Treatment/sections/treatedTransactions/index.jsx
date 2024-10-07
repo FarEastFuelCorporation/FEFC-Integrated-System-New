@@ -82,8 +82,8 @@ const TreatedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       sortedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].id,
+        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+          .id,
       sortedWasteTransactionId: waste.id,
       treatedWastes: [
         {

@@ -30,12 +30,12 @@ const BillingStatementForm = ({ row, verify = null }) => {
   const certificateRef = useRef();
 
   const billedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0];
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0].BilledTransaction[0];
 
   const sortedWasteTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].SortedWasteTransaction;
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .SortedWasteTransaction;
 
   // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
   const aggregatedWasteTransactions = Object.values(

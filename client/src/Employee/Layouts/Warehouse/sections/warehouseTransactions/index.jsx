@@ -87,13 +87,10 @@ const WarehouseTransactions = ({ user }) => {
       clientId: row.Client.clientId,
       bookedTransactionId: row.id,
       receivedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].id,
+        row.ScheduledTransaction[0].ReceivedTransaction[0].id,
       sortedDate: "",
       sortedTime: "",
-      batchWeight:
-        row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].netWeight,
+      batchWeight: row.ScheduledTransaction[0].ReceivedTransaction[0].netWeight,
       totalSortedWeight: 0,
       discrepancyWeight: 0,
       sortedWastes: [
@@ -134,20 +131,19 @@ const WarehouseTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const sortedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          .ReceivedTransaction?.[0].SortedTransaction?.[0] || {};
+        typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+          .SortedTransaction?.[0] || {};
       setFormData({
         id: sortedTransaction.id,
         clientId: typeToEdit.Client.clientId,
         bookedTransactionId: typeToEdit.id,
         receivedTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            .ReceivedTransaction?.[0].id,
+          typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0].id,
         sortedDate: sortedTransaction.sortedDate,
         sortedTime: sortedTransaction.sortedTime,
         batchWeight:
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            .ReceivedTransaction?.[0].netWeight,
+          typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+            .netWeight,
         totalSortedWeight: sortedTransaction.totalSortedWeight,
         discrepancyWeight: sortedTransaction.discrepancyWeight,
         sortedWastes: sortedTransaction.SortedWasteTransaction
@@ -195,7 +191,7 @@ const WarehouseTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/sortedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
+        `${apiUrl}/api/sortedTransaction/${row.ScheduledTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,

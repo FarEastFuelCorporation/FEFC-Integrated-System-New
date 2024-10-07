@@ -22,12 +22,11 @@ const TreatedTransaction = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const sortedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction;
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction;
 
   const sortedWasteTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].SortedWasteTransaction;
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .SortedWasteTransaction;
 
   // Get the bookedTransactionId from ScheduledTransaction
   const bookedTransactionId = row.ScheduledTransaction[0].bookedTransactionId;
@@ -313,18 +312,18 @@ const TreatedTransaction = ({
                 Waste Name: {waste.wasteName}
               </Typography>
               <Box sx={{ display: "flex", gap: 2 }}>
-                {sortedWasteTransaction[index].treatedWeight !==
-                  waste.weight && (
-                  <Button
-                    sx={{
-                      backgroundColor: `${colors.greenAccent[700]}`,
-                      color: `${colors.grey[100]}`,
-                    }}
-                    onClick={() => handleOpenModal(row, waste)}
-                  >
-                    Treat
-                  </Button>
-                )}
+                {sortedWasteTransaction[index].treatedWeight !== waste.weight &&
+                  user.userType === 6 && (
+                    <Button
+                      sx={{
+                        backgroundColor: `${colors.greenAccent[700]}`,
+                        color: `${colors.grey[100]}`,
+                      }}
+                      onClick={() => handleOpenModal(row, waste)}
+                    >
+                      Treat
+                    </Button>
+                  )}
 
                 <Box
                   sx={{

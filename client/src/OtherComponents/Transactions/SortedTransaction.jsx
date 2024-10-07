@@ -12,13 +12,12 @@ const SortedTransaction = ({ row }) => {
 
   // Extract received transaction data
   const sortedTransaction =
-    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-      .ReceivedTransaction?.[0].SortedTransaction?.[0] || {};
+    row?.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+      .SortedTransaction?.[0] || {};
 
   // Extract received transaction data
   const receivedTransaction =
-    row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-      .ReceivedTransaction?.[0] || {};
+    row?.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};
 
   const sortedWasteTransaction = sortedTransaction.SortedWasteTransaction
     ? sortedTransaction.SortedWasteTransaction.map((item) => ({

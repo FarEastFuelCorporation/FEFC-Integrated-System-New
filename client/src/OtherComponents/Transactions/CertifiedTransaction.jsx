@@ -12,8 +12,8 @@ const CertifiedTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const certifiedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0];
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0];
 
   return (
     <Box>

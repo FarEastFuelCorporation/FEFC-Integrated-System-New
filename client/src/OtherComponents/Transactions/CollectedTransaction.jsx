@@ -12,15 +12,14 @@ const CollectedTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const billingDistributionTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0]
-      .BillingApprovalTransaction.BillingDistributionTransaction;
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
+      .BillingDistributionTransaction;
 
   const collectedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0]
-      .BillingApprovalTransaction.BillingDistributionTransaction
-      .CollectedTransaction;
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
+      .BillingDistributionTransaction.CollectedTransaction;
 
   // Assuming distributedDate is in a valid Date format (either Date object or string)
   const distributedDate = new Date(

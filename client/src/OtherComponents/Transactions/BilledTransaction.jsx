@@ -12,12 +12,12 @@ const BilledTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const billedTransaction =
-    row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction[0]
-      .SortedTransaction[0].CertifiedTransaction[0].BilledTransaction[0];
+    row.ScheduledTransaction[0]?.ReceivedTransaction[0]?.SortedTransaction[0]
+      ?.CertifiedTransaction[0]?.BilledTransaction[0];
 
   return (
     <Box>
-      {row.statusId === 7 ? (
+      {row.statusId === 5 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <ReceiptIcon
@@ -61,20 +61,20 @@ const BilledTransaction = ({ row, user }) => {
               Billed
             </Typography>
             <Typography variant="h5">
-              {billedTransaction.createdAt
+              {billedTransaction?.createdAt
                 ? timestampDate(billedTransaction.createdAt)
                 : ""}
             </Typography>
           </Box>
           <Typography variant="h5">
             Billed Date:{" "}
-            {billedTransaction.billedDate
+            {billedTransaction?.billedDate
               ? format(new Date(billedTransaction.billedDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Billed Time:{" "}
-            {billedTransaction.billedTime
+            {billedTransaction?.billedTime
               ? format(
                   parseTimeString(billedTransaction.billedTime),
                   "hh:mm aa"
@@ -83,20 +83,20 @@ const BilledTransaction = ({ row, user }) => {
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {billedTransaction.remarks
+            {billedTransaction?.remarks
               ? billedTransaction.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Service Invoice Number:{" "}
-            {billedTransaction.serviceInvoiceNumber
+            {billedTransaction?.serviceInvoiceNumber
               ? billedTransaction.serviceInvoiceNumber
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Submitted By:{" "}
-            {`${billedTransaction.Employee.firstName || ""} ${
-              billedTransaction.Employee.lastName || ""
+            {`${billedTransaction?.Employee?.firstName || ""} ${
+              billedTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
           {row.statusId === 8 && <BillingStatementForm row={row} />}

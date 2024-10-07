@@ -86,9 +86,8 @@ const BilledTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       certifiedTransactionId: [
-        row.ScheduledTransaction[0].DispatchedTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0]
-          .id,
+        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+          .CertifiedTransaction[0].id,
       ],
       billingNumber: "",
       billedDate: "",
@@ -123,23 +122,21 @@ const BilledTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const billedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0].BilledTransaction?.[0] || {};
+        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+          .BilledTransaction?.[0] || {};
       console.log(
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-          ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]?.BilledCertified
-          ?.certifiedTransactionId
+        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+          ?.BilledTransaction?.[0]?.BilledCertified?.certifiedTransactionId
       );
       setFormData({
         id: billedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         certifiedTransactionId: [
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-            ?.CertifiedTransaction?.[0]?.BilledTransaction?.[0]?.BilledCertified
-            ?.certifiedTransactionId,
+          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+            ?.BilledTransaction?.[0]?.BilledCertified?.certifiedTransactionId,
         ],
         billingNumber: billedTransaction.billingNumber,
         billedDate: billedTransaction.billedDate,
@@ -171,7 +168,7 @@ const BilledTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billedTransaction/${row.ScheduledTransaction?.[0].DispatchedTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.id}`,
+        `${apiUrl}/api/billedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.id}`,
         {
           data: {
             deletedBy: user.id,

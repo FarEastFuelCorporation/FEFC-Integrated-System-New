@@ -50,20 +50,44 @@ const ReceivedTransactions = ({ user }) => {
         `${apiUrl}/api/receivedTransaction`
       );
 
-      // For pending transactions
-      setPendingTransactions(
-        receivedTransactionResponse.data.pendingTransactions
-      );
+      // Define the logisticsId to match
+      const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
 
-      // For in progress transactions
-      setInProgressTransactions(
-        receivedTransactionResponse.data.inProgressTransactions
-      );
+      // For pending transactions
+      const filteredPendingTransactions =
+        receivedTransactionResponse.data.pendingTransactions.filter(
+          (transaction) =>
+            (transaction.statusId === 2 &&
+              transaction.ScheduledTransaction &&
+              transaction.ScheduledTransaction[0].logisticsId !==
+                matchingLogisticsId) ||
+            transaction.statusId === 3
+        );
+      setPendingTransactions(filteredPendingTransactions);
+
+      // For in-progress transactions
+      const filteredInProgressTransactions =
+        receivedTransactionResponse.data.inProgressTransactions.filter(
+          (transaction) =>
+            (transaction.statusId === 2 &&
+              transaction.ScheduledTransaction &&
+              transaction.ScheduledTransaction[0].logisticsId !==
+                matchingLogisticsId) ||
+            transaction.statusId === 3
+        );
+      setInProgressTransactions(filteredInProgressTransactions);
 
       // For finished transactions
-      setFinishedTransactions(
-        receivedTransactionResponse.data.finishedTransactions
-      );
+      const filteredFinishedTransactions =
+        receivedTransactionResponse.data.finishedTransactions.filter(
+          (transaction) =>
+            (transaction.statusId === 2 &&
+              transaction.ScheduledTransaction &&
+              transaction.ScheduledTransaction[0].logisticsId !==
+                matchingLogisticsId) ||
+            transaction.statusId === 3
+        );
+      setFinishedTransactions(filteredFinishedTransactions);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -80,8 +104,7 @@ const ReceivedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       scheduledTransactionId: row.ScheduledTransaction[0].id,
-      dispatchedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction[0].id,
+      dispatchedTransactionId: row.ScheduledTransaction[0].id,
       receivedDate: "",
       receivedTime: "",
       pttNo: "",
@@ -120,14 +143,12 @@ const ReceivedTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const receivedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
-          .ReceivedTransaction?.[0] || {};
+        typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};
       setFormData({
         id: receivedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         scheduledTransactionId: typeToEdit.ScheduledTransaction?.[0]?.id,
-        dispatchedTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0].id,
+        dispatchedTransactionId: typeToEdit.ScheduledTransaction?.[0].id,
         receivedDate: receivedTransaction.receivedDate,
         receivedTime: receivedTransaction.receivedTime,
         pttNo: receivedTransaction.pttNo,
@@ -163,7 +184,7 @@ const ReceivedTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/receivedTransaction/${row.ScheduledTransaction[0].DispatchedTransaction[0].ReceivedTransaction?.[0].id}`,
+        `${apiUrl}/api/receivedTransaction/${row.ScheduledTransaction[0].ReceivedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import CertificateOfDestruction from "./CertificateOfDestruction";
 
 const Certificate = () => {
   const [loading, setLoading] = useState(true); // State to indicate loading
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const [quotationData, setQuotationData] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Certificate = () => {
     navigate("/login"); // Navigate back to the previous page
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const certificateResponse = await axios.get(
@@ -32,11 +32,11 @@ const Certificate = () => {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
-  };
+  }, [apiUrl, id]);
 
   useEffect(() => {
     fetchData();
-  }, [apiUrl, id]);
+  }, [fetchData]);
 
   return (
     <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "center" }}>

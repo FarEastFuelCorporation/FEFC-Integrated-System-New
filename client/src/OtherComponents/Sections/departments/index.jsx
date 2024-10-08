@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   IconButton,
@@ -20,7 +20,7 @@ import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 
 const Departments = ({ user }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -40,7 +40,7 @@ const Departments = ({ user }) => {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/department`);
@@ -50,11 +50,11 @@ const Departments = ({ user }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleOpenModal = () => {
     setOpenModal(true);

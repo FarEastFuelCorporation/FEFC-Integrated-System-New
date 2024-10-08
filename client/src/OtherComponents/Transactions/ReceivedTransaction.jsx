@@ -88,7 +88,7 @@ const ReceivedTransaction = ({ row }) => {
             {receivedTransaction.pttNo ? receivedTransaction.pttNo : "N/A"}
           </Typography>
           <Typography variant="h5">
-            PTT No:{" "}
+            Manifest No:{" "}
             {receivedTransaction.manifestNo
               ? receivedTransaction.manifestNo
               : "N/A"}

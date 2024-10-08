@@ -144,8 +144,7 @@ const CertifiedTransactions = ({ user }) => {
     if (!isConfirmed) {
       return; // Abort the deletion if the user cancels
     }
-    console.log(row);
-    console.log(row.bookedTransactionId);
+
     try {
       setLoading(true);
       await axios.delete(

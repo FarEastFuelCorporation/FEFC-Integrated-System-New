@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -11,7 +11,7 @@ import EmployeeProfileModal from "../../../../../OtherComponents/Modals/Employee
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
 const Contacts = ({ user }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
     id: "",
@@ -98,7 +98,7 @@ const Contacts = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [employeeRecordResponse, departmentResponse] = await Promise.all([
@@ -112,11 +112,11 @@ const Contacts = ({ user }) => {
     } catch (error) {
       console.error("Error fetching employeeData:", error);
     }
-  };
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchData();
-  }, [apiUrl]);
+  }, [fetchData]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -742,7 +742,7 @@ const Contacts = ({ user }) => {
           rows={employeeRecords ? employeeRecords : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
-          {...(user.userType === 9 && { onRowClick: handleRowClick })}
+          {...(user.userType === 12 && { onRowClick: handleRowClick })}
         />
       </CustomDataGridStyles>
       <EmployeeRecordModal

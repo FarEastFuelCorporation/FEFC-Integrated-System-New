@@ -1,93 +1,40 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  IconButton,
-  Modal,
-  Typography,
-  TextField,
-  Button,
-  useTheme,
-} from "@mui/material";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Box, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import PostAddIcon from "@mui/icons-material/PostAdd";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Header from "../../Header";
-import { tokens } from "../../../theme";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
-import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 
 const SwitchUsers = ({ user, onUpdateUser }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const navigate = useNavigate(); // Initialize the navigate hook
 
   const [employeeRoles, setEmployeeRoles] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Replace `user.id` with the actual ID
-        const response = await axios.get(`${apiUrl}/api/switchUser/${user.id}`);
-        console.log(response.data.employeeRolesOtherRole);
-        const mappedData = response.data.employeeRolesOtherRole.map((data) => ({
-          ...data,
-          employeeRole: data.EmployeeRole.employeeRole,
-        }));
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Replace `user.id` with the actual ID
+      const response = await axios.get(`${apiUrl}/api/switchUser/${user.id}`);
 
-        setEmployeeRoles(mappedData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+      const mappedData = response.data.employeeRolesOtherRole.map((data) => ({
+        ...data,
+        employeeRole: data.EmployeeRole.employeeRole,
+      }));
 
-    fetchData();
+      setEmployeeRoles(mappedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }, [apiUrl, user.id]);
 
-  // const handleFormSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     let response;
-
-  //     if (formData.id) {
-  //       // Update existing vehicle type
-  //       response = await axios.put(
-  //         `${apiUrl}/api/vehicleType/${formData.id}`,
-  //         formData
-  //       );
-
-  //       const updatedData = response.data.vehicleTypes;
-
-  //       setVehicleTypes(updatedData);
-  //       setSuccessMessage("Vehicle Type Updated Successfully!");
-  //     } else {
-  //       // Add new vehicle type
-  //       response = await axios.post(`${apiUrl}/api/vehicleType`, formData);
-
-  //       const updatedData = response.data.vehicleTypes;
-
-  //       setVehicleTypes(updatedData);
-  //       setSuccessMessage("Vehicle Type Added Successfully!");
-  //     }
-
-  //     setShowSuccessMessage(true);
-  //     handleCloseModal();
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSwitchRole = async (row) => {
     try {
@@ -155,12 +102,6 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
         <Header title="User Role" subtitle="List of User roles" />
       </Box>
 
-      {showSuccessMessage && (
-        <SuccessMessage
-          message={successMessage}
-          onClose={() => setShowSuccessMessage(false)}
-        />
-      )}
       <CustomDataGridStyles>
         <DataGrid
           rows={employeeRoles ? employeeRoles : []}

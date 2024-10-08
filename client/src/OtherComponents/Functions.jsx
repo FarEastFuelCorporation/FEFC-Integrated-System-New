@@ -160,3 +160,119 @@ export const formatDateWithSuffix = (dateString) => {
     dateString: `day of ${month} ${year}`,
   };
 };
+
+export function calculateAge(dateOfBirth) {
+  // Ensure the input is a Date object
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+
+  // Adjust age if the current date is before the birth date this year
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
+export function concatenatePresentAddress(selectedRow) {
+  const { province, municipality, barangay, address } = selectedRow;
+
+  // Initialize an array to hold non-null/undefined values
+  const addressComponents = [];
+
+  // Check each component and add to the array if valid
+  if (address != null) addressComponents.push(address);
+  if (barangay != null) addressComponents.push(`BRGY. ${barangay}`);
+  if (municipality != null) addressComponents.push(municipality);
+  if (province != null) addressComponents.push(province);
+
+  // Return "NO Data" if no valid components were found
+  if (addressComponents.length === 0) {
+    return "No Data";
+  }
+
+  // Join the components with a comma and space
+  return addressComponents.join(", ");
+}
+
+export function concatenatePermanentAddress(selectedRow) {
+  const { otherProvince, otherMunicipality, otherBarangay, otherAddress } =
+    selectedRow;
+
+  // Initialize an array to hold non-null/undefined values
+  const addressComponents = [];
+
+  // Check each component and add to the array if valid
+  if (otherAddress != null) addressComponents.push(otherAddress);
+  if (otherBarangay != null) addressComponents.push(`BRGY. ${otherBarangay}`);
+  if (otherMunicipality != null) addressComponents.push(otherMunicipality);
+  if (otherProvince != null) addressComponents.push(otherProvince);
+
+  // Return "NO Data" if no valid components were found
+  if (addressComponents.length === 0) {
+    return "No Data";
+  }
+
+  // Join the components with a comma and space
+  return addressComponents.join(", ");
+}
+
+export function calculateLengthOfService(startDate) {
+  // Convert the startDate to a Date object
+  const start = new Date(startDate);
+  const today = new Date();
+
+  // Calculate the difference in years, months, and days
+  let years = today.getFullYear() - start.getFullYear();
+  let months = today.getMonth() - start.getMonth();
+  let days = today.getDate() - start.getDate();
+
+  // Adjust for negative days
+  if (days < 0) {
+    months--;
+    const previousMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      0
+    );
+    days += previousMonth.getDate();
+  }
+
+  // Adjust for negative months
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  // Create an array to hold the parts of the result
+  const resultParts = [];
+
+  // Add years to the result if not zero
+  if (years > 0) {
+    resultParts.push(`${years} year${years > 1 ? "s" : ""}`);
+  }
+
+  // Add months to the result if not zero
+  if (months > 0) {
+    resultParts.push(`${months} month${months > 1 ? "s" : ""}`);
+  }
+
+  // Add days to the result if not zero
+  if (days > 0) {
+    resultParts.push(`${days} day${days > 1 ? "s" : ""}`);
+  }
+
+  // If no parts, return "No data"
+  if (resultParts.length === 0) {
+    return "No data";
+  }
+
+  // Join the parts with commas
+  return resultParts.join(", ");
+}

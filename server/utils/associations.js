@@ -42,6 +42,8 @@ const BillingApprovalTransaction = require("../models/BillingApprovalTransaction
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
 const Logistics = require("../models/Logistics");
+const WarehousedTransaction = require("../models/WarehousedTransaction");
+const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -621,6 +623,32 @@ ScrapType.hasMany(SortedScrapTransaction, {
 SortedScrapTransaction.belongsTo(ScrapType, {
   as: "ScrapType",
   foreignKey: "scrapTypeId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+ReceivedTransaction.hasMany(WarehousedTransaction, {
+  as: "WarehousedTransaction",
+  foreignKey: "receivedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+WarehousedTransaction.belongsTo(ReceivedTransaction, {
+  as: "ReceivedTransaction",
+  foreignKey: "receivedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+WarehousedTransaction.hasMany(WarehousedTransactionItem, {
+  as: "WarehousedTransactionItem",
+  foreignKey: "warehousedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+WarehousedTransactionItem.belongsTo(WarehousedTransaction, {
+  as: "WarehousedTransaction",
+  foreignKey: "warehousedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

@@ -32,6 +32,7 @@ import BilledTransaction from "./Transactions/BilledTransaction";
 import BillingApprovalTransaction from "./Transactions/BillingApprovalTransaction";
 import CollectedTransaction from "./Transactions/CollectedTransaction";
 import BillingDistributionTransaction from "./Transactions/BillingDistributionTransaction";
+import WarehousedTransaction from "./Transactions/WarehousedTransaction";
 
 const Transaction = ({
   user,
@@ -215,6 +216,8 @@ const Transaction = ({
                 {user.userType === 3 && <DispatchedTransaction row={row} />}
                 {user.userType === 4 && <ReceivedTransaction row={row} />}
                 {user.userType === 5 && <SortedTransaction row={row} />}
+                {user.userType === 14 && <WarehousedTransaction row={row} />}
+
                 {user.userType === 6 && (
                   <TreatedTransaction
                     row={row}
@@ -328,10 +331,19 @@ const Transaction = ({
                       user={user}
                     />
                   )}
-                  {row.statusId >= 4 && <SortedTransaction row={row} />}
+                  {row.statusId >= 4 &&
+                    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+                      .submitTo === "SORTING" && (
+                      <SortedTransaction row={row} />
+                    )}
+                  {row.statusId >= 4 &&
+                    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+                      .submitTo === "WAREHOUSE" && (
+                      <WarehousedTransaction row={row} />
+                    )}
                   {row.statusId >= 3 && <ReceivedTransaction row={row} />}
                   {row.statusId >= 2 &&
-                    row.ScheduledTransaction[0].logisticsId !==
+                    row.ScheduledTransaction?.[0].logisticsId !==
                       "0577d985-8f6f-47c7-be3c-20ca86021154" && (
                       <DispatchedTransaction row={row} />
                     )}

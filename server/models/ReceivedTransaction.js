@@ -71,9 +71,8 @@ const ReceivedTransaction = sequelize.define(
     },
     submitTo: {
       type: DataTypes.ENUM,
-      values: ["LOGISTICS", "RECEIVING"],
+      values: ["SORTING", "WAREHOUSE"],
       allowNull: true,
-      // defaultValue: "LOGISTICS",
     },
     remarks: {
       type: DataTypes.STRING,

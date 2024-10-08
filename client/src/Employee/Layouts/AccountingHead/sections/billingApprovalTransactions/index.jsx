@@ -60,7 +60,7 @@ const BillingApprovalTransactions = ({ user }) => {
       setInProgressTransactions(
         billingApprovalTransactionResponse.data.inProgressTransactions
       );
-      console.log(billingApprovalTransactionResponse.data);
+
       // For finished transactions
       setFinishedTransactions(
         billingApprovalTransactionResponse.data.finishedTransactions
@@ -110,7 +110,6 @@ const BillingApprovalTransactions = ({ user }) => {
     const typeToEdit = inProgressTransactions.find(
       (type) => type.id === row.id
     );
-
     if (typeToEdit) {
       const billingApprovalTransaction =
         typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
@@ -210,7 +209,7 @@ const BillingApprovalTransactions = ({ user }) => {
     if (!validateForm(updatedFormData)) {
       return;
     }
-    console.log(updatedFormData);
+
     try {
       setLoading(true);
 

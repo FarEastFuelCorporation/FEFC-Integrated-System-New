@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Modal,
   Box,
@@ -17,6 +17,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
 import { tokens } from "../../theme";
+import {
+  calculateAge,
+  calculateLengthOfService,
+  concatenatePermanentAddress,
+  concatenatePresentAddress,
+} from "../Functions";
 
 const EmployeeProfileModal = ({
   selectedRow,
@@ -24,41 +30,39 @@ const EmployeeProfileModal = ({
   handleClose,
   handleEditClick,
 }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selectedTab, setSelectedTab] = useState(0);
   const [employeesData, setEmployeesData] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [attachmentData, setAttachmentData] = useState([]);
 
-  console.log(selectedRow);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [
-          employeeResponse,
-          departmentResponse,
-          employeeAttachmentResponse,
-        ] = await Promise.all([
+  const fetchData = useCallback(async () => {
+    if (!selectedRow || !selectedRow.employeeId) {
+      return;
+    }
+    try {
+      const [employeeResponse, departmentResponse, employeeAttachmentResponse] =
+        await Promise.all([
           axios.get(`${apiUrl}/api/employee`),
           axios.get(`${apiUrl}/api/department`),
           axios.get(
             `${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`
           ),
         ]);
-        setEmployeesData(employeeResponse.data.employees);
-        setDepartments(departmentResponse.data.departments);
-        setAttachmentData(employeeAttachmentResponse.data.employeeAttachments);
-        console.log(departmentResponse.data.departments);
-      } catch (error) {
-        console.error("Error fetching provinces:", error);
-      }
-    };
+      setEmployeesData(employeeResponse.data.employees);
+      setDepartments(departmentResponse.data.departments);
+      setAttachmentData(employeeAttachmentResponse.data.employeeAttachments);
+    } catch (error) {
+      console.error("Error fetching provinces:", error);
+    }
+  }, [apiUrl, selectedRow]);
+
+  useEffect(() => {
     fetchData();
-  }, [apiUrl]);
+  }, [fetchData]);
 
   let employeePicture;
 
@@ -103,122 +107,6 @@ const EmployeeProfileModal = ({
     );
   }
 
-  function calculateAge(dateOfBirth) {
-    // Ensure the input is a Date object
-    const birthDate = new Date(dateOfBirth);
-    const today = new Date();
-
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    // Adjust age if the current date is before the birth date this year
-    if (
-      monthDifference < 0 ||
-      (monthDifference === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
-  }
-
-  function concatenatePresentAddress(selectedRow) {
-    const { province, municipality, barangay, address } = selectedRow;
-
-    // Initialize an array to hold non-null/undefined values
-    const addressComponents = [];
-
-    // Check each component and add to the array if valid
-    if (address != null) addressComponents.push(address);
-    if (barangay != null) addressComponents.push(`BRGY. ${barangay}`);
-    if (municipality != null) addressComponents.push(municipality);
-    if (province != null) addressComponents.push(province);
-
-    // Return "NO Data" if no valid components were found
-    if (addressComponents.length === 0) {
-      return "No Data";
-    }
-
-    // Join the components with a comma and space
-    return addressComponents.join(", ");
-  }
-
-  function concatenatePermanentAddress(selectedRow) {
-    const { otherProvince, otherMunicipality, otherBarangay, otherAddress } =
-      selectedRow;
-
-    // Initialize an array to hold non-null/undefined values
-    const addressComponents = [];
-
-    // Check each component and add to the array if valid
-    if (otherAddress != null) addressComponents.push(otherAddress);
-    if (otherBarangay != null) addressComponents.push(`BRGY. ${otherBarangay}`);
-    if (otherMunicipality != null) addressComponents.push(otherMunicipality);
-    if (otherProvince != null) addressComponents.push(otherProvince);
-
-    // Return "NO Data" if no valid components were found
-    if (addressComponents.length === 0) {
-      return "No Data";
-    }
-
-    // Join the components with a comma and space
-    return addressComponents.join(", ");
-  }
-
-  function calculateLengthOfService(startDate) {
-    // Convert the startDate to a Date object
-    const start = new Date(startDate);
-    const today = new Date();
-
-    // Calculate the difference in years, months, and days
-    let years = today.getFullYear() - start.getFullYear();
-    let months = today.getMonth() - start.getMonth();
-    let days = today.getDate() - start.getDate();
-
-    // Adjust for negative days
-    if (days < 0) {
-      months--;
-      const previousMonth = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        0
-      );
-      days += previousMonth.getDate();
-    }
-
-    // Adjust for negative months
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-
-    // Create an array to hold the parts of the result
-    const resultParts = [];
-
-    // Add years to the result if not zero
-    if (years > 0) {
-      resultParts.push(`${years} year${years > 1 ? "s" : ""}`);
-    }
-
-    // Add months to the result if not zero
-    if (months > 0) {
-      resultParts.push(`${months} month${months > 1 ? "s" : ""}`);
-    }
-
-    // Add days to the result if not zero
-    if (days > 0) {
-      resultParts.push(`${days} day${days > 1 ? "s" : ""}`);
-    }
-
-    // If no parts, return "No data"
-    if (resultParts.length === 0) {
-      return "No data";
-    }
-
-    // Join the parts with commas
-    return resultParts.join(", ");
-  }
-
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
@@ -226,7 +114,6 @@ const EmployeeProfileModal = ({
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setFile(file);
       setFileName(file.name);
     }
   };
@@ -336,7 +223,7 @@ const EmployeeProfileModal = ({
               // Determine the MIME type based on the file's magic number (first few bytes)
               let mimeType = "application/octet-stream"; // Default MIME type
               const magicNumbers = byteArray.slice(0, 4).join(",");
-              console.log(magicNumbers);
+
               // Common magic numbers
               if (magicNumbers.startsWith("255,216,255")) {
                 mimeType = "image/jpeg";

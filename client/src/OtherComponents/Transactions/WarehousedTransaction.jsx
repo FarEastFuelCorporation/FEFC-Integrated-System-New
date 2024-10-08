@@ -1,12 +1,12 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
+import WarehouseIcon from "@mui/icons-material/Warehouse";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
 import { timestampDate, formatWeight } from "../Functions";
 
-const SortedTransaction = ({ row }) => {
+const WarehousedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -126,7 +126,7 @@ const SortedTransaction = ({ row }) => {
       {row.statusId === 4 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <SwapVertIcon
+            <WarehouseIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -140,7 +140,7 @@ const SortedTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Sorting
+              For Warehousing
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -150,7 +150,7 @@ const SortedTransaction = ({ row }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <SwapVertIcon
+            <WarehouseIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -164,7 +164,7 @@ const SortedTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Sorted
+              Warehoused
             </Typography>
             <Typography variant="h5">
               {sortedTransaction.createdAt
@@ -306,4 +306,4 @@ const SortedTransaction = ({ row }) => {
   );
 };
 
-export default SortedTransaction;
+export default WarehousedTransaction;

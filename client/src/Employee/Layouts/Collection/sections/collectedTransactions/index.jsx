@@ -62,7 +62,7 @@ const CollectedTransactions = ({ user }) => {
       setInProgressTransactions(
         collectionTransactionResponse.data.inProgressTransactions
       );
-      console.log(collectionTransactionResponse.data);
+
       // For finished transactions
       setFinishedTransactions(
         collectionTransactionResponse.data.finishedTransactions

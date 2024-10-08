@@ -3,9 +3,6 @@ import { MenuItem } from "react-pro-sidebar";
 import { useNavigate } from "react-router-dom";
 import { Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import log from "loglevel";
-
-log.setLevel("info");
 
 const Item = ({ title, to, icon, selected, setSelected, collapsed }) => {
   const theme = useTheme();

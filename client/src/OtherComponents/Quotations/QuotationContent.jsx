@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -7,10 +7,8 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import { formatNumber } from "../Functions";
 import QuotationTransportationTableHead from "./QuotationTransportationTableHead";
 import QuotationWasteTableHead from "./QuotationWasteTableHead";
-import QuotationFooter from "./QuotationFooter";
 
 const QuotationContent = ({
   quotationData,
@@ -31,14 +29,12 @@ const QuotationContent = ({
   const nextPageHeight = pageHeight;
 
   // Helper function to calculate total height of rows and divide into pages
-  const calculatePageContent = () => {
-    console.log("Calculating Page Content");
-
+  const calculatePageContent = useCallback(() => {
     const pages = [];
     let currentPage = [];
     let currentPageHeight = 0;
     let availableHeight = firstPageHeight; // First page's available height (excludes header)
-
+    console.log(currentPageHeight);
     // Helper function to check if an element can fit on the current page
     const canFitOnPage = (elementHeight) => {
       return availableHeight >= elementHeight; // Ensure it's greater than or equal
@@ -80,7 +76,6 @@ const QuotationContent = ({
     const wasteRows = wasteTableRef.current?.querySelectorAll("tr") || [];
     const transportRows =
       transportTableRef.current?.querySelectorAll("tr") || [];
-    const allRows = [...wasteRows, ...transportRows];
 
     // Add WASTE DETAILS header
     addElementToPage(null, wasteDetailsHeadingHeight);
@@ -120,8 +115,13 @@ const QuotationContent = ({
 
     setPagesContent(pages); // Store the pages content in state
     setIsDoneCalculation(true); // Indicate that the calculation is done
-    console.log("Calculated pages:", pages);
-  };
+  }, [
+    firstPageHeight,
+    footerHeight,
+    nextPageHeight,
+    setIsDoneCalculation,
+    setPagesContent,
+  ]);
 
   useEffect(() => {
     if (heightsReady) {
@@ -129,7 +129,7 @@ const QuotationContent = ({
         calculatePageContent();
       }
     }
-  }, [heightsReady]);
+  }, [heightsReady, calculatePageContent]);
 
   // Helper function to generate styles for TableCell
   const getCellStyle = (isLastCell) => ({

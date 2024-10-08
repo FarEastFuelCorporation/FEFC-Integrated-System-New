@@ -61,7 +61,7 @@ const BillingDistributionTransactions = ({ user }) => {
       setInProgressTransactions(
         billingDistributionTransactionResponse.data.inProgressTransactions
       );
-      console.log(billingDistributionTransactionResponse.data);
+
       // For finished transactions
       setFinishedTransactions(
         billingDistributionTransactionResponse.data.finishedTransactions
@@ -216,7 +216,7 @@ const BillingDistributionTransactions = ({ user }) => {
     if (!validateForm(updatedFormData)) {
       return;
     }
-    console.log(updatedFormData);
+
     try {
       setLoading(true);
 

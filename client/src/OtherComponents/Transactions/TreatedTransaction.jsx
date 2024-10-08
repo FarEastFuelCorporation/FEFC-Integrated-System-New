@@ -324,7 +324,6 @@ const TreatedTransaction = ({
                       Treat
                     </Button>
                   )}
-
                 <Box
                   sx={{
                     padding: "5px",

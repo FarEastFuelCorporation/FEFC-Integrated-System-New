@@ -44,8 +44,7 @@ const SortModal = ({
             axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
             axios.get(`${apiUrl}/api/scrapType`),
           ]);
-          console.log(formData.clientId);
-          console.log(quotationsResponse.data.quotations);
+
           setQuotations(quotationsResponse.data.quotations);
           setScrapTypes(scrapTypesResponse.data.scrapTypes);
         } catch (error) {

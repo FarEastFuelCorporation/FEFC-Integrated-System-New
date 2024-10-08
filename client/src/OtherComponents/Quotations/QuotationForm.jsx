@@ -1,4 +1,11 @@
-import React, { forwardRef, useRef, useState, useEffect } from "react";
+import React, {
+  forwardRef,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   Box,
   Table,
@@ -25,7 +32,7 @@ const defaultHeaderHeight = 150; // Default approximate height for header
 const defaultFooterHeight = 100; // Default approximate height for footer
 
 const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
-  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+  const REACT_APP_API_URL = useMemo(() => process.env.REACT_APP_API_URL, []);
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
 
   const [pagesContent, setPagesContent] = useState([]);
@@ -37,27 +44,24 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
   const [footerHeight, setFooterHeight] = useState(0);
   const [heightsReady, setHeightsReady] = useState(false);
   const [isDoneCalculation, setIsDoneCalculation] = useState(false);
-  console.log(row);
+
   const qrCodeURL = `${apiUrl}/quotationForm/${row.id}`;
 
   // Calculate header and footer heights
-  const calculateRemainingHeight = () => {
-    console.log("calculateRemainingHeight...");
+  const calculateRemainingHeight = useCallback(() => {
     const headerH = headerRef.current?.offsetHeight || defaultHeaderHeight;
     const footerH = footerRef.current?.offsetHeight || defaultFooterHeight;
     setHeaderHeight(headerH);
     setFooterHeight(footerH);
     setHeightsReady(true);
-  };
+  }, []);
 
   // This function will be responsible for creating the PDF content
-  const generatePDFContent = () => {
-    console.log("Generating PDF Content...");
-
+  const generatePDFContent = useCallback(() => {
     setIsContentReady(true);
 
     // You can now set the pagesContent array once it is processed
-  };
+  }, [setIsContentReady]);
 
   // Recalculate height and generate content whenever row or heights change
   useEffect(() => {
@@ -67,16 +71,13 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
     setIsDoneCalculation(false);
 
     calculateRemainingHeight();
-  }, [row]);
+  }, [row, calculateRemainingHeight]);
 
   useEffect(() => {
     if (isDoneCalculation) {
-      console.log("isDoneCalculation...");
-      console.log("pagesContent:", pagesContent);
-
       generatePDFContent();
     }
-  }, [isDoneCalculation]);
+  }, [isDoneCalculation, generatePDFContent]);
 
   return (
     <Box>

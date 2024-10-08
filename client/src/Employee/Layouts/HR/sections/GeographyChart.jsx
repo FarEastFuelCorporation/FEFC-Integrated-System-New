@@ -8,12 +8,6 @@ const GeographyChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  if (!colors) {
-    console.error("Colors are not defined");
-  } else {
-    console.log("Colors are defined:", colors);
-  }
-
   // Map data to features
   const mappedFeatures = geoFeatures.features.map((feature) => {
     const matchingData = data.find((item) => item.id === feature.id);

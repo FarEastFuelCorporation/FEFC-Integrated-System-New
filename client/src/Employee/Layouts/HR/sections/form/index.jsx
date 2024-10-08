@@ -31,9 +31,7 @@ const userSchema = yup.object().shape({
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
-  };
+  const handleFormSubmit = (values) => {};
   return (
     <Box m="20px">
       <Header title="CREATE USER" subtitle="Create a New User Profile" />

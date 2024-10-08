@@ -1,7 +1,13 @@
 // components/Quotations.js
 
-import React, { useState, useEffect, useRef } from "react";
-import { Box, IconButton, Modal } from "@mui/material";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import { Box, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import PageviewIcon from "@mui/icons-material/Pageview";
@@ -21,7 +27,7 @@ import LoadingSpinner from "../../LoadingSpinner";
 
 const Quotations = ({ user }) => {
   const certificateRef = useRef();
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
     id: "",
@@ -78,7 +84,7 @@ const Quotations = ({ user }) => {
 
   const [showQuotationForm, setShowQuotationForm] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       let response;
@@ -110,11 +116,11 @@ const Quotations = ({ user }) => {
     } catch (error) {
       console.error("Error fetching quotationsData:", error);
     }
-  };
+  }, [apiUrl, user.id, user.userType]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -136,7 +142,7 @@ const Quotations = ({ user }) => {
     const quotationToView = quotationsData.find(
       (quotation) => quotation.id === row.QuotationWaste[0].quotationId
     );
-    console.log("handleViewClick press", quotationToView); // Debugging line
+
     setSelectedQuotation(quotationToView); // Set the selected quotation
 
     setIsDownload(false);
@@ -148,7 +154,7 @@ const Quotations = ({ user }) => {
 
   const handleViewPDF = () => {
     const input = certificateRef.current;
-    console.log("handleViewPDF press: ", input); // Debugging line
+
     const pageHeight = 1056;
     const pageWidth = 816;
     const pdf = new jsPDF({
@@ -191,7 +197,6 @@ const Quotations = ({ user }) => {
   };
 
   useEffect(() => {
-    console.log("isContentReady", isContentReady);
     if (isContentReady) {
       handleViewPDF();
     }
@@ -214,7 +219,6 @@ const Quotations = ({ user }) => {
   };
 
   const handleDownloadPDF = (quotationData) => {
-    console.log("handleDownloadPDF");
     const input = certificateRef.current;
     const pageHeight = 1056;
     const pageWidth = 816;
@@ -258,11 +262,10 @@ const Quotations = ({ user }) => {
   };
 
   useEffect(() => {
-    console.log("isDownloadContentReady", isDownloadContentReady);
     if (isDownloadContentReady) {
       handleDownloadPDF(selectedQuotation);
     }
-  }, [isDownloadContentReady]);
+  }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (id) => {
     const quotationToEdit = quotationsData.find(

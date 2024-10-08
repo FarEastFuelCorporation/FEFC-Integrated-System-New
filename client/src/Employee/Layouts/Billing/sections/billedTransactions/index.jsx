@@ -65,7 +65,7 @@ const BilledTransactions = ({ user }) => {
       setInProgressTransactions(
         billedTransactionResponse.data.inProgressTransactions
       );
-      console.log(billedTransactionResponse.data.inProgressTransactions);
+
       // For finished transactions
       setFinishedTransactions(
         billedTransactionResponse.data.finishedTransactions
@@ -125,11 +125,7 @@ const BilledTransactions = ({ user }) => {
         typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
           ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
           .BilledTransaction?.[0] || {};
-      console.log(
-        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-          ?.BilledTransaction?.[0]?.BilledCertified?.certifiedTransactionId
-      );
+
       setFormData({
         id: billedTransaction.id,
         bookedTransactionId: typeToEdit.id,
@@ -233,7 +229,7 @@ const BilledTransactions = ({ user }) => {
     if (!validateForm(updatedFormData)) {
       return;
     }
-    console.log(updatedFormData);
+
     try {
       setLoading(true);
 

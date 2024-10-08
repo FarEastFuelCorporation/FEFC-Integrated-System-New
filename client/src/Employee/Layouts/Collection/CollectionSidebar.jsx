@@ -14,9 +14,6 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
-import log from "loglevel";
-
-log.setLevel("info");
 
 const CollectionSidebar = ({ user }) => {
   const theme = useTheme();

@@ -18,7 +18,8 @@ const DispatchedTransactions = () => {
   });
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.1.244:3001");
+    // const socket = new WebSocket("ws://192.168.1.244:3001");
+    const socket = new WebSocket("ws://192.168.137.1:3001");
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);

@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import UserSidebar from "../../OtherComponents/UserSidebar";
 import Dashboard from "../Layouts/Certification/sections/dashboard";
 import CertifiedTransactions from "../Layouts/Certification/sections/certifiedTransactions";
+import PlasticTransactions from "../../OtherComponents/Sections/plasticTransactions";
 import Clients from "../../OtherComponents/Sections/clients";
 import TreatmentProcess from "../../OtherComponents/Sections/treatmentProcess";
 import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
@@ -18,6 +19,10 @@ const CertificationRoutes = ({ user, onUpdateUser }) => (
       <Route
         path="transactions"
         element={<CertifiedTransactions user={user} />}
+      />
+      <Route
+        path="plasticTransactions"
+        element={<PlasticTransactions user={user} />}
       />
       <Route
         path="treatmentProcess"

@@ -67,7 +67,9 @@ async function createClientController(req, res) {
 async function getClientsController(req, res) {
   try {
     // Fetch all clients from the database
-    const clients = await Client.findAll();
+    const clients = await Client.findAll({
+      order: [["clientName", "ASC"]],
+    });
 
     res.json({ clients });
   } catch (error) {
@@ -80,7 +82,7 @@ async function getClientsController(req, res) {
 async function getClientController(req, res) {
   try {
     const client = await Client.findByPk(req.params.id);
-    res.json(client);
+    res.json({ client });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

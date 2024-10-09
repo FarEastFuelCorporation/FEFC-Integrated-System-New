@@ -9,25 +9,35 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
+const getInitialWarehousedItemValues = () => ({
+  warehousedTransactionId: "",
+  gatePass: "",
+  warehouse: "",
+  area: "",
+  section: "",
+  level: "",
+  palletNumber: "",
+  steamNumber: "",
+  quantity: 0,
+  unit: "",
+  description: "",
+});
+
+// Helper function to filter by submitTo "SORTING"
+const filterBySubmitToSorting = (transactions) => {
+  return transactions.filter((transaction) => {
+    const scheduledTransaction = transaction.ScheduledTransaction?.[0];
+    const receivedTransaction = scheduledTransaction?.ReceivedTransaction?.[0];
+    return receivedTransaction?.submitTo === "WAREHOUSE";
+  });
+};
+
 const WarehousedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const methods = useForm({
     defaultValues: {
-      warehousedItems: [
-        {
-          gatePass: "",
-          warehouse: "",
-          area: "",
-          section: "",
-          level: "",
-          palletNumber: "",
-          steamNumber: "",
-          quantity: 0,
-          unit: "",
-          description: "",
-        },
-      ],
+      warehousedItems: [getInitialWarehousedItemValues()],
       warehousedDate: "",
       warehousedTime: "",
       remarks: "",
@@ -36,7 +46,7 @@ const WarehousedTransactions = ({ user }) => {
     },
   });
 
-  const { reset, control, handleSubmit } = methods;
+  const { reset, handleSubmit } = methods;
 
   const [openModal, setOpenModal] = useState(false);
   const [pendingTransactions, setPendingTransactions] = useState([]);
@@ -44,45 +54,21 @@ const WarehousedTransactions = ({ user }) => {
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const warehousedTransactionResponse = await axios.get(
-        `${apiUrl}/api/warehousedTransaction`
-      );
+      const { data } = await axios.get(`${apiUrl}/api/warehousedTransaction`);
 
-      // Helper function to filter by submitTo "SORTING"
-      const filterBySubmitToSorting = (transactions) => {
-        return transactions.filter((transaction) => {
-          const scheduledTransaction = transaction.ScheduledTransaction?.[0];
-          const receivedTransaction =
-            scheduledTransaction?.ReceivedTransaction?.[0];
-          return receivedTransaction?.submitTo === "WAREHOUSE";
-        });
-      };
-
-      // For pending transactions
-      const filteredPendingTransactions = filterBySubmitToSorting(
-        warehousedTransactionResponse.data.pendingTransactions
+      setPendingTransactions(filterBySubmitToSorting(data.pendingTransactions));
+      setInProgressTransactions(
+        filterBySubmitToSorting(data.inProgressTransactions)
       );
-      setPendingTransactions(filteredPendingTransactions);
-
-      // For in progress transactions
-      const filteredInProgressTransactions = filterBySubmitToSorting(
-        warehousedTransactionResponse.data.inProgressTransactions
+      setFinishedTransactions(
+        filterBySubmitToSorting(data.finishedTransactions)
       );
-      setInProgressTransactions(filteredInProgressTransactions);
-
-      // For finished transactions
-      const filteredFinishedTransactions = filterBySubmitToSorting(
-        warehousedTransactionResponse.data.finishedTransactions
-      );
-      setFinishedTransactions(filteredFinishedTransactions);
 
       setLoading(false);
     } catch (error) {
@@ -104,21 +90,7 @@ const WarehousedTransactions = ({ user }) => {
         row.ScheduledTransaction[0].ReceivedTransaction[0].id,
       warehousedDate: "",
       warehousedTime: "",
-      warehousedItems: [
-        {
-          warehousedTransactionId: "",
-          gatePass: "",
-          warehouse: "",
-          area: "",
-          section: "",
-          level: "",
-          palletNumber: "",
-          steamNumber: "",
-          quantity: 0,
-          unit: "",
-          description: "",
-        },
-      ],
+      warehousedItems: [getInitialWarehousedItemValues()],
       remarks: "",
       statusId: 5,
       createdBy: user.id,
@@ -162,21 +134,7 @@ const WarehousedTransactions = ({ user }) => {
               unit: item.unit || "",
               description: item.description || "",
             }))
-          : [
-              {
-                warehousedTransactionId: "",
-                gatePass: "",
-                warehouse: "",
-                area: "",
-                section: "",
-                level: "",
-                palletNumber: "",
-                steamNumber: "",
-                quantity: 0,
-                unit: "",
-                description: "",
-              },
-            ],
+          : [getInitialWarehousedItemValues()],
         remarks: warehousedTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,
@@ -222,6 +180,7 @@ const WarehousedTransactions = ({ user }) => {
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
     try {
       setLoading(true);
       if (data.id) {
@@ -276,13 +235,14 @@ const WarehousedTransactions = ({ user }) => {
         handleDeleteClick={handleDeleteClick}
       />
       <FormProvider {...methods}>
-        <Modal
-          user={user}
-          open={openModal}
-          control={control}
-          onClose={handleCloseModal}
-          onSubmit={handleSubmit(onSubmit)}
-        />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Modal
+            user={user}
+            open={openModal}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmit(onSubmit)}
+          />
+        </form>
       </FormProvider>
     </Box>
   );

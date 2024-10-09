@@ -44,6 +44,8 @@ const CollectedTransaction = require("../models/CollectedTransaction");
 const Logistics = require("../models/Logistics");
 const WarehousedTransaction = require("../models/WarehousedTransaction");
 const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
+const PlasticTransaction = require("../models/PlasticTransaction");
+const PlasticInventory = require("../models/PlasticInventory");
 
 // Define associations
 Department.hasMany(EmployeeRecord, {
@@ -812,6 +814,28 @@ CollectedTransaction.belongsTo(BillingDistributionTransaction, {
   foreignKey: "billingDistributionTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
+});
+
+Client.hasMany(PlasticInventory, {
+  as: "PlasticInventory",
+  foreignKey: "clientId",
+  sourceKey: "clientId",
+});
+PlasticInventory.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "clientId",
+  targetKey: "clientId",
+});
+
+Client.hasMany(PlasticTransaction, {
+  as: "PlasticTransaction",
+  foreignKey: "clientId",
+  sourceKey: "clientId",
+});
+PlasticTransaction.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "clientId",
+  targetKey: "clientId",
 });
 
 // Export the associations

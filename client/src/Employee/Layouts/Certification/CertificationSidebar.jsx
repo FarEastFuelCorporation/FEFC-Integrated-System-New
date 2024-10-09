@@ -6,9 +6,10 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import RecyclingIcon from "@mui/icons-material/Recycling";
+import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+import FireplaceIcon from "@mui/icons-material/Fireplace";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -24,16 +25,13 @@ const CertificationSidebar = ({ user }) => {
     () => ({
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
+      "/dashboard/plasticTransactions": "Plastic Transactions",
       "/dashboard/clients": "Clients",
       "/dashboard/treatmentProcess": "Treatment Process",
       "/dashboard/typeOfWastes": "Waste Types",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
-      "/dashboard/faq": "FAQ Page",
-      "/dashboard/bar": "Bar Chart",
-      "/dashboard/pie": "Pie Chart",
-      "/dashboard/line": "Line Chart",
     }),
     []
   ); // No dependencies, as this is a static object
@@ -183,6 +181,14 @@ const CertificationSidebar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
+            <Item
+              title="Plastic Transactions"
+              to="plasticTransactions"
+              icon={<RecyclingIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -201,7 +207,7 @@ const CertificationSidebar = ({ user }) => {
             <Item
               title="Treatment Process"
               to="treatmentProcess"
-              icon={<FormatListBulletedIcon />}
+              icon={<FireplaceIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
@@ -209,7 +215,7 @@ const CertificationSidebar = ({ user }) => {
             <Item
               title="Type of Wastes"
               to="typeOfWastes"
-              icon={<RecyclingIcon />}
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

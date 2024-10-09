@@ -33,7 +33,16 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
         }}
       >
         <h2>Warehoused Transaction</h2>
-        <Grid container spacing={2}>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            overflowY: "scroll",
+            "&::-webkit-scrollbar": { display: "none" },
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+          }}
+        >
           {/* Warehoused Date */}
           <Grid item xs={6}>
             <Controller
@@ -98,7 +107,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
               render={({ field: { onChange, value } }) =>
                 value.map((item, index) => (
                   <Grid container spacing={2} key={index}>
-                    <Grid item xs={3}>
+                    <Grid item xs={12} sm={6} md={6} lg={3}>
                       <TextField
                         label="Description"
                         value={item.description}
@@ -110,7 +119,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Unit"
                         value={item.unit}
@@ -122,7 +131,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Quantity"
                         type="number"
@@ -136,7 +145,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         required
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Gate Pass"
                         value={item.gatePass}
@@ -149,7 +158,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         required
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Warehouse"
                         value={item.warehouse}
@@ -162,7 +171,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         required
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Area"
                         value={item.area}
@@ -174,7 +183,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Section"
                         value={item.section}
@@ -186,7 +195,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Level"
                         value={item.level}
@@ -198,7 +207,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Pallet #"
                         value={item.palletNumber}
@@ -210,7 +219,7 @@ const WarehousedTransactionModal = ({ open, onClose, onSubmit }) => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} sm={3} md={2} lg={1}>
                       <TextField
                         label="Steam Number"
                         value={item.steamNumber}

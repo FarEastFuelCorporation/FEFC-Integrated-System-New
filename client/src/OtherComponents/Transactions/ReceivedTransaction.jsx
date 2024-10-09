@@ -54,6 +54,8 @@ const ReceivedTransaction = ({ row }) => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
+              flexWrap: "wrap",
+              mb: 2,
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>

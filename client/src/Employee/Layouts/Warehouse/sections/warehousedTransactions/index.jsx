@@ -280,6 +280,7 @@ const WarehousedTransactions = ({ user }) => {
           user={user}
           open={openModal}
           control={control}
+          onClose={handleCloseModal}
           onSubmit={handleSubmit(onSubmit)}
         />
       </FormProvider>

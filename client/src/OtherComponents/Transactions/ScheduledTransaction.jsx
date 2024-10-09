@@ -11,21 +11,6 @@ const ScheduledTransaction = ({ row }) => {
   const colors = tokens(theme.palette.mode);
   const scheduledData = row.ScheduledTransaction?.[0] || {};
 
-  const renderStatusHeader = (title, date) => (
-    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-      <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-        {title}
-      </Typography>
-      {date && <Typography variant="h5">{timestampDate(date)}</Typography>}
-    </Box>
-  );
-
-  const renderDetail = (label, value) => (
-    <Typography variant="h5">
-      {label}: {value || "Pending"}
-    </Typography>
-  );
-
   return (
     <Box sx={{ my: 3, position: "relative" }}>
       <CircleLogo pending={row.statusId === 1}>
@@ -46,22 +31,45 @@ const ScheduledTransaction = ({ row }) => {
         </>
       ) : (
         <>
-          {renderStatusHeader("Scheduled", scheduledData.createdAt)}
-          {renderDetail(
-            "Scheduled Date",
-            scheduledData.scheduledDate &&
-              format(new Date(scheduledData.scheduledDate), "MMMM dd, yyyy")
-          )}
-          {renderDetail(
-            "Scheduled Time",
-            scheduledData.scheduledTime &&
-              format(parseTimeString(scheduledData.scheduledTime), "hh:mm aa")
-          )}
-          {renderDetail("Remarks", scheduledData.remarks || "NO REMARKS")}
-          {renderDetail(
-            "Scheduled By",
-            `${scheduledData.Employee?.firstName} ${scheduledData.Employee?.lastName}`
-          )}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              mb: 2,
+            }}
+          >
+            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
+              Scheduled
+            </Typography>
+            <Typography variant="h5">
+              {scheduledData?.createdAt
+                ? timestampDate(scheduledData.createdAt)
+                : ""}
+            </Typography>
+          </Box>
+          <Typography variant="h5">
+            Scheduled Date:{" "}
+            {scheduledData?.billedDate
+              ? format(new Date(scheduledData.scheduledDate), "MMMM dd, yyyy")
+              : "Pending"}
+          </Typography>
+          <Typography variant="h5">
+            Scheduled Time:{" "}
+            {scheduledData?.billedTime
+              ? format(parseTimeString(scheduledData.scheduledTime), "hh:mm aa")
+              : "Pending"}
+          </Typography>
+          <Typography variant="h5">
+            Remarks:{" "}
+            {scheduledData?.remarks ? scheduledData.remarks : "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">
+            Scheduled By:{" "}
+            {`${scheduledData?.Employee?.firstName || ""} ${
+              scheduledData?.Employee?.lastName || ""
+            }`}
+          </Typography>
         </>
       )}
 

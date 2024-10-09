@@ -8,6 +8,7 @@ import {
   useTheme,
   Tabs,
   Tab,
+  Grid,
 } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import Badge from "@mui/material/Badge";
@@ -138,74 +139,125 @@ const Transaction = ({
         <CustomAccordionStyles>
           {transactions.map((row) => (
             <Accordion key={row.id}>
-              <AccordionSummary sx={{}}>
-                <Typography variant="h4">
-                  Transaction ID: {row.transactionId}
-                  {!Number.isInteger(user.userType) ? (
-                    <Box>
-                      {" - "}
-                      {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
-                    </Box>
+              <AccordionSummary>
+                <Grid container>
+                  <Grid
+                    item
+                    md={3}
+                    lg={2}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="h4">
+                      Transaction ID: {row.transactionId}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    md={9}
+                    lg={9}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {!Number.isInteger(user.userType) ? (
+                      <Box>
+                        <Typography>
+                          {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Box>
+                        <Typography>
+                          {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+                        </Typography>
+                        <Typography>{row.Client.clientName}</Typography>
+                      </Box>
+                    )}
+                  </Grid>
+                  {selectedTab === 0 ? (
+                    <Grid
+                      item
+                      md={12}
+                      lg={1}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "end",
+                      }}
+                    >
+                      {Number.isInteger(user.userType) &&
+                        user.userType !== 6 && (
+                          <Button
+                            onClick={() => handleOpenModal(row)}
+                            sx={{
+                              backgroundColor: `${colors.greenAccent[700]}`,
+                              color: `${colors.grey[100]}`,
+                            }}
+                          >
+                            {buttonText}
+                          </Button>
+                        )}
+                      {!Number.isInteger(user.userType) && (
+                        <div style={{ display: "flex" }}>
+                          <IconButton onClick={() => handleEditClick(row)}>
+                            <EditIcon sx={{ color: "#ff9800" }} />
+                          </IconButton>
+                          <IconButton onClick={() => handleDeleteClick(row)}>
+                            <DeleteIcon sx={{ color: "#f44336" }} />
+                          </IconButton>
+                        </div>
+                      )}
+                    </Grid>
+                  ) : selectedTab === 1 ? (
+                    <Grid
+                      item
+                      md={12}
+                      lg={1}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {Number.isInteger(user.userType) &&
+                        user.userType !== 6 && (
+                          <div style={{ display: "flex" }}>
+                            <IconButton onClick={() => handleEditClick(row)}>
+                              <EditIcon sx={{ color: "#ff9800" }} />
+                            </IconButton>
+                            <IconButton onClick={() => handleDeleteClick(row)}>
+                              <DeleteIcon sx={{ color: "#f44336" }} />
+                            </IconButton>
+                          </div>
+                        )}
+                    </Grid>
                   ) : (
-                    <Box>
-                      {" - "}
-                      {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
-                      {" - "}
-                      {row.Client.clientName}
-                    </Box>
+                    <Grid
+                      item
+                      md={12}
+                      lg={1}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {!(user.userType === 6) && (
+                        <div style={{ display: "flex" }}>
+                          <IconButton onClick={() => handleEditClick(row)}>
+                            <EditIcon sx={{ color: "#ff9800" }} />
+                          </IconButton>
+                          <IconButton onClick={() => handleDeleteClick(row)}>
+                            <DeleteIcon sx={{ color: "#f44336" }} />
+                          </IconButton>
+                        </div>
+                      )}
+                    </Grid>
                   )}
-                </Typography>
-                {selectedTab === 0 ? (
-                  <Box>
-                    {Number.isInteger(user.userType) && user.userType !== 6 && (
-                      <Button
-                        onClick={() => handleOpenModal(row)}
-                        sx={{
-                          backgroundColor: `${colors.greenAccent[700]}`,
-                          color: `${colors.grey[100]}`,
-                        }}
-                      >
-                        {buttonText}
-                      </Button>
-                    )}
-                    {!Number.isInteger(user.userType) && (
-                      <div style={{ display: "flex" }}>
-                        <IconButton onClick={() => handleEditClick(row)}>
-                          <EditIcon sx={{ color: "#ff9800" }} />
-                        </IconButton>
-                        <IconButton onClick={() => handleDeleteClick(row)}>
-                          <DeleteIcon sx={{ color: "#f44336" }} />
-                        </IconButton>
-                      </div>
-                    )}
-                  </Box>
-                ) : selectedTab === 1 ? (
-                  <Box>
-                    {Number.isInteger(user.userType) && user.userType !== 6 && (
-                      <div style={{ display: "flex" }}>
-                        <IconButton onClick={() => handleEditClick(row)}>
-                          <EditIcon sx={{ color: "#ff9800" }} />
-                        </IconButton>
-                        <IconButton onClick={() => handleDeleteClick(row)}>
-                          <DeleteIcon sx={{ color: "#f44336" }} />
-                        </IconButton>
-                      </div>
-                    )}
-                  </Box>
-                ) : (
-                  <Box>
-                    {!(user.userType === 6) && (
-                      <div style={{ display: "flex" }}>
-                        <IconButton onClick={() => handleEditClick(row)}>
-                          <EditIcon sx={{ color: "#ff9800" }} />
-                        </IconButton>
-                        <IconButton onClick={() => handleDeleteClick(row)}>
-                          <DeleteIcon sx={{ color: "#f44336" }} />
-                        </IconButton>
-                      </div>
-                    )}
-                  </Box>
-                )}
+                </Grid>
               </AccordionSummary>
 
               <CustomAccordionDetails>

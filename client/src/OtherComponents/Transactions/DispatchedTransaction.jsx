@@ -68,7 +68,14 @@ const DispatchedTransaction = ({ row }) => {
               sx={{ fontSize: "30px", color: colors.grey[100] }}
             />
           </CircleLogo>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              mb: 2,
+            }}
+          >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
               Dispatched
             </Typography>

@@ -1,59 +1,89 @@
-// controllers/attendanceController.js
+// // controllers/attendanceController.js
 
-const BookedTransaction = require("../models/BookedTransaction");
-const CertifiedTransaction = require("../models/CertifiedTransaction");
-const Client = require("../models/Client");
-const PlasticTransaction = require("../models/PlasticTransaction");
-const { getIncludeOptions } = require("../utils/getBookedTransactions");
+// const Attendance = require("../models/Attendance");
+// const IdInformation = require("../models/IdInformation");
+// const Violation = require("../models/Violation");
+// const ViolationList = require("../models/ViolationList");
 
-// Get Certificate of Destruction controller
-async function getCertificateController(req, res) {
-  try {
-    const id = req.params.id;
+// async function submitAttendance(req, res) {
+//   const employeeId = req.params.employeeId;
 
-    console.log(id);
+//   try {
+//     // Check the previous attendance status of the employee
+//     const previousAttendance = await Attendance.findOne({
+//       where: { employee_id: employeeId },
+//       order: [
+//         ["date", "DESC"],
+//         ["time", "DESC"],
+//       ],
+//       limit: 1,
+//     });
 
-    const certifiedTransaction = await CertifiedTransaction.findByPk(id, {
-      include: {
-        model: BookedTransaction,
-        as: "BookedTransaction",
-        include: getIncludeOptions(),
-      },
-    });
+//     console.log("Previous attendance status results:", previousAttendance);
 
-    res.json({ certifiedTransaction });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
+//     let status = "TIME-IN"; // Default status
+//     let audioIrl = "/public/time-in.mp3";
 
-// Get Plastic Certificate controller
-async function getPlasticCertificateController(req, res) {
-  try {
-    const id = req.params.id;
+//     if (previousAttendance && previousAttendance.status === "TIME-IN") {
+//       // If the last status was TIME-IN, set to TIME-OUT, else set to TIME-IN
+//       status = "TIME-OUT";
+//       audioIrl = "/public/time-out.mp3";
+//     }
 
-    console.log(id);
+//     // Insert the attendance information into the attendance table
+//     await Attendance.create({
+//       employee_id: employeeId,
+//       date: timestamp,
+//       time: currentTime,
+//       status: status,
+//     });
 
-    const plasticTransaction = await PlasticTransaction.findByPk(id, {
-      include: {
-        model: Client,
-        as: "Client",
-      },
-    });
+//     // Retrieve employee data
+//     const employeeData = await IdInformation.findOne({
+//       where: { employee_id: employeeId },
+//     });
 
-    if (!plasticTransaction) {
-      return res.status(404).send("Plastic transaction not found");
-    }
+//     // Retrieve violation data for the employee if it exists
+//     const violations = await Violation.findAll({
+//       where: { employee_id: employeeId },
+//       include: [
+//         {
+//           model: ViolationList,
+//           as: "ViolationList", // Specify the alias used in the association
+//         },
+//       ],
+//     });
 
-    res.json({ plasticTransaction });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
+//     console.log(`List of Violations: ${JSON.stringify(violations, null, 2)}`); // Log the violations as JSON
 
-module.exports = {
-  getCertificateController,
-  getPlasticCertificateController,
-};
+//     // Assuming you have the profile picture Buffer in the `employeeData` object
+//     const profilePictureBuffer = employeeData.profile_picture;
+
+//     // Convert the Buffer to a Base64 data URL
+//     const profilePictureBase64 = profilePictureBuffer.toString("base64");
+
+//     // Add the Base64 data URL to the employeeData object
+//     employeeData.profile_picture_base64 = `data:image/png;base64,${profilePictureBase64}`;
+
+//     // Render the view with attendance, employee data, violations, and updated safety man-hours
+//     res.render("attendance", {
+//       attendance: {
+//         employee_id: employeeId,
+//         date: timestamp,
+//         time: currentTime,
+//         status: status,
+//       },
+//       employeeData: employeeData,
+//       violations: violations.map((v) => v.toJSON()), // Pass violations as plain objects to the view
+//       audioUrl: audioIrl,
+//     });
+//   } catch (error) {
+//     // Handle errors and send an error response
+//     console.error(error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// }
+
+// module.exports = {
+//   submitAttendance,
+// };

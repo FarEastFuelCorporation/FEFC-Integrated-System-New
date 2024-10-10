@@ -1,9 +1,9 @@
-// routes/attendanceRoutes.js
+// // routes/attendanceRoutes.js
 
-const express = require("express");
-const router = express.Router();
-const { submitAttendance } = require("../controllers/attendanceController");
+// const express = require("express");
+// const router = express.Router();
+// const { submitAttendance } = require("../controllers/attendanceController");
 
-router.post("/submitAttendance/:employeeId", submitAttendance);
+// router.post("/submitAttendance/:employeeId", submitAttendance);
 
-module.exports = router;
+// module.exports = router;

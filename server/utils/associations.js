@@ -46,8 +46,33 @@ const WarehousedTransaction = require("../models/WarehousedTransaction");
 const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 const PlasticTransaction = require("../models/PlasticTransaction");
 const PlasticInventory = require("../models/PlasticInventory");
+const Attendance = require("../models/Attendance");
+const ViolationList = require("../models/ViolationList");
+const Violation = require("../models/Violation");
 
 // Define associations
+IdInformation.hasMany(Attendance, {
+  as: "attendances",
+  foreignKey: "employee_id",
+  sourceKey: "employee_id",
+});
+Attendance.belongsTo(IdInformation, {
+  as: "IdInformation",
+  foreignKey: "employee_id",
+  targetKey: "employee_id",
+});
+
+ViolationList.hasMany(Violation, {
+  as: "Violation",
+  foreignKey: "violation_id",
+  sourceKey: "violation_id",
+});
+Violation.belongsTo(ViolationList, {
+  as: "ViolationList",
+  foreignKey: "violation_id",
+  targetKey: "violation_id",
+});
+
 Department.hasMany(EmployeeRecord, {
   as: "EmployeeRecord",
   foreignKey: "departmentId",

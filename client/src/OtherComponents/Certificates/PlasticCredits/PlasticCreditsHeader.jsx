@@ -13,8 +13,9 @@ const PlasticCreditsHeader = ({ row }) => {
         align="center"
         mt={3}
         sx={{
+          fontFamily:
+            "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
           fontSize: "2rem",
-          fontFamily: "'Times New Roman', Times, serif",
           textAlign: "center",
         }}
       >

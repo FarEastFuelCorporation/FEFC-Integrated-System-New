@@ -122,7 +122,7 @@ export const PlasticCreditsFooter2 = ({ row, qrCodeURL }) => {
               mt: -1,
             }}
           >
-            Plant Manager
+            Managing Head
           </Typography>
           <Box
             component="img"

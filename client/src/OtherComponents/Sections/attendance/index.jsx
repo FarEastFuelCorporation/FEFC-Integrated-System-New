@@ -36,10 +36,18 @@ const Attendance = () => {
   const [urlInput, setUrlInput] = useState("");
   const debounceTimeout = useRef(null);
   const idleTimeout = useRef(null);
+  const dataGridRef = useRef(null);
 
   // Audio refs
   const timeInRef = useRef(null);
   const timeOutRef = useRef(null);
+
+  // Scroll to the bottom whenever the rows change
+  useEffect(() => {
+    if (dataGridRef.current) {
+      dataGridRef.current.scrollTop = dataGridRef.current.scrollHeight;
+    }
+  }, []);
 
   useEffect(() => {
     const updateTheme = () => {
@@ -271,6 +279,7 @@ const Attendance = () => {
                 </Typography>
               </Box>
               <DataGrid
+                ref={dataGridRef}
                 rows={rows}
                 columns={columns}
                 pagination={false}

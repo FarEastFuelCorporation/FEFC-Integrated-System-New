@@ -192,22 +192,16 @@ const Attendance = () => {
       headerName: "Date",
       headerAlign: "center",
       align: "center",
-      width: 200,
+      width: 250,
     },
     {
       field: "timeIn",
       headerName: "Time In",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      width: 175,
     },
-    {
-      field: "timeOut",
-      headerName: "Time Out",
-      headerAlign: "center",
-      align: "center",
-      width: 150,
-    },
+
     {
       field: "status",
       headerName: "Status",
@@ -231,7 +225,6 @@ const Attendance = () => {
       designation: item.IdInformation.designation,
       date: dateFormatted, // Add formatted date
       timeIn: timeInFormatted, // Adjusted timeIn
-      timeOut: timeOutFormatted, // Adjusted timeOut
       status: item.status,
     };
   });
@@ -288,10 +281,10 @@ const Attendance = () => {
                 }}
                 sx={{
                   "& .MuiDataGrid-columnHeader": {
-                    fontSize: "25px", // Change header font size
+                    fontSize: "30px", // Change header font size
                   },
                   "& .MuiDataGrid-cell": {
-                    fontSize: "25px", // Change cell font size
+                    fontSize: "30px", // Change cell font size
                   },
                 }}
               />

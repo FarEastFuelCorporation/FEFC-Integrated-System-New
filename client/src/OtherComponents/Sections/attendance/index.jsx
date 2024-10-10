@@ -184,7 +184,7 @@ const Attendance = () => {
       headerName: "Date",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      width: 200,
     },
     {
       field: "timeIn",
@@ -254,20 +254,38 @@ const Attendance = () => {
         }}
       >
         {showDataList && (
-          <Box
-            s
-            sx={{
-              width: {
-                xs: "100%", // 100% width on extra small screens
-                sm: "600px", // 600px on small screens
-                md: "800px", // 800px on medium screens
-                lg: "1000px", // 1000px on large screens
-                xl: "1200px", // 1200px on extra large screens
-              },
-            }}
-          >
+          <Box s sx={{ width: "100%", paddingX: "40px" }}>
             <CustomDataGridStyles>
-              <DataGrid rows={rows} columns={columns} />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  px: "20px",
+                }}
+              >
+                <Typography sx={{ fontSize: "40px" }}>
+                  Employee On Duty
+                </Typography>
+                <Typography sx={{ fontSize: "40px" }}>
+                  {dataList.length}
+                </Typography>
+              </Box>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                pagination={false}
+                components={{
+                  Footer: () => null, // Hide the footer
+                }}
+                sx={{
+                  "& .MuiDataGrid-columnHeader": {
+                    fontSize: "20px", // Change header font size
+                  },
+                  "& .MuiDataGrid-cell": {
+                    fontSize: "20px", // Change cell font size
+                  },
+                }}
+              />
             </CustomDataGridStyles>
           </Box>
         )}

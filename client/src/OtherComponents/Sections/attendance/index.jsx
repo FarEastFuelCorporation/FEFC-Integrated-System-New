@@ -288,10 +288,10 @@ const Attendance = () => {
                 }}
                 sx={{
                   "& .MuiDataGrid-columnHeader": {
-                    fontSize: "20px", // Change header font size
+                    fontSize: "25px", // Change header font size
                   },
                   "& .MuiDataGrid-cell": {
-                    fontSize: "20px", // Change cell font size
+                    fontSize: "25px", // Change cell font size
                   },
                 }}
               />

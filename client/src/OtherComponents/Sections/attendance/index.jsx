@@ -1,438 +1,472 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Box, IconButton, Modal, useTheme } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Header from "../../Header";
-import PostAddIcon from "@mui/icons-material/PostAdd";
-import PageviewIcon from "@mui/icons-material/Pageview";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
+import { Box, Typography } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+import { DataGrid } from "@mui/x-data-grid"; // Import DataGrid
 import axios from "axios";
-import { tokens } from "../../../theme";
-import SuccessMessage from "../../SuccessMessage";
-import CustomDataGridStyles from "../../CustomDataGridStyles";
+import { format } from "date-fns"; // Import date-fns for date formatting
 import LoadingSpinner from "../../LoadingSpinner";
-import Counter from "../../Counter";
-import PlasticTransactionModal from "../../TransactionModals/PlasticTransactionModal";
-import { formatDateFull, formatWeightWithNA } from "../../Functions";
-import PlasticCreditsForm from "../../Certificates/PlasticCredits/PlasticCreditsForm";
+import timeInAudio from "../../../images/time-in.mp3";
+import timeOutAudio from "../../../images/time-out.mp3"; // Renamed to avoid conflict with variable names
+import CustomDataGridStyles from "../../CustomDataGridStyles";
+import { formatTime } from "../../Functions";
+import { tokens, themeSettings } from "../../../theme";
 
-const Attendance = ({ user }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const theme = useTheme();
+const Attendance = () => {
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
+  const currentHour = new Date().getHours();
+  const isDayTime = currentHour >= 6 && currentHour < 18; // 6 AM to 6 PM
+  const [mode, setMode] = useState(isDayTime ? "light" : "dark");
+  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const colors = tokens(theme.palette.mode);
 
-  const initialFormData = {
-    id: "",
-    clientId: "",
-    certificateNumber: "",
-    issuedDate: "",
-    issuedTime: "",
-    typeOfCertificate: "",
-    volume: 0,
-    createdBy: user.id,
-  };
+  const [loading, setLoading] = useState(false);
+  const [showData, setShowData] = useState(false);
+  const [showDataList, setShowDataList] = useState(true);
+  const [attendanceData, setAttendanceData] = useState({});
+  const [employeeData, setEmployeeData] = useState({});
+  const [picture, setPicture] = useState({});
+  const [violationsData, setViolationsData] = useState([]);
+  const [dataList, setdataList] = useState([]);
+  const [urlInput, setUrlInput] = useState("");
+  const debounceTimeout = useRef(null);
+  const idleTimeout = useRef(null);
 
-  const [openModal, setOpenModal] = useState(false);
-  const [openCertificateModal, setOpenCertificateModal] = useState(false);
-  const [formData, setFormData] = useState(initialFormData);
+  // Audio refs
+  const timeInRef = useRef(null);
+  const timeOutRef = useRef(null);
 
-  const [plasticTransactions, setPlasticTransactions] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [data, setdata] = useState([]);
+  useEffect(() => {
+    const updateTheme = () => {
+      const hour = new Date().getHours();
+      setMode(hour >= 6 && hour < 18 ? "light" : "dark");
+    };
 
-  const fetchData = useCallback(async () => {
-    try {
+    // Update theme on initial load and every hour
+    updateTheme();
+    const intervalId = setInterval(updateTheme, 3600000); // Check every hour
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
+
+  // Fetch data function
+  const fetchData = useCallback(
+    async (inputId) => {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/api/plasticTransaction`);
-
-      // Map through the transactions to include Client.clientName in each one
-      const updatedTransactions = response.data.plasticTransactions.map(
-        (transaction) => {
-          return {
-            ...transaction,
-            clientName: transaction.Client?.clientName || "N/A", // Add clientName, handle if Client is null or undefined
-          };
-        }
-      );
-
-      setPlasticTransactions(updatedTransactions);
+      try {
+        const response = await axios.post(
+          `${apiUrl}/api/attendance/${inputId}`
+        );
+        setAttendanceData(response.data.attendance);
+        setEmployeeData(response.data.employeeData);
+        setPicture(response.data.picture);
+        setViolationsData(response.data.violations);
+        setShowDataList(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+      setShowData(true);
       setLoading(false);
+    },
+    [apiUrl]
+  );
+
+  // Fetch data function
+  const fetchDataList = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${apiUrl}/api/attendance`);
+      console.log(response.data.filteredData);
+      setdataList(response.data.filteredData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+    setLoading(false);
   }, [apiUrl]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
-
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    clearFormData();
-  };
-
-  const handleOpenCertificateModal = () => {
-    setOpenCertificateModal(true);
-  };
-  const handleCloseCertificateModal = () => {
-    setOpenCertificateModal(false);
-  };
-
-  const clearFormData = () => {
-    setFormData(initialFormData);
-  };
-
+  // Handle form input change and submit (with debouncing)
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const newValue = e.target.value;
+    setUrlInput(newValue);
 
-  const handleViewClick = (params) => {
-    try {
-      setShowForm(true); // Set state to show the form
-      setdata(params); // Set state to show the form
-      handleOpenCertificateModal();
-    } catch (error) {
-      console.error("Error fetching document file:", error);
-    }
-  };
-
-  const handleEditClick = (id) => {
-    const typeToEdit = plasticTransactions.find((type) => type.id === id);
-    if (typeToEdit) {
-      setFormData({
-        id: plasticTransactions.id,
-        clientId: plasticTransactions.clientId,
-        certificateNumber: plasticTransactions.certificateNumber,
-        issuedDate: plasticTransactions.issuedDate,
-        issuedTime: plasticTransactions.issuedTime,
-        typeOfCertificate: plasticTransactions.typeOfCertificate,
-        volume: plasticTransactions.volume,
-        createdBy: user.id,
-      });
-      handleOpenModal();
-    } else {
-      console.error(`Plastic Transaction with ID ${id} not found for editing.`);
-    }
-  };
-
-  const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Plastic Transaction?"
-    );
-
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
+    // Clear previous timeout if it exists
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
     }
 
-    try {
-      setLoading(true);
-      await axios.delete(`${apiUrl}/api/plasticTransaction/${id}`, {
-        data: { deletedBy: user.id },
-      });
-
-      fetchData();
-      setSuccessMessage("Plastic Transaction Deleted Successfully!");
-      setShowSuccessMessage(true);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const validateForm = () => {
-    const errors = []; // Array to collect validation errors
-    const { issuedDate, issuedTime, clientId, typeOfCertificate, volume } =
-      formData;
-
-    // Check if the issued date is a valid date
-    if (!issuedDate) {
-      errors.push("Issued Date is required.");
-    } else {
-      const datePattern = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
-      if (!datePattern.test(issuedDate)) {
-        errors.push("Issued Date must be in YYYY-MM-DD format.");
+    // Trigger fetching data after 500ms (debouncing)
+    debounceTimeout.current = setTimeout(() => {
+      if (newValue) {
+        const urlParts = newValue.split("/");
+        const idFromInput = urlParts[urlParts.length - 1]; // Extract ID from URL
+        fetchData(idFromInput); // Call fetchData with the new ID
+        setUrlInput("");
       }
-    }
-
-    // Check if the issued time is a valid time
-    if (!issuedTime) {
-      errors.push("Issued Time is required.");
-    } else {
-      const timePattern = /^(0?[0-1]\d|2[0-3]):([0-5]\d)$/; // HH:MM format
-      if (!timePattern.test(issuedTime)) {
-        errors.push("Issued Time must be in HH:MM format.");
-      }
-    }
-
-    // Check if clientId is selected
-    if (!clientId) {
-      errors.push("Client must be selected.");
-    }
-
-    // Check if typeOfCertificate is valid
-    const validCertificateTypes = ["PLASTIC CREDIT", "PLASTIC WASTE DIVERSION"];
-    if (!validCertificateTypes.includes(typeOfCertificate)) {
-      errors.push("Invalid Type of Certificate.");
-    }
-
-    // Check if volume is a positive number
-    if (!volume) {
-      errors.push("Volume is required.");
-    } else if (isNaN(volume) || volume <= 0) {
-      errors.push("Volume must be a positive number.");
-    }
-
-    return errors; // Return the array of errors
+    }, 10);
   };
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+  // Call fetchDataList when the component mounts
+  useEffect(() => {
+    fetchDataList();
+  }, [fetchDataList]); //
 
-    // Validate form
-    const validationErrors = validateForm();
-    if (validationErrors.length > 0) {
-      setErrorMessage(validationErrors.join(" ")); // Join errors into a single string
-      setShowErrorMessage(true);
-      return;
+  // Play audio based on attendance status change
+  useEffect(() => {
+    if (attendanceData.status === "TIME-IN") {
+      timeInRef.current.play(); // Play "TIME-IN" audio
+    } else if (attendanceData.status === "TIME-OUT") {
+      timeOutRef.current.play(); // Play "TIME-OUT" audio
     }
+  }, [attendanceData]);
 
-    try {
-      setLoading(true);
-      if (formData.id) {
-        // Update existing Plastic Transaction
-        await axios.put(
-          `${apiUrl}/api/plasticTransaction/${formData.id}`,
-          formData
-        );
-
-        setSuccessMessage("Plastic Transaction Updated Successfully!");
-      } else {
-        // Add new Plastic Transaction
-        await axios.post(`${apiUrl}/api/plasticTransaction`, formData);
-
-        setSuccessMessage("Plastic Transaction Added Successfully!");
+  useEffect(() => {
+    const resetIdleTimer = () => {
+      // Clear any existing idle timeout
+      if (idleTimeout.current) {
+        clearTimeout(idleTimeout.current);
       }
 
-      fetchData();
-      setShowSuccessMessage(true);
-      handleCloseModal();
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+      // Set a new idle timeout to refresh the page after 10 seconds of inactivity
+      idleTimeout.current = setTimeout(() => {
+        window.location.reload(); // Reload the page after 10 seconds of inactivity
+      }, 10000);
+    };
 
-  const renderCellWithWrapText = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {params.value}
-    </div>
-  );
+    // Add event listeners for user activity
+    window.addEventListener("mousemove", resetIdleTimer);
+    window.addEventListener("keydown", resetIdleTimer);
 
+    // Start the idle timer immediately
+    resetIdleTimer();
+
+    // Cleanup event listeners and timeout on component unmount
+    return () => {
+      window.removeEventListener("mousemove", resetIdleTimer);
+      window.removeEventListener("keydown", resetIdleTimer);
+      if (idleTimeout.current) {
+        clearTimeout(idleTimeout.current);
+      }
+    };
+  }, []);
+
+  // Define columns for DataGrid
   const columns = [
     {
-      field: "certificateNumber",
-      headerName: "Certificate Number",
+      field: "id",
+      headerName: "ID",
       headerAlign: "center",
       align: "center",
-      width: 140,
-      renderCell: renderCellWithWrapText,
+      width: 100,
     },
     {
-      field: "clientName",
-      headerName: "Client Name",
+      field: "employeeName",
+      headerName: "Employee Name",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: renderCellWithWrapText,
     },
     {
-      field: "volume",
-      headerName: "Volume",
-      headerAlign: "center",
-      align: "center",
-      width: 150,
-      renderCell: (params) => (
-        <div className={"wrap-text"} style={{ textAlign: "center" }}>
-          {formatWeightWithNA(params.value)}
-        </div>
-      ),
-    },
-    {
-      field: "typeOfCertificate",
-      headerName: "Type of Certificate",
-      headerAlign: "center",
-      align: "center",
-      width: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "issuedDate",
-      headerName: "Issued Date",
-      headerAlign: "center",
-      align: "center",
-      width: 150,
-      renderCell: (params) => {
-        const formattedDate = formatDateFull(params.value);
-        return (
-          <div>
-            {renderCellWithWrapText({ ...params, value: formattedDate })}
-          </div>
-        );
-      },
-    },
-    {
-      field: "issuedTime",
-      headerName: "Issued Time",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "remarks",
-      headerName: "Remarks",
+      field: "designation",
+      headerName: "Designation",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: renderCellWithWrapText,
     },
     {
-      field: "view",
-      headerName: "View File",
+      field: "date",
+      headerName: "Date",
       headerAlign: "center",
       align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          sx={{ color: colors.greenAccent[400], fontSize: "large" }}
-          onClick={() => handleViewClick(params.row)}
-        >
-          <PageviewIcon sx={{ fontSize: "2rem" }} />
-        </IconButton>
-      ),
+      width: 150,
     },
     {
-      field: "edit",
-      headerName: "Edit",
+      field: "timeIn",
+      headerName: "Time In",
       headerAlign: "center",
       align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
+      width: 150,
     },
     {
-      field: "delete",
-      headerName: "Delete",
+      field: "timeOut",
+      headerName: "Time Out",
       headerAlign: "center",
       align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      width: 150,
     },
+    {
+      field: "status",
+      headerName: "Status",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+    },
+    // Add other fields as necessary
   ];
 
+  // Prepare rows for DataGrid
+  const rows = dataList.map((item, index) => {
+    const createdAt = new Date(item.createdAt); // Parse the createdAt date
+    const dateFormatted = format(createdAt, "MMMM dd, yyyy"); // Format date as 'October 10, 2024'
+    const timeInFormatted = format(createdAt, "hh:mm:ss a"); // Format time as '12:00:00 AM'
+    const timeOutFormatted = format(createdAt, "hh:mm:ss a"); // Adjust based on how you derive timeOut
+
+    return {
+      id: index + 1, // Ensure a unique id for each row
+      employeeName: `${item.IdInformation.last_name}, ${item.IdInformation.first_name} ${item.IdInformation.middle_name}`,
+      designation: item.IdInformation.designation,
+      date: dateFormatted, // Add formatted date
+      timeIn: timeInFormatted, // Adjusted timeIn
+      timeOut: timeOutFormatted, // Adjusted timeOut
+      status: item.status,
+    };
+  });
+
   return (
-    <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
-      <LoadingSpinner isLoading={loading} />
-      <Box display="flex" justifyContent="space-between">
-        <Header
-          title="Plastic Transactions"
-          subtitle="List of Plastic Transactions"
-        />
-        <Box sx={{ display: "flex" }}>
-          <Counter label={"Generated Plastic Credits"} content={600000} />
-          <Counter label={"Issued Plastic Credits"} content={100000} />
-          <Counter label={"Available Plastic Credits"} content={500000} />
-        </Box>
-        <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
-            <PostAddIcon sx={{ fontSize: "40px" }} />
-          </IconButton>
-        </Box>
-      </Box>
-
-      {showSuccessMessage && (
-        <SuccessMessage
-          message={successMessage}
-          onClose={() => setShowSuccessMessage(false)}
-        />
-      )}
-
-      {/* <PlasticCreditsForm /> */}
-
-      <CustomDataGridStyles>
-        <DataGrid
-          rows={plasticTransactions ? plasticTransactions : []}
-          columns={columns}
-          components={{ Toolbar: GridToolbar }}
-          getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "typeOfScrap", sort: "asc" }],
-            },
-          }}
-        />
-      </CustomDataGridStyles>
-      <PlasticTransactionModal
-        open={openModal}
-        onClose={handleCloseModal}
-        formData={formData}
-        handleInputChange={handleInputChange}
-        handleFormSubmit={handleFormSubmit}
-        errorMessage={errorMessage}
-        showErrorMessage={showErrorMessage}
+    <Box>
+      {loading && <LoadingSpinner isLoading={loading} />}
+      {/* Input for URL without form */}
+      <input
+        type="text"
+        id="urlInput"
+        name="urlInput"
+        placeholder="Enter URL"
+        value={urlInput}
+        onChange={handleInputChange}
+        autoFocus
+        autoComplete="off"
+        style={{ position: "absolute", top: "20px" }} // Position it as needed
       />
-      {showForm && (
-        <Modal
-          open={openCertificateModal}
-          onClose={handleCloseCertificateModal}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            border: "none",
-          }}
-        >
-          <Box sx={{ position: "relative" }}>
-            <PlasticCreditsForm row={data} />
+
+      <Box
+        sx={{
+          marginTop: "60px",
+          left: 0,
+          position: "relative",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        {showDataList && (
+          <Box
+            s
+            sx={{
+              width: {
+                xs: "100%", // 100% width on extra small screens
+                sm: "600px", // 600px on small screens
+                md: "800px", // 800px on medium screens
+                lg: "1000px", // 1000px on large screens
+                xl: "1200px", // 1200px on extra large screens
+              },
+            }}
+          >
+            <CustomDataGridStyles>
+              <DataGrid rows={rows} columns={columns} />
+            </CustomDataGridStyles>
           </Box>
-        </Modal>
-      )}
+        )}
+
+        {showData && (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              padding: "20px",
+              height: "calc(100vh - 100px)",
+            }}
+          >
+            {/* Left Side: Profile Picture */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "20px",
+              }}
+            >
+              <Box
+                component="img"
+                src={picture || "default_image.png"}
+                alt="Profile Picture"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  border: "20px solid black",
+                  borderRadius: "20px",
+                  backgroundColor: "white",
+                }}
+              />
+            </Box>
+
+            {/* Right Side: Attendance and Info */}
+            <Box
+              sx={{
+                display: "flex",
+                padding: "20px",
+                height: "100%",
+                width: "100%",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  width: "100%",
+                }}
+              >
+                {/* Attendance Status */}
+                {attendanceData.status === "TIME-IN" && (
+                  <Box
+                    sx={{
+                      backgroundColor: "green",
+                      width: "100%",
+                      color: "white",
+                    }}
+                  >
+                    <Typography
+                      variant="h2"
+                      align="center"
+                      sx={{ fontSize: "100px", fontWeight: "bold" }}
+                    >
+                      {attendanceData.status}
+                    </Typography>
+                  </Box>
+                )}
+                {attendanceData.status === "TIME-OUT" && (
+                  <Box
+                    sx={{
+                      backgroundColor: "red",
+                      width: "100%",
+                      color: "white",
+                    }}
+                  >
+                    <Typography
+                      variant="h2"
+                      align="center"
+                      sx={{ fontSize: "100px", fontWeight: "bold" }}
+                    >
+                      {attendanceData.status}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Attendance Time */}
+                <Box>
+                  <Typography
+                    variant="h2"
+                    align="center"
+                    sx={{
+                      fontSize: "100px",
+                      color: colors.grey[100],
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {formatTime(attendanceData.createdAt)}
+                  </Typography>
+                  <br />
+                </Box>
+
+                {/* Employee Name */}
+                <Box>
+                  <Typography
+                    variant="h2"
+                    align="center"
+                    sx={{
+                      fontSize: "100px",
+                      color: colors.grey[100],
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {employeeData.last_name},<br />
+                    {employeeData.first_name}
+                    <br />
+                    {employeeData.middle_name}
+                  </Typography>
+                </Box>
+
+                {/* Employee Designation */}
+                <Box>
+                  <Typography
+                    variant="h2"
+                    align="center"
+                    sx={{
+                      fontSize: "60px",
+                      fontStyle: "italic",
+                      color: colors.grey[100],
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {employeeData.designation}
+                  </Typography>
+                </Box>
+
+                <hr />
+
+                {/* Violations */}
+                {violationsData && violationsData.length > 0 ? (
+                  <Box>
+                    <Typography
+                      variant="h2"
+                      align="center"
+                      sx={{
+                        fontSize: "60px",
+                        color: "red",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Violations:
+                    </Typography>
+                    <Box
+                      component="ul"
+                      sx={{
+                        listStyle: "none",
+                        padding: 0,
+                        textAlign: "center",
+                      }}
+                    >
+                      {violationsData.map((v, index) => (
+                        <Box
+                          component="li"
+                          key={index}
+                          sx={{ fontSize: "50px", color: "red" }}
+                        >
+                          {v.ViolationList.description}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                ) : (
+                  <Box>
+                    <Typography
+                      variant="h2"
+                      align="center"
+                      sx={{
+                        fontSize: "60px",
+                        color: "green",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      No Violations
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        )}
+
+        {/* Audio elements */}
+        <audio ref={timeInRef} src={timeInAudio} />
+        <audio ref={timeOutRef} src={timeOutAudio} />
+      </Box>
     </Box>
   );
 };

@@ -1,9 +1,14 @@
-// // routes/attendanceRoutes.js
+// routes/attendanceRoutes.js
 
-// const express = require("express");
-// const router = express.Router();
-// const { submitAttendance } = require("../controllers/attendanceController");
+const express = require("express");
+const router = express.Router();
+const {
+  submitAttendance,
+  attendance,
+} = require("../controllers/attendanceController");
 
-// router.post("/submitAttendance/:employeeId", submitAttendance);
+router.get("/", attendance);
 
-// module.exports = router;
+router.post("/:employeeId", submitAttendance);
+
+module.exports = router;

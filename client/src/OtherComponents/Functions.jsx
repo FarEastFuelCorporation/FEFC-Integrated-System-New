@@ -64,6 +64,26 @@ export const formatDateFull = (date) => {
   return new Intl.DateTimeFormat("en-US", options).format(new Date(date));
 };
 
+// Function to format the time
+export const formatTime = (dateString) => {
+  const date = new Date(dateString); // Convert the string to a Date object
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+
+  // Determine AM or PM suffix
+  const ampm = hours >= 12 ? "PM" : "AM";
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+
+  // Pad minutes and seconds with leading zeros
+  const formattedTime = `${hours}:${String(minutes).padStart(2, "0")}:${String(
+    seconds
+  ).padStart(2, "0")} ${ampm}`;
+  return formattedTime;
+};
+
 export const calculateRemainingDays = (expirationDate) => {
   if (expirationDate === null) {
     return null; // Handle invalid dates

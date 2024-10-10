@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { Box, TableContainer, Paper, Button } from "@mui/material";
-
 import letterhead from "../../../images/letterhead2.jpg";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";

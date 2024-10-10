@@ -22,6 +22,7 @@ import QuotationDisplay from "./OtherComponents/Quotations/QuotationDisplay";
 import BillingVerify from "./OtherComponents/BillingStatement/BillingVerify";
 import VerifyPlasticCredit from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticCredit";
 import VerifyPlasticWasteDiversion from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticWasteDiversion";
+import Attendance from "./OtherComponents/Sections/attendance";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -74,6 +75,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
+          <Route path="/attendance" element={<Attendance />} />
           <Route path="/certificate/:id" element={<Certificate />} />
           <Route
             path="/certificate/plasticCredit/:id"

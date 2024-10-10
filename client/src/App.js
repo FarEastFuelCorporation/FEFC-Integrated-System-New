@@ -20,6 +20,8 @@ import LoadingSpinner from "./OtherComponents/LoadingSpinner";
 import Certificate from "./OtherComponents/Certificates/Certificate";
 import QuotationDisplay from "./OtherComponents/Quotations/QuotationDisplay";
 import BillingVerify from "./OtherComponents/BillingStatement/BillingVerify";
+import VerifyPlasticCredit from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticCredit";
+import VerifyPlasticWasteDiversion from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticWasteDiversion";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -73,6 +75,14 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
           <Route path="/certificate/:id" element={<Certificate />} />
+          <Route
+            path="/certificate/plasticCredit/:id"
+            element={<VerifyPlasticCredit />}
+          />
+          <Route
+            path="/certificate/plasticWasteDiversion/:id"
+            element={<VerifyPlasticWasteDiversion />}
+          />
           <Route path="/billing/:id" element={<BillingVerify />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />

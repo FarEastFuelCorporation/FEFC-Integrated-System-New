@@ -1,11 +1,12 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { formatNumber } from "../../Functions";
 
-const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
+const PlasticCreditsHeader = ({ row }) => {
   return (
     <Box>
       <Typography variant="h6" component="h4" sx={{ textAlign: "right" }}>
-        FEFC-PCC-IP-241009001-100000KGS
+        {row?.certificateNumber}
       </Typography>
       <Typography
         variant="h2"
@@ -17,7 +18,9 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
           textAlign: "center",
         }}
       >
-        PLASTIC CREDIT CERTIFICATE
+        {row?.typeOfCertificate === "PLASTIC CREDIT"
+          ? "PLASTIC CREDIT CERTIFICATE"
+          : "PLASTIC WASTE DIVERSION CERTIFICATE"}
       </Typography>
 
       <Box sx={{ textAlign: "center", mt: 2 }}>
@@ -31,8 +34,7 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
             margin: "0px 0px 8px",
           }}
         >
-          IKANO PHILIPPINES
-          {/* {row.Client.clientName} */}
+          {row?.Client.clientName}
         </Typography>
       </Box>
       <Typography
@@ -53,9 +55,13 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
           margin: "16px 0 8px",
         }}
       >
-        The Volume of plastic waste amounting to 100,000.00 Kgs has been
-        recovered and diverted on behalf of IKANO PHILIPPINES and has been
-        awarded with equivalent volume as Plastic Credits
+        The Volume of plastic waste amounting to {formatNumber(row?.volume)} Kgs
+        has been recovered and diverted on behalf of {row?.Client.clientName}{" "}
+        and has been awarded with equivalent volume as{" "}
+        {row?.typeOfCertificate === "PLASTIC CREDIT"
+          ? "Plastic Credit"
+          : "Plastic Waste Diversion"}
+        s
       </Typography>
       <Typography
         sx={{
@@ -65,19 +71,20 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
           margin: "16px 0 8px",
         }}
       >
-        The Plastic Credits are designated by the following serial number on the
+        The{" "}
+        {row?.typeOfCertificate === "PLASTIC CREDIT"
+          ? "Plastic Credit"
+          : "Plastic Waste Diversion"}
+        s are designated by the following serial number on the
         <br />
-        FEFC Plastic Credit Registry: FEFC-PCC-IP-241009001-100000KGS
+        FEFC{" "}
+        {row?.typeOfCertificate === "PLASTIC CREDIT"
+          ? "Plastic Credit"
+          : "Plastic Waste Diversion"}{" "}
+        Registry: {row?.certificateNumber}
       </Typography>
-      <Typography
-        sx={{
-          fontFamily:
-            "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
-          fontSize: "20px",
-        }}
-      ></Typography>
     </Box>
   );
 };
 
-export default CertificateOfDestructionHeader;
+export default PlasticCreditsHeader;

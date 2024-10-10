@@ -2,9 +2,11 @@
 
 const BookedTransaction = require("../models/BookedTransaction");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
+const Client = require("../models/Client");
+const PlasticTransaction = require("../models/PlasticTransaction");
 const { getIncludeOptions } = require("../utils/getBookedTransactions");
 
-// Get Certificate controller
+// Get Certificate of Destruction controller
 async function getCertificateController(req, res) {
   try {
     const id = req.params.id;
@@ -26,6 +28,32 @@ async function getCertificateController(req, res) {
   }
 }
 
+// Get Plastic Certificate controller
+async function getPlasticCertificateController(req, res) {
+  try {
+    const id = req.params.id;
+
+    console.log(id);
+
+    const plasticTransaction = await PlasticTransaction.findByPk(id, {
+      include: {
+        model: Client,
+        as: "Client",
+      },
+    });
+
+    if (!plasticTransaction) {
+      return res.status(404).send("Plastic transaction not found");
+    }
+
+    res.json({ plasticTransaction });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 module.exports = {
   getCertificateController,
+  getPlasticCertificateController,
 };

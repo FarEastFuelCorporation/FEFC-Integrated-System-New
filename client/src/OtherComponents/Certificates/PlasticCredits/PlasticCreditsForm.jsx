@@ -4,11 +4,11 @@ import { Box, TableContainer, Paper, Button } from "@mui/material";
 import letterhead from "../../../images/letterhead2.jpg";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import CertificateOfDestructionHeader from "./CertificateOfDestructionHeader";
+import PlasticCreditsHeader from "./PlasticCreditsHeader";
 import {
-  CertificateOfDestructionFooter1,
-  CertificateOfDestructionFooter2,
-} from "./CertificateOfDestructionFooter";
+  PlasticCreditsFooter1,
+  PlasticCreditsFooter2,
+} from "./PlasticCreditsFooter";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
@@ -37,24 +37,30 @@ const PlasticCreditsForm = ({ row, verify = null }) => {
       pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
 
       // Save the generated PDF
-      pdf.save(`FEFC-PCC-IP-241009001-100000KGS-IKANO PHILIPPINES.pdf`);
+      pdf.save(`${row?.certificateNumber}-${row?.Client.clientName}.pdf`);
     });
   };
 
-  const qrCodeURL = `${apiUrl}/certificate/`;
+  const certificateRoute =
+    row?.typeOfCertificate === "PLASTIC CREDIT"
+      ? "plasticCredit"
+      : "plasticWasteDiversion";
+
+  const qrCodeURL = `${apiUrl}/certificate/${certificateRoute}/${row?.id}`;
 
   const generatePDFContent = () => (
     <Box
       ref={certificateRef}
       sx={{
         position: "absolute",
-        left: verify ? "0" : "-9999px",
+        // left: verify ? "0" : "-9999px",
         padding: "123px 38px 38px 76px",
         minHeight: "1056px", // Ensure at least one page height
         width: "816px",
         backgroundColor: "white",
         color: "black",
-        // zIndex: 1,
+        zIndex: 1,
+        left: 0,
       }}
     >
       <Box
@@ -71,10 +77,7 @@ const PlasticCreditsForm = ({ row, verify = null }) => {
         }}
       />
       <Box sx={{ zIndex: 1, position: "relative" }}>
-        <CertificateOfDestructionHeader
-        // row={row}
-        // certifiedTransaction={certifiedTransaction}
-        />
+        <PlasticCreditsHeader row={row} />
         <TableContainer
           component={Paper}
           sx={{
@@ -90,11 +93,8 @@ const PlasticCreditsForm = ({ row, verify = null }) => {
             backgroundColor: "white",
           }}
         ></TableContainer>
-        <CertificateOfDestructionFooter1
-          row={row}
-          // sortedWasteTransaction={sortedWasteTransaction}
-        />
-        <CertificateOfDestructionFooter2 qrCodeURL={qrCodeURL} />
+        <PlasticCreditsFooter1 row={row} />
+        <PlasticCreditsFooter2 row={row} qrCodeURL={qrCodeURL} />
       </Box>
     </Box>
   );

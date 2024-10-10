@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import LoadingSpinner from "../LoadingSpinner";
-import CertificateOfDestruction from "./CertificateOfDestruction";
+import LoadingSpinner from "../../LoadingSpinner";
+import PlasticCreditsForm from "./PlasticCreditsForm";
 
-const Certificate = () => {
+const VerifyPlasticWasteDiversion = () => {
   const [loading, setLoading] = useState(true); // State to indicate loading
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
-  const [quotationData, setQuotationData] = useState(null);
+  const [data, setData] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -20,12 +20,9 @@ const Certificate = () => {
     try {
       setLoading(true);
       const certificateResponse = await axios.get(
-        `${apiUrl}/api/certificate/${id}`
+        `${apiUrl}/api/certificate/plasticWasteDiversion/${id}`
       );
-
-      setQuotationData(
-        certificateResponse.data.certifiedTransaction.BookedTransaction
-      );
+      setData(certificateResponse.data.plasticTransaction);
 
       // Set a timeout of 5 seconds before setting loading to false
     } catch (error) {
@@ -39,10 +36,18 @@ const Certificate = () => {
   }, [fetchData]);
 
   return (
-    <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "center" }}>
+    <Box
+      sx={{
+        marginTop: "60px",
+        left: 0,
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
       <LoadingSpinner isLoading={loading} />
-      {quotationData ? (
-        <CertificateOfDestruction row={quotationData} verify={true} />
+      {data ? (
+        <PlasticCreditsForm row={data} verify={true} />
       ) : (
         <Box
           sx={{
@@ -69,4 +74,4 @@ const Certificate = () => {
   );
 };
 
-export default Certificate;
+export default VerifyPlasticWasteDiversion;

@@ -1,18 +1,11 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import {
-  formatDateWithSuffix,
-  formatNumber,
-  getLatestTreatedDate,
-} from "../../Functions";
+import { formatDateWithSuffix, formatNumber } from "../../Functions";
 import QRCode from "qrcode.react";
 import pco_signature from "../../../images/pco_signature.png";
 import pm_signature from "../../../images/pm_signature.png";
 
-export const CertificateOfDestructionFooter1 = ({
-  row,
-  sortedWasteTransaction,
-}) => {
+export const PlasticCreditsFooter1 = ({ row }) => {
   return (
     <Box>
       <Box sx={{ display: "flex", mt: 2 }}>
@@ -23,7 +16,7 @@ export const CertificateOfDestructionFooter1 = ({
             fontSize: "20px",
           }}
         >
-          Grantid this
+          Granted this
         </Typography>
         <Typography
           sx={{
@@ -34,11 +27,7 @@ export const CertificateOfDestructionFooter1 = ({
             fontSize: "20px",
           }}
         >
-          {/* {
-            formatDateWithSuffix(getLatestTreatedDate(sortedWasteTransaction))
-              .day
-          } */}
-          8
+          {formatDateWithSuffix(row?.issuedDate).day}
         </Typography>
         <Typography
           sx={{
@@ -50,11 +39,7 @@ export const CertificateOfDestructionFooter1 = ({
           }}
           id="certification2"
         >
-          {/* {
-            formatDateWithSuffix(getLatestTreatedDate(sortedWasteTransaction))
-              .suffix
-          } */}
-          th
+          {formatDateWithSuffix(row?.issuedDate).suffix}
         </Typography>
         <Typography
           sx={{
@@ -65,18 +50,14 @@ export const CertificateOfDestructionFooter1 = ({
             fontSize: "20px",
           }}
         >
-          {/* {
-            formatDateWithSuffix(getLatestTreatedDate(sortedWasteTransaction))
-              .dateString
-          } */}
-          day of October 2024
+          {formatDateWithSuffix(row?.issuedDate).dateString}
         </Typography>
       </Box>
     </Box>
   );
 };
 
-export const CertificateOfDestructionFooter2 = ({ qrCodeURL }) => {
+export const PlasticCreditsFooter2 = ({ row, qrCodeURL }) => {
   return (
     <Box>
       <Box
@@ -168,7 +149,7 @@ export const CertificateOfDestructionFooter2 = ({ qrCodeURL }) => {
             >
               Name of Organization
               <br />
-              IKANO PHILIPPINES
+              {row?.Client.clientName}
             </Typography>
           </Box>
           <Box mt={2}>
@@ -181,7 +162,7 @@ export const CertificateOfDestructionFooter2 = ({ qrCodeURL }) => {
             >
               Volume of Plastic Waste
               <br />
-              {formatNumber(100000)} Kgs.
+              {formatNumber(row?.volume)} Kgs.
             </Typography>
           </Box>
         </Box>

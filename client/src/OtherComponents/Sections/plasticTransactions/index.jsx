@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, IconButton, Modal, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import PageviewIcon from "@mui/icons-material/Pageview";
-import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
@@ -34,6 +33,7 @@ const PlasticTransactions = ({ user }) => {
   };
 
   const [openModal, setOpenModal] = useState(false);
+  const [openCertificateModal, setOpenCertificateModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
   const [plasticTransactions, setPlasticTransactions] = useState([]);
@@ -42,13 +42,13 @@ const PlasticTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [data, setdata] = useState([]);
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/plasticTransaction`);
-
-      console.log(response.data.plasticTransactions);
 
       // Map through the transactions to include Client.clientName in each one
       const updatedTransactions = response.data.plasticTransactions.map(
@@ -71,10 +71,6 @@ const PlasticTransactions = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSuccessMessage(false);
@@ -85,9 +81,19 @@ const PlasticTransactions = ({ user }) => {
     };
   }, [showSuccessMessage]);
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
+  };
+
+  const handleOpenCertificateModal = () => {
+    setOpenCertificateModal(true);
+  };
+  const handleCloseCertificateModal = () => {
+    setOpenCertificateModal(false);
   };
 
   const clearFormData = () => {
@@ -97,6 +103,16 @@ const PlasticTransactions = ({ user }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleViewClick = (params) => {
+    try {
+      setShowForm(true); // Set state to show the form
+      setdata(params); // Set state to show the form
+      handleOpenCertificateModal();
+    } catch (error) {
+      console.error("Error fetching document file:", error);
+    }
   };
 
   const handleEditClick = (id) => {
@@ -311,101 +327,9 @@ const PlasticTransactions = ({ user }) => {
       renderCell: (params) => (
         <IconButton
           sx={{ color: colors.greenAccent[400], fontSize: "large" }}
-          onClick={async () => {
-            try {
-              const documentId = params.row.id; // Get the document ID
-
-              // Fetch the attachment from the API using the document ID
-              const response = await axios.get(
-                `${apiUrl}/api/document/${documentId}`
-              );
-
-              const attachment = response.data.document.attachment; // Access the attachment data
-
-              if (attachment) {
-                const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
-
-                // Determine the MIME type based on the file's magic number (first few bytes)
-                let mimeType = "application/octet-stream"; // Default MIME type
-                const magicNumbers = byteArray.slice(0, 4).join(",");
-
-                // Common magic numbers
-                if (magicNumbers.startsWith("255,216,255")) {
-                  mimeType = "image/jpeg";
-                } else if (magicNumbers.startsWith("137,80,78,71")) {
-                  mimeType = "image/png";
-                } else if (magicNumbers.startsWith("37,80,68,70")) {
-                  mimeType = "application/pdf";
-                }
-                // Add more magic numbers as necessary
-
-                const blob = new Blob([byteArray], { type: mimeType });
-                const url = URL.createObjectURL(blob); // Create an object URL from the Blob
-                window.open(url, "_blank"); // Open the URL in a new tab
-              }
-            } catch (error) {
-              console.error("Error fetching document file:", error);
-            }
-          }}
+          onClick={() => handleViewClick(params.row)}
         >
           <PageviewIcon sx={{ fontSize: "2rem" }} />
-        </IconButton>
-      ),
-    },
-    {
-      field: "download",
-      headerName: "Download",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      renderCell: (params) => (
-        <IconButton
-          sx={{ color: colors.blueAccent[400], fontSize: "large" }}
-          onClick={async () => {
-            try {
-              const documentId = params.row.id; // Get the document ID
-
-              // Fetch the attachment from the API using the document ID
-              const response = await axios.get(
-                `${apiUrl}/api/document/${documentId}`
-              );
-
-              const attachment = response.data.document.attachment; // Access the attachment data
-              const fileName = params.row.fileName; // Access the file name
-
-              if (attachment) {
-                const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
-
-                // Determine the MIME type based on the file's magic number (first few bytes)
-                let mimeType = "application/octet-stream"; // Default MIME type
-                const magicNumbers = byteArray.slice(0, 4).join(",");
-                // Common magic numbers
-                if (magicNumbers.startsWith("255,216,255")) {
-                  mimeType = "image/jpeg";
-                } else if (magicNumbers.startsWith("137,80,78,71")) {
-                  mimeType = "image/png";
-                } else if (magicNumbers.startsWith("37,80,68,70")) {
-                  mimeType = "application/pdf";
-                }
-                // Add more magic numbers as necessary
-
-                const blob = new Blob([byteArray], { type: mimeType });
-                const url = URL.createObjectURL(blob); // Create an object URL from the Blob
-
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", fileName); // Use the file name for the download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }
-            } catch (error) {
-              console.error("Error fetching document file:", error);
-            }
-          }}
-        >
-          <DownloadIcon sx={{ fontSize: "2rem" }} />
         </IconButton>
       ),
     },
@@ -470,7 +394,7 @@ const PlasticTransactions = ({ user }) => {
         />
       )}
 
-      <PlasticCreditsForm />
+      {/* <PlasticCreditsForm /> */}
 
       <CustomDataGridStyles>
         <DataGrid
@@ -491,7 +415,24 @@ const PlasticTransactions = ({ user }) => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
       />
+      {showForm && (
+        <Modal
+          open={openCertificateModal}
+          onClose={handleCloseCertificateModal}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            border: "none",
+          }}
+        >
+          <Box sx={{ position: "relative" }}>
+            <PlasticCreditsForm row={data} />
+          </Box>
+        </Modal>
+      )}
     </Box>
   );
 };

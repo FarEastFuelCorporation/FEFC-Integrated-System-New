@@ -33,7 +33,6 @@ const PlasticTransactionModal = ({
       const clientResponse = await axios.get(`${apiUrl}/api/client`);
 
       setClients(clientResponse.data.clients);
-      console.log(clientResponse.data.clients);
     } catch (error) {
       console.error("Error fetching data:", error);
     }

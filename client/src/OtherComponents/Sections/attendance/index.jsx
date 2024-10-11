@@ -90,7 +90,17 @@ const Attendance = () => {
     try {
       const response = await axios.get(`${apiUrl}/api/attendance`);
       console.log(response.data.filteredData);
-      setdataList(response.data.filteredData);
+
+      const sortedData = response.data.filteredData.sort((a, b) => {
+        // Convert `createdAt` to Date objects for both a and b
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+
+        // Sort in descending order (latest dates first)
+        return dateB - dateA;
+      });
+
+      setdataList(sortedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -197,11 +207,13 @@ const Attendance = () => {
     {
       field: "timeIn",
       headerName: "Time In",
-      headerAlign: "center",
-      align: "center",
       width: 175,
+      // Use the raw timeIn value for sorting
+      sortComparator: (v1, v2, param1, param2) => {
+        console.log(param1);
+        return new Date(param1.row.timeInRaw) - new Date(param2.row.timeInRaw);
+      },
     },
-
     {
       field: "status",
       headerName: "Status",
@@ -217,7 +229,6 @@ const Attendance = () => {
     const createdAt = new Date(item.createdAt); // Parse the createdAt date
     const dateFormatted = format(createdAt, "MMMM dd, yyyy"); // Format date as 'October 10, 2024'
     const timeInFormatted = format(createdAt, "hh:mm:ss a"); // Format time as '12:00:00 AM'
-    const timeOutFormatted = format(createdAt, "hh:mm:ss a"); // Adjust based on how you derive timeOut
 
     return {
       id: index + 1, // Ensure a unique id for each row
@@ -225,6 +236,7 @@ const Attendance = () => {
       designation: item.IdInformation.designation,
       date: dateFormatted, // Add formatted date
       timeIn: timeInFormatted, // Adjusted timeIn
+      timeInRaw: createdAt,
       status: item.status,
     };
   });

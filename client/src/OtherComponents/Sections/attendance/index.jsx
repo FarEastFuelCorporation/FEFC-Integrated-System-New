@@ -182,6 +182,13 @@ const Attendance = () => {
       width: 100,
     },
     {
+      field: "employeeId",
+      headerName: "Employee ID",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+    },
+    {
       field: "employeeName",
       headerName: "Employee Name",
       headerAlign: "center",
@@ -207,12 +214,9 @@ const Attendance = () => {
     {
       field: "timeIn",
       headerName: "Time In",
+      headerAlign: "center",
+      align: "center",
       width: 175,
-      // Use the raw timeIn value for sorting
-      sortComparator: (v1, v2, param1, param2) => {
-        console.log(param1);
-        return new Date(param1.row.timeInRaw) - new Date(param2.row.timeInRaw);
-      },
     },
     {
       field: "status",
@@ -233,6 +237,7 @@ const Attendance = () => {
     return {
       id: index + 1, // Ensure a unique id for each row
       employeeName: `${item.IdInformation.last_name}, ${item.IdInformation.first_name} ${item.IdInformation.middle_name}`,
+      employeeId: item.employee_id,
       designation: item.IdInformation.designation,
       date: dateFormatted, // Add formatted date
       timeIn: timeInFormatted, // Adjusted timeIn

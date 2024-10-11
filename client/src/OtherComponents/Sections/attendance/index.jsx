@@ -271,7 +271,7 @@ const Attendance = () => {
         }}
       >
         {showDataList && (
-          <Box s sx={{ width: "100%", paddingX: "40px" }}>
+          <Box sx={{ width: "100%", paddingX: "40px" }}>
             <CustomDataGridStyles>
               <Box
                 sx={{
@@ -291,7 +291,6 @@ const Attendance = () => {
                 ref={dataGridRef}
                 rows={rows}
                 columns={columns}
-                pagination={false}
                 components={{
                   Footer: () => null, // Hide the footer
                 }}

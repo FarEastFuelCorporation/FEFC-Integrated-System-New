@@ -89,7 +89,6 @@ const Attendance = () => {
     setLoading(true);
     try {
       const response = await axios.get(`${apiUrl}/api/attendance`);
-      console.log(response.data.filteredData);
 
       const sortedData = response.data.filteredData.sort((a, b) => {
         // Convert `createdAt` to Date objects for both a and b

@@ -26,6 +26,7 @@ import Attendance from "./OtherComponents/Sections/attendance";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  
   const [user, setUser] = useState(null); // State to hold user information
   const [loading, setLoading] = useState(false); // State to indicate loading
   const [theme, colorMode] = useMode();

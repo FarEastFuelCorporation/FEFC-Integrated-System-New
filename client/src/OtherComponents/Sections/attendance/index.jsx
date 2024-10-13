@@ -329,7 +329,13 @@ const Attendance = () => {
   const today = new Date();
 
   return (
-    <Box sx={{ height: "calc(100vh - 64px)" }}>
+    <Box
+      sx={{
+        height: "calc(100vh - 64px)",
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // IE 10+
+      }}
+    >
       {loading && <LoadingSpinner isLoading={loading} />}
       {/* Input for URL without form */}
       <audio ref={audioRef} src={happyBirthday} />
@@ -418,8 +424,10 @@ const Attendance = () => {
                     Footer: () => null, // Hide the footer
                   }}
                   sx={{
-                    height: "75vh",
+                    height: "90vh",
                     width: "100%",
+                    scrollbarWidth: "none", // Firefox
+                    msOverflowStyle: "none", // IE 10+
                     "& .MuiDataGrid-columnHeader": {
                       fontSize: "30px", // Change header font size
                     },

@@ -84,6 +84,7 @@ async function attendance(req, res) {
             "middle_name",
             "last_name",
             "designation",
+            "birthday",
           ],
         },
       ],

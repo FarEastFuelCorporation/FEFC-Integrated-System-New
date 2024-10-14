@@ -142,7 +142,7 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
               DAISY M. CARDINEZ
             </Typography>
           </Box>
-          <Typography textAlign="center">Accounting Manager</Typography>
+          <Typography textAlign="center">Accounting Head</Typography>
         </Box>
         <Box sx={{ border: "1px solid black", borderLeft: "none" }}>
           <Typography variant="h6" pl={2}>

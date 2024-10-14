@@ -16,7 +16,6 @@ function getDayOfWeek(date) {
   return day === 0 ? 6 : day - 1; // Convert 0 (Sunday) to 6, shift others
 }
 
-// Helper function to check if a date is today
 function isToday(date) {
   const today = new Date();
   return (
@@ -43,86 +42,111 @@ async function getAttendanceRecordController(req, res) {
           ],
         },
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["createdAt", "ASC"]], // Sort by date for proper pairing
     });
 
-    const weeklyData = {};
-    let index = 0; // Initialize index for return data
+    const attendanceMap = {};
 
-    // Group by employee and week, organize by day
+    // First, group TIME-IN and TIME-OUT entries for each employee per day
     results.forEach((row) => {
       const employeeId = row.employee_id;
-      const employeeDetails = row.IdInformation;
-      const weekNumber = getWeekNumber(new Date(row.createdAt));
-      const dayOfWeek = getDayOfWeek(new Date(row.createdAt));
+      const dayKey = new Date(row.createdAt).toDateString(); // Use day as the key to pair
       const timeFormatted = new Date(row.createdAt).toLocaleTimeString(
         "en-US",
         {
           hour: "numeric",
           minute: "numeric",
+          second: "numeric",
           hour12: true,
         }
       );
 
-      // Initialize week and employee structure if it doesn't exist
-      if (!weeklyData[weekNumber]) {
-        weeklyData[weekNumber] = {};
+      if (!attendanceMap[employeeId]) {
+        attendanceMap[employeeId] = {};
       }
 
-      if (!weeklyData[weekNumber][employeeId]) {
-        weeklyData[weekNumber][employeeId] = {
-          id: ++index, // Increment and assign index
-          weekNumber,
-          employee_id: employeeDetails.employee_id,
-          employee_name: `${employeeDetails.last_name}, ${employeeDetails.first_name} ${employeeDetails.middle_name}`,
-          designation: employeeDetails.designation,
-          birthday: employeeDetails.birthday,
-          Monday: [],
-          Tuesday: [],
-          Wednesday: [],
-          Thursday: [],
-          Friday: [],
-          Saturday: [],
-          Sunday: [],
-        };
+      if (!attendanceMap[employeeId][dayKey]) {
+        attendanceMap[employeeId][dayKey] = [];
       }
 
-      const dayLabels = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ];
-      const dayLabel = dayLabels[dayOfWeek];
-
-      // Handle TIME-IN and TIME-OUT entries
       if (row.status === "TIME-IN") {
-        // Start a new entry for the day
-        weeklyData[weekNumber][employeeId][dayLabel].push({
+        attendanceMap[employeeId][dayKey].push({
           timeIn: timeFormatted,
-          timeOut: null, // Placeholder for TIME-OUT
+          timeOut: null,
         });
       } else if (row.status === "TIME-OUT") {
-        // Associate this TIME-OUT with the last TIME-IN of the day
-        const lastEntry = weeklyData[weekNumber][employeeId][dayLabel].find(
+        // Pair this TIME-OUT with the last TIME-IN that doesn't have a TIME-OUT yet
+        const lastEntry = attendanceMap[employeeId][dayKey].find(
           (entry) => entry.timeOut === null
         );
         if (lastEntry) {
-          // Only update if there is no existing TIME-OUT
           lastEntry.timeOut = timeFormatted;
         }
       }
     });
 
-    // Convert the object into a flat array, sorted by week number in descending order
+    const weeklyData = {};
+    let index = 0;
+
+    // Now group by week and organize by day
+    Object.keys(attendanceMap).forEach((employeeId) => {
+      Object.keys(attendanceMap[employeeId]).forEach((dayKey) => {
+        const date = new Date(dayKey);
+        const weekNumber = getWeekNumber(date);
+        const dayOfWeek = getDayOfWeek(date);
+        const employeeRecords = attendanceMap[employeeId][dayKey];
+
+        // Initialize week and employee structure if it doesn't exist
+        if (!weeklyData[weekNumber]) {
+          weeklyData[weekNumber] = {};
+        }
+
+        if (!weeklyData[weekNumber][employeeId]) {
+          const employeeDetails = results.find(
+            (row) => row.employee_id === employeeId
+          ).IdInformation;
+          weeklyData[weekNumber][employeeId] = {
+            id: ++index,
+            weekNumber,
+            employee_id: employeeDetails.employee_id,
+            employee_name: `${employeeDetails.last_name}, ${employeeDetails.first_name} ${employeeDetails.middle_name}`,
+            designation: employeeDetails.designation,
+            birthday: employeeDetails.birthday,
+            Monday: [],
+            Tuesday: [],
+            Wednesday: [],
+            Thursday: [],
+            Friday: [],
+            Saturday: [],
+            Sunday: [],
+          };
+        }
+
+        const dayLabels = [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ];
+        const dayLabel = dayLabels[dayOfWeek];
+
+        employeeRecords.forEach(({ timeIn, timeOut }) => {
+          weeklyData[weekNumber][employeeId][dayLabel].push({
+            timeIn,
+            timeOut,
+          });
+        });
+      });
+    });
+
+    // Format the final output
     const formattedData = Object.keys(weeklyData)
-      .sort((a, b) => b - a) // Sort week numbers in descending order
+      .sort((a, b) => b - a)
       .flatMap((weekNumber) =>
         Object.values(weeklyData[weekNumber]).map((employeeData) => {
-          // Format each day as a string showing multiple entries
           const dayLabels = [
             "Monday",
             "Tuesday",
@@ -137,14 +161,13 @@ async function getAttendanceRecordController(req, res) {
               employeeData[dayLabel] = employeeData[dayLabel]
                 .map(({ timeIn, timeOut }) => {
                   if (timeOut === null) {
-                    // Only use "On Duty" or "No Time-Out" when no timeOut is found
                     return isToday(new Date())
                       ? `${timeIn} / On Duty`
                       : `${timeIn} / No Time-Out`;
                   }
                   return `${timeIn} / ${timeOut}`;
                 })
-                .join("; "); // Join multiple entries with semicolons
+                .join("; "); // Multiple pairs are joined with a semicolon
             } else {
               employeeData[dayLabel] = null; // No entries for this day
             }

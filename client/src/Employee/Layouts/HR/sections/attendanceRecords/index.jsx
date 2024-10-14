@@ -74,7 +74,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Monday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -82,7 +82,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Tuesday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -90,7 +90,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Wednesday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -98,7 +98,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Thursday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -106,7 +106,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Friday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -114,7 +114,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Saturday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -122,7 +122,7 @@ const AttendanceRecords = ({ user }) => {
       headerName: "Sunday",
       headerAlign: "center",
       align: "center",
-      width: 125,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     // {

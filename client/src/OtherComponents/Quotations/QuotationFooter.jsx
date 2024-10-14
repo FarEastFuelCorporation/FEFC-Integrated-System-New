@@ -162,7 +162,7 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
               RUEL S. MANGARON
             </Typography>
           </Box>
-          <Typography textAlign="center">Vice President</Typography>
+          <Typography textAlign="center">President</Typography>
         </Box>
         <Box sx={{ border: "1px solid black", borderLeft: "none" }}>
           <Typography variant="h6" pl={2}>

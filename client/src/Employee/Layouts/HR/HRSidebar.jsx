@@ -7,6 +7,7 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -52,6 +53,7 @@ const HRSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
+      "/dashboard/attendanceRecords": "Attendance Records",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -219,6 +221,14 @@ const HRSidebar = ({ user }) => {
               title="Employee Records"
               to="employee"
               icon={<ContactsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Attendance Records"
+              to="attendanceRecords"
+              icon={<AssignmentIndIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

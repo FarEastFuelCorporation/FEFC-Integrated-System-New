@@ -41,6 +41,7 @@ const collectionTransactionRoutes = require("./collectionTransactionRoutes");
 const hrDashboardRoutes = require("./hr_dashboard");
 const employeeRoutes = require("./employeeRoutes");
 const employeeRecordRoutes = require("./employeeRecordRoutes");
+const attendanceRecordRoutes = require("./attendanceRecordRoutes");
 const employeeAttachmentRoutes = require("./employeeAttachmentRoutes");
 const departmentRoutes = require("./departmentRoutes");
 const { error404Controller } = require("../controllers/othersController");
@@ -95,6 +96,7 @@ router.use("/collectionTransaction", collectionTransactionRoutes);
 router.use("/hrDashboard", hrDashboardRoutes);
 router.use("/employee", employeeRoutes);
 router.use("/employeeRecord", employeeRecordRoutes);
+router.use("/attendanceRecord", attendanceRecordRoutes);
 router.use("/employeeAttachment", employeeAttachmentRoutes);
 router.use("/department", departmentRoutes);
 

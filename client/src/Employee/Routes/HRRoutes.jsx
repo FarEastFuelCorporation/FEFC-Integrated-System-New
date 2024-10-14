@@ -4,6 +4,7 @@ import UserSidebar from "../../OtherComponents/UserSidebar";
 import Dashboard from "../../Employee/Layouts/HR/sections/dashboard";
 import Departments from "../../OtherComponents/Sections/departments";
 import Contacts from "../../Employee/Layouts/HR/sections/contacts";
+import AttendanceRecords from "../Layouts/HR/sections/attendanceRecords";
 import Calendar from "../../Employee/Layouts/HR/sections/calendar";
 import FAQ from "../../Employee/Layouts/HR/sections/faq";
 import Bar from "../../Employee/Layouts/HR/sections/bar";
@@ -18,6 +19,10 @@ const HRRoutes = ({ user, onUpdateUser }) => (
       <Route path="" element={<Dashboard />} />
       <Route path="departments" element={<Departments user={user} />} />
       <Route path="employee" element={<Contacts user={user} />} />
+      <Route
+        path="attendanceRecords"
+        element={<AttendanceRecords user={user} />}
+      />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

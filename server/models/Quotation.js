@@ -38,6 +38,9 @@ const Quotation = sequelize.define(
     scopeOfWork: {
       type: DataTypes.STRING,
     },
+    contactPerson: {
+      type: DataTypes.STRING,
+    },
     remarks: {
       type: DataTypes.STRING,
     },

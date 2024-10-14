@@ -54,7 +54,7 @@ async function getQuotationFormController(req, res) {
         {
           model: IdInformation,
           as: "IdInformation",
-          attributes: ["first_name", "last_name", "signature"],
+          attributes: ["first_name", "middle_name", "last_name", "signature"],
         },
       ],
       where: {

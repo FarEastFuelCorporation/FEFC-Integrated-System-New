@@ -37,6 +37,8 @@ const Quotations = ({ user }) => {
     termsCharge: "",
     termsBuying: "",
     scopeOfWork: "",
+    contactPerson: "",
+    contactPerson: "",
     remarks: "",
     createdBy: user.id,
     quotationWastes: [
@@ -280,6 +282,7 @@ const Quotations = ({ user }) => {
         termsCharge: quotationToEdit.termsCharge,
         termsBuying: quotationToEdit.termsBuying,
         scopeOfWork: quotationToEdit.scopeOfWork,
+        contactPerson: quotationToEdit.contactPerson,
         remarks: quotationToEdit.remarks,
         createdBy: user.id,
         quotationWastes: quotationToEdit.quotationWastes

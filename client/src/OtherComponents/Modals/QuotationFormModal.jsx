@@ -333,6 +333,21 @@ const QuotationFormModal = ({
             </Grid>
             <Grid item xs={2.5}>
               <TextField
+                label="Contact Person"
+                name="contactPerson"
+                value={formData.contactPerson}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={2.5}>
+              <TextField
                 label="Remarks"
                 name="remarks"
                 value={formData.remarks}

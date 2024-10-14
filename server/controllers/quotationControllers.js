@@ -18,6 +18,7 @@ async function createQuotationController(req, res) {
     termsCharge,
     termsBuying,
     scopeOfWork,
+    contactPerson,
     remarks,
     createdBy,
     quotationWastes, // This should be an array of quotation wastes
@@ -27,6 +28,7 @@ async function createQuotationController(req, res) {
   termsCharge = termsCharge.toUpperCase();
   termsBuying = termsBuying.toUpperCase();
   scopeOfWork = scopeOfWork.toUpperCase();
+  contactPerson = contactPerson.toUpperCase();
   remarks = remarks.toUpperCase();
 
   try {
@@ -38,6 +40,7 @@ async function createQuotationController(req, res) {
       termsCharge,
       termsBuying,
       scopeOfWork,
+      contactPerson,
       remarks,
       createdBy,
     });
@@ -179,7 +182,7 @@ async function getQuotationsController(req, res) {
         {
           model: IdInformation,
           as: "IdInformation",
-          attributes: ["first_name", "last_name", "signature"],
+          attributes: ["first_name", "middle_name", "last_name", "signature"],
         },
       ],
       where: {
@@ -238,7 +241,7 @@ async function getQuotationController(req, res) {
         {
           model: IdInformation,
           as: "IdInformation",
-          attributes: ["first_name", "last_name", "signature"],
+          attributes: ["first_name", "middle_name", "last_name", "signature"],
         },
       ],
       where: {
@@ -268,6 +271,7 @@ async function updateQuotationController(req, res) {
       termsCharge,
       termsBuying,
       scopeOfWork,
+      contactPerson,
       remarks,
       createdBy,
       quotationWastes, // This should be an array of quotation wastes
@@ -277,6 +281,7 @@ async function updateQuotationController(req, res) {
     termsCharge = termsCharge.toUpperCase();
     termsBuying = termsBuying.toUpperCase();
     scopeOfWork = scopeOfWork.toUpperCase();
+    contactPerson = contactPerson.toUpperCase();
     remarks = remarks.toUpperCase();
 
     // Find the quotation by ID and update it
@@ -301,6 +306,7 @@ async function updateQuotationController(req, res) {
         termsCharge,
         termsBuying,
         scopeOfWork,
+        contactPerson,
         remarks,
         createdBy,
       });

@@ -74,6 +74,9 @@ const QuotationHeader = ({ quotationData }) => {
       </Box>
       <Box display="grid" gridTemplateColumns="50% 50%">
         <Box sx={{ height: "100%", border: "1px solid black", padding: 1 }}>
+          <Typography fontWeight="bold">
+            Attention to:{quotationData.contactPerson}
+          </Typography>
           <Typography fontWeight="bold">{clientData.clientName}</Typography>
           <Typography fontSize="12px">{clientData.address}</Typography>
           <Typography fontSize="12px"></Typography>
@@ -83,7 +86,6 @@ const QuotationHeader = ({ quotationData }) => {
                 ? "Contact #: " + clientData.contactNumber
                 : ""}
             </Typography>
-            <Typography id="contact_number" pl={1}></Typography>
           </Box>
         </Box>
 

@@ -149,30 +149,24 @@ body,
 @keyframes blink-yellow-animation {
   0% {
     background-color: #d6b500; /* Change background color to #D6B500 */
-    color: black; /* Optional: change text color for better visibility */
   }
   50% {
     background-color: transparent; /* Change to transparent for dimming effect */
-    color: white; /* Optional: keep text color for better visibility */
   }
   100% {
     background-color: #d6b500; /* Return to #D6B500 */
-    color: black; /* Optional: change text color for better visibility */
   }
 }
 
 @keyframes blink-red-animation {
   0% {
     background-color: red; /* Change background color to red */
-    color: white; /* Optional: change text color for better visibility */
   }
   50% {
     background-color: transparent; /* Change to transparent for dimming effect */
-    color: white; /* Optional: keep text color for better visibility */
   }
   100% {
     background-color: red; /* Return to red */
-    color: white; /* Optional: change text color for better visibility */
   }
 }
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import QRCode from "qrcode.react";
 import accountingManagerSignature from "../../images/CARDINEZ_DAISY.png";
-import vicePresidentSignature from "../../images/DE_VERA_EXEQUIEL.png";
+import presidentSignature from "../../images/MANGARON_RUEL_NEW.png";
 import SignatureComponent from "../SignatureComponent ";
 
 const QuotationFooter = ({ quotationData, qrCodeURL }) => {
@@ -120,6 +120,7 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
               sx={{ textDecoration: "underline" }}
             >
               {quotationData.IdInformation.first_name}{" "}
+              {quotationData.IdInformation.middle_name.charAt(0)}{" "}
               {quotationData.IdInformation.last_name}
             </Typography>
             <Typography textAlign="center">Marketing Staff / CSR</Typography>
@@ -138,7 +139,7 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
               textAlign="center"
               sx={{ textDecoration: "underline" }}
             >
-              DAISY CARDINEZ
+              DAISY M. CARDINEZ
             </Typography>
           </Box>
           <Typography textAlign="center">Accounting Manager</Typography>
@@ -148,14 +149,17 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
             Checked By:
           </Typography>
           <Box mt={3} position="relative">
-            <SignatureComponent signature={vicePresidentSignature} />
+            <SignatureComponent
+              style={{ top: "-50px" }}
+              signature={presidentSignature}
+            />
             <Typography
               fontWeight="bold"
               id="noted_user"
               textAlign="center"
               sx={{ textDecoration: "underline" }}
             >
-              EXEQUIEL DE VERA
+              RUEL S. MANGARON
             </Typography>
           </Box>
           <Typography textAlign="center">Vice President</Typography>

@@ -67,6 +67,7 @@ const Attendance = () => {
   const debounceTimeout = useRef(null);
   const idleTimeout = useRef(null);
   const dataGridRef = useRef(null);
+  
 
   // Audio refs
   const timeInRef = useRef(null);

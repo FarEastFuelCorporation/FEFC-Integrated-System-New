@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
+import SickIcon from "@mui/icons-material/Sick";
 import RestoreIcon from "@mui/icons-material/Restore";
 import { tokens } from "../../../../../theme";
-import Header from "../../../../../OtherComponents/Header";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import NavIcon from "../../../../../OtherComponents/NavIcon";
 
@@ -66,7 +66,7 @@ const Home = ({ user }) => {
             label={"Undertime"}
           />
           <NavIcon
-            icon={<i className="fa-solid fa-right-from-bracket"></i>}
+            icon={<SickIcon sx={{ fontSize: "30px" }} />}
             label={"Leave"}
           />
           <NavIcon

@@ -35,7 +35,7 @@ const QuotationContent = ({
     let currentPage = [];
     let currentPageHeight = 0;
     let availableHeight = firstPageHeight; // First page's available height (excludes header)
-    console.log(currentPageHeight);
+
     // Helper function to check if an element can fit on the current page
     const canFitOnPage = (elementHeight) => {
       return availableHeight >= elementHeight; // Ensure it's greater than or equal

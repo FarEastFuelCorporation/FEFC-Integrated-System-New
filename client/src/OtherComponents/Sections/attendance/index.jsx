@@ -165,8 +165,6 @@ const Attendance = () => {
         const timeInFormatted = format(createdAt, "hh:mm:ss a");
 
         const birthday = new Date(item.IdInformation.birthday); // Parse birthday
-        console.log(birthday);
-        console.log(isToday(birthday));
 
         setIsPlayingVideo(false);
 
@@ -192,8 +190,6 @@ const Attendance = () => {
           status: item.status,
         };
       });
-
-      console.log(newBirthdayCelebrants);
 
       setdataList(rows);
       setBirthdayCelebrants(newBirthdayCelebrants); // Set birthday celebrants once at the end

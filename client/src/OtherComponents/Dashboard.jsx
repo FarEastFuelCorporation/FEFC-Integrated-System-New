@@ -119,7 +119,11 @@ const Dashboard = ({ user, onUpdateUser }) => {
         </RoleProtectedRoute>
       );
     default:
-      return <Navigate to="/login" />;
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[1]}>
+          <EmployeeRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
   }
 };
 

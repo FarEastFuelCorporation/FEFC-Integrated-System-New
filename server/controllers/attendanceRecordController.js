@@ -84,11 +84,35 @@ async function getAttendanceRecordController(req, res) {
         });
       } else if (row.status === "TIME-OUT") {
         // Pair this TIME-OUT with the last TIME-IN that doesn't have a TIME-OUT yet
-        const lastEntry = attendanceMap[employeeId][dayKey].find(
+        let paired = false;
+        // Check the current day
+        const currentEntries = attendanceMap[employeeId][dayKey];
+        const lastEntry = currentEntries?.find(
           (entry) => entry.timeOut === null
         );
+
         if (lastEntry) {
           lastEntry.timeOut = timeFormatted;
+          paired = true;
+        }
+
+        // If no pairing happened, check the previous day
+        if (!paired) {
+          const previousDay = new Date(dayKey);
+          previousDay.setDate(previousDay.getDate() - 1); // Go back one day
+          const previousDayKey = previousDay.toLocaleDateString("en-US", {
+            timeZone: "Asia/Manila",
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+          });
+          const previousEntries = attendanceMap[employeeId][previousDayKey];
+          const lastPrevEntry = previousEntries?.find(
+            (entry) => entry.timeOut === null
+          );
+          if (lastPrevEntry) {
+            lastPrevEntry.timeOut = timeFormatted;
+          }
         }
       }
     });

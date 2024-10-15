@@ -13,35 +13,22 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import RecyclingIcon from "@mui/icons-material/Recycling";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import PaidIcon from "@mui/icons-material/Paid";
-import TopicIcon from "@mui/icons-material/Topic";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import Paper from "@mui/material/Paper";
 import Item from "../../../OtherComponents/Item";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
-const MarketingSidebar = ({ user }) => {
+const EmployeeSideBar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathToTitleMap = useMemo(
     () => ({
-      "/dashboard/dashboard": "Dashboard",
-      "/dashboard/clients": "Clients",
-      "/dashboard/typeOfWastes": "Type Of Wastes",
-      "/dashboard/logistics": "Logistics",
-      "/dashboard/quotations": "Quotations",
+      "/dashboard": "Home",
       "/dashboard/transactions": "Transactions",
-      "/dashboard/commissions": "Commissions",
-      "/dashboard/documents": "Documents",
-      "/dashboard/calendar": "Calendar",
-      "/dashboard/switchUser": "Switch User",
+      "/dashboard/profile": "Profile",
     }),
     []
   );
@@ -87,35 +74,29 @@ const MarketingSidebar = ({ user }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return isMobile ? (
-    <Box
-      sx={{
-        width: "100%",
-        overflowX: "auto", // Enable horizontal scrolling
-        whiteSpace: "nowrap", // Prevent items from wrapping to the next line
-        position: "fixed",
-        scrollbarWidth: "none", // Firefox
-        msOverflowStyle: "none", // IE 10+
-        bottom: 0,
-        zIndex: 1300,
-        backgroundColor: colors.primary[400],
-      }}
+    <Paper
+      sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+      elevation={3}
     >
       <BottomNavigation
+        showLabels
         value={selected}
         onChange={(event, newValue) => {
           setSelected(newValue);
         }}
         sx={{
+          backgroundColor: colors.primary[400],
           display: "inline-flex", // Align items in a single row
           flexDirection: "row",
           "& .Mui-selected": {
             color: colors.greenAccent[400], // Apply custom color to selected action
           },
+          width: "100%",
         }}
       >
         <BottomNavItem
-          label="Dashboard"
-          value="Dashboard"
+          label="Home"
+          value="Home"
           icon={HomeOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
@@ -130,71 +111,15 @@ const MarketingSidebar = ({ user }) => {
           navigate={"transactions"}
         />
         <BottomNavItem
-          label="Clients"
-          value="Clients"
+          label="Profile"
+          value="Profile"
           icon={PeopleOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"clients"}
-        />
-        <BottomNavItem
-          label="Type Of Wastes"
-          value="Type Of Wastes"
-          icon={RecyclingIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"typeOfWastes"}
-        />
-        <BottomNavItem
-          label="Logistics"
-          value="Logistics"
-          icon={LocalShippingIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"logistics"}
-        />
-        <BottomNavItem
-          label="Quotations"
-          value="Quotations"
-          icon={FormatListBulletedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"quotations"}
-        />
-        <BottomNavItem
-          label="Commissions"
-          value="Commissions"
-          icon={PaidIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"commissions"}
-        />
-        <BottomNavItem
-          label="Documents"
-          value="Documents"
-          icon={TopicIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"documents"}
-        />
-        <BottomNavItem
-          label="Calendar"
-          value="Calendar"
-          icon={CalendarTodayOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"calendar"}
-        />
-        <BottomNavItem
-          label="Switch User"
-          value="Switch User"
-          icon={AccountCircleIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"switchUser"}
+          navigate={"profile"}
         />
       </BottomNavigation>
-    </Box>
+    </Paper>
   ) : (
     <Box
       sx={{
@@ -287,8 +212,8 @@ const MarketingSidebar = ({ user }) => {
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
-              title="Dashboard"
-              to="dashboard"
+              title="Home"
+              to=""
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -302,81 +227,10 @@ const MarketingSidebar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
             <Item
-              title="Clients"
-              to="clients"
+              title="Profile"
+              to="profile"
               icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Type Of Wastes"
-              to="typeOfWastes"
-              icon={<RecyclingIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Logistics"
-              to="logistics"
-              icon={<LocalShippingIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Quotations"
-              to="quotations"
-              icon={<FormatListBulletedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Commissions"
-              to="commissions"
-              icon={<PaidIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Documents"
-              to="documents"
-              icon={<TopicIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
-
-            <Item
-              title="Calendar"
-              to="calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Switch User"
-              to="switchUser"
-              icon={<AccountCircleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
@@ -388,4 +242,4 @@ const MarketingSidebar = ({ user }) => {
   );
 };
 
-export default MarketingSidebar;
+export default EmployeeSideBar;

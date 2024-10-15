@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { tokens } from "../../../../../theme";
 import Header from "../../../../../OtherComponents/Header";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
-const Dashboard = () => {
+const Transactions = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(true); // Add loading state
@@ -25,10 +25,10 @@ const Dashboard = () => {
     <Box m="20px">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your Dashboard" />
+        <Header title="TRANSACTIONS" subtitle="Welcome to your Transactions" />
       </Box>
     </Box>
   );
 };
 
-export default Dashboard;
+export default Transactions;

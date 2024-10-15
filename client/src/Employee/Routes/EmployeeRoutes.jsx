@@ -1,19 +1,17 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Dashboard from "../Layouts/Employee/sections/dashboard";
-import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
-import EmployeeSidebar from "../../OtherComponents/EmployeeSidebar";
+import EmployeeSidebarComponent from "../../OtherComponents/EmployeeSidebarComponent";
+import Home from "../Layouts/Employee/sections/home";
+import Transactions from "../Layouts/Employee/sections/transactions";
+import Profile from "../Layouts/Employee/sections/profile";
 
 const EmployeeRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     {" "}
-    <Route path="/" element={<EmployeeSidebar user={user} />}>
-      <Route path="" element={<Dashboard />} />
-
-      <Route
-        path="switchUser"
-        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
-      />
+    <Route path="/" element={<EmployeeSidebarComponent user={user} />}>
+      <Route path="" element={<Home user={user} />} />
+      <Route path="transactions" element={<Transactions user={user} />} />
+      <Route path="profile" element={<Profile user={user} />} />
     </Route>
   </Routes>
 );

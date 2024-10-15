@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import BottomNavbar from "../Employee/Layouts/Employee/BottomNavbar";
+import EmployeeSideBar from "../Employee/Layouts/Employee/EmployeeSideBar";
 
-const EmployeeSidebar = ({ user }) => {
+const EmployeeSidebarComponent = ({ user }) => {
   return (
     <div
       style={{
@@ -13,7 +13,7 @@ const EmployeeSidebar = ({ user }) => {
       }}
     >
       {/* Bottom navigation bar */}
-      <BottomNavbar />
+      <EmployeeSideBar user={user} />
 
       {/* Main content area */}
       <div
@@ -34,4 +34,4 @@ const EmployeeSidebar = ({ user }) => {
   );
 };
 
-export default EmployeeSidebar;
+export default EmployeeSidebarComponent;

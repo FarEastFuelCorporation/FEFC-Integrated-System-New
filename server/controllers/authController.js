@@ -113,6 +113,10 @@ async function createEmployeeLoginController(req, res) {
       where: { employeeId },
     });
 
+    // Determine the userType, defaulting to 1 if no roles are found
+    const userType =
+      employeeRoles.length > 0 ? employeeRoles[0].employeeRoleId : 1;
+
     const employeeDetails = await Employee.findOne({
       where: { employeeId },
       attributes: [
@@ -133,7 +137,7 @@ async function createEmployeeLoginController(req, res) {
     // Set session data
     req.session.user = {
       id: user.employeeId,
-      userType: employeeRoles[0].employeeRoleId,
+      userType: userType,
       employeeDetails: employeeDetails,
       employeePicture: employeePicture,
     };
@@ -144,7 +148,7 @@ async function createEmployeeLoginController(req, res) {
     res.status(200).json({
       user: {
         id: user.employeeId,
-        userType: employeeRoles[0].employeeRoleId,
+        userType: userType,
         employeeDetails: employeeDetails,
         employeePicture: employeePicture,
       },

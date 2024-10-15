@@ -56,9 +56,10 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 id="charge_input"
                 textAlign="center"
               >
-                {parseInt(quotationData.termsCharge)
+                {quotationData.termsCharge &&
+                Number.isInteger(parseInt(quotationData.termsCharge))
                   ? `${parseInt(quotationData.termsCharge)} Days`
-                  : quotationData.termsCharge}
+                  : quotationData.termsCharge || "N/A"}
               </Typography>
             </Box>
             <Box
@@ -75,11 +76,10 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 textAlign="center"
               >
                 {" "}
-                {parseInt(quotationData.termsBuying)
+                {quotationData.termsBuying &&
+                Number.isInteger(parseInt(quotationData.termsBuying))
                   ? `${parseInt(quotationData.termsBuying)} Days`
-                  : quotationData.termsBuying === 0
-                  ? "N/A"
-                  : "N/A"}
+                  : quotationData.termsBuying || "N/A"}
               </Typography>
             </Box>
           </Box>

@@ -50,17 +50,24 @@ async function getAttendanceRecordController(req, res) {
     // First, group TIME-IN and TIME-OUT entries for each employee per day
     results.forEach((row) => {
       const employeeId = row.employee_id;
-      const dayKey = new Date(row.createdAt).toDateString(); // Use day as the key to pair
-      const timeFormatted = new Date(row.createdAt).toLocaleTimeString(
-        "en-US",
-        {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-          timeZone: "Asia/Manila",
-        }
-      );
+      const date = new Date(row.createdAt);
+
+      // Format the dayKey using Asia/Manila timezone
+      const dayKey = date.toLocaleDateString("en-US", {
+        timeZone: "Asia/Manila",
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      });
+
+      // Format the time in the same timezone
+      const timeFormatted = date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: true,
+        timeZone: "Asia/Manila",
+      });
 
       if (!attendanceMap[employeeId]) {
         attendanceMap[employeeId] = {};

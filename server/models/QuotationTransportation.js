@@ -27,6 +27,11 @@ const QuotationTransportation = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    quantity: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: 1,
+    },
     unit: {
       type: DataTypes.STRING,
       allowNull: false,

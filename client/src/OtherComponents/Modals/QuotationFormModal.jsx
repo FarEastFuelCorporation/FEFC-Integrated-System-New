@@ -479,6 +479,28 @@ const QuotationFormModal = ({
                     </FormControl>
                   </Grid>
                   <Grid item xs={1}>
+                    <TextField
+                      label="Qty"
+                      name={`quotationWastes[${index}].quantity`}
+                      value={waste.quantity}
+                      onChange={(e) =>
+                        handleWasteInputChangeLocal(
+                          index,
+                          "quantity",
+                          e.target.value
+                        )
+                      }
+                      type="number"
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={1}>
                     <FormControl fullWidth>
                       <InputLabel
                         id={`unit-label-${index}`}
@@ -536,7 +558,7 @@ const QuotationFormModal = ({
                       }}
                     />
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item xs={1}>
                     <FormControl fullWidth>
                       <InputLabel
                         id={`vat-calculation-label-${index}`}
@@ -762,6 +784,28 @@ const QuotationFormModal = ({
                     </FormControl>
                   </Grid>
                   <Grid item xs={1}>
+                    <TextField
+                      label="Qty"
+                      name={`quotationTransportation[${index}].quantity`}
+                      value={transportation.quantity}
+                      onChange={(e) =>
+                        handleTransportationInputChangeLocal(
+                          index,
+                          "quantity",
+                          e.target.value
+                        )
+                      }
+                      type="number"
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={1}>
                     <FormControl fullWidth>
                       <InputLabel
                         id={`unit-label-${index}`}
@@ -819,7 +863,7 @@ const QuotationFormModal = ({
                       }}
                     />
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item xs={1}>
                     <FormControl fullWidth>
                       <InputLabel
                         id={`vat-calculation-label-${index}`}

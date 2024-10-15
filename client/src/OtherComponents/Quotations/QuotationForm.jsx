@@ -129,7 +129,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
               waste: [
                 "40px",
                 "auto",
-                "40px",
+                "50px",
                 "40px",
                 "70px",
                 "70px",
@@ -140,7 +140,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                 "40px",
                 "auto",
                 "auto",
-                "40px",
+                "50px",
                 "40px",
                 "70px",
                 "70px",

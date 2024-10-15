@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import QuotationTransportationTableHead from "./QuotationTransportationTableHead";
 import QuotationWasteTableHead from "./QuotationWasteTableHead";
+import { formatNumber } from "../Functions";
 
 const QuotationContent = ({
   quotationData,
@@ -160,7 +161,7 @@ const QuotationContent = ({
                     {waste.wasteName}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.quantity ? waste.quantity : 1}
+                    {formatNumber(waste.quantity ? waste.quantity : 1)}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
                     {waste.unit}
@@ -169,7 +170,9 @@ const QuotationContent = ({
                     {waste.unitPrice}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.unitPrice}
+                    {waste.quantity
+                      ? waste.quantity * waste.unitPrice
+                      : waste.unitPrice}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
                     {waste.mode}
@@ -204,7 +207,9 @@ const QuotationContent = ({
                     {transportation.haulingArea}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.quantity ? transportation.quantity : 1}
+                    {formatNumber(
+                      transportation.quantity ? transportation.quantity : 1
+                    )}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
                     {transportation.unit}
@@ -213,7 +218,9 @@ const QuotationContent = ({
                     {transportation.unitPrice}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.unitPrice}
+                    {transportation.quantity
+                      ? transportation.quantity * transportation.unitPrice
+                      : transportation.unitPrice}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
                     {transportation.mode}

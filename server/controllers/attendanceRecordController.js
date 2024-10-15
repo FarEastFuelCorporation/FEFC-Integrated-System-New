@@ -177,7 +177,7 @@ async function getAttendanceRecordController(req, res) {
         })
       );
 
-    res.json({ data: formattedData });
+    res.json({ data: formattedData, results });
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).send("Error fetching data from the database");

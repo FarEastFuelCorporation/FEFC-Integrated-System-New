@@ -17,6 +17,7 @@ const AttendanceRecords = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/attendanceRecord`);
       console.log(response.data.data);
+      console.log(response.data.results);
       setRecords(response.data.data);
       setLoading(false);
     } catch (error) {

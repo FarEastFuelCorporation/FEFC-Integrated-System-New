@@ -38,7 +38,6 @@ const Quotations = ({ user }) => {
     termsBuying: "",
     scopeOfWork: "",
     contactPerson: "",
-    contactPerson: "",
     remarks: "",
     createdBy: user.id,
     quotationWastes: [

@@ -58,6 +58,7 @@ async function getAttendanceRecordController(req, res) {
           minute: "numeric",
           second: "numeric",
           hour12: true,
+          timeZone: "Asia/Manila",
         }
       );
 

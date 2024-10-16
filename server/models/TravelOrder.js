@@ -2,21 +2,50 @@
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database.js");
+const { v4: uuidv4 } = require("uuid");
 
 const TravelOrder = sequelize.define("TravelOrder", {
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
+    defaultValue: () => uuidv4(), // Generate UUID automatically
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
   },
-  employee_id: {
+  employeeId: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+  },
+  destination: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-
-  synced: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false, // Make sure to include this if you're using the synced column
+  purpose: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  departureDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
+  departureTime: {
+    type: DataTypes.TIME,
+    allowNull: true,
+  },
+  arrivalDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
+  arrivalTime: {
+    type: DataTypes.TIME,
+    allowNull: true,
+  },
+  out: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  in: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
 });
 

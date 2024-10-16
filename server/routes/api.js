@@ -7,6 +7,8 @@ const router = express.Router();
 const authRoutes = require("./auth");
 const othersRoutes = require("./others");
 const attendanceRoutes = require("./attendanceRoutes");
+const travelOrderRoutes = require("./travelOrderRoutes");
+const travelOrderVerifyRoutes = require("./travelOrderVerifyRoutes");
 const switchUserRoutes = require("./switchUserRoutes");
 const geoTableRoutes = require("./geoTableRoutes");
 const requestsRoutes = require("./requests");
@@ -59,6 +61,8 @@ router.get("/session", (req, res) => {
 router.use(authRoutes);
 router.use(othersRoutes);
 router.use("/attendance", attendanceRoutes);
+router.use("/travelOrder", travelOrderRoutes);
+router.use("/travelOrderVerify", travelOrderVerifyRoutes);
 router.use("/switchUser", switchUserRoutes);
 router.use("/geoTable", geoTableRoutes);
 router.use("/request", requestsRoutes);

@@ -535,7 +535,7 @@ const Quotations = ({ user }) => {
   }
 
   return (
-    <Box p="20px" width="100% !important">
+    <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Quotations" subtitle="List of Quotations" />

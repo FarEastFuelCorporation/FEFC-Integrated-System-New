@@ -276,7 +276,7 @@ const VehicleMaintenanceRequest = ({ user }) => {
   }
 
   return (
-    <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+    <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header

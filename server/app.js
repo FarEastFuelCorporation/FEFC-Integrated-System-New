@@ -78,70 +78,20 @@ app.use("/hr_Dashboard/*", isAuthenticated);
 
 // Import API routes
 const apiRoutes = require("./routes/api");
-const IdInformationLocal = require("./models/IdInformationLocal");
-const IdInformation = require("./models/IdInformation");
 
 // Use the /api prefix for all API routes
 app.use("/api", apiRoutes);
-
-async function fetchCloudData() {
-  return await IdInformationLocal.findAll(); // Get all records from YourTableName
-}
-
-async function insertIntoLocalDatabase(data) {
-  console.log("Data to be inserted:", data); // Log the data
-  return await IdInformation.bulkCreate(data, {
-    updateOnDuplicate: [
-      "employee_id",
-      "first_name",
-      "middle_name",
-      "last_name",
-      "affix",
-      "type_of_employee",
-      "designation",
-      "url",
-      "birthday",
-      "contact_number",
-      "address",
-      "sss_no",
-      "pag_ibig_no",
-      "philhealth_no",
-      "tin_no",
-      "contact_person",
-      "contact_person_number",
-      "contact_person_address",
-      "address2",
-      "contact_person_address2",
-      "date_expire",
-      "profile_picture",
-      "signature",
-    ],
-  });
-}
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
-    // await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: false });
     console.log("Models synced successfully.");
   } catch (error) {
     console.error("Error syncing models:", error);
   }
 }
-
-// async function syncData() {
-//   try {
-//     const cloudData = await fetchCloudData();
-//     const formattedData = cloudData.map((item) => item.toJSON()); // Convert to plain objects
-//     await insertIntoLocalDatabase(formattedData);
-//     console.log("Data synced successfully from YourTableName");
-//   } catch (error) {
-//     console.error("Error syncing data:", error);
-//   }
-// }
-
-// syncData();
 
 // Call the function to initialize the application
 initializeApp();

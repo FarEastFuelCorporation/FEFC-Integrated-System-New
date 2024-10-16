@@ -49,6 +49,7 @@ const PlasticInventory = require("../models/PlasticInventory");
 const Attendance = require("../models/Attendance");
 const ViolationList = require("../models/ViolationList");
 const Violation = require("../models/Violation");
+const TravelOrder = require("../models/TravelOrder");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -119,6 +120,19 @@ Employee.hasMany(User, {
   onDelete: "CASCADE",
 });
 User.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(TravelOrder, {
+  as: "TravelOrder",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+TravelOrder.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "employeeId",
   targetKey: "employeeId",

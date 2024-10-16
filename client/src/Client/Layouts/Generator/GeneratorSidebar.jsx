@@ -206,6 +206,7 @@ const GeneratorSidebar = ({ user }) => {
 
   return (
     <Box
+      position="relative"
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,

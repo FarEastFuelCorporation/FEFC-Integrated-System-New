@@ -23,10 +23,11 @@ import BillingVerify from "./OtherComponents/BillingStatement/BillingVerify";
 import VerifyPlasticCredit from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticCredit";
 import VerifyPlasticWasteDiversion from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticWasteDiversion";
 import Attendance from "./OtherComponents/Sections/attendance";
+import VerifyTravelOrder from "./Employee/Layouts/Employee/screens/travelOrder/VerifyTravelOrder";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  
+
   const [user, setUser] = useState(null); // State to hold user information
   const [loading, setLoading] = useState(false); // State to indicate loading
   const [theme, colorMode] = useMode();
@@ -87,6 +88,10 @@ const App = () => {
             element={<VerifyPlasticWasteDiversion />}
           />
           <Route path="/billing/:id" element={<BillingVerify />} />
+          <Route
+            path="/travelOrderVerify/:id"
+            element={<VerifyTravelOrder />}
+          />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           {user ? (

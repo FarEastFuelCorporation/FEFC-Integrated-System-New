@@ -54,6 +54,31 @@ export const formatDate2 = (dateString) => {
   return `${day}-${month}-${year}`;
 };
 
+export function formatDate3(dateString) {
+  const date = new Date(dateString);
+
+  // Options for formatting the date
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+
+  // Return the formatted date as "Month Day, Year"
+  return date.toLocaleDateString("en-US", options);
+}
+
+export function formatDate4(isoString) {
+  // Convert the ISO string to a Date object
+  const date = new Date(isoString);
+
+  // Define formatting options for month, day, and year
+  const options = { year: "numeric", month: "long", day: "numeric" };
+
+  // Format the date to 'October 16, 2024'
+  return date.toLocaleDateString("en-US", options);
+}
+
 export const formatDateFull = (date) => {
   // Check if date is null, undefined, or invalid
   if (!date || isNaN(new Date(date).getTime())) {
@@ -83,6 +108,41 @@ export const formatTime = (dateString) => {
   ).padStart(2, "0")} ${ampm}`;
   return formattedTime;
 };
+
+export function formatTime2(timeString) {
+  const [hours, minutes] = timeString.split(":"); // Split time into hours and minutes
+  const date = new Date();
+  date.setHours(hours, minutes); // Set hours and minutes in the date object
+
+  // Format the time to "h:mm AM/PM"
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  return date.toLocaleTimeString("en-US", options);
+}
+
+export function formatTime3(isoString) {
+  // Create a new Date object from the ISO string
+  const date = new Date(isoString);
+
+  // Get the hours, minutes, and seconds
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+
+  // Determine AM or PM
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  // Convert 24-hour format to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // If hour is 0, make it 12
+
+  // Return formatted time
+  return `${hours}:${minutes}:${seconds} ${ampm}`;
+}
 
 export const calculateRemainingDays = (expirationDate) => {
   if (expirationDate === null) {

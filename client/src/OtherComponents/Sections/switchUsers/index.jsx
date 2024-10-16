@@ -102,16 +102,11 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
         <Header title="User Role" subtitle="List of User roles" />
       </Box>
 
-      <CustomDataGridStyles>
+      <CustomDataGridStyles margin={0} height={"70vh"}>
         <DataGrid
           rows={employeeRoles ? employeeRoles : []}
           columns={columns}
           getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
-            },
-          }}
         />
       </CustomDataGridStyles>
     </Box>

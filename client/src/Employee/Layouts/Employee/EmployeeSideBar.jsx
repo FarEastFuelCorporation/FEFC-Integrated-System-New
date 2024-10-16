@@ -122,6 +122,16 @@ const EmployeeSideBar = ({ user }) => {
           setSelected={setSelected}
           navigate={"profile"}
         />
+        {user.role === "employee" && (
+          <BottomNavItem
+            label="Switch User"
+            value="switchUser"
+            icon={AccountCircleIcon}
+            selected={selected}
+            setSelected={setSelected}
+            navigate={"switchUser"}
+          />
+        )}
       </BottomNavigation>
     </Paper>
   ) : (
@@ -142,6 +152,7 @@ const EmployeeSideBar = ({ user }) => {
         "& .pro-menu-item.active": {
           color: "#6870fa !important",
         },
+        display: "flex",
       }}
     >
       <ProSidebar collapsed={isCollapsed}>
@@ -162,7 +173,7 @@ const EmployeeSideBar = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  MARKETING
+                  EMPLOYEE
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
@@ -239,6 +250,16 @@ const EmployeeSideBar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
+            {user.role === "employee" && (
+              <Item
+                title="Switch User"
+                to="switchUser"
+                icon={<AccountCircleIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
+            )}
           </Box>
         </Menu>
       </ProSidebar>

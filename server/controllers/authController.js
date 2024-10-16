@@ -48,6 +48,8 @@ async function createEmployeeSignupController(req, res) {
     const userType =
       employeeRoles.length > 0 ? employeeRoles[0].employeeRoleId : 1;
 
+    const role = employeeRoles.length > 0 ? "employee" : "defaultRole";
+
     const employeeDetails = await Employee.findOne({
       where: { employeeId },
       attributes: [
@@ -69,6 +71,7 @@ async function createEmployeeSignupController(req, res) {
     req.session.user = {
       id: newUser.employeeId,
       userType: userType,
+      role: role,
       employeeDetails: employeeDetails,
       employeePicture: employeePicture,
     };
@@ -78,6 +81,7 @@ async function createEmployeeSignupController(req, res) {
       user: {
         id: newUser.employeeId,
         userType: userType,
+        role: role,
         employeeDetails: employeeDetails,
         employeePicture: employeePicture,
       },
@@ -117,6 +121,8 @@ async function createEmployeeLoginController(req, res) {
     const userType =
       employeeRoles.length > 0 ? employeeRoles[0].employeeRoleId : 1;
 
+    const role = employeeRoles.length > 0 ? "employee" : "defaultRole";
+
     const employeeDetails = await Employee.findOne({
       where: { employeeId },
       attributes: [
@@ -138,6 +144,7 @@ async function createEmployeeLoginController(req, res) {
     req.session.user = {
       id: user.employeeId,
       userType: userType,
+      role: role,
       employeeDetails: employeeDetails,
       employeePicture: employeePicture,
     };
@@ -149,6 +156,7 @@ async function createEmployeeLoginController(req, res) {
       user: {
         id: user.employeeId,
         userType: userType,
+        role: role,
         employeeDetails: employeeDetails,
         employeePicture: employeePicture,
       },

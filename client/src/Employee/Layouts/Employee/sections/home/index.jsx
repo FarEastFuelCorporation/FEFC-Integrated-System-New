@@ -50,8 +50,6 @@ const Home = ({ user }) => {
     convertUint8ArrayToBlob();
   }, [user]);
 
-  console.log(user);
-
   return (
     <Box m="20px">
       <LoadingSpinner isLoading={loading} />

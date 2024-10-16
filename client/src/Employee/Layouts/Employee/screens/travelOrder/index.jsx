@@ -65,7 +65,7 @@ const TravelOrder = ({ user }) => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/travelOrder/${user.id}`);
-      console.log(`${apiUrl}/api/travelOrder`);
+
       setRecords(response.data.travelOrders);
       setLoading(false);
     } catch (error) {
@@ -215,7 +215,6 @@ const TravelOrder = ({ user }) => {
 
   const handleShowQRCode = (id) => {
     const qrUrl = `${modify}/travelOrderVerify/${id}`;
-    console.log(qrUrl);
 
     // You can set the QR code URL to the state to display it in a modal or another component.
     setQRCodeUrl(qrUrl);

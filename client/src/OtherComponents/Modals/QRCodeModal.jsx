@@ -17,12 +17,13 @@ const QRCodeModal = ({ open, handleClose, qrCodeUrl }) => (
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        backgroundColor: "white",
       }}
     >
-      <Typography variant="h6" component="h2" gutterBottom>
+      <Typography variant="h6" component="h2" gutterBottom color="black">
         QR Code
       </Typography>
-      {qrCodeUrl && <QRCode value={qrCodeUrl} size={128} />}
+      {qrCodeUrl && <QRCode value={qrCodeUrl} size={200} />}
     </Box>
   </Modal>
 );

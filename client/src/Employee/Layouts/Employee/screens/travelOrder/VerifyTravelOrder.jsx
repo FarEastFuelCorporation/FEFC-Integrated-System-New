@@ -5,7 +5,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import { tokens } from "../../../../../theme";
 import {
-  formatDate,
   formatDate3,
   formatDate4,
   formatTime2,
@@ -27,8 +26,6 @@ const VerifyTravelOrder = () => {
 
   const navigate = useNavigate();
 
-  console.log("pass");
-
   const handleGoBack = () => {
     navigate("/login"); // Navigate back to the previous page
   };
@@ -38,8 +35,6 @@ const VerifyTravelOrder = () => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/travelOrderVerify/${id}`);
 
-      console.log(`${apiUrl}/api/travelOrderVerify/${id}`);
-      console.log(response.data.travelOrder);
       setData(response.data.travelOrder);
 
       // Set a timeout of 5 seconds before setting loading to false

@@ -7,7 +7,7 @@ import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
 
-const Overtime = ({ user }) => {
+const CashAdvance = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [dataRecords, setRecords] = useState([]);
@@ -48,11 +48,11 @@ const Overtime = ({ user }) => {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography sx={{ fontSize: 20 }}>Overtime</Typography>
+        <Typography sx={{ fontSize: 20 }}>Cash Advance</Typography>
       </Box>
       <hr />
     </Box>
   );
 };
 
-export default Overtime;
+export default CashAdvance;

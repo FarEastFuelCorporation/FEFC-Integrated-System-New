@@ -1,17 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import axios from "axios";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
-import { tokens } from "../../../../../theme";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
 
 const Attendance = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const [dataRecords, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +21,7 @@ const Attendance = ({ user }) => {
 
   const fetchData = useCallback(async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
       const response = await axios.get(
         `${apiUrl}/api/attendanceRecord/${user.id}`
       );

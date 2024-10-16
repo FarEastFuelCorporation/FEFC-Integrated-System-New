@@ -106,7 +106,6 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
         <DataGrid
           rows={employeeRoles ? employeeRoles : []}
           columns={columns}
-          components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {

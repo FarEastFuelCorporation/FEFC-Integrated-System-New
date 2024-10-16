@@ -5,6 +5,7 @@ import Home from "../Layouts/Employee/sections/home";
 import Transactions from "../Layouts/Employee/sections/transactions";
 import Profile from "../Layouts/Employee/sections/profile";
 import Attendance from "../Layouts/Employee/screens/attendance";
+import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 
 const EmployeeRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -15,6 +16,10 @@ const EmployeeRoutes = ({ user, onUpdateUser }) => (
       <Route path="profile" element={<Profile user={user} />} />
       {/* Screens */}
       <Route path="attendance" element={<Attendance user={user} />} />
+      <Route
+        path="switchUser"
+        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
+      />
     </Route>
   </Routes>
 );

@@ -23,7 +23,6 @@ const EmployeeSidebarComponent = ({ user }) => {
           overflowY: "scroll",
           scrollbarWidth: "none", // Firefox
           msOverflowStyle: "none", // IE 10+
-          zIndex: -1,
         }}
       >
         {/* Outlet component to render nested routes */}

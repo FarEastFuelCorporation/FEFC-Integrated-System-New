@@ -2,13 +2,13 @@ import React from "react";
 import { Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
-const CustomDataGridStyles = ({ children }) => {
+const CustomDataGridStyles = ({ children, height }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
     <Box
       m="40px 0 0 0"
-      height="75vh"
+      height={height ? height : "75vh"}
       width="100%"
       sx={{
         "& .MuiDataGrid-root": {

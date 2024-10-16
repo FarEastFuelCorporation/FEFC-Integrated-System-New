@@ -85,6 +85,9 @@ const EmployeeSideBar = ({ user }) => {
           setSelected(newValue);
         }}
         sx={{
+          position: "fixed",
+          bottom: 0,
+          zIndex: 99999,
           backgroundColor: colors.primary[400],
           display: "inline-flex", // Align items in a single row
           flexDirection: "row",

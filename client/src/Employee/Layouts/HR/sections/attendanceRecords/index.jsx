@@ -9,7 +9,7 @@ import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 const AttendanceRecords = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const [datarecords, setRecords] = useState([]);
+  const [dataRecords, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -147,7 +147,7 @@ const AttendanceRecords = ({ user }) => {
 
       <CustomDataGridStyles>
         <DataGrid
-          rows={datarecords ? datarecords : []}
+          rows={dataRecords ? dataRecords : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}

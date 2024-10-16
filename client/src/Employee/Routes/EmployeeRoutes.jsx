@@ -4,6 +4,7 @@ import EmployeeSidebarComponent from "../../OtherComponents/EmployeeSidebarCompo
 import Home from "../Layouts/Employee/sections/home";
 import Transactions from "../Layouts/Employee/sections/transactions";
 import Profile from "../Layouts/Employee/sections/profile";
+import Attendance from "../Layouts/Employee/screens/attendance";
 
 const EmployeeRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -12,6 +13,8 @@ const EmployeeRoutes = ({ user, onUpdateUser }) => (
       <Route path="" element={<Home user={user} />} />
       <Route path="transactions" element={<Transactions user={user} />} />
       <Route path="profile" element={<Profile user={user} />} />
+      {/* Screens */}
+      <Route path="attendance" element={<Attendance user={user} />} />
     </Route>
   </Routes>
 );

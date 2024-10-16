@@ -25,7 +25,7 @@ function isToday(date) {
   );
 }
 
-async function getAttendanceRecordController(req, res) {
+async function getAttendanceRecordsController(req, res) {
   try {
     const results = await Attendance.findAll({
       include: [
@@ -215,6 +215,25 @@ async function getAttendanceRecordController(req, res) {
   }
 }
 
+async function getAttendanceRecordController(req, res) {
+  try {
+    const id = req.params.id;
+
+    const results = await Attendance.findAll({
+      where: {
+        employee_id: id, // Filter by employee_id
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({ results });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Error fetching data from the database");
+  }
+}
+
 module.exports = {
+  getAttendanceRecordsController,
   getAttendanceRecordController,
 };

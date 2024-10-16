@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import SickIcon from "@mui/icons-material/Sick";
 import RestoreIcon from "@mui/icons-material/Restore";
@@ -56,32 +56,26 @@ const Home = ({ user }) => {
           <NavIcon
             icon={<i className="fa-solid fa-clipboard-user"></i>}
             label={"Attendance"}
-            to={"attendance"}
           />
           <NavIcon
             icon={<MoreTimeIcon sx={{ fontSize: "30px" }} />}
             label={"Overtime"}
-            to={"overtime"}
           />
           <NavIcon
             icon={<RestoreIcon sx={{ fontSize: "30px" }} />}
             label={"Undertime"}
-            to={"undertime"}
           />
           <NavIcon
             icon={<SickIcon sx={{ fontSize: "30px" }} />}
             label={"Leave"}
-            to={"leave"}
           />
           <NavIcon
             icon={<i className="fa-solid fa-car-side"></i>}
             label={"Travel Order"}
-            to={"travelOrder"}
           />
           <NavIcon
             icon={<i className="fa-solid fa-sack-dollar"></i>}
             label={"Cash Advance"}
-            to={"cashAdvance"}
           />
         </Box>
       </Box>

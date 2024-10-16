@@ -19,10 +19,11 @@ const EmployeeSidebarComponent = ({ user }) => {
       <div
         style={{
           width: "100%",
-          height: "calc(100vh - 64px)", // Adjust for margin-top
+          height: "calc(100vh - 126px)", // Adjust for margin-top
           overflowY: "scroll",
           scrollbarWidth: "none", // Firefox
           msOverflowStyle: "none", // IE 10+
+          zIndex: -1,
         }}
       >
         {/* Outlet component to render nested routes */}

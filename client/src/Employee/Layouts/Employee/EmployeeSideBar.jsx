@@ -30,6 +30,7 @@ const EmployeeSideBar = ({ user }) => {
       "/dashboard": "Home",
       "/dashboard/transactions": "Transactions",
       "/dashboard/profile": "Profile",
+      "/dashboard/switchUser": "Switch User",
     }),
     []
   );
@@ -125,7 +126,7 @@ const EmployeeSideBar = ({ user }) => {
         {user.role === "employee" && (
           <BottomNavItem
             label="Switch User"
-            value="switchUser"
+            value="Switch User"
             icon={AccountCircleIcon}
             selected={selected}
             setSelected={setSelected}

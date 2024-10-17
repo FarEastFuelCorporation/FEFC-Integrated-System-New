@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import "react-pro-sidebar/dist/css/styles.css";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  BottomNavigation,
+  Box,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -15,6 +20,8 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
 const CertificationSidebar = ({ user }) => {
   const theme = useTheme();
@@ -74,7 +81,110 @@ const CertificationSidebar = ({ user }) => {
     setIsCollapsed(!isCollapsed);
   };
 
-  return (
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return isMobile ? (
+    <Box
+      sx={{
+        width: "100%",
+        overflowX: "auto", // Enable horizontal scrolling
+        whiteSpace: "nowrap", // Prevent items from wrapping to the next line
+        position: "fixed",
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // IE 10+
+        bottom: 0,
+        zIndex: 1300,
+        backgroundColor: colors.primary[400],
+      }}
+    >
+      <BottomNavigation
+        value={selected}
+        onChange={(event, newValue) => {
+          setSelected(newValue);
+        }}
+        sx={{
+          display: "inline-flex", // Align items in a single row
+          flexDirection: "row",
+          "& .Mui-selected": {
+            color: colors.greenAccent[400], // Apply custom color to selected action
+          },
+        }}
+      >
+        <BottomNavItem
+          label="Dashboard"
+          value="Dashboard"
+          icon={HomeOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={""}
+        />
+        <BottomNavItem
+          label="Transactions"
+          value="Transactions"
+          icon={PointOfSaleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"transactions"}
+        />
+        <BottomNavItem
+          label="Plastic Transactions"
+          value="Plastic Transactions"
+          icon={RecyclingIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"plasticTransactions"}
+        />
+        <BottomNavItem
+          label="Clients"
+          value="Clients"
+          icon={PeopleOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"clients"}
+        />
+        <BottomNavItem
+          label="Treatment Process"
+          value="Treatment Process"
+          icon={FireplaceIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"treatmentProcess"}
+        />
+        <BottomNavItem
+          label="Type of Wastes"
+          value="Type of Wastes"
+          icon={FormatListBulletedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"typeOfWastes"}
+        />
+        <BottomNavItem
+          label="Documents"
+          value="Documents"
+          icon={TopicIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"documents"}
+        />
+        <BottomNavItem
+          label="Calendar"
+          value="Calendar"
+          icon={CalendarTodayOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"calendar"}
+        />
+        <BottomNavItem
+          label="Switch User"
+          value="Switch User"
+          icon={AccountCircleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"switchUser"}
+        />
+      </BottomNavigation>
+    </Box>
+  ) : (
     <Box
       sx={{
         "& .pro-sidebar-inner": {

@@ -80,7 +80,7 @@ const Home = ({ user }) => {
             <Typography sx={{ fontSize: 12 }}>
               {user?.employeeDetails?.department}
             </Typography>
-            <Typography sx={{ fontSize: 12 }}>Employee User</Typography>
+            <Typography sx={{ fontSize: 12 }}>Leader User</Typography>
           </Box>
         </Box>
       </Box>

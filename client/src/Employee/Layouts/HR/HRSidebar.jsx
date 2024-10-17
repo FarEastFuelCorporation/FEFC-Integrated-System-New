@@ -1,8 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import "react-pro-sidebar/dist/css/styles.css";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  BottomNavigation,
+  Box,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -16,32 +21,9 @@ import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-
-const Item = ({ title, to, icon, selected, setSelected }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    setSelected(title);
-    navigate(to);
-  };
-
-  return (
-    <MenuItem
-      active={selected === title} // Apply 'active' prop based on selected state
-      style={{
-        color: colors.grey[100],
-        backgroundColor:
-          selected === title ? colors.primary[500] : "transparent", // Apply background color based on active state
-      }}
-      onClick={handleClick}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-    </MenuItem>
-  );
-};
+import Item from "../../../OtherComponents/Item";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
 const HRSidebar = ({ user }) => {
   const theme = useTheme();
@@ -103,7 +85,134 @@ const HRSidebar = ({ user }) => {
     setIsCollapsed(!isCollapsed);
   };
 
-  return (
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return isMobile ? (
+    <Box
+      sx={{
+        width: "100%",
+        overflowX: "auto", // Enable horizontal scrolling
+        whiteSpace: "nowrap", // Prevent items from wrapping to the next line
+        position: "fixed",
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // IE 10+
+        bottom: 0,
+        zIndex: 1300,
+        backgroundColor: colors.primary[400],
+      }}
+    >
+      <BottomNavigation
+        value={selected}
+        onChange={(event, newValue) => {
+          setSelected(newValue);
+        }}
+        sx={{
+          display: "inline-flex", // Align items in a single row
+          flexDirection: "row",
+          "& .Mui-selected": {
+            color: colors.greenAccent[400], // Apply custom color to selected action
+          },
+        }}
+      >
+        <BottomNavItem
+          label="Dashboard"
+          value="Dashboard"
+          icon={HomeOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={""}
+        />
+        <BottomNavItem
+          label="Departments"
+          value="Departments"
+          icon={PeopleOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"departments"}
+        />
+        <BottomNavItem
+          label="Employee Records"
+          value="Employee Records"
+          icon={ContactsOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"employee"}
+        />
+        <BottomNavItem
+          label="Attendance Records"
+          value="Attendance Records"
+          icon={AssignmentIndIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"attendanceRecords"}
+        />
+        <BottomNavItem
+          label="Documents"
+          value="Documents"
+          icon={TopicIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"documents"}
+        />
+        <BottomNavItem
+          label="Calendar"
+          value="Calendar"
+          icon={CalendarTodayOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"calendar"}
+        />
+        <BottomNavItem
+          label="Switch User"
+          value="Switch User"
+          icon={AccountCircleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"switchUser"}
+        />
+        <BottomNavItem
+          label="FAQ Page"
+          value="FAQ Page"
+          icon={HelpOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"faq"}
+        />
+        <BottomNavItem
+          label="Bar Chart"
+          value="Bar Chart"
+          icon={BarChartOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"bar"}
+        />
+        <BottomNavItem
+          label="Pie Chart"
+          value="Pie Chart"
+          icon={PieChartOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"pie"}
+        />
+        <BottomNavItem
+          label="Line Chart"
+          value="Line Chart"
+          icon={TimelineOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"line"}
+        />
+        <BottomNavItem
+          label="Switch User"
+          value="Switch User"
+          icon={AccountCircleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"switchUser"}
+        />
+      </BottomNavigation>
+    </Box>
+  ) : (
     <Box
       sx={{
         "& .pro-sidebar-inner": {

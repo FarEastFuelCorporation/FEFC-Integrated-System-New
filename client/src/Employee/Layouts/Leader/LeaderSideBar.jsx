@@ -1,45 +1,38 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
+import "react-pro-sidebar/dist/css/styles.css";
 import {
-  BottomNavigation,
   Box,
   IconButton,
   Typography,
   useTheme,
+  BottomNavigation,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import RecyclingIcon from "@mui/icons-material/Recycling";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import TopicIcon from "@mui/icons-material/Topic";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Paper from "@mui/material/Paper";
 import Item from "../../../OtherComponents/Item";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
-const AccountingHeadSidebar = ({ user }) => {
+const LeaderSideBar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathToTitleMap = useMemo(
     () => ({
-      "/dashboard/dashboard": "Dashboard",
-      "/dashboard/clients": "Clients",
-      "/dashboard/typeOfWastes": "Type Of Wastes",
-      "/dashboard/quotations": "Quotations",
+      "/dashboard": "Home",
       "/dashboard/transactions": "Transactions",
-      "/dashboard/documents": "Documents",
-      "/dashboard/calendar": "Calendar",
-      "/dashboard/switchUser": "Switch User",
+      "/dashboard/profile": "Profile",
     }),
     []
-  ); // No dependencies, as this is a static object
+  );
 
   const initialSelected = pathToTitleMap[location.pathname] || "Dashboard";
   const [selected, setSelected] = useState(initialSelected);
@@ -82,35 +75,32 @@ const AccountingHeadSidebar = ({ user }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return isMobile ? (
-    <Box
-      sx={{
-        width: "100%",
-        overflowX: "auto", // Enable horizontal scrolling
-        whiteSpace: "nowrap", // Prevent items from wrapping to the next line
-        position: "fixed",
-        scrollbarWidth: "none", // Firefox
-        msOverflowStyle: "none", // IE 10+
-        bottom: 0,
-        zIndex: 1300,
-        backgroundColor: colors.primary[400],
-      }}
+    <Paper
+      sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+      elevation={3}
     >
       <BottomNavigation
+        showLabels
         value={selected}
         onChange={(event, newValue) => {
           setSelected(newValue);
         }}
         sx={{
+          position: "fixed",
+          bottom: 0,
+          zIndex: 99999,
+          backgroundColor: colors.primary[400],
           display: "inline-flex", // Align items in a single row
           flexDirection: "row",
           "& .Mui-selected": {
             color: colors.greenAccent[400], // Apply custom color to selected action
           },
+          width: "100%",
         }}
       >
         <BottomNavItem
-          label="Dashboard"
-          value="Dashboard"
+          label="Home"
+          value="Home"
           icon={HomeOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
@@ -125,63 +115,30 @@ const AccountingHeadSidebar = ({ user }) => {
           navigate={"transactions"}
         />
         <BottomNavItem
-          label="Clients"
-          value="Clients"
+          label="Profile"
+          value="Profile"
           icon={PeopleOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"clients"}
+          navigate={"profile"}
         />
-        <BottomNavItem
-          label="Type of Wastes"
-          value="Type of Wastes"
-          icon={RecyclingIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"typeOfWastes"}
-        />
-        <BottomNavItem
-          label="Quotations"
-          value="Quotations"
-          icon={FormatListBulletedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"quotations"}
-        />
-        <BottomNavItem
-          label="Documents"
-          value="Documents"
-          icon={TopicIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"documents"}
-        />
-        <BottomNavItem
-          label="Calendar"
-          value="Calendar"
-          icon={CalendarTodayOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"calendar"}
-        />
-        <BottomNavItem
-          label="Switch User"
-          value="Switch User"
-          icon={AccountCircleIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"switchUser"}
-        />
+        {user.role === "employee" && (
+          <BottomNavItem
+            label="Switch User"
+            value="switchUser"
+            icon={AccountCircleIcon}
+            selected={selected}
+            setSelected={setSelected}
+            navigate={"switchUser"}
+          />
+        )}
       </BottomNavigation>
-    </Box>
+    </Paper>
   ) : (
     <Box
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
-        },
-        "& .pro-sidebar-layout": {
-          scrollbarWidth: "none",
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -195,6 +152,7 @@ const AccountingHeadSidebar = ({ user }) => {
         "& .pro-menu-item.active": {
           color: "#6870fa !important",
         },
+        display: "flex",
       }}
     >
       <ProSidebar collapsed={isCollapsed}>
@@ -215,7 +173,7 @@ const AccountingHeadSidebar = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  ACCOUNTING HEAD
+                  EMPLOYEE
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
@@ -269,7 +227,7 @@ const AccountingHeadSidebar = ({ user }) => {
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
-              title="Dashboard"
+              title="Home"
               to=""
               icon={<HomeOutlinedIcon />}
               selected={selected}
@@ -283,71 +241,25 @@ const AccountingHeadSidebar = ({ user }) => {
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            ></Item>
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
+            />
             <Item
-              title="Clients"
-              to="clients"
+              title="Profile"
+              to="profile"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-            <Item
-              title="Type Of Wastes"
-              to="typeOfWastes"
-              icon={<RecyclingIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Quotations"
-              to="quotations"
-              icon={<FormatListBulletedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-
-            <Item
-              title="Documents"
-              to="documents"
-              icon={<TopicIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
-
-            <Item
-              title="Calendar"
-              to="calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Switch User"
-              to="switchUser"
-              icon={<AccountCircleIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
+            {user.role === "employee" && (
+              <Item
+                title="Switch User"
+                to="switchUser"
+                icon={<AccountCircleIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
+            )}
           </Box>
         </Menu>
       </ProSidebar>
@@ -355,4 +267,4 @@ const AccountingHeadSidebar = ({ user }) => {
   );
 };
 
-export default AccountingHeadSidebar;
+export default LeaderSideBar;

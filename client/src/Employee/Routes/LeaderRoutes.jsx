@@ -1,18 +1,18 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import UserSidebar from "../../OtherComponents/UserSidebar";
-import Home from "../Layouts/Employee/sections/home";
-import Transactions from "../Layouts/Employee/sections/transactions";
-import Profile from "../Layouts/Employee/sections/profile";
-import Attendance from "../Layouts/Employee/screens/attendance";
+import Home from "../Layouts/Leader/sections/home";
+import Transactions from "../Layouts/Leader/sections/transactions";
+import Profile from "../Layouts/Leader/sections/profile";
+import Attendance from "../Layouts/Leader/screens/attendance";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
-import Overtime from "../Layouts/Employee/screens/overtime";
-import Undertime from "../Layouts/Employee/screens/undertime";
-import Leave from "../Layouts/Employee/screens/leave";
-import TravelOrder from "../Layouts/Employee/screens/travelOrder";
-import CashAdvance from "../Layouts/Employee/screens/cashAdvance";
+import Overtime from "../Layouts/Leader/screens/overtime";
+import Undertime from "../Layouts/Leader/screens/undertime";
+import Leave from "../Layouts/Leader/screens/leave";
+import TravelOrder from "../Layouts/Leader/screens/travelOrder";
+import CashAdvance from "../Layouts/Leader/screens/cashAdvance";
 
-const EmployeeRoutes = ({ user, onUpdateUser }) => (
+const LeaderRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebar user={user} />}>
@@ -34,4 +34,4 @@ const EmployeeRoutes = ({ user, onUpdateUser }) => (
   </Routes>
 );
 
-export default EmployeeRoutes;
+export default LeaderRoutes;

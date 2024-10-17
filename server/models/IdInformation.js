@@ -16,6 +16,15 @@ const IdInformation = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    immediateHeadId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    employeeStatus: {
+      type: DataTypes.ENUM,
+      values: ["ACTIVE", "INACTIVE"],
+      defaultValue: "ACTIVE",
+    },
     first_name: {
       type: DataTypes.STRING,
       allowNull: false,

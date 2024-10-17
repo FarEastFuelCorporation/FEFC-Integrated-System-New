@@ -1,5 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@emotion/react";
 import GeneratorSidebar from "../Client/Layouts/Generator/GeneratorSidebar";
 import MarketingSidebar from "../Employee/Layouts/Marketing/MarketingSidebar";
 import DispatchingSidebar from "../Employee/Layouts/Dispatching/DispatchingSidebar";
@@ -14,14 +16,26 @@ import CollectionSidebar from "../Employee/Layouts/Collection/CollectionSidebar"
 import MessengerSidebar from "../Employee/Layouts/Messenger/MessengerSidebar";
 import SafetySidebar from "../Employee/Layouts/Safety/SafetySidebar";
 import WarehouseSidebar from "../Employee/Layouts/Warehouse/WarehouseSidebar";
+import EmployeeSideBar from "../Employee/Layouts/Employee/EmployeeSideBar";
+import LeaderSideBar from "../Employee/Layouts/Leader/LeaderSideBar";
 
 const UserSidebar = ({ user }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   let sidebar;
+
   switch (user.userType) {
     case "GEN":
     case "TRP":
     case "IFM":
       sidebar = <GeneratorSidebar user={user} />;
+      break;
+    case 0:
+      sidebar = <LeaderSideBar user={user} />;
+      break;
+    case 1:
+      sidebar = <EmployeeSideBar user={user} />;
       break;
     case 2:
       sidebar = <MarketingSidebar user={user} />;
@@ -63,21 +77,53 @@ const UserSidebar = ({ user }) => {
       sidebar = <WarehouseSidebar user={user} />;
       break;
     default:
-      sidebar = <MarketingSidebar user={user} />;
+      sidebar = <EmployeeSideBar user={user} />;
   }
 
   return (
-    <div style={{ display: "flex", width: "100%", marginTop: "64px" }}>
-      <div>{sidebar}</div>
-      <div
-        style={{
-          width: "100%",
-          height: "calc(100vh - 64px)",
-          overflowY: "scroll",
-        }}
-      >
-        <Outlet style={{ overflow: "none" }} />
-      </div>
+    <div>
+      {isMobile ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            marginTop: "64px",
+          }}
+        >
+          {/* Bottom navigation bar */}
+          {sidebar}
+
+          {/* Main content area */}
+          <div
+            style={{
+              width: "100%",
+              height: "calc(100vh - 126px)", // Adjust for margin-top
+              overflowY: "scroll",
+              scrollbarWidth: "none", // Firefox
+              msOverflowStyle: "none", // IE 10+
+            }}
+          >
+            {/* Outlet component to render nested routes */}
+            <div style={{ overflow: "none" }}>
+              <Outlet />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", width: "100%", marginTop: "64px" }}>
+          {sidebar}
+          <div
+            style={{
+              width: "100%",
+              height: "calc(100vh - 64px)",
+              overflowY: "scroll",
+            }}
+          >
+            <Outlet style={{ overflow: "none" }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

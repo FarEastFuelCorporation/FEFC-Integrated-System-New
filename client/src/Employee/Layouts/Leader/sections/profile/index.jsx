@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import MoreTimeIcon from "@mui/icons-material/MoreTime";
-import SickIcon from "@mui/icons-material/Sick";
-import RestoreIcon from "@mui/icons-material/Restore";
 import { tokens } from "../../../../../theme";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
-import NavIcon from "../../../../../OtherComponents/NavIcon";
 
-const Home = ({ user }) => {
+const Profile = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(true); // Add loading state
@@ -80,85 +76,11 @@ const Home = ({ user }) => {
             <Typography sx={{ fontSize: 12 }}>
               {user?.employeeDetails?.department}
             </Typography>
-            <Typography sx={{ fontSize: 12 }}>Employee User</Typography>
           </Box>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          mt: 3,
-          backgroundColor: colors.blueAccent[700],
-          borderRadius: "10px",
-          padding: "10px",
-        }}
-      >
-        <Typography sx={{ fontSize: 20 }}>Shortcuts</Typography>
-        <hr />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "start",
-            flexWrap: "wrap",
-            columnGap: "30px",
-          }}
-        >
-          <NavIcon
-            icon={<i className="fa-solid fa-clipboard-user"></i>}
-            label={"Attendance"}
-            to={"attendance"}
-          />
-          <NavIcon
-            icon={<MoreTimeIcon sx={{ fontSize: "30px" }} />}
-            label={"Overtime"}
-            to={"overtime"}
-          />
-          <NavIcon
-            icon={<RestoreIcon sx={{ fontSize: "30px" }} />}
-            label={"Undertime"}
-            to={"undertime"}
-          />
-          <NavIcon
-            icon={<SickIcon sx={{ fontSize: "30px" }} />}
-            label={"Leave"}
-            to={"leave"}
-          />
-          <NavIcon
-            icon={<i className="fa-solid fa-car-side"></i>}
-            label={"Travel Order"}
-            to={"travelOrder"}
-          />
-          <NavIcon
-            icon={<i className="fa-solid fa-sack-dollar"></i>}
-            label={"Cash Advance"}
-            to={"cashAdvance"}
-          />
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          mt: 3,
-          backgroundColor: colors.blueAccent[700],
-          borderRadius: "10px",
-          padding: "10px",
-        }}
-      >
-        <Typography sx={{ fontSize: 20 }}>Announcements</Typography>
-        <hr />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-          }}
-        >
-          <Typography sx={{ fontSize: 12 }}>
-            No Announcements for today
-          </Typography>
         </Box>
       </Box>
     </Box>
   );
 };
 
-export default Home;
+export default Profile;

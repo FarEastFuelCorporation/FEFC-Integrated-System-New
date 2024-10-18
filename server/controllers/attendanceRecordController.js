@@ -290,7 +290,7 @@ async function getAttendanceRecordSubordinatesController(req, res) {
           ],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["createdAt", "ASC"]],
       right: true, // Ensure to include IdInformation rows without attendance
     });
 
@@ -371,6 +371,8 @@ async function getAttendanceRecordSubordinatesController(req, res) {
         }
       }
     });
+
+    console.log(attendanceMap);
 
     const weeklyData = {};
     let index = 0;
@@ -499,13 +501,13 @@ async function getAttendanceRecordSubordinatesController(req, res) {
           employee_name: `${subordinate.last_name}, ${subordinate.first_name} ${subordinate.affix} ${subordinate.middle_name}`,
           designation: subordinate.designation,
           birthday: subordinate.birthday,
-          Monday: "No attendance",
-          Tuesday: "No attendance",
-          Wednesday: "No attendance",
-          Thursday: "No attendance",
-          Friday: "No attendance",
-          Saturday: "No attendance",
-          Sunday: "No attendance",
+          Monday: "",
+          Tuesday: "",
+          Wednesday: "",
+          Thursday: "",
+          Friday: "",
+          Saturday: "",
+          Sunday: "",
         };
 
         // Push the empty attendance record into formattedData
@@ -517,7 +519,7 @@ async function getAttendanceRecordSubordinatesController(req, res) {
     formattedData.sort((a, b) => a.employee_id - b.employee_id); // Sorting by employee_id
 
     // Send the final response with the updated formattedData
-    res.json({ data: formattedData, results });
+    res.json({ data: formattedData, attendanceMap, results });
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).send("Error fetching data from the database");

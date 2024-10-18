@@ -26,6 +26,8 @@ const Attendance = ({ user }) => {
         `${apiUrl}/api/attendanceRecord/subordinates/${user.id}`
       );
 
+      console.log(response.data.results);
+      console.log(response.data.attendanceMap);
       console.log(response.data.data);
       setRecords(response.data.data);
       setLoading(false);

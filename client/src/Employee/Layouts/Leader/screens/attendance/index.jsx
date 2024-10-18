@@ -23,10 +23,11 @@ const Attendance = ({ user }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${apiUrl}/api/attendanceRecord/${user.id}`
+        `${apiUrl}/api/attendanceRecord/subordinates/${user.id}`
       );
 
-      setRecords(response.data.results);
+      console.log(response.data.data);
+      setRecords(response.data.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -45,48 +46,103 @@ const Attendance = ({ user }) => {
 
   const columns = [
     {
-      field: "formattedDate", // Custom field for date
-      headerName: "Date",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
-      valueGetter: (params) => {
-        const date = new Date(params.row.createdAt);
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "formattedTime", // Custom field for time
-      headerName: "Time",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
-      valueGetter: (params) => {
-        const date = new Date(params.row.createdAt);
-        return date.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24 PM"
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "status",
-      headerName: "Status",
+      field: "employee_id",
+      headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
       width: 100,
       renderCell: renderCellWithWrapText,
     },
+    {
+      field: "employee_name",
+      headerName: "Employee Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "designation",
+      headerName: "Designation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "weekNumber",
+      headerName: "Week Number",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Monday",
+      headerName: "Monday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Tuesday",
+      headerName: "Tuesday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Wednesday",
+      headerName: "Wednesday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Thursday",
+      headerName: "Thursday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Friday",
+      headerName: "Friday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Saturday",
+      headerName: "Saturday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Sunday",
+      headerName: "Sunday",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    // {
+    //   field: "daysOfWork",
+    //   headerName: "# of Days Worked",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   width: 125,
+    //   renderCell: renderCellWithWrapText,
+    // },
   ];
 
   return (

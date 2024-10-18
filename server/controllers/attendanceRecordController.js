@@ -252,6 +252,15 @@ async function getAttendanceRecordSubordinatesController(req, res) {
           ],
         },
       },
+      attributes: [
+        "employee_id",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "affix",
+        "designation",
+        "birthday",
+      ],
     });
 
     // Extract subordinate IDs from the result
@@ -259,14 +268,7 @@ async function getAttendanceRecordSubordinatesController(req, res) {
       (subordinate) => subordinate.employee_id
     );
 
-    console.log(subordinates);
-
-    // If there are no subordinates, return an empty result
-    if (subordinateIds.length === 0) {
-      return res.json({ results: [] });
-    }
-
-    // Step 2: Find attendance records for the specific subordinate IDs
+    // Step 2: Find attendance records for the specific subordinate IDs (LEFT JOIN)
     const results = await Attendance.findAll({
       where: {
         employee_id: {
@@ -289,9 +291,16 @@ async function getAttendanceRecordSubordinatesController(req, res) {
         },
       ],
       order: [["createdAt", "DESC"]],
+      right: true, // Ensure to include IdInformation rows without attendance
     });
 
     const attendanceMap = {};
+
+    // Step 3: Process attendance records and include employees without attendance
+    subordinates.forEach((subordinate) => {
+      const employeeId = subordinate.employee_id;
+      attendanceMap[employeeId] = {}; // Initialize with empty attendance for every employee
+    });
 
     // First, group TIME-IN and TIME-OUT entries for each employee per day
     results.forEach((row) => {
@@ -368,6 +377,9 @@ async function getAttendanceRecordSubordinatesController(req, res) {
 
     // Now group by week and organize by day
     Object.keys(attendanceMap).forEach((employeeId) => {
+      const employee = subordinates.find(
+        (subordinate) => subordinate.employee_id === employeeId
+      );
       Object.keys(attendanceMap[employeeId]).forEach((dayKey) => {
         const date = new Date(dayKey);
         const weekNumber = getWeekNumber(date);
@@ -380,16 +392,13 @@ async function getAttendanceRecordSubordinatesController(req, res) {
         }
 
         if (!weeklyData[weekNumber][employeeId]) {
-          const employeeDetails = results.find(
-            (row) => row.employee_id === employeeId
-          ).IdInformation;
           weeklyData[weekNumber][employeeId] = {
             id: ++index,
             weekNumber,
-            employee_id: employeeDetails.employee_id,
-            employee_name: `${employeeDetails.last_name}, ${employeeDetails.first_name} ${employeeDetails.affix} ${employeeDetails.middle_name}`,
-            designation: employeeDetails.designation,
-            birthday: employeeDetails.birthday,
+            employee_id: employee.employee_id,
+            employee_name: `${employee.last_name}, ${employee.first_name} ${employee.affix} ${employee.middle_name}`,
+            designation: employee.designation,
+            birthday: employee.birthday,
             Monday: [],
             Tuesday: [],
             Wednesday: [],
@@ -420,6 +429,8 @@ async function getAttendanceRecordSubordinatesController(req, res) {
       });
     });
 
+    console.log(weeklyData);
+
     // Format the final output
     const formattedData = Object.keys(weeklyData)
       .sort((a, b) => b - a)
@@ -434,8 +445,14 @@ async function getAttendanceRecordSubordinatesController(req, res) {
             "Saturday",
             "Sunday",
           ];
+
           dayLabels.forEach((dayLabel) => {
-            if (employeeData[dayLabel].length > 0) {
+            if (
+              !employeeData[dayLabel] ||
+              employeeData[dayLabel].length === 0
+            ) {
+            } else {
+              // Format the attendance data for days that have records
               employeeData[dayLabel] = employeeData[dayLabel]
                 .map(({ timeIn, timeOut }) => {
                   if (timeOut === null) {
@@ -446,14 +463,60 @@ async function getAttendanceRecordSubordinatesController(req, res) {
                   return `${timeIn} / ${timeOut}`;
                 })
                 .join("; "); // Multiple pairs are joined with a semicolon
-            } else {
-              employeeData[dayLabel] = null; // No entries for this day
             }
           });
+
           return employeeData;
         })
       );
 
+    // After constructing formattedData, ensure all subordinates are included
+    subordinates.forEach((subordinate) => {
+      const employeeId = subordinate.employee_id;
+
+      // Check if the employee_id exists in formattedData
+      const existingEmployee = formattedData.find(
+        (employeeData) => employeeData.employee_id === employeeId
+      );
+
+      // If the employee is not present in the formattedData, add a default empty record
+      if (!existingEmployee) {
+        let weekNumber = null;
+
+        // Try to get the weekNumber from a co-employee in the same formattedData
+        const coEmployee = formattedData.find(
+          (employeeData) => employeeData.weekNumber !== null
+        );
+
+        if (coEmployee) {
+          weekNumber = coEmployee.weekNumber; // Get the weekNumber from a co-employee
+        }
+
+        const emptyAttendanceRecord = {
+          id: ++index,
+          weekNumber: weekNumber, // Assign the same weekNumber as the co-employee
+          employee_id: employeeId,
+          employee_name: `${subordinate.last_name}, ${subordinate.first_name} ${subordinate.affix} ${subordinate.middle_name}`,
+          designation: subordinate.designation,
+          birthday: subordinate.birthday,
+          Monday: "No attendance",
+          Tuesday: "No attendance",
+          Wednesday: "No attendance",
+          Thursday: "No attendance",
+          Friday: "No attendance",
+          Saturday: "No attendance",
+          Sunday: "No attendance",
+        };
+
+        // Push the empty attendance record into formattedData
+        formattedData.push(emptyAttendanceRecord);
+      }
+    });
+
+    // Sort the final formattedData (if necessary)
+    formattedData.sort((a, b) => a.employee_id - b.employee_id); // Sorting by employee_id
+
+    // Send the final response with the updated formattedData
     res.json({ data: formattedData, results });
   } catch (error) {
     console.error("Error fetching data:", error);

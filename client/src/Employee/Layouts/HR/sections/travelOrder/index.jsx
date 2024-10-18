@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, IconButton } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Header from "../Header";
 import axios from "axios";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
-import { DataGrid } from "@mui/x-data-grid";
-import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 
 const TravelOrder = ({ user }) => {
@@ -16,25 +15,18 @@ const TravelOrder = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate();
-
-  const handleBackClick = () => {
-    navigate(-1); // Navigate to the previous page
-  };
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${apiUrl}/api/travelOrder/subordinate/${user.id}`
-      );
+      const response = await axios.get(`${apiUrl}/api/travelOrder`);
 
+      console.log(response.data.travelOrders);
       setRecords(response.data.travelOrders);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl, user.id]);
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchData();
@@ -51,7 +43,7 @@ const TravelOrder = ({ user }) => {
 
     try {
       setLoading(true);
-      await axios.put(`${apiUrl}/api/travelOrder/subordinateApproved/${id}`);
+      await axios.put(`${apiUrl}/api/travelOrder/subordinateApproved2/${id}`);
 
       fetchData();
       setSuccessMessage("Travel Order Approved Successfully!");
@@ -73,7 +65,9 @@ const TravelOrder = ({ user }) => {
 
     try {
       setLoading(true);
-      await axios.put(`${apiUrl}/api/travelOrder/subordinateDisapproved/${id}`);
+      await axios.put(
+        `${apiUrl}/api/travelOrder/subordinateDisapproved2/${id}`
+      );
 
       fetchData();
       setSuccessMessage("Travel Order Approved Successfully!");
@@ -92,14 +86,34 @@ const TravelOrder = ({ user }) => {
 
   const columns = [
     {
-      field: "employeeName",
+      field: "employeeId",
+      headerName: "Employee ID",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "employee_name",
       headerName: "Employee Name",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
       valueGetter: (params) => {
         return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "designation",
+      headerName: "Designation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return params.row.Employee.designation;
       },
       renderCell: renderCellWithWrapText,
     },
@@ -194,6 +208,7 @@ const TravelOrder = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
     },
+
     {
       field: "Approval",
       headerName: "Approval",
@@ -203,6 +218,21 @@ const TravelOrder = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         if (!params.row.isApproved) {
+          return "FOR APPROVAL";
+        }
+        return params.row.isApproved;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "isNoted",
+      headerName: "Noted",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      valueGetter: (params) => {
+        if (!params.row.isNoted && params.row.isApproved) {
           return (
             <>
               <IconButton
@@ -219,21 +249,6 @@ const TravelOrder = ({ user }) => {
               </IconButton>
             </>
           );
-        }
-        return params.row.isApproved;
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "isNoted",
-      headerName: "Noted",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      valueGetter: (params) => {
-        if (!params.row.isNoted && params.row.isApproved) {
-          return "WAITING FOR APPROVAL";
         }
         return params.row.isNoted;
       },
@@ -292,29 +307,20 @@ const TravelOrder = ({ user }) => {
   return (
     <Box m="20px" position="relative">
       <LoadingSpinner isLoading={loading} />
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <IconButton
-            color="error" // Set the color to error (red)
-            onClick={handleBackClick}
-            sx={{ m: 0 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography sx={{ fontSize: 20 }}>Travel Order</Typography>
-        </Box>
+      <Box display="flex" justifyContent="space-between">
+        <Header title="Travel Order" subtitle="List of Travel Orders" />
       </Box>
-      <hr />
       {showSuccessMessage && (
         <SuccessMessage
           message={successMessage}
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}
+          components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
         />
       </CustomDataGridStyles>

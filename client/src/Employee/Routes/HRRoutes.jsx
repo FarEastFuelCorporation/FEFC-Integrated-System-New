@@ -11,6 +11,7 @@ import Bar from "../../Employee/Layouts/HR/sections/bar";
 import Pie from "../../Employee/Layouts/HR/sections/pie";
 import Line from "../../Employee/Layouts/HR/sections/line";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import TravelOrder from "../Layouts/HR/sections/travelOrder";
 import Documents from "../../OtherComponents/Sections/documents";
 
 const HRRoutes = ({ user, onUpdateUser }) => (
@@ -23,6 +24,7 @@ const HRRoutes = ({ user, onUpdateUser }) => (
         path="attendanceRecords"
         element={<AttendanceRecords user={user} />}
       />
+      <Route path="travelOrder" element={<TravelOrder user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

@@ -15,6 +15,16 @@ const TravelOrder = sequelize.define("TravelOrder", {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
+  isApproved: {
+    type: DataTypes.ENUM,
+    values: ["APPROVED", "DISAPPROVED"],
+    allowNull: true,
+  },
+  isNoted: {
+    type: DataTypes.ENUM,
+    values: ["APPROVED", "DISAPPROVED"],
+    allowNull: true,
+  },
   destination: {
     type: DataTypes.STRING,
     allowNull: false,

@@ -15,11 +15,8 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -36,13 +33,10 @@ const HRSidebar = ({ user }) => {
       "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
       "/dashboard/attendanceRecords": "Attendance Records",
+      "/dashboard/travelOrder": "Travel Order",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
-      "/dashboard/faq": "FAQ Page",
-      "/dashboard/bar": "Bar Chart",
-      "/dashboard/pie": "Pie Chart",
-      "/dashboard/line": "Line Chart",
     }),
     []
   ); // No dependencies, as this is a static object
@@ -147,6 +141,14 @@ const HRSidebar = ({ user }) => {
           navigate={"attendanceRecords"}
         />
         <BottomNavItem
+          label="Travel Order"
+          value="Travel Order"
+          icon={LocalShippingIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"travelOrder"}
+        />
+        <BottomNavItem
           label="Documents"
           value="Documents"
           icon={TopicIcon}
@@ -161,46 +163,6 @@ const HRSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"calendar"}
-        />
-        <BottomNavItem
-          label="Switch User"
-          value="Switch User"
-          icon={AccountCircleIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"switchUser"}
-        />
-        <BottomNavItem
-          label="FAQ Page"
-          value="FAQ Page"
-          icon={HelpOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"faq"}
-        />
-        <BottomNavItem
-          label="Bar Chart"
-          value="Bar Chart"
-          icon={BarChartOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"bar"}
-        />
-        <BottomNavItem
-          label="Pie Chart"
-          value="Pie Chart"
-          icon={PieChartOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"pie"}
-        />
-        <BottomNavItem
-          label="Line Chart"
-          value="Line Chart"
-          icon={TimelineOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"line"}
         />
         <BottomNavItem
           label="Switch User"
@@ -343,6 +305,14 @@ const HRSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
+              title="Travel Order"
+              to="travelOrder"
+              icon={<i className="fa-solid fa-car-side"></i>}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
               title="Documents"
               to="documents"
               icon={<TopicIcon />}
@@ -369,45 +339,6 @@ const HRSidebar = ({ user }) => {
               title="Switch User"
               to="switchUser"
               icon={<AccountCircleIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="FAQ Page"
-              to="faq"
-              icon={<HelpOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Pie Chart"
-              to="pie"
-              icon={<PieChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Line Chart"
-              to="line"
-              icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

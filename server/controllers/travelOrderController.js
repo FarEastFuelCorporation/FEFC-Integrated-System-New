@@ -1,6 +1,7 @@
 // controllers/travelOrderController.js
 
 const Employee = require("../models/Employee");
+const IdInformation = require("../models/IdInformation");
 const TravelOrder = require("../models/TravelOrder");
 
 // Create Travel Order controller
@@ -52,7 +53,19 @@ async function getTravelOrdersController(req, res) {
   try {
     // Fetch all travelOrders from the database
     const travelOrders = await TravelOrder.findAll({
-      order: [["typeOfScrap", "ASC"]],
+      include: {
+        model: Employee,
+        as: "Employee",
+        attributes: [
+          "firstName",
+          "middleName",
+          "lastName",
+          "affix",
+          "department",
+          "designation",
+        ],
+      },
+      order: [["createdAt", "DESC"]],
     });
 
     res.json({ travelOrders });
@@ -81,12 +94,45 @@ async function getTravelOrderController(req, res) {
   }
 }
 
-// Get Travel Order IN/OUT controller
-async function getTravelOrderInOutController(req, res) {
+const { Op } = require("sequelize");
+
+// Get Travel Order Subordinate controller
+async function getTravelOrderSubordinateController(req, res) {
   try {
     const id = req.params.id;
+
+    // Step 1: Find all subordinates based on the immediateHeadId
+    const subordinates = await IdInformation.findAll({
+      where: {
+        immediateHeadId: {
+          [Op.or]: [
+            { [Op.like]: `${id},%` }, // id at the start
+            { [Op.like]: `%,${id},%` }, // id in the middle
+            { [Op.like]: `%,${id}` }, // id at the end
+            { [Op.like]: `${id}` }, // id is the only value
+          ],
+        },
+      },
+      attributes: [
+        "employee_id",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "affix",
+        "designation",
+        "birthday",
+      ],
+    });
+
+    // Extract subordinate IDs from the result
+    const subordinateIds = subordinates.map(
+      (subordinate) => subordinate.employee_id
+    );
+
+    console.log(subordinateIds);
+
     // Fetch all travelOrders from the database
-    const travelOrders = await TravelOrder.findByPk(id, {
+    const travelOrders = await TravelOrder.findAll({
       include: {
         model: Employee,
         as: "Employee",
@@ -98,6 +144,11 @@ async function getTravelOrderInOutController(req, res) {
           "department",
           "designation",
         ],
+      },
+      where: {
+        employeeId: {
+          [Op.in]: subordinateIds, // Only get attendance for these subordinate IDs
+        },
       },
     });
 
@@ -158,46 +209,118 @@ async function updateTravelOrderController(req, res) {
   }
 }
 
-// Update Travel Order controller
-async function updateTravelOrderInOutController(req, res) {
+// Update Travel Order Subordinate Approved controller
+async function updateTravelOrderSubordinateApprovedController(req, res) {
   try {
     const id = req.params.id;
     console.log("Updating travel order with ID:", id);
 
     // Find the travel order by ID and update it
-    const updatedTravelOrder = await TravelOrder.findByPk(id, {
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: [
-          "firstName",
-          "middleName",
-          "lastName",
-          "affix",
-          "department",
-          "designation",
-        ],
-      },
-    });
-
-    const timestamp = new Date();
+    const updatedTravelOrder = await TravelOrder.findByPk(id);
 
     if (updatedTravelOrder) {
-      if (updatedTravelOrder.out) {
-        // Update travel order attributes
-        updatedTravelOrder.in = timestamp;
-      }
-      if (!updatedTravelOrder.out) {
-        // Update travel order attributes
-        updatedTravelOrder.out = timestamp;
-      }
+      // Update travel order attributes
+      updatedTravelOrder.isApproved = "APPROVED";
 
       // Save the updated travel order
       await updatedTravelOrder.save();
 
-      // Respond with the updated travel order data
+      // Respond with a success message
       res.json({
-        updatedTravelOrder,
+        message: `TravelOrder with ID ${id} updated successfully`,
+      });
+    } else {
+      // If travel order with the specified ID was not found
+      res.status(404).json({ message: `Travel order with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating travel order:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Update Travel Order Subordinate Disapproved controller
+async function updateTravelOrderSubordinateDisapprovedController(req, res) {
+  try {
+    const id = req.params.id;
+    console.log("Updating travel order with ID:", id);
+
+    // Find the travel order by ID and update it
+    const updatedTravelOrder = await TravelOrder.findByPk(id);
+
+    if (updatedTravelOrder) {
+      // Update travel order attributes
+      updatedTravelOrder.isApproved = "DISAPPROVED";
+
+      // Save the updated travel order
+      await updatedTravelOrder.save();
+
+      // Respond with a success message
+      res.json({
+        message: `TravelOrder with ID ${id} updated successfully`,
+      });
+    } else {
+      // If travel order with the specified ID was not found
+      res.status(404).json({ message: `Travel order with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating travel order:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Update Travel Order Subordinate Approved 2 controller
+async function updateTravelOrderSubordinateApproved2Controller(req, res) {
+  try {
+    const id = req.params.id;
+    console.log("Updating travel order with ID:", id);
+
+    // Find the travel order by ID and update it
+    const updatedTravelOrder = await TravelOrder.findByPk(id);
+
+    if (updatedTravelOrder) {
+      // Update travel order attributes
+      updatedTravelOrder.isNoted = "APPROVED";
+
+      // Save the updated travel order
+      await updatedTravelOrder.save();
+
+      // Respond with a success message
+      res.json({
+        message: `TravelOrder with ID ${id} updated successfully`,
+      });
+    } else {
+      // If travel order with the specified ID was not found
+      res.status(404).json({ message: `Travel order with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating travel order:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Update Travel Order Subordinate Disapproved 2 controller
+async function updateTravelOrderSubordinateDisapproved2Controller(req, res) {
+  try {
+    const id = req.params.id;
+    console.log("Updating travel order with ID:", id);
+
+    // Find the travel order by ID and update it
+    const updatedTravelOrder = await TravelOrder.findByPk(id);
+
+    if (updatedTravelOrder) {
+      // Update travel order attributes
+      updatedTravelOrder.isNoted = "DISAPPROVED";
+
+      // Save the updated travel order
+      await updatedTravelOrder.save();
+
+      // Respond with a success message
+      res.json({
+        message: `TravelOrder with ID ${id} updated successfully`,
       });
     } else {
       // If travel order with the specified ID was not found
@@ -243,8 +366,11 @@ module.exports = {
   createTravelOrderController,
   getTravelOrdersController,
   getTravelOrderController,
-  getTravelOrderInOutController,
+  getTravelOrderSubordinateController,
   updateTravelOrderController,
-  updateTravelOrderInOutController,
+  updateTravelOrderSubordinateApprovedController,
+  updateTravelOrderSubordinateDisapprovedController,
+  updateTravelOrderSubordinateApproved2Controller,
+  updateTravelOrderSubordinateDisapproved2Controller,
   deleteTravelOrderController,
 };

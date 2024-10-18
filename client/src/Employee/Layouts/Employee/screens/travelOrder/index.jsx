@@ -320,8 +320,38 @@ const TravelOrder = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "Approval",
+      headerName: "Approval",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      valueGetter: (params) => {
+        if (!params.row.isApproved) {
+          return "WAITING FOR APPROVAL";
+        }
+        return params.row.isApproved;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "isNoted",
+      headerName: "Noted",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      valueGetter: (params) => {
+        if (!params.row.isNoted) {
+          return "WAITING FOR APPROVAL";
+        }
+        return params.row.isNoted;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "formattedOut",
-      headerName: "Out",
+      headerName: "Actual Out",
       headerAlign: "center",
       align: "center",
       width: 120,
@@ -345,7 +375,7 @@ const TravelOrder = ({ user }) => {
     },
     {
       field: "formattedIn",
-      headerName: "In",
+      headerName: "Actual In",
       headerAlign: "center",
       align: "center",
       width: 120,
@@ -374,15 +404,17 @@ const TravelOrder = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleShowQRCode(params.row.id)} // Call the function to show QR code
-        >
-          Show QR
-        </Button>
-      ),
+      renderCell: (params) =>
+        params.row.isApproved &&
+        params.row.isNoted && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleShowQRCode(params.row.id)}
+          >
+            Show QR
+          </Button>
+        ),
     },
     {
       field: "edit",
@@ -391,14 +423,15 @@ const TravelOrder = ({ user }) => {
       align: "center",
       sortable: false,
       width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
-          <EditIcon />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.isApproved && (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
     },
     {
       field: "delete",
@@ -407,14 +440,15 @@ const TravelOrder = ({ user }) => {
       align: "center",
       sortable: false,
       width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        !params.row.isApproved && (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
     },
   ];
 

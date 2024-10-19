@@ -24,6 +24,7 @@ import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridS
 import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const Leave = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -55,6 +56,8 @@ const Leave = ({ user }) => {
   const [sickLeaveCount, setSickLeaveCount] = useState(0);
   const [vacationLeaveCount, setVacationLeaveCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
   const navigate = useNavigate();
 
@@ -249,18 +252,15 @@ const Leave = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Leave?"
-    );
+  const handleConfirmDelete = (id) => {
+    setIdToDelete(id);
+    setOpenDialog(true);
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleDeleteClick = async () => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/leave/${id}`);
+      await axios.delete(`${apiUrl}/api/leave/${idToDelete}`);
 
       fetchData();
       setSuccessMessage("Leave Deleted Successfully!");
@@ -454,7 +454,7 @@ const Leave = ({ user }) => {
         !params.row.isApproved && (
           <IconButton
             color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
+            onClick={() => handleConfirmDelete(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -484,6 +484,11 @@ const Leave = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={handleDeleteClick}
+      />
       <Box
         sx={{
           display: "flex",

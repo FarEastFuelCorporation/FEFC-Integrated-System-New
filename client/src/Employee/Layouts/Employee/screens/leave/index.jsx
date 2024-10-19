@@ -268,6 +268,9 @@ const Leave = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
+      setIdToDelete(null); // Clear the leave ID
     }
   };
 

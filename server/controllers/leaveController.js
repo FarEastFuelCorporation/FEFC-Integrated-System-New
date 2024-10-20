@@ -153,6 +153,7 @@ async function getLeaveSubordinateController(req, res) {
           [Op.in]: subordinateIds, // Only get attendance for these subordinate IDs
         },
       },
+      order: [["createdAt", "DESC"]],
     });
 
     res.json({ leaves });
@@ -196,11 +197,9 @@ async function updateLeaveController(req, res) {
       // Save the updated travel order
       await updatedLeave.save();
 
-      const leaves = await Leave.findAll();
-
-      // Respond with the updated travel order data
+      // Respond with a success message
       res.json({
-        leaves,
+        message: `Leave with ID ${id} updated successfully`,
       });
     } else {
       // If travel order with the specified ID was not found

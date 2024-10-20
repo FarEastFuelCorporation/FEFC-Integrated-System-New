@@ -6,12 +6,10 @@ import Departments from "../../OtherComponents/Sections/departments";
 import Contacts from "../../Employee/Layouts/HR/sections/contacts";
 import AttendanceRecords from "../Layouts/HR/sections/attendanceRecords";
 import Calendar from "../../Employee/Layouts/HR/sections/calendar";
-import FAQ from "../../Employee/Layouts/HR/sections/faq";
-import Bar from "../../Employee/Layouts/HR/sections/bar";
-import Pie from "../../Employee/Layouts/HR/sections/pie";
-import Line from "../../Employee/Layouts/HR/sections/line";
+
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import TravelOrder from "../Layouts/HR/sections/travelOrder";
+import Leave from "../Layouts/HR/sections/leave";
 import Documents from "../../OtherComponents/Sections/documents";
 
 const HRRoutes = ({ user, onUpdateUser }) => (
@@ -25,16 +23,13 @@ const HRRoutes = ({ user, onUpdateUser }) => (
         element={<AttendanceRecords user={user} />}
       />
       <Route path="travelOrder" element={<TravelOrder user={user} />} />
+      <Route path="leave" element={<Leave user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"
         element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
       />
-      <Route path="faq" element={<FAQ />} />
-      <Route path="bar" element={<Bar />} />
-      <Route path="pie" element={<Pie />} />
-      <Route path="line" element={<Line />} />
     </Route>
   </Routes>
 );

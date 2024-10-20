@@ -118,6 +118,8 @@ const UserSidebar = ({ user }) => {
               width: "100%",
               height: "calc(100vh - 64px)",
               overflowY: "scroll",
+              scrollbarWidth: "none", // Firefox
+              msOverflowStyle: "none", // IE 10+
             }}
           >
             <Outlet style={{ overflow: "none" }} />

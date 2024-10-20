@@ -190,7 +190,7 @@ const Departments = ({ user }) => {
     },
   ];
 
-  if (user.userType === 9) {
+  if (user.userType === 12) {
     columns.push(
       {
         field: "edit",
@@ -232,7 +232,7 @@ const Departments = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Departments" subtitle="List of Departments" />
-        {user.userType === 9 && (
+        {user.userType === 12 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
               <PostAddIcon sx={{ fontSize: "40px" }} />

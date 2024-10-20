@@ -49,6 +49,9 @@ const CustomDataGridStyles = ({ children, height, margin = "40px 0 0 0" }) => {
           alignItems: "center",
           justifyContent: "center",
         },
+        "& .MuiDataGrid-overlayWrapper": {
+          minHeight: "30px",
+        },
       }}
     >
       {children}

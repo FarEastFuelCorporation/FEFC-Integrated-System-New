@@ -308,7 +308,7 @@ const TravelOrder = ({ user }) => {
     <Box m="20px" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
-        <Header title="Travel Order" subtitle="List of Travel Orders" />
+        <Header title="Travel Order Records" subtitle="List of Travel Orders" />
       </Box>
       {showSuccessMessage && (
         <SuccessMessage

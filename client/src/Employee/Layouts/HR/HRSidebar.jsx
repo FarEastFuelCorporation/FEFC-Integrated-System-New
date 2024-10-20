@@ -16,6 +16,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import Item from "../../../OtherComponents/Item";
@@ -34,6 +35,7 @@ const HRSidebar = ({ user }) => {
       "/dashboard/employee": "Employee Records",
       "/dashboard/attendanceRecords": "Attendance Records",
       "/dashboard/travelOrder": "Travel Order",
+      "/dashboard/leave": "Leave",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -125,7 +127,7 @@ const HRSidebar = ({ user }) => {
           navigate={"departments"}
         />
         <BottomNavItem
-          label="Employee Records"
+          label="Employee"
           value="Employee Records"
           icon={ContactsOutlinedIcon}
           selected={selected}
@@ -133,7 +135,7 @@ const HRSidebar = ({ user }) => {
           navigate={"employee"}
         />
         <BottomNavItem
-          label="Attendance Records"
+          label="Attendance"
           value="Attendance Records"
           icon={AssignmentIndIcon}
           selected={selected}
@@ -147,6 +149,14 @@ const HRSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"travelOrder"}
+        />
+        <BottomNavItem
+          label="Leave"
+          value="Leave"
+          icon={AirportShuttleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"leave"}
         />
         <BottomNavItem
           label="Documents"
@@ -305,9 +315,17 @@ const HRSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
-              title="Travel Order"
+              title="Travel Order Records"
               to="travelOrder"
-              icon={<i className="fa-solid fa-car-side"></i>}
+              icon={<LocalShippingIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Leave Records"
+              to="leave"
+              icon={<AirportShuttleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

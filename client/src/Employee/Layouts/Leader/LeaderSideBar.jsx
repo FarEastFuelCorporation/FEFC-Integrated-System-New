@@ -174,7 +174,7 @@ const LeaderSideBar = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  EMPLOYEE
+                  LEADER
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />

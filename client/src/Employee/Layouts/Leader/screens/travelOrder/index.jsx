@@ -104,6 +104,18 @@ const TravelOrder = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "designation",
+      headerName: "Designation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params) => {
+        return params.row.Employee.designation;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "destination",
       headerName: "Destination",
       headerAlign: "center",

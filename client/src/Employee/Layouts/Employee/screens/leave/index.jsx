@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PostAddIcon from "@mui/icons-material/PostAdd";
 import SickIcon from "@mui/icons-material/Sick";
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
@@ -57,7 +56,8 @@ const Leave = ({ user }) => {
   const [vacationLeaveCount, setVacationLeaveCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
-  const [idToDelete, setIdToDelete] = useState(null);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const navigate = useNavigate();
 
@@ -70,16 +70,22 @@ const Leave = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/leave/${user.id}`);
 
-      console.log(response.data.leaves);
-
       const leaves = response.data.leaves;
 
       const sickLeaveCount = leaves
-        .filter((leave) => leave.typeOfLeave === "SICK LEAVE")
+        .filter(
+          (leave) =>
+            leave.typeOfLeave === "SICK LEAVE" &&
+            leave.isApproved !== "DISAPPROVED"
+        )
         .reduce((total, leave) => total + (leave.duration || 0), 0);
 
       const vacationLeaveCount = leaves
-        .filter((leave) => leave.typeOfLeave === "VACATION LEAVE")
+        .filter(
+          (leave) =>
+            leave.typeOfLeave === "VACATION LEAVE" &&
+            leave.isApproved !== "DISAPPROVED"
+        )
         .reduce((total, leave) => total + (leave.duration || 0), 0);
 
       setRecords(response.data.leaves);
@@ -95,6 +101,62 @@ const Leave = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
+  const handleInputChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
+    },
+    [formData]
+  );
+
+  const handleDateChange = useCallback(
+    (e) => {
+      handleInputChange(e);
+
+      const { startDate, endDate, isHalfDay } = {
+        ...formData,
+        [e.target.name]: e.target.value,
+      };
+
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (end < start) {
+          // Set error message and show the error
+          setErrorMessage("End date cannot be earlier than the start date.");
+          setShowErrorMessage(true);
+
+          // Reset the duration to prevent invalid data
+          setFormData((prevData) => ({
+            ...prevData,
+            duration: "",
+          }));
+        } else {
+          // Calculate the difference in time and convert it to days
+          const diffTime = Math.abs(end - start);
+          let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include the start date
+
+          // Adjust duration if isHalfDay is checked
+          if (isHalfDay) {
+            diffDays -= 0.5; // Subtract 0.5 if it's a half-day leave
+          }
+
+          // Clear the error message and update the duration
+          setErrorMessage("");
+          setShowErrorMessage(false);
+
+          // Update the duration in the formData
+          setFormData((prevData) => ({
+            ...prevData,
+            duration: diffDays,
+          }));
+        }
+      }
+    },
+    [formData, handleInputChange]
+  );
+
   useEffect(() => {
     // Trigger date recalculation whenever isHalfDay changes
     if (formData.startDate && formData.endDate) {
@@ -105,7 +167,12 @@ const Leave = ({ user }) => {
         },
       });
     }
-  }, [formData.isHalfDay]);
+  }, [
+    formData.isHalfDay,
+    formData.startDate,
+    formData.endDate,
+    handleDateChange,
+  ]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -118,11 +185,6 @@ const Leave = ({ user }) => {
 
   const clearFormData = () => {
     setFormData(initialFormData);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
   };
 
   const handleSickLeaveClick = (id) => {
@@ -207,60 +269,16 @@ const Leave = ({ user }) => {
     }
   };
 
-  const handleDateChange = (e) => {
-    handleInputChange(e);
-
-    const { startDate, endDate, isHalfDay } = {
-      ...formData,
-      [e.target.name]: e.target.value,
-    };
-
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      if (end < start) {
-        // Set error message and show the error
-        setErrorMessage("End date cannot be earlier than the start date.");
-        setShowErrorMessage(true);
-
-        // Reset the duration to prevent invalid data
-        setFormData((prevData) => ({
-          ...prevData,
-          duration: "",
-        }));
-      } else {
-        // Calculate the difference in time and convert it to days
-        const diffTime = Math.abs(end - start);
-        let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Add 1 to include the start date
-
-        // Adjust duration if isHalfDay is checked
-        if (isHalfDay) {
-          diffDays -= 0.5; // Subtract 0.5 if it's a half-day leave
-        }
-
-        // Clear the error message and update the duration
-        setErrorMessage("");
-        setShowErrorMessage(false);
-
-        // Update the duration in the formData
-        setFormData((prevData) => ({
-          ...prevData,
-          duration: diffDays,
-        }));
-      }
-    }
-  };
-
-  const handleConfirmDelete = (id) => {
-    setIdToDelete(id);
+  const handleDeleteClick = (id) => {
     setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Leave?");
+    setDialogAction(() => () => handleConfirmDelete(id));
   };
 
-  const handleDeleteClick = async () => {
+  const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/leave/${idToDelete}`);
+      await axios.delete(`${apiUrl}/api/leave/${id}`);
 
       fetchData();
       setSuccessMessage("Leave Deleted Successfully!");
@@ -270,7 +288,6 @@ const Leave = ({ user }) => {
       console.error("Error:", error);
     } finally {
       setOpenDialog(false); // Close the dialog
-      setIdToDelete(null); // Clear the leave ID
     }
   };
 
@@ -430,6 +447,21 @@ const Leave = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "isNoted",
+      headerName: "Noted",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      valueGetter: (params) => {
+        if (!params.row.isNoted) {
+          return "WAITING FOR APPROVAL";
+        }
+        return params.row.isNoted;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "edit",
       headerName: "Edit",
       headerAlign: "center",
@@ -457,7 +489,7 @@ const Leave = ({ user }) => {
         !params.row.isApproved && (
           <IconButton
             color="error"
-            onClick={() => handleConfirmDelete(params.row.id)}
+            onClick={() => handleDeleteClick(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -490,7 +522,8 @@ const Leave = ({ user }) => {
       <ConfirmationDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
-        onConfirm={handleDeleteClick}
+        onConfirm={dialogAction}
+        text={dialog}
       />
       <Box
         sx={{

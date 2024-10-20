@@ -1,20 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import {
-  Box,
-  IconButton,
-  Tab,
-  Tabs,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, IconButton, Tab, Tabs, useTheme } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Header from "../Header";
 import axios from "axios";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
-import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
-import { DataGrid } from "@mui/x-data-grid";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
-import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 import { tokens } from "../../../../../theme";
 
 const Leave = ({ user }) => {
@@ -28,26 +19,15 @@ const Leave = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialog, setDialog] = useState(false);
-  const [dialogAction, setDialogAction] = useState(false);
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
-  const navigate = useNavigate();
-
-  const handleBackClick = () => {
-    navigate(-1); // Navigate to the previous page
-  };
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${apiUrl}/api/leave/subordinate/${user.id}`
-      );
+      const response = await axios.get(`${apiUrl}/api/leave`);
 
       setRecords(response.data.leaves);
 
@@ -89,22 +69,24 @@ const Leave = ({ user }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl, user.id]);
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const handleApprovedClick = (id) => {
-    setDialog("Are you sure you want to Approved this Leave?");
-    setDialogAction(() => () => handleConfirmApproved(id));
-    setOpenDialog(true);
-  };
+  const handleApprovedClick = async (id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to Approved this Leave?"
+    );
 
-  const handleConfirmApproved = async (id) => {
+    if (!isConfirmed) {
+      return; // Abort the deletion if the user cancels
+    }
+
     try {
       setLoading(true);
-      await axios.put(`${apiUrl}/api/leave/subordinateApproved/${id}`);
+      await axios.put(`${apiUrl}/api/leave/subordinateApproved2/${id}`);
 
       fetchData();
       setSuccessMessage("Leave Approved Successfully!");
@@ -112,21 +94,21 @@ const Leave = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
-    } finally {
-      setOpenDialog(false); // Close the dialog
     }
   };
 
-  const handleDisapprovedClick = (id) => {
-    setDialog("Are you sure you want to Disapproved this Leave?");
-    setDialogAction(() => () => handleConfirmDisapproved(id));
-    setOpenDialog(true);
-  };
+  const handleDisapprovedClick = async (id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to Disapproved this Leave?"
+    );
 
-  const handleConfirmDisapproved = async (id) => {
+    if (!isConfirmed) {
+      return; // Abort the deletion if the user cancels
+    }
+
     try {
       setLoading(true);
-      await axios.put(`${apiUrl}/api/leave/subordinateDisapproved/${id}`);
+      await axios.put(`${apiUrl}/api/leave/subordinateDisapproved2/${id}`);
 
       fetchData();
       setSuccessMessage("Leave Approved Successfully!");
@@ -134,8 +116,6 @@ const Leave = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
-    } finally {
-      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -146,6 +126,14 @@ const Leave = ({ user }) => {
   );
 
   const columns = [
+    {
+      field: "employeeId",
+      headerName: "Employee ID",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithWrapText,
+    },
     {
       field: "employeeName",
       headerName: "Employee Name",
@@ -243,9 +231,25 @@ const Leave = ({ user }) => {
       headerName: "Approval",
       headerAlign: "center",
       align: "center",
+      sortable: false,
       width: 100,
       valueGetter: (params) => {
         if (!params.row.isApproved) {
+          return "FOR APPROVAL";
+        }
+        return params.row.isApproved;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "isNoted",
+      headerName: "Noted",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      valueGetter: (params) => {
+        if (!params.row.isNoted && params.row.isApproved) {
           return (
             <>
               <IconButton
@@ -263,27 +267,6 @@ const Leave = ({ user }) => {
             </>
           );
         }
-        return params.row.isApproved;
-      },
-      renderCell: renderCellWithWrapText,
-      sortComparator: (v1, v2, params1, params2) => {
-        console.log(params1.row.isApproved);
-        if (params1.row.isApproved === null) return -1;
-        if (params2.row.isApproved === null) return 1;
-        return params1.row.isApproved - params2.row.isApproved;
-      },
-    },
-    {
-      field: "isNoted",
-      headerName: "Noted",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 100,
-      valueGetter: (params) => {
-        if (!params.row.isNoted && params.row.isApproved) {
-          return "WAITING FOR APPROVAL";
-        }
         return params.row.isNoted;
       },
       renderCell: renderCellWithWrapText,
@@ -296,7 +279,7 @@ const Leave = ({ user }) => {
       headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      width: 100,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -371,32 +354,16 @@ const Leave = ({ user }) => {
   return (
     <Box m="20px" position="relative">
       <LoadingSpinner isLoading={loading} />
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <IconButton
-            color="error" // Set the color to error (red)
-            onClick={handleBackClick}
-            sx={{ m: 0 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography sx={{ fontSize: 20 }}>Leave</Typography>
-        </Box>
+      <Box display="flex" justifyContent="space-between">
+        <Header title="Leave Records" subtitle="List of Leaves" />
       </Box>
-      <hr />
       {showSuccessMessage && (
         <SuccessMessage
           message={successMessage}
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <ConfirmationDialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        onConfirm={dialogAction}
-        text={dialog}
-      />
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles height={"65vh"}>
         <hr />
         <Tabs
           value={selectedTab}
@@ -416,11 +383,11 @@ const Leave = ({ user }) => {
           <Tab label={"Summary"} />
         </Tabs>
         <hr />
-
         {selectedTab === 0 && (
           <DataGrid
             rows={dataRecords ? dataRecords : []}
             columns={columns}
+            components={{ Toolbar: GridToolbar }}
             getRowId={(row) => row.id}
           />
         )}
@@ -428,6 +395,7 @@ const Leave = ({ user }) => {
           <DataGrid
             rows={dataRecords2 ? dataRecords2 : []}
             columns={columns2}
+            components={{ Toolbar: GridToolbar }}
             getRowId={(row) => row.employeeId}
           />
         )}

@@ -25,6 +25,11 @@ const Leave = sequelize.define("Leave", {
     values: ["APPROVED", "DISAPPROVED"],
     allowNull: true,
   },
+  isNoted: {
+    type: DataTypes.ENUM,
+    values: ["APPROVED", "DISAPPROVED"],
+    allowNull: true,
+  },
   startDate: {
     type: DataTypes.DATEONLY,
     allowNull: false,

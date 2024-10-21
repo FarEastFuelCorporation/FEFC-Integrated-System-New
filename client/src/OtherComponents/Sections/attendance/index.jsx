@@ -270,7 +270,7 @@ const Attendance = () => {
   const columns = [
     {
       field: "id",
-      headerName: "ID",
+      headerName: "#",
       headerAlign: "center",
       align: "center",
       width: 100,
@@ -280,7 +280,7 @@ const Attendance = () => {
       headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      width: 200,
     },
     {
       field: "employeeName",

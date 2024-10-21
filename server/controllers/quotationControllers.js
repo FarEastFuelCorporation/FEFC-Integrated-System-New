@@ -25,11 +25,11 @@ async function createQuotationController(req, res) {
     quotationTransportation, // This should be an array of quotation transportation
   } = req.body;
 
-  termsCharge = termsCharge.toUpperCase();
-  termsBuying = termsBuying.toUpperCase();
-  scopeOfWork = scopeOfWork.toUpperCase();
-  contactPerson = contactPerson.toUpperCase();
-  remarks = remarks.toUpperCase();
+  termsCharge = termsCharge && termsCharge.toUpperCase();
+  termsBuying = termsBuying && termsBuying.toUpperCase();
+  scopeOfWork = scopeOfWork && scopeOfWork.toUpperCase();
+  contactPerson = contactPerson && contactPerson.toUpperCase();
+  remarks = remarks && remarks.toUpperCase();
 
   try {
     // Create the quotation record
@@ -282,11 +282,11 @@ async function updateQuotationController(req, res) {
       quotationTransportation, // This should be an array of quotation transportation
     } = req.body;
 
-    termsCharge = termsCharge.toUpperCase();
-    termsBuying = termsBuying.toUpperCase();
-    scopeOfWork = scopeOfWork.toUpperCase();
-    contactPerson = contactPerson.toUpperCase();
-    remarks = remarks.toUpperCase();
+    termsCharge = termsCharge && termsCharge.toUpperCase();
+    termsBuying = termsBuying && termsBuying.toUpperCase();
+    scopeOfWork = scopeOfWork && scopeOfWork.toUpperCase();
+    contactPerson = contactPerson && contactPerson.toUpperCase();
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the quotation by ID and update it
     const updatedQuotation = await Quotation.findByPk(id);

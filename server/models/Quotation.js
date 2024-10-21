@@ -49,6 +49,10 @@ const Quotation = sequelize.define(
       values: ["active", "inactive"],
       defaultValue: "active",
     },
+    isOneTime: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

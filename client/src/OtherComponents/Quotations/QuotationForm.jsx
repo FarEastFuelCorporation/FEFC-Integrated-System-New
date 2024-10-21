@@ -22,6 +22,42 @@ import QuotationWasteTableHead from "./QuotationWasteTableHead";
 import QuotationTransportationTableHead from "./QuotationTransportationTableHead";
 import { formatNumber } from "../Functions";
 
+const calculateTotal = (row) => {
+  let totalAmount = 0;
+  let vatCalculation = null; // Initialize VAT calculation
+
+  // Helper function to calculate for each item
+  const calculateItemTotal = (items) => {
+    items.forEach((item) => {
+      const itemTotal = item.unitPrice * item.quantity;
+
+      // Set VAT calculation from the first item
+      if (vatCalculation === null && item.vatCalculation) {
+        vatCalculation = item.vatCalculation; // Get VAT calculation from the first item
+      }
+
+      // Check mode and adjust totalAmount accordingly
+      if (item.mode === "CHARGE") {
+        totalAmount += itemTotal; // Add for 'charge' mode
+      } else if (item.mode === "BUYING") {
+        totalAmount -= itemTotal; // Subtract for 'buying' mode
+      }
+    });
+  };
+
+  // Calculate totals for QuotationWaste and QuotationTransportation
+  if (Array.isArray(row.QuotationWaste)) {
+    calculateItemTotal(row.QuotationWaste);
+  }
+
+  if (Array.isArray(row.QuotationTransportation)) {
+    calculateItemTotal(row.QuotationTransportation);
+  }
+
+  // Return totalAmount and the VAT calculation
+  return { totalAmount, vatCalculation };
+};
+
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
   return url.replace(portPattern, ":3000");
@@ -129,10 +165,10 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
               waste: [
                 "40px",
                 "auto",
-                "50px",
+                row.isOneTime && "50px",
                 "40px",
                 "70px",
-                "70px",
+                row.isOneTime && "70px",
                 "100px",
                 "100px",
               ],
@@ -140,10 +176,10 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                 "40px",
                 "auto",
                 "auto",
-                "50px",
+                row.isOneTime && "50px",
                 "40px",
                 "70px",
-                "70px",
+                row.isOneTime && "70px",
                 "100px",
                 "100px",
               ],
@@ -160,13 +196,13 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
 
             // Process each item in the tableData
             tableData.forEach((item, index) => {
-              if (item[0] === "Item" && item[1] === "Description") {
+              if (item[0] === "Item" && item[1] === "Description of Waste") {
                 bodyRows.QuotationWasteTableHead.header = (
-                  <QuotationWasteTableHead />
+                  <QuotationWasteTableHead row={row} />
                 );
               } else if (item[0] === "Item" && item[1] === "Vehicle") {
                 bodyRows.QuotationTransportationTableHead.header = (
-                  <QuotationTransportationTableHead />
+                  <QuotationTransportationTableHead row={row} />
                 );
               } else if (
                 item[0] &&
@@ -189,12 +225,14 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       >
                         {waste[1]}
                       </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={getCellStyle(false, columnWidths.waste[2])}
-                      >
-                        {waste[2]}
-                      </TableCell>
+                      {row.isOneTime && (
+                        <TableCell
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[2])}
+                        >
+                          {waste[2]}
+                        </TableCell>
+                      )}
                       <TableCell
                         align="center"
                         sx={getCellStyle(false, columnWidths.waste[3])}
@@ -207,12 +245,14 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       >
                         {formatNumber(waste[4])}
                       </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={getCellStyle(false, columnWidths.waste[5])}
-                      >
-                        {formatNumber(waste[5])}
-                      </TableCell>
+                      {row.isOneTime && (
+                        <TableCell
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[5])}
+                        >
+                          {formatNumber(waste[5])}
+                        </TableCell>
+                      )}
                       <TableCell
                         align="center"
                         sx={getCellStyle(false, columnWidths.waste[6])}
@@ -255,12 +295,17 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       >
                         {transportation[2]}
                       </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={getCellStyle(false, columnWidths.transportation[3])}
-                      >
-                        {transportation[3]}
-                      </TableCell>
+                      {row.isOneTime && (
+                        <TableCell
+                          align="center"
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.transportation[3]
+                          )}
+                        >
+                          {transportation[3]}
+                        </TableCell>
+                      )}
                       <TableCell
                         align="center"
                         sx={getCellStyle(false, columnWidths.transportation[4])}
@@ -273,12 +318,17 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       >
                         {formatNumber(transportation[5])}
                       </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={getCellStyle(false, columnWidths.transportation[6])}
-                      >
-                        {formatNumber(transportation[6])}
-                      </TableCell>
+                      {row.isOneTime && (
+                        <TableCell
+                          align="center"
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.transportation[6]
+                          )}
+                        >
+                          {formatNumber(transportation[6])}
+                        </TableCell>
+                      )}
                       <TableCell
                         align="center"
                         sx={getCellStyle(false, columnWidths.transportation[7])}
@@ -372,7 +422,69 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
 
                     {bodyRows.QuotationTransportationTableHead.content}
                   </Table>
-
+                  {row.isOneTime && (
+                    <>
+                      <Typography
+                        variant="h5"
+                        fontWeight="bold"
+                        textAlign="center"
+                      >
+                        SUMMARY
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          border: "1px solid black",
+                          width: "100%",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: "calc(100% - 270px)",
+                            borderRight: "1px solid black",
+                            textAlign: "end",
+                            paddingX: "10px",
+                            fontSize: "13px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Total Amount:
+                        </Box>
+                        <Box
+                          sx={{
+                            width: "70px",
+                            borderRight: "1px solid black",
+                            textAlign: "center",
+                            fontSize: "13px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {formatNumber(calculateTotal(row).totalAmount)}
+                        </Box>
+                        <Box
+                          sx={{
+                            width: "100px",
+                            borderRight: "1px solid black",
+                            textAlign: "center",
+                            fontSize: "13px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Vat Calculation:
+                        </Box>
+                        <Box
+                          sx={{
+                            width: "100px",
+                            textAlign: "center",
+                            fontSize: "13px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {calculateTotal(row).vatCalculation}
+                        </Box>
+                      </Box>
+                    </>
+                  )}
                   {index === pagesContent.length - 1 && (
                     <Box>
                       <QuotationFooter

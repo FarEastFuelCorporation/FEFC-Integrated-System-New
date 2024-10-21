@@ -218,7 +218,23 @@ const QuotationFormModal = ({
         <Typography variant="h6" gutterBottom>
           Quotation Form
         </Typography>
-        <form onSubmit={handleFormSubmit}>
+        <FormControlLabel
+          sx={{ marginTop: "20px" }}
+          control={
+            <Checkbox
+              name="isOneTime"
+              checked={!!formData.isOneTime}
+              color="secondary"
+              onChange={(e) =>
+                handleInputChange({
+                  target: { name: e.target.name, value: e.target.checked },
+                })
+              }
+            />
+          }
+          label="One Time Quotation"
+        />
+        <form onSubmit={handleFormSubmit} style={{ marginTop: "20px" }}>
           <Grid container spacing={2}>
             <Grid item xs={1}>
               <TextField
@@ -478,28 +494,30 @@ const QuotationFormModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={1}>
-                    <TextField
-                      label="Qty"
-                      name={`quotationWastes[${index}].quantity`}
-                      value={waste.quantity}
-                      onChange={(e) =>
-                        handleWasteInputChangeLocal(
-                          index,
-                          "quantity",
-                          e.target.value
-                        )
-                      }
-                      type="number"
-                      fullWidth
-                      required
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                    />
-                  </Grid>
+                  {formData.isOneTime && (
+                    <Grid item xs={1}>
+                      <TextField
+                        label="Qty"
+                        name={`quotationWastes[${index}].quantity`}
+                        value={waste.quantity}
+                        onChange={(e) =>
+                          handleWasteInputChangeLocal(
+                            index,
+                            "quantity",
+                            e.target.value
+                          )
+                        }
+                        type="number"
+                        fullWidth
+                        required
+                        InputLabelProps={{
+                          style: {
+                            color: colors.grey[100],
+                          },
+                        }}
+                      />
+                    </Grid>
+                  )}
                   <Grid item xs={1}>
                     <FormControl fullWidth>
                       <InputLabel
@@ -783,28 +801,30 @@ const QuotationFormModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={1}>
-                    <TextField
-                      label="Qty"
-                      name={`quotationTransportation[${index}].quantity`}
-                      value={transportation.quantity}
-                      onChange={(e) =>
-                        handleTransportationInputChangeLocal(
-                          index,
-                          "quantity",
-                          e.target.value
-                        )
-                      }
-                      type="number"
-                      fullWidth
-                      required
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                    />
-                  </Grid>
+                  {formData.isOneTime && (
+                    <Grid item xs={1}>
+                      <TextField
+                        label="Qty"
+                        name={`quotationTransportation[${index}].quantity`}
+                        value={transportation.quantity}
+                        onChange={(e) =>
+                          handleTransportationInputChangeLocal(
+                            index,
+                            "quantity",
+                            e.target.value
+                          )
+                        }
+                        type="number"
+                        fullWidth
+                        required
+                        InputLabelProps={{
+                          style: {
+                            color: colors.grey[100],
+                          },
+                        }}
+                      />
+                    </Grid>
+                  )}
                   <Grid item xs={1}>
                     <FormControl fullWidth>
                       <InputLabel

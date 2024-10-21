@@ -20,7 +20,6 @@ const TravelOrder = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/travelOrder`);
 
-      console.log(response.data.travelOrders);
       setRecords(response.data.travelOrders);
       setLoading(false);
     } catch (error) {

@@ -180,7 +180,6 @@ const WarehousedTransactions = ({ user }) => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
     try {
       setLoading(true);
       if (data.id) {

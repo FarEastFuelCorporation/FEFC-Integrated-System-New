@@ -17,7 +17,20 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
         <Typography variant="h6" fontWeight="bold">
           REMARKS:
         </Typography>
-        <Typography fontSize="12px">{quotationData.remarks}</Typography>
+        <Typography fontSize="12px">
+          {quotationData.remarks ? (
+            quotationData.remarks.split("*").map(
+              (remark, index) =>
+                remark.trim() && (
+                  <Typography key={index} fontSize="12px">
+                    • {remark.trim()}
+                  </Typography>
+                )
+            )
+          ) : (
+            <Typography fontSize="12px">No remarks available.</Typography>
+          )}
+        </Typography>
       </Box>
 
       {/* Footer Details */}

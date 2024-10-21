@@ -20,6 +20,7 @@ async function createQuotationController(req, res) {
     scopeOfWork,
     contactPerson,
     remarks,
+    isOneTime,
     createdBy,
     quotationWastes, // This should be an array of quotation wastes
     quotationTransportation, // This should be an array of quotation transportation
@@ -42,6 +43,7 @@ async function createQuotationController(req, res) {
       scopeOfWork,
       contactPerson,
       remarks,
+      isOneTime,
       createdBy,
     });
 
@@ -277,6 +279,7 @@ async function updateQuotationController(req, res) {
       scopeOfWork,
       contactPerson,
       remarks,
+      isOneTime,
       createdBy,
       quotationWastes, // This should be an array of quotation wastes
       quotationTransportation, // This should be an array of quotation transportation
@@ -312,6 +315,7 @@ async function updateQuotationController(req, res) {
         scopeOfWork,
         contactPerson,
         remarks,
+        isOneTime,
         createdBy,
       });
 

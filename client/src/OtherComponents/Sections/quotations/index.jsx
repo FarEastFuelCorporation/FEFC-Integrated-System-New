@@ -39,6 +39,7 @@ const Quotations = ({ user }) => {
     scopeOfWork: "",
     contactPerson: "",
     remarks: "",
+    isOneTime: false,
     createdBy: user.id,
     quotationWastes: [
       {
@@ -274,6 +275,7 @@ const Quotations = ({ user }) => {
     const quotationToEdit = quotationsData.find(
       (quotation) => quotation.id === id
     );
+
     if (quotationToEdit) {
       setFormData({
         id: quotationToEdit.id,
@@ -285,6 +287,7 @@ const Quotations = ({ user }) => {
         scopeOfWork: quotationToEdit.scopeOfWork,
         contactPerson: quotationToEdit.contactPerson,
         remarks: quotationToEdit.remarks,
+        isOneTime: quotationToEdit.isOneTime,
         createdBy: user.id,
         quotationWastes: quotationToEdit.quotationWastes
           ? quotationToEdit.quotationWastes

@@ -150,7 +150,7 @@ const QuotationContent = ({
             WASTE DETAILS
           </Typography>
           <Table ref={wasteTableRef}>
-            <QuotationWasteTableHead />
+            <QuotationWasteTableHead row={quotationData} />
             <TableBody id="table_data">
               {quotationWaste.map((waste, index) => (
                 <TableRow key={index} sx={{ border: "black" }}>
@@ -193,7 +193,7 @@ const QuotationContent = ({
             TRANSPORTATION DETAILS
           </Typography>
           <Table ref={transportTableRef}>
-            <QuotationTransportationTableHead />
+            <QuotationTransportationTableHead row={quotationData} />
             <TableBody id="table_data">
               {quotationTransportation.map((transportation, index) => (
                 <TableRow key={index} sx={{ border: "black" }}>

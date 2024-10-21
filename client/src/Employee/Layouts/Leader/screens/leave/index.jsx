@@ -267,7 +267,6 @@ const Leave = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
       sortComparator: (v1, v2, params1, params2) => {
-        console.log(params1.row.isApproved);
         if (params1.row.isApproved === null) return -1;
         if (params2.row.isApproved === null) return 1;
         return params1.row.isApproved - params2.row.isApproved;

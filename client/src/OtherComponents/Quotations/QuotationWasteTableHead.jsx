@@ -12,20 +12,26 @@ const cellStyles = (isLastCell) => ({
   textAlign: "center",
 });
 
-const QuotationWasteTableHead = () => {
+const QuotationWasteTableHead = ({ row }) => {
   return (
     <TableHead>
       <TableRow>
         <TableCell sx={{ ...cellStyles(false), width: "40px" }}>Item</TableCell>
-        <TableCell sx={cellStyles(false)}>Description</TableCell>
-        <TableCell sx={{ ...cellStyles(false), width: "40px" }}>Qty.</TableCell>
+        <TableCell sx={cellStyles(false)}>Description of Waste</TableCell>
+        {row.isOneTime && (
+          <TableCell sx={{ ...cellStyles(false), width: "40px" }}>
+            Qty.
+          </TableCell>
+        )}
         <TableCell sx={{ ...cellStyles(false), width: "40px" }}>Unit</TableCell>
         <TableCell sx={{ ...cellStyles(false), width: "70px" }}>
           Unit Price
         </TableCell>
-        <TableCell sx={{ ...cellStyles(false), width: "70px" }}>
-          Amount
-        </TableCell>
+        {row.isOneTime && (
+          <TableCell sx={{ ...cellStyles(false), width: "70px" }}>
+            Amount
+          </TableCell>
+        )}
         <TableCell sx={{ ...cellStyles(false), width: "100px" }}>
           Mode
         </TableCell>

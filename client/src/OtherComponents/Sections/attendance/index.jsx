@@ -288,7 +288,7 @@ const Attendance = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 350,
     },
     {
       field: "designation",
@@ -296,7 +296,7 @@ const Attendance = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 250,
     },
     {
       field: "date",

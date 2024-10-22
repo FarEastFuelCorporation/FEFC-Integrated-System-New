@@ -356,3 +356,33 @@ export function calculateLengthOfService(startDate) {
   // Join the parts with commas
   return resultParts.join(", ");
 }
+
+export const formatTimeRange = (inTime, outTime) => {
+  if (!inTime || !outTime) return "Day Off";
+
+  // Format start time (inTime)
+  const [inHours, inMinutes, inSeconds] = inTime.split(":");
+  const formattedInTime = new Date();
+  formattedInTime.setHours(inHours);
+  formattedInTime.setMinutes(inMinutes);
+  formattedInTime.setSeconds(inSeconds);
+  const formattedIn = formattedInTime.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+
+  // Format end time (outTime)
+  const [outHours, outMinutes, outSeconds] = outTime.split(":");
+  const formattedOutTime = new Date();
+  formattedOutTime.setHours(outHours);
+  formattedOutTime.setMinutes(outMinutes);
+  formattedOutTime.setSeconds(outSeconds);
+  const formattedOut = formattedOutTime.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+
+  return `${formattedIn} - ${formattedOut}`;
+};

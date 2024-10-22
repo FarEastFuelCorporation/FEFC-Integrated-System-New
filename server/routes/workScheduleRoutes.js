@@ -6,6 +6,7 @@ const {
   createWorkScheduleController,
   getWorkSchedulesController,
   getWorkScheduleController,
+  getSubordinateController,
   getWorkScheduleSubordinateController,
   updateWorkScheduleController,
   updateWorkScheduleSubordinateApprovedController,
@@ -23,6 +24,9 @@ router.get("/", getWorkSchedulesController);
 
 // Get WorkSchedule route
 router.get("/:id", getWorkScheduleController);
+
+// Get Subordinate route
+router.get("/getSubordinate/:id", getSubordinateController);
 
 // Get WorkSchedule Subordinate route
 router.get("/subordinate/:id", getWorkScheduleSubordinateController);

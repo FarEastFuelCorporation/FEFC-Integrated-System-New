@@ -15,6 +15,15 @@ const WorkSchedule = sequelize.define("WorkSchedule", {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
+  typeOfSchedule: {
+    type: DataTypes.ENUM,
+    values: ["CONTINUOUS", "SHIFTING"],
+    allowNull: false,
+  },
+  weekNumber: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
   mondayIn: {
     type: DataTypes.TIME,
     allowNull: true,
@@ -73,7 +82,7 @@ const WorkSchedule = sequelize.define("WorkSchedule", {
   },
   remarks: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   createdBy: {
     type: DataTypes.STRING(50),

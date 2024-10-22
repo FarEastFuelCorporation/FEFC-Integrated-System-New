@@ -10,40 +10,60 @@ async function createWorkScheduleController(req, res) {
     // Extracting data from the request body
     let {
       employeeId,
-      typeOfLeave,
-      startDate,
-      endDate,
-      isHalfDay,
-      startTime,
-      endTime,
-      duration,
-      reason,
+      typeOfSchedule,
+      weekNumber,
+      mondayIn,
+      mondayOut,
+      tuesdayIn,
+      tuesdayOut,
+      wednesdayIn,
+      wednesdayOut,
+      thursdayIn,
+      thursdayOut,
+      fridayIn,
+      fridayOut,
+      saturdayIn,
+      saturdayOut,
+      sundayIn,
+      sundayOut,
+      remarks,
+      createdBy,
     } = req.body;
 
-    reason = reason.toUpperCase();
+    remarks = remarks && remarks.toUpperCase();
 
     // Creating a new travel order
     await WorkSchedule.create({
       employeeId,
-      typeOfLeave,
-      startDate,
-      endDate,
-      isHalfDay,
-      startTime,
-      endTime,
-      duration,
-      reason,
+      typeOfSchedule,
+      weekNumber,
+      mondayIn,
+      mondayOut,
+      tuesdayIn,
+      tuesdayOut,
+      wednesdayIn,
+      wednesdayOut,
+      thursdayIn,
+      thursdayOut,
+      fridayIn,
+      fridayOut,
+      saturdayIn,
+      saturdayOut,
+      sundayIn,
+      sundayOut,
+      remarks,
+      createdBy,
     });
 
-    // Fetch all leaves from the database
-    const leaves = await WorkSchedule.findAll({
+    // Fetch all workSchedules from the database
+    const workSchedules = await WorkSchedule.findAll({
       where: {
         employeeId: employeeId,
       },
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({ leaves });
+    res.json({ workSchedules });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -54,8 +74,8 @@ async function createWorkScheduleController(req, res) {
 // Get WorkSchedules controller
 async function getWorkSchedulesController(req, res) {
   try {
-    // Fetch all leaves from the database
-    const leaves = await WorkSchedule.findAll({
+    // Fetch all workSchedules from the database
+    const workSchedules = await WorkSchedule.findAll({
       include: {
         model: Employee,
         as: "Employee",
@@ -71,7 +91,7 @@ async function getWorkSchedulesController(req, res) {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({ leaves });
+    res.json({ workSchedules });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -82,15 +102,15 @@ async function getWorkSchedulesController(req, res) {
 async function getWorkScheduleController(req, res) {
   try {
     const id = req.params.id;
-    // Fetch all leaves from the database
-    const leaves = await WorkSchedule.findAll({
+    // Fetch all workSchedules from the database
+    const workSchedules = await WorkSchedule.findAll({
       where: {
         employeeId: id,
       },
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({ leaves });
+    res.json({ workSchedules });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -98,6 +118,42 @@ async function getWorkScheduleController(req, res) {
 }
 
 const { Op } = require("sequelize");
+
+// Get WorkSchedule Subordinate controller
+async function getSubordinateController(req, res) {
+  try {
+    const id = req.params.id;
+
+    // Step 1: Find all subordinates based on the immediateHeadId
+    const subordinates = await IdInformation.findAll({
+      where: {
+        immediateHeadId: {
+          [Op.or]: [
+            { [Op.like]: `${id},%` }, // id at the start
+            { [Op.like]: `%,${id},%` }, // id in the middle
+            { [Op.like]: `%,${id}` }, // id at the end
+            { [Op.like]: `${id}` }, // id is the only value
+          ],
+        },
+      },
+      attributes: [
+        "employee_id",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "affix",
+        "designation",
+        "birthday",
+      ],
+      order: [["employee_id", "ASC"]],
+    });
+
+    res.json({ subordinates });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
 
 // Get WorkSchedule Subordinate controller
 async function getWorkScheduleSubordinateController(req, res) {
@@ -134,8 +190,8 @@ async function getWorkScheduleSubordinateController(req, res) {
 
     console.log(subordinateIds);
 
-    // Fetch all leaves from the database
-    const leaves = await WorkSchedule.findAll({
+    // Fetch all workSchedules from the database
+    const workSchedules = await WorkSchedule.findAll({
       include: {
         model: Employee,
         as: "Employee",
@@ -156,7 +212,7 @@ async function getWorkScheduleSubordinateController(req, res) {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({ leaves });
+    res.json({ workSchedules });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -369,6 +425,7 @@ module.exports = {
   createWorkScheduleController,
   getWorkSchedulesController,
   getWorkScheduleController,
+  getSubordinateController,
   getWorkScheduleSubordinateController,
   updateWorkScheduleController,
   updateWorkScheduleSubordinateApprovedController,

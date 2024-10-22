@@ -16,8 +16,8 @@ const AttendanceRecords = ({ user }) => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/attendanceRecord`);
+
       setRecords(response.data.data);
-      console.log(response.data.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);

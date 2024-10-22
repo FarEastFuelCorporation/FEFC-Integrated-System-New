@@ -75,6 +75,10 @@ const WorkSchedule = sequelize.define("WorkSchedule", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  createdBy: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+  },
 });
 
 module.exports = WorkSchedule;

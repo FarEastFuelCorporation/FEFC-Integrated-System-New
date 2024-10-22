@@ -162,6 +162,19 @@ Employee.hasMany(WorkSchedule, {
 });
 WorkSchedule.belongsTo(Employee, {
   as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(WorkSchedule, {
+  as: "WorkScheduleCreatedBy",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+WorkSchedule.belongsTo(Employee, {
+  as: "EmployeeCreatedBy",
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",

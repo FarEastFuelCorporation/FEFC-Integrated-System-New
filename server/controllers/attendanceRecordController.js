@@ -61,6 +61,13 @@ async function getAttendanceRecordsController(req, res) {
         day: "numeric",
       });
 
+      const dateFormatted = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Asia/Manila",
+      });
+
       // Format the time in the same timezone
       const timeFormatted = date.toLocaleTimeString("en-US", {
         hour: "numeric",
@@ -80,40 +87,32 @@ async function getAttendanceRecordsController(req, res) {
 
       if (row.status === "TIME-IN") {
         attendanceMap[employeeId][dayKey].push({
-          timeIn: timeFormatted,
+          timeIn: `${dateFormatted} ${timeFormatted}`,
           timeOut: null,
         });
       } else if (row.status === "TIME-OUT") {
-        // Pair this TIME-OUT with the last TIME-IN that doesn't have a TIME-OUT yet
         let paired = false;
-        // Check the current day
-        const currentEntries = attendanceMap[employeeId][dayKey];
-        const lastEntry = currentEntries?.find(
-          (entry) => entry.timeOut === null
-        );
 
-        if (lastEntry) {
-          lastEntry.timeOut = timeFormatted;
-          paired = true;
-        }
+        // Check the current day and all previous days for unpaired TIME-IN
+        const allDays = Object.keys(attendanceMap[employeeId]).sort().reverse(); // Get all days sorted in reverse (most recent first)
 
-        // If no pairing happened, check the previous day
-        if (!paired) {
-          const previousDay = new Date(dayKey);
-          previousDay.setDate(previousDay.getDate() - 1); // Go back one day
-          const previousDayKey = previousDay.toLocaleDateString("en-US", {
-            timeZone: "Asia/Manila",
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-          });
-          const previousEntries = attendanceMap[employeeId][previousDayKey];
-          const lastPrevEntry = previousEntries?.find(
+        for (const previousDayKey of allDays) {
+          const currentEntries = attendanceMap[employeeId][previousDayKey];
+          const lastEntry = currentEntries.find(
             (entry) => entry.timeOut === null
           );
-          if (lastPrevEntry) {
-            lastPrevEntry.timeOut = timeFormatted;
+
+          if (lastEntry) {
+            // Pair the TIME-OUT with the unpaired TIME-IN
+            lastEntry.timeOut = `${dateFormatted} ${timeFormatted}`;
+            paired = true;
+            break; // Exit the loop once paired
           }
+        }
+
+        // If for some reason no unpaired TIME-IN was found, log an error or handle it
+        if (!paired) {
+          console.warn(`No unpaired TIME-IN found for employee ${employeeId}`);
         }
       }
     });

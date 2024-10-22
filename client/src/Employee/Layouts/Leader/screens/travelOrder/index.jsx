@@ -313,7 +313,11 @@ const TravelOrder = ({ user }) => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography sx={{ fontSize: 20 }}>Travel Order</Typography>
+          <Typography
+            sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+          >
+            Travel Order
+          </Typography>
         </Box>
       </Box>
       <hr />

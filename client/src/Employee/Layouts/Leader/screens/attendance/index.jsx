@@ -155,7 +155,11 @@ const Attendance = ({ user }) => {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography sx={{ fontSize: 20 }}>Attendance</Typography>
+        <Typography
+          sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+        >
+          Attendance
+        </Typography>
       </Box>
       <hr />
       <CustomDataGridStyles height={"auto"}>

@@ -48,7 +48,11 @@ const Overtime = ({ user }) => {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography sx={{ fontSize: 20 }}>Overtime</Typography>
+        <Typography
+          sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+        >
+          Overtime
+        </Typography>
       </Box>
       <hr />
     </Box>

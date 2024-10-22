@@ -10,7 +10,7 @@ import Overtime from "../Layouts/Leader/screens/overtime";
 import Undertime from "../Layouts/Leader/screens/undertime";
 import Leave from "../Layouts/Leader/screens/leave";
 import TravelOrder from "../Layouts/Leader/screens/travelOrder";
-import CashAdvance from "../Layouts/Leader/screens/cashAdvance";
+import WorkSchedule from "../Layouts/Leader/screens/workSchedule";
 
 const LeaderRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -19,17 +19,17 @@ const LeaderRoutes = ({ user, onUpdateUser }) => (
       <Route path="" element={<Home user={user} />} />
       <Route path="transactions" element={<Transactions user={user} />} />
       <Route path="profile" element={<Profile user={user} />} />
+      <Route
+        path="switchUser"
+        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
+      />
       {/* Screens */}
       <Route path="attendance" element={<Attendance user={user} />} />
       <Route path="overtime" element={<Overtime user={user} />} />
       <Route path="undertime" element={<Undertime user={user} />} />
       <Route path="leave" element={<Leave user={user} />} />
       <Route path="travelOrder" element={<TravelOrder user={user} />} />
-      <Route path="cashAdvance" element={<CashAdvance user={user} />} />
-      <Route
-        path="switchUser"
-        element={<SwitchUsers user={user} onUpdateUser={onUpdateUser} />}
-      />
+      <Route path="workSchedule" element={<WorkSchedule user={user} />} />
     </Route>
   </Routes>
 );

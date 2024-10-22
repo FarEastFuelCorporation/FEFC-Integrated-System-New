@@ -379,7 +379,11 @@ const Leave = ({ user }) => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography sx={{ fontSize: 20 }}>Leave</Typography>
+          <Typography
+            sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+          >
+            Leave
+          </Typography>
         </Box>
       </Box>
       <hr />

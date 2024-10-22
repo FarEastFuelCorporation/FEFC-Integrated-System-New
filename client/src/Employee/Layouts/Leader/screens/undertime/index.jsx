@@ -48,7 +48,11 @@ const Undertime = ({ user }) => {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography sx={{ fontSize: 20 }}>Undertime</Typography>
+        <Typography
+          sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+        >
+          Undertime
+        </Typography>
       </Box>
       <hr />
     </Box>

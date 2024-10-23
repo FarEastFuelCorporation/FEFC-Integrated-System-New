@@ -249,7 +249,7 @@ const Overtime = ({ user }) => {
   ];
 
   return (
-    <Box m="20px">
+    <Box m="20px" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box sx={{ display: "flex", gap: 2 }}>
         <IconButton

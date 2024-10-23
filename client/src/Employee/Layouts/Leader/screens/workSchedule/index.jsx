@@ -7,6 +7,7 @@ import {
   Grid,
   IconButton,
   InputLabel,
+  MenuItem,
   Modal,
   Select,
   TextField,
@@ -24,7 +25,6 @@ import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridS
 import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
-import { MenuItem } from "react-pro-sidebar";
 import { formatTimeRange } from "../../../../../OtherComponents/Functions";
 
 const WorkSchedule = ({ user }) => {
@@ -67,6 +67,8 @@ const WorkSchedule = ({ user }) => {
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+
+  const typeOfSchedule = ["CONTINUOUS", "SHIFTING"];
 
   const handleBackClick = () => {
     navigate(-1); // Navigate to the previous page
@@ -117,6 +119,7 @@ const WorkSchedule = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Name: ${name}, Value: ${value}`); // Log the name and value
     setFormData({ ...formData, [name]: value });
   };
 

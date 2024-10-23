@@ -254,7 +254,7 @@ const QuotationFormModal = ({
               />
             </Grid>
             <Grid item xs={3}>
-              <FormControl fullWidth>
+              <FormControl fullWidth required>
                 <InputLabel
                   id="client-select-label"
                   style={{
@@ -270,7 +270,6 @@ const QuotationFormModal = ({
                   onChange={handleInputChange}
                   label="Client"
                   fullWidth
-                  required
                   disabled={!!formData.id}
                 >
                   {clients.map((client) => (
@@ -403,7 +402,7 @@ const QuotationFormModal = ({
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={1.5}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`waste-type-select-label-${index}`}
                         style={{
@@ -421,7 +420,6 @@ const QuotationFormModal = ({
                         }
                         label="Type of Waste"
                         fullWidth
-                        required
                         InputLabelProps={{
                           style: {
                             color: colors.grey[100],
@@ -459,7 +457,7 @@ const QuotationFormModal = ({
                     />
                   </Grid>
                   <Grid item xs={1.5}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`mode-label-${index}`}
                         style={{
@@ -480,7 +478,6 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
-                        required
                         inputProps={{
                           name: `quotationWastes[${index}].mode`,
                           id: `mode-select-${index}`,
@@ -519,7 +516,7 @@ const QuotationFormModal = ({
                     </Grid>
                   )}
                   <Grid item xs={1}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`unit-label-${index}`}
                         style={{
@@ -540,7 +537,6 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
-                        required
                         inputProps={{
                           name: `quotationWastes[${index}].unit`,
                           id: `unit-select-${index}`,
@@ -577,7 +573,7 @@ const QuotationFormModal = ({
                     />
                   </Grid>
                   <Grid item xs={1}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`vat-calculation-label-${index}`}
                         style={{
@@ -598,7 +594,6 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
-                        required
                         inputProps={{
                           name: `quotationWastes[${index}].vatCalculation`,
                           id: `vat-calculation-select-${index}`,
@@ -710,7 +705,7 @@ const QuotationFormModal = ({
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={1.5}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`transportation-type-select-label-${index}`}
                         style={{
@@ -728,7 +723,6 @@ const QuotationFormModal = ({
                         }
                         label="Type of Waste"
                         fullWidth
-                        required
                         InputLabelProps={{
                           style: {
                             color: colors.grey[100],
@@ -766,7 +760,7 @@ const QuotationFormModal = ({
                     />
                   </Grid>
                   <Grid item xs={1.5}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`mode-label-${index}`}
                         style={{
@@ -787,7 +781,6 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
-                        required
                         inputProps={{
                           name: `quotationTransportation[${index}].mode`,
                           id: `mode-select-${index}`,
@@ -826,7 +819,7 @@ const QuotationFormModal = ({
                     </Grid>
                   )}
                   <Grid item xs={1}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`unit-label-${index}`}
                         style={{
@@ -847,7 +840,6 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
-                        required
                         inputProps={{
                           name: `quotationTransportation[${index}].unit`,
                           id: `unit-select-${index}`,
@@ -884,7 +876,7 @@ const QuotationFormModal = ({
                     />
                   </Grid>
                   <Grid item xs={1}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <InputLabel
                         id={`vat-calculation-label-${index}`}
                         style={{
@@ -905,7 +897,6 @@ const QuotationFormModal = ({
                           )
                         }
                         fullWidth
-                        required
                         inputProps={{
                           name: `quotationTransportation[${index}].vatCalculation`,
                           id: `vat-calculation-select-${index}`,

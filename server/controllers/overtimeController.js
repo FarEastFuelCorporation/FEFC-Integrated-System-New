@@ -209,6 +209,8 @@ async function updateOvertimeController(req, res) {
 async function updateOvertimeSubordinateApprovedController(req, res) {
   try {
     const id = req.params.id;
+    const { approvedBy } = req.body;
+
     console.log("Updating overtime with ID:", id);
 
     // Find the overtime by ID and update it
@@ -217,6 +219,7 @@ async function updateOvertimeSubordinateApprovedController(req, res) {
     if (updatedOvertime) {
       // Update overtime attributes
       updatedOvertime.isApproved = "APPROVED";
+      updatedOvertime.approvedBy = approvedBy;
 
       // Save the updated overtime
       await updatedOvertime.save();
@@ -240,6 +243,8 @@ async function updateOvertimeSubordinateApprovedController(req, res) {
 async function updateOvertimeSubordinateDisapprovedController(req, res) {
   try {
     const id = req.params.id;
+    const { approvedBy } = req.body;
+
     console.log("Updating overtime with ID:", id);
 
     // Find the overtime by ID and update it
@@ -248,6 +253,7 @@ async function updateOvertimeSubordinateDisapprovedController(req, res) {
     if (updatedOvertime) {
       // Update overtime attributes
       updatedOvertime.isApproved = "DISAPPROVED";
+      updatedOvertime.approvedBy = approvedBy;
 
       // Save the updated overtime
       await updatedOvertime.save();

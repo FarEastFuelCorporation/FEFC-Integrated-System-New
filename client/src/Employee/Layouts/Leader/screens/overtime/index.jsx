@@ -46,17 +46,19 @@ const Overtime = ({ user }) => {
 
   const handleApprovedClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Approve this Travel Order?");
+    setDialog("Are you sure you want to Approve this Overtime Request?");
     setDialogAction(() => () => handleConfirmApproved(id));
   };
 
   const handleConfirmApproved = async (id) => {
     try {
       setLoading(true);
-      await axios.put(`${apiUrl}/api/travelOrder/subordinateApproved/${id}`);
+      await axios.put(`${apiUrl}/api/overtime/subordinateApproved/${id}`, {
+        data: { approvedBy: user.id },
+      });
 
       fetchData();
-      setSuccessMessage("Travel Order Approved Successfully!");
+      setSuccessMessage("Overtime Request Approved Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {
@@ -68,17 +70,19 @@ const Overtime = ({ user }) => {
 
   const handleDisapprovedClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Disapprove this Travel Order?");
+    setDialog("Are you sure you want to Disapprove this Overtime Request?");
     setDialogAction(() => () => handleConfirmDisapproved(id));
   };
 
   const handleConfirmDisapproved = async (id) => {
     try {
       setLoading(true);
-      await axios.put(`${apiUrl}/api/travelOrder/subordinateDisapproved/${id}`);
+      await axios.put(`${apiUrl}/api/overtime/subordinateDisapproved/${id}`, {
+        data: { approvedBy: user.id },
+      });
 
       fetchData();
-      setSuccessMessage("Travel Order Approved Successfully!");
+      setSuccessMessage("Overtime Request Approved Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {

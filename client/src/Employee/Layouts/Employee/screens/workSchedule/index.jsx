@@ -1,29 +1,39 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Box } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Header from "../Header";
+import { useState, useEffect, useCallback } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
 import axios from "axios";
-import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import { DataGrid } from "@mui/x-data-grid";
 import { formatTimeRange } from "../../../../../OtherComponents/Functions";
 
 const WorkSchedule = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-
   const [dataRecords, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  const handleBackClick = () => {
+    navigate(-1); // Navigate to the previous page
+  };
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/api/workSchedule`);
 
-      setRecords(response.data.workSchedules);
+      const workScheduleResponse = await axios.get(
+        `${apiUrl}/api/workSchedule/${user.id}`
+      );
+
+      setRecords(workScheduleResponse.data.workSchedules);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl]);
+  }, [apiUrl, user.id]);
 
   useEffect(() => {
     fetchData();
@@ -36,42 +46,6 @@ const WorkSchedule = ({ user }) => {
   );
 
   const columns = [
-    {
-      field: "employeeId",
-      headerName: "Employee ID",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
-      valueGetter: (params) => {
-        return params.row.employeeId;
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "employeeName",
-      headerName: "Employee Name",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "designation",
-      headerName: "Designation",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.Employee.designation;
-      },
-      renderCell: renderCellWithWrapText,
-    },
     {
       field: "typeOfSchedule",
       headerName: "Type Of Schedule",
@@ -95,7 +69,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Monday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { mondayIn, mondayOut } = params.row;
         return formatTimeRange(mondayIn, mondayOut);
@@ -107,7 +81,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Tuesday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { tuesdayIn, tuesdayOut } = params.row;
         return formatTimeRange(tuesdayIn, tuesdayOut);
@@ -119,7 +93,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Wednesday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { wednesdayIn, wednesdayOut } = params.row;
         return formatTimeRange(wednesdayIn, wednesdayOut);
@@ -131,7 +105,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Thursday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { thursdayIn, thursdayOut } = params.row;
         return formatTimeRange(thursdayIn, thursdayOut);
@@ -143,7 +117,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Friday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { fridayIn, fridayOut } = params.row;
         return formatTimeRange(fridayIn, fridayOut);
@@ -155,7 +129,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Saturday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { saturdayIn, saturdayOut } = params.row;
         return formatTimeRange(saturdayIn, saturdayOut);
@@ -167,7 +141,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Sunday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
+      width: 120,
       valueGetter: (params) => {
         const { sundayIn, sundayOut } = params.row;
         return formatTimeRange(sundayIn, sundayOut);
@@ -189,20 +163,30 @@ const WorkSchedule = ({ user }) => {
   ];
 
   return (
-    <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
+    <Box m="20px" position="relative">
       <LoadingSpinner isLoading={loading} />
-      <Box display="flex" justifyContent="space-between">
-        <Header
-          title="Attendance Records"
-          subtitle="List of Attendance Records"
-        />
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <IconButton
+            color="error" // Set the color to error (red)
+            onClick={handleBackClick}
+            sx={{ m: 0 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography
+            sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+          >
+            Work Schedule
+          </Typography>
+        </Box>
       </Box>
+      <hr />
 
-      <CustomDataGridStyles>
+      <CustomDataGridStyles height={"auto"}>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}
-          components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
         />
       </CustomDataGridStyles>

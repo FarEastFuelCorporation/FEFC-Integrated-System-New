@@ -3,6 +3,7 @@ import { Box, Typography, useTheme } from "@mui/material";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import SickIcon from "@mui/icons-material/Sick";
 import RestoreIcon from "@mui/icons-material/Restore";
+import PunchClockIcon from "@mui/icons-material/PunchClock";
 import { tokens } from "../../../../../theme";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import NavIcon from "../../../../../OtherComponents/NavIcon";
@@ -129,9 +130,9 @@ const Home = ({ user }) => {
             to={"travelOrder"}
           />
           <NavIcon
-            icon={<i className="fa-solid fa-sack-dollar"></i>}
-            label={"Cash Advance"}
-            to={"cashAdvance"}
+            icon={<PunchClockIcon sx={{ fontSize: "30px" }} />}
+            label={"Work Schedule"}
+            to={"workSchedule"}
           />
         </Box>
       </Box>

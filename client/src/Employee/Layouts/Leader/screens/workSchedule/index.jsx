@@ -224,6 +224,18 @@ const WorkSchedule = ({ user }) => {
 
   const columns = [
     {
+      field: "employeeId",
+      headerName: "Employee ID",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return params.row.employeeId;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "employeeName",
       headerName: "Employee Name",
       headerAlign: "center",
@@ -270,7 +282,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Monday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { mondayIn, mondayOut } = params.row;
         return formatTimeRange(mondayIn, mondayOut);
@@ -282,7 +294,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Tuesday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { tuesdayIn, tuesdayOut } = params.row;
         return formatTimeRange(tuesdayIn, tuesdayOut);
@@ -294,7 +306,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Wednesday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { wednesdayIn, wednesdayOut } = params.row;
         return formatTimeRange(wednesdayIn, wednesdayOut);
@@ -306,7 +318,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Thursday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { thursdayIn, thursdayOut } = params.row;
         return formatTimeRange(thursdayIn, thursdayOut);
@@ -318,7 +330,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Friday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { fridayIn, fridayOut } = params.row;
         return formatTimeRange(fridayIn, fridayOut);
@@ -330,7 +342,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Saturday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { saturdayIn, saturdayOut } = params.row;
         return formatTimeRange(saturdayIn, saturdayOut);
@@ -342,7 +354,7 @@ const WorkSchedule = ({ user }) => {
       headerName: "Sunday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 80,
       valueGetter: (params) => {
         const { sundayIn, sundayOut } = params.row;
         return formatTimeRange(sundayIn, sundayOut);

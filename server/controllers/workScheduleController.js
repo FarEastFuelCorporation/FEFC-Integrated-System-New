@@ -81,6 +81,7 @@ async function getWorkSchedulesController(req, res) {
           model: Employee,
           as: "Employee",
           attributes: [
+            "employeeId",
             "firstName",
             "middleName",
             "lastName",
@@ -122,6 +123,33 @@ async function getWorkScheduleController(req, res) {
         employeeId: id,
       },
       order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: [
+            "employeeId",
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+        {
+          model: Employee,
+          as: "EmployeeCreatedBy",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+      ],
     });
 
     res.json({ workSchedules });

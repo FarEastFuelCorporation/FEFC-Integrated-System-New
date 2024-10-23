@@ -390,7 +390,11 @@ const Overtime = ({ user }) => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography sx={{ fontSize: 20 }}>Overtime Request</Typography>
+          <Typography
+            sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
+          >
+            Overtime Request
+          </Typography>
         </Box>
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>

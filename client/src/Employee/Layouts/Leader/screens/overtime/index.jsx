@@ -6,12 +6,19 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
+import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const Overtime = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [dataRecords, setRecords] = useState([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const navigate = useNavigate();
 
@@ -22,11 +29,11 @@ const Overtime = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      // const response = await axios.get(
-      //   `${apiUrl}/api/attendanceRecord/${user.id}`
-      // );
+      const response = await axios.get(
+        `${apiUrl}/api/overtime/subordinate/${user.id}`
+      );
 
-      // setRecords(response.data.results);
+      setRecords(response.data.overtimes);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -36,6 +43,206 @@ const Overtime = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleApprovedClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Approve this Travel Order?");
+    setDialogAction(() => () => handleConfirmApproved(id));
+  };
+
+  const handleConfirmApproved = async (id) => {
+    try {
+      setLoading(true);
+      await axios.put(`${apiUrl}/api/travelOrder/subordinateApproved/${id}`);
+
+      fetchData();
+      setSuccessMessage("Travel Order Approved Successfully!");
+      setShowSuccessMessage(true);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
+    }
+  };
+
+  const handleDisapprovedClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Disapprove this Travel Order?");
+    setDialogAction(() => () => handleConfirmDisapproved(id));
+  };
+
+  const handleConfirmDisapproved = async (id) => {
+    try {
+      setLoading(true);
+      await axios.put(`${apiUrl}/api/travelOrder/subordinateDisapproved/${id}`);
+
+      fetchData();
+      setSuccessMessage("Travel Order Approved Successfully!");
+      setShowSuccessMessage(true);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
+    }
+  };
+
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
+  const columns = [
+    {
+      field: "employeeId",
+      headerName: "Employee ID",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return params.row.employeeId;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "employeeName",
+      headerName: "Employee Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params) => {
+        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "designation",
+      headerName: "Designation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params) => {
+        return params.row.Employee.designation;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "start",
+      headerName: "Start",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+      valueGetter: (params) => {
+        if (!params.row.dateStart) return "";
+        if (!params.row.timeStart) return "";
+
+        // Format departure date
+        const date = new Date(params.row.dateStart);
+        const dateFormat = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }); // Format to "October 15, 2024"
+
+        // Format departure time
+        const [hours, minutes, seconds] = params.row.timeStart.split(":");
+        const timeFormat = new Date();
+        timeFormat.setHours(hours);
+        timeFormat.setMinutes(minutes);
+        timeFormat.setSeconds(seconds);
+
+        const timeString = timeFormat.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: true,
+        }); // Format to "12:24:30 PM"
+
+        return `${dateFormat} ${timeString}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "end",
+      headerName: "End",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+      valueGetter: (params) => {
+        if (!params.row.dateStart) return "";
+        if (!params.row.timeEnd) return "";
+
+        // Format departure date
+        const date = new Date(params.row.dateStart);
+        const dateFormat = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }); // Format to "October 15, 2024"
+
+        // Format departure time
+        const [hours, minutes, seconds] = params.row.timeEnd.split(":");
+        const timeFormat = new Date();
+        timeFormat.setHours(hours);
+        timeFormat.setMinutes(minutes);
+        timeFormat.setSeconds(seconds);
+
+        const timeString = timeFormat.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: true,
+        }); // Format to "12:24:30 PM"
+
+        return `${dateFormat} ${timeString}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "purpose",
+      headerName: "Purpose",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Approval",
+      headerName: "Approval",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      valueGetter: (params) => {
+        if (!params.row.isApproved) {
+          return (
+            <>
+              <IconButton
+                color="success"
+                onClick={() => handleApprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-up"></i>
+              </IconButton>
+              <IconButton
+                color="error"
+                onClick={() => handleDisapprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-down"></i>
+              </IconButton>
+            </>
+          );
+        }
+        return params.row.isApproved;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+  ];
 
   return (
     <Box m="20px">
@@ -51,10 +258,29 @@ const Overtime = ({ user }) => {
         <Typography
           sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
         >
-          Overtime
+          Overtime Request
         </Typography>
       </Box>
       <hr />
+      {showSuccessMessage && (
+        <SuccessMessage
+          message={successMessage}
+          onClose={() => setShowSuccessMessage(false)}
+        />
+      )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
+      <CustomDataGridStyles height={"auto"}>
+        <DataGrid
+          rows={dataRecords ? dataRecords : []}
+          columns={columns}
+          getRowId={(row) => row.id}
+        />
+      </CustomDataGridStyles>
     </Box>
   );
 };

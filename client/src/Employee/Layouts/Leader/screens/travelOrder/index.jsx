@@ -78,7 +78,7 @@ const TravelOrder = ({ user }) => {
       await axios.put(`${apiUrl}/api/travelOrder/subordinateDisapproved/${id}`);
 
       fetchData();
-      setSuccessMessage("Travel Order Approved Successfully!");
+      setSuccessMessage("Travel Order Disapproved Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {

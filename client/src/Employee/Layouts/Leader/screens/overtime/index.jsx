@@ -82,7 +82,7 @@ const Overtime = ({ user }) => {
       });
 
       fetchData();
-      setSuccessMessage("Overtime Request Approved Successfully!");
+      setSuccessMessage("Overtime Request Disapproved Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {

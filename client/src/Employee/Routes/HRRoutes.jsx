@@ -6,11 +6,11 @@ import Departments from "../../OtherComponents/Sections/departments";
 import Contacts from "../../Employee/Layouts/HR/sections/contacts";
 import AttendanceRecords from "../Layouts/HR/sections/attendanceRecords";
 import Calendar from "../../Employee/Layouts/HR/sections/calendar";
-
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import TravelOrder from "../Layouts/HR/sections/travelOrder";
 import Leave from "../Layouts/HR/sections/leave";
 import Documents from "../../OtherComponents/Sections/documents";
+import WorkSchedule from "../Layouts/HR/sections/workSchedule";
 
 const HRRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -22,6 +22,7 @@ const HRRoutes = ({ user, onUpdateUser }) => (
         path="attendanceRecords"
         element={<AttendanceRecords user={user} />}
       />
+      <Route path="workSchedule" element={<WorkSchedule user={user} />} />
       <Route path="travelOrder" element={<TravelOrder user={user} />} />
       <Route path="leave" element={<Leave user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />

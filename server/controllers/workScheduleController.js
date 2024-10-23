@@ -76,18 +76,32 @@ async function getWorkSchedulesController(req, res) {
   try {
     // Fetch all workSchedules from the database
     const workSchedules = await WorkSchedule.findAll({
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: [
-          "firstName",
-          "middleName",
-          "lastName",
-          "affix",
-          "department",
-          "designation",
-        ],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+        {
+          model: Employee,
+          as: "EmployeeCreatedBy",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 

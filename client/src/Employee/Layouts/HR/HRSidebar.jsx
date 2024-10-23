@@ -15,6 +15,7 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import PunchClockIcon from "@mui/icons-material/PunchClock";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -141,6 +142,14 @@ const HRSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"attendanceRecords"}
+        />
+        <BottomNavItem
+          label="Work Schedule"
+          value="Work Schedule"
+          icon={PunchClockIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"workSchedule"}
         />
         <BottomNavItem
           label="Travel Order"
@@ -310,6 +319,14 @@ const HRSidebar = ({ user }) => {
               title="Attendance Records"
               to="attendanceRecords"
               icon={<AssignmentIndIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Work Schedule"
+              to="workSchedule"
+              icon={<PunchClockIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

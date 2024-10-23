@@ -10,9 +10,8 @@ async function createDocumentController(req, res) {
     let { fileName, expirationDate, createdBy } = req.body;
     console.log(req.body);
 
-    if (fileName) {
-      fileName = fileName.toUpperCase();
-    }
+    fileName = fileName && fileName.toUpperCase();
+
     console.log(req.file);
     let attachment = null;
     if (req.file) {
@@ -129,9 +128,7 @@ async function updateDocumentController(req, res) {
 
     console.log(req.body);
 
-    if (fileName) {
-      fileName = fileName.toUpperCase(); // Optionally format the file name
-    }
+    fileName = fileName && fileName.toUpperCase();
 
     let attachment = null;
     if (req.file) {

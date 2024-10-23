@@ -18,8 +18,8 @@ async function createTravelOrderController(req, res) {
       employeeId,
     } = req.body;
 
-    destination = destination.toUpperCase();
-    purpose = purpose.toUpperCase();
+    destination = destination && destination.toUpperCase();
+    purpose = purpose && purpose.toUpperCase();
 
     // Creating a new travel order
     await TravelOrder.create({
@@ -174,8 +174,8 @@ async function updateTravelOrderController(req, res) {
       purpose,
     } = req.body;
 
-    destination = destination.toUpperCase();
-    purpose = purpose.toUpperCase();
+    destination = destination && destination.toUpperCase();
+    purpose = purpose && purpose.toUpperCase();
 
     // Find the travel order by ID and update it
     const updatedTravelOrder = await TravelOrder.findByPk(id);

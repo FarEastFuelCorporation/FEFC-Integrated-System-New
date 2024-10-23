@@ -13,6 +13,7 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const BillingApprovalTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -43,6 +44,9 @@ const BillingApprovalTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -138,15 +142,15 @@ const BillingApprovalTransactions = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (row) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Billing Approval Transaction?"
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog(
+      "Are you sure you want to Delete this Billing Approval Transaction?"
     );
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (row) => {
     try {
       setLoading(true);
       await axios.delete(
@@ -167,6 +171,8 @@ const BillingApprovalTransactions = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -262,6 +268,12 @@ const BillingApprovalTransactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Transaction
         user={user}
         buttonText={"Approve"}

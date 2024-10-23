@@ -8,7 +8,7 @@ async function createTreatmentProcessController(req, res) {
     // Extracting data from the request body
     let { treatmentProcess, createdBy } = req.body;
 
-    treatmentProcess = treatmentProcess.toUpperCase();
+    treatmentProcess = treatmentProcess && treatmentProcess.toUpperCase();
 
     // Creating a new treatment processes
     await TreatmentProcess.create({
@@ -48,7 +48,7 @@ async function updateTreatmentProcessController(req, res) {
 
     let { treatmentProcess, createdBy } = req.body;
 
-    treatmentProcess = treatmentProcess.toUpperCase();
+    treatmentProcess = treatmentProcess && treatmentProcess.toUpperCase();
 
     // Find the treatmentProcess by ID and update it
     const updatedTreatmentProcess = await TreatmentProcess.findByPk(id);

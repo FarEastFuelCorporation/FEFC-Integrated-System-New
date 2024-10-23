@@ -7,6 +7,7 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const ScheduledTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -32,6 +33,9 @@ const ScheduledTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -119,15 +123,13 @@ const ScheduledTransactions = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (row) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Scheduled Transaction?"
-    );
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Scheduled Transaction?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (row) => {
     try {
       setLoading(true);
       // Make the delete request
@@ -146,6 +148,8 @@ const ScheduledTransactions = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -205,6 +209,12 @@ const ScheduledTransactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Transaction
         user={user}
         buttonText={"Schedule"}

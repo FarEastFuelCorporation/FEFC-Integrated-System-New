@@ -25,13 +25,12 @@ async function createClientController(req, res) {
       clientPicture = req.file.buffer;
     }
 
-    clientName = clientName ? clientName.toUpperCase() : "";
-    address = address ? address.toUpperCase() : "";
-    billerName = billerName ? billerName.toUpperCase() : "";
-    billerAddress = billerAddress ? billerAddress.toUpperCase() : "";
-    billerContactPerson = billerContactPerson
-      ? billerContactPerson.toUpperCase()
-      : "";
+    clientName = clientName && clientName.toUpperCase();
+    address = address && address.toUpperCase();
+    billerName = billerName && billerName.toUpperCase();
+    billerAddress = billerAddress && billerAddress.toUpperCase();
+    billerContactPerson =
+      billerContactPerson && billerContactPerson.toUpperCase();
 
     // Generate a new client ID based on the client type
     const clientId = await generateClientId(clientType);
@@ -114,13 +113,12 @@ async function updateClientController(req, res) {
       clientPicture = req.file.buffer;
     }
 
-    clientName = clientName ? clientName.toUpperCase() : "";
-    address = address ? address.toUpperCase() : "";
-    billerName = billerName ? billerName.toUpperCase() : "";
-    billerAddress = billerAddress ? billerAddress.toUpperCase() : "";
-    billerContactPerson = billerContactPerson
-      ? billerContactPerson.toUpperCase()
-      : "";
+    clientName = clientName && clientName.toUpperCase();
+    address = address && address.toUpperCase();
+    billerName = billerName && billerName.toUpperCase();
+    billerAddress = billerAddress && billerAddress.toUpperCase();
+    billerContactPerson =
+      billerContactPerson && billerContactPerson.toUpperCase();
 
     // Find the client by UUID (id) and update it
     const updatedClient = await Client.findByPk(id);

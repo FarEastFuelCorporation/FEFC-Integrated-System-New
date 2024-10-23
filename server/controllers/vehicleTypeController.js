@@ -8,7 +8,7 @@ async function createVehicleTypeController(req, res) {
     // Extracting data from the request body
     let { typeOfVehicle, createdBy } = req.body;
 
-    typeOfVehicle = typeOfVehicle.toUpperCase();
+    typeOfVehicle = typeOfVehicle && typeOfVehicle.toUpperCase();
 
     // Creating a new vehicle type
     await VehicleType.create({
@@ -51,7 +51,7 @@ async function updateVehicleTypeController(req, res) {
     let { typeOfVehicle, createdBy } = req.body;
     console.log("Request body:", req.body);
 
-    typeOfVehicle = typeOfVehicle.toUpperCase();
+    typeOfVehicle = typeOfVehicle && typeOfVehicle.toUpperCase();
 
     // Find the vehicle type by ID and update it
     const updatedVehicleType = await VehicleType.findByPk(id);

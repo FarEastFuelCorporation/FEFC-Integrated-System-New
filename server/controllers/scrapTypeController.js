@@ -8,7 +8,7 @@ async function createScrapTypeController(req, res) {
     // Extracting data from the request body
     let { typeOfScrap, createdBy } = req.body;
 
-    typeOfScrap = typeOfScrap.toUpperCase();
+    typeOfScrap = typeOfScrap && typeOfScrap.toUpperCase();
 
     // Creating a new scrap type
     await ScrapType.create({
@@ -51,7 +51,7 @@ async function updateScrapTypeController(req, res) {
     let { typeOfScrap, createdBy } = req.body;
     console.log("Request body:", req.body);
 
-    typeOfScrap = typeOfScrap.toUpperCase();
+    typeOfScrap = typeOfScrap && typeOfScrap.toUpperCase();
 
     // Find the scrap type by ID and update it
     const updatedScrapType = await ScrapType.findByPk(id);

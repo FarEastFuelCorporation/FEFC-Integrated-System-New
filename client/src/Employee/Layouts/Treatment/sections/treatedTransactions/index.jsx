@@ -7,6 +7,7 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const TreatedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -40,6 +41,9 @@ const TreatedTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -115,15 +119,15 @@ const TreatedTransactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleDeleteClick = async (row) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Treated Waste Transaction?"
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog(
+      "Are you sure you want to Delete this Treated Waste Transaction?"
     );
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (row) => {
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/treatedTransaction/${row.id}`, {
@@ -140,6 +144,8 @@ const TreatedTransactions = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -226,44 +232,6 @@ const TreatedTransactions = ({ user }) => {
     }
   };
 
-  // const updateIsFinished = (formData) => {
-  //   const updatedFormData = { ...formData };
-
-  //   // Calculate total treated weight from treatedWastes array
-  //   let totalTreatedWeight = formData.treatedWastes.reduce(
-  //     (total, waste) => total + parseFloat(waste.weight || 0),
-  //     0
-  //   );
-
-  //   totalTreatedWeight += formData.waste.treatedWeight;
-
-  //   // Update sortedWasteTransaction with the total treated weight
-  //   if (
-  //     updatedFormData.row &&
-  //     updatedFormData.row.sortedWasteTransaction &&
-  //     updatedFormData.sortedWasteTransactionId
-  //   ) {
-  //     updatedFormData.row.sortedWasteTransaction =
-  //       updatedFormData.row.sortedWasteTransaction.map((item) => {
-  //         if (item.id === updatedFormData.sortedWasteTransactionId) {
-  //           return {
-  //             ...item,
-  //             treatedWeight: totalTreatedWeight,
-  //           };
-  //         }
-  //         return item;
-  //       });
-
-  //     // Check if all sortedWasteTransaction items are fully treated
-  //     const isAllTreated = updatedFormData.row.sortedWasteTransaction.every(
-  //       (item) => item.treatedWeight === item.weight
-  //     );
-  //     updatedFormData.isFinished = isAllTreated;
-  //   }
-
-  //   return updatedFormData;
-  // };
-
   const updateIsFinished = (formData) => {
     // Extract relevant data from the formData object
     const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
@@ -342,6 +310,12 @@ const TreatedTransactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Transaction
         user={user}
         buttonText={"Treat"}

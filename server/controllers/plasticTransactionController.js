@@ -84,7 +84,7 @@ async function updatePlasticTransactionController(req, res) {
     let { typeOfScrap, createdBy } = req.body;
     console.log("Request body:", req.body);
 
-    typeOfScrap = typeOfScrap.toUpperCase();
+    typeOfScrap = typeOfScrap && typeOfScrap.toUpperCase();
 
     // Find the scrap type by ID and update it
     const updatedPlasticTransaction = await PlasticTransaction.findByPk(id);

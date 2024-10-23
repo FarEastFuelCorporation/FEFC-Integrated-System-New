@@ -15,6 +15,7 @@ import Counter from "../../Counter";
 import PlasticTransactionModal from "../../TransactionModals/PlasticTransactionModal";
 import { formatDateFull, formatWeightWithNA } from "../../Functions";
 import PlasticCreditsForm from "../../Certificates/PlasticCredits/PlasticCreditsForm";
+import ConfirmationDialog from "../../ConfirmationDialog";
 
 const PlasticTransactions = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -44,6 +45,9 @@ const PlasticTransactions = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [data, setdata] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -134,15 +138,13 @@ const PlasticTransactions = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Plastic Transaction?"
-    );
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Plastic Transaction?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/plasticTransaction/${id}`, {
@@ -155,6 +157,8 @@ const PlasticTransactions = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -393,6 +397,12 @@ const PlasticTransactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
 
       {/* <PlasticCreditsForm /> */}
 

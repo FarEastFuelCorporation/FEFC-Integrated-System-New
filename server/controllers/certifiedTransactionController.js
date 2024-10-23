@@ -24,9 +24,8 @@ async function createCertifiedTransactionController(req, res) {
       createdBy,
     } = req.body;
     console.log(req.body);
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+
+    remarks = remarks && remarks.toUpperCase();
 
     const certificateNumber = await generateCertificateNumber();
 
@@ -122,7 +121,7 @@ async function updateCertifiedTransactionController(req, res) {
       } = req.body;
 
       // Uppercase the remarks if present
-      const updatedRemarks = remarks ? remarks.toUpperCase() : null;
+      const updatedRemarks = remarks && remarks.toUpperCase();
 
       // Find the certified transaction by UUID (id)
       const certifiedTransaction = await CertifiedTransaction.findByPk(id);

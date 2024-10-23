@@ -16,49 +16,49 @@ const {
   deleteWorkScheduleController,
 } = require("../controllers/workScheduleController");
 
-// Create WorkSchedule route
+// Create Work Schedule route
 router.post("/", createWorkScheduleController);
 
-// Get WorkSchedules route
+// Get Work Schedules route
 router.get("/", getWorkSchedulesController);
 
-// Get WorkSchedule route
+// Get Work Schedule route
 router.get("/:id", getWorkScheduleController);
 
 // Get Subordinate route
 router.get("/getSubordinate/:id", getSubordinateController);
 
-// Get WorkSchedule Subordinate route
+// Get Work Schedule Subordinate route
 router.get("/subordinate/:id", getWorkScheduleSubordinateController);
 
 // Update WorkSchedule route
 router.put("/:id", updateWorkScheduleController);
 
-// Update WorkSchedule Subordinate Approved route
+// Update Work Schedule Subordinate Approved route
 router.put(
   "/subordinateApproved/:id",
   updateWorkScheduleSubordinateApprovedController
 );
 
-// Update WorkSchedule Subordinate Disapproved route
+// Update Work Schedule Subordinate Disapproved route
 router.put(
   "/subordinateDisapproved/:id",
   updateWorkScheduleSubordinateDisapprovedController
 );
 
-// Update WorkSchedule Subordinate Approved 2 route
+// Update Work Schedule Subordinate Approved 2 route
 router.put(
   "/subordinateApproved2/:id",
   updateWorkScheduleSubordinateApproved2Controller
 );
 
-// Update WorkSchedule Subordinate Disapproved 2 route
+// Update Work Schedule Subordinate Disapproved 2 route
 router.put(
   "/subordinateDisapproved2/:id",
   updateWorkScheduleSubordinateDisapproved2Controller
 );
 
-// Delete WorkSchedule route
+// Delete Work Schedule route
 router.delete("/:id", deleteWorkScheduleController);
 
 module.exports = router;

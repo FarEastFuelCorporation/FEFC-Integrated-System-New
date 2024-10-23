@@ -4,7 +4,7 @@ const Employee = require("../models/Employee");
 const IdInformation = require("../models/IdInformation");
 const WorkSchedule = require("../models/WorkSchedule");
 
-// Create WorkSchedule controller
+// Create Work Schedule controller
 async function createWorkScheduleController(req, res) {
   try {
     // Extracting data from the request body
@@ -32,7 +32,7 @@ async function createWorkScheduleController(req, res) {
 
     remarks = remarks && remarks.toUpperCase();
 
-    // Creating a new travel order
+    // Creating a new work schedule
     await WorkSchedule.create({
       employeeId,
       typeOfSchedule,
@@ -71,7 +71,7 @@ async function createWorkScheduleController(req, res) {
   }
 }
 
-// Get WorkSchedules controller
+// Get Work Schedules controller
 async function getWorkSchedulesController(req, res) {
   try {
     // Fetch all workSchedules from the database
@@ -113,7 +113,7 @@ async function getWorkSchedulesController(req, res) {
   }
 }
 
-// Get WorkSchedule controller
+// Get Work Schedule controller
 async function getWorkScheduleController(req, res) {
   try {
     const id = req.params.id;
@@ -161,7 +161,7 @@ async function getWorkScheduleController(req, res) {
 
 const { Op } = require("sequelize");
 
-// Get WorkSchedule Subordinate controller
+// Get Work Schedule Subordinate controller
 async function getSubordinateController(req, res) {
   try {
     const id = req.params.id;
@@ -197,7 +197,7 @@ async function getSubordinateController(req, res) {
   }
 }
 
-// Get WorkSchedule Subordinate controller
+// Get Work Schedule Subordinate controller
 async function getWorkScheduleSubordinateController(req, res) {
   try {
     const id = req.params.id;
@@ -261,69 +261,92 @@ async function getWorkScheduleSubordinateController(req, res) {
   }
 }
 
-// Update WorkSchedule controller
+// Update Work Schedule controller
 async function updateWorkScheduleController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating travel order with ID:", id);
+    console.log("Updating work schedule with ID:", id);
 
     let {
-      startDate,
-      endDate,
-      isHalfDay,
-      startTime,
-      endTime,
-      duration,
-      reason,
+      employeeId,
+      typeOfSchedule,
+      weekNumber,
+      mondayIn,
+      mondayOut,
+      tuesdayIn,
+      tuesdayOut,
+      wednesdayIn,
+      wednesdayOut,
+      thursdayIn,
+      thursdayOut,
+      fridayIn,
+      fridayOut,
+      saturdayIn,
+      saturdayOut,
+      sundayIn,
+      sundayOut,
+      remarks,
+      createdBy,
     } = req.body;
 
-    reason = reason.toUpperCase();
+    remarks = remarks && remarks.toUpperCase();
 
-    // Find the travel order by ID and update it
+    // Find the work schedule by ID and update it
     const updatedWorkSchedule = await WorkSchedule.findByPk(id);
 
     if (updatedWorkSchedule) {
-      // Update travel order attributes
-      updatedWorkSchedule.startDate = startDate;
-      updatedWorkSchedule.endDate = endDate;
-      updatedWorkSchedule.isHalfDay = isHalfDay;
-      updatedWorkSchedule.startTime = startTime;
-      updatedWorkSchedule.endTime = endTime;
-      updatedWorkSchedule.duration = duration;
-      updatedWorkSchedule.reason = reason;
-
-      // Save the updated travel order
-      await updatedWorkSchedule.save();
+      // Update work schedule attributes
+      (updatedWorkSchedule.employeeId = employeeId),
+        (updatedWorkSchedule.typeOfSchedule = typeOfSchedule),
+        (updatedWorkSchedule.weekNumber = weekNumber),
+        (updatedWorkSchedule.mondayIn = mondayIn),
+        (updatedWorkSchedule.mondayOut = mondayOut),
+        (updatedWorkSchedule.tuesdayIn = tuesdayIn),
+        (updatedWorkSchedule.tuesdayOut = tuesdayOut),
+        (updatedWorkSchedule.wednesdayIn = wednesdayIn),
+        (updatedWorkSchedule.wednesdayOut = wednesdayOut),
+        (updatedWorkSchedule.thursdayIn = thursdayIn),
+        (updatedWorkSchedule.thursdayOut = thursdayOut),
+        (updatedWorkSchedule.fridayIn = fridayIn),
+        (updatedWorkSchedule.fridayOut = fridayOut),
+        (updatedWorkSchedule.saturdayIn = saturdayIn),
+        (updatedWorkSchedule.saturdayOut = saturdayOut),
+        (updatedWorkSchedule.sundayIn = sundayIn),
+        (updatedWorkSchedule.sundayOut = sundayOut),
+        (updatedWorkSchedule.remarks = remarks),
+        (updatedWorkSchedule.createdBy = createdBy),
+        // Save the updated work schedule
+        await updatedWorkSchedule.save();
 
       // Respond with a success message
       res.json({
         message: `WorkSchedule with ID ${id} updated successfully`,
       });
     } else {
-      // If travel order with the specified ID was not found
+      // If work schedule with the specified ID was not found
       res.status(404).json({ message: `Travel order with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating travel order:", error);
+    console.error("Error updating work schedule:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Update WorkSchedule Subordinate Approved controller
+// Update Work Schedule Subordinate Approved controller
 async function updateWorkScheduleSubordinateApprovedController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating travel order with ID:", id);
+    console.log("Updating work schedule with ID:", id);
 
-    // Find the travel order by ID and update it
+    // Find the work schedule by ID and update it
     const updatedWorkSchedule = await WorkSchedule.findByPk(id);
 
     if (updatedWorkSchedule) {
-      // Update travel order attributes
+      // Update work schedule attributes
       updatedWorkSchedule.isApproved = "APPROVED";
 
-      // Save the updated travel order
+      // Save the updated work schedule
       await updatedWorkSchedule.save();
 
       // Respond with a success message
@@ -331,30 +354,30 @@ async function updateWorkScheduleSubordinateApprovedController(req, res) {
         message: `WorkSchedule with ID ${id} updated successfully`,
       });
     } else {
-      // If travel order with the specified ID was not found
+      // If work schedule with the specified ID was not found
       res.status(404).json({ message: `Travel order with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating travel order:", error);
+    console.error("Error updating work schedule:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Update WorkSchedule Subordinate Disapproved controller
+// Update Work Schedule Subordinate Disapproved controller
 async function updateWorkScheduleSubordinateDisapprovedController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating travel order with ID:", id);
+    console.log("Updating work schedule with ID:", id);
 
-    // Find the travel order by ID and update it
+    // Find the work schedule by ID and update it
     const updatedWorkSchedule = await WorkSchedule.findByPk(id);
 
     if (updatedWorkSchedule) {
-      // Update travel order attributes
+      // Update work schedule attributes
       updatedWorkSchedule.isApproved = "DISAPPROVED";
 
-      // Save the updated travel order
+      // Save the updated work schedule
       await updatedWorkSchedule.save();
 
       // Respond with a success message
@@ -362,30 +385,30 @@ async function updateWorkScheduleSubordinateDisapprovedController(req, res) {
         message: `WorkSchedule with ID ${id} updated successfully`,
       });
     } else {
-      // If travel order with the specified ID was not found
+      // If work schedule with the specified ID was not found
       res.status(404).json({ message: `Travel order with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating travel order:", error);
+    console.error("Error updating work schedule:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Update WorkSchedule Subordinate Approved 2 controller
+// Update Work Schedule Subordinate Approved 2 controller
 async function updateWorkScheduleSubordinateApproved2Controller(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating travel order with ID:", id);
+    console.log("Updating work schedule with ID:", id);
 
-    // Find the travel order by ID and update it
+    // Find the work schedule by ID and update it
     const updatedWorkSchedule = await WorkSchedule.findByPk(id);
 
     if (updatedWorkSchedule) {
-      // Update travel order attributes
+      // Update work schedule attributes
       updatedWorkSchedule.isNoted = "APPROVED";
 
-      // Save the updated travel order
+      // Save the updated work schedule
       await updatedWorkSchedule.save();
 
       // Respond with a success message
@@ -393,30 +416,30 @@ async function updateWorkScheduleSubordinateApproved2Controller(req, res) {
         message: `WorkSchedule with ID ${id} updated successfully`,
       });
     } else {
-      // If travel order with the specified ID was not found
+      // If work schedule with the specified ID was not found
       res.status(404).json({ message: `Travel order with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating travel order:", error);
+    console.error("Error updating work schedule:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Update WorkSchedule Subordinate Disapproved 2 controller
+// Update Work Schedule Subordinate Disapproved 2 controller
 async function updateWorkScheduleSubordinateDisapproved2Controller(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating travel order with ID:", id);
+    console.log("Updating work schedule with ID:", id);
 
-    // Find the travel order by ID and update it
+    // Find the work schedule by ID and update it
     const updatedWorkSchedule = await WorkSchedule.findByPk(id);
 
     if (updatedWorkSchedule) {
-      // Update travel order attributes
+      // Update work schedule attributes
       updatedWorkSchedule.isNoted = "DISAPPROVED";
 
-      // Save the updated travel order
+      // Save the updated work schedule
       await updatedWorkSchedule.save();
 
       // Respond with a success message
@@ -424,17 +447,17 @@ async function updateWorkScheduleSubordinateDisapproved2Controller(req, res) {
         message: `WorkSchedule with ID ${id} updated successfully`,
       });
     } else {
-      // If travel order with the specified ID was not found
+      // If work schedule with the specified ID was not found
       res.status(404).json({ message: `Travel order with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating travel order:", error);
+    console.error("Error updating work schedule:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Delete WorkSchedule controller
+// Delete Work Schedule controller
 async function deleteWorkScheduleController(req, res) {
   try {
     const id = req.params.id;

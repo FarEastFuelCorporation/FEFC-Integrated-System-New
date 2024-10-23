@@ -27,9 +27,7 @@ async function createWarehousedTransactionController(req, res) {
 
     console.log(req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Creating a new sorted transaction
     const newWarehousedTransaction = await WarehousedTransaction.create(
@@ -50,9 +48,7 @@ async function createWarehousedTransactionController(req, res) {
       const sortedWastePromises = sortedWastes.map((waste) => {
         let wasteName = waste.wasteName;
 
-        if (wasteName) {
-          wasteName = wasteName.toUpperCase();
-        }
+        wasteName = wasteName && wasteName.toUpperCase();
 
         return SortedWasteTransaction.create(
           {
@@ -161,9 +157,7 @@ async function updateWarehousedTransactionController(req, res) {
 
     console.log(req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the sorted transaction by ID and update it
     const updatedWarehousedTransaction = await WarehousedTransaction.findByPk(
@@ -219,7 +213,7 @@ async function updateWarehousedTransactionController(req, res) {
           await SortedWasteTransaction.update(
             {
               quotationWasteId: waste.quotationWasteId,
-              wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
+              wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
               formNo: waste.formNo,
@@ -232,7 +226,7 @@ async function updateWarehousedTransactionController(req, res) {
             {
               sortedTransactionId: id,
               quotationWasteId: waste.quotationWasteId,
-              wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
+              wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
               formNo: waste.formNo,

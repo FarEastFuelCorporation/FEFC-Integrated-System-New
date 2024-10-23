@@ -24,6 +24,7 @@ import SuccessMessage from "../../SuccessMessage";
 import QuotationFormModal from "../../Modals/QuotationFormModal";
 import QuotationForm from "../../Quotations/QuotationForm";
 import LoadingSpinner from "../../LoadingSpinner";
+import ConfirmationDialog from "../../ConfirmationDialog";
 
 const Quotations = ({ user }) => {
   const certificateRef = useRef();
@@ -85,6 +86,9 @@ const Quotations = ({ user }) => {
   const [isContentReady, setIsContentReady] = useState(false);
   const [isDownloadContentReady, setDownloadIsContentReady] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const [showQuotationForm, setShowQuotationForm] = useState(false);
 
@@ -302,15 +306,13 @@ const Quotations = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Quotation?"
-    );
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Quotation?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/quotation/${id}`, {
@@ -322,6 +324,8 @@ const Quotations = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -556,6 +560,12 @@ const Quotations = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <CustomDataGridStyles>
         <DataGrid
           rows={quotationsData}

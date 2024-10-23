@@ -22,9 +22,7 @@ async function createBookedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     const transactionId = await generateTransactionId();
 
@@ -96,9 +94,7 @@ async function updateBookedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the booked transaction by UUID (id) and update it
     const updatedBookedTransaction = await BookedTransaction.findByPk(id);

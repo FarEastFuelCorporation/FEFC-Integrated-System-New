@@ -23,9 +23,7 @@ async function createBillingApprovalTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Create BillingApprovalTransaction entry
     await BillingApprovalTransaction.create(
@@ -115,9 +113,7 @@ async function updateBillingApprovalTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the billing approval transaction by its billedTransactionId
     const billingApprovalTransaction =

@@ -28,9 +28,7 @@ async function createReceivedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Creating a new transaction
     await ReceivedTransaction.create({
@@ -125,9 +123,7 @@ async function updateReceivedTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the booked transaction by UUID (id) and update it
     const updatedReceivedTransaction = await ReceivedTransaction.findByPk(id);

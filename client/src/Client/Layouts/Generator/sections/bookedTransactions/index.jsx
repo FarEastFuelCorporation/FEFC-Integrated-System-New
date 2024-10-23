@@ -7,6 +7,7 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import Header from "../../../../../OtherComponents/Header";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const BookedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -38,6 +39,9 @@ const BookedTransactions = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -109,23 +113,27 @@ const BookedTransactions = ({ user }) => {
     [pendingTransactions, user.id]
   );
 
-  const handleDeleteClick = async (row) => {
-    if (
-      window.confirm("Are you sure you want to delete this Book Transaction?")
-    ) {
-      try {
-        setLoading(true);
-        await axios.delete(`${apiUrl}/api/bookedTransaction/${row.id}`, {
-          data: { deletedBy: user.id },
-        });
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Book Transaction?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-        fetchData();
-        setSuccessMessage("Booked Transaction Deleted Successfully!");
-        setShowSuccessMessage(true);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
-      }
+  const handleConfirmDelete = async (row) => {
+    try {
+      setLoading(true);
+      await axios.delete(`${apiUrl}/api/bookedTransaction/${row.id}`, {
+        data: { deletedBy: user.id },
+      });
+
+      fetchData();
+      setSuccessMessage("Booked Transaction Deleted Successfully!");
+      setShowSuccessMessage(true);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -198,6 +206,12 @@ const BookedTransactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Transaction
         user={user}
         pendingTransactions={pendingTransactions}

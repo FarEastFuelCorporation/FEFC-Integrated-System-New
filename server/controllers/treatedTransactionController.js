@@ -24,9 +24,9 @@ async function createTreatedTransactionController(req, res) {
       createdBy,
     } = req.body;
     console.log("logger:" + req.body);
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+
+    remarks = remarks && remarks.toUpperCase();
+
     // Create TreatedTransaction entry
     const newTreatedTransaction = await TreatedTransaction.create(
       {

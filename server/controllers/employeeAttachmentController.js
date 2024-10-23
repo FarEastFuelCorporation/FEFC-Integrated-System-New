@@ -10,9 +10,8 @@ async function createEmployeeAttachmentController(req, res) {
     let { bookedTransactionId, fileName, createdBy } = req.body;
     console.log(req.body);
 
-    if (fileName) {
-      fileName = fileName.toUpperCase();
-    }
+    fileName = fileName && fileName.toUpperCase();
+
     console.log(req.file);
     let attachment = null;
     if (req.file) {

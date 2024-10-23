@@ -9,7 +9,7 @@ async function createTreatmentMachineController(req, res) {
     // Extracting data from the request body
     let { treatmentProcessId, machineName, createdBy } = req.body;
 
-    machineName = machineName.toUpperCase();
+    machineName = machineName && machineName.toUpperCase();
 
     // Creating a new vehicle
     await TreatmentMachine.create({
@@ -62,7 +62,7 @@ async function updateTreatmentMachineController(req, res) {
 
     let { treatmentProcessId, machineName, createdBy } = req.body;
 
-    machineName = machineName.toUpperCase();
+    machineName = machineName && machineName.toUpperCase();
 
     // Find the vehicle by ID and update it
     const updatedTreatmentMachine = await TreatmentMachine.findByPk(id);

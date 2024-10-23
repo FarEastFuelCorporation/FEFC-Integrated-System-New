@@ -27,9 +27,7 @@ async function createBilledTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     const billingNumber = await generateBillingNumber();
 
@@ -143,7 +141,7 @@ async function updateBilledTransactionController(req, res) {
       } = req.body;
 
       // Uppercase the remarks if present
-      const updatedRemarks = remarks ? remarks.toUpperCase() : null;
+      const updatedRemarks = remarks && remarks.toUpperCase();
 
       // Find the billed transaction by UUID (id)
       const billedTransaction = await BilledTransaction.findByPk(id);

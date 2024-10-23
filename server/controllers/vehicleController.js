@@ -16,8 +16,8 @@ async function createVehicleController(req, res) {
       createdBy,
     } = req.body;
 
-    plateNumber = plateNumber.toUpperCase();
-    vehicleName = vehicleName.toUpperCase();
+    plateNumber = plateNumber && plateNumber.toUpperCase();
+    vehicleName = vehicleName && vehicleName.toUpperCase();
 
     // Creating a new vehicle
     await Vehicle.create({
@@ -101,8 +101,8 @@ async function updateVehicleController(req, res) {
       createdBy,
     } = req.body;
 
-    plateNumber = plateNumber.toUpperCase();
-    vehicleName = vehicleName.toUpperCase();
+    plateNumber = plateNumber && plateNumber.toUpperCase();
+    vehicleName = vehicleName && vehicleName.toUpperCase();
 
     // Find the vehicle by ID and update it
     const updatedVehicle = await Vehicle.findByPk(id);

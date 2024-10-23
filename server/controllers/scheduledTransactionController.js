@@ -19,9 +19,7 @@ async function createScheduledTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Creating a new transaction
     await ScheduledTransaction.create({
@@ -98,9 +96,7 @@ async function updateScheduledTransactionController(req, res) {
       createdBy,
     } = req.body;
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the scheduled transaction by UUID (id) and update it
     const updatedScheduledTransaction = await ScheduledTransaction.findByPk(id);

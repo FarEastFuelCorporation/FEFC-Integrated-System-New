@@ -63,7 +63,7 @@ async function createQuotationController(req, res) {
           fixedPrice,
         } = waste;
 
-        wasteName = wasteName.toUpperCase();
+        wasteName = wasteName && wasteName.toUpperCase();
 
         return await QuotationWaste.create({
           quotationId: quotation.id,
@@ -98,7 +98,7 @@ async function createQuotationController(req, res) {
           fixedPrice,
         } = transportation;
 
-        haulingArea = haulingArea.toUpperCase();
+        haulingArea = haulingArea && haulingArea.toUpperCase();
 
         return await QuotationTransportation.create({
           quotationId: quotation.id,
@@ -335,7 +335,7 @@ async function updateQuotationController(req, res) {
             fixedPrice,
           } = waste;
 
-          wasteName = wasteName.toUpperCase();
+          wasteName = wasteName && wasteName.toUpperCase();
 
           return await QuotationWaste.create({
             quotationId: quotation.id,
@@ -370,7 +370,7 @@ async function updateQuotationController(req, res) {
             fixedPrice,
           } = transportation;
 
-          haulingArea = haulingArea.toUpperCase();
+          haulingArea = haulingArea && haulingArea.toUpperCase();
 
           return await QuotationTransportation.create({
             quotationId: quotation.id,

@@ -8,8 +8,8 @@ async function createLogisticsController(req, res) {
     // Extracting data from the request body
     let { logisticsName, address, contactNumber, createdBy } = req.body;
 
-    logisticsName = logisticsName.toUpperCase();
-    address = address.toUpperCase();
+    logisticsName = logisticsName && logisticsName.toUpperCase();
+    address = address && address.toUpperCase();
 
     // Creating a new logistics
     await Logistics.create({
@@ -55,8 +55,8 @@ async function updateLogisticsController(req, res) {
 
     let { logisticsName, address, contactNumber, createdBy } = req.body;
 
-    logisticsName = logisticsName.toUpperCase();
-    address = address.toUpperCase();
+    logisticsName = logisticsName && logisticsName.toUpperCase();
+    address = address && address.toUpperCase();
 
     // Find the logistics by ID and update it
     const updatedLogistics = await Logistics.findByPk(id);

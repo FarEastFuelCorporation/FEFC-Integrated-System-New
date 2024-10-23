@@ -26,6 +26,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
 import { formatTimeRange } from "../../../../../OtherComponents/Functions";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const WorkSchedule = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -65,10 +66,11 @@ const WorkSchedule = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const navigate = useNavigate();
-
-  const typeOfSchedule = ["CONTINUOUS", "SHIFTING"];
 
   const handleBackClick = () => {
     navigate(-1); // Navigate to the previous page
@@ -119,22 +121,38 @@ const WorkSchedule = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Name: ${name}, Value: ${value}`); // Log the name and value
     setFormData({ ...formData, [name]: value });
   };
 
   const handleEditClick = (id) => {
     const typeToEdit = dataRecords.find((type) => type.id === id);
     if (typeToEdit) {
+      const employee = sortedSubordinates.find(
+        (emp) => emp.employee_id === typeToEdit.employeeId
+      ); // Find the employee details
+
       setFormData({
         id: typeToEdit.id,
-        departureDate: typeToEdit.departureDate,
-        departureTime: typeToEdit.departureTime,
-        arrivalDate: typeToEdit.arrivalDate,
-        arrivalTime: typeToEdit.arrivalTime,
-        destination: typeToEdit.destination,
-        purpose: typeToEdit.purpose,
-        employeeId: user.id,
+        employeeId: typeToEdit.employeeId,
+        designation: employee ? employee.designation : "",
+        typeOfSchedule: typeToEdit.typeOfSchedule,
+        weekNumber: typeToEdit.weekNumber,
+        mondayIn: typeToEdit.mondayIn,
+        mondayOut: typeToEdit.mondayOut,
+        tuesdayIn: typeToEdit.tuesdayIn,
+        tuesdayOut: typeToEdit.tuesdayOut,
+        wednesdayIn: typeToEdit.wednesdayIn,
+        wednesdayOut: typeToEdit.wednesdayOut,
+        thursdayIn: typeToEdit.thursdayIn,
+        thursdayOut: typeToEdit.thursdayOut,
+        fridayIn: typeToEdit.fridayIn,
+        fridayOut: typeToEdit.fridayOut,
+        saturdayIn: typeToEdit.saturdayIn,
+        saturdayOut: typeToEdit.saturdayOut,
+        sundayIn: typeToEdit.sundayIn,
+        sundayOut: typeToEdit.sundayOut,
+        remarks: typeToEdit.remarks,
+        createdBy: user.id,
       });
       handleOpenModal();
     } else {
@@ -142,15 +160,13 @@ const WorkSchedule = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Work Schedule?"
-    );
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Work Schedule?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/travelOrder/${id}`);
@@ -161,6 +177,8 @@ const WorkSchedule = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -193,8 +211,6 @@ const WorkSchedule = ({ user }) => {
       setShowErrorMessage(true);
       return;
     }
-
-    console.log(formData);
 
     try {
       setLoading(true);
@@ -364,6 +380,40 @@ const WorkSchedule = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
     },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        !params.row.isApproved && (
+          <IconButton
+            color="warning"
+            onClick={() => handleEditClick(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
+        ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        !params.row.isApproved && (
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        ),
+    },
   ];
 
   return (
@@ -397,7 +447,12 @@ const WorkSchedule = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <CustomDataGridStyles height={"auto"}>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
@@ -505,6 +560,11 @@ const WorkSchedule = ({ user }) => {
                     autoComplete="off"
                   />
                 )}
+                value={
+                  sortedSubordinates.find(
+                    (option) => option.employee_id === formData.employeeId
+                  ) || null
+                } // Set the value to the current employee
                 onChange={(event, newValue) => {
                   // Handle selection and set the employeeId as the value
                   if (newValue) {
@@ -516,7 +576,6 @@ const WorkSchedule = ({ user }) => {
                   }
                 }}
                 autoHighlight
-                disableClearable
               />
             </Grid>
 

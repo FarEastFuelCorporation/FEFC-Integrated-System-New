@@ -8,9 +8,7 @@ async function createDepartmentController(req, res) {
     // Extracting data from the request body
     let { department, createdBy } = req.body;
 
-    if (department) {
-      department = department.toUpperCase();
-    }
+    department = department && department.toUpperCase();
 
     // Creating a new departments
     await Department.create({
@@ -57,9 +55,7 @@ async function updateDepartmentController(req, res) {
     // Extracting data from the request body
     let { department, createdBy } = req.body;
 
-    if (department) {
-      department = department.toUpperCase();
-    }
+    department = department && department.toUpperCase();
 
     // Find the department by UUID (id) and update it
     const updatedDepartment = await Department.findByPk(id);

@@ -15,8 +15,8 @@ async function createTypeOfWasteController(req, res) {
       createdBy,
     } = req.body;
 
-    wasteCode = wasteCode.toUpperCase();
-    wasteDescription = wasteDescription.toUpperCase();
+    wasteCode = wasteCode && wasteCode.toUpperCase();
+    wasteDescription = wasteDescription && wasteDescription.toUpperCase();
 
     // Creating a new type of waste
     await TypeOfWaste.create({
@@ -77,8 +77,8 @@ async function updateTypeOfWasteController(req, res) {
       createdBy,
     } = req.body;
 
-    wasteCode = wasteCode.toUpperCase();
-    wasteDescription = wasteDescription.toUpperCase();
+    wasteCode = wasteCode && wasteCode.toUpperCase();
+    wasteDescription = wasteDescription && wasteDescription.toUpperCase();
 
     // Find the typeOfWaste by ID and update it
     const updatedTypeOfWaste = await TypeOfWaste.findByPk(id);

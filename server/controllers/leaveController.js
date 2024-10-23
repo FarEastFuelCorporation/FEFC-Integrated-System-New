@@ -20,7 +20,7 @@ async function createLeaveController(req, res) {
       reason,
     } = req.body;
 
-    reason = reason.toUpperCase();
+    reason = reason && reason.toUpperCase();
 
     // Creating a new travel order
     await Leave.create({
@@ -179,7 +179,7 @@ async function updateLeaveController(req, res) {
       reason,
     } = req.body;
 
-    reason = reason.toUpperCase();
+    reason = reason && reason.toUpperCase();
 
     // Find the travel order by ID and update it
     const updatedLeave = await Leave.findByPk(id);

@@ -8,6 +8,7 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const getInitialWarehousedItemValues = () => ({
   warehousedTransactionId: "",
@@ -55,6 +56,9 @@ const WarehousedTransactions = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -148,16 +152,13 @@ const WarehousedTransactions = ({ user }) => {
       );
     }
   };
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Warehoused Transaction?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-  const handleDeleteClick = async (row) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Warehoused Transaction?"
-    );
-
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (row) => {
     try {
       setLoading(true);
       await axios.delete(
@@ -176,6 +177,8 @@ const WarehousedTransactions = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -223,6 +226,12 @@ const WarehousedTransactions = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Transaction
         user={user}
         buttonText={"Warehouse"}

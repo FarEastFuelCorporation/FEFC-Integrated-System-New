@@ -23,9 +23,7 @@ async function createBillingDistributionTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Create BillingDistributionTransaction entry
     await BillingDistributionTransaction.create(
@@ -115,9 +113,7 @@ async function updateBillingDistributionTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the billing distribution transaction by its ID
     const billingDistributionTransaction =

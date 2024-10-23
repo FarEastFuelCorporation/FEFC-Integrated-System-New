@@ -11,16 +11,19 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  // colors,
   useTheme,
 } from "@mui/material";
 import { tokens } from "../../../../../theme";
 import Header from "../../../../../OtherComponents/Header";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const Calendar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [currentEvents, setCurrentEvents] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const handleDateClick = (selected) => {
     const title = prompt("Please enter a new title for your event");
@@ -39,19 +42,28 @@ const Calendar = () => {
   };
 
   const handleEventClick = (selected) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
-      )
-    ) {
-      selected.event.remove();
-    }
+    setOpenDialog(true);
+    setDialog(
+      `Are you sure you want to Delete this event '${selected.event.title}?`
+    );
+    setDialogAction(() => () => handleConfirmDelete(selected));
+  };
+
+  const handleConfirmDelete = (selected) => {
+    selected.event.remove();
+    setOpenDialog(false); // Close the dialog
   };
 
   return (
     <Box m="20px">
       <Header title="CALENDAR" subtitle="Full Calendar Interactive Page" />
       <Box display="flex" justifyContent="space-between">
+        <ConfirmationDialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          onConfirm={dialogAction}
+          text={dialog}
+        />
         {/* CALENDAR SIDEBAR */}
         <Box
           flex="1 1 20%"

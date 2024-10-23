@@ -24,9 +24,7 @@ async function createCollectedTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Create CollectedTransaction entry
     await CollectedTransaction.create(
@@ -118,9 +116,7 @@ async function updateCollectedTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the collected transaction by its billingDistributionTransactionId
     const collectedTransaction = await CollectedTransaction.findByPk(id, {

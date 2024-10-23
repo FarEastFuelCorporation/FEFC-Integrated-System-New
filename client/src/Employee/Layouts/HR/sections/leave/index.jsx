@@ -7,6 +7,7 @@ import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridS
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const Leave = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -19,6 +20,9 @@ const Leave = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
@@ -75,15 +79,13 @@ const Leave = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  const handleApprovedClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to Approved this Leave?"
-    );
+  const handleApprovedClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Approve this Leave?");
+    setDialogAction(() => () => handleConfirmApproved(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmApproved = async (id) => {
     try {
       setLoading(true);
       await axios.put(`${apiUrl}/api/leave/subordinateApproved2/${id}`);
@@ -94,18 +96,17 @@ const Leave = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
+  const handleDisapprovedClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Disapprove this Leave?");
+    setDialogAction(() => () => handleConfirmDisapproved(id));
+  };
 
-  const handleDisapprovedClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to Disapproved this Leave?"
-    );
-
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDisapproved = async (id) => {
     try {
       setLoading(true);
       await axios.put(`${apiUrl}/api/leave/subordinateDisapproved2/${id}`);
@@ -116,6 +117,8 @@ const Leave = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -363,6 +366,12 @@ const Leave = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <CustomDataGridStyles height={"65vh"}>
         <hr />
         <Tabs

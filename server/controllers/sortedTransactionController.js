@@ -29,9 +29,7 @@ async function createSortedTransactionController(req, res) {
 
     console.log(req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Creating a new sorted transaction
     const newSortedTransaction = await SortedTransaction.create(
@@ -52,9 +50,7 @@ async function createSortedTransactionController(req, res) {
       const sortedWastePromises = sortedWastes.map((waste) => {
         let wasteName = waste.wasteName;
 
-        if (wasteName) {
-          wasteName = wasteName.toUpperCase();
-        }
+        wasteName = wasteName && wasteName.toUpperCase();
 
         return SortedWasteTransaction.create(
           {
@@ -163,9 +159,7 @@ async function updateSortedTransactionController(req, res) {
 
     console.log(req.body);
 
-    if (remarks) {
-      remarks = remarks.toUpperCase();
-    }
+    remarks = remarks && remarks.toUpperCase();
 
     // Find the sorted transaction by ID and update it
     const updatedSortedTransaction = await SortedTransaction.findByPk(id);
@@ -218,7 +212,7 @@ async function updateSortedTransactionController(req, res) {
           await SortedWasteTransaction.update(
             {
               quotationWasteId: waste.quotationWasteId,
-              wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
+              wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
               formNo: waste.formNo,
@@ -231,7 +225,7 @@ async function updateSortedTransactionController(req, res) {
             {
               sortedTransactionId: id,
               quotationWasteId: waste.quotationWasteId,
-              wasteName: waste.wasteName ? waste.wasteName.toUpperCase() : null,
+              wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
               formNo: waste.formNo,

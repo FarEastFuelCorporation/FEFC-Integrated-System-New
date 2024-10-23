@@ -22,6 +22,7 @@ import { tokens } from "../../../theme";
 import SuccessMessage from "../../SuccessMessage";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import LoadingSpinner from "../../LoadingSpinner";
+import ConfirmationDialog from "../../ConfirmationDialog";
 
 const TreatmentMachine = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -44,6 +45,9 @@ const TreatmentMachine = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -109,15 +113,13 @@ const TreatmentMachine = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this Treatment Machine?"
-    );
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Treatment Machine?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/treatmentMachine/${id}`, {
@@ -130,6 +132,8 @@ const TreatmentMachine = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -253,7 +257,12 @@ const TreatmentMachine = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <CustomDataGridStyles>
         <DataGrid
           rows={treatmentMachines ? treatmentMachines : []}

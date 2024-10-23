@@ -6,6 +6,7 @@ import axios from "axios";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const TravelOrder = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -14,6 +15,9 @@ const TravelOrder = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -31,15 +35,13 @@ const TravelOrder = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  const handleApprovedClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to Approved this Travel Order?"
-    );
+  const handleApprovedClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Approve this Travel Order?");
+    setDialogAction(() => () => handleConfirmApproved(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmApproved = async (id) => {
     try {
       setLoading(true);
       await axios.put(`${apiUrl}/api/travelOrder/subordinateApproved2/${id}`);
@@ -50,18 +52,18 @@ const TravelOrder = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
-  const handleDisapprovedClick = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to Disapproved this Travel Order?"
-    );
+  const handleDisapprovedClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Disapprove this Travel Order?");
+    setDialogAction(() => () => handleConfirmDisapproved(id));
+  };
 
-    if (!isConfirmed) {
-      return; // Abort the deletion if the user cancels
-    }
-
+  const handleConfirmDisapproved = async (id) => {
     try {
       setLoading(true);
       await axios.put(
@@ -74,6 +76,8 @@ const TravelOrder = ({ user }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -315,6 +319,12 @@ const TravelOrder = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}

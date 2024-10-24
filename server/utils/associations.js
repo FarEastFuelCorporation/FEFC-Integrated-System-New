@@ -53,6 +53,7 @@ const TravelOrder = require("../models/TravelOrder");
 const Leave = require("../models/Leave");
 const WorkSchedule = require("../models/WorkSchedule");
 const Overtime = require("../models/Overtime");
+const EmployeeSalary = require("../models/EmployeeSalary");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -203,6 +204,32 @@ Employee.hasMany(Overtime, {
 Overtime.belongsTo(Employee, {
   as: "EmployeeApprovedBy",
   foreignKey: "approvedBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(EmployeeSalary, {
+  as: "EmployeeSalary",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeSalary.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(EmployeeSalary, {
+  as: "EmployeeCreatedBy",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeSalary.belongsTo(Employee, {
+  as: "EmployeeSalaryCreatedBy",
+  foreignKey: "createdBy",
   targetKey: "employeeId",
   onDelete: "CASCADE",
 });

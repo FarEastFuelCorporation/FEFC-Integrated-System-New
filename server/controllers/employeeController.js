@@ -50,7 +50,9 @@ async function createEmployeeController(req, res) {
 async function getEmployeesController(req, res) {
   try {
     // Fetch all vehicles from the database
-    const employees = await Employee.findAll();
+    const employees = await Employee.findAll({
+      order: [["lastName", "ASC"]], // Sort by lastName in ascending order
+    });
 
     res.json({ employees });
   } catch (error) {

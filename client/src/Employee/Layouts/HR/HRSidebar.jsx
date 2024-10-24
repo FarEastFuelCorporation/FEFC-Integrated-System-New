@@ -12,6 +12,7 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import PaidIcon from "@mui/icons-material/Paid";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
@@ -35,9 +36,10 @@ const HRSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
+      "/dashboard/employeeSalary": "Employee Salary",
       "/dashboard/attendanceRecords": "Attendance Records",
       "/dashboard/workSchedules": "Work Schedules",
-      "/dashboard/overtimeRequest": "Overtime Requests",
+      "/dashboard/overtimeRequests": "Overtime Requests",
       "/dashboard/travelOrder": "Travel Order",
       "/dashboard/leave": "Leave",
       "/dashboard/documents": "Documents",
@@ -133,10 +135,18 @@ const HRSidebar = ({ user }) => {
         <BottomNavItem
           label="Employee"
           value="Employee Records"
-          icon={ContactsOutlinedIcon}
+          icon={PaidIcon}
           selected={selected}
           setSelected={setSelected}
           navigate={"employee"}
+        />
+        <BottomNavItem
+          label="Salary"
+          value="Employee Salary"
+          icon={ContactsOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"employeeSalary"}
         />
         <BottomNavItem
           label="Attendance"
@@ -147,7 +157,7 @@ const HRSidebar = ({ user }) => {
           navigate={"attendanceRecords"}
         />
         <BottomNavItem
-          label="Work Schedules"
+          label="Schedules"
           value="Work Schedules"
           icon={PunchClockIcon}
           selected={selected}
@@ -155,7 +165,7 @@ const HRSidebar = ({ user }) => {
           navigate={"workSchedules"}
         />
         <BottomNavItem
-          label="Overtime Requests"
+          label="Overtime"
           value="Overtime Requests"
           icon={MoreTimeIcon}
           selected={selected}
@@ -322,6 +332,14 @@ const HRSidebar = ({ user }) => {
               title="Employee Records"
               to="employee"
               icon={<ContactsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Employee Salary"
+              to="employeeSalary"
+              icon={<PaidIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

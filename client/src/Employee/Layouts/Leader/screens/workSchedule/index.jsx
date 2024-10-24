@@ -22,7 +22,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
 import { formatTimeRange } from "../../../../../OtherComponents/Functions";
@@ -247,54 +247,54 @@ const WorkSchedule = ({ user }) => {
       headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       minWidth: 100,
       valueGetter: (params) => {
         return params.row.employeeId;
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "employeeName",
       headerName: "Employee Name",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
         return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "designation",
       headerName: "Designation",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
         return params.row.Employee.designation;
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "typeOfSchedule",
       headerName: "Type Of Schedule",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "weekNumber",
       headerName: "Week Number",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      minWidth: 80,
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "mondaySchedule",
@@ -307,6 +307,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(mondayIn, mondayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "tuesdaySchedule",
@@ -319,6 +320,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(tuesdayIn, tuesdayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "wednesdaySchedule",
@@ -331,6 +333,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(wednesdayIn, wednesdayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "thursdaySchedule",
@@ -343,6 +346,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(thursdayIn, thursdayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "fridaySchedule",
@@ -355,6 +359,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(fridayIn, fridayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "saturdaySchedule",
@@ -367,6 +372,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(saturdayIn, saturdayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "sundaySchedule",
@@ -379,6 +385,7 @@ const WorkSchedule = ({ user }) => {
         return formatTimeRange(sundayIn, sundayOut);
       },
       renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
     },
     {
       field: "edit",
@@ -457,7 +464,30 @@ const WorkSchedule = ({ user }) => {
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}
+          components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          sx={{
+            "& .MuiDataGrid-row  > div": {
+              color: "black",
+              backgroundColor: "white",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              borderBottom: "1px solid black",
+              backgroundColor: "white",
+              color: "black",
+            },
+            "& .MuiDataGrid-row": {
+              backgroundColor: "white",
+              color: "black",
+            },
+            "& .MuiDataGrid-row.Mui-selected": {
+              backgroundColor: "white",
+              color: "black",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              display: "none",
+            },
+          }}
         />
       </CustomDataGridStyles>
 

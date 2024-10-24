@@ -13,6 +13,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import PaidIcon from "@mui/icons-material/Paid";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
@@ -37,6 +38,7 @@ const HRSidebar = ({ user }) => {
       "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
       "/dashboard/employeeSalary": "Employee Salary",
+      "/dashboard/payroll": "Payroll",
       "/dashboard/attendanceRecords": "Attendance Records",
       "/dashboard/workSchedules": "Work Schedules",
       "/dashboard/overtimeRequests": "Overtime Requests",
@@ -147,6 +149,14 @@ const HRSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"employeeSalary"}
+        />
+        <BottomNavItem
+          label="Payroll"
+          value="Payroll"
+          icon={ReceiptIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"payroll"}
         />
         <BottomNavItem
           label="Attendance"
@@ -340,6 +350,14 @@ const HRSidebar = ({ user }) => {
               title="Employee Salary"
               to="employeeSalary"
               icon={<PaidIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Payroll"
+              to="payroll"
+              icon={<ReceiptIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

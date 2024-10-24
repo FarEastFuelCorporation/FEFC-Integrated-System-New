@@ -184,3 +184,27 @@ body,
     visibility: hidden;
   }
 }
+
+.custom-toolbar {
+  color: black !important; /* Force the text color to black */
+}
+
+.custom-toolbar .MuiButton-root {
+  color: black !important; /* Ensure button text is black as well */
+}
+
+/* CSS for wrapping header text */
+.wrap-header-text .MuiDataGrid-columnHeaderTitle {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit the number of lines */
+  -webkit-box-orient: vertical;
+  line-height: 1.2;
+  text-align: center; /* Center text horizontally */
+  display: flex; /* Use flexbox for vertical centering */
+  justify-content: center; /* Align text horizontally */
+  align-items: center; /* Align text vertically */
+  height: 100%; /* Ensure it takes the full height of the header cell */
+}

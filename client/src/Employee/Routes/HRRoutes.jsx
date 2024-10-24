@@ -13,6 +13,7 @@ import Documents from "../../OtherComponents/Sections/documents";
 import WorkSchedule from "../Layouts/HR/sections/workSchedule";
 import OvertimeRequest from "../Layouts/HR/sections/overtimeRequest";
 import EmployeeSalary from "../Layouts/HR/sections/employeeSalary";
+import Payroll from "../Layouts/HR/sections/payroll";
 
 const HRRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -25,6 +26,7 @@ const HRRoutes = ({ user, onUpdateUser }) => (
         element={<AttendanceRecords user={user} />}
       />
       <Route path="employeeSalary" element={<EmployeeSalary user={user} />} />
+      <Route path="payroll" element={<Payroll user={user} />} />
       <Route path="workSchedules" element={<WorkSchedule user={user} />} />
       <Route
         path="overtimeRequests"

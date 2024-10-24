@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createOvertimeController,
   getOvertimesController,
+  getOvertimesApprovedController,
   getOvertimeController,
   getOvertimeSubordinateController,
   updateOvertimeController,
@@ -20,6 +21,9 @@ router.post("/", createOvertimeController);
 
 // Get Overtimes route
 router.get("/", getOvertimesController);
+
+// Get Overtimes Approved route
+router.get("/approved", getOvertimesApprovedController);
 
 // Get Overtime route
 router.get("/:id", getOvertimeController);

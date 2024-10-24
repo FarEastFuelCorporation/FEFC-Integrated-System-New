@@ -90,6 +90,50 @@ async function getOvertimesController(req, res) {
   }
 }
 
+// Get Overtimes Approved controller
+async function getOvertimesApprovedController(req, res) {
+  try {
+    // Fetch all overtimes from the database
+    const overtimes = await Overtime.findAll({
+      where: {
+        isApproved: "APPROVED",
+      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+        {
+          model: Employee,
+          as: "EmployeeApprovedBy",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({ overtimes });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 // Get Overtime controller
 async function getOvertimeController(req, res) {
   try {
@@ -383,6 +427,7 @@ async function deleteOvertimeController(req, res) {
 module.exports = {
   createOvertimeController,
   getOvertimesController,
+  getOvertimesApprovedController,
   getOvertimeController,
   getOvertimeSubordinateController,
   updateOvertimeController,

@@ -4,7 +4,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database.js");
 const { v4: uuidv4 } = require("uuid");
 
-const EmployeeSalary = sequelize.define("EmployeeSalary", {
+const Payroll = sequelize.define("Payroll", {
   id: {
     type: DataTypes.UUID,
     defaultValue: () => uuidv4(), // Generate UUID automatically
@@ -48,4 +48,4 @@ const EmployeeSalary = sequelize.define("EmployeeSalary", {
   },
 });
 
-module.exports = EmployeeSalary;
+module.exports = Payroll;

@@ -194,10 +194,10 @@ async function getAttendanceRecordsController(req, res) {
                 .map(({ timeIn, timeOut }) => {
                   if (timeOut === null) {
                     return isToday(new Date())
-                      ? `${timeIn} / On Duty`
-                      : `${timeIn} / No Time-Out`;
+                      ? `${timeIn} - On Duty`
+                      : `${timeIn} - No Time-Out`;
                   }
-                  return `${timeIn} / ${timeOut}`;
+                  return `${timeIn} - ${timeOut}`;
                 })
                 .join("; "); // Multiple pairs are joined with a semicolon
             } else {

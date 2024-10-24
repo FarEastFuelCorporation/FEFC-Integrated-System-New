@@ -8,7 +8,7 @@ const {
   getEmployeeSalaryController,
   updateEmployeeSalaryController,
   deleteEmployeeSalaryController,
-} = require("../controllers/payrollRoutes");
+} = require("../controllers/payrollController");
 
 // Create EmployeeSalary route
 router.post("/", createEmployeeSalaryController);

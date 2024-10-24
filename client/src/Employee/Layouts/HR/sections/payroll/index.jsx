@@ -49,6 +49,9 @@ const Payroll = ({ user }) => {
 
   const [dataRecords, setRecords] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [employeeSalaryRecords, setEmployeeSalaryRecords] = useState([]);
+  const [overtimeRecords, setOvertimeRecords] = useState([]);
+  const [workSchedule, setWorkScheduleRecords] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -58,20 +61,217 @@ const Payroll = ({ user }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
 
+  function calculateHours(dayString, data, day) {
+    // Check if dayString is valid
+    if (!dayString || typeof dayString !== "string") {
+      return null; // Return null if dayString is invalid
+    }
+
+    // Split the string to get multiple time intervals using the semicolon
+    const timeIntervals = dayString.split(";");
+
+    // Initialize total hours worked
+    let totalHoursWorked = 0;
+    let totalLateMinutes = 0; // Variable to store total late minutes
+
+    // Initialize global variable for hourly rate
+    let hourlyRate;
+
+    // Check if workSchedule exists and is an array
+    if (workSchedule && Array.isArray(workSchedule)) {
+      // Find the schedule for the employee that matches data.employee_id
+      const employeeSchedule = workSchedule.find(
+        (schedule) => schedule.employeeId === data.employee_id
+      );
+
+      // If a matching employee record is found, calculate the total amount
+      if (!employeeSchedule) {
+        return null; // Return null if no matching record is found
+      }
+
+      // If a matching schedule is found, extract the day-specific attributes
+      const dayIn = employeeSchedule[`${day}In`]; // e.g., "08:00:00"
+      const dayOut = employeeSchedule[`${day}Out`]; // e.g., "17:00:00"
+
+      // Check if dayIn and dayOut are valid
+      if (!dayIn || !dayOut) {
+        return null; // Return null if dayIn or dayOut is invalid
+      }
+
+      console.log(dayIn); // e.g., "08:00:00"
+      console.log(dayOut); // e.g., "17:00:00"
+
+      // Iterate through each time interval
+      for (const interval of timeIntervals) {
+        const trimmedInterval = interval.trim();
+        const [startTime, endTime] = trimmedInterval.split(" - ");
+
+        console.log(startTime); // e.g., "10/21/2024 7:41:17 AM"
+        console.log(endTime); // e.g., "10/21/2024 5:00:37 PM"
+
+        // Extract the time components without parsing dates
+        const startParts = startTime.split(" ");
+        const endParts = endTime.split(" ");
+        const startOnlyTime = startParts[1] + " " + startParts[2]; // e.g., "7:41:17 AM"
+        const endOnlyTime = endParts[1] + " " + endParts[2]; // e.g., "5:00:37 PM"
+
+        console.log("Start Only Time:", startOnlyTime);
+        console.log("End Only Time:", endOnlyTime);
+
+        // Construct Date objects for the start and end of the workday
+        const startOfWorkParts = dayIn.split(":");
+        const endOfWorkParts = dayOut.split(":");
+
+        const startOfWork = new Date(1970, 0, 1, ...startOfWorkParts); // Create Date object for dayIn
+        const endOfWork = new Date(1970, 0, 1, ...endOfWorkParts); // Create Date object for dayOut
+
+        // Create Date objects for the start and end of the interval
+        let [hours, minutes, seconds] = startOnlyTime.split(/[:\s]/);
+        const start = new Date(
+          1970,
+          0,
+          1,
+          (hours % 12) + (startParts[2] === "PM" ? 12 : 0),
+          minutes,
+          seconds
+        );
+
+        [hours, minutes, seconds] = endOnlyTime.split(/[:\s]/);
+        let end = new Date(
+          1970,
+          0,
+          1,
+          (hours % 12) + (endParts[2] === "PM" ? 12 : 0),
+          minutes,
+          seconds
+        );
+
+        // Adjust for night shifts by checking if the end time is before the start time
+        if (end < start) {
+          end.setDate(end.getDate() + 1); // Add 1 day to the end time
+        }
+
+        console.log("Start:", start);
+        console.log("End:", end);
+        console.log("startOfWork:", startOfWork);
+        console.log("endOfWork:", endOfWork);
+
+        // Check if the work hours fall within the employee's scheduled hours
+        if (end > startOfWork) {
+          // Set effectiveStart to startOfWork since we only want to count hours from there
+          const effectiveStart = startOfWork;
+
+          // Calculate the difference in milliseconds
+          const diffInMs = end - effectiveStart;
+
+          // Ensure the difference is positive before calculating hours
+          if (diffInMs > 0) {
+            const hoursWorked = diffInMs / (1000 * 60 * 60); // Convert from milliseconds to hours
+
+            // Add to the total hours worked
+            totalHoursWorked += hoursWorked;
+
+            // Calculate late minutes if the start time is after startOfWork
+            if (start > startOfWork) {
+              // Calculate late time in minutes
+              const lateTimeMs = start - startOfWork; // Time late in milliseconds
+              const lateMinutes = Math.floor(lateTimeMs / (1000 * 60)); // Convert to minutes
+              totalLateMinutes += lateMinutes; // Accumulate late minutes
+            }
+          }
+        }
+      }
+    }
+
+    // Find the employee salary record that matches the employee_id
+    let employeeRecord; // Declare employeeRecord
+    if (employeeSalaryRecords && Array.isArray(employeeSalaryRecords)) {
+      employeeRecord = employeeSalaryRecords.find(
+        (record) => record.employeeId === data.employee_id
+      );
+    }
+
+    // If a matching employee record is found, set hourlyRate
+    if (employeeRecord) {
+      hourlyRate = employeeRecord.salary / 8; // Calculate hourly rate here
+
+      // Check if the dayString indicates "On Duty"
+      if (dayString.includes("On Duty")) {
+        return "On Duty"; // Return "On Duty" if found
+      }
+
+      // Initialize overtime to 0
+      let overtime = 0;
+      let regularHours = Math.min(totalHoursWorked, 8); // Cap regular hours at 8
+
+      // Calculate regular and overtime pay
+      const regularPay = (regularHours * hourlyRate).toFixed(2);
+      const overtimePay = (overtime * (hourlyRate * 1.5)).toFixed(2); // Overtime pay at 1.5x rate
+
+      const totalAmount = (
+        parseFloat(regularPay) + parseFloat(overtimePay)
+      ).toFixed(2); // Calculate total amount
+
+      // Calculate late pay based on hourly rate per minute
+      let latePay = 0; // Initialize latePay variable
+      if (hourlyRate !== undefined) {
+        latePay = (hourlyRate / 60) * totalLateMinutes; // Calculate late pay
+        console.log(
+          `Late Pay for ${totalLateMinutes} minutes: ${latePay.toFixed(2)}`
+        );
+      }
+
+      // Return only the total amount less late pay
+      const finalAmount = (totalAmount - latePay).toFixed(2);
+      return finalAmount; // Return the final amount
+    }
+
+    // If no matching employee record is found, return null
+    return null;
+  }
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/api/employeeSalary`);
 
-      // console.log(response.data.employeeSalaries);
-      // setRecords(response.data.employeeSalaries);
+      // Using Promise.all to fetch all data concurrently
+      const [
+        employeeSalaryResponse,
+        attendanceResponse,
+        employeeResponse,
+        overtimeResponse,
+        workScheduleResponse,
+      ] = await Promise.all([
+        axios.get(`${apiUrl}/api/employeeSalary`),
+        axios.get(`${apiUrl}/api/attendanceRecord`),
+        axios.get(`${apiUrl}/api/employee`),
+        axios.get(`${apiUrl}/api/overtime/approved`),
+        axios.get(`${apiUrl}/api/workSchedule`),
+      ]);
 
-      const employeeResponse = await axios.get(`${apiUrl}/api/employee`);
+      // Logging and setting employee salary records
+      console.log(employeeSalaryResponse.data.employeeSalaries);
+      setEmployeeSalaryRecords(employeeSalaryResponse.data.employeeSalaries);
 
+      // Logging and setting attendance records
+      console.log(attendanceResponse.data.data);
+      setRecords(attendanceResponse.data.data);
+
+      // Logging and setting employee data
       setEmployees(employeeResponse.data.employees);
+
+      // Logging and setting overtime records
+      console.log(overtimeResponse.data.overtimes);
+      setOvertimeRecords(overtimeResponse.data.overtimes);
+
+      // Logging and setting overtime records
+      console.log(workScheduleResponse.data.workSchedules);
+      setWorkScheduleRecords(workScheduleResponse.data.workSchedules);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false); // Ensure loading is stopped on error as well
     }
   }, [apiUrl]);
 
@@ -230,26 +430,20 @@ const Payroll = ({ user }) => {
 
   const columns = [
     {
-      field: "employeeId",
+      field: "employee_id",
       headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
-      minWidth: 100,
-      valueGetter: (params) => {
-        return params.row.employeeId;
-      },
+      width: 100,
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "employeeName",
+      field: "employee_name",
       headerName: "Employee Name",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
-      },
+      minWidth: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -258,109 +452,116 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "weekNumber",
+      headerName: "Week Number",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "Monday",
+      headerName: "Monday",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
       valueGetter: (params) => {
-        return params.row.Employee.designation;
+        return params.row.Monday
+          ? calculateHours(params.row.Monday, params.row, "monday")
+          : null;
       },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "payrollType",
-      headerName: "Payroll Type",
+      field: "Tuesday",
+      headerName: "Tuesday",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "salaryType",
-      headerName: "Salary Type",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "compensationType",
-      headerName: "Compensation Type",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "salary",
-      headerName: "Salary",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
+      width: 100,
       valueGetter: (params) => {
-        return formatNumber(params.row.salary);
+        return params.row.Tuesday
+          ? calculateHours(params.row.Tuesday, params.row, "tuesday")
+          : null;
       },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "dayAllowance",
-      headerName: "Day Allowance",
+      field: "Wednesday",
+      headerName: "Wednesday",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 100,
+      width: 100,
       valueGetter: (params) => {
-        return formatNumber(params.row.dayAllowance);
+        return params.row.Wednesday
+          ? calculateHours(params.row.Wednesday, params.row, "wednesday")
+          : null;
       },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "nightAllowance",
-      headerName: "Night Allowance",
+      field: "Thursday",
+      headerName: "Thursday",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 100,
+      width: 100,
       valueGetter: (params) => {
-        return formatNumber(params.row.nightAllowance);
+        return params.row.Thursday
+          ? calculateHours(params.row.Thursday, params.row, "thursday")
+          : null;
       },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "edit",
-      headerName: "Edit",
+      field: "Friday",
+      headerName: "Friday",
       headerAlign: "center",
       align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) =>
-        !params.row.isApproved && (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row.id)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
+      width: 100,
+      valueGetter: (params) => {
+        return params.row.Friday
+          ? calculateHours(params.row.Friday, params.row, "friday")
+          : null;
+      },
+      renderCell: renderCellWithWrapText,
     },
     {
-      field: "delete",
-      headerName: "Delete",
+      field: "Saturday",
+      headerName: "Saturday",
       headerAlign: "center",
       align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) =>
-        !params.row.isApproved && (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
+      width: 100,
+      valueGetter: (params) => {
+        return params.row.Saturday
+          ? calculateHours(params.row.Saturday, params.row, "saturday")
+          : null;
+      },
+      renderCell: renderCellWithWrapText,
     },
+    {
+      field: "Sunday",
+      headerName: "Sunday",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return params.row.Sunday
+          ? calculateHours(params.row.Sunday, params.row, "sunday")
+          : null;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    // {
+    //   field: "daysOfWork",
+    //   headerName: "# of Days Worked",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   width: 125,
+    //   renderCell: renderCellWithWrapText,
+    // },
   ];
 
   return (

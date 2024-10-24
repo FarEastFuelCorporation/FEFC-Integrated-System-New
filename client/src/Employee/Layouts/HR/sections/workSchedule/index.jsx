@@ -176,7 +176,7 @@ const WorkSchedule = ({ user }) => {
     },
     {
       field: "submittedBy",
-      headerName: "Submitted By",
+      headerName: "Immediate Head",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -192,10 +192,7 @@ const WorkSchedule = ({ user }) => {
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
-        <Header
-          title="Attendance Records"
-          subtitle="List of Attendance Records"
-        />
+        <Header title="Work Schedules" subtitle="List of Work Schedules" />
       </Box>
 
       <CustomDataGridStyles>

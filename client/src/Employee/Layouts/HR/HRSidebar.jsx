@@ -16,6 +16,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PunchClockIcon from "@mui/icons-material/PunchClock";
+import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -35,6 +36,8 @@ const HRSidebar = ({ user }) => {
       "/dashboard/departments": "Departments",
       "/dashboard/employee": "Employee Records",
       "/dashboard/attendanceRecords": "Attendance Records",
+      "/dashboard/workSchedules": "Work Schedules",
+      "/dashboard/overtimeRequest": "Overtime Requests",
       "/dashboard/travelOrder": "Travel Order",
       "/dashboard/leave": "Leave",
       "/dashboard/documents": "Documents",
@@ -144,12 +147,20 @@ const HRSidebar = ({ user }) => {
           navigate={"attendanceRecords"}
         />
         <BottomNavItem
-          label="Work Schedule"
-          value="Work Schedule"
+          label="Work Schedules"
+          value="Work Schedules"
           icon={PunchClockIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"workSchedule"}
+          navigate={"workSchedules"}
+        />
+        <BottomNavItem
+          label="Overtime Requests"
+          value="Overtime Requests"
+          icon={MoreTimeIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"overtimeRequests"}
         />
         <BottomNavItem
           label="Travel Order"
@@ -324,9 +335,17 @@ const HRSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
-              title="Work Schedule"
-              to="workSchedule"
+              title="Work Schedules"
+              to="workSchedules"
               icon={<PunchClockIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Overtime Requests"
+              to="overtimeRequests"
+              icon={<MoreTimeIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

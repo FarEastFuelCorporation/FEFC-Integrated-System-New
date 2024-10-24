@@ -11,6 +11,7 @@ import TravelOrder from "../Layouts/HR/sections/travelOrder";
 import Leave from "../Layouts/HR/sections/leave";
 import Documents from "../../OtherComponents/Sections/documents";
 import WorkSchedule from "../Layouts/HR/sections/workSchedule";
+import OvertimeRequest from "../Layouts/HR/sections/overtimeRequest";
 
 const HRRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -22,7 +23,11 @@ const HRRoutes = ({ user, onUpdateUser }) => (
         path="attendanceRecords"
         element={<AttendanceRecords user={user} />}
       />
-      <Route path="workSchedule" element={<WorkSchedule user={user} />} />
+      <Route path="workSchedules" element={<WorkSchedule user={user} />} />
+      <Route
+        path="overtimeRequests"
+        element={<OvertimeRequest user={user} />}
+      />
       <Route path="travelOrder" element={<TravelOrder user={user} />} />
       <Route path="leave" element={<Leave user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />

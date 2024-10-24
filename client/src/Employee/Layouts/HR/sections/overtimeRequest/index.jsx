@@ -1,96 +1,32 @@
-import { useState, useEffect, useCallback } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Header from "../Header";
 import axios from "axios";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
-import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
-import { DataGrid } from "@mui/x-data-grid";
-import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
-import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 
-const Overtime = ({ user }) => {
+const OvertimeRequest = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [dataRecords, setRecords] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialog, setDialog] = useState(false);
-  const [dialogAction, setDialogAction] = useState(false);
-
-  const navigate = useNavigate();
-
-  const handleBackClick = () => {
-    navigate(-1); // Navigate to the previous page
-  };
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${apiUrl}/api/overtime/subordinate/${user.id}`
-      );
+      const response = await axios.get(`${apiUrl}/api/overtime`);
 
       setRecords(response.data.overtimes);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl, user.id]);
+  }, [apiUrl]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const handleApprovedClick = (id) => {
-    setOpenDialog(true);
-    setDialog("Are you sure you want to Approve this Overtime Request?");
-    setDialogAction(() => () => handleConfirmApproved(id));
-  };
-
-  const handleConfirmApproved = async (id) => {
-    try {
-      setLoading(true);
-      await axios.put(`${apiUrl}/api/overtime/subordinateApproved/${id}`, {
-        approvedBy: user.id,
-      });
-
-      fetchData();
-      setSuccessMessage("Overtime Request Approved Successfully!");
-      setShowSuccessMessage(true);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setOpenDialog(false); // Close the dialog
-    }
-  };
-
-  const handleDisapprovedClick = (id) => {
-    setOpenDialog(true);
-    setDialog("Are you sure you want to Disapprove this Overtime Request?");
-    setDialogAction(() => () => handleConfirmDisapproved(id));
-  };
-
-  const handleConfirmDisapproved = async (id) => {
-    try {
-      setLoading(true);
-      await axios.put(`${apiUrl}/api/overtime/subordinateDisapproved/${id}`, {
-        approvedBy: user.id,
-      });
-
-      fetchData();
-      setSuccessMessage("Overtime Request Disapproved Successfully!");
-      setShowSuccessMessage(true);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setOpenDialog(false); // Close the dialog
-    }
-  };
 
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
@@ -118,7 +54,7 @@ const Overtime = ({ user }) => {
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return `${params.row.EmployeeApprovedBy.lastName}, ${params.row.EmployeeApprovedBy.firstName} ${params.row.EmployeeApprovedBy.affix}`;
+        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
       },
       renderCell: renderCellWithWrapText,
     },
@@ -216,71 +152,43 @@ const Overtime = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "Approval",
+      field: "isApproved",
       headerName: "Approval",
       headerAlign: "center",
       align: "center",
       sortable: false,
       width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "immediateHead",
+      headerName: "Immediate Head",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
       valueGetter: (params) => {
-        if (!params.row.isApproved) {
-          return (
-            <>
-              <IconButton
-                color="success"
-                onClick={() => handleApprovedClick(params.row.id)}
-              >
-                <i className="fa-solid fa-thumbs-up"></i>
-              </IconButton>
-              <IconButton
-                color="error"
-                onClick={() => handleDisapprovedClick(params.row.id)}
-              >
-                <i className="fa-solid fa-thumbs-down"></i>
-              </IconButton>
-            </>
-          );
-        }
-        return params.row.isApproved;
+        return `${params.row.EmployeeApprovedBy.lastName}, ${params.row.EmployeeApprovedBy.firstName} ${params.row.EmployeeApprovedBy.affix}`;
       },
       renderCell: renderCellWithWrapText,
     },
   ];
 
   return (
-    <Box m="20px" position="relative">
+    <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <LoadingSpinner isLoading={loading} />
-      <Box sx={{ display: "flex", gap: 2 }}>
-        <IconButton
-          color="error" // Set the color to error (red)
-          onClick={handleBackClick}
-          sx={{ m: 0 }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography
-          sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
-        >
-          Overtime Request
-        </Typography>
-      </Box>
-      <hr />
-      {showSuccessMessage && (
-        <SuccessMessage
-          message={successMessage}
-          onClose={() => setShowSuccessMessage(false)}
+      <Box display="flex" justifyContent="space-between">
+        <Header
+          title="Overtime Requests"
+          subtitle="List of Overtime Requests"
         />
-      )}
-      <ConfirmationDialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        onConfirm={dialogAction}
-        text={dialog}
-      />
-      <CustomDataGridStyles height={"auto"}>
+      </Box>
+
+      <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}
+          components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
         />
       </CustomDataGridStyles>
@@ -288,4 +196,4 @@ const Overtime = ({ user }) => {
   );
 };
 
-export default Overtime;
+export default OvertimeRequest;

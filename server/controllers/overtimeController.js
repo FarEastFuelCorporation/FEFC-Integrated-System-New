@@ -54,18 +54,32 @@ async function getOvertimesController(req, res) {
   try {
     // Fetch all overtimes from the database
     const overtimes = await Overtime.findAll({
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: [
-          "firstName",
-          "middleName",
-          "lastName",
-          "affix",
-          "department",
-          "designation",
-        ],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+        {
+          model: Employee,
+          as: "EmployeeApprovedBy",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -212,6 +226,8 @@ async function updateOvertimeSubordinateApprovedController(req, res) {
     const { approvedBy } = req.body;
 
     console.log("Updating overtime with ID:", id);
+
+    console.log(approvedBy);
 
     // Find the overtime by ID and update it
     const updatedOvertime = await Overtime.findByPk(id);

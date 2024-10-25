@@ -137,14 +137,12 @@ const Home = ({ user }) => {
             to={"workSchedule"}
           />
           <NavIcon
-            icon={<NoteAltIcon sx={{ fontSize: "30px" }} />}
-            label={"Contract"}
-            to={"contract"}
-          />
-          <NavIcon
             icon={<MenuBookIcon sx={{ fontSize: "30px" }} />}
             label={"Handbook"}
             to={"handbook"}
+          />
+          <NavIcon
+            icon={<MenuBookIcon sx={{ fontSize: "30px", display: "none" }} />}
           />
           <NavIcon
             icon={<MenuBookIcon sx={{ fontSize: "30px", display: "none" }} />}

@@ -12,8 +12,7 @@ import Leave from "../Layouts/Employee/screens/leave";
 import TravelOrder from "../Layouts/Employee/screens/travelOrder";
 import WorkSchedule from "../Layouts/Employee/screens/workSchedule";
 import Contract from "../Layouts/Employee/screens/contract";
-import HandBook from "../Layouts/Employee/screens/handbook";
-
+import HandBook from "../../OtherComponents/Sections/handbook";
 const EmployeeRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     {" "}

@@ -11,6 +11,7 @@ import Undertime from "../Layouts/Leader/screens/undertime";
 import Leave from "../Layouts/Leader/screens/leave";
 import TravelOrder from "../Layouts/Leader/screens/travelOrder";
 import WorkSchedule from "../Layouts/Leader/screens/workSchedule";
+import HandBook from "../../OtherComponents/Sections/handbook";
 
 const LeaderRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -30,6 +31,7 @@ const LeaderRoutes = ({ user, onUpdateUser }) => (
       <Route path="leave" element={<Leave user={user} />} />
       <Route path="travelOrder" element={<TravelOrder user={user} />} />
       <Route path="workSchedule" element={<WorkSchedule user={user} />} />
+      <Route path="handbook" element={<HandBook user={user} />} />
     </Route>
   </Routes>
 );

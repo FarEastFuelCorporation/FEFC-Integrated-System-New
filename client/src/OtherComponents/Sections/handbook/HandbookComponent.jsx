@@ -89,10 +89,14 @@ import page88 from "../../../images/Handbook/83.jpg";
 import page89 from "../../../images/Handbook/84.jpg";
 import page90 from "../../../images/Handbook/85.jpg";
 
-import React from "react";
-import FlipPage from "react-flip-page";
+import React, { useEffect, useState } from "react";
+import { useMediaQuery, useTheme } from "@mui/material";
+import FlipPage from "react-flip-page"; // Assuming you're using a library for the flip effect
 
 const HandbookComponent = () => {
+  const theme = useTheme(); // Get the theme
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Use the theme breakpoint for mobile
+
   const images = [
     page1,
     page2,
@@ -185,18 +189,43 @@ const HandbookComponent = () => {
     page89,
     page90,
   ];
-
-  // Group images into pairs to form a book-like layout,
-  // starting with just the right page for the first spread
   const spreads = [];
-
-  // Add first page as the right page with the left blank
-  spreads.push([null, images[0]]);
-
-  // Add the rest of the pages as normal spreads
+  spreads.push([null, images[0]]); // First page as right with left blank
   for (let i = 1; i < images.length; i += 2) {
     spreads.push([images[i], images[i + 1]]);
   }
+
+  const defaultWidth = "1056px"; // Fixed width for large screens
+  const defaultHeight = "816px"; // Fixed height for large screens
+
+  // State for dynamic dimensions
+  const [dynamicWidth, setDynamicWidth] = useState(defaultWidth);
+  const [dynamicHeight, setDynamicHeight] = useState(defaultHeight);
+
+  // Recalculate dynamic dimensions
+  useEffect(() => {
+    const calculateDimensions = () => {
+      if (isMobile) {
+        const actualWidth = window.innerWidth - 40; // Consider padding/margins if needed
+        const scaledHeight = (816 / 528) * actualWidth; // Maintain aspect ratio
+        setDynamicWidth(`${actualWidth}px`);
+        setDynamicHeight(`${scaledHeight}px`);
+      } else {
+        setDynamicWidth(defaultWidth);
+        setDynamicHeight(defaultHeight);
+      }
+    };
+
+    calculateDimensions();
+    window.addEventListener("resize", calculateDimensions); // Update on resize
+
+    return () => {
+      window.removeEventListener("resize", calculateDimensions); // Clean up
+    };
+  }, [isMobile]); // Rerun effect when `isMobile` changes
+
+  const containerWidth = isMobile ? dynamicWidth : defaultWidth;
+  const containerHeight = isMobile ? dynamicHeight : defaultHeight;
 
   return (
     <div
@@ -204,8 +233,8 @@ const HandbookComponent = () => {
         display: "flex",
         justifyContent: "center",
         marginTop: "20px",
-        width: "1056px", // Double the width for both pages
-        height: "816px", // Height remains the same
+        width: containerWidth,
+        height: containerHeight,
       }}
       className="flip-page"
     >
@@ -214,47 +243,68 @@ const HandbookComponent = () => {
         uncutPages={true}
         flipOnTouch={true}
         style={{
-          width: "1056px !important", // Double the width for both pages
-          height: "816px !important", // Height remains the same
+          width: containerWidth,
+          height: containerHeight,
+          backgroundColor: "none",
         }}
       >
-        {spreads.map((spread, index) => (
-          <div
-            key={index}
-            style={{ display: "flex", width: "100%", height: "100%" }}
-          >
-            {/* Left Page (if exists) */}
-            <div style={{ width: "50%", height: "100%" }}>
-              {spread[0] ? (
+        {isMobile
+          ? images.map((image, index) => (
+              <div key={index} style={{ width: "100%", height: "100%" }}>
                 <img
-                  src={spread[0]}
-                  alt={`Page ${index * 2 + 1}`}
-                  style={{ width: "528px", height: "816px" }} // Explicit size
+                  src={image}
+                  alt={`Page ${index + 1}`}
+                  style={{ width: "100%", height: "100%" }}
                 />
-              ) : (
-                // Leave the left side blank for the first page
+              </div>
+            ))
+          : spreads.map((spread, index) => (
+              <div
+                key={index}
+                style={{ display: "flex", width: "100%", height: "100%" }}
+              >
                 <div
-                  style={{
-                    backgroundColor: "white",
-                    width: "528px",
-                    height: "816px",
-                  }}
-                />
-              )}
-            </div>
-
-            {/* Right Page */}
-            <div style={{ width: "50%", height: "100%" }}>
-              {spread[1] && (
-                <img
-                  src={spread[1]}
-                  alt={`Page ${index * 2 + 2}`}
-                  style={{ width: "528px", height: "816px" }} // Explicit size
-                />
-              )}
-            </div>
-          </div>
-        ))}
+                  style={{ width: isMobile ? "100%" : "50%", height: "100%" }}
+                >
+                  {index === 0 ? (
+                    <div
+                      style={{
+                        backgroundColor: "none",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                  ) : (
+                    spread[0] && (
+                      <img
+                        src={spread[0]}
+                        alt={`Page ${index * 2 + 1}`}
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    )
+                  )}
+                </div>
+                <div
+                  style={{ width: isMobile ? "100%" : "50%", height: "100%" }}
+                >
+                  {spread[1] ? (
+                    <img
+                      src={spread[1]}
+                      alt={`Page ${index * 2 + 2}`}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: "none",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
       </FlipPage>
     </div>
   );

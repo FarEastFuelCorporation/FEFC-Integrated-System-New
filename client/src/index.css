@@ -209,12 +209,12 @@ body,
   height: 100%; /* Ensure it takes the full height of the header cell */
 }
 
-.flip-page > div {
-  width: 1056px !important;
-  height: 816px !important;
-}
-
 @media (min-width: 600px) {
+  .flip-page > div {
+    width: 1056px !important;
+    height: 816px !important;
+  }
+
   /* Target the third child div */
   .flip-page > div > div:first-child > div:first-child {
     display: none;

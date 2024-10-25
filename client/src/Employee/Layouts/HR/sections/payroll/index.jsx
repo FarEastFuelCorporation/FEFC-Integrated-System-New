@@ -298,28 +298,7 @@ const Payroll = ({ user }) => {
   };
 
   const handleEditClick = (id) => {
-    const typeToEdit = dataRecords.find((type) => type.id === id);
-    if (typeToEdit) {
-      const employee = employees.find(
-        (emp) => emp.employeeId === typeToEdit.employeeId
-      ); // Find the employee details
-
-      setFormData({
-        id: typeToEdit.id,
-        employeeId: typeToEdit.employeeId,
-        designation: employee ? employee.designation : "",
-        payrollType: typeToEdit.payrollType,
-        salaryType: typeToEdit.salaryType,
-        compensationType: typeToEdit.compensationType,
-        salary: typeToEdit.salary,
-        dayAllowance: typeToEdit.dayAllowance,
-        nightAllowance: typeToEdit.nightAllowance,
-        createdBy: user.id,
-      });
-      handleOpenModal();
-    } else {
-      console.error(`Employee Salary with ID ${id} not found for editing.`);
-    }
+    handleOpenModal();
   };
 
   const handleDeleteClick = (id) => {
@@ -553,6 +532,19 @@ const Payroll = ({ user }) => {
           : null;
       },
       renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
     },
     // {
     //   field: "daysOfWork",

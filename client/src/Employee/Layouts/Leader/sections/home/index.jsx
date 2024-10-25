@@ -4,6 +4,8 @@ import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import SickIcon from "@mui/icons-material/Sick";
 import RestoreIcon from "@mui/icons-material/Restore";
 import PunchClockIcon from "@mui/icons-material/PunchClock";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import { tokens } from "../../../../../theme";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import NavIcon from "../../../../../OtherComponents/NavIcon";
@@ -133,6 +135,19 @@ const Home = ({ user }) => {
             icon={<PunchClockIcon sx={{ fontSize: "30px" }} />}
             label={"Work Schedule"}
             to={"workSchedule"}
+          />
+          <NavIcon
+            icon={<NoteAltIcon sx={{ fontSize: "30px" }} />}
+            label={"Contract"}
+            to={"contract"}
+          />
+          <NavIcon
+            icon={<MenuBookIcon sx={{ fontSize: "30px" }} />}
+            label={"Handbook"}
+            to={"handbook"}
+          />
+          <NavIcon
+            icon={<MenuBookIcon sx={{ fontSize: "30px", display: "none" }} />}
           />
         </Box>
       </Box>

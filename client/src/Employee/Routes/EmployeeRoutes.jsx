@@ -11,6 +11,8 @@ import Undertime from "../Layouts/Employee/screens/undertime";
 import Leave from "../Layouts/Employee/screens/leave";
 import TravelOrder from "../Layouts/Employee/screens/travelOrder";
 import WorkSchedule from "../Layouts/Employee/screens/workSchedule";
+import Contract from "../Layouts/Employee/screens/contract";
+import HandBook from "../Layouts/Employee/screens/handbook";
 
 const EmployeeRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -30,6 +32,8 @@ const EmployeeRoutes = ({ user, onUpdateUser }) => (
       <Route path="leave" element={<Leave user={user} />} />
       <Route path="travelOrder" element={<TravelOrder user={user} />} />
       <Route path="workSchedule" element={<WorkSchedule user={user} />} />
+      <Route path="contract" element={<Contract user={user} />} />
+      <Route path="handbook" element={<HandBook user={user} />} />
     </Route>
   </Routes>
 );

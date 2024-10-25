@@ -44,7 +44,7 @@ const HandBook = ({ user }) => {
           <Typography
             sx={{ fontSize: 20, display: "flex", alignItems: "center" }}
           >
-            Work Schedule
+            Employee Handbook
           </Typography>
         </Box>
       </Box>

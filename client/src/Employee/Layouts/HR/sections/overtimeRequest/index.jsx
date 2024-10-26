@@ -162,14 +162,16 @@ const OvertimeRequest = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "immediateHead",
-      headerName: "Immediate Head",
+      field: "approvedBy",
+      headerName: "Approved By",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return `${params.row.EmployeeApprovedBy.lastName}, ${params.row.EmployeeApprovedBy.firstName} ${params.row.EmployeeApprovedBy.affix}`;
+        if (params.row.EmployeeApprovedBy) {
+          return `${params.row.EmployeeApprovedBy.lastName}, ${params.row.EmployeeApprovedBy.firstName} ${params.row.EmployeeApprovedBy.affix}`;
+        }
       },
       renderCell: renderCellWithWrapText,
     },

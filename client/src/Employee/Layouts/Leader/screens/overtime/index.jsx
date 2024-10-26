@@ -119,7 +119,7 @@ const Overtime = ({ user }) => {
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return `${params.row.EmployeeApprovedBy.lastName}, ${params.row.EmployeeApprovedBy.firstName} ${params.row.EmployeeApprovedBy.affix}`;
+        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
       },
       renderCell: renderCellWithWrapText,
     },

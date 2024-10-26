@@ -33,6 +33,7 @@ const Overtime = ({ user }) => {
         `${apiUrl}/api/overtime/subordinate/${user.id}`
       );
 
+      console.log(response.data.overtimes);
       setRecords(response.data.overtimes);
       setLoading(false);
     } catch (error) {

@@ -192,18 +192,32 @@ async function getOvertimeSubordinateController(req, res) {
 
     // Fetch all overtimes from the database
     const overtimes = await Overtime.findAll({
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: [
-          "firstName",
-          "middleName",
-          "lastName",
-          "affix",
-          "department",
-          "designation",
-        ],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+        {
+          model: Employee,
+          as: "EmployeeApprovedBy",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "affix",
+            "department",
+            "designation",
+          ],
+        },
+      ],
       where: {
         employeeId: {
           [Op.in]: subordinateIds, // Only get attendance for these subordinate IDs

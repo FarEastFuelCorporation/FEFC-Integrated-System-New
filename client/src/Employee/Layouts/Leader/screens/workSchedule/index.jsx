@@ -90,6 +90,7 @@ const WorkSchedule = ({ user }) => {
       console.log(workScheduleResponse.data.workSchedules);
       setRecords(workScheduleResponse.data.workSchedules);
 
+      console.log(response.data.subordinates);
       const sorted = [...response.data.subordinates].sort((a, b) =>
         a.last_name.localeCompare(b.last_name)
       );

@@ -126,28 +126,29 @@ async function getWorkScheduleController(req, res) {
       order: [["createdAt", "DESC"]],
       include: [
         {
-          model: Employee,
-          as: "Employee",
+          model: IdInformation,
+          as: "IdInformation",
           attributes: [
-            "employeeId",
-            "firstName",
-            "middleName",
-            "lastName",
+            "employee_id",
+            "first_name",
+            "middle_name",
+            "last_name",
             "affix",
-            "department",
             "designation",
+            "birthday",
           ],
         },
         {
-          model: Employee,
-          as: "EmployeeCreatedBy",
+          model: IdInformation,
+          as: "IdInformationCreatedBy",
           attributes: [
-            "firstName",
-            "middleName",
-            "lastName",
+            "employee_id",
+            "first_name",
+            "middle_name",
+            "last_name",
             "affix",
-            "department",
             "designation",
+            "birthday",
           ],
         },
       ],
@@ -245,18 +246,34 @@ async function getWorkScheduleSubordinateController(req, res) {
 
     // Fetch all workSchedules from the database
     const workSchedules = await WorkSchedule.findAll({
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: [
-          "firstName",
-          "middleName",
-          "lastName",
-          "affix",
-          "department",
-          "designation",
-        ],
-      },
+      include: [
+        {
+          model: IdInformation,
+          as: "IdInformation",
+          attributes: [
+            "employee_id",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "affix",
+            "designation",
+            "birthday",
+          ],
+        },
+        {
+          model: IdInformation,
+          as: "IdInformationCreatedBy",
+          attributes: [
+            "employee_id",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "affix",
+            "designation",
+            "birthday",
+          ],
+        },
+      ],
       where: {
         employeeId: {
           [Op.in]: subordinateIds, // Only get attendance for these subordinate IDs

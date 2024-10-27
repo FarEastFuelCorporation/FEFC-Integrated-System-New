@@ -17,7 +17,6 @@ const OvertimeRequest = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/overtime`);
 
-      console.log(response.data.overtimes);
       setRecords(response.data.overtimes);
       setLoading(false);
     } catch (error) {

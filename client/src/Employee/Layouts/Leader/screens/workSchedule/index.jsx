@@ -87,10 +87,8 @@ const WorkSchedule = ({ user }) => {
         `${apiUrl}/api/workSchedule/subordinate/${user.id}`
       );
 
-      console.log(workScheduleResponse.data.workSchedules);
       setRecords(workScheduleResponse.data.workSchedules);
 
-      console.log(response.data.subordinates);
       const sorted = [...response.data.subordinates].sort((a, b) =>
         a.last_name.localeCompare(b.last_name)
       );
@@ -184,7 +182,6 @@ const WorkSchedule = ({ user }) => {
   };
 
   const validateFormData = (formData) => {
-    console.log(formData);
     const { employeeId, typeOfSchedule } = formData;
 
     const errors = []; // Initialize an array to collect error messages
@@ -244,13 +241,13 @@ const WorkSchedule = ({ user }) => {
 
   const columns = [
     {
-      field: "employeeId",
+      field: "employee_id",
       headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
       minWidth: 100,
       valueGetter: (params) => {
-        return params.row.employeeId;
+        return params.row.employee_id;
       },
       renderCell: renderCellWithWrapText,
       headerClassName: "wrap-header-text",
@@ -260,12 +257,12 @@ const WorkSchedule = ({ user }) => {
       headerName: "Employee Name",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+        return `${params.row.IdInformation.last_name}, ${params.row.IdInformation.first_name} ${params.row.IdInformation.affix}`;
       },
       renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "designation",
@@ -274,7 +271,7 @@ const WorkSchedule = ({ user }) => {
       align: "center",
       minWidth: 200,
       valueGetter: (params) => {
-        return params.row.Employee.designation;
+        return params.row.IdInformation.designation;
       },
       renderCell: renderCellWithWrapText,
       headerClassName: "wrap-header-text",

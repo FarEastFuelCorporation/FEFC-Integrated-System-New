@@ -63,7 +63,6 @@ const EmployeeSalary = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/employeeSalary`);
 
-      console.log(response.data.employeeSalaries);
       setRecords(response.data.employeeSalaries);
 
       const employeeResponse = await axios.get(`${apiUrl}/api/employee`);

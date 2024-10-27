@@ -226,9 +226,6 @@ const HandbookComponent = () => {
 
   const containerWidth = isMobile ? dynamicWidth : defaultWidth;
   const containerHeight = isMobile ? dynamicHeight : defaultHeight;
-  console.log(isMobile);
-  console.log(dynamicWidth);
-  console.log(dynamicHeight);
   return (
     <div
       style={{

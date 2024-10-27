@@ -193,7 +193,7 @@ const WorkSchedule = ({ user }) => {
       flex: 1,
       minWidth: 100,
       valueGetter: (params) => {
-        return `${params.row.EmployeeCreatedBy.lastName}, ${params.row.EmployeeCreatedBy.firstName} ${params.row.EmployeeCreatedBy.affix}`;
+        return `${params.row.EmployeeCreatedBy.last_name}, ${params.row.EmployeeCreatedBy.first_name} ${params.row.EmployeeCreatedBy.affix}`;
       },
       renderCell: renderCellWithWrapText,
     },

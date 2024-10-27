@@ -88,8 +88,6 @@ const Attendance = () => {
   useEffect(() => {
     if (isDayTime) {
       colorMode.toggleColorMode(); // Toggle to light mode if daytime
-    } else {
-      colorMode.toggleColorMode(); // Toggle to dark mode if nighttime
     }
   }, [isDayTime, colorMode]);
 
@@ -330,6 +328,7 @@ const Attendance = () => {
         height: "calc(100vh - 64px)",
         scrollbarWidth: "none", // Firefox
         msOverflowStyle: "none", // IE 10+
+        paddingTop: "100px",
       }}
     >
       {loading && <LoadingSpinner isLoading={loading} />}
@@ -349,7 +348,6 @@ const Attendance = () => {
 
       <Box
         sx={{
-          marginTop: "60px",
           left: 0,
           position: "relative",
           display: "flex",

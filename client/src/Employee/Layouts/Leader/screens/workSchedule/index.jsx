@@ -170,7 +170,7 @@ const WorkSchedule = ({ user }) => {
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/travelOrder/${id}`);
+      await axios.delete(`${apiUrl}/api/workSchedule/${id}`);
 
       fetchData();
       setSuccessMessage("Work Schedule Deleted Successfully!");

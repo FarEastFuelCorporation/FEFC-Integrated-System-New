@@ -162,7 +162,7 @@ const WorkSchedule = ({ user }) => {
     },
     {
       field: "submittedBy",
-      headerName: "Submitted By",
+      headerName: "Scheduled By",
       headerAlign: "center",
       align: "center",
       flex: 1,

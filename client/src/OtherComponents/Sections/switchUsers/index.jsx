@@ -102,7 +102,7 @@ const SwitchUsers = ({ user, onUpdateUser }) => {
         <Header title="User Role" subtitle="List of User roles" />
       </Box>
 
-      <CustomDataGridStyles margin={0} height={"70vh"}>
+      <CustomDataGridStyles margin={0} height={"80vh"}>
         <DataGrid
           rows={employeeRoles ? employeeRoles : []}
           columns={columns}

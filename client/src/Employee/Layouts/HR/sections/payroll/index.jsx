@@ -61,6 +61,42 @@ const Payroll = ({ user }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
 
+  // basic 8 hours pay rate
+  // from 6am to 10pm
+  const ordinary = 1;
+  const restDayDuty = 1.3;
+  const specialHoliday = 1.3;
+  const specialHolidayRestDayDuty = 1.5;
+  const regularHoliday = 2;
+  const regularHolidayRestDayDuty = 2.6;
+
+  // basic 8 hours pay rate
+  // from 10pm to 6am
+  const ordinaryNight = 1.1;
+  const restDayDutyNight = 1.43;
+  const specialHolidayNight = 1.43;
+  const specialHolidayRestDayDutyNight = 1.65;
+  const regularHolidayNight = 2.2;
+  const regularHolidayRestDayDutyNight = 2.86;
+
+  // overtime pay rate
+  // from 6am to 10pm
+  const ordinaryOT = 1.25;
+  const restDayDutyOT = 1.69;
+  const specialHolidayOT = 1.69;
+  const specialHolidayRestDayDutyOT = 1.95;
+  const regularHolidayOT = 2.6;
+  const regularHolidayRestDayDutyOT = 3.38;
+
+  // overtime pay rate
+  // from 10pm to 6am
+  const ordinaryNightOT = 1.375;
+  const restDayDutyNightOT = 1.859;
+  const specialHolidayNightOT = 1.859;
+  const specialHolidayRestDayDutyNightOT = 2.145;
+  const regularHolidayNightOT = 2.86;
+  const regularHolidayRestDayDutyNightOT = 3.718;
+
   function calculateHours(dayString, data, day) {
     // Check if dayString is valid
     if (!dayString || typeof dayString !== "string") {

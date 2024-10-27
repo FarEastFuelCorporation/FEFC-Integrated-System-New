@@ -6,7 +6,9 @@ async function getEmployeeRecords(req, res) {
   try {
     // Fetch all employees and their IdInformation records
     const employeeRecords = await Employee.findAll({});
-    const employeeIdRecords = await IdInformation.findAll({});
+    const employeeIdRecords = await IdInformation.findAll({
+      attributes: { exclude: ["profile_picture", "signature"] },
+    });
 
     // Create a map of IdInformation records for quick lookup by employee_id
     const idInformationMap = employeeIdRecords.reduce((map, idInfo) => {

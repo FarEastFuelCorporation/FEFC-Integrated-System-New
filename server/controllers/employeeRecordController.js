@@ -180,6 +180,22 @@ async function getEmployeeRecordsController(req, res) {
   try {
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
+      attributes: { exclude: ["picture", "signature"] },
+      order: [["employeeId", "ASC"]],
+    });
+
+    res.json({ employeeRecords });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get EmployeeRecords controller
+async function getEmployeeRecordsFullController(req, res) {
+  try {
+    // Fetch all EmployeeRecords from the database
+    const employeeRecords = await EmployeeRecord.findAll({
       order: [["employeeId", "ASC"]],
     });
 
@@ -411,6 +427,7 @@ async function deleteEmployeeRecordController(req, res) {
 module.exports = {
   createEmployeeRecordController,
   getEmployeeRecordsController,
+  getEmployeeRecordsFullController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
 };

@@ -9,6 +9,12 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import EmployeeProfileModal from "../../../../../OtherComponents/Modals/EmployeeProfileModal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
+import {
+  formatDate,
+  formatDate2,
+  formatDate3,
+} from "../../../../../OtherComponents/Functions";
 
 const Contacts = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -92,6 +98,7 @@ const Contacts = ({ user }) => {
   const [signatureFileName, setSignatureFileName] = useState("");
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPicture, setLoadingPicture] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -101,14 +108,33 @@ const Contacts = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      // const [employeeRecordResponse, departmentResponse] = await Promise.all([
-      //   axios.get(`${apiUrl}/api/employeeRecord`),
-      //   axios.get(`${apiUrl}/api/department`),
-      // ]);
+      const [employeeRecordResponse, departmentResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/employeeRecord`),
+        axios.get(`${apiUrl}/api/department`),
+      ]);
 
-      // setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
-      // setDepartments(departmentResponse.data.departments);
+      console.log(employeeRecordResponse.data.employeeRecords);
+      setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
+      setDepartments(departmentResponse.data.departments);
       setLoading(false);
+
+      // Now fetch the full data with pictures
+      setLoadingPicture(true);
+      const fullEmployeeRecordResponse = await axios.get(
+        `${apiUrl}/api/employeeRecord/full`
+      );
+      setEmployeeRecord((prevRecords) => {
+        return prevRecords.map((record) => {
+          const fullRecord =
+            fullEmployeeRecordResponse.data.employeeRecords.find(
+              (r) => r.employeeId === record.employeeId
+            );
+          return fullRecord
+            ? { ...record, picture: fullRecord.picture }
+            : record;
+        });
+      });
+      setLoadingPicture(false);
     } catch (error) {
       console.error("Error fetching employeeData:", error);
     }
@@ -549,6 +575,45 @@ const Contacts = ({ user }) => {
     </div>
   );
 
+  const renderPictureCell = (params) => {
+    if (loadingPicture) {
+      return <CircularProgress size={20} color="secondary" />; // Spinner while loading pictures
+    }
+
+    if (params.value && params.value.data && params.value.type) {
+      try {
+        const uint8Array = new Uint8Array(params.value.data);
+        const blob = new Blob([uint8Array], { type: params.value.type });
+        const imageUrl = URL.createObjectURL(blob);
+
+        return (
+          <img
+            src={imageUrl}
+            alt="Employee"
+            style={{ width: 40, height: 40, borderRadius: "50%" }}
+          />
+        );
+      } catch (error) {
+        console.error("Error creating image URL:", error);
+        return (
+          <img
+            src="/assets/unknown.png"
+            alt="Employee"
+            style={{ width: 40, height: 40, borderRadius: "50%" }}
+          />
+        );
+      }
+    } else {
+      return (
+        <img
+          src="/assets/unknown.png"
+          alt="Employee"
+          style={{ width: 40, height: 40, borderRadius: "50%" }}
+        />
+      );
+    }
+  };
+
   const columns = [
     {
       field: "employeeId",
@@ -564,44 +629,7 @@ const Contacts = ({ user }) => {
       sortable: false,
       width: 70,
       headerAlign: "center",
-      renderCell: (params) => {
-        // Check if params.value is valid
-        if (params.value && params.value.data && params.value.type) {
-          try {
-            // Convert Buffer to Uint8Array
-            const uint8Array = new Uint8Array(params.value.data);
-            // Create Blob from Uint8Array
-            const blob = new Blob([uint8Array], { type: params.value.type });
-            // Create object URL from Blob
-            const imageUrl = URL.createObjectURL(blob);
-
-            return (
-              <img
-                src={imageUrl}
-                alt="Logo"
-                style={{ width: 40, height: 40, borderRadius: "50%" }}
-              />
-            );
-          } catch (error) {
-            console.error("Error creating image URL:", error);
-            return (
-              <img
-                src="/assets/unknown.png"
-                alt="Logo"
-                style={{ width: 40, height: 40, borderRadius: "50%" }}
-              />
-            );
-          }
-        } else {
-          return (
-            <img
-              src="/assets/unknown.png"
-              alt="Logo"
-              style={{ width: 40, height: 40, borderRadius: "50%" }}
-            />
-          );
-        }
-      },
+      renderCell: renderPictureCell,
     },
     {
       field: "employeeStatus",
@@ -664,6 +692,9 @@ const Contacts = ({ user }) => {
       headerName: "Birthday",
       width: 100,
       headerAlign: "center",
+      valueGetter: (params) => {
+        return params.row.birthday ? formatDate3(params.row.birthday) : null;
+      },
       renderCell: renderCellWithWrapText,
     },
     {
@@ -671,6 +702,9 @@ const Contacts = ({ user }) => {
       headerName: "Date Hire",
       width: 100,
       headerAlign: "center",
+      valueGetter: (params) => {
+        return params.row.dateHire ? formatDate3(params.row.dateHire) : null;
+      },
       renderCell: renderCellWithWrapText,
     },
     {

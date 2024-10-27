@@ -7,6 +7,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const {
   createEmployeeRecordController,
   getEmployeeRecordsController,
+  getEmployeeRecordsFullController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
 } = require("../controllers/employeeRecordController");
@@ -23,6 +24,9 @@ router.post(
 
 // Get EmployeeRecords route
 router.get("/", getEmployeeRecordsController);
+
+// Get EmployeeRecords route
+router.get("/full", getEmployeeRecordsFullController);
 
 // Update EmployeeRecord route
 router.put(

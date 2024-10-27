@@ -101,13 +101,13 @@ const Contacts = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      // const [employeeRecordResponse, departmentResponse] = await Promise.all([
-      //   axios.get(`${apiUrl}/api/employeeRecord`),
-      //   axios.get(`${apiUrl}/api/department`),
-      // ]);
+      const [employeeRecordResponse, departmentResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/employeeRecord`),
+        axios.get(`${apiUrl}/api/department`),
+      ]);
 
-      // setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
-      // setDepartments(departmentResponse.data.departments);
+      setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
+      setDepartments(departmentResponse.data.departments);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching employeeData:", error);

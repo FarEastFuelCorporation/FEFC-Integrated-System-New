@@ -56,7 +56,7 @@ const WorkSchedule = ({ user }) => {
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+        return `${params.row.IdInformation.last_name}, ${params.row.IdInformation.first_name} ${params.row.IdInformation.affix}`;
       },
       renderCell: renderCellWithWrapText,
     },
@@ -68,7 +68,7 @@ const WorkSchedule = ({ user }) => {
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return params.row.Employee.designation;
+        return params.row.IdInformation.designation;
       },
       renderCell: renderCellWithWrapText,
     },

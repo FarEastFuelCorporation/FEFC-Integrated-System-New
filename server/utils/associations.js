@@ -156,29 +156,29 @@ Leave.belongsTo(Employee, {
   onDelete: "CASCADE",
 });
 
-Employee.hasMany(WorkSchedule, {
+IdInformation.hasMany(WorkSchedule, {
   as: "WorkSchedule",
   foreignKey: "employeeId",
-  sourceKey: "employeeId",
+  sourceKey: "employee_id",
   onDelete: "CASCADE",
 });
-WorkSchedule.belongsTo(Employee, {
-  as: "Employee",
+WorkSchedule.belongsTo(IdInformation, {
+  as: "IdInformation",
   foreignKey: "employeeId",
-  targetKey: "employeeId",
+  targetKey: "employee_id",
   onDelete: "CASCADE",
 });
 
-Employee.hasMany(WorkSchedule, {
+IdInformation.hasMany(WorkSchedule, {
   as: "WorkScheduleCreatedBy",
   foreignKey: "createdBy",
-  sourceKey: "employeeId",
+  sourceKey: "employee_id",
   onDelete: "CASCADE",
 });
-WorkSchedule.belongsTo(Employee, {
-  as: "EmployeeCreatedBy",
+WorkSchedule.belongsTo(IdInformation, {
+  as: "IdInformationCreatedBy",
   foreignKey: "createdBy",
-  targetKey: "employeeId",
+  targetKey: "employee_id",
   onDelete: "CASCADE",
 });
 

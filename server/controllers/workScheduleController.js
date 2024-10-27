@@ -210,14 +210,19 @@ async function getWorkScheduleSubordinateController(req, res) {
     // Step 1: Find all subordinates based on the immediateHeadId
     const subordinates = await IdInformation.findAll({
       where: {
-        immediateHeadId: {
-          [Op.or]: [
-            { [Op.like]: `${id},%` }, // id at the start
-            { [Op.like]: `%,${id},%` }, // id in the middle
-            { [Op.like]: `%,${id}` }, // id at the end
-            { [Op.like]: `${id}` }, // id is the only value
-          ],
-        },
+        [Op.or]: [
+          {
+            immediateHeadId: {
+              [Op.or]: [
+                { [Op.like]: `${id},%` }, // id at the start
+                { [Op.like]: `%,${id},%` }, // id in the middle
+                { [Op.like]: `%,${id}` }, // id at the end
+                { [Op.like]: `${id}` }, // id is the only value
+              ],
+            },
+          },
+          { employee_id: id }, // additional condition: employee_id = id
+        ],
       },
       attributes: [
         "employee_id",

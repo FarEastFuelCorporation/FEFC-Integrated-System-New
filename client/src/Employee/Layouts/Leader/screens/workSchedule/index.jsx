@@ -389,6 +389,18 @@ const WorkSchedule = ({ user }) => {
       headerClassName: "wrap-header-text",
     },
     {
+      field: "remarks",
+      headerName: "Remarks",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return params.row.remarks ? params.row.remarks : "NO REMARKS";
+      },
+      renderCell: renderCellWithWrapText,
+      headerClassName: "wrap-header-text",
+    },
+    {
       field: "edit",
       headerName: "Edit",
       headerAlign: "center",

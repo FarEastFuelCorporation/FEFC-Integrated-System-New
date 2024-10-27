@@ -78,7 +78,7 @@ const WorkSchedule = ({ user }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -87,7 +87,7 @@ const WorkSchedule = ({ user }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 80,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -175,12 +175,23 @@ const WorkSchedule = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "remarks",
+      headerName: "Remarks",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return params.row.remarks ? params.row.remarks : "NO REMARKS";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "submittedBy",
       headerName: "Immediate Head",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
+      minWidth: 100,
       valueGetter: (params) => {
         return `${params.row.EmployeeCreatedBy.lastName}, ${params.row.EmployeeCreatedBy.firstName} ${params.row.EmployeeCreatedBy.affix}`;
       },

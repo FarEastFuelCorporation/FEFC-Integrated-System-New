@@ -59,7 +59,23 @@ async function getAttachmentsController(req, res) {
   }
 }
 
+// Get Attachment controller
+async function getAttachmentController(req, res) {
+  try {
+    const id = req.params.id;
+    // Fetch all clients from the database
+    const attachments = await Attachment.findByPk(id);
+
+    res.json({ attachments });
+  } catch (error) {
+    // Handling errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createAttachmentController,
   getAttachmentsController,
+  getAttachmentController,
 };

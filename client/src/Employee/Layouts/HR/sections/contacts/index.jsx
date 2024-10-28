@@ -690,7 +690,7 @@ const Contacts = ({ user }) => {
     {
       field: "birthday",
       headerName: "Birthday",
-      width: 100,
+      width: 80,
       headerAlign: "center",
       valueGetter: (params) => {
         return params.row.birthday ? formatDate3(params.row.birthday) : null;
@@ -700,11 +700,19 @@ const Contacts = ({ user }) => {
     {
       field: "dateHire",
       headerName: "Date Hire",
-      width: 100,
+      width: 80,
       headerAlign: "center",
       valueGetter: (params) => {
         return params.row.dateHire ? formatDate3(params.row.dateHire) : null;
       },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "employeeType",
+      headerName: "Employee Type",
+      minWidth: 80,
+      flex: 1,
+      headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
@@ -718,14 +726,15 @@ const Contacts = ({ user }) => {
     {
       field: "departmentId",
       headerName: "Department",
-      width: 150,
+      width: 200,
       headerAlign: "center",
-      renderCell: (params) => {
+      valueGetter: (params) => {
         const department = departments.find(
           (department) => department.id === params.value
         );
         return department ? department.department : "(No Data)";
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "mobileNumber",

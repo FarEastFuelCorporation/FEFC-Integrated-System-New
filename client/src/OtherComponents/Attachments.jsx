@@ -192,12 +192,16 @@ const Attachments = ({
       align: "center",
       sortable: false,
       width: 100,
-      renderCell: (params) => (
-        <IconButton
-          sx={{ color: colors.greenAccent[400], fontSize: "large" }}
-          onClick={() => {
-            const attachment = params.row.attachment; // Access the longblob data
+      renderCell: (params) => {
+        const handleViewFile = async () => {
+          try {
+            console.log(params.row.id);
+            const response = await axios.get(
+              `${apiUrl}/api/attachment/${params.row.id}`
+            );
 
+            const attachment = response.data.attachments.attachment; // Access the longblob data
+            console.log(response.data.attachments);
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
 
@@ -218,12 +222,24 @@ const Attachments = ({
               const blob = new Blob([byteArray], { type: mimeType });
               const url = URL.createObjectURL(blob); // Create an object URL from the Blob
               window.open(url, "_blank"); // Open the URL in a new tab
+
+              // Revoke the object URL after some delay to free up resources
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
             }
-          }}
-        >
-          <PageviewIcon sx={{ fontSize: "2rem" }} />
-        </IconButton>
-      ),
+          } catch (error) {
+            console.error("Error fetching attachment:", error);
+          }
+        };
+
+        return (
+          <IconButton
+            sx={{ color: colors.greenAccent[400], fontSize: "large" }}
+            onClick={handleViewFile} // No async here; handleViewFile is async but onClick isn’t
+          >
+            <PageviewIcon sx={{ fontSize: "2rem" }} />
+          </IconButton>
+        );
+      },
     },
     {
       field: "download",
@@ -232,12 +248,17 @@ const Attachments = ({
       align: "center",
       sortable: false,
       width: 100,
-      renderCell: (params) => (
-        <IconButton
-          sx={{ color: colors.blueAccent[400], fontSize: "large" }}
-          onClick={() => {
-            const attachment = params.row.attachment; // Access the longblob data
+      renderCell: (params) => {
+        const handleDownloadFile = async () => {
+          try {
             const fileName = params.row.fileName; // Access the file name
+            console.log(params.row.id);
+
+            const response = await axios.get(
+              `${apiUrl}/api/attachment/${params.row.id}`
+            );
+
+            const attachment = response.data.attachments.attachment; // Access the longblob data
 
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
@@ -245,6 +266,7 @@ const Attachments = ({
               // Determine the MIME type based on the file's magic number (first few bytes)
               let mimeType = "application/octet-stream"; // Default MIME type
               const magicNumbers = byteArray.slice(0, 4).join(",");
+
               // Common magic numbers
               if (magicNumbers.startsWith("255,216,255")) {
                 mimeType = "image/jpeg";
@@ -258,18 +280,31 @@ const Attachments = ({
               const blob = new Blob([byteArray], { type: mimeType });
               const url = URL.createObjectURL(blob); // Create an object URL from the Blob
 
+              // Create a temporary download link
               const link = document.createElement("a");
               link.href = url;
               link.setAttribute("download", fileName); // Use the file name for the download
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
+
+              // Revoke the object URL after download to free up resources
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
             }
-          }}
-        >
-          <DownloadIcon sx={{ fontSize: "2rem" }} />
-        </IconButton>
-      ),
+          } catch (error) {
+            console.error("Error downloading attachment:", error);
+          }
+        };
+
+        return (
+          <IconButton
+            sx={{ color: colors.blueAccent[400], fontSize: "large" }}
+            onClick={handleDownloadFile} // Call the asynchronous handler here
+          >
+            <DownloadIcon sx={{ fontSize: "2rem" }} />
+          </IconButton>
+        );
+      },
     },
   ];
 

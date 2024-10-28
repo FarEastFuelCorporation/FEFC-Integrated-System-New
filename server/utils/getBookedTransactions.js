@@ -64,6 +64,7 @@ const getIncludeOptions = () => [
     model: Attachment,
     as: "Attachment",
     required: false,
+    attributes: { exclude: ["attachment"] },
     include: {
       model: Employee,
       as: "Employee",

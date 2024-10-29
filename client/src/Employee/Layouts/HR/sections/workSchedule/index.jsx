@@ -18,6 +18,7 @@ const WorkSchedule = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/workSchedule`);
 
+      console.log(response.data.workSchedules);
       setRecords(response.data.workSchedules);
       setLoading(false);
     } catch (error) {
@@ -56,7 +57,9 @@ const WorkSchedule = ({ user }) => {
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return `${params.row.IdInformation.last_name}, ${params.row.IdInformation.first_name} ${params.row.IdInformation.affix}`;
+        if (params.row.IdInformation) {
+          return `${params.row.IdInformation.last_name}, ${params.row.IdInformation.first_name} ${params.row.IdInformation.affix}`;
+        }
       },
       renderCell: renderCellWithWrapText,
     },
@@ -193,7 +196,9 @@ const WorkSchedule = ({ user }) => {
       flex: 1,
       minWidth: 100,
       valueGetter: (params) => {
-        return `${params.row.EmployeeCreatedBy.last_name}, ${params.row.EmployeeCreatedBy.first_name} ${params.row.EmployeeCreatedBy.affix}`;
+        if (params.row.EmployeeCreatedBy) {
+          return `${params.row.EmployeeCreatedBy.last_name}, ${params.row.EmployeeCreatedBy.first_name} ${params.row.EmployeeCreatedBy.affix}`;
+        }
       },
       renderCell: renderCellWithWrapText,
     },

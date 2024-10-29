@@ -85,10 +85,10 @@ const BillingDistributionTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      billingDistributionTransactionId:
-        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-          .CertifiedTransaction[0].BilledTransaction[0]
-          .BillingApprovalTransaction.BillingDistributionTransaction.id,
+      // billingDistributionTransactionId:
+      //   row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      //     .CertifiedTransaction[0].BilledTransaction[0]
+      //     .BillingApprovalTransaction.BillingDistributionTransaction?.id,
       collectedDate: "",
       collectedTime: "",
       collectedAmount: 0,

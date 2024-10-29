@@ -130,9 +130,11 @@ const ReceivedTransaction = ({ row }) => {
           </Typography>
           <Typography variant="h5">
             Received By:{" "}
-            {`${receivedTransaction.Employee.firstName || ""} ${
-              receivedTransaction.Employee.lastName || ""
-            }`}
+            {receivedTransaction.Employee
+              ? `${receivedTransaction.Employee.firstName || ""} ${
+                  receivedTransaction.Employee.lastName || ""
+                }`
+              : ""}
           </Typography>
           <br />
           <hr />

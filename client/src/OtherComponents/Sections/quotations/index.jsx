@@ -119,6 +119,45 @@ const Quotations = ({ user }) => {
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
 
+      // Define a sorting function for QuotationWaste
+      const sortQuotationWaste = (a, b) => {
+        // First sort by mode
+        if (a.mode < b.mode) return -1;
+        if (a.mode > b.mode) return 1;
+
+        // If modes are equal, sort by wasteName
+        if (a.wasteName < b.wasteName) return -1;
+        if (a.wasteName > b.wasteName) return 1;
+
+        return 0; // They are equal
+      };
+
+      // Define a sorting function for QuotationTransportation
+      const sortQuotationTransportation = (a, b) => {
+        // First sort by mode
+        if (a.mode < b.mode) return -1;
+        if (a.mode > b.mode) return 1;
+
+        // If modes are equal, sort by typeOfVehicle from VehicleType
+        const vehicleTypeA = a.VehicleType?.typeOfVehicle || "";
+        const vehicleTypeB = b.VehicleType?.typeOfVehicle || "";
+
+        if (vehicleTypeA < vehicleTypeB) return -1;
+        if (vehicleTypeA > vehicleTypeB) return 1;
+
+        return 0; // They are equal
+      };
+
+      // Iterate over each item in flattenedData
+      flattenedData.forEach((item) => {
+        if (Array.isArray(item.QuotationWaste)) {
+          item.QuotationWaste.sort(sortQuotationWaste);
+        }
+        if (Array.isArray(item.QuotationTransportation)) {
+          item.QuotationTransportation.sort(sortQuotationTransportation);
+        }
+      });
+
       setQuotationsData(flattenedData);
       setLoading(false);
     } catch (error) {

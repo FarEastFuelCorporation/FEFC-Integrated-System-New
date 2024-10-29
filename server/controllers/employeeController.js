@@ -51,6 +51,9 @@ async function getEmployeesController(req, res) {
   try {
     // Fetch all vehicles from the database
     const employees = await Employee.findAll({
+      where: {
+        employeeStatus: "ACTIVE",
+      },
       order: [["lastName", "ASC"]], // Sort by lastName in ascending order
     });
 

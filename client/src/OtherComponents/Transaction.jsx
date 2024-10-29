@@ -66,15 +66,15 @@ const Transaction = ({
       ? inProgressTransactions
       : finishedTransactions;
 
-  const pendingCount = pendingTransactions.filter(
-    (transaction) => transaction.statusId === 1
-  ).length;
-  const inProgressCount = inProgressTransactions.filter(
-    (transaction) => transaction.statusId === 2
-  ).length;
-  const finishedCount = finishedTransactions.filter(
-    (transaction) => transaction.statusId === 3
-  ).length;
+  const pendingCount = pendingTransactions.length;
+  const inProgressCount = inProgressTransactions.length;
+  const finishedCount = finishedTransactions.length;
+
+  console.log(pendingTransactions);
+  console.log(inProgressTransactions);
+  console.log(pendingCount);
+  console.log(inProgressCount);
+  console.log(finishedCount);
 
   return (
     <Box mt="40px">

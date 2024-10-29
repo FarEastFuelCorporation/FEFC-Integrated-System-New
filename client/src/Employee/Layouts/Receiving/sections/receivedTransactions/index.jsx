@@ -57,6 +57,8 @@ const ReceivedTransactions = ({ user }) => {
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
 
+      console.log(receivedTransactionResponse.data.pendingTransactions);
+
       // For pending transactions
       const filteredPendingTransactions =
         receivedTransactionResponse.data.pendingTransactions.filter(
@@ -72,26 +74,15 @@ const ReceivedTransactions = ({ user }) => {
       // For in-progress transactions
       const filteredInProgressTransactions =
         receivedTransactionResponse.data.inProgressTransactions.filter(
-          (transaction) =>
-            (transaction.statusId === 2 &&
-              transaction.ScheduledTransaction &&
-              transaction.ScheduledTransaction[0].logisticsId !==
-                matchingLogisticsId) ||
-            transaction.statusId === 3
+          (transaction) => transaction.statusId === 4
         );
       setInProgressTransactions(filteredInProgressTransactions);
 
       // For finished transactions
-      const filteredFinishedTransactions =
-        receivedTransactionResponse.data.finishedTransactions.filter(
-          (transaction) =>
-            (transaction.statusId === 2 &&
-              transaction.ScheduledTransaction &&
-              transaction.ScheduledTransaction[0].logisticsId !==
-                matchingLogisticsId) ||
-            transaction.statusId === 3
-        );
-      setFinishedTransactions(filteredFinishedTransactions);
+
+      setFinishedTransactions(
+        receivedTransactionResponse.data.finishedTransactions
+      );
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -108,7 +99,8 @@ const ReceivedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       scheduledTransactionId: row.ScheduledTransaction[0].id,
-      dispatchedTransactionId: row.ScheduledTransaction[0].id,
+      dispatchedTransactionId:
+        row.ScheduledTransaction[0].DispatchedTransaction?.[0].id,
       receivedDate: "",
       receivedTime: "",
       pttNo: "",

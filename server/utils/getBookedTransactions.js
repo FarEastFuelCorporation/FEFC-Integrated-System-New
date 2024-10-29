@@ -255,17 +255,26 @@ const getIncludeOptions = () => [
 ];
 
 // Get Pending Transactions (where statusId equals given value)
-const getPendingTransactions = async (statusId, user = null) => {
+const getPendingTransactions = async (
+  statusId,
+  additionalStatusId = null,
+  user = null
+) => {
   try {
     // Build the where clause dynamically
-    const whereConditions = { statusId }; // Always include statusId
-
+    const whereConditions = {
+      [Op.or]: [
+        { statusId }, // Matches the main statusId
+        additionalStatusId ? { statusId: additionalStatusId } : null, // Optionally matches an additional statusId
+      ].filter(Boolean), // Filter out nulls if additionalStatusId is not provided
+    };
     // If user is provided, add user-specific condition (e.g., createdBy)
     if (user) {
       whereConditions.createdBy = user;
     }
+    console.log(whereConditions);
     const bookedTransactions = await BookedTransaction.findAll({
-      where: whereConditions,
+      // where: whereConditions,
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
     });

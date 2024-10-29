@@ -122,6 +122,10 @@ async function createQuotationController(req, res) {
         {
           model: QuotationWaste,
           as: "QuotationWaste",
+          order: [
+            ["wasteName", "ASC"],
+            ["mode", "ASC"],
+          ],
         },
         {
           model: QuotationTransportation,
@@ -166,6 +170,10 @@ async function getQuotationsController(req, res) {
               as: "Quotation",
             },
           ],
+          order: [
+            ["wasteName", "ASC"],
+            ["mode", "ASC"],
+          ],
         },
         {
           model: QuotationTransportation,
@@ -174,6 +182,7 @@ async function getQuotationsController(req, res) {
             {
               model: VehicleType,
               as: "VehicleType",
+              order: [["typeOfVehicle", "ASC"]],
             },
             {
               model: Quotation,
@@ -225,6 +234,10 @@ async function getQuotationController(req, res) {
               as: "Quotation",
             },
           ],
+          order: [
+            ["wasteName", "ASC"],
+            ["mode", "ASC"],
+          ],
         },
         {
           model: QuotationTransportation,
@@ -233,6 +246,7 @@ async function getQuotationController(req, res) {
             {
               model: VehicleType,
               as: "VehicleType",
+              order: [["typeOfVehicle", "ASC"]],
             },
             {
               model: Quotation,
@@ -394,6 +408,10 @@ async function updateQuotationController(req, res) {
           {
             model: QuotationWaste,
             as: "QuotationWaste",
+            order: [
+              ["wasteName", "ASC"],
+              ["mode", "ASC"],
+            ],
           },
           {
             model: QuotationTransportation,

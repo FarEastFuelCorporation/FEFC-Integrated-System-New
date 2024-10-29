@@ -4,6 +4,7 @@ const BookedTransaction = require("../models/BookedTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
 const statusId = 2;
+const additionalStatusId = 3;
 
 // Create Received Transaction controller
 async function createReceivedTransactionController(req, res) {
@@ -86,7 +87,9 @@ async function createReceivedTransactionController(req, res) {
 async function getReceivedTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(statusId);
+    const data = await fetchData(statusId, additionalStatusId);
+
+    console.log(data);
 
     // Respond with the updated data
     res.status(200).json({

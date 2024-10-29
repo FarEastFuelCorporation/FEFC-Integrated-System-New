@@ -32,6 +32,10 @@ async function getQuotationFormController(req, res) {
               as: "Quotation",
             },
           ],
+          order: [
+            ["wasteName", "ASC"],
+            ["mode", "ASC"],
+          ],
         },
         {
           model: QuotationTransportation,
@@ -40,6 +44,7 @@ async function getQuotationFormController(req, res) {
             {
               model: VehicleType,
               as: "VehicleType",
+              order: [["typeOfVehicle", "ASC"]],
             },
             {
               model: Quotation,

@@ -50,13 +50,13 @@ const ScheduledTransaction = ({ row }) => {
           </Box>
           <Typography variant="h5">
             Scheduled Date:{" "}
-            {scheduledData?.billedDate
+            {scheduledData?.scheduledDate
               ? format(new Date(scheduledData.scheduledDate), "MMMM dd, yyyy")
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Scheduled Time:{" "}
-            {scheduledData?.billedTime
+            {scheduledData?.scheduledTime
               ? format(parseTimeString(scheduledData.scheduledTime), "hh:mm aa")
               : "Pending"}
           </Typography>

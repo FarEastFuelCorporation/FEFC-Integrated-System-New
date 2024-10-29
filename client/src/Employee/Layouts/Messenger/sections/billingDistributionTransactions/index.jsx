@@ -82,13 +82,14 @@ const BillingDistributionTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
+    console.log(row);
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      // billingDistributionTransactionId:
-      //   row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      //     .CertifiedTransaction[0].BilledTransaction[0]
-      //     .BillingApprovalTransaction.BillingDistributionTransaction?.id,
+      billingApprovalTransactionId:
+        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+          .CertifiedTransaction[0].BilledTransaction[0]
+          .BillingApprovalTransaction.id,
       collectedDate: "",
       collectedTime: "",
       collectedAmount: 0,

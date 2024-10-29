@@ -284,6 +284,7 @@ const getInProgressTransactions = async (statusId, user = null) => {
     const whereConditions = {
       statusId: {
         [Op.gt]: statusId, // Status ID greater than the given value
+        [Op.lt]: 11,
       },
     };
 
@@ -309,7 +310,7 @@ const getFinishedTransactions = async (user = null) => {
   try {
     const bookedTransactions = await BookedTransaction.findAll({
       where: {
-        statusId: 12,
+        statusId: 11,
       },
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],

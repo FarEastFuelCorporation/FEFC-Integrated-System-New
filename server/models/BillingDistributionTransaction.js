@@ -15,7 +15,7 @@ const BillingDistributionTransaction = sequelize.define(
     },
     billingApprovalTransactionId: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
     },
     distributedDate: {
       type: DataTypes.DATEONLY,

@@ -19,19 +19,26 @@ const CollectedTransaction = ({ row, user }) => {
   const collectedTransaction =
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
-      .BillingDistributionTransaction.CollectedTransaction;
+      .BillingDistributionTransaction?.CollectedTransaction;
+
+  console.log(billingDistributionTransaction.distributedDate);
 
   // Assuming distributedDate is in a valid Date format (either Date object or string)
   const distributedDate = new Date(
-    billingDistributionTransaction.distributedDate
+    billingDistributionTransaction?.distributedDate
   );
 
   // Add the terms to the distributedDate
   const terms = parseInt(row.QuotationWaste.Quotation.termsCharge);
 
+  let dueDate;
+
   // Create a new Date instance for dueDate by adding terms to distributedDate
-  const dueDate = new Date(distributedDate);
-  dueDate.setDate(dueDate.getDate() + terms);
+  console.log(distributedDate);
+  if (distributedDate) {
+    dueDate = new Date(distributedDate);
+    dueDate.setDate(dueDate.getDate() + terms);
+  }
 
   return (
     <Box>

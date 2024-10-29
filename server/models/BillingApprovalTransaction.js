@@ -15,7 +15,7 @@ const BillingApprovalTransaction = sequelize.define(
     },
     billedTransactionId: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
     },
     approvedDate: {
       type: DataTypes.DATEONLY,

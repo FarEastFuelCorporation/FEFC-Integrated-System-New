@@ -27,6 +27,7 @@ async function createClientController(req, res) {
 
     clientName = clientName && clientName.toUpperCase();
     address = address && address.toUpperCase();
+    natureOfBusiness = natureOfBusiness && natureOfBusiness.toUpperCase();
     billerName = billerName && billerName.toUpperCase();
     billerAddress = billerAddress && billerAddress.toUpperCase();
     billerContactPerson =
@@ -115,6 +116,7 @@ async function updateClientController(req, res) {
 
     clientName = clientName && clientName.toUpperCase();
     address = address && address.toUpperCase();
+    natureOfBusiness = natureOfBusiness && natureOfBusiness.toUpperCase();
     billerName = billerName && billerName.toUpperCase();
     billerAddress = billerAddress && billerAddress.toUpperCase();
     billerContactPerson =

@@ -15,7 +15,7 @@ const BilledTransaction = sequelize.define(
     },
     bookedTransactionId: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
     },
     billingNumber: {
       type: DataTypes.STRING,

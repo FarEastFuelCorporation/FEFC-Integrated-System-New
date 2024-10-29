@@ -168,7 +168,7 @@ const WorkSchedule = ({ user }) => {
       flex: 1,
       minWidth: 100,
       valueGetter: (params) => {
-        return `${params.row.EmployeeCreatedBy.lastName}, ${params.row.EmployeeCreatedBy.firstName} ${params.row.EmployeeCreatedBy.affix}`;
+        return `${params.row.IdInformationCreatedBy.last_name}, ${params.row.IdInformationCreatedBy.first_name} ${params.row.IdInformationCreatedBy.affix}`;
       },
       renderCell: renderCellWithWrapText,
     },

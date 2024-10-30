@@ -129,7 +129,7 @@ const Leave = ({ user }) => {
       await axios.put(`${apiUrl}/api/leave/subordinateDisapproved/${id}`);
 
       fetchData();
-      setSuccessMessage("Leave Approved Successfully!");
+      setSuccessMessage("Leave Disapproved Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {

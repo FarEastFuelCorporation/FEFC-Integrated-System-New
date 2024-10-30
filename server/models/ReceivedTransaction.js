@@ -21,11 +21,11 @@ const ReceivedTransaction = sequelize.define(
       type: DataTypes.UUID,
       allowNull: true,
     },
-    vehicleId: {
-      type: DataTypes.UUID,
+    vehicle: {
+      type: DataTypes.STRING,
       allowNull: true,
     },
-    driverId: {
+    driver: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -71,7 +71,7 @@ const ReceivedTransaction = sequelize.define(
     },
     submitTo: {
       type: DataTypes.ENUM,
-      values: ["SORTING", "WAREHOUSE"],
+      values: ["SORTING", "WAREHOUSE", "ACCOUNTING"],
       allowNull: true,
     },
     remarks: {

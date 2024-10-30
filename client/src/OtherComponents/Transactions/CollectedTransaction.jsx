@@ -21,8 +21,6 @@ const CollectedTransaction = ({ row, user }) => {
       .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
       .BillingDistributionTransaction?.CollectedTransaction;
 
-  console.log(billingDistributionTransaction.distributedDate);
-
   // Assuming distributedDate is in a valid Date format (either Date object or string)
   const distributedDate = new Date(
     billingDistributionTransaction?.distributedDate
@@ -34,7 +32,6 @@ const CollectedTransaction = ({ row, user }) => {
   let dueDate;
 
   // Create a new Date instance for dueDate by adding terms to distributedDate
-  console.log(distributedDate);
   if (distributedDate) {
     dueDate = new Date(distributedDate);
     dueDate.setDate(dueDate.getDate() + terms);

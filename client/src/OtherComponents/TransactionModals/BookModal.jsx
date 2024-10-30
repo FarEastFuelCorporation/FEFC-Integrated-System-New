@@ -25,9 +25,12 @@ const BookModal = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [quotationsData, setQuotationsData] = useState([]);
+
+  const [filteredVehicleTypes, setFilteredVehicleTypes] = useState([]);
+
   const processDataQuotations = (response) => {
     const transactions = response.data;
-
+    console.log(transactions);
     if (transactions && Array.isArray(transactions.quotations)) {
       const flattenedData = transactions.quotations.map((item) => ({
         ...item,
@@ -51,7 +54,7 @@ const BookModal = ({
           ? new Date(item.haulingDate).toISOString().split("T")[0]
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
-
+      console.log(flattenedData);
       setQuotationsData(flattenedData);
     } else {
       console.error(
@@ -74,6 +77,50 @@ const BookModal = ({
 
     fetchData();
   }, [apiUrl, user.id]);
+
+  const filterVehicleTypes = (selectedWasteId) => {
+    console.log("selectedWasteId Data:", quotationsData);
+    console.log("Quotations Data:", selectedWasteId);
+
+    // Find the quotation where QuotationWaste contains the selected waste ID
+    const matchingQuotation = quotationsData.find((q) =>
+      q.QuotationWaste.some((waste) => waste.id === selectedWasteId)
+    );
+
+    console.log(matchingQuotation);
+
+    // If a matching quotation is found, map the relevant QuotationTransportation data
+    if (matchingQuotation) {
+      const filteredData = matchingQuotation.QuotationTransportation.map(
+        (transport) => ({
+          id: transport.vehicleTypeId,
+          quotationTransportationId: transport.id,
+          typeOfVehicle: transport.VehicleType.typeOfVehicle,
+        })
+      );
+
+      console.log(filteredData);
+
+      // Update the state with the filtered vehicle types
+      setFilteredVehicleTypes(filteredData);
+    } else {
+      // If no match found, clear filtered vehicle types
+      setFilteredVehicleTypes([]);
+    }
+  };
+
+  // Function to handle input changes
+  const handleInputChangeAndFilter = (event) => {
+    const { name, value } = event.target;
+
+    // Call the provided handleInputChange from the parent component
+    handleInputChange(event);
+
+    // Call the filter function if the field is quotationWasteId
+    if (name === "quotationWasteId") {
+      filterVehicleTypes(value); // Pass the selected waste ID to the filter function
+    }
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -138,7 +185,7 @@ const BookModal = ({
           label="Waste Name"
           name="quotationWasteId"
           value={formData.quotationWasteId}
-          onChange={handleInputChange}
+          onChange={handleInputChangeAndFilter}
           select
           fullWidth
           required
@@ -172,13 +219,11 @@ const BookModal = ({
           }}
           autoComplete="off"
         >
-          {quotationsData.map((q, index) =>
-            q.QuotationTransportation.map((transport, transportIndex) => (
-              <MenuItem key={`${index}-${transportIndex}`} value={transport.id}>
-                {transport.VehicleType.typeOfVehicle}
-              </MenuItem>
-            ))
-          )}
+          {filteredVehicleTypes.map((transport, index) => (
+            <MenuItem key={index} value={transport.quotationTransportationId}>
+              {transport.typeOfVehicle}
+            </MenuItem>
+          ))}
         </TextField>
         <TextField
           label="Remarks"

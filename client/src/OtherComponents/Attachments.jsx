@@ -195,13 +195,11 @@ const Attachments = ({
       renderCell: (params) => {
         const handleViewFile = async () => {
           try {
-            console.log(params.row.id);
             const response = await axios.get(
               `${apiUrl}/api/attachment/${params.row.id}`
             );
 
             const attachment = response.data.attachments.attachment; // Access the longblob data
-            console.log(response.data.attachments);
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
 
@@ -252,7 +250,6 @@ const Attachments = ({
         const handleDownloadFile = async () => {
           try {
             const fileName = params.row.fileName; // Access the file name
-            console.log(params.row.id);
 
             const response = await axios.get(
               `${apiUrl}/api/attachment/${params.row.id}`

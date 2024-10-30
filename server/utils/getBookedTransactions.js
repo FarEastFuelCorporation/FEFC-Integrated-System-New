@@ -27,6 +27,7 @@ const BillingApprovalTransaction = require("../models/BillingApprovalTransaction
 const CollectedTransaction = require("../models/CollectedTransaction");
 const Quotation = require("../models/Quotation");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
+const Logistics = require("../models/Logistics");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -246,6 +247,11 @@ const getIncludeOptions = () => [
         ],
       },
       {
+        model: Logistics,
+        as: "Logistics",
+        attributes: ["logisticsName"],
+      },
+      {
         model: Employee,
         as: "Employee",
         attributes: ["firstName", "lastName"],
@@ -274,7 +280,7 @@ const getPendingTransactions = async (
     }
     console.log(whereConditions);
     const bookedTransactions = await BookedTransaction.findAll({
-      // where: whereConditions,
+      where: whereConditions,
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
     });
@@ -292,11 +298,11 @@ const getInProgressTransactions = async (statusId, user = null) => {
     // Build the base where conditions
     const whereConditions = {
       statusId: {
-        [Op.gt]: statusId, // Status ID greater than the given value
+        [Op.gt]: statusId, // Status ID greater than or equal to the given value
         [Op.lt]: 11,
       },
     };
-
+    console.log(whereConditions);
     // If user is provided, add the condition for createdBy (or whatever the user field is)
     if (user) {
       whereConditions.createdBy = user;
@@ -332,13 +338,15 @@ const getFinishedTransactions = async (user = null) => {
   }
 };
 
-const fetchData = async (statusId, user = null) => {
+const fetchData = async (statusId, additionalStatusId = null, user = null) => {
   try {
+    console.log(statusId);
+    console.log(additionalStatusId);
     // Fetch all transactions concurrently
     const [pendingTransactions, inProgressTransactions, finishedTransactions] =
       await Promise.all([
-        getPendingTransactions(statusId, user),
-        getInProgressTransactions(statusId, user),
+        getPendingTransactions(statusId, additionalStatusId, user),
+        getInProgressTransactions(statusId, additionalStatusId, user),
         getFinishedTransactions(user),
       ]);
 

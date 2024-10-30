@@ -7,6 +7,10 @@ import {
   TextField,
   Button,
   Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { tokens } from "../../theme";
 
@@ -225,6 +229,27 @@ const ReceiveModal = ({
             />
           </Grid>
         </Grid>
+        <FormControl fullWidth required>
+          <InputLabel
+            id="submitTo-label"
+            style={{
+              color: colors.grey[100],
+            }}
+          >
+            Submit To
+          </InputLabel>
+          <Select
+            labelId="submitTo-label"
+            name="submitTo"
+            value={formData.submitTo}
+            onChange={handleInputChange}
+            label="Submit To"
+          >
+            <MenuItem value="SORTING">SORTING</MenuItem>
+            <MenuItem value="WAREHOUSE">WAREHOUSE</MenuItem>
+            <MenuItem value="ACCOUNTING">ACCOUNTING</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           label="Remarks"
           name="remarks"

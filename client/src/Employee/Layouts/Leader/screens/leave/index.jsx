@@ -245,7 +245,6 @@ const Leave = ({ user }) => {
       align: "center",
       width: 150,
       valueGetter: (params) => {
-        console.log(params.row.isApproved);
         if (
           params.row.isApproved === "APPROVED" &&
           new Date(params.row.startDate) >= new Date()

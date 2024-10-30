@@ -61,6 +61,12 @@ const ScheduledTransaction = ({ row }) => {
               : "Pending"}
           </Typography>
           <Typography variant="h5">
+            Logistics:{" "}
+            {scheduledData?.Logistics
+              ? scheduledData.Logistics.logisticsName
+              : ""}
+          </Typography>
+          <Typography variant="h5">
             Remarks:{" "}
             {scheduledData?.remarks ? scheduledData.remarks : "NO REMARKS"}
           </Typography>

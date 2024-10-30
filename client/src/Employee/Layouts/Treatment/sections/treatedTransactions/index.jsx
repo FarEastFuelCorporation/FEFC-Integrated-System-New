@@ -216,9 +216,7 @@ const TreatedTransactions = ({ user }) => {
     try {
       setLoading(true);
 
-      console.log(formData);
       const updatedFormData = updateIsFinished(formData);
-      console.log(updatedFormData);
 
       if (!formData.id) {
         await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
@@ -236,8 +234,6 @@ const TreatedTransactions = ({ user }) => {
   };
 
   const updateIsFinished = (formData) => {
-    console.log(formData);
-
     // Extract relevant data from the formData object
     const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
     if (!scheduledTransaction) return;
@@ -266,8 +262,6 @@ const TreatedTransactions = ({ user }) => {
       0
     );
 
-    console.log(sortedWasteTransactions);
-
     // Calculate the total treatedWeight from all SortedWasteTransaction objects
     let totalTreatedWeight = sortedWasteTransactions.reduce(
       (total, wasteTransaction) => {
@@ -289,8 +283,6 @@ const TreatedTransactions = ({ user }) => {
 
     // Update isFinished if totalSortedWeight matches totalTreatedWeight
     const isFinished = totalSortedWeight === totalTreatedWeight;
-
-    console.log(formData);
 
     // Return the updated formData with the isFinished flag
     return {

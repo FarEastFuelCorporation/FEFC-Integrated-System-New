@@ -397,7 +397,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       fontWeight="bold"
                       textAlign="center"
                     >
-                      WASTE DETAILS
+                      WASTE CLASSIFICATION
                     </Typography>
                   )}
                   {/* Render Waste Table */}

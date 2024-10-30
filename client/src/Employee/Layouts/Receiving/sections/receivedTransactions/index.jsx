@@ -27,6 +27,7 @@ const ReceivedTransactions = ({ user }) => {
     grossWeight: 0,
     tareWeight: 0,
     netWeight: 0,
+    submitTo: "",
     remarks: "",
     statusId: 4,
     createdBy: user.id,
@@ -57,8 +58,6 @@ const ReceivedTransactions = ({ user }) => {
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
 
-      console.log(receivedTransactionResponse.data.pendingTransactions);
-
       // For pending transactions
       const filteredPendingTransactions =
         receivedTransactionResponse.data.pendingTransactions.filter(
@@ -70,8 +69,6 @@ const ReceivedTransactions = ({ user }) => {
             transaction.statusId === 3
         );
       setPendingTransactions(filteredPendingTransactions);
-
-      console.log(receivedTransactionResponse.data.inProgressTransactions);
 
       // For in-progress transactions
       const filteredInProgressTransactions =
@@ -102,7 +99,7 @@ const ReceivedTransactions = ({ user }) => {
       bookedTransactionId: row.id,
       scheduledTransactionId: row.ScheduledTransaction[0].id,
       dispatchedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction?.[0].id,
+        row.ScheduledTransaction[0].DispatchedTransaction?.[0]?.id,
       receivedDate: "",
       receivedTime: "",
       pttNo: "",
@@ -113,6 +110,7 @@ const ReceivedTransactions = ({ user }) => {
       grossWeight: 0,
       tareWeight: 0,
       netWeight: 0,
+      submitTo: "",
       remarks: "",
       statusId: 4,
       createdBy: user.id,
@@ -157,6 +155,7 @@ const ReceivedTransactions = ({ user }) => {
         grossWeight: receivedTransaction.grossWeight,
         tareWeight: receivedTransaction.tareWeight,
         netWeight: receivedTransaction.netWeight,
+        submitTo: receivedTransaction.submitTo,
         remarks: receivedTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,

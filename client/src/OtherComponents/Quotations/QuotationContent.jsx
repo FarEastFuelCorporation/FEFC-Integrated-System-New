@@ -147,7 +147,7 @@ const QuotationContent = ({
       {quotationWaste.length !== 0 && (
         <Box className="account_details" mt={1}>
           <Typography variant="h5" fontWeight="bold" textAlign="center">
-            WASTE DETAILS
+            WASTE CLASSIFICATION
           </Typography>
           <Table ref={wasteTableRef}>
             <QuotationWasteTableHead row={quotationData} />

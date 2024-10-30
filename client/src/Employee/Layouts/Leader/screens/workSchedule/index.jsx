@@ -87,7 +87,6 @@ const WorkSchedule = ({ user }) => {
         `${apiUrl}/api/workSchedule/subordinate/${user.id}`
       );
 
-      console.log(workScheduleResponse.data.workSchedules);
       setRecords(workScheduleResponse.data.workSchedules);
 
       const sorted = [...response.data.subordinates].sort((a, b) =>

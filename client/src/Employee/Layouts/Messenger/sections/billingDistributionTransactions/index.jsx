@@ -82,7 +82,6 @@ const BillingDistributionTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
-    console.log(row);
     setFormData({
       id: "",
       bookedTransactionId: row.id,

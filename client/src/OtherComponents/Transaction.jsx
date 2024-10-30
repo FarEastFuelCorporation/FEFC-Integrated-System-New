@@ -70,12 +70,6 @@ const Transaction = ({
   const inProgressCount = inProgressTransactions.length;
   const finishedCount = finishedTransactions.length;
 
-  console.log(pendingTransactions);
-  console.log(inProgressTransactions);
-  console.log(pendingCount);
-  console.log(inProgressCount);
-  console.log(finishedCount);
-
   return (
     <Box mt="40px">
       <Card>
@@ -97,7 +91,7 @@ const Transaction = ({
             label={
               <Badge
                 badgeContent={pendingCount}
-                color="danger"
+                color="error"
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",

@@ -34,19 +34,24 @@ const SortModal = ({
   const colors = tokens(theme.palette.mode);
   const [quotations, setQuotations] = useState([]);
   const [scrapTypes, setScrapTypes] = useState([]);
+  const [treatmentProcesses, setTreatmentProcesses] = useState([]);
 
   useEffect(() => {
     if (open) {
       const fetchData = async () => {
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
-          const [quotationsResponse, scrapTypesResponse] = await Promise.all([
-            axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
-            axios.get(`${apiUrl}/api/scrapType`),
-          ]);
+          const [quotationsResponse, scrapTypesResponse, treatmentProcesses] =
+            await Promise.all([
+              axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
+              axios.get(`${apiUrl}/api/scrapType`),
+              axios.get(`${apiUrl}/api/treatmentProcess`),
+            ]);
 
           setQuotations(quotationsResponse.data.quotations);
           setScrapTypes(scrapTypesResponse.data.scrapTypes);
+          console.log(treatmentProcesses.data.treatmentProcesses);
+          setTreatmentProcesses(treatmentProcesses.data.treatmentProcesses);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -101,6 +106,9 @@ const SortModal = ({
 
   const handleWasteChange = useCallback(
     (index, field, value) => {
+      console.log(index);
+      console.log(field);
+      console.log(value);
       const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
         i === index ? { ...waste, [field]: value } : waste
       );
@@ -229,7 +237,7 @@ const SortModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 1200,
+          width: 1400,
           maxHeight: "80vh",
           bgcolor: "background.paper",
           boxShadow: 24,
@@ -341,7 +349,7 @@ const SortModal = ({
               Waste Entry #{index + 1}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={3.5}>
+              <Grid item xs={2.5}>
                 <FormControl fullWidth>
                   <InputLabel
                     id={`waste-type-select-label-${index}`}
@@ -372,7 +380,7 @@ const SortModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={3.5}>
+              <Grid item xs={2.5}>
                 <TextField
                   label="Waste Name"
                   name="wasteName"
@@ -389,6 +397,42 @@ const SortModal = ({
                   }}
                   autoComplete="off"
                 />
+              </Grid>
+              <Grid item xs={2}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    id={`treatmentProcessId-select-label-${index}`}
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Treatment Process
+                  </InputLabel>
+                  <Select
+                    labelId={`treatmentProcessId-select-label-${index}`}
+                    name={`sortedWastes[${index}].treatmentProcessId`}
+                    value={waste.treatmentProcessId || ""}
+                    onChange={(e) =>
+                      handleWasteChange(
+                        index,
+                        "treatmentProcessId",
+                        e.target.value
+                      )
+                    }
+                    label="Treatment Process"
+                    fullWidth
+                    required
+                  >
+                    {treatmentProcesses.map((treatmentProcess) => (
+                      <MenuItem
+                        key={treatmentProcess.id}
+                        value={treatmentProcess.id}
+                      >
+                        {treatmentProcess.treatmentProcess}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={1.5}>
                 <TextField

@@ -200,7 +200,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                 bodyRows.QuotationWasteTableHead.header = (
                   <QuotationWasteTableHead row={row} />
                 );
-              } else if (item[0] === "Item" && item[1] === "Vehicle") {
+              } else if (item[0] === "Item" && item[1] === "Vehicle Type") {
                 bodyRows.QuotationTransportationTableHead.header = (
                   <QuotationTransportationTableHead row={row} />
                 );

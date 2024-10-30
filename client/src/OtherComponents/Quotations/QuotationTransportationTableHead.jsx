@@ -17,7 +17,7 @@ const QuotationTransportationTableHead = ({ row }) => {
     <TableHead>
       <TableRow>
         <TableCell sx={{ ...cellStyles(false), width: "40px" }}>Item</TableCell>
-        <TableCell sx={cellStyles(false)}>Vehicle</TableCell>
+        <TableCell sx={cellStyles(false)}>Vehicle Type</TableCell>
         <TableCell sx={cellStyles(false)}>Area</TableCell>
         {row.isOneTime && (
           <TableCell sx={{ ...cellStyles(false), width: "40px" }}>

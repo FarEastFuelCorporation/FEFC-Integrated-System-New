@@ -243,25 +243,43 @@ const Leave = ({ user }) => {
       headerName: "Approval",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      width: 150,
       valueGetter: (params) => {
-        if (!params.row.isApproved) {
+        console.log(params.row.isApproved);
+        if (params.row.isApproved === "APPROVED") {
           return (
-            <>
-              <IconButton
-                color="success"
-                onClick={() => handleApprovedClick(params.row.id)}
-              >
-                <i className="fa-solid fa-thumbs-up"></i>
-              </IconButton>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography>{params.row.isApproved}</Typography>
               <IconButton
                 color="error"
                 onClick={() => handleDisapprovedClick(params.row.id)}
               >
                 <i className="fa-solid fa-thumbs-down"></i>
               </IconButton>
-            </>
+            </Box>
           );
+        } else if (!params.row.isApproved) {
+          <>
+            <IconButton
+              color="success"
+              onClick={() => handleApprovedClick(params.row.id)}
+            >
+              <i className="fa-solid fa-thumbs-up"></i>
+            </IconButton>
+            <IconButton
+              color="error"
+              onClick={() => handleDisapprovedClick(params.row.id)}
+            >
+              <i className="fa-solid fa-thumbs-down"></i>
+            </IconButton>
+          </>;
         }
         return params.row.isApproved;
       },

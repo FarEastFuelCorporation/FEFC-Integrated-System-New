@@ -255,6 +255,7 @@ async function updateLeaveSubordinateDisapprovedController(req, res) {
     if (updatedLeave) {
       // Update travel order attributes
       updatedLeave.isApproved = "DISAPPROVED";
+      updatedLeave.isNoted = "DISAPPROVED";
 
       // Save the updated travel order
       await updatedLeave.save();

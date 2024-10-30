@@ -245,8 +245,7 @@ const Leave = ({ user }) => {
       align: "center",
       width: 150,
       valueGetter: (params) => {
-        console.log(new Date(params.row.startDate));
-        console.log(new Date());
+        console.log(params.row.isApproved);
         if (
           params.row.isApproved === "APPROVED" &&
           new Date(params.row.startDate) >= new Date()
@@ -291,21 +290,23 @@ const Leave = ({ user }) => {
               </IconButton>
             </Box>
           );
-        } else if (!params.row.isApproved) {
-          <>
-            <IconButton
-              color="success"
-              onClick={() => handleApprovedClick(params.row.id)}
-            >
-              <i className="fa-solid fa-thumbs-up"></i>
-            </IconButton>
-            <IconButton
-              color="error"
-              onClick={() => handleDisapprovedClick(params.row.id)}
-            >
-              <i className="fa-solid fa-thumbs-down"></i>
-            </IconButton>
-          </>;
+        } else if (!params.row.isApproved || params.row.isApproved === null) {
+          return (
+            <>
+              <IconButton
+                color="success"
+                onClick={() => handleApprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-up"></i>
+              </IconButton>
+              <IconButton
+                color="error"
+                onClick={() => handleDisapprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-down"></i>
+              </IconButton>
+            </>
+          );
         }
         return params.row.isApproved;
       },

@@ -245,8 +245,12 @@ const Leave = ({ user }) => {
       align: "center",
       width: 150,
       valueGetter: (params) => {
-        console.log(params.row.isApproved);
-        if (params.row.isApproved === "APPROVED") {
+        console.log(new Date(params.row.startDate));
+        console.log(new Date());
+        if (
+          params.row.isApproved === "APPROVED" &&
+          new Date(params.row.startDate) >= new Date()
+        ) {
           return (
             <Box
               sx={{
@@ -262,6 +266,28 @@ const Leave = ({ user }) => {
                 onClick={() => handleDisapprovedClick(params.row.id)}
               >
                 <i className="fa-solid fa-thumbs-down"></i>
+              </IconButton>
+            </Box>
+          );
+        } else if (
+          params.row.isApproved === "DISAPPROVED" &&
+          new Date(params.row.startDate) >= new Date()
+        ) {
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography>{params.row.isApproved}</Typography>
+              <IconButton
+                color="success"
+                onClick={() => handleApprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-up"></i>
               </IconButton>
             </Box>
           );

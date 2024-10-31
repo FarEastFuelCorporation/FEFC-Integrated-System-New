@@ -105,6 +105,7 @@ const Quotations = ({ user }) => {
       } else {
         response = await axios.get(`${apiUrl}/api/quotation`);
       }
+      console.log(response.data.quotations);
 
       const flattenedData = response.data.quotations.map((item) => ({
         ...item,
@@ -158,6 +159,7 @@ const Quotations = ({ user }) => {
         }
       });
 
+      console.log(flattenedData);
       setQuotationsData(flattenedData);
       setLoading(false);
     } catch (error) {

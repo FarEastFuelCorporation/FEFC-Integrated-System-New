@@ -58,7 +58,6 @@ const Clients = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/client`);
 
-      console.log(response.data.clients);
       setClientData(response.data.clients);
 
       setLoading(false);

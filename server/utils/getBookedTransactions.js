@@ -293,16 +293,24 @@ const getPendingTransactions = async (
 };
 
 // Get In Progress Transactions (where statusId is greater than given value)
-const getInProgressTransactions = async (statusId, user = null) => {
+const getInProgressTransactions = async (
+  statusId,
+  additionalStatusId = null,
+  user = null
+) => {
   try {
     // Build the base where conditions
     const whereConditions = {
-      statusId: {
-        [Op.gt]: statusId, // Status ID greater than or equal to the given value
-        [Op.lt]: 11,
-      },
+      statusId: {},
     };
+
+    whereConditions.statusId[Op.gt] = additionalStatusId
+      ? additionalStatusId
+      : statusId; // Status ID >= given value
+    whereConditions.statusId[Op.lt] = 11;
+
     console.log(whereConditions);
+    console.log("Where Conditions:", JSON.stringify(whereConditions, null, 2));
     // If user is provided, add the condition for createdBy (or whatever the user field is)
     if (user) {
       whereConditions.createdBy = user;

@@ -85,6 +85,22 @@ const ReceivedTransaction = ({ row }) => {
                 )
               : "Pending"}
           </Typography>
+          {!receivedTransaction.dispatchedTransactionId && (
+            <Box>
+              <Typography variant="h5">
+                Plate Number:{" "}
+                {receivedTransaction.vehicle
+                  ? receivedTransaction.vehicle
+                  : "N/A"}
+              </Typography>
+              <Typography variant="h5">
+                Driver:{" "}
+                {receivedTransaction.driver
+                  ? receivedTransaction.driver
+                  : "N/A"}
+              </Typography>
+            </Box>
+          )}
           <Typography variant="h5">
             Permit To Transport No:{" "}
             {receivedTransaction.pttNo ? receivedTransaction.pttNo : "N/A"}

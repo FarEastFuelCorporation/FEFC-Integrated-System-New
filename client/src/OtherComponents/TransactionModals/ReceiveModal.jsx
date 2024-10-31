@@ -105,12 +105,45 @@ const ReceiveModal = ({
             autoComplete="off"
           />
         </div>
+        {!formData.dispatchedTransactionId && (
+          <Box>
+            <TextField
+              label="Plate Number"
+              name="vehicle"
+              value={formData.vehicle}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+            <TextField
+              label="Driver"
+              name="driver"
+              value={formData.driver}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Box>
+        )}
         <TextField
           label="PTT No."
           name="pttNo"
           value={formData.pttNo}
           onChange={handleInputChange}
           fullWidth
+          required
           InputLabelProps={{
             style: {
               color: colors.grey[100],
@@ -124,6 +157,7 @@ const ReceiveModal = ({
           value={formData.manifestNo}
           onChange={handleInputChange}
           fullWidth
+          required
           InputLabelProps={{
             style: {
               color: colors.grey[100],
@@ -137,6 +171,7 @@ const ReceiveModal = ({
           value={formData.pullOutFormNo}
           onChange={handleInputChange}
           fullWidth
+          required
           InputLabelProps={{
             style: {
               color: colors.grey[100],
@@ -152,6 +187,7 @@ const ReceiveModal = ({
               value={formData.manifestWeight}
               onChange={handleInputChange}
               type="number"
+              required
               fullWidth
               InputLabelProps={{
                 style: {
@@ -168,6 +204,7 @@ const ReceiveModal = ({
               value={formData.clientWeight}
               onChange={handleInputChange}
               type="number"
+              required
               fullWidth
               InputLabelProps={{
                 style: {
@@ -186,6 +223,7 @@ const ReceiveModal = ({
               value={formData.grossWeight}
               onChange={handleInputChangeWithNetWeight}
               type="number"
+              required
               fullWidth
               InputLabelProps={{
                 style: {
@@ -202,6 +240,7 @@ const ReceiveModal = ({
               value={formData.tareWeight}
               onChange={handleInputChangeWithNetWeight}
               type="number"
+              required
               fullWidth
               InputLabelProps={{
                 style: {
@@ -218,6 +257,7 @@ const ReceiveModal = ({
               value={formData.netWeight}
               onChange={handleInputChange}
               type="number"
+              required
               fullWidth
               InputLabelProps={{
                 style: {

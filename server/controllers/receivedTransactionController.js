@@ -16,6 +16,8 @@ async function createReceivedTransactionController(req, res) {
       dispatchedTransactionId,
       receivedDate,
       receivedTime,
+      vehicle,
+      driver,
       pttNo,
       manifestNo,
       pullOutFormNo,
@@ -39,6 +41,8 @@ async function createReceivedTransactionController(req, res) {
       dispatchedTransactionId,
       receivedDate,
       receivedTime,
+      vehicle,
+      driver,
       pttNo,
       manifestNo,
       pullOutFormNo,
@@ -116,6 +120,8 @@ async function updateReceivedTransactionController(req, res) {
       dispatchedTransactionId,
       receivedDate,
       receivedTime,
+      vehicle,
+      driver,
       pttNo,
       manifestNo,
       pullOutFormNo,
@@ -136,14 +142,10 @@ async function updateReceivedTransactionController(req, res) {
 
     if (updatedReceivedTransaction) {
       // Update booked transaction attributes
-      updatedReceivedTransaction.scheduledTransactionId =
-        scheduledTransactionId;
-      updatedReceivedTransaction.scheduledTransactionId =
-        scheduledTransactionId;
-      updatedReceivedTransaction.dispatchedTransactionId =
-        dispatchedTransactionId;
       updatedReceivedTransaction.receivedDate = receivedDate;
       updatedReceivedTransaction.receivedTime = receivedTime;
+      updatedReceivedTransaction.vehicle = vehicle;
+      updatedReceivedTransaction.driver = driver;
       updatedReceivedTransaction.pttNo = pttNo;
       updatedReceivedTransaction.manifestNo = manifestNo;
       updatedReceivedTransaction.pullOutFormNo = pullOutFormNo;

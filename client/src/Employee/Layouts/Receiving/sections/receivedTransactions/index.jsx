@@ -19,6 +19,8 @@ const ReceivedTransactions = ({ user }) => {
     dispatchedTransactionId: "",
     receivedDate: "",
     receivedTime: "",
+    vehicle: "",
+    driver: "",
     pttNo: "",
     manifestNo: "",
     pullOutFormNo: "",
@@ -68,9 +70,11 @@ const ReceivedTransactions = ({ user }) => {
                 matchingLogisticsId) ||
             transaction.statusId === 3
         );
+      console.log(filteredPendingTransactions);
       setPendingTransactions(filteredPendingTransactions);
 
       // For in-progress transactions
+      console.log(receivedTransactionResponse.data.inProgressTransactions);
       setInProgressTransactions(
         receivedTransactionResponse.data.inProgressTransactions
       );
@@ -99,6 +103,8 @@ const ReceivedTransactions = ({ user }) => {
         row.ScheduledTransaction[0].DispatchedTransaction?.[0]?.id,
       receivedDate: "",
       receivedTime: "",
+      vehicle: "",
+      driver: "",
       pttNo: "",
       manifestNo: "",
       pullOutFormNo: "",
@@ -137,13 +143,20 @@ const ReceivedTransactions = ({ user }) => {
     if (typeToEdit) {
       const receivedTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};
+      console.log(
+        typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]?.id
+      );
       setFormData({
         id: receivedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         scheduledTransactionId: typeToEdit.ScheduledTransaction?.[0]?.id,
-        dispatchedTransactionId: typeToEdit.ScheduledTransaction?.[0].id,
+        dispatchedTransactionId:
+          typeToEdit.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]
+            ?.id || "",
         receivedDate: receivedTransaction.receivedDate,
         receivedTime: receivedTransaction.receivedTime,
+        vehicle: receivedTransaction.vehicle,
+        driver: receivedTransaction.driver,
         pttNo: receivedTransaction.pttNo,
         manifestNo: receivedTransaction.manifestNo,
         pullOutFormNo: receivedTransaction.pullOutFormNo,

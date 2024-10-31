@@ -388,12 +388,7 @@ const Transaction = ({
                       <WarehousedTransaction row={row} />
                     )}
                   {row.statusId >= 3 && <ReceivedTransaction row={row} />}
-                  {row.statusId >= 2 &&
-                    row.ScheduledTransaction?.[0].logisticsId !==
-                      "0577d985-8f6f-47c7-be3c-20ca86021154" && (
-                      <DispatchedTransaction row={row} />
-                    )}
-                  {/* {row.statusId >= 2 && <DispatchedTransaction row={row} />} */}
+                  {row.statusId >= 2 && <DispatchedTransaction row={row} />}
                   {row.statusId >= 1 && <ScheduledTransaction row={row} />}
                   {Number.isInteger(user.userType) && (
                     <>

@@ -216,7 +216,7 @@ async function createClientSignupController(req, res) {
     // Respond with redirect URL and session details
     res.status(200).json({
       user: {
-        id: newUser.employeeId,
+        id: newUser.clientId,
         userType: clientRole,
         clientDetails: clientDetails,
       },

@@ -306,6 +306,17 @@ Attachment.belongsTo(Employee, {
   targetKey: "employeeId",
 });
 
+Employee.hasMany(Client, {
+  as: "Client",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+Client.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
 Employee.hasMany(Document, {
   as: "Document",
   foreignKey: "createdBy",
@@ -579,6 +590,19 @@ QuotationWaste.hasMany(SortedWasteTransaction, {
 SortedWasteTransaction.belongsTo(QuotationWaste, {
   as: "QuotationWaste",
   foreignKey: "quotationWasteId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+TreatmentProcess.hasMany(SortedWasteTransaction, {
+  as: "SortedWasteTransaction",
+  foreignKey: "treatmentProcessId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+SortedWasteTransaction.belongsTo(TreatmentProcess, {
+  as: "TreatmentProcess",
+  foreignKey: "treatmentProcessId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

@@ -60,7 +60,7 @@ async function createBookedTransactionController(req, res) {
 async function getBookedTransactionsController(req, res) {
   try {
     const { user } = req.query;
-
+    console.log(user);
     // fetch transactions
     const data = await fetchData(statusId, user);
 

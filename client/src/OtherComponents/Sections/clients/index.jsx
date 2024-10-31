@@ -58,6 +58,7 @@ const Clients = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/client`);
 
+      console.log(response.data.clients);
       setClientData(response.data.clients);
 
       setLoading(false);
@@ -297,6 +298,17 @@ const Clients = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "accountHandler",
+      headerName: "Account Handler",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return `${params.row.Employee.firstName} ${params.row.Employee.lastName}`;
+      },
       renderCell: renderCellWithWrapText,
     },
   ];

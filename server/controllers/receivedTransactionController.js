@@ -89,7 +89,7 @@ async function createReceivedTransactionController(req, res) {
 async function getReceivedTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(statusId, additionalStatusId);
+    const data = await fetchData(statusId, null, additionalStatusId);
 
     console.log(data);
 

@@ -1,6 +1,7 @@
 // controllers/clientController.js
 
 const Client = require("../models/Client");
+const Employee = require("../models/Employee");
 const generateClientId = require("../utils/generateClientId");
 
 // Create Client controller
@@ -69,6 +70,11 @@ async function getClientsController(req, res) {
     // Fetch all clients from the database
     const clients = await Client.findAll({
       order: [["clientName", "ASC"]],
+      include: {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
     });
 
     res.json({ clients });

@@ -125,6 +125,11 @@ const getIncludeOptions = () => [
                     as: "QuotationWaste",
                   },
                   {
+                    model: TreatmentProcess,
+                    as: "TreatmentProcess",
+                    attributes: ["treatmentProcess"],
+                  },
+                  {
                     model: TreatedWasteTransaction,
                     as: "TreatedWasteTransaction",
                     required: false,
@@ -263,8 +268,8 @@ const getIncludeOptions = () => [
 // Get Pending Transactions (where statusId equals given value)
 const getPendingTransactions = async (
   statusId,
-  additionalStatusId = null,
-  user = null
+  user = null,
+  additionalStatusId = null
 ) => {
   try {
     // Build the where clause dynamically
@@ -295,22 +300,23 @@ const getPendingTransactions = async (
 // Get In Progress Transactions (where statusId is greater than given value)
 const getInProgressTransactions = async (
   statusId,
-  additionalStatusId = null,
-  user = null
+  user = null,
+  additionalStatusId = null
 ) => {
   try {
+    console.log("statusId", statusId);
+    console.log("user", user);
+    console.log("additionalStatusId", additionalStatusId);
+
     // Build the base where conditions
     const whereConditions = {
-      statusId: {},
+      statusId: {
+        [Op.gt]: additionalStatusId ? additionalStatusId : statusId,
+        [Op.lt]: 11,
+      },
     };
 
-    whereConditions.statusId[Op.gt] = additionalStatusId
-      ? additionalStatusId
-      : statusId; // Status ID >= given value
-    whereConditions.statusId[Op.lt] = 11;
-
     console.log(whereConditions);
-    console.log("Where Conditions:", JSON.stringify(whereConditions, null, 2));
     // If user is provided, add the condition for createdBy (or whatever the user field is)
     if (user) {
       whereConditions.createdBy = user;
@@ -346,15 +352,15 @@ const getFinishedTransactions = async (user = null) => {
   }
 };
 
-const fetchData = async (statusId, additionalStatusId = null, user = null) => {
+const fetchData = async (statusId, user = null, additionalStatusId = null) => {
   try {
     console.log(statusId);
     console.log(additionalStatusId);
     // Fetch all transactions concurrently
     const [pendingTransactions, inProgressTransactions, finishedTransactions] =
       await Promise.all([
-        getPendingTransactions(statusId, additionalStatusId, user),
-        getInProgressTransactions(statusId, additionalStatusId, user),
+        getPendingTransactions(statusId, user, additionalStatusId),
+        getInProgressTransactions(statusId, user, additionalStatusId),
         getFinishedTransactions(user),
       ]);
 

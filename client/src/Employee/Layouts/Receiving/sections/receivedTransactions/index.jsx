@@ -55,8 +55,6 @@ const ReceivedTransactions = ({ user }) => {
         `${apiUrl}/api/receivedTransaction`
       );
 
-      console.log(receivedTransactionResponse.data);
-
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
 
@@ -73,14 +71,11 @@ const ReceivedTransactions = ({ user }) => {
       setPendingTransactions(filteredPendingTransactions);
 
       // For in-progress transactions
-      const filteredInProgressTransactions =
-        receivedTransactionResponse.data.inProgressTransactions.filter(
-          (transaction) => transaction.statusId === 4
-        );
-      setInProgressTransactions(filteredInProgressTransactions);
+      setInProgressTransactions(
+        receivedTransactionResponse.data.inProgressTransactions
+      );
 
       // For finished transactions
-
       setFinishedTransactions(
         receivedTransactionResponse.data.finishedTransactions
       );

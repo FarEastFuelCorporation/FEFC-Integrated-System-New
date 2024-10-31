@@ -71,8 +71,7 @@ const SortedTransaction = ({ row }) => {
       headerName: "Sorted Date",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      width: 150,
       renderCell: renderCellWithFormattedDate,
     },
     {
@@ -80,8 +79,7 @@ const SortedTransaction = ({ row }) => {
       headerName: "Sorted Time",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      width: 100,
       renderCell: renderCellWithFormattedTime,
     },
     {
@@ -94,11 +92,23 @@ const SortedTransaction = ({ row }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "treatmentProcess",
+      headerName: "Treatment Process",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return params.row.TreatmentProcess.treatmentProcess;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "weight",
       headerName: "Weight",
       headerAlign: "center",
       align: "center",
-      flex: 1,
+      flex: 0.5,
       minWidth: 150,
       renderCell: (params) => (
         <div className={"wrap-text"} style={{ textAlign: "center" }}>
@@ -111,7 +121,7 @@ const SortedTransaction = ({ row }) => {
       headerName: "Client Weight",
       headerAlign: "center",
       align: "center",
-      flex: 1,
+      flex: 0.5,
       minWidth: 150,
       renderCell: (params) => (
         <div className={"wrap-text"} style={{ textAlign: "center" }}>

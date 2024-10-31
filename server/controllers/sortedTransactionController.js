@@ -56,6 +56,7 @@ async function createSortedTransactionController(req, res) {
           {
             sortedTransactionId: newSortedTransaction.id,
             quotationWasteId: waste.quotationWasteId,
+            treatmentProcessId: waste.treatmentProcessId,
             wasteName: wasteName,
             weight: waste.weight,
             clientWeight: waste.clientWeight,
@@ -212,6 +213,7 @@ async function updateSortedTransactionController(req, res) {
           await SortedWasteTransaction.update(
             {
               quotationWasteId: waste.quotationWasteId,
+              treatmentProcessId: waste.treatmentProcessId,
               wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
@@ -225,6 +227,7 @@ async function updateSortedTransactionController(req, res) {
             {
               sortedTransactionId: id,
               quotationWasteId: waste.quotationWasteId,
+              treatmentProcessId: waste.treatmentProcessId,
               wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,

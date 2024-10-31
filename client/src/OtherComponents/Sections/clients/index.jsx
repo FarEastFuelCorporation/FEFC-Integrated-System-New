@@ -322,14 +322,15 @@ const Clients = ({ user }) => {
         align: "center",
         sortable: false,
         width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row.id)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
+        renderCell: (params) =>
+          params.row.createdBy === user.id ? (
+            <IconButton
+              color="warning"
+              onClick={() => handleEditClick(params.row.id)}
+            >
+              <EditIcon />
+            </IconButton>
+          ) : null, // Return null if condition is not met
       },
       {
         field: "delete",
@@ -338,14 +339,16 @@ const Clients = ({ user }) => {
         align: "center",
         sortable: false,
         width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
+
+        renderCell: (params) =>
+          params.row.createdBy === user.id ? (
+            <IconButton
+              color="error"
+              onClick={() => handleDeleteClick(params.row.id)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          ) : null, // Return null if condition is not met
       }
     );
   }

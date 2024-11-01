@@ -30,7 +30,6 @@ const BookModal = ({
 
   const processDataQuotations = (response) => {
     const transactions = response.data;
-    console.log(transactions);
     if (transactions && Array.isArray(transactions.quotations)) {
       const flattenedData = transactions.quotations.map((item) => ({
         ...item,
@@ -54,7 +53,6 @@ const BookModal = ({
           ? new Date(item.haulingDate).toISOString().split("T")[0]
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
-      console.log(flattenedData);
       setQuotationsData(flattenedData);
     } else {
       console.error(
@@ -79,15 +77,12 @@ const BookModal = ({
   }, [apiUrl, user.id]);
 
   const filterVehicleTypes = (selectedWasteId) => {
-    console.log("selectedWasteId Data:", quotationsData);
-    console.log("Quotations Data:", selectedWasteId);
 
     // Find the quotation where QuotationWaste contains the selected waste ID
     const matchingQuotation = quotationsData.find((q) =>
       q.QuotationWaste.some((waste) => waste.id === selectedWasteId)
     );
 
-    console.log(matchingQuotation);
 
     // If a matching quotation is found, map the relevant QuotationTransportation data
     if (matchingQuotation) {
@@ -99,7 +94,6 @@ const BookModal = ({
         })
       );
 
-      console.log(filteredData);
 
       // Update the state with the filtered vehicle types
       setFilteredVehicleTypes(filteredData);

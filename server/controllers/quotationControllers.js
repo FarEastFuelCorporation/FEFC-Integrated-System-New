@@ -15,7 +15,9 @@ async function createQuotationController(req, res) {
     quotationCode,
     validity,
     clientId,
+    termsChargeDays,
     termsCharge,
+    termsBuyingDays,
     termsBuying,
     scopeOfWork,
     contactPerson,
@@ -26,8 +28,6 @@ async function createQuotationController(req, res) {
     quotationTransportation, // This should be an array of quotation transportation
   } = req.body;
 
-  termsCharge = termsCharge && termsCharge.toUpperCase();
-  termsBuying = termsBuying && termsBuying.toUpperCase();
   scopeOfWork = scopeOfWork && scopeOfWork.toUpperCase();
   contactPerson = contactPerson && contactPerson.toUpperCase();
   remarks = remarks && remarks.toUpperCase();
@@ -38,7 +38,9 @@ async function createQuotationController(req, res) {
       quotationCode,
       validity,
       clientId,
+      termsChargeDays,
       termsCharge,
+      termsBuyingDays,
       termsBuying,
       scopeOfWork,
       contactPerson,
@@ -288,7 +290,9 @@ async function updateQuotationController(req, res) {
       quotationCode,
       validity,
       clientId,
+      termsChargeDays,
       termsCharge,
+      termsBuyingDays,
       termsBuying,
       scopeOfWork,
       contactPerson,
@@ -299,8 +303,6 @@ async function updateQuotationController(req, res) {
       quotationTransportation, // This should be an array of quotation transportation
     } = req.body;
 
-    termsCharge = termsCharge && termsCharge.toUpperCase();
-    termsBuying = termsBuying && termsBuying.toUpperCase();
     scopeOfWork = scopeOfWork && scopeOfWork.toUpperCase();
     contactPerson = contactPerson && contactPerson.toUpperCase();
     remarks = remarks && remarks.toUpperCase();
@@ -324,7 +326,9 @@ async function updateQuotationController(req, res) {
         revisionNumber,
         validity,
         clientId,
+        termsChargeDays,
         termsCharge,
+        termsBuyingDays,
         termsBuying,
         scopeOfWork,
         contactPerson,

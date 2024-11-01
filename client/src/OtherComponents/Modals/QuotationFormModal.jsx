@@ -301,24 +301,9 @@ const QuotationFormModal = ({
             </Grid>
             <Grid item xs={1}>
               <TextField
-                label="Terms Charge"
-                name="termsCharge"
-                value={formData.termsCharge}
-                onChange={handleInputChange}
-                fullWidth
-                InputLabelProps={{
-                  style: {
-                    color: colors.grey[100],
-                  },
-                }}
-                autoComplete="off"
-              />
-            </Grid>
-            <Grid item xs={1}>
-              <TextField
-                label="Terms Buying"
-                name="termsBuying"
-                value={formData.termsBuying}
+                label="Terms Charge Days"
+                name="termsChargeDays"
+                value={formData.termsChargeDays}
                 onChange={handleInputChange}
                 fullWidth
                 required
@@ -330,7 +315,107 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={2.5}>
+            <Grid item xs={2}>
+              <FormControl fullWidth required>
+                <InputLabel
+                  id={`termsCharge-label`}
+                  style={{
+                    color: colors.grey[100],
+                  }}
+                >
+                  Terms Charge
+                </InputLabel>
+                <Select
+                  labelId={`termsCharge-label`}
+                  name={`termsCharge`}
+                  value={formData.termsCharge}
+                  onChange={handleInputChange}
+                  fullWidth
+                  inputProps={{
+                    name: `termsCharge`,
+                    id: `termsCharge-select`,
+                  }}
+                >
+                  <MenuItem
+                    key={"UPON RECEIVING OF DOCUMENTS"}
+                    value={"UPON RECEIVING OF DOCUMENTS"}
+                  >
+                    UPON RECEIVING OF DOCUMENTS
+                  </MenuItem>
+                  <MenuItem key={"UPON HAULING"} value={"UPON HAULING"}>
+                    UPON HAULING
+                  </MenuItem>
+                  <MenuItem key={"ON PICKUP"} value={"ON PICKUP"}>
+                    ON PICKUP
+                  </MenuItem>
+                  <MenuItem key={"ON DELIVERY"} value={"ON DELIVERY"}>
+                    ON DELIVERY
+                  </MenuItem>
+                  <MenuItem key={"N/A"} value={"N/A"}>
+                    N/A
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={1}>
+              <TextField
+                label="Terms Buying Days"
+                name="termsBuyingDays"
+                value={formData.termsBuyingDays}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <FormControl fullWidth required>
+                <InputLabel
+                  id={`termsBuying-label`}
+                  style={{
+                    color: colors.grey[100],
+                  }}
+                >
+                  Terms Buying
+                </InputLabel>
+                <Select
+                  labelId={`termsBuying-label`}
+                  name={`termsBuying`}
+                  value={formData.termsBuying}
+                  onChange={handleInputChange}
+                  fullWidth
+                  inputProps={{
+                    name: `termsBuying`,
+                    id: `termsBuying-select`,
+                  }}
+                >
+                  <MenuItem
+                    key={"UPON RECEIVING OF DOCUMENTS"}
+                    value={"UPON RECEIVING OF DOCUMENTS"}
+                  >
+                    UPON RECEIVING OF DOCUMENTS
+                  </MenuItem>
+                  <MenuItem key={"UPON HAULING"} value={"UPON HAULING"}>
+                    UPON HAULING
+                  </MenuItem>
+                  <MenuItem key={"ON PICKUP"} value={"ON PICKUP"}>
+                    ON PICKUP
+                  </MenuItem>
+                  <MenuItem key={"ON DELIVERY"} value={"ON DELIVERY"}>
+                    ON DELIVERY
+                  </MenuItem>
+                  <MenuItem key={"N/A"} value={"N/A"}>
+                    N/A
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={4}>
               <TextField
                 label="Scope of Work"
                 name="scopeOfWork"
@@ -346,7 +431,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={2.5}>
+            <Grid item xs={2}>
               <TextField
                 label="Contact Person"
                 name="contactPerson"
@@ -361,7 +446,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={2.5}>
+            <Grid item xs={5}>
               <TextField
                 label="Remarks"
                 name="remarks"

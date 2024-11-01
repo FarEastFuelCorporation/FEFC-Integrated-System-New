@@ -29,8 +29,14 @@ const Quotation = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    termsChargeDays: {
+      type: DataTypes.INTEGER,
+    },
     termsCharge: {
       type: DataTypes.STRING,
+    },
+    termsBuyingDays: {
+      type: DataTypes.INTEGER,
     },
     termsBuying: {
       type: DataTypes.STRING,

@@ -35,7 +35,9 @@ const Quotations = ({ user }) => {
     clientId: "",
     quotationCode: "",
     validity: "",
+    termsChargeDays: 0,
     termsCharge: "",
+    termsBuyingDays: 0,
     termsBuying: "",
     scopeOfWork: "",
     contactPerson: "",
@@ -328,7 +330,9 @@ const Quotations = ({ user }) => {
         quotationCode: quotationToEdit.quotationCode,
         validity: quotationToEdit.validity,
         termsCharge: quotationToEdit.termsCharge,
+        termsChargeDays: quotationToEdit.termsChargeDays,
         termsBuying: quotationToEdit.termsBuying,
+        termsBuyingDays: quotationToEdit.termsBuyingDays,
         scopeOfWork: quotationToEdit.scopeOfWork,
         contactPerson: quotationToEdit.contactPerson,
         remarks: quotationToEdit.remarks,
@@ -480,6 +484,17 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 120,
+      valueGetter: (params) => {
+        if (params.row.termsCharge === "N/A") {
+          return "N/A";
+        } else {
+          let days = params.row.termsChargeDays;
+          days =
+            days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
+
+          return `${days} ${params.row.termsCharge}`;
+        }
+      },
       renderCell: renderCellWithWrapText,
     },
     {
@@ -488,6 +503,17 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
+      valueGetter: (params) => {
+        if (params.row.termsBuying === "N/A") {
+          return "N/A";
+        } else {
+          let days = params.row.termsBuyingDays;
+          days =
+            days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
+
+          return `${days} ${params.row.termsBuying}`;
+        }
+      },
       renderCell: renderCellWithWrapText,
     },
     {

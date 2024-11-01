@@ -69,10 +69,13 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 id="charge_input"
                 textAlign="center"
               >
-                {quotationData.termsCharge &&
-                Number.isInteger(parseInt(quotationData.termsCharge))
-                  ? `${parseInt(quotationData.termsCharge)} Days`
-                  : quotationData.termsCharge || "N/A"}
+                {quotationData.termsCharge !== "N/A"
+                  ? quotationData.termsChargeDays === 0
+                    ? `CASH ${quotationData.termsCharge}`
+                    : quotationData.termsChargeDays === 1
+                    ? `${quotationData.termsChargeDays} DAY ${quotationData.termsCharge}`
+                    : `${quotationData.termsChargeDays} DAYS ${quotationData.termsCharge}`
+                  : "N/A"}
               </Typography>
             </Box>
             <Box
@@ -88,11 +91,13 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 id="buying_input"
                 textAlign="center"
               >
-                {" "}
-                {quotationData.termsBuying &&
-                Number.isInteger(parseInt(quotationData.termsBuying))
-                  ? `${parseInt(quotationData.termsBuying)} Days`
-                  : quotationData.termsBuying || "N/A"}
+                {quotationData.termsBuying !== "N/A"
+                  ? quotationData.termsBuyingDays === 0
+                    ? `CASH ${quotationData.termsBuying}`
+                    : quotationData.termsBuyingDays === 1
+                    ? `${quotationData.termsBuyingDays} DAY ${quotationData.termsBuying}`
+                    : `${quotationData.termsBuyingDays} DAYS ${quotationData.termsBuying}`
+                  : "N/A"}
               </Typography>
             </Box>
           </Box>

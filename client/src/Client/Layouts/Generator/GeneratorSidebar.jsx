@@ -231,6 +231,7 @@ const GeneratorSidebar = ({ user }) => {
           setSelected(newValue);
         }}
         sx={{
+          width: "100%",
           display: "inline-flex", // Align items in a single row
           flexDirection: "row",
           "& .Mui-selected": {

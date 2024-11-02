@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { format } from "date-fns";
 import axios from "axios";
@@ -71,23 +71,41 @@ const DispatchedTransaction = ({ row }) => {
                   sx={{ fontSize: "30px", color: colors.grey[100] }}
                 />
               </CircleLogo>
-              <Box
+
+              <Grid
+                container
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   flexWrap: "wrap",
-                  mb: 2,
+                  mb: 3,
                 }}
               >
-                <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-                  Dispatched
-                </Typography>
-                <Typography variant="h5">
-                  {dispatchedTransaction.createdAt
-                    ? timestampDate(dispatchedTransaction.createdAt)
-                    : ""}
-                </Typography>
-              </Box>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="h4" color={colors.greenAccent[400]}>
+                    Dispatched
+                  </Typography>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: {
+                      xs: "start",
+                      md: "end",
+                    },
+                  }}
+                >
+                  <Typography variant="h5">
+                    {dispatchedTransaction.createdAt
+                      ? timestampDate(dispatchedTransaction.createdAt)
+                      : ""}
+                  </Typography>
+                </Grid>
+              </Grid>
               <Typography variant="h5">
                 Dispatched Date:{" "}
                 {dispatchedTransaction.dispatchedDate

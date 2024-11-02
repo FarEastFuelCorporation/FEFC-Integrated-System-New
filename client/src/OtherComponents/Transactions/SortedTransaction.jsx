@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { CircleLogo } from "../CustomAccordionStyles";
@@ -167,23 +167,40 @@ const SortedTransaction = ({ row }) => {
               }}
             />
           </CircleLogo>
-          <Box
+          <Grid
+            container
             sx={{
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
-              mb: 2,
+              mb: 3,
             }}
           >
-            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Sorted
-            </Typography>
-            <Typography variant="h5">
-              {sortedTransaction.createdAt
-                ? timestampDate(sortedTransaction.createdAt)
-                : ""}
-            </Typography>
-          </Box>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h4" color={colors.greenAccent[400]}>
+                Sorted
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: {
+                  xs: "start",
+                  md: "end",
+                },
+              }}
+            >
+              <Typography variant="h5">
+                {sortedTransaction.createdAt
+                  ? timestampDate(sortedTransaction.createdAt)
+                  : ""}
+              </Typography>
+            </Grid>
+          </Grid>
           <Typography variant="subtitle1" gutterBottom>
             Sorted Wastes
           </Typography>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import ApprovalIcon from "@mui/icons-material/Approval";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
@@ -51,23 +51,40 @@ const CertifiedTransaction = ({ row, user }) => {
               }}
             />
           </CircleLogo>
-          <Box
+          <Grid
+            container
             sx={{
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
-              mb: 2,
+              mb: 3,
             }}
           >
-            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Certified
-            </Typography>
-            <Typography variant="h5">
-              {certifiedTransaction.createdAt
-                ? timestampDate(certifiedTransaction.createdAt)
-                : ""}
-            </Typography>
-          </Box>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h4" color={colors.greenAccent[400]}>
+                Certified
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: {
+                  xs: "start",
+                  md: "end",
+                },
+              }}
+            >
+              <Typography variant="h5">
+                {certifiedTransaction.createdAt
+                  ? timestampDate(certifiedTransaction.createdAt)
+                  : ""}
+              </Typography>
+            </Grid>
+          </Grid>
           <Typography variant="h5">
             Certificate Number:{" "}
             {certifiedTransaction.certificateNumber

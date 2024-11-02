@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
@@ -51,23 +51,40 @@ const BillingApprovalTransaction = ({ row, user }) => {
               }}
             />
           </CircleLogo>
-          <Box
+          <Grid
+            container
             sx={{
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
-              mb: 2,
+              mb: 3,
             }}
           >
-            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Billing Approved
-            </Typography>
-            <Typography variant="h5">
-              {billingApprovalTransaction.createdAt
-                ? timestampDate(billingApprovalTransaction.createdAt)
-                : ""}
-            </Typography>
-          </Box>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h4" color={colors.greenAccent[400]}>
+                Billing Approved
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: {
+                  xs: "start",
+                  md: "end",
+                },
+              }}
+            >
+              <Typography variant="h5">
+                {billingApprovalTransaction.createdAt
+                  ? timestampDate(billingApprovalTransaction.createdAt)
+                  : ""}
+              </Typography>
+            </Grid>
+          </Grid>
           <Typography variant="h5">
             Approved Date:{" "}
             {billingApprovalTransaction.approvedDate

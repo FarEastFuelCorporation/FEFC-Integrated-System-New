@@ -176,6 +176,7 @@ const Transaction = ({
                   {selectedTab === 0 ? (
                     <Grid
                       item
+                      xs={12}
                       md={12}
                       lg={1}
                       sx={{
@@ -210,6 +211,7 @@ const Transaction = ({
                   ) : selectedTab === 1 ? (
                     <Grid
                       item
+                      xs={12}
                       md={12}
                       lg={1}
                       sx={{
@@ -232,6 +234,7 @@ const Transaction = ({
                   ) : (
                     <Grid
                       item
+                      xs={12}
                       md={12}
                       lg={1}
                       sx={{
@@ -387,7 +390,7 @@ const Transaction = ({
                       .submitTo === "WAREHOUSE" && (
                       <WarehousedTransaction row={row} />
                     )}
-                  {row.statusId >= 3 && <ReceivedTransaction row={row} />}
+                  {row.statusId >= 2 && <ReceivedTransaction row={row} />}
                   {row.statusId >= 2 && <DispatchedTransaction row={row} />}
                   {row.statusId >= 1 && <ScheduledTransaction row={row} />}
                   {Number.isInteger(user.userType) && (

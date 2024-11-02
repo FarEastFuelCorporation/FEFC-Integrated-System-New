@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import { format } from "date-fns";
 import { CircleLogo } from "../CustomAccordionStyles";
@@ -19,21 +19,38 @@ const BookedTransaction = ({ row }) => {
           }}
         />
       </CircleLogo>
-      <Box
+      <Grid
+        container
         sx={{
           display: "flex",
           justifyContent: "space-between",
           flexWrap: "wrap",
-          mb: 2,
+          mb: 3,
         }}
       >
-        <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-          Booked
-        </Typography>
-        <Typography variant="h5">
-          {row.createdAt ? timestampDate(row.createdAt) : ""}
-        </Typography>
-      </Box>
+        <Grid item xs={12} md={6}>
+          <Typography variant="h4" color={colors.greenAccent[400]}>
+            Booked
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: {
+              xs: "start",
+              md: "end",
+            },
+          }}
+        >
+          <Typography variant="h5">
+            {row.createdAt ? timestampDate(row.createdAt) : ""}
+          </Typography>
+        </Grid>
+      </Grid>
       <Typography variant="h5">
         Hauling Date:{" "}
         {row.haulingDate

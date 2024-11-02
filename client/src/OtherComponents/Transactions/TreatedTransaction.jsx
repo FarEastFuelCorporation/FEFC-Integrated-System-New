@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Typography, useTheme, IconButton, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useTheme,
+  IconButton,
+  Button,
+  Grid,
+} from "@mui/material";
 import FactoryIcon from "@mui/icons-material/Factory";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -280,23 +287,40 @@ const TreatedTransaction = ({
             <Typography variant="h5">Pending</Typography>
           </Box>
         ) : (
-          <Box
+          <Grid
+            container
             sx={{
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
-              mb: 2,
+              mb: 3,
             }}
           >
-            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Treated
-            </Typography>
-            <Typography variant="h5">
-              {latestTreatedDateTime
-                ? timestampDate(latestTreatedDateTime)
-                : ""}
-            </Typography>
-          </Box>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h4" color={colors.greenAccent[400]}>
+                Treated
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: {
+                  xs: "start",
+                  md: "end",
+                },
+              }}
+            >
+              <Typography variant="h5">
+                {latestTreatedDateTime
+                  ? timestampDate(latestTreatedDateTime)
+                  : ""}
+              </Typography>
+            </Grid>
+          </Grid>
         )}
       </Box>
       {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (

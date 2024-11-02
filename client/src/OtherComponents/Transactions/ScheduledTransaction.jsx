@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import AlarmIcon from "@mui/icons-material/Alarm";
 import { format } from "date-fns";
 import { CircleLogo } from "../CustomAccordionStyles";
@@ -31,23 +31,40 @@ const ScheduledTransaction = ({ row }) => {
         </>
       ) : (
         <>
-          <Box
+          <Grid
+            container
             sx={{
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
-              mb: 2,
+              mb: 3,
             }}
           >
-            <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              Scheduled
-            </Typography>
-            <Typography variant="h5">
-              {scheduledData?.createdAt
-                ? timestampDate(scheduledData.createdAt)
-                : ""}
-            </Typography>
-          </Box>
+            <Grid item xs={12} md={6}>
+              <Typography variant="h4" color={colors.greenAccent[400]}>
+                Scheduled
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: {
+                  xs: "start",
+                  md: "end",
+                },
+              }}
+            >
+              <Typography variant="h5">
+                {scheduledData?.createdAt
+                  ? timestampDate(scheduledData.createdAt)
+                  : ""}
+              </Typography>
+            </Grid>
+          </Grid>
           <Typography variant="h5">
             Scheduled Date:{" "}
             {scheduledData?.scheduledDate

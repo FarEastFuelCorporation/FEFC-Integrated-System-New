@@ -157,9 +157,16 @@ const ScheduledTransactions = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { scheduledDate, scheduledTime, statusId, createdBy } = formData;
+    const { scheduledDate, scheduledTime, logisticsId, statusId, createdBy } =
+      formData;
 
-    if (!scheduledDate || !scheduledTime || !statusId || !createdBy) {
+    if (
+      !scheduledDate ||
+      !scheduledTime ||
+      !logisticsId ||
+      !statusId ||
+      !createdBy
+    ) {
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;

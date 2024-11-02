@@ -9,6 +9,8 @@ import {
   Modal,
   TextField,
   Button,
+  BottomNavigation,
+  useMediaQuery,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
@@ -20,7 +22,10 @@ import {
   CalendarTodayOutlined as CalendarTodayOutlinedIcon,
   MenuOutlined as MenuOutlinedIcon,
 } from "@mui/icons-material";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import axios from "axios";
+import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
 const GeneratorSidebar = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -204,7 +209,62 @@ const GeneratorSidebar = ({ user }) => {
     }
   };
 
-  return (
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return isMobile ? (
+    <Box
+      sx={{
+        width: "100%",
+        overflowX: "auto", // Enable horizontal scrolling
+        whiteSpace: "nowrap", // Prevent items from wrapping to the next line
+        position: "fixed",
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // IE 10+
+        bottom: 0,
+        zIndex: 1300,
+        backgroundColor: colors.primary[400],
+      }}
+    >
+      <BottomNavigation
+        value={selected}
+        onChange={(event, newValue) => {
+          setSelected(newValue);
+        }}
+        sx={{
+          display: "inline-flex", // Align items in a single row
+          flexDirection: "row",
+          "& .Mui-selected": {
+            color: colors.greenAccent[400], // Apply custom color to selected action
+          },
+        }}
+      >
+        <BottomNavItem
+          label="Dashboard"
+          value="Dashboard"
+          icon={HomeOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={""}
+        />
+        <BottomNavItem
+          label="Transactions"
+          value="Transactions"
+          icon={PointOfSaleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"transactions"}
+        />
+        <BottomNavItem
+          label="Quotations"
+          value="Quotations"
+          icon={FormatListBulletedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"quotations"}
+        />
+      </BottomNavigation>
+    </Box>
+  ) : (
     <Box
       position="relative"
       sx={{

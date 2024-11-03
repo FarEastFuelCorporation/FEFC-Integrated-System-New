@@ -259,7 +259,7 @@ const Payroll = ({ user }) => {
 
       // Return only the total amount less late pay
       const finalAmount = (totalAmount - latePay).toFixed(2);
-      return finalAmount; // Return the final amount
+      return Math.max(finalAmount, 0); // Return the final amount
     }
 
     // If no matching employee record is found, return null
@@ -486,7 +486,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Monday
-          ? calculateHours(params.row.Monday, params.row, "monday")
+          ? formatNumber(
+              calculateHours(params.row.Monday, params.row, "monday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,
@@ -499,7 +501,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Tuesday
-          ? calculateHours(params.row.Tuesday, params.row, "tuesday")
+          ? formatNumber(
+              calculateHours(params.row.Tuesday, params.row, "tuesday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,
@@ -512,7 +516,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Wednesday
-          ? calculateHours(params.row.Wednesday, params.row, "wednesday")
+          ? formatNumber(
+              calculateHours(params.row.Wednesday, params.row, "wednesday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,
@@ -525,7 +531,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Thursday
-          ? calculateHours(params.row.Thursday, params.row, "thursday")
+          ? formatNumber(
+              calculateHours(params.row.Thursday, params.row, "thursday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,
@@ -538,7 +546,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Friday
-          ? calculateHours(params.row.Friday, params.row, "friday")
+          ? formatNumber(
+              calculateHours(params.row.Friday, params.row, "friday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,
@@ -551,7 +561,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Saturday
-          ? calculateHours(params.row.Saturday, params.row, "saturday")
+          ? formatNumber(
+              calculateHours(params.row.Saturday, params.row, "saturday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,
@@ -564,7 +576,9 @@ const Payroll = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         return params.row.Sunday
-          ? calculateHours(params.row.Sunday, params.row, "sunday")
+          ? formatNumber(
+              calculateHours(params.row.Sunday, params.row, "sunday")
+            )
           : null;
       },
       renderCell: renderCellWithWrapText,

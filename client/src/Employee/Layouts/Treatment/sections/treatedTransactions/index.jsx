@@ -16,6 +16,7 @@ const TreatedTransactions = ({ user }) => {
     waste: [],
     id: "",
     bookedTransactionId: "",
+    sortedTransactionId: "",
     sortedWasteTransactionId: "",
     treatedWastes: [
       {
@@ -54,6 +55,7 @@ const TreatedTransactions = ({ user }) => {
       );
 
       // For pending transactions
+      console.log(treatedTransactionResponse.data.pendingTransactions);
       setPendingTransactions(
         treatedTransactionResponse.data.pendingTransactions
       );
@@ -128,12 +130,13 @@ const TreatedTransactions = ({ user }) => {
   };
 
   const handleConfirmDelete = async (row) => {
+    console.log(row);
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/treatedTransaction/${row.id}`, {
         data: {
           deletedBy: user.id,
-          bookedTransactionId: row.id,
+          bookedTransactionId: row.bookedTransactionId,
         },
       });
 
@@ -195,6 +198,49 @@ const TreatedTransactions = ({ user }) => {
       });
     }
 
+    // Calculate total weights for validation
+    const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
+    if (scheduledTransaction) {
+      const receivedTransaction =
+        scheduledTransaction?.ReceivedTransaction?.[0];
+      if (receivedTransaction) {
+        const sortedTransaction = receivedTransaction?.SortedTransaction?.[0];
+        if (sortedTransaction) {
+          // Total sorted weight
+          const sortedWasteTransactions =
+            sortedTransaction?.SortedWasteTransaction || [];
+          const totalSortedWeight = sortedWasteTransactions.reduce(
+            (total, wasteTransaction) =>
+              total +
+              (wasteTransaction.weight ? Number(wasteTransaction.weight) : 0),
+            0
+          );
+
+          // Total treated weight
+          let totalTreatedWeight = sortedWasteTransactions.reduce(
+            (total, wasteTransaction) =>
+              total +
+              (wasteTransaction.treatedWeight
+                ? Number(wasteTransaction.treatedWeight)
+                : 0),
+            0
+          );
+          totalTreatedWeight += formData.treatedWastes.reduce(
+            (total, treatedWaste) =>
+              total + (treatedWaste.weight ? Number(treatedWaste.weight) : 0),
+            0
+          );
+
+          // Compare treated weight to sorted weight
+          if (totalTreatedWeight > totalSortedWeight) {
+            validationErrors.push(
+              "Total treated weight exceeds the total sorted weight."
+            );
+          }
+        }
+      }
+    }
+
     if (validationErrors.length > 0) {
       setErrorMessage(validationErrors.join(" "));
       setShowErrorMessage(true);
@@ -206,41 +252,10 @@ const TreatedTransactions = ({ user }) => {
     return true;
   };
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    // Perform client-side validation
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const updatedFormData = updateIsFinished(formData);
-
-      if (!formData.id) {
-        await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
-        setSuccessMessage("Treated Transaction Submitted Successfully!");
-      }
-
-      fetchData();
-
-      setShowSuccessMessage(true);
-      handleCloseModal();
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const updateIsFinished = (formData) => {
     // Extract relevant data from the formData object
     const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
     if (!scheduledTransaction) return;
-
-    const dispatchedTransaction =
-      scheduledTransaction?.DispatchedTransaction?.[0];
-    if (!dispatchedTransaction) return;
 
     const receivedTransaction = scheduledTransaction?.ReceivedTransaction?.[0];
     if (!receivedTransaction) return;
@@ -284,11 +299,41 @@ const TreatedTransactions = ({ user }) => {
     // Update isFinished if totalSortedWeight matches totalTreatedWeight
     const isFinished = totalSortedWeight === totalTreatedWeight;
 
+    console.log(formData);
+    console.log(isFinished);
     // Return the updated formData with the isFinished flag
     return {
       ...formData,
       isFinished,
     };
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    // Perform client-side validation
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const updatedFormData = updateIsFinished(formData);
+      console.log(formData);
+      console.log(updatedFormData);
+      if (!formData.id) {
+        await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
+        setSuccessMessage("Treated Transaction Submitted Successfully!");
+      }
+
+      fetchData();
+
+      setShowSuccessMessage(true);
+      handleCloseModal();
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (

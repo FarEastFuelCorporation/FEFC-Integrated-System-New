@@ -2,7 +2,6 @@
 
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
-const SortedTransaction = require("../models/SortedTransaction");
 const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
@@ -31,7 +30,6 @@ async function createTreatedTransactionController(req, res) {
     const newTreatedTransaction = await TreatedTransaction.create(
       {
         sortedTransactionId,
-        isFinished,
         remarks,
         createdBy,
       },
@@ -61,19 +59,11 @@ async function createTreatedTransactionController(req, res) {
       { transaction }
     );
 
-    const sortedTransactionToUpdate = await SortedTransaction.findByPk(
-      sortedTransactionId,
-      { transaction }
-    );
-
     if (updatedBookedTransaction) {
       // Update booked transaction attributes if isFinished is true
       if (isFinished) {
         updatedBookedTransaction.statusId = statusId;
         await updatedBookedTransaction.save({ transaction });
-
-        sortedTransactionToUpdate.isFinishTreated = isFinished;
-        await sortedTransactionToUpdate.save({ transaction });
       }
       // Commit the transaction
       await transaction.commit();
@@ -148,15 +138,6 @@ async function deleteTreatedTransactionController(req, res) {
       return res.status(404).json({ message: `Treated Transaction not found` });
     }
 
-    // Find the associated sorted transaction
-    const sortedTransactionToUpdate = await SortedTransaction.findByPk(
-      treatedTransactionToDelete.sortedTransactionId
-    );
-
-    if (!sortedTransactionToUpdate) {
-      return res.status(404).json({ message: `Sorted Transaction not found` });
-    }
-
     // Find other TreatedWasteTransaction records associated with this treated transaction
     const otherTreatedWasteTransactions = await TreatedWasteTransaction.findAll(
       {
@@ -170,10 +151,6 @@ async function deleteTreatedTransactionController(req, res) {
       treatedTransactionToDelete.updatedBy = deletedBy;
       treatedTransactionToDelete.deletedBy = deletedBy;
       await treatedTransactionToDelete.save();
-
-      // Update the sorted transaction's isFinished status
-      sortedTransactionToUpdate.isFinished = false;
-      await sortedTransactionToUpdate.save();
 
       // Soft delete the TreatedTransaction
       await treatedTransactionToDelete.destroy();

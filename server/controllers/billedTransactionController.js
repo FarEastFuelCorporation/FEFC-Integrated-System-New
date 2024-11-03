@@ -5,7 +5,6 @@ const BookedTransaction = require("../models/BookedTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
 const generateBillingNumber = require("../utils/generateBillingNumber");
 const { fetchData } = require("../utils/getBookedTransactions");
-const BilledCertified = require("../models/BilledCertified");
 const transactionStatusId = 7;
 
 // Create Billed Transaction controller
@@ -15,7 +14,6 @@ async function createBilledTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId,
-      certifiedTransactionId, // Expecting an array of CertifiedTransaction IDs
       billedDate,
       billedTime,
       serviceInvoiceNumber,
@@ -32,7 +30,7 @@ async function createBilledTransactionController(req, res) {
     const billingNumber = await generateBillingNumber();
 
     // Create BilledTransaction entry
-    const billedTransaction = await BilledTransaction.create(
+    await BilledTransaction.create(
       {
         bookedTransactionId,
         billingNumber,
@@ -45,23 +43,6 @@ async function createBilledTransactionController(req, res) {
       },
       { transaction }
     );
-
-    // Link CertifiedTransactions with the newly created BilledTransaction using BilledCertified
-    if (certifiedTransactionId && certifiedTransactionId.length > 0) {
-      // Create entries in the BilledCertified join table
-      const billedCertified = await Promise.all(
-        certifiedTransactionId.map(async (certifiedId) => {
-          await BilledCertified.create(
-            {
-              billedTransactionId: billedTransaction.id,
-              certifiedTransactionId: certifiedId,
-            },
-            { transaction }
-          );
-        })
-      );
-      console.log("billedCertified", billedCertified);
-    }
 
     // Update the status of the booked transaction
     const updatedBookedTransaction = await BookedTransaction.findByPk(
@@ -130,7 +111,6 @@ async function updateBilledTransactionController(req, res) {
       // Extracting data from the request body
       let {
         bookedTransactionId,
-        certifiedTransactionId, // Array of CertifiedTransaction IDs
         billedDate,
         billedTime,
         serviceInvoiceNumber,
@@ -157,28 +137,6 @@ async function updateBilledTransactionController(req, res) {
 
         // Save the updated billed transaction
         await billedTransaction.save({ transaction });
-
-        // Update the linked CertifiedTransactions in BilledCertified join table
-        if (certifiedTransactionId && certifiedTransactionId.length > 0) {
-          // Remove existing BilledCertified entries for this billedTransactionId
-          await BilledCertified.destroy({
-            where: { billedTransactionId: billedTransaction.id },
-            transaction,
-          });
-
-          // Re-link the CertifiedTransactions
-          await Promise.all(
-            certifiedTransactionId.map(async (certifiedId) => {
-              await BilledCertified.create(
-                {
-                  billedTransactionId: billedTransaction.id,
-                  certifiedTransactionId: certifiedId,
-                },
-                { transaction }
-              );
-            })
-          );
-        }
 
         // Update the status of the booked transaction
         const updatedBookedTransaction = await BookedTransaction.findByPk(
@@ -239,15 +197,13 @@ async function deleteBilledTransactionController(req, res) {
     console.log("Soft deleting billed transaction with ID:", id);
 
     // Find the billed transaction by UUID (id)
-    const treatedWasteTransactionToDelete = await BilledTransaction.findByPk(
-      id
-    );
+    const billedTransactionToDelete = await BilledTransaction.findByPk(id);
 
-    if (treatedWasteTransactionToDelete) {
+    if (billedTransactionToDelete) {
       // Update the deletedBy field
-      treatedWasteTransactionToDelete.updatedBy = deletedBy;
-      treatedWasteTransactionToDelete.deletedBy = deletedBy;
-      await treatedWasteTransactionToDelete.save();
+      billedTransactionToDelete.updatedBy = deletedBy;
+      billedTransactionToDelete.deletedBy = deletedBy;
+      await billedTransactionToDelete.save();
 
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         bookedTransactionId
@@ -259,7 +215,7 @@ async function deleteBilledTransactionController(req, res) {
       await updatedBookedTransaction.save();
 
       // Soft delete the billed transaction (sets deletedAt timestamp)
-      await treatedWasteTransactionToDelete.destroy();
+      await billedTransactionToDelete.destroy();
 
       // fetch transactions
       const data = await fetchData(transactionStatusId);

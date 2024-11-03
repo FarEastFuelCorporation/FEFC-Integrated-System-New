@@ -65,6 +65,7 @@ const BookedTransactions = ({ user }) => {
       );
 
       // For finished transactions
+      console.log(bookedTransactionResponse.data.finishedTransactions);
       setFinishedTransactions(
         bookedTransactionResponse.data.finishedTransactions
       );

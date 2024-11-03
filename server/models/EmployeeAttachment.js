@@ -14,7 +14,7 @@ const EmployeeAttachment = sequelize.define(
       primaryKey: true,
     },
     employeeId: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
     fileName: {

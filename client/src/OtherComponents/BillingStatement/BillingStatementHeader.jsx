@@ -10,6 +10,11 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
 
   const vat = amounts.vatExclusive * 0.12;
 
+  const termsChargeDays = parseInt(
+    row.QuotationWaste.Quotation.termsChargeDays
+  );
+  const termsCharge = row.QuotationWaste.Quotation.termsCharge;
+
   return (
     <Box>
       <Box display="flex" justifyContent="space-between">
@@ -47,11 +52,7 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {
-                row.ScheduledTransaction[0].ReceivedTransaction[0]
-                  .SortedTransaction[0].CertifiedTransaction[0]
-                  .BilledTransaction[0].billingNumber
-              }
+              {row.BilledTransaction[0].billingNumber}
             </Typography>
             <Typography
               mt={1}
@@ -68,13 +69,9 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row.ScheduledTransaction[0].ReceivedTransaction[0]
-                .SortedTransaction[0].CertifiedTransaction[0]
-                .BilledTransaction[0].BillingApprovalTransaction
+              {row.BilledTransaction[0].BillingApprovalTransaction
                 ? formatDateFull(
-                    row.ScheduledTransaction[0].ReceivedTransaction[0]
-                      .SortedTransaction[0].CertifiedTransaction[0]
-                      .BilledTransaction[0].BillingApprovalTransaction
+                    row.BilledTransaction[0].BillingApprovalTransaction
                       .approvedDate
                   )
                 : ""}
@@ -201,7 +198,12 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               Total Amount Due:
             </Typography>
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-              {formatNumber(amounts.vatInclusive + amounts.vatExclusive + vat)}
+              {formatNumber(
+                amounts.vatInclusive +
+                  amounts.vatExclusive +
+                  vat -
+                  credits.vatInclusive
+              )}
             </Typography>
           </Box>
           <Box
@@ -215,9 +217,11 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               Due Date:
             </Typography>
             <Box>
-              <Typography sx={{ fontWeight: "bold" }}>30 days</Typography>
+              <Typography
+                sx={{ fontWeight: "bold" }}
+              >{`${termsChargeDays} DAYS`}</Typography>
               <Typography sx={{ fontWeight: "bold" }}>
-                from the date received
+                {`${termsCharge}`}
               </Typography>
             </Box>
           </Box>

@@ -1,6 +1,7 @@
 // controllers/employeeRecordController.js
 
 const Department = require("../models/Department");
+const EmployeeAttachment = require("../models/EmployeeAttachment");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const Vehicle = require("../models/Vehicle");
 
@@ -164,6 +165,13 @@ async function createEmployeeRecordController(req, res) {
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
       order: [["employeeId", "ASC"]],
+      include: [
+        {
+          model: EmployeeAttachment,
+          as: "EmployeeAttachment",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+      ],
     });
 
     // Respond with the newly created employee record and the associated departments
@@ -182,6 +190,13 @@ async function getEmployeeRecordsController(req, res) {
     const employeeRecords = await EmployeeRecord.findAll({
       attributes: { exclude: ["picture", "signature"] },
       order: [["employeeId", "ASC"]],
+      include: [
+        {
+          model: EmployeeAttachment,
+          as: "EmployeeAttachment",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+      ],
     });
 
     res.json({ employeeRecords });
@@ -197,6 +212,13 @@ async function getEmployeeRecordsFullController(req, res) {
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
       order: [["employeeId", "ASC"]],
+      include: [
+        {
+          model: EmployeeAttachment,
+          as: "EmployeeAttachment",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+      ],
     });
 
     res.json({ employeeRecords });
@@ -370,6 +392,13 @@ async function updateEmployeeRecordController(req, res) {
       // Fetch all EmployeeRecords from the database
       const employeeRecords = await EmployeeRecord.findAll({
         order: [["employeeId", "ASC"]],
+        include: [
+          {
+            model: EmployeeAttachment,
+            as: "EmployeeAttachment",
+            attributes: ["fileName", "createdBy"], // Include only necessary fields
+          },
+        ],
       });
 
       console.log(employeeRecords);

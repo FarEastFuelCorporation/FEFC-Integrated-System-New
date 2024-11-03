@@ -87,9 +87,8 @@ const CollectedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       billingDistributionTransactionId:
-        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-          .CertifiedTransaction[0].BilledTransaction[0]
-          .BillingApprovalTransaction.BillingDistributionTransaction.id,
+        row.BilledTransaction[0].BillingApprovalTransaction
+          .BillingDistributionTransaction.id,
       collectedDate: "",
       collectedTime: "",
       collectedAmount: 0,
@@ -121,9 +120,7 @@ const CollectedTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const collectedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-          .BilledTransaction[0].BillingApprovalTransaction
+        typeToEdit.BilledTransaction[0].BillingApprovalTransaction
           .BillingDistributionTransaction.CollectedTransaction || {};
 
       setFormData({
@@ -157,7 +154,7 @@ const CollectedTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/collectionTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.BillingDistributionTransaction.CollectedTransaction.id}`,
+        `${apiUrl}/api/collectionTransaction/${row.BilledTransaction?.[0]?.BillingApprovalTransaction.BillingDistributionTransaction.CollectedTransaction.id}`,
         {
           data: {
             deletedBy: user.id,

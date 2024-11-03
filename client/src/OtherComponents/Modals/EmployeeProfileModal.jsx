@@ -9,6 +9,7 @@ import {
   Button,
   IconButton,
   useTheme,
+  TextField,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { format } from "date-fns";
@@ -23,21 +24,28 @@ import {
   concatenatePermanentAddress,
   concatenatePresentAddress,
 } from "../Functions";
+import SuccessMessage from "../SuccessMessage";
 
 const EmployeeProfileModal = ({
+  user,
   selectedRow,
   open,
   handleClose,
   handleEditClick,
+  selectedTab,
+  setSelectedTab,
 }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [selectedTab, setSelectedTab] = useState(0);
   const [employeesData, setEmployeesData] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [fileName, setFileName] = useState("");
+  const [fileNameToSubmit, setFileNameToSubmit] = useState("");
   const [attachmentData, setAttachmentData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.employeeId) {
@@ -118,6 +126,50 @@ const EmployeeProfileModal = ({
     }
   };
 
+  const handleFileNameChange = (event) => {
+    setFileNameToSubmit(event.target.value); // Allow editing file name in the TextField
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check if file is selected before proceeding
+    if (!fileName) {
+      alert("Please select a file to upload.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      const fileInput = document.querySelector("#attachment").files[0];
+      formData.append("employeeId", selectedRow.employeeId);
+      formData.append("attachment", fileInput);
+      formData.append("fileName", fileNameToSubmit);
+      formData.append("createdBy", user.id);
+
+      console.log(formData);
+
+      // Submit the form data with file upload
+      await axios.post(`${apiUrl}/api/employeeAttachment`, formData);
+
+      setSuccessMessage("File uploaded successfully!");
+      setShowSuccessMessage(true);
+      const employeeAttachmentResponse = await axios.get(
+        `${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`
+      );
+
+      setAttachmentData(employeeAttachmentResponse.data.employeeAttachments);
+      setFileName("");
+      setFileNameToSubmit("");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
       {params.value}
@@ -141,6 +193,11 @@ const EmployeeProfileModal = ({
       align: "center",
       flex: 1,
       minWidth: 150,
+      valueGetter: (params) => {
+        if (params.row.Employee) {
+          return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+        }
+      },
       renderCell: renderCellWithWrapText,
     },
     {
@@ -267,7 +324,8 @@ const EmployeeProfileModal = ({
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 1050,
-            height: "90%",
+            minHeight: "90%",
+            overflowY: "scroll",
             bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,
@@ -285,14 +343,16 @@ const EmployeeProfileModal = ({
               >
                 Employee Profile
               </Typography>
-              <IconButton
-                color="warning"
-                onClick={() => handleEditClick(selectedRow.id)}
-                sx={{ position: "absolute", right: 20, top: 20 }}
-              >
-                <EditIcon />
-                Edit
-              </IconButton>
+              {user.userType === 21 && (
+                <IconButton
+                  color="warning"
+                  onClick={() => handleEditClick(selectedRow.id)}
+                  sx={{ position: "absolute", right: 20, top: 20 }}
+                >
+                  <EditIcon />
+                  Edit
+                </IconButton>
+              )}
               <Box padding={1} sx={{ position: "relative" }}>
                 <Box
                   sx={{
@@ -304,14 +364,14 @@ const EmployeeProfileModal = ({
                 >
                   {employeePicture}
                 </Box>
-                <Grid container spacing={2} sx={{ height: 220 }}>
+                <Grid container spacing={2} sx={{ minHeight: 220 }}>
                   <Grid item xs={12} md={6} lg={6.5}>
                     {" "}
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
+                      <Grid item xs={12} md={6} lg={5}>
                         <Typography variant="h3">Employee ID:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
+                      <Grid item xs={12} md={6} lg={7}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.employeeId
                             ? selectedRow.employeeId
@@ -320,22 +380,23 @@ const EmployeeProfileModal = ({
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
+                      <Grid item xs={12} md={6} lg={5}>
                         <Typography variant="h3">First Name:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
+                      <Grid item xs={12} md={6} lg={7}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.firstName
                             ? selectedRow.firstName
-                            : "(No Data)"}
+                            : "(No Data)"}{" "}
+                          {selectedRow.affix ? selectedRow.affix : ""}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
+                      <Grid item xs={12} md={6} lg={5}>
                         <Typography variant="h3">Middle Name:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
+                      <Grid item xs={12} md={6} lg={7}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.middleName
                             ? selectedRow.middleName
@@ -344,10 +405,10 @@ const EmployeeProfileModal = ({
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
+                      <Grid item xs={12} md={6} lg={5}>
                         <Typography variant="h3">Last Name:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
+                      <Grid item xs={12} md={6} lg={7}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.lastName
                             ? selectedRow.lastName
@@ -359,12 +420,20 @@ const EmployeeProfileModal = ({
                       (selectedRow.civilStatus === "MARRIED" ||
                         selectedRow.civilStatus === "WIDOW") && (
                         <Grid container spacing={2}>
-                          <Grid item xs={12} md={6} lg={4}>
-                            <Typography variant="h3">
+                          <Grid item xs={12} md={6} lg={5}>
+                            <Typography
+                              variant="h3"
+                              sx={{
+                                fontSize: "20px",
+                                display: "flex",
+                                alignItems: "center",
+                                height: "100%",
+                              }}
+                            >
                               Husband's Surname:
                             </Typography>
                           </Grid>{" "}
-                          <Grid item xs={12} md={6} lg={8}>
+                          <Grid item xs={12} md={6} lg={7}>
                             <Typography
                               variant="h3"
                               sx={{ fontWeight: "bold" }}
@@ -377,10 +446,10 @@ const EmployeeProfileModal = ({
                         </Grid>
                       )}
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
+                      <Grid item xs={12} md={6} lg={5}>
                         <Typography variant="h3">Birthday:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
+                      <Grid item xs={12} md={6} lg={7}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.birthday
                             ? format(
@@ -392,10 +461,10 @@ const EmployeeProfileModal = ({
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
+                      <Grid item xs={12} md={6} lg={5}>
                         <Typography variant="h3">Civil Status:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
+                      <Grid item xs={12} md={6} lg={7}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                           {selectedRow.civilStatus
                             ? selectedRow.civilStatus
@@ -1055,7 +1124,7 @@ const EmployeeProfileModal = ({
                   </Box>
                 )}
                 {selectedTab === 5 && (
-                  <Box>
+                  <Box position="relative">
                     <Typography variant="h3" gutterBottom mt={2}>
                       Upload Attachment
                     </Typography>
@@ -1065,11 +1134,11 @@ const EmployeeProfileModal = ({
                         className="form-control visually-hidden"
                         accept="image/*"
                         onChange={handleFileChange}
-                        id="picture"
-                        name="picture"
+                        id="attachment"
+                        name="attachment"
                         style={{ display: "none" }}
                       />
-                      <label htmlFor="picture">
+                      <label htmlFor="attachment">
                         <Typography>File: {fileName}</Typography>
                         <Button
                           variant="contained"
@@ -1079,9 +1148,36 @@ const EmployeeProfileModal = ({
                           Upload Employee Attachment
                         </Button>
                       </label>
+                      <TextField
+                        label="File Name"
+                        variant="outlined"
+                        value={fileNameToSubmit}
+                        onChange={handleFileNameChange}
+                        fullWidth
+                        required
+                        autoComplete="off"
+                        sx={{ mt: 2 }}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={handleFormSubmit}
+                        sx={{
+                          mt: 2,
+                          backgroundColor: colors.greenAccent[500],
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? "Uploading..." : "Submit Attachment"}
+                      </Button>
                     </Grid>
                     <hr />
-                    <Typography variant="h3" gutterBottom mt={2}>
+                    {showSuccessMessage && (
+                      <SuccessMessage
+                        message={successMessage}
+                        onClose={() => setShowSuccessMessage(false)}
+                      />
+                    )}
+                    <Typography variant="h3" gutterBottom mt={5}>
                       Attachments
                     </Typography>
                     <DataGrid

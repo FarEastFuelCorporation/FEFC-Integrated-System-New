@@ -7,7 +7,7 @@ const EmployeeAttachment = require("../models/EmployeeAttachment");
 async function createEmployeeAttachmentController(req, res) {
   try {
     // Extracting data from the request body
-    let { bookedTransactionId, fileName, createdBy } = req.body;
+    let { employeeId, fileName, createdBy } = req.body;
     console.log(req.body);
 
     fileName = fileName && fileName.toUpperCase();
@@ -20,7 +20,7 @@ async function createEmployeeAttachmentController(req, res) {
 
     // Create Attachment entry
     const newAttachmentData = await EmployeeAttachment.create({
-      bookedTransactionId,
+      employeeId,
       fileName,
       attachment,
       createdBy,
@@ -34,7 +34,7 @@ async function createEmployeeAttachmentController(req, res) {
           {
             model: Employee,
             as: "Employee",
-            attributes: ["firstName", "lastName"], // Include only necessary fields
+            attributes: ["firstName", "lastName", "affix"], // Include only necessary fields
           },
         ],
       }
@@ -52,7 +52,15 @@ async function createEmployeeAttachmentController(req, res) {
 async function getEmployeeAttachmentsController(req, res) {
   try {
     // Fetch all Employee Attachments from the database
-    const employeeAttachments = await EmployeeAttachment.findAll();
+    const employeeAttachments = await EmployeeAttachment.findAll({
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName", "affix"], // Include only necessary fields
+        },
+      ],
+    });
 
     res.json({ employeeAttachments });
   } catch (error) {
@@ -69,6 +77,13 @@ async function getEmployeeAttachmentController(req, res) {
     // Fetch Employee Attachment from the database
     const employeeAttachments = await EmployeeAttachment.findAll({
       where: { employeeId },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName", "affix"], // Include only necessary fields
+        },
+      ],
     });
 
     res.json({ employeeAttachments });

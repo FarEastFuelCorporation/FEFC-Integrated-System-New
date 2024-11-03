@@ -55,7 +55,6 @@ const TreatedTransactions = ({ user }) => {
       );
 
       // For pending transactions
-      console.log(treatedTransactionResponse.data.pendingTransactions);
       setPendingTransactions(
         treatedTransactionResponse.data.pendingTransactions
       );
@@ -130,7 +129,6 @@ const TreatedTransactions = ({ user }) => {
   };
 
   const handleConfirmDelete = async (row) => {
-    console.log(row);
     try {
       setLoading(true);
       await axios.delete(`${apiUrl}/api/treatedTransaction/${row.id}`, {
@@ -299,8 +297,6 @@ const TreatedTransactions = ({ user }) => {
     // Update isFinished if totalSortedWeight matches totalTreatedWeight
     const isFinished = totalSortedWeight === totalTreatedWeight;
 
-    console.log(formData);
-    console.log(isFinished);
     // Return the updated formData with the isFinished flag
     return {
       ...formData,
@@ -319,8 +315,6 @@ const TreatedTransactions = ({ user }) => {
       setLoading(true);
 
       const updatedFormData = updateIsFinished(formData);
-      console.log(formData);
-      console.log(updatedFormData);
       if (!formData.id) {
         await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
         setSuccessMessage("Treated Transaction Submitted Successfully!");

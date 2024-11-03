@@ -61,6 +61,28 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     });
   };
 
+  const handleViewPDF = () => {
+    const input = certificateRef.current;
+    const pageHeight = 1056;
+    const pageWidth = 816;
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [pageWidth, pageHeight], // Page size in px
+      });
+
+      // Add the captured image to the PDF
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+
+      // Open the PDF in a new browser tab
+      const pdfUrl = pdf.output("bloburl");
+      window.open(pdfUrl, "_blank");
+    });
+  };
+
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "2-digit" };
     const date = new Date(dateString);
@@ -211,13 +233,18 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
       {verify ? (
         ""
       ) : (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleDownloadPDF}
-        >
-          Download Certificate
-        </Button>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleDownloadPDF}
+          >
+            Download Certificate
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleViewPDF}>
+            View Certificate
+          </Button>
+        </Box>
       )}
 
       {generatePDFContent()}

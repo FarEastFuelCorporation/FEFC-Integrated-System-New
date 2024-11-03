@@ -11,9 +11,7 @@ const BilledTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const billedTransaction =
-    row.ScheduledTransaction[0]?.ReceivedTransaction[0]?.SortedTransaction[0]
-      ?.CertifiedTransaction[0]?.BilledTransaction[0];
+  const billedTransaction = row.BilledTransaction[0];
 
   return (
     <Box>

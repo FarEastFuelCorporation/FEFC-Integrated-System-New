@@ -20,7 +20,7 @@ async function generateCertificateNumber() {
     // Generate the new transaction ID
     let newIdNumber = 1;
     if (latestTransaction) {
-      const latestTransactionId = latestTransaction.transactionId;
+      const latestTransactionId = latestTransaction.certificateNumber;
       const latestYear = latestTransactionId.substring(3, 7);
       const latestMonth = latestTransactionId.substring(7, 9);
       if (latestYear === currentYear && latestMonth === currentMonth) {

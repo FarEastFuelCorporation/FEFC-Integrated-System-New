@@ -62,7 +62,7 @@ const Transaction = ({
   const transactions =
     selectedTab === 0
       ? pendingTransactions
-      : selectedTab === 1
+      : selectedTab === 1 && user.userType !== 11
       ? inProgressTransactions
       : finishedTransactions;
 
@@ -101,20 +101,22 @@ const Transaction = ({
               </Badge>
             }
           />
-          <Tab
-            label={
-              <Badge
-                badgeContent={inProgressCount}
-                color="warning"
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                In Progress
-              </Badge>
-            }
-          />
+          {user.userType !== 11 && (
+            <Tab
+              label={
+                <Badge
+                  badgeContent={inProgressCount}
+                  color="warning"
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                >
+                  In Progress
+                </Badge>
+              }
+            />
+          )}
           <Tab
             label={
               <Badge

@@ -12,8 +12,7 @@ const BillingApprovalTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const billingApprovalTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction;
+    row.BilledTransaction[0].BillingApprovalTransaction;
 
   return (
     <Box>

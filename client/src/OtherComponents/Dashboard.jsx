@@ -17,6 +17,7 @@ import SafetyRoutes from "../Employee/Routes/SafetyRoutes";
 import WarehouseRoutes from "../Employee/Routes/WarehouseRoutes";
 import EmployeeRoutes from "../Employee/Routes/EmployeeRoutes";
 import LeaderRoutes from "../Employee/Routes/LeaderRoutes";
+import HealthOfficerRoutes from "../Employee/Routes/HealthOfficerRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -106,22 +107,28 @@ const Dashboard = ({ user, onUpdateUser }) => {
           <CollectionRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
-    case 12:
-      return (
-        <RoleProtectedRoute user={user} allowedRoles={[12]}>
-          <HRRoutes user={user} onUpdateUser={onUpdateUser} />
-        </RoleProtectedRoute>
-      );
-    case 13:
-      return (
-        <RoleProtectedRoute user={user} allowedRoles={[13]}>
-          <SafetyRoutes user={user} onUpdateUser={onUpdateUser} />
-        </RoleProtectedRoute>
-      );
     case 14:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[14]}>
           <WarehouseRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 21:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[21]}>
+          <HRRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 22:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[22]}>
+          <SafetyRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 23:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[23]}>
+          <HealthOfficerRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     default:

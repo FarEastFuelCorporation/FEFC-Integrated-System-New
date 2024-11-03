@@ -50,7 +50,6 @@ const SortModal = ({
 
           setQuotations(quotationsResponse.data.quotations);
           setScrapTypes(scrapTypesResponse.data.scrapTypes);
-          console.log(treatmentProcesses.data.treatmentProcesses);
           setTreatmentProcesses(treatmentProcesses.data.treatmentProcesses);
         } catch (error) {
           console.error("Error fetching data:", error);

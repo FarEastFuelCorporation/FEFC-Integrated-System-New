@@ -20,7 +20,7 @@ async function generateBillingNumber() {
     // Generate the new transaction ID
     let newIdNumber = 1;
     if (latestTransaction) {
-      const latestTransactionId = latestTransaction.transactionId;
+      const latestTransactionId = latestTransaction.billingNumber;
       const latestYear = latestTransactionId.substring(1, 3); // Get last two digits of the year
       const latestMonth = latestTransactionId.substring(4, 6); // Get the month
       if (latestYear === currentYear && latestMonth === currentMonth) {

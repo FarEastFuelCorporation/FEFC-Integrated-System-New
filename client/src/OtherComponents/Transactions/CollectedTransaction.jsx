@@ -12,13 +12,11 @@ const CollectedTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const billingDistributionTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
+    row.BilledTransaction[0].BillingApprovalTransaction
       .BillingDistributionTransaction;
 
   const collectedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
+    row.BilledTransaction[0].BillingApprovalTransaction
       .BillingDistributionTransaction?.CollectedTransaction;
 
   // Assuming distributedDate is in a valid Date format (either Date object or string)
@@ -27,15 +25,106 @@ const CollectedTransaction = ({ row, user }) => {
   );
 
   // Add the terms to the distributedDate
-  const terms = parseInt(row.QuotationWaste.Quotation.termsCharge);
+  const termsChargeDays = parseInt(
+    row.QuotationWaste.Quotation.termsChargeDays
+  );
+  const termsCharge = row.QuotationWaste.Quotation.termsCharge;
 
   let dueDate;
 
   // Create a new Date instance for dueDate by adding terms to distributedDate
   if (distributedDate) {
     dueDate = new Date(distributedDate);
-    dueDate.setDate(dueDate.getDate() + terms);
+    dueDate.setDate(dueDate.getDate() + termsChargeDays);
   }
+
+  const sortedWasteTransaction =
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .SortedWasteTransaction;
+
+  // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
+  const aggregatedWasteTransactions = Object.values(
+    sortedWasteTransaction.reduce((acc, current) => {
+      const { id } = current.QuotationWaste;
+
+      // If the `QuotationWaste.id` is already in the accumulator, add the weight
+      if (acc[id]) {
+        acc[id].weight += current.weight;
+      } else {
+        // Otherwise, set the initial object in the accumulator
+        acc[id] = { ...current, weight: current.weight };
+      }
+
+      return acc;
+    }, {})
+  );
+
+  const amounts = {
+    vatExclusive: 0,
+    vatInclusive: 0,
+    nonVatable: 0,
+  };
+
+  const credits = {
+    vatExclusive: 0,
+    vatInclusive: 0,
+    nonVatable: 0,
+  };
+
+  // Calculate amounts and credits based on vatCalculation and mode
+  aggregatedWasteTransactions.forEach((item) => {
+    const { weight, QuotationWaste } = item;
+    const totalWeightPrice = weight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+    const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+    switch (QuotationWaste.vatCalculation) {
+      case "VAT EXCLUSIVE":
+        target.vatExclusive += totalWeightPrice;
+        break;
+      case "VAT INCLUSIVE":
+        target.vatInclusive += totalWeightPrice;
+        break;
+      case "NON VATABLE":
+        target.nonVatable += totalWeightPrice;
+        break;
+      default:
+        break;
+    }
+  });
+
+  const transpoFee = row.QuotationTransportation.unitPrice;
+  const transpoVatCalculation = row.QuotationTransportation.vatCalculation;
+  const transpoMode = row.QuotationTransportation.mode;
+
+  const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
+    // Check if the mode is "CHARGE"
+    if (transpoMode === "CHARGE") {
+      // Add the transportation fee based on VAT calculation
+      switch (transpoVatCalculation) {
+        case "VAT EXCLUSIVE":
+          amounts.vatExclusive += transpoFee;
+          break;
+        case "VAT INCLUSIVE":
+          amounts.vatInclusive += transpoFee;
+          break;
+        case "NON VATABLE":
+          amounts.nonVatable += transpoFee;
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  // Call the function to add transportation fee
+  addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+
+  const vat = amounts.vatExclusive * 0.12;
+
+  const totalAmountDue = formatNumber(
+    amounts.vatInclusive + amounts.vatExclusive + vat - credits.vatInclusive
+  );
 
   return (
     <Box>
@@ -59,14 +148,23 @@ const CollectedTransaction = ({ row, user }) => {
               For Collection
             </Typography>
           </Box>
+          <Typography mb={3} variant="h5">
+            Pending
+          </Typography>
           <Typography variant="h5">
-            Terms: {terms ? `${terms} Days` : "Pending"}
+            Total Amount Due: {totalAmountDue}
+          </Typography>
+          <Typography variant="h5">
+            Terms:{" "}
+            {termsChargeDays
+              ? `${termsChargeDays} DAYS ${termsCharge}`
+              : "Pending"}
           </Typography>
           <Typography variant="h5">
             Due Date:{" "}
             {dueDate ? format(new Date(dueDate), "MMMM dd, yyyy") : "Pending"}
           </Typography>
-          <Typography variant="h5">Pending</Typography>
+
           <br />
           <hr />
         </Box>

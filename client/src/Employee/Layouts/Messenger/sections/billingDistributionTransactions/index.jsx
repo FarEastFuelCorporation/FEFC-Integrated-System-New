@@ -86,9 +86,7 @@ const BillingDistributionTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       billingApprovalTransactionId:
-        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-          .CertifiedTransaction[0].BilledTransaction[0]
-          .BillingApprovalTransaction.id,
+        row.BilledTransaction[0].BillingApprovalTransaction.id,
       collectedDate: "",
       collectedTime: "",
       collectedAmount: 0,
@@ -120,18 +118,14 @@ const BillingDistributionTransactions = ({ user }) => {
 
     if (typeToEdit) {
       const billingDistributionTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-          .BilledTransaction[0].BillingApprovalTransaction
+        typeToEdit.BilledTransaction[0].BillingApprovalTransaction
           .BillingDistributionTransaction || {};
 
       setFormData({
         id: billingDistributionTransaction.id,
         bookedTransactionId: typeToEdit.id,
         billingApprovalTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-            ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-            ?.BilledTransaction?.[0].BillingApprovalTransaction.id,
+          typeToEdit.BilledTransaction?.[0].BillingApprovalTransaction.id,
         distributedDate: billingDistributionTransaction.distributedDate,
         distributedTime: billingDistributionTransaction.distributedTime,
         remarks: billingDistributionTransaction.remarks,
@@ -159,7 +153,7 @@ const BillingDistributionTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billingDistributionTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.BillingApprovalTransaction.BillingDistributionTransaction.id}`,
+        `${apiUrl}/api/billingDistributionTransaction/${row.BilledTransaction?.[0]?.BillingApprovalTransaction.BillingDistributionTransaction.id}`,
         {
           data: {
             deletedBy: user.id,

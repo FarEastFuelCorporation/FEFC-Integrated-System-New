@@ -91,6 +91,32 @@ EmployeeRecord.belongsTo(Department, {
   onDelete: "CASCADE",
 });
 
+EmployeeRecord.hasMany(EmployeeAttachment, {
+  as: "EmployeeAttachment",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeAttachment.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(EmployeeAttachment, {
+  as: "EmployeeAttachment",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeAttachment.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
 Client.hasMany(ClientUser, {
   as: "ClientUser",
   foreignKey: "clientId",
@@ -901,24 +927,6 @@ CertifiedTransaction.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
   targetKey: "id",
-  onDelete: "CASCADE",
-});
-
-// BilledTransaction belongs to many CertifiedTransaction through BilledCertified
-BilledTransaction.belongsToMany(CertifiedTransaction, {
-  through: BilledCertified, // Junction table
-  as: "CertifiedTransaction", // Alias for the CertifiedTransactions
-  foreignKey: "billedTransactionId", // Foreign key on the junction table
-  otherKey: "certifiedTransactionId", // The other key on the junction table
-  onDelete: "CASCADE",
-});
-
-// CertifiedTransaction belongs to many BilledTransaction through BilledCertified
-CertifiedTransaction.belongsToMany(BilledTransaction, {
-  through: BilledCertified, // Junction table
-  as: "BilledTransaction", // Alias for the BilledTransactions
-  foreignKey: "certifiedTransactionId", // Foreign key on the junction table
-  otherKey: "billedTransactionId", // The other key on the junction table
   onDelete: "CASCADE",
 });
 

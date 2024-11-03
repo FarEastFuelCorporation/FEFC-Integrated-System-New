@@ -51,7 +51,6 @@ const ScheduledTransactions = ({ user }) => {
       );
 
       // For in progress transactions
-      console.log(scheduledTransactionResponse.data.inProgressTransactions);
       setInProgressTransactions(
         scheduledTransactionResponse.data.inProgressTransactions
       );

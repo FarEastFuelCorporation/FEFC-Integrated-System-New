@@ -10,13 +10,9 @@ import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridS
 import EmployeeProfileModal from "../../../../../OtherComponents/Modals/EmployeeProfileModal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CircularProgress from "@mui/material/CircularProgress";
-import {
-  formatDate,
-  formatDate2,
-  formatDate3,
-} from "../../../../../OtherComponents/Functions";
+import { formatDate3 } from "../../../../../OtherComponents/Functions";
 
-const Contacts = ({ user }) => {
+const EmployeeRecords = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
@@ -88,6 +84,7 @@ const Contacts = ({ user }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [employeeRecords, setEmployeeRecord] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [gender, setGender] = useState(formData.gender);
@@ -113,7 +110,6 @@ const Contacts = ({ user }) => {
         axios.get(`${apiUrl}/api/department`),
       ]);
 
-      console.log(employeeRecordResponse.data.employeeRecords);
       setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
       setDepartments(departmentResponse.data.departments);
       setLoading(false);
@@ -643,6 +639,9 @@ const Contacts = ({ user }) => {
       headerName: "First Name",
       width: 100,
       headerAlign: "center",
+      valueGetter: (params) => {
+        return `${params.row.firstName} ${params.row.affix}`;
+      },
       renderCell: renderCellWithWrapText,
     },
     {
@@ -663,13 +662,6 @@ const Contacts = ({ user }) => {
       field: "husbandSurname",
       headerName: "Husband Surname",
       width: 100,
-      headerAlign: "center",
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "affix",
-      headerName: "Affix",
-      width: 50,
       headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
@@ -756,6 +748,7 @@ const Contacts = ({ user }) => {
   const handleClose = () => {
     setOpen(false);
     setSelectedRow(null);
+    setSelectedTab(0);
   };
 
   return (
@@ -785,10 +778,11 @@ const Contacts = ({ user }) => {
           rows={employeeRecords ? employeeRecords : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
-          {...(user.userType === 12 && { onRowClick: handleRowClick })}
+          {...{ onRowClick: handleRowClick }}
         />
       </CustomDataGridStyles>
       <EmployeeRecordModal
+        user={user}
         openModal={openModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}
@@ -809,14 +803,17 @@ const Contacts = ({ user }) => {
         showErrorMessage={showErrorMessage}
       />
       <EmployeeProfileModal
+        user={user}
         selectedRow={selectedRow}
         open={open}
         openModal={openModal}
         handleClose={handleClose}
         handleEditClick={handleEditClick}
+        selectedTab={selectedTab}
+        setSelectedTab={setSelectedTab}
       />
     </Box>
   );
 };
 
-export default Contacts;
+export default EmployeeRecords;

@@ -183,54 +183,6 @@ const getIncludeOptions = () => [
                 required: false,
                 include: [
                   {
-                    model: BilledTransaction,
-                    as: "BilledTransaction",
-                    required: false,
-                    include: [
-                      {
-                        model: BillingApprovalTransaction,
-                        as: "BillingApprovalTransaction",
-                        required: false,
-                        include: [
-                          {
-                            model: BillingDistributionTransaction,
-                            as: "BillingDistributionTransaction",
-                            required: false,
-                            include: [
-                              {
-                                model: CollectedTransaction,
-                                as: "CollectedTransaction",
-                                required: false,
-                                include: [
-                                  {
-                                    model: Employee,
-                                    as: "Employee",
-                                    attributes: ["firstName", "lastName"],
-                                  },
-                                ],
-                              },
-                              {
-                                model: Employee,
-                                as: "Employee",
-                                attributes: ["firstName", "lastName"],
-                              },
-                            ],
-                          },
-                          {
-                            model: Employee,
-                            as: "Employee",
-                            attributes: ["firstName", "lastName"],
-                          },
-                        ],
-                      },
-                      {
-                        model: Employee,
-                        as: "Employee",
-                        attributes: ["firstName", "lastName"],
-                      },
-                    ],
-                  },
-                  {
                     model: Employee,
                     as: "Employee",
                     attributes: ["firstName", "lastName"],
@@ -255,6 +207,54 @@ const getIncludeOptions = () => [
         model: Logistics,
         as: "Logistics",
         attributes: ["logisticsName"],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: BilledTransaction,
+    as: "BilledTransaction",
+    required: false,
+    include: [
+      {
+        model: BillingApprovalTransaction,
+        as: "BillingApprovalTransaction",
+        required: false,
+        include: [
+          {
+            model: BillingDistributionTransaction,
+            as: "BillingDistributionTransaction",
+            required: false,
+            include: [
+              {
+                model: CollectedTransaction,
+                as: "CollectedTransaction",
+                required: false,
+                include: [
+                  {
+                    model: Employee,
+                    as: "Employee",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
+              {
+                model: Employee,
+                as: "Employee",
+                attributes: ["firstName", "lastName"],
+              },
+            ],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
       },
       {
         model: Employee,
@@ -304,10 +304,6 @@ const getInProgressTransactions = async (
   additionalStatusId = null
 ) => {
   try {
-    console.log("statusId", statusId);
-    console.log("user", user);
-    console.log("additionalStatusId", additionalStatusId);
-
     // Build the base where conditions
     const whereConditions = {
       statusId: {
@@ -335,12 +331,26 @@ const getInProgressTransactions = async (
 };
 
 // Get In Finished Transactions (where statusId is greater than given value)
-const getFinishedTransactions = async (user = null) => {
+const getFinishedTransactions = async (
+  statusId,
+  user = null,
+  additionalStatusId = null
+) => {
   try {
+    console.log("statusId", statusId);
+    console.log("user", user);
+    console.log("additionalStatusId", additionalStatusId);
+
+    // Build the base where conditions
+    const whereConditions = { statusId: 11 };
+
+    // If user is provided, add the condition for createdBy (or whatever the user field is)
+    if (user) {
+      whereConditions.createdBy = user;
+    }
+
     const bookedTransactions = await BookedTransaction.findAll({
-      where: {
-        statusId: 11,
-      },
+      where: whereConditions,
       include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
     });
@@ -361,7 +371,7 @@ const fetchData = async (statusId, user = null, additionalStatusId = null) => {
       await Promise.all([
         getPendingTransactions(statusId, user, additionalStatusId),
         getInProgressTransactions(statusId, user, additionalStatusId),
-        getFinishedTransactions(user),
+        getFinishedTransactions(statusId, user, additionalStatusId),
       ]);
 
     // Return the results as an object or process them as needed

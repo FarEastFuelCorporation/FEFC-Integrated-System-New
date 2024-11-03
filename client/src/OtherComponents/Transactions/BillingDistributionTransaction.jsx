@@ -12,8 +12,7 @@ const BillingDistributionTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const billingDistributionTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0].BilledTransaction[0].BillingApprovalTransaction
+    row.BilledTransaction[0].BillingApprovalTransaction
       .BillingDistributionTransaction;
 
   return (

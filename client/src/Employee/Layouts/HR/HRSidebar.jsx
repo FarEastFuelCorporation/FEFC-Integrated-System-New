@@ -137,7 +137,7 @@ const HRSidebar = ({ user }) => {
         <BottomNavItem
           label="Employee"
           value="Employee Records"
-          icon={PaidIcon}
+          icon={ContactsOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
           navigate={"employee"}
@@ -145,7 +145,7 @@ const HRSidebar = ({ user }) => {
         <BottomNavItem
           label="Salary"
           value="Employee Salary"
-          icon={ContactsOutlinedIcon}
+          icon={PaidIcon}
           selected={selected}
           setSelected={setSelected}
           navigate={"employeeSalary"}

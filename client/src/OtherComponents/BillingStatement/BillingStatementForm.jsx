@@ -29,9 +29,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
 
-  const billedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0].BilledTransaction[0];
+  const billedTransaction = row.BilledTransaction[0];
 
   const sortedWasteTransaction =
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
@@ -188,6 +186,8 @@ const BillingStatementForm = ({ row, verify = null }) => {
     height: "20px",
   });
 
+  const invoiceNumber = row.BilledTransaction[0].serviceInvoiceNumber || "";
+
   const generatePDFContent = () => (
     <Box
       ref={certificateRef}
@@ -272,7 +272,9 @@ const BillingStatementForm = ({ row, verify = null }) => {
                       {formatDate2(row.haulingDate)}
                     </TableCell>
                     <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {invoiceNumber}
+                    </TableCell>
                     <TableCell sx={bodyCellStyles()}>
                       {waste.QuotationWaste.wasteName}
                     </TableCell>
@@ -311,7 +313,9 @@ const BillingStatementForm = ({ row, verify = null }) => {
                     {formatDate2(row.haulingDate)}
                   </TableCell>
                   <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 40 })}>
+                    {invoiceNumber}
+                  </TableCell>
                   <TableCell sx={bodyCellStyles()}>
                     {`TRANS FEE ${row.QuotationTransportation.VehicleType.typeOfVehicle}`}
                   </TableCell>
@@ -370,17 +374,22 @@ const BillingStatementForm = ({ row, verify = null }) => {
       {verify ? (
         ""
       ) : (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={
-            row.statusId === 8 ? handleOpenPDFInNewTab : handleDownloadPDF
-          }
-        >
-          {row.statusId === 8
-            ? "View Billing Statement"
-            : "Download Billing Statement"}
-        </Button>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleDownloadPDF}
+          >
+            Download Billing Statement
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleOpenPDFInNewTab}
+          >
+            View Billing Statement
+          </Button>
+        </Box>
       )}
 
       {generatePDFContent()}

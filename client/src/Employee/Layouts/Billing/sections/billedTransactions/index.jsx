@@ -27,7 +27,6 @@ const BilledTransactions = ({ user }) => {
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    certifiedTransactionId: [],
     billingNumber: "",
     billedDate: "",
     billedTime: "",
@@ -89,10 +88,6 @@ const BilledTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      certifiedTransactionId: [
-        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-          .CertifiedTransaction[0].id,
-      ],
       billingNumber: "",
       billedDate: "",
       billedTime: "",
@@ -125,10 +120,7 @@ const BilledTransactions = ({ user }) => {
     );
 
     if (typeToEdit) {
-      const billedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-          .BilledTransaction?.[0] || {};
+      const billedTransaction = typeToEdit.BilledTransaction?.[0] || {};
 
       setFormData({
         id: billedTransaction.id,
@@ -166,7 +158,7 @@ const BilledTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].BilledTransaction?.[0]?.id}`,
+        `${apiUrl}/api/billedTransaction/${row.BilledTransaction?.[0]?.id}`,
         {
           data: {
             deletedBy: user.id,

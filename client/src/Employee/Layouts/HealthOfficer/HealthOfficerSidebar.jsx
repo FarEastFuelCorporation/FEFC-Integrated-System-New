@@ -11,7 +11,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
+import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -20,7 +20,7 @@ import Item from "../../../OtherComponents/Item";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
-const SafetySidebar = ({ user }) => {
+const HealthOfficerSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
@@ -28,7 +28,7 @@ const SafetySidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
-      "/dashboard/clients": "Clients",
+      "/dashboard/employee": "Employee Records",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -112,12 +112,12 @@ const SafetySidebar = ({ user }) => {
           navigate={""}
         />
         <BottomNavItem
-          label="Clients"
-          value="Clients"
-          icon={PeopleOutlinedIcon}
+          label="Employee"
+          value="Employee Records"
+          icon={ContactsOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"clients"}
+          navigate={"employee"}
         />
         <BottomNavItem
           label="Documents"
@@ -186,7 +186,7 @@ const SafetySidebar = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  SAFETY OFFICER
+                  HEALTH OFFICER
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
@@ -255,9 +255,9 @@ const SafetySidebar = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Clients"
-              to="clients"
-              icon={<PeopleOutlinedIcon />}
+              title="Employee Records"
+              to="employee"
+              icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
@@ -300,4 +300,4 @@ const SafetySidebar = ({ user }) => {
   );
 };
 
-export default SafetySidebar;
+export default HealthOfficerSidebar;

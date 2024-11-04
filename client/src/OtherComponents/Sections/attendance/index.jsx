@@ -18,6 +18,7 @@ import timeOutAudio from "../../../images/time-out.mp3"; // Renamed to avoid con
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import { formatTime } from "../../Functions";
 import { tokens, ColorModeContext } from "../../../theme";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const isToday = (date) => {
   const today = new Date();
@@ -286,7 +287,7 @@ const Attendance = () => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 350,
+      minWidth: 500,
     },
     {
       field: "designation",
@@ -301,7 +302,7 @@ const Attendance = () => {
       headerName: "Date",
       headerAlign: "center",
       align: "center",
-      width: 250,
+      width: 270,
     },
     {
       field: "timeIn",
@@ -321,6 +322,8 @@ const Attendance = () => {
   ];
 
   const today = new Date();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Box
@@ -401,12 +404,23 @@ const Attendance = () => {
                   justifyContent: "space-between",
                   px: "20px",
                   marginTop: "-40px",
+                  mb: 2,
                 }}
               >
-                <Typography sx={{ fontSize: "40px", fontWeight: "bold" }}>
+                <Typography
+                  sx={{
+                    fontSize: `${isMobile ? "20px" : "40px"}`,
+                    fontWeight: "bold",
+                  }}
+                >
                   Employee On Duty
                 </Typography>
-                <Typography sx={{ fontSize: "40px", fontWeight: "bold" }}>
+                <Typography
+                  sx={{
+                    fontSize: `${isMobile ? "20px" : "40px"}`,
+                    fontWeight: "bold",
+                  }}
+                >
                   {dataList.length}
                 </Typography>
               </Box>

@@ -18,6 +18,7 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const Navbar = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -83,6 +84,8 @@ const Navbar = () => {
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, []);
 
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <AppBar position="fixed">
       <Toolbar sx={{ padding: "10px" }}>
@@ -107,7 +110,7 @@ const Navbar = () => {
             FAR EAST FUEL CORPORATION
           </Typography>
         </Box>
-        {location.pathname === "/attendance" && (
+        {location.pathname === "/attendance" && !isMobile && (
           <Box display="flex" alignItems="center" mr={2}>
             <Typography variant="h6" sx={{ fontSize: "40px" }}>
               {currentTime}

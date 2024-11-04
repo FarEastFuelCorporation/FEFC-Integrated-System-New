@@ -109,7 +109,7 @@ const BillingApprovalTransaction = ({ row, user }) => {
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Submitted By:{" "}
+            Approved By:{" "}
             {`${billingApprovalTransaction.Employee.firstName || ""} ${
               billingApprovalTransaction.Employee.lastName || ""
             }`}

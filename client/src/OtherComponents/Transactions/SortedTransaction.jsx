@@ -201,107 +201,113 @@ const SortedTransaction = ({ row }) => {
               </Typography>
             </Grid>
           </Grid>
-          <Typography variant="subtitle1" gutterBottom>
-            Sorted Wastes
-          </Typography>
+
           {sortedWasteTransaction && sortedWasteTransaction.length > 0 && (
-            <DataGrid
-              sx={{
-                "& .MuiDataGrid-root": {
-                  border: "none",
-                  width: "100%",
-                },
-                "& .MuiDataGrid-overlayWrapper": {
-                  minHeight: "52px",
-                },
-                "& .name-column--cell": {
-                  color: colors.greenAccent[300],
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: colors.blueAccent[700],
-                  borderBottom: "none",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  whiteSpace: "normal !important",
-                  wordWrap: "break-word !important",
-                  lineHeight: "1.2 !important",
-                },
-                "& .MuiDataGrid-virtualScroller": {
-                  backgroundColor: colors.primary[400],
-                },
-                "& .MuiDataGrid-toolbarContainer": {
-                  display: "none",
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  display: "none",
-                },
-              }}
-              rows={sortedWasteTransaction ? sortedWasteTransaction : []}
-              columns={columns}
-              components={{ Toolbar: GridToolbar }}
-              getRowId={(row) => (row.id ? row.id : [])}
-              localeText={{ noRowsLabel: "No Treated Transactions" }}
-              initialState={{
-                sortModel: [
-                  { field: "treatedDate", sort: "asc" },
-                  { field: "treatedTime", sort: "asc" },
-                  { field: "machineName", sort: "asc" },
-                ],
-              }}
-            />
+            <>
+              <Typography variant="subtitle1" gutterBottom>
+                Sorted Wastes
+              </Typography>
+              <DataGrid
+                sx={{
+                  "& .MuiDataGrid-root": {
+                    border: "none",
+                    width: "100%",
+                  },
+                  "& .MuiDataGrid-overlayWrapper": {
+                    minHeight: "52px",
+                  },
+                  "& .name-column--cell": {
+                    color: colors.greenAccent[300],
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.blueAccent[700],
+                    borderBottom: "none",
+                  },
+                  "& .MuiDataGrid-columnHeaderTitle": {
+                    whiteSpace: "normal !important",
+                    wordWrap: "break-word !important",
+                    lineHeight: "1.2 !important",
+                  },
+                  "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.primary[400],
+                  },
+                  "& .MuiDataGrid-toolbarContainer": {
+                    display: "none",
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    display: "none",
+                  },
+                }}
+                rows={sortedWasteTransaction ? sortedWasteTransaction : []}
+                columns={columns}
+                components={{ Toolbar: GridToolbar }}
+                getRowId={(row) => (row.id ? row.id : [])}
+                localeText={{ noRowsLabel: "No Treated Transactions" }}
+                initialState={{
+                  sortModel: [
+                    { field: "treatedDate", sort: "asc" },
+                    { field: "treatedTime", sort: "asc" },
+                    { field: "machineName", sort: "asc" },
+                  ],
+                }}
+              />
+            </>
           )}
-          <Typography
-            variant="subtitle1"
-            gutterBottom
-            sx={{ marginTop: "20px" }}
-          >
-            Sorted Scraps
-          </Typography>
+
           {sortedScrapTransaction && sortedScrapTransaction.length > 0 && (
-            <DataGrid
-              sx={{
-                "& .MuiDataGrid-root": {
-                  border: "none",
-                  width: "100%",
-                },
-                "& .MuiDataGrid-overlayWrapper": {
-                  minHeight: "52px",
-                },
-                "& .name-column--cell": {
-                  color: colors.greenAccent[300],
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: colors.blueAccent[700],
-                  borderBottom: "none",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  whiteSpace: "normal !important",
-                  wordWrap: "break-word !important",
-                  lineHeight: "1.2 !important",
-                },
-                "& .MuiDataGrid-virtualScroller": {
-                  backgroundColor: colors.primary[400],
-                },
-                "& .MuiDataGrid-toolbarContainer": {
-                  display: "none",
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  display: "none",
-                },
-              }}
-              rows={sortedScrapTransaction ? sortedScrapTransaction : []}
-              columns={columns}
-              components={{ Toolbar: GridToolbar }}
-              getRowId={(row) => (row.id ? row.id : [])}
-              localeText={{ noRowsLabel: "No Treated Transactions" }}
-              initialState={{
-                sortModel: [
-                  { field: "treatedDate", sort: "asc" },
-                  { field: "treatedTime", sort: "asc" },
-                  { field: "machineName", sort: "asc" },
-                ],
-              }}
-            />
+            <>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{ marginTop: "20px" }}
+              >
+                Sorted Scraps
+              </Typography>
+              <DataGrid
+                sx={{
+                  "& .MuiDataGrid-root": {
+                    border: "none",
+                    width: "100%",
+                  },
+                  "& .MuiDataGrid-overlayWrapper": {
+                    minHeight: "52px",
+                  },
+                  "& .name-column--cell": {
+                    color: colors.greenAccent[300],
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.blueAccent[700],
+                    borderBottom: "none",
+                  },
+                  "& .MuiDataGrid-columnHeaderTitle": {
+                    whiteSpace: "normal !important",
+                    wordWrap: "break-word !important",
+                    lineHeight: "1.2 !important",
+                  },
+                  "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.primary[400],
+                  },
+                  "& .MuiDataGrid-toolbarContainer": {
+                    display: "none",
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    display: "none",
+                  },
+                }}
+                rows={sortedScrapTransaction ? sortedScrapTransaction : []}
+                columns={columns}
+                components={{ Toolbar: GridToolbar }}
+                getRowId={(row) => (row.id ? row.id : [])}
+                localeText={{ noRowsLabel: "No Treated Transactions" }}
+                initialState={{
+                  sortModel: [
+                    { field: "treatedDate", sort: "asc" },
+                    { field: "treatedTime", sort: "asc" },
+                    { field: "machineName", sort: "asc" },
+                  ],
+                }}
+              />
+            </>
           )}
           <br />
           <Typography variant="h5">

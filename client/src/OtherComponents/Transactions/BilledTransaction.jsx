@@ -111,7 +111,7 @@ const BilledTransaction = ({ row, user }) => {
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Submitted By:{" "}
+            Billed By:{" "}
             {`${billedTransaction?.Employee?.firstName || ""} ${
               billedTransaction?.Employee?.lastName || ""
             }`}

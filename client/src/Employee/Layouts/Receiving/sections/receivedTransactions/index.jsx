@@ -221,6 +221,7 @@ const ReceivedTransactions = ({ user }) => {
       tareWeight,
       netWeight,
       statusId,
+      submitTo,
       createdBy,
     } = formData;
 
@@ -236,6 +237,7 @@ const ReceivedTransactions = ({ user }) => {
       !tareWeight ||
       !netWeight ||
       !statusId ||
+      !submitTo ||
       !createdBy
     ) {
       setErrorMessage("Please fill all required fields.");

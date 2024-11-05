@@ -34,6 +34,66 @@ const Vehicle = sequelize.define(
       type: DataTypes.ENUM("OWNED", "LEASED"),
       allowNull: false,
     },
+    makeModel: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    yearManufacture: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    registrationNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    owner: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    registrationExpirationDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    insuranceProvider: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    insuranceExpirationDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    engineType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    fuelType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    transmission: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    grossVehicleWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    grossVehicleWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    grossVehicleWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    curbWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    // picture: {
+    //   type: DataTypes.BLOB("long"),
+    //   allowNull: true,
+    // },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

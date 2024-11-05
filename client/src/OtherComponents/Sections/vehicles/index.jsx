@@ -20,6 +20,8 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
+import EmployeeProfileModal from "../../Modals/EmployeeProfileModal";
+import VehicleProfileModal from "../../Modals/VehicleProfileModal";
 
 const Vehicles = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -42,6 +44,9 @@ const Vehicles = ({ user }) => {
 
   const [vehicleData, setVehicleData] = useState([]);
   const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -203,6 +208,18 @@ const Vehicles = ({ user }) => {
     }
   };
 
+  const handleRowClick = (params) => {
+    console.log(params);
+    setSelectedRow(params);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedRow(null);
+    setSelectedTab(0);
+  };
+
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
       {params.value}
@@ -250,6 +267,22 @@ const Vehicles = ({ user }) => {
       align: "center",
       width: 200,
       renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "view",
+      headerName: "View",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: (params) => (
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => handleRowClick(params.row)}
+        >
+          View
+        </Button>
+      ),
     },
   ];
 
@@ -451,6 +484,16 @@ const Vehicles = ({ user }) => {
           </Button>
         </Box>
       </Modal>
+      <VehicleProfileModal
+        user={user}
+        selectedRow={selectedRow}
+        open={open}
+        openModal={openModal}
+        handleClose={handleClose}
+        handleEditClick={handleEditClick}
+        selectedTab={selectedTab}
+        setSelectedTab={setSelectedTab}
+      />
     </Box>
   );
 };

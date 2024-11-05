@@ -54,6 +54,7 @@ const Leave = require("../models/Leave");
 const WorkSchedule = require("../models/WorkSchedule");
 const Overtime = require("../models/Overtime");
 const EmployeeSalary = require("../models/EmployeeSalary");
+const VehicleAttachment = require("../models/VehicleAttachment");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -111,6 +112,32 @@ Employee.hasMany(EmployeeAttachment, {
   onDelete: "CASCADE",
 });
 EmployeeAttachment.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Vehicle.hasMany(VehicleAttachment, {
+  as: "VehicleAttachment",
+  foreignKey: "plateNumber",
+  sourceKey: "plateNumber",
+  onDelete: "CASCADE",
+});
+VehicleAttachment.belongsTo(Vehicle, {
+  as: "Vehicle",
+  foreignKey: "plateNumber",
+  targetKey: "plateNumber",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(VehicleAttachment, {
+  as: "VehicleAttachment",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+VehicleAttachment.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",

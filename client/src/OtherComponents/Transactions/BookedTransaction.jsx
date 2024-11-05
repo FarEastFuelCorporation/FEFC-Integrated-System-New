@@ -52,13 +52,13 @@ const BookedTransaction = ({ row }) => {
         </Grid>
       </Grid>
       <Typography variant="h5">
-        Hauling Date:{" "}
+        Proposed Hauling Date:{" "}
         {row.haulingDate
           ? format(new Date(row.haulingDate), "MMMM dd, yyyy")
           : ""}
       </Typography>
       <Typography variant="h5">
-        Hauling Time:{" "}
+        Proposed Hauling Time:{" "}
         {row.haulingTime
           ? format(parseTimeString(row.haulingTime), "hh:mm aa")
           : ""}

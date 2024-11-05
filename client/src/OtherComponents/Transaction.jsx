@@ -70,6 +70,7 @@ const Transaction = ({
   const inProgressCount = inProgressTransactions.length;
   const finishedCount = finishedTransactions.length;
 
+  console.log(transactions);
   return (
     <Box mt="40px">
       <Card>
@@ -162,15 +163,37 @@ const Transaction = ({
                   >
                     {!Number.isInteger(user.userType) ? (
                       <Box>
-                        <Typography>
-                          {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
-                        </Typography>
+                        {row.ScheduledTransaction[0] ? (
+                          <Typography>
+                            {format(
+                              new Date(
+                                row.ScheduledTransaction[0].scheduledDate
+                              ),
+                              "MMMM dd, yyyy"
+                            )}
+                          </Typography>
+                        ) : (
+                          <Typography>
+                            {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+                          </Typography>
+                        )}
                       </Box>
                     ) : (
                       <Box>
-                        <Typography>
-                          {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
-                        </Typography>
+                        {row.ScheduledTransaction[0] ? (
+                          <Typography>
+                            {format(
+                              new Date(
+                                row.ScheduledTransaction[0].scheduledDate
+                              ),
+                              "MMMM dd, yyyy"
+                            )}
+                          </Typography>
+                        ) : (
+                          <Typography>
+                            {format(new Date(row.haulingDate), "MMMM dd, yyyy")}
+                          </Typography>
+                        )}
                         <Typography>{row.Client.clientName}</Typography>
                       </Box>
                     )}

@@ -77,12 +77,10 @@ const BookModal = ({
   }, [apiUrl, user.id]);
 
   const filterVehicleTypes = (selectedWasteId) => {
-
     // Find the quotation where QuotationWaste contains the selected waste ID
     const matchingQuotation = quotationsData.find((q) =>
       q.QuotationWaste.some((waste) => waste.id === selectedWasteId)
     );
-
 
     // If a matching quotation is found, map the relevant QuotationTransportation data
     if (matchingQuotation) {
@@ -93,7 +91,6 @@ const BookModal = ({
           typeOfVehicle: transport.VehicleType.typeOfVehicle,
         })
       );
-
 
       // Update the state with the filtered vehicle types
       setFilteredVehicleTypes(filteredData);
@@ -143,7 +140,7 @@ const BookModal = ({
         </Typography>
         <div style={{ width: "100%", display: "flex", gap: "20px" }}>
           <TextField
-            label="Hauling Date"
+            label="Proposed Hauling Date"
             name="haulingDate"
             value={formData.haulingDate}
             onChange={handleInputChange}
@@ -159,7 +156,7 @@ const BookModal = ({
             autoComplete="off"
           />
           <TextField
-            label="Hauling Time"
+            label="Proposed Hauling Time"
             name="haulingTime"
             value={formData.haulingTime}
             onChange={handleInputChange}

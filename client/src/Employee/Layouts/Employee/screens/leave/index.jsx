@@ -306,14 +306,16 @@ const Leave = ({ user }) => {
     if (!reason) {
       errors.push("Please enter a reason.");
     }
-    if (duration <= 0) {
-      errors.push("Duration must be greater than zero.");
-    }
-    if (remaining < duration) {
-      errors.push("Remaining days cannot be less than the duration.");
-    }
-    if (new Date(startDate) > new Date(endDate)) {
-      errors.push("End date must be after start date.");
+    if (formData.typeOfLeave !== "EMERGENCY LEAVE") {
+      if (duration <= 0) {
+        errors.push("Duration must be greater than zero.");
+      }
+      if (remaining < duration) {
+        errors.push("Remaining days cannot be less than the duration.");
+      }
+      if (new Date(startDate) > new Date(endDate)) {
+        errors.push("End date must be after start date.");
+      }
     }
 
     // Return concatenated error messages or null if no errors

@@ -758,7 +758,10 @@ const Leave = ({ user }) => {
           <Button
             variant="contained"
             color="primary"
-            disabled={formData.remaining < formData.duration} // Disable when remaining is less than duration
+            disabled={
+              formData.typeOfLeave !== "EMERGENCY LEAVE" &&
+              formData.remaining < formData.duration
+            } // Disable when remaining is less than duration
             onClick={handleFormSubmit}
           >
             {formData.id ? "Update" : "Add"}

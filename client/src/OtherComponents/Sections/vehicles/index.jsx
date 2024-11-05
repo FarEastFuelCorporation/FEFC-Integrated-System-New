@@ -246,7 +246,7 @@ const Vehicles = ({ user }) => {
     },
     {
       field: "netCapacity",
-      headerName: "Net Capacity",
+      headerName: "Net Capacity (MT)",
       headerAlign: "center",
       align: "center",
       width: 150,

@@ -47,6 +47,7 @@ const BillingApprovalTransactions = ({ user }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
+  const [openTransactionModal, setOpenTransactionModal] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -160,7 +161,7 @@ const BillingApprovalTransactions = ({ user }) => {
 
       setSuccessMessage("Billing Approval Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
-
+      setOpenTransactionModal(false);
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
@@ -233,6 +234,7 @@ const BillingApprovalTransactions = ({ user }) => {
       fetchData();
 
       setShowSuccessMessage(true);
+      setOpenTransactionModal(false);
       handleCloseModal();
 
       setLoading(false);
@@ -278,6 +280,8 @@ const BillingApprovalTransactions = ({ user }) => {
         handleDeleteClick={handleDeleteClick}
         setSuccessMessage={setSuccessMessage}
         setShowSuccessMessage={setShowSuccessMessage}
+        openTransactionModal={openTransactionModal}
+        setOpenTransactionModal={setOpenTransactionModal}
       />
       <Modal
         user={user}

@@ -42,6 +42,7 @@ const BookedTransactions = ({ user }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
+  const [openTransactionModal, setOpenTransactionModal] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -130,6 +131,7 @@ const BookedTransactions = ({ user }) => {
       fetchData();
       setSuccessMessage("Booked Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
+      setOpenTransactionModal(false);
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
@@ -178,7 +180,7 @@ const BookedTransactions = ({ user }) => {
       }
 
       fetchData();
-
+      setOpenTransactionModal(false);
       setShowSuccessMessage(true);
       handleCloseModal();
       setLoading(false);
@@ -221,6 +223,8 @@ const BookedTransactions = ({ user }) => {
         handleOpenModal={handleOpenModal}
         handleEditClick={handleEditClick}
         handleDeleteClick={handleDeleteClick}
+        openTransactionModal={openTransactionModal}
+        setOpenTransactionModal={setOpenTransactionModal}
       />
       <Modal
         user={user}

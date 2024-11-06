@@ -50,13 +50,14 @@ const Transaction = ({
   handleDeleteClick,
   setSuccessMessage,
   setShowSuccessMessage,
+  openTransactionModal,
+  setOpenTransactionModal,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedSubTab, setSelectedSubTab] = useState(0);
 
-  const [openModal, setOpenModal] = useState(false);
   const [row, setRow] = useState(null);
 
   const handleChangeTab = (event, newValue) => {
@@ -81,12 +82,12 @@ const Transaction = ({
   console.log(transactions);
 
   const handleOpenTransactionModal = (data) => {
-    setOpenModal(true);
+    setOpenTransactionModal(true);
     setRow(data);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseTransactionModal = () => {
+    setOpenTransactionModal(false);
   };
 
   const renderCellWithWrapText = (params) => (
@@ -263,8 +264,10 @@ const Transaction = ({
             getRowId={(row) => row.id}
           />
         </CustomDataGridStyles>
-
-        <Modal open={openModal} onClose={handleCloseModal}>
+        <Modal
+          open={openTransactionModal}
+          onClose={handleCloseTransactionModal}
+        >
           <Box
             sx={{
               position: "absolute",

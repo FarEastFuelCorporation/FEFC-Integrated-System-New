@@ -78,22 +78,14 @@ const Vehicle = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: true,
     },
-    grossVehicleWeight: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    grossVehicleWeight: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
     curbWeight: {
       type: DataTypes.FLOAT,
       allowNull: true,
     },
-    // picture: {
-    //   type: DataTypes.BLOB("long"),
-    //   allowNull: true,
-    // },
+    picture: {
+      type: DataTypes.BLOB("long"),
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

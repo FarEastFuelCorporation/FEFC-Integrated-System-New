@@ -8,6 +8,7 @@ import {
   Button,
   useTheme,
   MenuItem,
+  Grid,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -323,6 +324,25 @@ const Vehicles = ({ user }) => {
     );
   }
 
+  const calculateNetWeight = (grossWeight, tareWeight) => {
+    return grossWeight - tareWeight;
+  };
+
+  const handleInputChangeWithNetWeight = (e) => {
+    const { name, value } = e.target;
+    const updatedFormData = { ...formData, [name]: value };
+
+    if (name === "grossWeight" || name === "tareWeight") {
+      const netWeight = calculateNetWeight(
+        parseFloat(updatedFormData.grossWeight || 0),
+        parseFloat(updatedFormData.tareWeight || 0)
+      );
+      updatedFormData.netWeight = netWeight;
+    }
+
+    setFormData(updatedFormData);
+  };
+
   return (
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
@@ -370,12 +390,16 @@ const Vehicles = ({ user }) => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
+            maxHeight: "80vh",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
             display: "flex",
             flexDirection: "column",
             gap: 2,
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
           <Typography variant="h6" component="h2">
@@ -466,6 +490,220 @@ const Vehicles = ({ user }) => {
             <MenuItem value="OWNED">OWNED</MenuItem>
             <MenuItem value="LEASED">LEASED</MenuItem>
           </TextField>
+          <TextField
+            label="Make/Model"
+            name="makeModel"
+            value={formData.makeModel}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Year Manufacture"
+            name="yearManufacture"
+            value={formData.yearManufacture}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Registration Number"
+            name="registrationNumber"
+            value={formData.registrationNumber}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Registration Number"
+            name="owner"
+            value={formData.owner}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Registration Expiration Date"
+            name="registrationExpirationDate"
+            value={formData.registrationExpirationDate}
+            onChange={handleInputChange}
+            type="date"
+            fullWidth
+            InputLabelProps={{
+              shrink: true,
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Insurance Provider"
+            name="insuranceProvider"
+            value={formData.insuranceProvider}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="insurance Expiration Date"
+            name="insuranceExpirationDate"
+            value={formData.insuranceExpirationDate}
+            onChange={handleInputChange}
+            type="date"
+            fullWidth
+            InputLabelProps={{
+              shrink: true,
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Engine Type"
+            name="engineType"
+            value={formData.engineType}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Fuel Type"
+            name="fuelType"
+            value={formData.fuelType}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Transmission"
+            name="transmission"
+            value={formData.transmission}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Gross Vehicle Weight"
+            name="grossVehicleWeight"
+            value={formData.grossVehicleWeight}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <TextField
+            label="Curb Weight"
+            name="curbWeight"
+            value={formData.curbWeight}
+            onChange={handleInputChange}
+            fullWidth
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          />
+          <Grid container spacing={2}>
+            <Grid item xs={4}>
+              <TextField
+                label="Gross Weight"
+                name={`grossWeight`}
+                value={formData.grossWeight}
+                onChange={handleInputChangeWithNetWeight}
+                type="number"
+                required
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                label="Tare Weight"
+                name={`tareWeight`}
+                value={formData.tareWeight}
+                onChange={handleInputChangeWithNetWeight}
+                type="number"
+                required
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                label="Net Weight"
+                name={`netWeight`}
+                value={formData.netWeight}
+                onChange={handleInputChange}
+                type="number"
+                required
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+                disabled
+              />
+            </Grid>
+          </Grid>
           <TextField
             label="Created By"
             name="createdBy"

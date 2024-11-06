@@ -149,8 +149,6 @@ const EmployeeProfileModal = ({
       formData.append("fileName", fileNameToSubmit);
       formData.append("createdBy", user.id);
 
-      console.log(formData);
-
       // Submit the form data with file upload
       await axios.post(`${apiUrl}/api/employeeAttachment`, formData);
 

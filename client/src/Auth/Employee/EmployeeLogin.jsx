@@ -22,7 +22,6 @@ const EmployeeLogin = ({ onLogin }) => {
         { employeeUsername, password },
         { withCredentials: true }
       );
-      console.log(response.data);
       const { user } = response.data;
       onLogin(user); // Update user state in App component
       navigate("/dashboard"); // Redirect user to the specified URL

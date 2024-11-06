@@ -14,11 +14,36 @@ async function createVehicleController(req, res) {
       vehicleName,
       netCapacity,
       ownership,
+      yearManufacture,
+      registrationNumber,
+      owner,
+      registrationExpirationDate,
+      insuranceProvider,
+      insuranceExpirationDate,
+      engineType,
+      fuelType,
+      transmission,
+      grossVehicleWeight,
+      curbWeight,
       createdBy,
     } = req.body;
 
     plateNumber = plateNumber && plateNumber.toUpperCase();
     vehicleName = vehicleName && vehicleName.toUpperCase();
+    yearManufacture = yearManufacture && yearManufacture.toUpperCase();
+    registrationNumber = registrationNumber && registrationNumber.toUpperCase();
+    owner = owner && owner.toUpperCase();
+    insuranceProvider = insuranceProvider && insuranceProvider.toUpperCase();
+    engineType = engineType && engineType.toUpperCase();
+    fuelType = fuelType && fuelType.toUpperCase();
+    transmission = transmission && transmission.toUpperCase();
+
+    let picture;
+
+    // Handle file uploads if they are present
+    if (req.files && req.files.picture) {
+      picture = req.files.picture[0].buffer;
+    }
 
     // Creating a new vehicle
     await Vehicle.create({
@@ -27,6 +52,18 @@ async function createVehicleController(req, res) {
       vehicleName,
       netCapacity,
       ownership,
+      yearManufacture,
+      registrationNumber,
+      owner,
+      registrationExpirationDate,
+      insuranceProvider,
+      insuranceExpirationDate,
+      engineType,
+      fuelType,
+      transmission,
+      grossVehicleWeight,
+      curbWeight,
+      picture,
       createdBy,
     });
 
@@ -51,6 +88,33 @@ async function getVehiclesController(req, res) {
   try {
     // Fetch all vehicles from the database
     const vehicles = await Vehicle.findAll({
+      attributes: [
+        "id",
+        "vehicleTypeId",
+        "plateNumber",
+        "vehicleName",
+        "netCapacity",
+        "ownership",
+        "makeModel",
+        "yearManufacture",
+        "registrationNumber",
+        "owner",
+        "registrationExpirationDate",
+        "insuranceProvider",
+        "insuranceExpirationDate",
+        "engineType",
+        "fuelType",
+        "transmission",
+        "grossVehicleWeight",
+        "curbWeight",
+        "picture", // Ensure picture is included here
+        "createdAt",
+        "createdBy",
+        "updatedAt",
+        "updatedBy",
+        "deletedAt",
+        "deletedBy",
+      ],
       include: {
         model: VehicleType,
         as: "VehicleType",
@@ -127,11 +191,38 @@ async function updateVehicleController(req, res) {
       vehicleName,
       netCapacity,
       ownership,
+      yearManufacture,
+      registrationNumber,
+      owner,
+      registrationExpirationDate,
+      insuranceProvider,
+      insuranceExpirationDate,
+      engineType,
+      fuelType,
+      transmission,
+      grossVehicleWeight,
+      curbWeight,
       createdBy,
     } = req.body;
 
     plateNumber = plateNumber && plateNumber.toUpperCase();
     vehicleName = vehicleName && vehicleName.toUpperCase();
+    yearManufacture = yearManufacture && yearManufacture.toUpperCase();
+    registrationNumber = registrationNumber && registrationNumber.toUpperCase();
+    owner = owner && owner.toUpperCase();
+    insuranceProvider = insuranceProvider && insuranceProvider.toUpperCase();
+    engineType = engineType && engineType.toUpperCase();
+    fuelType = fuelType && fuelType.toUpperCase();
+    transmission = transmission && transmission.toUpperCase();
+
+    let picture;
+
+    // Handle file uploads if they are present
+    if (req.files && req.files.picture) {
+      picture = req.files.picture[0].buffer;
+    }
+
+    console.log(picture);
 
     // Find the vehicle by ID and update it
     const updatedVehicle = await Vehicle.findByPk(id);
@@ -143,7 +234,23 @@ async function updateVehicleController(req, res) {
       updatedVehicle.vehicleName = vehicleName;
       updatedVehicle.netCapacity = netCapacity;
       updatedVehicle.ownership = ownership;
+      updatedVehicle.yearManufacture = yearManufacture;
+      updatedVehicle.registrationNumber = registrationNumber;
+      updatedVehicle.owner = owner;
+      updatedVehicle.registrationExpirationDate = registrationExpirationDate;
+      updatedVehicle.insuranceProvider = insuranceProvider;
+      updatedVehicle.insuranceExpirationDate = insuranceExpirationDate;
+      updatedVehicle.engineType = engineType;
+      updatedVehicle.fuelType = fuelType;
+      updatedVehicle.transmission = transmission;
+      updatedVehicle.grossVehicleWeight = grossVehicleWeight;
+      updatedVehicle.curbWeight = curbWeight;
+      updatedVehicle.vehicleTypeId = vehicleTypeId;
       updatedVehicle.updatedBy = createdBy;
+      // Handle file uploads if they are present
+      if (req.files && req.files.picture) {
+        updatedVehicle.picture = req.files.picture[0].buffer;
+      }
 
       // Save the updated vehicle
       await updatedVehicle.save();

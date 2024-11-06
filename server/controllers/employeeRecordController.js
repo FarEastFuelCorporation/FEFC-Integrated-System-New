@@ -1,6 +1,5 @@
 // controllers/employeeRecordController.js
 
-const Department = require("../models/Department");
 const EmployeeAttachment = require("../models/EmployeeAttachment");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const Vehicle = require("../models/Vehicle");

@@ -2,6 +2,8 @@
 
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 const {
   createVehicleController,
   getVehiclesController,
@@ -12,7 +14,11 @@ const {
 } = require("../controllers/vehicleController");
 
 // Create Vehicle route
-router.post("/", createVehicleController);
+router.post(
+  "/",
+  upload.fields([{ name: "picture", maxCount: 1 }]),
+  createVehicleController
+);
 
 // Get Vehicles route
 router.get("/", getVehiclesController);
@@ -24,7 +30,11 @@ router.get("/", getVehicleController);
 router.get("/vehicleType/:id", getVehiclesByVehicleTypeIdController);
 
 // Update Vehicle route
-router.put("/:id", updateVehicleController);
+router.put(
+  "/:id",
+  upload.fields([{ name: "picture", maxCount: 1 }]),
+  updateVehicleController
+);
 
 // Delete Vehicle route
 router.delete("/:id", deleteVehicleController);

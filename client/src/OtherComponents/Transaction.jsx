@@ -79,8 +79,6 @@ const Transaction = ({
   const inProgressCount = inProgressTransactions.length;
   const finishedCount = finishedTransactions.length;
 
-  console.log(transactions);
-
   const handleOpenTransactionModal = (data) => {
     setOpenTransactionModal(true);
     setRow(data);

@@ -12,19 +12,12 @@ import {
   TextField,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { format } from "date-fns";
 import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
 import { tokens } from "../../theme";
-import {
-  calculateAge,
-  calculateLengthOfService,
-  concatenatePermanentAddress,
-  concatenatePresentAddress,
-  formatNumber,
-} from "../Functions";
+import { formatNumber } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
 
 const VehicleProfileModal = ({
@@ -142,8 +135,6 @@ const VehicleProfileModal = ({
       formData.append("attachment", fileInput);
       formData.append("fileName", fileNameToSubmit);
       formData.append("createdBy", user.id);
-
-      console.log(formData);
 
       // Submit the form data with file upload
       await axios.post(`${apiUrl}/api/vehicleAttachment`, formData);

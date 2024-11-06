@@ -21,8 +21,12 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
-import EmployeeProfileModal from "../../Modals/EmployeeProfileModal";
 import VehicleProfileModal from "../../Modals/VehicleProfileModal";
+import {
+  calculateRemainingDays,
+  calculateRemainingTime,
+  formatDateFull,
+} from "../../Functions";
 
 const Vehicles = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -36,7 +40,18 @@ const Vehicles = ({ user }) => {
     vehicleName: "",
     netCapacity: "",
     ownership: "",
-    vehicleId: "",
+    yearManufacture: "",
+    registrationNumber: "",
+    owner: "",
+    registrationExpirationDate: "",
+    insuranceProvider: "",
+    insuranceExpirationDate: "",
+    engineType: "",
+    fuelType: "",
+    transmission: "",
+    grossVehicleWeight: "",
+    curbWeight: "",
+    picture: null,
     createdBy: user.id,
   };
 
@@ -45,6 +60,8 @@ const Vehicles = ({ user }) => {
 
   const [vehicleData, setVehicleData] = useState([]);
   const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [pictureFile, setPictureFile] = useState(null);
+  const [pictureFileName, setPictureFileName] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedTab, setSelectedTab] = useState(0);
@@ -114,6 +131,19 @@ const Vehicles = ({ user }) => {
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
+    setErrorMessage("");
+    setPictureFileName("");
+  };
+
+  const handleRowClick = (params) => {
+    setSelectedRow(params);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedRow(null);
+    setSelectedTab(0);
   };
 
   const clearFormData = () => {
@@ -135,6 +165,18 @@ const Vehicles = ({ user }) => {
         vehicleName: vehicleToEdit.vehicleName,
         netCapacity: vehicleToEdit.netCapacity,
         ownership: vehicleToEdit.ownership,
+        yearManufacture: vehicleToEdit.yearManufacture,
+        registrationNumber: vehicleToEdit.registrationNumber,
+        owner: vehicleToEdit.owner,
+        registrationExpirationDate: vehicleToEdit.registrationExpirationDate,
+        insuranceProvider: vehicleToEdit.insuranceProvider,
+        insuranceExpirationDate: vehicleToEdit.insuranceExpirationDate,
+        engineType: vehicleToEdit.engineType,
+        fuelType: vehicleToEdit.fuelType,
+        transmission: vehicleToEdit.transmission,
+        grossVehicleWeight: vehicleToEdit.grossVehicleWeight,
+        curbWeight: vehicleToEdit.curbWeight,
+        picture: vehicleToEdit.picture,
         createdBy: user.id,
       });
       handleOpenModal();
@@ -167,58 +209,120 @@ const Vehicles = ({ user }) => {
     }
   };
 
+  const validateVehicleForm = () => {
+    let errors = [];
+
+    // Destructure vehicleData for easier validation
+    const {
+      vehicleTypeId,
+      plateNumber,
+      vehicleName,
+      netCapacity,
+      ownership,
+      // yearManufacture,
+      // registrationNumber,
+      // owner,
+      // registrationExpirationDate,
+      // insuranceProvider,
+      // insuranceExpirationDate,
+      // engineType,
+      // fuelType,
+      // transmission,
+      // grossVehicleWeight,
+      // curbWeight,
+      // picture,
+    } = formData;
+
+    if (!vehicleTypeId) errors.push("Vehicle Type is required");
+    if (!plateNumber) errors.push("Plate Number is required");
+    if (!vehicleName) errors.push("Vehicle Name is required");
+    if (!netCapacity) errors.push("Net Capacity is required");
+    if (!ownership) errors.push("Ownership is required");
+    // if (!yearManufacture) errors.push("Year of Manufacture is required");
+    // if (!registrationNumber) errors.push("Registration Number is required");
+    // if (!owner) errors.push("Owner is required");
+    // if (!registrationExpirationDate)
+    //   errors.push("Registration Expiration Date is required");
+    // if (!insuranceProvider) errors.push("Insurance Provider is required");
+    // if (!insuranceExpirationDate)
+    //   errors.push("Insurance Expiration Date is required");
+    // if (!engineType) errors.push("Engine Type is required");
+    // if (!fuelType) errors.push("Fuel Type is required");
+    // if (!transmission) errors.push("Transmission is required");
+    // if (!grossVehicleWeight) errors.push("Gross Vehicle Weight is required");
+    // if (!curbWeight) errors.push("Curb Weight is required");
+    // if (!picture) errors.push("Vehicle Picture is required");
+
+    if (errors.length > 0) {
+      setErrorMessage(errors.join(", "));
+      setShowErrorMessage(true);
+      return false;
+    }
+    setShowErrorMessage(false);
+    setErrorMessage("");
+    return true;
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { vehicleTypeId, plateNumber, vehicleName, netCapacity, ownership } =
-      formData;
-
-    // Check if all required fields are filled
-    if (
-      !vehicleTypeId ||
-      !plateNumber ||
-      !vehicleName ||
-      !netCapacity ||
-      !ownership
-    ) {
-      setErrorMessage("Please fill all required fields.");
-      setShowErrorMessage(true);
+    if (!validateVehicleForm()) {
       return;
     }
 
     try {
       setLoading(true);
+
+      const formDataToSend = new FormData();
+
+      // Append form data fields to FormData object
+      formDataToSend.append("vehicleTypeId", formData.vehicleTypeId);
+      formDataToSend.append("plateNumber", formData.plateNumber);
+      formDataToSend.append("vehicleName", formData.vehicleName);
+      formDataToSend.append("netCapacity", formData.netCapacity);
+      formDataToSend.append("ownership", formData.ownership);
+      formDataToSend.append("yearManufacture", formData.yearManufacture);
+      formDataToSend.append("registrationNumber", formData.registrationNumber);
+      formDataToSend.append("owner", formData.owner);
+      formDataToSend.append(
+        "registrationExpirationDate",
+        formData.registrationExpirationDate
+      );
+      formDataToSend.append("insuranceProvider", formData.insuranceProvider);
+      formDataToSend.append(
+        "insuranceExpirationDate",
+        formData.insuranceExpirationDate
+      );
+      formDataToSend.append("engineType", formData.engineType);
+      formDataToSend.append("fuelType", formData.fuelType);
+      formDataToSend.append("transmission", formData.transmission);
+      formDataToSend.append("grossVehicleWeight", formData.grossVehicleWeight);
+      formDataToSend.append("curbWeight", formData.curbWeight);
+      if (pictureFile) {
+        formDataToSend.append("picture", pictureFile);
+      }
+      formDataToSend.append("createdBy", formData.createdBy);
+
       if (formData.id) {
         // Update existing vehicle
-        await axios.put(`${apiUrl}/api/vehicle/${formData.id}`, formData);
+        await axios.put(`${apiUrl}/api/vehicle/${formData.id}`, formDataToSend);
 
         setSuccessMessage("Vehicle Updated Successfully!");
       } else {
         // Add new vehicle
-        await axios.post(`${apiUrl}/api/vehicle`, formData);
+        await axios.post(`${apiUrl}/api/vehicle`, formDataToSend);
 
         setSuccessMessage("Vehicle Added Successfully!");
       }
-
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+      setOpen(false);
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
-  };
-
-  const handleRowClick = (params) => {
-    console.log(params);
-    setSelectedRow(params);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedRow(null);
-    setSelectedTab(0);
   };
 
   const renderCellWithWrapText = (params) => (
@@ -268,6 +372,80 @@ const Vehicles = ({ user }) => {
       align: "center",
       width: 200,
       renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "registrationExpirationDate",
+      headerName: "Registration Expiration Date",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: (params) => {
+        const formattedDate = formatDateFull(params.value);
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: formattedDate })}
+          </div>
+        );
+      },
+    },
+    {
+      field: "remainingDays",
+      headerName: "Days to Expire",
+      headerAlign: "center",
+      align: "center",
+      WIDTH: 150,
+      renderCell: (params) => {
+        const { registrationExpirationDate } = params.row;
+
+        // Return empty string if registrationExpirationDate is null
+        if (registrationExpirationDate === null) {
+          return <div></div>; // Return empty div for null
+        }
+
+        const { years, months, days, isExpired } = calculateRemainingTime(
+          registrationExpirationDate
+        );
+
+        // Determine the display value
+        let displayValue;
+        if (isExpired) {
+          displayValue = `${
+            years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
+          }${
+            months > 0
+              ? months + " Month" + (months === 1 ? "" : "s") + ", "
+              : ""
+          }${days} Day${days === 1 ? "" : "s"} Expired`;
+        } else if (years === 0 && months === 0 && days === 0) {
+          displayValue = "Expires Today"; // Show if it expires today
+        } else {
+          displayValue = `${
+            years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
+          }${
+            months > 0
+              ? months + " Month" + (months === 1 ? "" : "s") + ", "
+              : ""
+          }${days} Day${days === 1 ? "" : "s"} Remaining`; // Show years, months, and days remaining
+        }
+
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: displayValue })}
+          </div>
+        );
+      },
+      sortComparator: (v1, v2) => {
+        const getDaysValue = (value) => {
+          if (value === null) return 1000000; // Null should be last (highest value)
+
+          return value;
+        };
+
+        const daysValue1 = getDaysValue(v1);
+        const daysValue2 = getDaysValue(v2);
+
+        return daysValue1 - daysValue2; // Sort based on the calculated values
+      },
     },
     {
       field: "view",
@@ -324,23 +502,31 @@ const Vehicles = ({ user }) => {
     );
   }
 
-  const calculateNetWeight = (grossWeight, tareWeight) => {
-    return grossWeight - tareWeight;
+  const calculateGrossVehicleWeight = (netCapacity, curbWeight) => {
+    return netCapacity + curbWeight;
   };
 
-  const handleInputChangeWithNetWeight = (e) => {
+  const handleInputChangeWithGrossVehicleWeight = (e) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
 
-    if (name === "grossWeight" || name === "tareWeight") {
-      const netWeight = calculateNetWeight(
-        parseFloat(updatedFormData.grossWeight || 0),
-        parseFloat(updatedFormData.tareWeight || 0)
+    if (name === "netCapacity" || name === "curbWeight") {
+      const grossVehicleWeight = calculateGrossVehicleWeight(
+        parseFloat(updatedFormData.netCapacity || 0),
+        parseFloat(updatedFormData.curbWeight || 0)
       );
-      updatedFormData.netWeight = netWeight;
+      updatedFormData.grossVehicleWeight = grossVehicleWeight;
     }
 
     setFormData(updatedFormData);
+  };
+
+  const handlePictureChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setPictureFile(file);
+      setPictureFileName(file.name);
+    }
   };
 
   return (
@@ -373,9 +559,25 @@ const Vehicles = ({ user }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          getRowClassName={(params) => {
+            const daysRemaining = calculateRemainingDays(
+              params.row.registrationExpirationDate
+            );
+
+            if (daysRemaining !== null) {
+              if (daysRemaining < 0) {
+                return "blink-red"; // Expired
+              } else if (daysRemaining <= 30) {
+                return "blink-yellow"; // Near expired
+              }
+            }
+            return ""; // Default class if no blinking is needed
+          }}
           initialState={{
             sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
+              sortModel: [
+                { field: "remainingDays", sort: "asc" }, // First sort by remaining days
+              ],
             },
           }}
         />
@@ -389,7 +591,7 @@ const Vehicles = ({ user }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            maxWidth: "100%",
             maxHeight: "80vh",
             bgcolor: "background.paper",
             boxShadow: 24,
@@ -408,255 +610,88 @@ const Vehicles = ({ user }) => {
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
-          <TextField
-            label="Vehicle Type"
-            name="vehicleTypeId"
-            value={formData.vehicleTypeId}
-            onChange={handleInputChange}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            {vehicleTypes.map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.typeOfVehicle}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label="Plate Number"
-            name="plateNumber"
-            value={formData.plateNumber}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Vehicle Name"
-            name="vehicleName"
-            value={formData.vehicleName}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Net Capacity"
-            name="netCapacity"
-            value={formData.netCapacity}
-            onChange={handleInputChange}
-            type="number"
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Ownership"
-            name="ownership"
-            value={formData.ownership}
-            onChange={handleInputChange}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            <MenuItem value="OWNED">OWNED</MenuItem>
-            <MenuItem value="LEASED">LEASED</MenuItem>
-          </TextField>
-          <TextField
-            label="Make/Model"
-            name="makeModel"
-            value={formData.makeModel}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Year Manufacture"
-            name="yearManufacture"
-            value={formData.yearManufacture}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Registration Number"
-            name="registrationNumber"
-            value={formData.registrationNumber}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Registration Number"
-            name="owner"
-            value={formData.owner}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Registration Expiration Date"
-            name="registrationExpirationDate"
-            value={formData.registrationExpirationDate}
-            onChange={handleInputChange}
-            type="date"
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Insurance Provider"
-            name="insuranceProvider"
-            value={formData.insuranceProvider}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="insurance Expiration Date"
-            name="insuranceExpirationDate"
-            value={formData.insuranceExpirationDate}
-            onChange={handleInputChange}
-            type="date"
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Engine Type"
-            name="engineType"
-            value={formData.engineType}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Fuel Type"
-            name="fuelType"
-            value={formData.fuelType}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Transmission"
-            name="transmission"
-            value={formData.transmission}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Gross Vehicle Weight"
-            name="grossVehicleWeight"
-            value={formData.grossVehicleWeight}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Curb Weight"
-            name="curbWeight"
-            value={formData.curbWeight}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
           <Grid container spacing={2}>
-            <Grid item xs={4}>
+            <Grid item xs={12} lg={6}>
               <TextField
-                label="Gross Weight"
-                name={`grossWeight`}
-                value={formData.grossWeight}
-                onChange={handleInputChangeWithNetWeight}
+                label="Vehicle Type"
+                name="vehicleTypeId"
+                value={formData.vehicleTypeId}
+                onChange={handleInputChange}
+                select
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              >
+                {vehicleTypes.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.typeOfVehicle}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Plate Number"
+                name="plateNumber"
+                value={formData.plateNumber}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Vehicle Name"
+                name="vehicleName"
+                value={formData.vehicleName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Ownership"
+                name="ownership"
+                value={formData.ownership}
+                onChange={handleInputChange}
+                select
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              >
+                <MenuItem value="OWNED">OWNED</MenuItem>
+                <MenuItem value="LEASED">LEASED</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <TextField
+                label="Net Capacity (MT)"
+                name={`netCapacity`}
+                value={formData.netCapacity}
+                onChange={handleInputChangeWithGrossVehicleWeight}
                 type="number"
                 required
                 fullWidth
@@ -668,12 +703,12 @@ const Vehicles = ({ user }) => {
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} lg={4}>
               <TextField
-                label="Tare Weight"
-                name={`tareWeight`}
-                value={formData.tareWeight}
-                onChange={handleInputChangeWithNetWeight}
+                label="Curb Weight (MT)"
+                name={`curbWeight`}
+                value={formData.curbWeight}
+                onChange={handleInputChangeWithGrossVehicleWeight}
                 type="number"
                 required
                 fullWidth
@@ -685,16 +720,17 @@ const Vehicles = ({ user }) => {
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} lg={4}>
               <TextField
-                label="Net Weight"
-                name={`netWeight`}
-                value={formData.netWeight}
+                label="Gross Vehicle Weight (MT)"
+                name={`grossVehicleWeight`}
+                value={formData.grossVehicleWeight}
                 onChange={handleInputChange}
                 type="number"
                 required
                 fullWidth
                 InputLabelProps={{
+                  shrink: true,
                   style: {
                     color: colors.grey[100],
                   },
@@ -702,6 +738,181 @@ const Vehicles = ({ user }) => {
                 autoComplete="off"
                 disabled
               />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Make/Model"
+                name="makeModel"
+                value={formData.makeModel}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Year Manufacture"
+                name="yearManufacture"
+                value={formData.yearManufacture}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={12}>
+              <TextField
+                label="Owner"
+                name="owner"
+                value={formData.owner}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Registration Number"
+                name="registrationNumber"
+                value={formData.registrationNumber}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Registration Expiration Date"
+                name="registrationExpirationDate"
+                value={formData.registrationExpirationDate}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Insurance Provider"
+                name="insuranceProvider"
+                value={formData.insuranceProvider}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="insurance Expiration Date"
+                name="insuranceExpirationDate"
+                value={formData.insuranceExpirationDate}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <TextField
+                label="Engine Type"
+                name="engineType"
+                value={formData.engineType}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <TextField
+                label="Fuel Type"
+                name="fuelType"
+                value={formData.fuelType}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <TextField
+                label="Transmission"
+                name="transmission"
+                value={formData.transmission}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <input
+                type="file"
+                className="form-control visually-hidden"
+                accept="image/*"
+                onChange={handlePictureChange}
+                id="picture"
+                name="picture"
+                style={{ display: "none" }}
+              />
+              <label htmlFor="picture">
+                <Typography>File: {pictureFileName}</Typography>
+                <Button
+                  variant="contained"
+                  component="span"
+                  sx={{ mt: 2, backgroundColor: colors.primary[500] }}
+                >
+                  Upload Vehicle Picture
+                </Button>
+              </label>
             </Grid>
           </Grid>
           <TextField

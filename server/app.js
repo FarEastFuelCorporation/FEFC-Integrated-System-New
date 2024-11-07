@@ -78,15 +78,24 @@ app.use("/hr_Dashboard/*", isAuthenticated);
 
 // Import API routes
 const apiRoutes = require("./routes/api");
+const syncronize = require("./syncronize");
 
 // Use the /api prefix for all API routes
 app.use("/api", apiRoutes);
+const {
+  syncIdInformationToLocal,
+  handleAttendanceSync,
+  syncSpecificEmployeeToLocal,
+} = require("./syncronize");
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: true });
+    // await syncIdInformationToLocal();
+    // await handleAttendanceSync();
+    // await syncSpecificEmployeeToLocal(24120);
     console.log("Models synced successfully.");
   } catch (error) {
     console.error("Error syncing models:", error);

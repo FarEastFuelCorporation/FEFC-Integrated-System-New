@@ -150,15 +150,21 @@ const EmployeeProfileModal = ({
       formData.append("createdBy", user.id);
 
       // Submit the form data with file upload
-      await axios.post(`${apiUrl}/api/employeeAttachment`, formData);
+      const uploadResponse = await axios.post(
+        `${apiUrl}/api/employeeAttachment`,
+        formData
+      );
+      console.log(uploadResponse.data);
 
       setSuccessMessage("File uploaded successfully!");
       setShowSuccessMessage(true);
-      const employeeAttachmentResponse = await axios.get(
-        `${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`
-      );
 
-      setAttachmentData(employeeAttachmentResponse.data.employeeAttachments);
+      // Assuming the response contains the uploaded attachment data:
+      const newAttachmentData = uploadResponse.data.newAttachment;
+
+      // Append the new attachment data to the existing data (if any)
+      setAttachmentData((prevData) => [...prevData, newAttachmentData]);
+
       setFileName("");
       setFileNameToSubmit("");
     } catch (error) {

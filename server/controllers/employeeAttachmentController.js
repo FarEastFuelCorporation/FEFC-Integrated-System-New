@@ -94,8 +94,46 @@ async function getEmployeeAttachmentController(req, res) {
   }
 }
 
+// Delete Employee Attachment controller
+async function deleteEmployeeAttachmentController(req, res) {
+  try {
+    const id = req.params.id;
+    const { deletedBy } = req.body;
+
+    console.log("Soft deleting Employee Attachment with ID:", id);
+
+    // Find the Employee Attachment by ID
+    const employeeAttachmentToDelete = await EmployeeAttachment.findByPk(id);
+
+    if (employeeAttachmentToDelete) {
+      // Update the deletedBy field
+      employeeAttachmentToDelete.updatedBy = deletedBy;
+      employeeAttachmentToDelete.deletedBy = deletedBy;
+      await employeeAttachmentToDelete.save();
+
+      // Soft delete the Employee AttachmentType (sets deletedAt timestamp)
+      await employeeAttachmentToDelete.destroy();
+
+      // Respond with a success message
+      res.json({
+        message: `Employee Attachment with ID ${id} soft-deleted successfully`,
+      });
+    } else {
+      // If Employee Attachment with the specified ID was not found
+      res
+        .status(404)
+        .json({ message: `Employee Attachment with ID ${id} not found` });
+    }
+  } catch (error) {
+    // Handle errors
+    console.error("Error soft-deleting Employee Attachment:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createEmployeeAttachmentController,
   getEmployeeAttachmentsController,
   getEmployeeAttachmentController,
+  deleteEmployeeAttachmentController,
 };

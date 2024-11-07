@@ -17,6 +17,7 @@ import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { tokens } from "../../theme";
 import {
   calculateAge,
@@ -25,6 +26,7 @@ import {
   concatenatePresentAddress,
 } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
+import ConfirmationDialog from "../ConfirmationDialog";
 
 const EmployeeProfileModal = ({
   user,
@@ -46,6 +48,9 @@ const EmployeeProfileModal = ({
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.employeeId) {
@@ -171,6 +176,30 @@ const EmployeeProfileModal = ({
       console.error("Error uploading file:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Attachment?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
+
+  const handleConfirmDelete = async (id) => {
+    try {
+      setLoading(true);
+      await axios.delete(`${apiUrl}/api/employeeAttachment/${id}`, {
+        data: { deletedBy: user.id },
+      });
+
+      fetchData();
+      setSuccessMessage("Attachment Deleted Successfully!");
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -311,10 +340,33 @@ const EmployeeProfileModal = ({
         </IconButton>
       ),
     },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+          >
+            <DeleteIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
+    },
   ];
 
   return (
     <Box>
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Modal
         open={open}
         onClose={handleClose}

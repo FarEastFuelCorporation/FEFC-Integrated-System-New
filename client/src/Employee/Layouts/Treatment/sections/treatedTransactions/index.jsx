@@ -317,8 +317,18 @@ const TreatedTransactions = ({ user }) => {
       setLoading(true);
 
       const updatedFormData = updateIsFinished(formData);
+
+      console.log(updatedFormData);
+
+      const { row, ...updatedDataWithoutRow } = updatedFormData;
+
+      console.log(updatedDataWithoutRow);
+
       if (!formData.id) {
-        await axios.post(`${apiUrl}/api/treatedTransaction`, updatedFormData);
+        await axios.post(
+          `${apiUrl}/api/treatedTransaction`,
+          updatedDataWithoutRow
+        );
         setSuccessMessage("Treated Transaction Submitted Successfully!");
       }
 

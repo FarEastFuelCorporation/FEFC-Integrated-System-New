@@ -1,11 +1,11 @@
-// models/BookedTransaction.js
+// models/TransporterClient.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const BookedTransaction = sequelize.define(
-  "BookedTransaction",
+const TransporterClient = sequelize.define(
+  "TransporterClient",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,36 +13,15 @@ const BookedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    transporterClientId: {
-      type: DataTypes.UUID,
-      defaultValue: () => uuidv4(), // Generate UUID automatically
-      allowNull: true,
-    },
-    transactionId: {
+    clientName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    quotationWasteId: {
-      type: DataTypes.UUID,
+    address: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    quotationTransportationId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    haulingDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    haulingTime: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
-    statusId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    remarks: {
+    contactNumber: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -79,4 +58,4 @@ const BookedTransaction = sequelize.define(
   }
 );
 
-module.exports = BookedTransaction;
+module.exports = TransporterClient;

@@ -19,6 +19,7 @@ import WarehouseSidebar from "../Employee/Layouts/Warehouse/WarehouseSidebar";
 import EmployeeSideBar from "../Employee/Layouts/Employee/EmployeeSideBar";
 import LeaderSideBar from "../Employee/Layouts/Leader/LeaderSideBar";
 import HealthOfficerSidebar from "../Employee/Layouts/HealthOfficer/HealthOfficerSidebar";
+import TransporterSidebar from "../Client/Layouts/Transporter/TransporterSidebar";
 
 const UserSidebar = ({ user }) => {
   const theme = useTheme();
@@ -28,7 +29,11 @@ const UserSidebar = ({ user }) => {
 
   switch (user.userType) {
     case "GEN":
+      sidebar = <GeneratorSidebar user={user} />;
+      break;
     case "TRP":
+      sidebar = <TransporterSidebar user={user} />;
+      break;
     case "IFM":
       sidebar = <GeneratorSidebar user={user} />;
       break;

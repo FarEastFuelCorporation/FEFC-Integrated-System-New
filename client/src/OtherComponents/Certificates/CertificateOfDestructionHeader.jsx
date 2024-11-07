@@ -55,7 +55,9 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
             margin: "0px 0px 8px",
           }}
         >
-          {row.Client.clientName}
+          {row.TransporterClient
+            ? row.TransporterClient.clientName
+            : row.Client.clientName}
         </Typography>
         <Typography
           id="table_company_address"
@@ -66,7 +68,9 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
             margin: 0,
           }}
         >
-          {row.Client.address}
+          {row.TransporterClient
+            ? row.TransporterClient.address
+            : row.Client.address}
         </Typography>
       </Box>
       <Typography

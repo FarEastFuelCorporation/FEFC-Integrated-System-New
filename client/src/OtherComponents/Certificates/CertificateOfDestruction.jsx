@@ -39,7 +39,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
       .SortedWasteTransaction;
 
   const typeOfWeight = certifiedTransaction.typeOfWeight;
-  console.log(typeOfWeight);
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;

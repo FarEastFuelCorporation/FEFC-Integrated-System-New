@@ -37,7 +37,6 @@ const EmployeeAttachment = require("../models/EmployeeAttachment");
 const IdInformation = require("../models/IdInformation");
 const Document = require("../models/Document");
 const BilledTransaction = require("../models/BilledTransaction");
-const BilledCertified = require("../models/BilledCertified");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
@@ -55,6 +54,7 @@ const WorkSchedule = require("../models/WorkSchedule");
 const Overtime = require("../models/Overtime");
 const EmployeeSalary = require("../models/EmployeeSalary");
 const VehicleAttachment = require("../models/VehicleAttachment");
+const TransporterClient = require("../models/TransporterClient");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -155,6 +155,30 @@ ClientUser.belongsTo(Client, {
   foreignKey: "clientId",
   targetKey: "clientId",
   onDelete: "CASCADE",
+});
+
+Client.hasMany(TransporterClient, {
+  as: "TransporterClient",
+  foreignKey: "createdBy",
+  sourceKey: "clientId",
+  onDelete: "CASCADE",
+});
+TransporterClient.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "createdBy",
+  targetKey: "clientId",
+  onDelete: "CASCADE",
+});
+
+TransporterClient.hasMany(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "transporterClientId",
+  sourceKey: "id",
+});
+BookedTransaction.belongsTo(TransporterClient, {
+  as: "TransporterClient",
+  foreignKey: "transporterClientId",
+  targetKey: "id",
 });
 
 Client.hasMany(BookedTransaction, {

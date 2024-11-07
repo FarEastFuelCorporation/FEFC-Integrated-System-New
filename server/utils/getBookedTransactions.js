@@ -28,6 +28,7 @@ const CollectedTransaction = require("../models/CollectedTransaction");
 const Quotation = require("../models/Quotation");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const Logistics = require("../models/Logistics");
+const TransporterClient = require("../models/TransporterClient");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -60,6 +61,11 @@ const getIncludeOptions = () => [
   {
     model: Client,
     as: "Client",
+  },
+  {
+    model: TransporterClient,
+    as: "TransporterClient",
+    required: false,
   },
   {
     model: Attachment,

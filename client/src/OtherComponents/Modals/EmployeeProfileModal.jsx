@@ -159,7 +159,6 @@ const EmployeeProfileModal = ({
         `${apiUrl}/api/employeeAttachment`,
         formData
       );
-      console.log(uploadResponse.data);
 
       setSuccessMessage("File uploaded successfully!");
       setShowSuccessMessage(true);

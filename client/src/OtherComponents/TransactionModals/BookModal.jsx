@@ -25,6 +25,7 @@ const BookModal = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [quotationsData, setQuotationsData] = useState([]);
+  const [transporterClient, setTransporterClient] = useState([]);
 
   const [filteredVehicleTypes, setFilteredVehicleTypes] = useState([]);
 
@@ -60,14 +61,19 @@ const BookModal = ({
       );
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const quotationResponse = await axios.get(
           `${apiUrl}/api/quotation/${user.id}`
         );
-
         processDataQuotations(quotationResponse);
+
+        const transporterClientResponse = await axios.get(
+          `${apiUrl}/api/transporterClient/${user.id}`
+        );
+        setTransporterClient(transporterClientResponse.data.transporterClients);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -172,6 +178,29 @@ const BookModal = ({
             autoComplete="off"
           />
         </div>
+        {user.userType === "TRP" && (
+          <TextField
+            label="Client Name"
+            name="transporterClientId"
+            value={formData.quotationWasteId}
+            onChange={handleInputChangeAndFilter}
+            select
+            fullWidth
+            required
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          >
+            {transporterClient.map((transporterClient, index) => (
+              <MenuItem key={`${index}`} value={transporterClient.id}>
+                {transporterClient.clientName}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
         <TextField
           label="Waste Name"
           name="quotationWasteId"

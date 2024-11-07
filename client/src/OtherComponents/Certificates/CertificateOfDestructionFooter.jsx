@@ -13,10 +13,20 @@ export const CertificateOfDestructionFooter1 = ({
   row,
   sortedWasteTransaction,
 }) => {
+  const certifiedTransaction =
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0];
+
+  const typeOfWeight = certifiedTransaction.typeOfWeight;
+
   const totalWeight = sortedWasteTransaction.reduce((total, waste) => {
     // Add the weight of the current waste to the total
-    return total + (parseFloat(waste.weight) || 0); // parseFloat to ensure it's a number
+    const weight =
+      typeOfWeight === "CLIENT WEIGHT" ? waste.clientWeight : waste.weight;
+
+    return total + (parseFloat(weight) || 0); // parseFloat to ensure it's a number
   }, 0);
+
   return (
     <Box>
       <Typography

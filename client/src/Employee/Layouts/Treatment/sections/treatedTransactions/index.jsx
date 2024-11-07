@@ -318,11 +318,7 @@ const TreatedTransactions = ({ user }) => {
 
       const updatedFormData = updateIsFinished(formData);
 
-      console.log(updatedFormData);
-
       const { row, ...updatedDataWithoutRow } = updatedFormData;
-
-      console.log(updatedDataWithoutRow);
 
       if (!formData.id) {
         await axios.post(

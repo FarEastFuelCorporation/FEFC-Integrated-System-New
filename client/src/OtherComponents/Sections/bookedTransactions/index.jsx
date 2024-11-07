@@ -15,6 +15,7 @@ const BookedTransactions = ({ user }) => {
   const initialFormData = useMemo(
     () => ({
       id: "",
+      transporterClientId: "",
       quotationWasteId: "",
       quotationTransportationId: "",
       haulingDate: "",

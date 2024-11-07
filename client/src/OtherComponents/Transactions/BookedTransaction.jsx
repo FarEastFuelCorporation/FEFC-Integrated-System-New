@@ -63,6 +63,11 @@ const BookedTransaction = ({ row }) => {
           ? format(parseTimeString(row.haulingTime), "hh:mm aa")
           : ""}
       </Typography>
+      {row.TransporterClient && (
+        <Typography variant="h5">
+          Client Name: {row.TransporterClient.clientName}
+        </Typography>
+      )}
       <Typography variant="h5">
         Waste Name:{" "}
         {row.QuotationWaste.wasteName ? row.QuotationWaste.wasteName : ""}

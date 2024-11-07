@@ -10,6 +10,7 @@ async function createBookedTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
+      transporterClientId,
       quotationWasteId,
       quotationTransportationId,
       haulingDate,
@@ -29,6 +30,7 @@ async function createBookedTransactionController(req, res) {
     // Creating a new transaction
     await BookedTransaction.create({
       transactionId,
+      transporterClientId,
       quotationWasteId,
       quotationTransportationId,
       haulingDate,

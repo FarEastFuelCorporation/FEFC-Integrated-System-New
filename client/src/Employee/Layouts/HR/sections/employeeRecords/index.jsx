@@ -759,7 +759,7 @@ const EmployeeRecords = ({ user }) => {
           title="Employee Records"
           subtitle="List of Employee for Future Reference"
         />
-        {user.userType === 12 && (
+        {user.userType === 21 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
               <PostAddIcon sx={{ fontSize: "40px" }} />

@@ -27,6 +27,7 @@ async function createDocumentController(req, res) {
     });
 
     const documents = await Document.findAll({
+      attributes: { exclude: ["attachment"] },
       include: [
         {
           model: Employee,
@@ -203,6 +204,7 @@ async function deleteDocumentsController(req, res) {
             attributes: ["firstName", "lastName"], // Include only necessary fields
           },
         ],
+        attributes: { exclude: ["attachment"] },
         order: [["fileName", "ASC"]],
       });
 

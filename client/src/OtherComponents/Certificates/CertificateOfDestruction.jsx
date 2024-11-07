@@ -38,6 +38,9 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;
 
+  const typeOfWeight = certifiedTransaction.typeOfWeight;
+  console.log(typeOfWeight);
+
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;
@@ -195,7 +198,13 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                     {row.QuotationWaste.TypeOfWaste.wasteCode}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>
-                    {`${formatNumber(waste.weight)} ${row.QuotationWaste.unit}`}
+                    {typeOfWeight === "CLIENT WEIGHT"
+                      ? `${formatNumber(waste.clientWeight)} ${
+                          row.QuotationWaste.unit
+                        }`
+                      : `${formatNumber(waste.weight)} ${
+                          row.QuotationWaste.unit
+                        }`}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>
                     {

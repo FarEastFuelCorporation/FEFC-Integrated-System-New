@@ -82,6 +82,7 @@ const Transaction = ({
   const handleOpenTransactionModal = (data) => {
     setOpenTransactionModal(true);
     setRow(data);
+    console.log(data);
   };
 
   const handleCloseTransactionModal = () => {

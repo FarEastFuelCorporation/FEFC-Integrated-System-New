@@ -157,6 +157,7 @@ async function updateDocumentController(req, res) {
 
     // Fetch updated document with associated Employee details
     const documents = await Document.findAll({
+      attributes: { exclude: ["attachment"] },
       include: [
         {
           model: Employee,

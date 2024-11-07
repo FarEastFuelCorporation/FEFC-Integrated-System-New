@@ -163,6 +163,7 @@ async function createEmployeeRecordController(req, res) {
 
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
+      attributes: { exclude: ["picture", "signature"] },
       order: [["employeeId", "ASC"]],
       include: [
         {

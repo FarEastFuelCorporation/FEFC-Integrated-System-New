@@ -224,27 +224,29 @@ const BookModal = ({
             ))
           )}
         </TextField>
-        <TextField
-          label="Vehicle Type"
-          name="quotationTransportationId"
-          value={formData.quotationTransportationId}
-          onChange={handleInputChange}
-          select
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        >
-          {filteredVehicleTypes.map((transport, index) => (
-            <MenuItem key={index} value={transport.quotationTransportationId}>
-              {transport.typeOfVehicle}
-            </MenuItem>
-          ))}
-        </TextField>
+        {filteredVehicleTypes.length > 0 && (
+          <TextField
+            label="Vehicle Type"
+            name="quotationTransportationId"
+            value={formData.quotationTransportationId}
+            onChange={handleInputChange}
+            select
+            fullWidth
+            required
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          >
+            {filteredVehicleTypes.map((transport, index) => (
+              <MenuItem key={index} value={transport.quotationTransportationId}>
+                {transport.typeOfVehicle}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
         <TextField
           label="Remarks"
           name="remarks"

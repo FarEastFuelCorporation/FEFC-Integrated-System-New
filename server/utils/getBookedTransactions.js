@@ -50,6 +50,7 @@ const getIncludeOptions = () => [
   {
     model: QuotationTransportation,
     as: "QuotationTransportation",
+    required: false,
     include: [
       {
         model: VehicleType,

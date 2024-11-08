@@ -15,7 +15,7 @@ const BookedTransaction = sequelize.define(
     },
     transporterClientId: {
       type: DataTypes.UUID,
-      defaultValue: () => uuidv4(), // Generate UUID automatically
+      defaultValue: null,
       allowNull: true,
     },
     transactionId: {
@@ -28,7 +28,8 @@ const BookedTransaction = sequelize.define(
     },
     quotationTransportationId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      defaultValue: null,
+      allowNull: true,
     },
     haulingDate: {
       type: DataTypes.DATEONLY,

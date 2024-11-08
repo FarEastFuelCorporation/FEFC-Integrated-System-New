@@ -27,12 +27,9 @@ async function createBookedTransactionController(req, res) {
 
     const transactionId = await generateTransactionId();
 
-    // Creating a new transaction
-    await BookedTransaction.create({
+    const transactionData = {
       transactionId,
-      transporterClientId,
       quotationWasteId,
-      quotationTransportationId,
       haulingDate,
       haulingTime,
       pttNo,
@@ -41,7 +38,25 @@ async function createBookedTransactionController(req, res) {
       remarks,
       statusId,
       createdBy,
-    });
+    };
+
+    console.log(req.body);
+    console.log("quotationTransportationId", quotationTransportationId);
+
+    if (quotationTransportationId && quotationTransportationId === "") {
+      console.log("pass");
+      transactionData.quotationTransportationId = quotationTransportationId;
+    }
+
+    if (transporterClientId && transporterClientId === "") {
+      console.log("pass");
+      transactionData.transporterClientId = transporterClientId;
+    }
+
+    console.log("transactionData", transactionData);
+
+    // Create the new transaction
+    await BookedTransaction.create(transactionData);
 
     // fetch transactions
     const newTransaction = await fetchData(statusId, null, null, transactionId);

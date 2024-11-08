@@ -156,7 +156,7 @@ const BookedTransactions = ({ user }) => {
       !haulingDate ||
       !haulingTime ||
       !quotationWasteId ||
-      !quotationTransportationId ||
+      (!quotationTransportationId && user.userType !== "TRP") || // Make optional for TRP users
       !statusId ||
       !createdBy
     ) {
@@ -205,14 +205,13 @@ const BookedTransactions = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
-        {user.userType === "GEN" ||
-          (user.userType === "TRP" && (
-            <Box display="flex">
-              <IconButton onClick={handleOpenModal}>
-                <PostAddIcon sx={{ fontSize: "40px" }} />
-              </IconButton>
-            </Box>
-          ))}
+        {(user.userType === "GEN" || user.userType === "TRP") && (
+          <Box display="flex">
+            <IconButton onClick={handleOpenModal}>
+              <PostAddIcon sx={{ fontSize: "40px" }} />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       {showSuccessMessage && (

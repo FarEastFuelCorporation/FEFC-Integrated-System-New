@@ -6,7 +6,7 @@ import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
 import { timestampDate, parseTimeString } from "../Functions";
 
-const BookedTransaction = ({ row }) => {
+const BookedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
@@ -74,9 +74,9 @@ const BookedTransaction = ({ row }) => {
       </Typography>
       <Typography variant="h5">
         Vehicle Type:{" "}
-        {row.QuotationTransportation.VehicleType.typeOfVehicle
+        {row.QuotationTransportation
           ? row.QuotationTransportation.VehicleType.typeOfVehicle
-          : ""}
+          : "CLIENT VEHICLE"}
       </Typography>
       <Typography variant="h5">
         Remarks: {row.remarks ? row.remarks : "NO REMARKS"}

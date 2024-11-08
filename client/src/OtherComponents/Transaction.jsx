@@ -38,6 +38,7 @@ import BillingDistributionTransaction from "./Transactions/BillingDistributionTr
 import WarehousedTransaction from "./Transactions/WarehousedTransaction";
 import CustomDataGridStyles from "./CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
+import { calculateRemainingDays } from "./Functions";
 
 const Transaction = ({
   user,
@@ -260,6 +261,23 @@ const Transaction = ({
             rows={transactions ? transactions : []}
             columns={columns}
             getRowId={(row) => row.id}
+            getRowClassName={(params) => {
+              const daysRemaining = calculateRemainingDays(
+                params.row.ScheduledTransaction[0].scheduledDate
+              );
+
+              if (daysRemaining !== null) {
+                if (daysRemaining < 0) {
+                  return "blink-red"; // Expired
+                }
+              }
+              return ""; // Default class if no blinking is needed
+            }}
+            initialState={{
+              sorting: {
+                sortModel: [{ field: "remainingDays", sort: "asc" }], // Default sorting by remaining days
+              },
+            }}
           />
         </CustomDataGridStyles>
         <Modal

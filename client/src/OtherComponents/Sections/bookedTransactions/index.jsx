@@ -166,20 +166,31 @@ const BookedTransactions = ({ user }) => {
     }
 
     try {
+      let newTransaction;
       setLoading(true);
       if (formData.id) {
-        await axios.put(
+        newTransaction = await axios.put(
           `${apiUrl}/api/bookedTransaction/${formData.id}`,
           formData
         );
-
         setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/api/bookedTransaction`, formData);
+        newTransaction = await axios.post(
+          `${apiUrl}/api/bookedTransaction`,
+          formData
+        );
         setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
 
-      fetchData();
+      // For pending transactions
+      setPendingTransactions(newTransaction.data.pendingTransactions);
+
+      // For in progress transactions
+      setInProgressTransactions(newTransaction.data.inProgressTransactions);
+
+      // For finished transactions
+      setFinishedTransactions(newTransaction.data.finishedTransactions);
+
       setOpenTransactionModal(false);
       setShowSuccessMessage(true);
       handleCloseModal();

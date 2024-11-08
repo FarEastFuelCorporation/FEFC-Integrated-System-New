@@ -275,7 +275,8 @@ const getIncludeOptions = () => [
 const getPendingTransactions = async (
   statusId,
   user = null,
-  additionalStatusId = null
+  additionalStatusId = null,
+  transactionId = null
 ) => {
   try {
     // Build the where clause dynamically
@@ -288,6 +289,9 @@ const getPendingTransactions = async (
     // If user is provided, add user-specific condition (e.g., createdBy)
     if (user) {
       whereConditions.createdBy = user;
+    }
+    if (transactionId) {
+      whereConditions.transactionId = transactionId;
     }
     console.log(whereConditions);
     const bookedTransactions = await BookedTransaction.findAll({
@@ -307,7 +311,8 @@ const getPendingTransactions = async (
 const getInProgressTransactions = async (
   statusId,
   user = null,
-  additionalStatusId = null
+  additionalStatusId = null,
+  transactionId = null
 ) => {
   try {
     // Build the base where conditions
@@ -318,10 +323,12 @@ const getInProgressTransactions = async (
       },
     };
 
-    console.log(whereConditions);
     // If user is provided, add the condition for createdBy (or whatever the user field is)
     if (user) {
       whereConditions.createdBy = user;
+    }
+    if (transactionId) {
+      whereConditions.transactionId = transactionId;
     }
     const bookedTransactions = await BookedTransaction.findAll({
       where: whereConditions,
@@ -340,19 +347,19 @@ const getInProgressTransactions = async (
 const getFinishedTransactions = async (
   statusId,
   user = null,
-  additionalStatusId = null
+  additionalStatusId = null,
+  transactionId = null
 ) => {
   try {
-    console.log("statusId", statusId);
-    console.log("user", user);
-    console.log("additionalStatusId", additionalStatusId);
-
     // Build the base where conditions
     const whereConditions = { statusId: 11 };
 
     // If user is provided, add the condition for createdBy (or whatever the user field is)
     if (user) {
       whereConditions.createdBy = user;
+    }
+    if (transactionId) {
+      whereConditions.transactionId = transactionId;
     }
 
     const bookedTransactions = await BookedTransaction.findAll({
@@ -368,16 +375,34 @@ const getFinishedTransactions = async (
   }
 };
 
-const fetchData = async (statusId, user = null, additionalStatusId = null) => {
+const fetchData = async (
+  statusId,
+  user = null,
+  additionalStatusId = null,
+  transactionId = null
+) => {
   try {
-    console.log(statusId);
-    console.log(additionalStatusId);
     // Fetch all transactions concurrently
     const [pendingTransactions, inProgressTransactions, finishedTransactions] =
       await Promise.all([
-        getPendingTransactions(statusId, user, additionalStatusId),
-        getInProgressTransactions(statusId, user, additionalStatusId),
-        getFinishedTransactions(statusId, user, additionalStatusId),
+        getPendingTransactions(
+          statusId,
+          user,
+          additionalStatusId,
+          transactionId
+        ),
+        getInProgressTransactions(
+          statusId,
+          user,
+          additionalStatusId,
+          transactionId
+        ),
+        getFinishedTransactions(
+          statusId,
+          user,
+          additionalStatusId,
+          transactionId
+        ),
       ]);
 
     // Return the results as an object or process them as needed

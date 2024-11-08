@@ -44,12 +44,12 @@ async function createBookedTransactionController(req, res) {
     });
 
     // fetch transactions
-    const data = await fetchData(statusId);
+    const newTransaction = await fetchData(statusId, null, null, transactionId);
 
     res.status(201).json({
-      pendingTransactions: data.pending,
-      inProgressTransactions: data.inProgress,
-      finishedTransactions: data.finished,
+      pendingTransactions: newTransaction.pending,
+      inProgressTransactions: newTransaction.inProgress,
+      finishedTransactions: newTransaction.finished,
     });
   } catch (error) {
     // Handling errors

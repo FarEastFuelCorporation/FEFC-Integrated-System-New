@@ -39,6 +39,7 @@ import WarehousedTransaction from "./Transactions/WarehousedTransaction";
 import CustomDataGridStyles from "./CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
 import { calculateRemainingDays } from "./Functions";
+import axios from "axios";
 
 const Transaction = ({
   user,
@@ -58,6 +59,10 @@ const Transaction = ({
   const colors = tokens(theme.palette.mode);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedSubTab, setSelectedSubTab] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [loadingRowId, setLoadingRowId] = useState(null);
+
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const [row, setRow] = useState(null);
 
@@ -173,8 +178,8 @@ const Transaction = ({
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "delete",
-      headerName: "Delete",
+      field: "view",
+      headerName: "View",
       headerAlign: "center",
       align: "center",
       sortable: false,
@@ -183,9 +188,28 @@ const Transaction = ({
         <Button
           color="secondary"
           variant="contained"
-          onClick={() => handleOpenTransactionModal(params.row)}
+          disabled={loading}
+          onClick={async () => {
+            try {
+              setLoading(true);
+              const id = params.row.id; // Get the document ID
+              setLoadingRowId(id);
+
+              // Fetch the attachment from the API using the document ID
+              const response = await axios.get(
+                `${apiUrl}/api/bookedTransaction/full/${id}`
+              );
+
+              handleOpenTransactionModal(response.data.transaction.transaction);
+            } catch (error) {
+              console.error("Error fetching document file:", error);
+            } finally {
+              setLoading(false);
+              setLoadingRowId(null); // Reset the loading row ID after the API call completes
+            }
+          }}
         >
-          View Transaction
+          {loadingRowId === params.row.id ? "Loading..." : "View Transaction"}
         </Button>
       ),
     },

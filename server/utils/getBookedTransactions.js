@@ -272,12 +272,25 @@ const getIncludeOptions = () => [
   },
 ];
 
+const getIncludeOptionsPartial = () => [
+  {
+    model: Client,
+    as: "Client",
+  },
+  {
+    model: ScheduledTransaction,
+    as: "ScheduledTransaction",
+    required: false,
+  },
+];
+
 // Get Pending Transactions (where statusId equals given value)
 const getPendingTransactions = async (
   statusId,
   user = null,
   additionalStatusId = null,
-  transactionId = null
+  transactionId = null,
+  partial = true
 ) => {
   try {
     // Build the where clause dynamically
@@ -295,11 +308,21 @@ const getPendingTransactions = async (
       whereConditions.transactionId = transactionId;
     }
     console.log(whereConditions);
-    const bookedTransactions = await BookedTransaction.findAll({
+
+    const queryOptions = {
       where: whereConditions,
-      include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
-    });
+    };
+
+    if (partial) {
+      queryOptions.include = getIncludeOptionsPartial();
+    } else {
+      queryOptions.include = getIncludeOptions();
+    }
+
+    console.log(queryOptions);
+
+    const bookedTransactions = await BookedTransaction.findAll(queryOptions);
 
     return bookedTransactions;
   } catch (error) {
@@ -313,7 +336,8 @@ const getInProgressTransactions = async (
   statusId,
   user = null,
   additionalStatusId = null,
-  transactionId = null
+  transactionId = null,
+  partial = true
 ) => {
   try {
     // Build the base where conditions
@@ -331,12 +355,19 @@ const getInProgressTransactions = async (
     if (transactionId) {
       whereConditions.transactionId = transactionId;
     }
-    const bookedTransactions = await BookedTransaction.findAll({
-      where: whereConditions,
-      include: getIncludeOptions(),
-      order: [["transactionId", "DESC"]],
-    });
 
+    const queryOptions = {
+      where: whereConditions,
+      order: [["transactionId", "DESC"]],
+    };
+
+    if (partial) {
+      queryOptions.include = getIncludeOptionsPartial();
+    } else {
+      queryOptions.include = getIncludeOptions();
+    }
+
+    const bookedTransactions = await BookedTransaction.findAll(queryOptions);
     return bookedTransactions;
   } catch (error) {
     console.error("Error fetching in progress transactions:", error);
@@ -349,7 +380,8 @@ const getFinishedTransactions = async (
   statusId,
   user = null,
   additionalStatusId = null,
-  transactionId = null
+  transactionId = null,
+  partial = true
 ) => {
   try {
     // Build the base where conditions
@@ -363,11 +395,18 @@ const getFinishedTransactions = async (
       whereConditions.transactionId = transactionId;
     }
 
-    const bookedTransactions = await BookedTransaction.findAll({
+    const queryOptions = {
       where: whereConditions,
-      include: getIncludeOptions(),
       order: [["transactionId", "DESC"]],
-    });
+    };
+
+    if (partial) {
+      queryOptions.include = getIncludeOptionsPartial();
+    } else {
+      queryOptions.include = getIncludeOptions();
+    }
+
+    const bookedTransactions = await BookedTransaction.findAll(queryOptions);
 
     return bookedTransactions;
   } catch (error) {
@@ -380,7 +419,8 @@ const fetchData = async (
   statusId,
   user = null,
   additionalStatusId = null,
-  transactionId = null
+  transactionId = null,
+  partial = true
 ) => {
   try {
     // Fetch all transactions concurrently
@@ -390,19 +430,22 @@ const fetchData = async (
           statusId,
           user,
           additionalStatusId,
-          transactionId
+          transactionId,
+          partial
         ),
         getInProgressTransactions(
           statusId,
           user,
           additionalStatusId,
-          transactionId
+          transactionId,
+          partial
         ),
         getFinishedTransactions(
           statusId,
           user,
           additionalStatusId,
-          transactionId
+          transactionId,
+          partial
         ),
       ]);
 
@@ -418,7 +461,24 @@ const fetchData = async (
   }
 };
 
+const fetchDataFull = async (id) => {
+  try {
+    const transaction = await BookedTransaction.findByPk(id, {
+      include: getIncludeOptions(),
+    });
+
+    // Return the results as an object or process them as needed
+    return {
+      transaction,
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   fetchData,
+  fetchDataFull,
   getIncludeOptions,
 };

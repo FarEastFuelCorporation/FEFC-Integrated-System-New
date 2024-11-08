@@ -140,28 +140,40 @@ const BookedTransactions = ({ user }) => {
     }
   };
 
+  const validateForm = (data) => {
+    let validationErrors = [];
+
+    // Validate haulingDate
+    if (!data.haulingDate) {
+      validationErrors.push("Hauling Date is required.");
+    }
+
+    // Validate haulingTime
+    if (!data.haulingTime) {
+      validationErrors.push("Hauling Time is required.");
+    }
+
+    // Validate quotationWasteId
+    if (!data.quotationWasteId) {
+      validationErrors.push("Waste Name is required.");
+    }
+
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(" "));
+      setShowErrorMessage(true);
+      return false;
+    }
+
+    setShowErrorMessage(false);
+    setErrorMessage("");
+    return true;
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    const {
-      haulingDate,
-      haulingTime,
-      quotationWasteId,
-      quotationTransportationId,
-      statusId,
-      createdBy,
-    } = formData;
-
-    if (
-      !haulingDate ||
-      !haulingTime ||
-      !quotationWasteId ||
-      (!quotationTransportationId && user.userType !== "TRP") || // Make optional for TRP users
-      !statusId ||
-      !createdBy
-    ) {
-      setErrorMessage("Please fill all required fields.");
-      setShowErrorMessage(true);
+    // Perform client-side validation
+    if (!validateForm(formData)) {
       return;
     }
 

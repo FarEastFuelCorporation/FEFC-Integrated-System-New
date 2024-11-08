@@ -2,7 +2,7 @@
 
 const BookedTransaction = require("../models/BookedTransaction");
 const generateTransactionId = require("../utils/generateTransactionId");
-const { fetchData } = require("../utils/getBookedTransactions");
+const { fetchData, fetchDataFull } = require("../utils/getBookedTransactions");
 const statusId = 1;
 
 // Create Booked Transaction controller
@@ -85,6 +85,23 @@ async function getBookedTransactionsController(req, res) {
       pendingTransactions: data.pending,
       inProgressTransactions: data.inProgress,
       finishedTransactions: data.finished,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get Booked Transactions controller
+async function getBookedTransactionFullController(req, res) {
+  try {
+    const id = req.params.id;
+
+    // fetch transactions
+    const transaction = await fetchDataFull(id);
+
+    res.status(200).json({
+      transaction,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -195,6 +212,7 @@ async function deleteBookedTransactionController(req, res) {
 module.exports = {
   createBookedTransactionController,
   getBookedTransactionsController,
+  getBookedTransactionFullController,
   updateBookedTransactionController,
   deleteBookedTransactionController,
 };

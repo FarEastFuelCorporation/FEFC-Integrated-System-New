@@ -262,13 +262,15 @@ const Transaction = ({
             columns={columns}
             getRowId={(row) => row.id}
             getRowClassName={(params) => {
-              const daysRemaining = calculateRemainingDays(
-                params.row.ScheduledTransaction[0].scheduledDate
-              );
+              if (user.userType === 3 || user.userType === 4) {
+                const daysRemaining = calculateRemainingDays(
+                  params.row.ScheduledTransaction[0].scheduledDate
+                );
 
-              if (daysRemaining !== null) {
-                if (daysRemaining < 0) {
-                  return "blink-red"; // Expired
+                if (daysRemaining !== null) {
+                  if (daysRemaining < 0) {
+                    return "blink-red"; // Expired
+                  }
                 }
               }
               return ""; // Default class if no blinking is needed

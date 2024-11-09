@@ -199,26 +199,26 @@ const ScheduledTransactions = ({ user }) => {
         );
         // Update the existing transaction in each state
         // Remove old entry and add the updated one in each state
-        setPendingTransactions((prevPendingTransactions) => [
-          ...prevPendingTransactions.filter(
-            (transaction) => transaction.id !== formData.id
-          ),
-          ...newTransaction.data.pendingTransactions,
-        ]);
+        // setPendingTransactions((prevPendingTransactions) => [
+        //   ...prevPendingTransactions.filter(
+        //     (transaction) => transaction.id !== formData.id
+        //   ),
+        //   ...newTransaction.data.pendingTransactions,
+        // ]);
 
-        setInProgressTransactions((prevInProgressTransactions) => [
-          ...prevInProgressTransactions.filter(
-            (transaction) => transaction.id !== formData.id
-          ),
-          ...newTransaction.data.inProgressTransactions,
-        ]);
+        // setInProgressTransactions((prevInProgressTransactions) => [
+        //   ...prevInProgressTransactions.filter(
+        //     (transaction) => transaction.id !== formData.id
+        //   ),
+        //   ...newTransaction.data.inProgressTransactions,
+        // ]);
 
-        setFinishedTransactions((prevFinishedTransactions) => [
-          ...prevFinishedTransactions.filter(
-            (transaction) => transaction.id !== formData.id
-          ),
-          ...newTransaction.data.finishedTransactions,
-        ]);
+        // setFinishedTransactions((prevFinishedTransactions) => [
+        //   ...prevFinishedTransactions.filter(
+        //     (transaction) => transaction.id !== formData.id
+        //   ),
+        //   ...newTransaction.data.finishedTransactions,
+        // ]);
         setSuccessMessage("Scheduled Transaction Updated Successfully!");
       } else {
         newTransaction = await axios.post(
@@ -226,24 +226,26 @@ const ScheduledTransactions = ({ user }) => {
           formData
         );
 
+        console.log(newTransaction);
+
         // Merging new data with previous state data
-        setPendingTransactions((prevPendingTransactions) => [
-          ...prevPendingTransactions,
-          ...newTransaction.data.pendingTransactions,
-        ]);
+        // setPendingTransactions((prevPendingTransactions) => [
+        //   ...prevPendingTransactions,
+        //   ...newTransaction.data.pendingTransactions,
+        // ]);
 
-        setInProgressTransactions((prevInProgressTransactions) => [
-          ...prevInProgressTransactions,
-          ...newTransaction.data.inProgressTransactions,
-        ]);
+        // setInProgressTransactions((prevInProgressTransactions) => [
+        //   ...prevInProgressTransactions,
+        //   ...newTransaction.data.inProgressTransactions,
+        // ]);
 
-        setFinishedTransactions((prevFinishedTransactions) => [
-          ...prevFinishedTransactions,
-          ...newTransaction.data.finishedTransactions,
-        ]);
+        // setFinishedTransactions((prevFinishedTransactions) => [
+        //   ...prevFinishedTransactions,
+        //   ...newTransaction.data.finishedTransactions,
+        // ]);
         setSuccessMessage("Scheduled Transaction Submitted Successfully!");
       }
-
+      fetchData();
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);
       handleCloseModal();

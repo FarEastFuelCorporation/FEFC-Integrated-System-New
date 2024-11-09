@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   Grid,
-  IconButton,
   Tab,
   Tabs,
   Typography,
@@ -16,8 +15,6 @@ import Header from "../../../../../OtherComponents/Header";
 import { tokens } from "../../../../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { ResponsivePie } from "@nivo/pie";
-import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
@@ -35,30 +32,6 @@ const Dashboard = () => {
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [currentDate, setCurrentDate] = useState(new Date());
-
-  // Function to format the date as a string (e.g., 'November 8, 2024')
-  const formatDate = (date) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
-
-  // Function to go to the previous day
-  const handlePreviousDate = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(newDate.getDate() - 1); // Decrease by 1 day
-      return newDate;
-    });
-  };
-
-  // Function to go to the next day
-  const handleNextDate = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(newDate.getDate() + 1); // Increase by 1 day
-      return newDate;
-    });
-  };
 
   useEffect(() => {
     const fetchData = async () => {

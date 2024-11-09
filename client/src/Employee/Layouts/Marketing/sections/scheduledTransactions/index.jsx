@@ -141,7 +141,22 @@ const ScheduledTransactions = ({ user }) => {
         }
       );
 
-      fetchData();
+      // Filter out the deleted transaction from each state
+      setPendingTransactions((prevPendingTransactions) =>
+        prevPendingTransactions.filter(
+          (transaction) => transaction.id !== row.ScheduledTransaction[0].id
+        )
+      );
+      setInProgressTransactions((prevInProgressTransactions) =>
+        prevInProgressTransactions.filter(
+          (transaction) => transaction.id !== row.ScheduledTransaction[0].id
+        )
+      );
+      setFinishedTransactions((prevFinishedTransactions) =>
+        prevFinishedTransactions.filter(
+          (transaction) => transaction.id !== row.ScheduledTransaction[0].id
+        )
+      );
 
       // Display success message
       setSuccessMessage("Scheduled Transaction Deleted Successfully!");
@@ -175,19 +190,59 @@ const ScheduledTransactions = ({ user }) => {
     }
 
     try {
+      let newTransaction;
       setLoading(true);
       if (formData.id) {
-        await axios.put(
+        newTransaction = await axios.put(
           `${apiUrl}/api/scheduledTransaction/${formData.id}`,
           formData
         );
+        // Update the existing transaction in each state
+        // Remove old entry and add the updated one in each state
+        setPendingTransactions((prevPendingTransactions) => [
+          ...prevPendingTransactions.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...newTransaction.data.pendingTransactions,
+        ]);
+
+        setInProgressTransactions((prevInProgressTransactions) => [
+          ...prevInProgressTransactions.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...newTransaction.data.inProgressTransactions,
+        ]);
+
+        setFinishedTransactions((prevFinishedTransactions) => [
+          ...prevFinishedTransactions.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...newTransaction.data.finishedTransactions,
+        ]);
         setSuccessMessage("Scheduled Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/api/scheduledTransaction`, formData);
+        newTransaction = await axios.post(
+          `${apiUrl}/api/scheduledTransaction`,
+          formData
+        );
+
+        // Merging new data with previous state data
+        setPendingTransactions((prevPendingTransactions) => [
+          ...prevPendingTransactions,
+          ...newTransaction.data.pendingTransactions,
+        ]);
+
+        setInProgressTransactions((prevInProgressTransactions) => [
+          ...prevInProgressTransactions,
+          ...newTransaction.data.inProgressTransactions,
+        ]);
+
+        setFinishedTransactions((prevFinishedTransactions) => [
+          ...prevFinishedTransactions,
+          ...newTransaction.data.finishedTransactions,
+        ]);
         setSuccessMessage("Scheduled Transaction Submitted Successfully!");
       }
-
-      fetchData();
 
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);

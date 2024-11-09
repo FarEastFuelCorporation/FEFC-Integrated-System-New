@@ -50,13 +50,20 @@ async function createDispatchedTransactionController(req, res) {
       await updatedBookedTransaction.save();
 
       // fetch transactions
-      const data = await fetchData(statusId);
+      const transactionId = updatedBookedTransaction.transactionId;
+
+      const newTransaction = await fetchData(
+        statusId,
+        null,
+        null,
+        transactionId
+      );
 
       // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      res.status(201).json({
+        pendingTransactions: newTransaction.pending,
+        inProgressTransactions: newTransaction.inProgress,
+        finishedTransactions: newTransaction.finished,
       });
     } else {
       // If booked transaction with the specified ID was not found

@@ -32,7 +32,10 @@ async function createScheduledTransactionController(req, res) {
     });
 
     const updatedBookedTransaction = await BookedTransaction.findByPk(
-      bookedTransactionId
+      bookedTransactionId,
+      {
+        attributes: ["transactionId", "statusId"],
+      }
     );
 
     if (updatedBookedTransaction) {
@@ -120,14 +123,28 @@ async function updateScheduledTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedScheduledTransaction.save();
 
+      const updatedBookedTransaction = await BookedTransaction.findByPk(
+        bookedTransactionId,
+        {
+          attributes: ["transactionId"],
+        }
+      );
+
       // fetch transactions
-      const data = await fetchData(statusId);
+      const transactionId = updatedBookedTransaction.transactionId;
+
+      const newTransaction = await fetchData(
+        statusId,
+        null,
+        null,
+        transactionId
+      );
 
       // Respond with the updated data
-      res.json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      res.status(201).json({
+        pendingTransactions: newTransaction.pending,
+        inProgressTransactions: newTransaction.inProgress,
+        finishedTransactions: newTransaction.finished,
       });
     } else {
       // If scheduled transaction with the specified ID was not found

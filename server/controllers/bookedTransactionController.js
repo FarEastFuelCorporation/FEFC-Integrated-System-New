@@ -43,12 +43,12 @@ async function createBookedTransactionController(req, res) {
     console.log(req.body);
     console.log("quotationTransportationId", quotationTransportationId);
 
-    if (quotationTransportationId && quotationTransportationId === "") {
+    if (quotationTransportationId && quotationTransportationId !== "") {
       console.log("pass");
       transactionData.quotationTransportationId = quotationTransportationId;
     }
 
-    if (transporterClientId && transporterClientId === "") {
+    if (transporterClientId && transporterClientId !== "") {
       console.log("pass");
       transactionData.transporterClientId = transporterClientId;
     }

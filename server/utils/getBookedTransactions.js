@@ -281,6 +281,13 @@ const getIncludeOptionsPartial = () => [
     model: ScheduledTransaction,
     as: "ScheduledTransaction",
     required: false,
+    include: [
+      {
+        model: ReceivedTransaction,
+        as: "ReceivedTransaction",
+        required: false,
+      },
+    ],
   },
 ];
 

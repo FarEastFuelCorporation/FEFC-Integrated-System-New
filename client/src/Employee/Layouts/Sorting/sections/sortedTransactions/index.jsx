@@ -61,7 +61,7 @@ const SortedTransactions = ({ user }) => {
       const sortedTransactionResponse = await axios.get(
         `${apiUrl}/api/sortedTransaction`
       );
-
+      console.log(sortedTransactionResponse);
       // Helper function to filter by submitTo "SORTING"
       const filterBySubmitToSorting = (transactions) => {
         return transactions.filter((transaction) => {

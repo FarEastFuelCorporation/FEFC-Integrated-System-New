@@ -34,7 +34,7 @@ async function createScheduledTransactionController(req, res) {
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       {
-        attributes: ["transactionId", "statusId"],
+        attributes: ["id", "transactionId", "statusId"],
       }
     );
 

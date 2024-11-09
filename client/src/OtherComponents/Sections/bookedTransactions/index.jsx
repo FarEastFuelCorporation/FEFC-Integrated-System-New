@@ -128,7 +128,23 @@ const BookedTransactions = ({ user }) => {
         data: { deletedBy: user.id },
       });
 
-      fetchData();
+      // Filter out the deleted transaction from each state
+      setPendingTransactions((prevPendingTransactions) =>
+        prevPendingTransactions.filter(
+          (transaction) => transaction.id !== row.id
+        )
+      );
+      setInProgressTransactions((prevInProgressTransactions) =>
+        prevInProgressTransactions.filter(
+          (transaction) => transaction.id !== row.id
+        )
+      );
+      setFinishedTransactions((prevFinishedTransactions) =>
+        prevFinishedTransactions.filter(
+          (transaction) => transaction.id !== row.id
+        )
+      );
+
       setSuccessMessage("Booked Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);
@@ -185,23 +201,52 @@ const BookedTransactions = ({ user }) => {
           `${apiUrl}/api/bookedTransaction/${formData.id}`,
           formData
         );
+        // Update the existing transaction in each state
+        // Remove old entry and add the updated one in each state
+        setPendingTransactions((prevPendingTransactions) => [
+          ...prevPendingTransactions.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...newTransaction.data.pendingTransactions,
+        ]);
+
+        setInProgressTransactions((prevInProgressTransactions) => [
+          ...prevInProgressTransactions.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...newTransaction.data.inProgressTransactions,
+        ]);
+
+        setFinishedTransactions((prevFinishedTransactions) => [
+          ...prevFinishedTransactions.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...newTransaction.data.finishedTransactions,
+        ]);
         setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
         newTransaction = await axios.post(
           `${apiUrl}/api/bookedTransaction`,
           formData
         );
+        // Merging new data with previous state data
+        setPendingTransactions((prevPendingTransactions) => [
+          ...prevPendingTransactions,
+          ...newTransaction.data.pendingTransactions,
+        ]);
+
+        setInProgressTransactions((prevInProgressTransactions) => [
+          ...prevInProgressTransactions,
+          ...newTransaction.data.inProgressTransactions,
+        ]);
+
+        setFinishedTransactions((prevFinishedTransactions) => [
+          ...prevFinishedTransactions,
+          ...newTransaction.data.finishedTransactions,
+        ]);
+
         setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
-
-      // For pending transactions
-      setPendingTransactions(newTransaction.data.pendingTransactions);
-
-      // For in progress transactions
-      setInProgressTransactions(newTransaction.data.inProgressTransactions);
-
-      // For finished transactions
-      setFinishedTransactions(newTransaction.data.finishedTransactions);
 
       setOpenTransactionModal(false);
       setShowSuccessMessage(true);

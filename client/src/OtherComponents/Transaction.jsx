@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import Badge from "@mui/material/Badge";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import {
   CustomAccordionDetails,
   CustomAccordionStyles,
@@ -137,6 +137,24 @@ const Transaction = ({
         } else {
           return format(new Date(params.row.haulingDate), "MMMM dd, yyyy");
         }
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "haulingTime",
+      headerName: "Hauling Time",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        const scheduledTime = params.row.ScheduledTransaction[0]
+          ? params.row.ScheduledTransaction[0].scheduledTime
+          : params.row.haulingTime;
+
+        const parsedTime = parse(scheduledTime, "HH:mm:ss", new Date());
+
+        return format(parsedTime, "hh:mm a");
       },
       renderCell: renderCellWithWrapText,
     },

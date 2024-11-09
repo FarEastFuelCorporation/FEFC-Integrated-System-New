@@ -276,16 +276,19 @@ const getIncludeOptionsPartial = () => [
   {
     model: Client,
     as: "Client",
+    attributes: ["clientName", "address"],
   },
   {
     model: ScheduledTransaction,
     as: "ScheduledTransaction",
     required: false,
+    attributes: ["logisticsId", "scheduledDate", "scheduledTime"],
     include: [
       {
         model: ReceivedTransaction,
         as: "ReceivedTransaction",
         required: false,
+        attributes: ["submitTo"],
       },
     ],
   },

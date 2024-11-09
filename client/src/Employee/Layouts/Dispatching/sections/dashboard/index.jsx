@@ -80,7 +80,7 @@ const Dashboard = () => {
 
   const data = [
     { id: "Pending", label: "Pending", value: pendingDispatch },
-    { id: "On-Time", label: "On-Time", value: lateDispatch },
+    { id: "On-Time", label: "On-Time", value: onTimeDispatch },
     { id: "Late", label: "Late", value: lateDispatch },
   ];
 

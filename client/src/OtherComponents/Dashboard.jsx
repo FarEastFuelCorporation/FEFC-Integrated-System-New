@@ -19,6 +19,7 @@ import EmployeeRoutes from "../Employee/Routes/EmployeeRoutes";
 import LeaderRoutes from "../Employee/Routes/LeaderRoutes";
 import HealthOfficerRoutes from "../Employee/Routes/HealthOfficerRoutes";
 import TransporterRoutes from "../Client/Routes/TransporterRoutes";
+import CustomerRoutes from "../Client/Routes/CustomerRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -36,8 +37,14 @@ const Dashboard = ({ user, onUpdateUser }) => {
       );
     case "IFM":
       return (
-        <RoleProtectedRoute user={user} allowedRoles={[user.userType]}>
-          <MarketingRoutes user={user} onUpdateUser={onUpdateUser} />
+        <RoleProtectedRoute user={user} allowedRoles={["IFM"]}>
+          <GeneratorRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case "CUS":
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={["CUS"]}>
+          <CustomerRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 0:

@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, IconButton } from "@mui/material";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
-import LoadingSpinner from "../../LoadingSpinner";
-import Header from "../../Header";
-import SuccessMessage from "../../SuccessMessage";
-import ConfirmationDialog from "../../ConfirmationDialog";
-import Transaction from "../../Transaction";
-import Modal from "../../Modal";
+import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
+import Transaction from "../../../../../OtherComponents/Transaction";
+import Modal from "../../../../../OtherComponents/Modal";
+import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
+import Header from "../../../../../OtherComponents/Header";
+import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
 const BookedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -15,7 +15,6 @@ const BookedTransactions = ({ user }) => {
   const initialFormData = useMemo(
     () => ({
       id: "",
-      transporterClientId: "",
       quotationWasteId: "",
       quotationTransportationId: "",
       haulingDate: "",
@@ -93,8 +92,6 @@ const BookedTransactions = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name);
-    console.log(value);
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
@@ -142,69 +139,46 @@ const BookedTransactions = ({ user }) => {
     }
   };
 
-  const validateForm = (data) => {
-    let validationErrors = [];
-
-    // Validate haulingDate
-    if (!data.haulingDate) {
-      validationErrors.push("Hauling Date is required.");
-    }
-
-    // Validate haulingTime
-    if (!data.haulingTime) {
-      validationErrors.push("Hauling Time is required.");
-    }
-
-    // Validate quotationWasteId
-    if (!data.quotationWasteId) {
-      validationErrors.push("Waste Name is required.");
-    }
-
-    if (validationErrors.length > 0) {
-      setErrorMessage(validationErrors.join(" "));
-      setShowErrorMessage(true);
-      return false;
-    }
-
-    setShowErrorMessage(false);
-    setErrorMessage("");
-    return true;
-  };
-
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Perform client-side validation
-    if (!validateForm(formData)) {
+    const {
+      haulingDate,
+      haulingTime,
+      quotationWasteId,
+      quotationTransportationId,
+      statusId,
+      createdBy,
+    } = formData;
+
+    if (
+      !haulingDate ||
+      !haulingTime ||
+      !quotationWasteId ||
+      !quotationTransportationId ||
+      !statusId ||
+      !createdBy
+    ) {
+      setErrorMessage("Please fill all required fields.");
+      setShowErrorMessage(true);
       return;
     }
 
     try {
-      let newTransaction;
       setLoading(true);
       if (formData.id) {
-        newTransaction = await axios.put(
+        await axios.put(
           `${apiUrl}/api/bookedTransaction/${formData.id}`,
           formData
         );
+
         setSuccessMessage("Booked Transaction Updated Successfully!");
       } else {
-        newTransaction = await axios.post(
-          `${apiUrl}/api/bookedTransaction`,
-          formData
-        );
+        await axios.post(`${apiUrl}/api/bookedTransaction`, formData);
         setSuccessMessage("Booked Transaction Submitted Successfully!");
       }
 
-      // For pending transactions
-      setPendingTransactions(newTransaction.data.pendingTransactions);
-
-      // For in progress transactions
-      setInProgressTransactions(newTransaction.data.inProgressTransactions);
-
-      // For finished transactions
-      setFinishedTransactions(newTransaction.data.finishedTransactions);
-
+      fetchData();
       setOpenTransactionModal(false);
       setShowSuccessMessage(true);
       handleCloseModal();
@@ -219,9 +193,7 @@ const BookedTransactions = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
-        {(user.userType === "GEN" ||
-          user.userType === "TRP" ||
-          user.userType === "CUS") && (
+        {user.userType === "GEN" && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
               <PostAddIcon sx={{ fontSize: "40px" }} />

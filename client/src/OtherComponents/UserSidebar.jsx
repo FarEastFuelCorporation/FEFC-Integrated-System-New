@@ -20,6 +20,7 @@ import EmployeeSideBar from "../Employee/Layouts/Employee/EmployeeSideBar";
 import LeaderSideBar from "../Employee/Layouts/Leader/LeaderSideBar";
 import HealthOfficerSidebar from "../Employee/Layouts/HealthOfficer/HealthOfficerSidebar";
 import TransporterSidebar from "../Client/Layouts/Transporter/TransporterSidebar";
+import CustomerSidebar from "../Client/Layouts/Customer/CustomerSidebar";
 
 const UserSidebar = ({ user }) => {
   const theme = useTheme();
@@ -36,6 +37,9 @@ const UserSidebar = ({ user }) => {
       break;
     case "IFM":
       sidebar = <GeneratorSidebar user={user} />;
+      break;
+    case "CUS":
+      sidebar = <CustomerSidebar user={user} />;
       break;
     case 0:
       sidebar = <LeaderSideBar user={user} />;

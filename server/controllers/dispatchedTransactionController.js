@@ -39,7 +39,10 @@ async function createDispatchedTransactionController(req, res) {
     });
 
     const updatedBookedTransaction = await BookedTransaction.findByPk(
-      bookedTransactionId
+      bookedTransactionId,
+      {
+        attributes: ["id", "transactionId", "statusId"],
+      }
     );
 
     if (updatedBookedTransaction) {
@@ -141,7 +144,7 @@ async function updateDispatchedTransactionController(req, res) {
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         bookedTransactionId,
         {
-          attributes: ["transactionId"],
+          attributes: ["id", "transactionId"],
         }
       );
 

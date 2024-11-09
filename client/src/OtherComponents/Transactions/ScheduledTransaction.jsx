@@ -81,7 +81,7 @@ const ScheduledTransaction = ({ row }) => {
             Logistics:{" "}
             {scheduledData?.Logistics
               ? scheduledData.Logistics.logisticsName
-              : ""}
+              : "CLIENT VEHICLE"}
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}

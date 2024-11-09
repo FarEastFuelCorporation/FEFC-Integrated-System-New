@@ -249,7 +249,7 @@ const Logistics = ({ user }) => {
       headerAlign: "center",
       align: "center",
       sortable: false,
-      width: 60,
+      width: 100,
       renderCell: (params) => (
         <IconButton
           color="warning"
@@ -259,22 +259,22 @@ const Logistics = ({ user }) => {
         </IconButton>
       ),
     },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
-    },
+    // {
+    //   field: "delete",
+    //   headerName: "Delete",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 60,
+    //   renderCell: (params) => (
+    //     <IconButton
+    //       color="error"
+    //       onClick={() => handleDeleteClick(params.row.id)}
+    //     >
+    //       <DeleteIcon />
+    //     </IconButton>
+    //   ),
+    // },
   ];
 
   const refs = {

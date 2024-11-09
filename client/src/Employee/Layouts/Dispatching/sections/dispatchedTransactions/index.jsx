@@ -51,8 +51,6 @@ const DispatchedTransactions = ({ user }) => {
         `${apiUrl}/api/dispatchedTransaction`
       );
 
-      console.log(dispatchedTransactionResponse);
-
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
 

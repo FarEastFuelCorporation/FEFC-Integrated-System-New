@@ -93,8 +93,6 @@ const BookedTransactions = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name);
-    console.log(value);
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 

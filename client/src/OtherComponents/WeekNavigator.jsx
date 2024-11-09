@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Grid, IconButton, Typography } from "@mui/material";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
-const WeekNavigator = () => {
+const WeekNavigator = ({ setStartDate, setEndDate }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const handlePreviousWeek = () => {
@@ -21,6 +21,21 @@ const WeekNavigator = () => {
       return newDate;
     });
   };
+
+  // Compute the start and end of the week whenever currentDate changes
+  useEffect(() => {
+    const startOfWeek = new Date(currentDate);
+    const day = startOfWeek.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day; // Adjust if Sunday (0) to get Monday
+    startOfWeek.setDate(currentDate.getDate() + diffToMonday); // Start on Monday
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Sunday
+
+    // Pass the start and end dates to the parent component
+    setStartDate(startOfWeek);
+    setEndDate(endOfWeek);
+  }, [currentDate, setStartDate, setEndDate]);
 
   const formatWeek = (date) => {
     const startOfWeek = new Date(date);

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, IconButton, Typography } from "@mui/material";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
-const DayNavigator = () => {
+const DayNavigator = ({ setStartDate, setEndDate }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // Format the current date
@@ -15,6 +15,12 @@ const DayNavigator = () => {
       year: "numeric",
     });
   };
+
+  // Update parent dates whenever currentDate changes
+  useEffect(() => {
+    setStartDate(currentDate);
+    setEndDate(currentDate); // or any logic to set different end date if needed
+  }, [currentDate, setStartDate, setEndDate]);
 
   // Handle previous and next day navigation
   const handlePreviousDay = () => {

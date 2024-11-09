@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Button,
@@ -24,18 +24,47 @@ import StarBorderPurple500Icon from "@mui/icons-material/StarBorderPurple500";
 import WeekNavigator from "../../../../../OtherComponents/WeekNavigator";
 import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
 import DayNavigator from "../../../../../OtherComponents/DayNavigator";
+import axios from "axios";
+import { formatNumber } from "../../../../../OtherComponents/Functions";
 
 const Dashboard = () => {
+  const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(true); // Add loading state
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [pendingDispatch, setPendingDispatch] = useState(0);
+  const [onTimeDispatch, setOnTimeDispatch] = useState(0);
+  const [onTimePercentage, setOnTimePercentage] = useState(0);
+  const [lateDispatch, setLateDispatch] = useState(0);
+  const [totalDispatch, setTotalDispatch] = useState(0);
+  const [income, setIncome] = useState(0);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true); // Set loading to false once data is fetched
+
+        // Ensure dates are formatted correctly
+        const formattedStartDate = startDate.toISOString().split("T")[0];
+        const formattedEndDate = endDate.toISOString().split("T")[0];
+
+        const response = await axios.get(
+          `${apiUrl}/api/dispatchedTransaction/dashboard/${formattedStartDate}/${formattedEndDate}`
+        );
+
+        setPendingDispatch(response.data.pending);
+        setTotalDispatch(response.data.totalDispatch);
+        setOnTimeDispatch(response.data.ontimeDispatch);
+        setOnTimePercentage(response.data.onTimePercentage);
+        setLateDispatch(response.data.lateDispatch);
+        setIncome(response.data.income);
+        setTransactions(response.data.dispatchedTransactions);
+
         setLoading(false); // Set loading to false once data is fetched
       } catch (error) {
         console.error("Error fetching employeeData:", error);
@@ -43,16 +72,16 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [apiUrl, startDate, endDate]);
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
   const data = [
-    { id: "Pending", label: "Pending", value: 50 },
-    { id: "On-Time", label: "On-Time", value: 120 },
-    { id: "Late", label: "Late", value: 10 },
+    { id: "Pending", label: "Pending", value: pendingDispatch },
+    { id: "On-Time", label: "On-Time", value: lateDispatch },
+    { id: "Late", label: "Late", value: lateDispatch },
   ];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -93,9 +122,15 @@ const Dashboard = () => {
         <Tab label="Monthly" />
       </Tabs>
       <hr />
-      {selectedTab === 0 && <DayNavigator />}
-      {selectedTab === 1 && <WeekNavigator />}
-      {selectedTab === 2 && <MonthNavigator />}
+      {selectedTab === 0 && (
+        <DayNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
+      )}
+      {selectedTab === 1 && (
+        <WeekNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
+      )}
+      {selectedTab === 2 && (
+        <MonthNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
+      )}
       <Grid container spacing={3} sx={{ marginTop: "20px" }}>
         <Grid item xs={12} sm={2.5}>
           <Card sx={{ minHeight: 50 }}>
@@ -112,7 +147,7 @@ const Dashboard = () => {
                     Pending Dispatches
                   </Typography>
                   <Typography variant="h4" color="textSecondary">
-                    50
+                    {pendingDispatch}
                   </Typography>
                 </Box>
                 <PendingActionsIcon
@@ -134,10 +169,10 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Total Dispatches
+                      Total Dispatch
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      180
+                      {totalDispatch}
                     </Typography>
                   </Box>
                   <LocalShippingIcon
@@ -165,7 +200,7 @@ const Dashboard = () => {
                     On-Time Dispatches
                   </Typography>
                   <Typography variant="h4" color="textSecondary">
-                    120
+                    {onTimeDispatch}
                   </Typography>
                 </Box>
                 <SentimentVerySatisfiedIcon
@@ -190,7 +225,7 @@ const Dashboard = () => {
                       Client Satisfaction
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      92.31%
+                      {onTimePercentage}%
                     </Typography>
                   </Box>
                   <StarBorderPurple500Icon
@@ -217,7 +252,7 @@ const Dashboard = () => {
                     Late Dispatches
                   </Typography>
                   <Typography variant="h4" color="textSecondary">
-                    10
+                    {lateDispatch}
                   </Typography>
                 </Box>
                 <SentimentVeryDissatisfiedIcon
@@ -242,7 +277,7 @@ const Dashboard = () => {
                       Generated Income
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      106,500.00
+                      {formatNumber(income)}
                     </Typography>
                   </Box>
                   <PaidIcon

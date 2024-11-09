@@ -1,8 +1,12 @@
 // controllers/dispatchedTransactionController.js
 
+const { Op } = require("sequelize");
 const BookedTransaction = require("../models/BookedTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
+const ReceivedTransaction = require("../models/ReceivedTransaction");
+const QuotationTransportation = require("../models/QuotationTransportation");
 const statusId = 2;
 
 // Create Dispatched Transaction controller
@@ -227,9 +231,176 @@ async function deleteDispatchedTransactionController(req, res) {
   }
 }
 
+// Get Dispatched Transactions Dashboard controller
+async function getDispatchedTransactionsDashboardController(req, res) {
+  try {
+    const { startDate, endDate } = req.params;
+    const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
+
+    // Log the dates for debugging
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+
+    const scheduledTransactionsNoDispatchCount =
+      await ScheduledTransaction.count({
+        where: {
+          logisticsId: "0577d985-8f6f-47c7-be3c-20ca86021154",
+          scheduledDate: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+        include: [
+          {
+            model: DispatchedTransaction,
+            as: "DispatchedTransaction",
+            required: false, // LEFT JOIN to include rows even without matching DispatchedTransaction
+            where: {
+              id: null, // Ensure no matching DispatchedTransaction
+            },
+          },
+        ],
+      });
+
+    const scheduledTransactionsWithDispatchCount =
+      await ScheduledTransaction.count({
+        where: {
+          logisticsId: "0577d985-8f6f-47c7-be3c-20ca86021154",
+          scheduledDate: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+        include: [
+          {
+            model: DispatchedTransaction,
+            as: "DispatchedTransaction",
+            required: true, // Ensures only records with a corresponding DispatchedTransaction are counted
+          },
+        ],
+      });
+
+    // Fetch all dispatched transactions between the provided date range
+    const dispatchedTransactions = await DispatchedTransaction.findAll({
+      where: {
+        dispatchedDate: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      include: [
+        {
+          model: ReceivedTransaction,
+          as: "ReceivedTransaction",
+          required: false,
+        },
+        {
+          model: ScheduledTransaction,
+          as: "ScheduledTransaction",
+          required: false,
+          include: {
+            model: BookedTransaction,
+            as: "BookedTransaction",
+            required: false,
+            include: {
+              model: QuotationTransportation,
+              as: "QuotationTransportation",
+              required: false,
+            },
+          },
+        },
+      ],
+    });
+
+    // Initialize counters for on-time and late dispatches
+    let ontimeDispatch = 0;
+    let lateDispatch = 0;
+
+    // Initialize variable for income calculation
+    let income = 0;
+
+    // Iterate through dispatched transactions and compare dates and times
+    dispatchedTransactions.forEach((dispatch) => {
+      const scheduledTransaction = dispatch.ScheduledTransaction;
+      if (scheduledTransaction) {
+        const scheduledDate = new Date(scheduledTransaction.scheduledDate);
+        const scheduledTime = scheduledTransaction.scheduledTime.split(":"); // split time into hours and minutes
+        scheduledDate.setHours(scheduledTime[0], scheduledTime[1], 0); // set the time to scheduled time
+
+        const dispatchedDate = new Date(dispatch.dispatchedDate);
+        const dispatchedTime = dispatch.dispatchedTime.split(":");
+        dispatchedDate.setHours(dispatchedTime[0], dispatchedTime[1], 0); // set the time to dispatched time
+
+        // Compare dispatched time and date with scheduled time and date
+        if (dispatchedDate <= scheduledDate) {
+          // On time
+          ontimeDispatch++;
+        } else {
+          // Late
+          lateDispatch++;
+        }
+
+        // Calculate the total income from QuotationTransportation's unitPrice
+        if (scheduledTransaction?.BookedTransaction) {
+          // Directly access the QuotationTransportation since BookedTransaction is an object
+          const bookedTransaction = scheduledTransaction.BookedTransaction;
+          const quotationTransportation =
+            bookedTransaction?.QuotationTransportation;
+
+          if (
+            quotationTransportation &&
+            typeof quotationTransportation.unitPrice === "number"
+          ) {
+            income += quotationTransportation.unitPrice || 0;
+          }
+        }
+      }
+    });
+
+    console.log("On-time Dispatches:", ontimeDispatch);
+    console.log("Late Dispatches:", lateDispatch);
+    console.log("Total Income:", income);
+
+    console.log("Total Income:", income);
+    console.log("On-time Dispatches:", ontimeDispatch);
+    console.log("Late Dispatches:", lateDispatch);
+    console.log("Total Income:", income);
+
+    const totalDispatch = dispatchedTransactions.length;
+    const onTimePercentage =
+      totalDispatch > 0
+        ? ((ontimeDispatch / totalDispatch) * 100).toFixed(2)
+        : "0.00";
+    const pending =
+      scheduledTransactionsNoDispatchCount -
+      scheduledTransactionsWithDispatchCount;
+
+    // Log the results for debugging
+    console.log(
+      "Total Schedule With Dispatch:",
+      scheduledTransactionsWithDispatchCount
+    );
+    console.log("Total Dispatches:", totalDispatch);
+    console.log("On-time Dispatches:", ontimeDispatch);
+    console.log("Late Dispatches:", lateDispatch);
+
+    // Respond with the updated data
+    res.status(200).json({
+      pending,
+      totalDispatch,
+      ontimeDispatch,
+      onTimePercentage,
+      lateDispatch,
+      income,
+      dispatchedTransactions,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 module.exports = {
   createDispatchedTransactionController,
   getDispatchedTransactionsController,
   updateDispatchedTransactionController,
   deleteDispatchedTransactionController,
+  getDispatchedTransactionsDashboardController,
 };

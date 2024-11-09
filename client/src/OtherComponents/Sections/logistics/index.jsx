@@ -111,29 +111,29 @@ const Logistics = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = (id) => {
-    setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Logistics?");
-    setDialogAction(() => () => handleConfirmDelete(id));
-  };
+  // const handleDeleteClick = (id) => {
+  //   setOpenDialog(true);
+  //   setDialog("Are you sure you want to Delete this Logistics?");
+  //   setDialogAction(() => () => handleConfirmDelete(id));
+  // };
 
-  const handleConfirmDelete = async (id) => {
-    try {
-      setLoading(true);
-      await axios.delete(`${apiUrl}/api/logistics/${id}`, {
-        data: { deletedBy: user.id },
-      });
+  // const handleConfirmDelete = async (id) => {
+  //   try {
+  //     setLoading(true);
+  //     await axios.delete(`${apiUrl}/api/logistics/${id}`, {
+  //       data: { deletedBy: user.id },
+  //     });
 
-      fetchData();
-      setSuccessMessage("Logistics Deleted Successfully!");
-      setShowSuccessMessage(true);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setOpenDialog(false); // Close the dialog
-    }
-  };
+  //     fetchData();
+  //     setSuccessMessage("Logistics Deleted Successfully!");
+  //     setShowSuccessMessage(true);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   } finally {
+  //     setOpenDialog(false); // Close the dialog
+  //   }
+  // };
 
   const validateForm = (data) => {
     let validationErrors = [];

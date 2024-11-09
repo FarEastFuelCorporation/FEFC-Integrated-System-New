@@ -286,8 +286,8 @@ const Transaction = ({
             columns={columns}
             getRowId={(row) => row.id}
             getRowClassName={(params) => {
-              const daysRemaining = params.row.ScheduledTransaction[0]
-                .scheduledDate
+              const daysRemaining = params.row.ScheduledTransaction?.[0]
+                ?.scheduledDate
                 ? calculateRemainingDays(
                     params.row.ScheduledTransaction[0].scheduledDate
                   )

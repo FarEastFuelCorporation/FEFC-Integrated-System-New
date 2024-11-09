@@ -103,6 +103,7 @@ async function updateDispatchedTransactionController(req, res) {
     console.log("Updating dispatched transaction with ID:", id);
 
     let {
+      bookedTransactionId,
       scheduledTransactionId,
       vehicleId,
       driverId,
@@ -137,14 +138,28 @@ async function updateDispatchedTransactionController(req, res) {
       // Save the updated booked transaction
       await updatedDispatchedTransaction.save();
 
+      const updatedBookedTransaction = await BookedTransaction.findByPk(
+        bookedTransactionId,
+        {
+          attributes: ["transactionId"],
+        }
+      );
+
       // fetch transactions
-      const data = await fetchData(statusId);
+      const transactionId = updatedBookedTransaction.transactionId;
+
+      const newTransaction = await fetchData(
+        statusId,
+        null,
+        null,
+        transactionId
+      );
 
       // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      res.status(201).json({
+        pendingTransactions: newTransaction.pending,
+        inProgressTransactions: newTransaction.inProgress,
+        finishedTransactions: newTransaction.finished,
       });
     } else {
       // If dispatched transaction with the specified ID was not found
@@ -192,14 +207,9 @@ async function deleteDispatchedTransactionController(req, res) {
       // Soft delete the scheduled transaction (sets deletedAt timestamp)
       await dispatchedTransactionToDelete.destroy();
 
-      // fetch transactions
-      const data = await fetchData(statusId);
-
-      // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      // Respond with a success message
+      res.json({
+        message: `Dispatched Transaction with ID ${id} soft-deleted successfully`,
       });
     } else {
       // If scheduled transaction with the specified ID was not found

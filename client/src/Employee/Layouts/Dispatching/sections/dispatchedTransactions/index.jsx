@@ -177,7 +177,22 @@ const DispatchedTransactions = ({ user }) => {
         }
       );
 
-      fetchData();
+      // Filter out the deleted transaction from each state
+      setPendingTransactions((prevPendingTransactions) =>
+        prevPendingTransactions.filter(
+          (transaction) => transaction.id !== row.id
+        )
+      );
+      setInProgressTransactions((prevInProgressTransactions) =>
+        prevInProgressTransactions.filter(
+          (transaction) => transaction.id !== row.id
+        )
+      );
+      setFinishedTransactions((prevFinishedTransactions) =>
+        prevFinishedTransactions.filter(
+          (transaction) => transaction.id !== row.id
+        )
+      );
 
       setSuccessMessage("Dispatched Transaction deleted successfully!");
       setShowSuccessMessage(true);
@@ -219,6 +234,7 @@ const DispatchedTransactions = ({ user }) => {
     }
 
     try {
+      let newTransaction;
       setLoading(true);
       if (!formData.driverId) {
         setError("Driver selection is required.");
@@ -226,14 +242,53 @@ const DispatchedTransactions = ({ user }) => {
         setError("");
 
         if (formData.id) {
-          await axios.put(
+          newTransaction = await axios.put(
             `${apiUrl}/api/dispatchedTransaction/${formData.id}`,
             formData
           );
+          // Update the existing transaction in each state
+          // Remove old entry and add the updated one in each state
+          setPendingTransactions((prevPendingTransactions) => [
+            ...prevPendingTransactions.filter(
+              (transaction) => transaction.id !== formData.id
+            ),
+            ...newTransaction.data.pendingTransactions,
+          ]);
 
+          setInProgressTransactions((prevInProgressTransactions) => [
+            ...prevInProgressTransactions.filter(
+              (transaction) => transaction.id !== formData.id
+            ),
+            ...newTransaction.data.inProgressTransactions,
+          ]);
+
+          setFinishedTransactions((prevFinishedTransactions) => [
+            ...prevFinishedTransactions.filter(
+              (transaction) => transaction.id !== formData.id
+            ),
+            ...newTransaction.data.finishedTransactions,
+          ]);
           setSuccessMessage("Update Dispatched Transaction successfully!");
         } else {
-          await axios.post(`${apiUrl}/api/dispatchedTransaction`, formData);
+          newTransaction = await axios.post(
+            `${apiUrl}/api/dispatchedTransaction`,
+            formData
+          );
+          // Merging new data with previous state data
+          setPendingTransactions((prevPendingTransactions) => [
+            ...prevPendingTransactions,
+            ...newTransaction.data.pendingTransactions,
+          ]);
+
+          setInProgressTransactions((prevInProgressTransactions) => [
+            ...prevInProgressTransactions,
+            ...newTransaction.data.inProgressTransactions,
+          ]);
+
+          setFinishedTransactions((prevFinishedTransactions) => [
+            ...prevFinishedTransactions,
+            ...newTransaction.data.finishedTransactions,
+          ]);
 
           setSuccessMessage("Dispatch Transaction successfully!");
         }

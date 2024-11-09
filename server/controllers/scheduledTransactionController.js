@@ -190,14 +190,9 @@ async function deleteScheduledTransactionController(req, res) {
       // Soft delete the scheduled transaction (sets deletedAt timestamp)
       await scheduledTransactionToDelete.destroy();
 
-      // fetch transactions
-      const data = await fetchData(statusId);
-
-      // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      // Respond with a success message
+      res.json({
+        message: `Scheduled Transaction with ID ${id} soft-deleted successfully`,
       });
     } else {
       // If scheduled transaction with the specified ID was not found

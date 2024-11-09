@@ -144,17 +144,17 @@ const ScheduledTransactions = ({ user }) => {
       // Filter out the deleted transaction from each state
       setPendingTransactions((prevPendingTransactions) =>
         prevPendingTransactions.filter(
-          (transaction) => transaction.id !== row.ScheduledTransaction[0].id
+          (transaction) => transaction.id !== row.id
         )
       );
       setInProgressTransactions((prevInProgressTransactions) =>
         prevInProgressTransactions.filter(
-          (transaction) => transaction.id !== row.ScheduledTransaction[0].id
+          (transaction) => transaction.id !== row.id
         )
       );
       setFinishedTransactions((prevFinishedTransactions) =>
         prevFinishedTransactions.filter(
-          (transaction) => transaction.id !== row.ScheduledTransaction[0].id
+          (transaction) => transaction.id !== row.id
         )
       );
 

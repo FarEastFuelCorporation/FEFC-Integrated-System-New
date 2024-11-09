@@ -467,6 +467,7 @@ const Clients = ({ user }) => {
             <MenuItem value="INTEGRATED FACILITIES MANAGEMENT">
               INTEGRATED FACILITIES MANAGEMENT
             </MenuItem>
+            <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
           </TextField>
           <input
             type="file"

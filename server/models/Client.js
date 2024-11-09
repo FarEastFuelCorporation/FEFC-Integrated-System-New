@@ -48,7 +48,12 @@ const Client = sequelize.define(
       allowNull: true,
       validate: {
         isIn: [
-          ["GENERATOR", "TRANSPORTER", "INTEGRATED FACILITIES MANAGEMENT"],
+          [
+            "GENERATOR",
+            "TRANSPORTER",
+            "INTEGRATED FACILITIES MANAGEMENT",
+            "CUSTOMER",
+          ],
         ],
       },
     },

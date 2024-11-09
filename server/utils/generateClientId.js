@@ -17,6 +17,9 @@ async function generateClientId(clientType) {
       case "INTEGRATED FACILITIES MANAGEMENT":
         prefix = "IFM";
         break;
+      case "CUSTOMER":
+        prefix = "CUS";
+        break;
       default:
         throw new Error("Invalid client type");
     }

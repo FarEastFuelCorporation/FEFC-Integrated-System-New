@@ -286,21 +286,19 @@ const Transaction = ({
             columns={columns}
             getRowId={(row) => row.id}
             getRowClassName={(params) => {
+              const daysRemaining = params.row.ScheduledTransaction[0]
+                .scheduledDate
+                ? calculateRemainingDays(
+                    params.row.ScheduledTransaction[0].scheduledDate
+                  )
+                : calculateRemainingDays(params.row.haulingDate);
               if (user.userType === 3 && selectedTab === 0) {
-                const daysRemaining = calculateRemainingDays(
-                  params.row.ScheduledTransaction[0].scheduledDate
-                );
-
                 if (daysRemaining !== null) {
                   if (daysRemaining < 0) {
                     return "blink-red"; // Expired
                   }
                 }
               } else if (user.userType === 4 && selectedTab === 0) {
-                const daysRemaining = calculateRemainingDays(
-                  params.row.ScheduledTransaction[0].scheduledDate
-                );
-
                 if (daysRemaining !== null) {
                   if (daysRemaining < -1) {
                     return "blink-red"; // Expired

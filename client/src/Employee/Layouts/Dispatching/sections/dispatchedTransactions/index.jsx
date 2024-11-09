@@ -51,6 +51,8 @@ const DispatchedTransactions = ({ user }) => {
         `${apiUrl}/api/dispatchedTransaction`
       );
 
+      console.log(dispatchedTransactionResponse);
+
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
 
@@ -65,24 +67,14 @@ const DispatchedTransactions = ({ user }) => {
       setPendingTransactions(filteredPendingTransactions);
 
       // For in-progress transactions
-      const filteredInProgressTransactions =
-        dispatchedTransactionResponse.data.inProgressTransactions.filter(
-          (transaction) =>
-            transaction.ScheduledTransaction &&
-            transaction.ScheduledTransaction[0].logisticsId ===
-              matchingLogisticsId
-        );
-      setInProgressTransactions(filteredInProgressTransactions);
+      setInProgressTransactions(
+        dispatchedTransactionResponse.data.inProgressTransactions
+      );
 
       // For finished transactions
-      const filteredFinishedTransactions =
-        dispatchedTransactionResponse.data.finishedTransactions.filter(
-          (transaction) =>
-            transaction.ScheduledTransaction &&
-            transaction.ScheduledTransaction[0].logisticsId ===
-              matchingLogisticsId
-        );
-      setFinishedTransactions(filteredFinishedTransactions);
+      setFinishedTransactions(
+        dispatchedTransactionResponse.data.finishedTransactions
+      );
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);

@@ -92,7 +92,7 @@ const {
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
-    // await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: true });
 
     // await syncIdInformationToLocal();
     // await handleAttendanceSync();

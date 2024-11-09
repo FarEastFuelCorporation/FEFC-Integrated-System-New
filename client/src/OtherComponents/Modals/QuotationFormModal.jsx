@@ -34,7 +34,7 @@ const QuotationFormModal = ({
   const [clients, setClients] = useState([]);
   const [wasteTypes, setWasteTypes] = useState([]);
   const [vehicleTypes, setVehicleTypes] = useState([]);
-  const modeOptions = ["BUYING", "CHARGE", "FREE OF CHARGE"];
+  const modeOptions = ["BUYING", "CHARGE", "FREE OF CHARGE", "SELLING"];
   const unitOptions = ["PC", "KG", "L", "DRUM", "LOT", "TRIP"];
   const vatCalculationOptions = [
     "VAT EXCLUSIVE",

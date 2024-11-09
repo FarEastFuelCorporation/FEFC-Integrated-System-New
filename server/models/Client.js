@@ -44,18 +44,14 @@ const Client = sequelize.define(
       allowNull: false,
     },
     clientType: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM,
+      values: [
+        "GENERATOR",
+        "TRANSPORTER",
+        "INTEGRATED FACILITIES MANAGEMENT",
+        "CUSTOMER",
+      ],
       allowNull: true,
-      validate: {
-        isIn: [
-          [
-            "GENERATOR",
-            "TRANSPORTER",
-            "INTEGRATED FACILITIES MANAGEMENT",
-            "CUSTOMER",
-          ],
-        ],
-      },
     },
     billerName: {
       type: DataTypes.STRING,

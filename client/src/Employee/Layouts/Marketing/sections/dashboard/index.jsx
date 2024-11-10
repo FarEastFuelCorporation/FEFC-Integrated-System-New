@@ -291,13 +291,13 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Pending Dispatches
+                      On-Time Dispatches
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {pendingDispatch}
+                      {onTimeDispatch}
                     </Typography>
                   </Box>
-                  <PendingActionsIcon
+                  <SentimentVerySatisfiedIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -320,13 +320,13 @@ const Dashboard = () => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Total Dispatches
+                        Pending Dispatches
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {totalDispatch}
+                        {pendingDispatch}
                       </Typography>
                     </Box>
-                    <LocalShippingIcon
+                    <PendingActionsIcon
                       sx={{ fontSize: 40, marginRight: 2 }}
                       color="secondary"
                     />
@@ -352,13 +352,13 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      On-Time Dispatches
+                      Late Dispatches
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {onTimeDispatch}
+                      {lateDispatch}
                     </Typography>
                   </Box>
-                  <SentimentVerySatisfiedIcon
+                  <SentimentVeryDissatisfiedIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -412,13 +412,13 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Late Dispatches
+                      Total Dispatches
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {lateDispatch}
+                      {totalDispatch}
                     </Typography>
                   </Box>
-                  <SentimentVeryDissatisfiedIcon
+                  <LocalShippingIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -474,13 +474,13 @@ const Dashboard = () => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Total Dispatches
+                          Pending Dispatches
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {totalDispatch}
+                          {pendingDispatch}
                         </Typography>
                       </Box>
-                      <LocalShippingIcon
+                      <PendingActionsIcon
                         sx={{ fontSize: 40, marginRight: 2 }}
                         color="secondary"
                       />

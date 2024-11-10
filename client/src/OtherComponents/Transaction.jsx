@@ -334,6 +334,22 @@ const Transaction = ({
                     return "blink-yellow"; // Near expired
                   }
                 }
+              } else if (user.userType === 6 && selectedTab === 0) {
+                if (daysRemaining !== null) {
+                  if (daysRemaining < -2) {
+                    return "blink-red"; // Expired
+                  } else if (daysRemaining < -1) {
+                    return "blink-yellow"; // Near expired
+                  }
+                }
+              } else if (user.userType === 7 && selectedTab === 0) {
+                if (daysRemaining !== null) {
+                  if (daysRemaining < -2) {
+                    return "blink-red"; // Expired
+                  } else if (daysRemaining < -1) {
+                    return "blink-yellow"; // Near expired
+                  }
+                }
               }
               return ""; // Default class if no blinking is needed
             }}
@@ -344,7 +360,11 @@ const Transaction = ({
                       sortModel: [{ field: "haulingDate", sort: "asc" }],
                     },
                   }
-                : {}
+                : {
+                    sorting: {
+                      sortModel: [{ field: "transactionId", sort: "desc" }],
+                    },
+                  }
             }
           />
         </CustomDataGridStyles>

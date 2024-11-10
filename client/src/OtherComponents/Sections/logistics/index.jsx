@@ -313,11 +313,6 @@ const Logistics = ({ user }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "typeOfScrap", sort: "asc" }],
-            },
-          }}
         />
       </CustomDataGridStyles>
       <Modal open={openModal} onClose={handleCloseModal}>

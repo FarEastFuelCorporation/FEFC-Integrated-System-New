@@ -314,9 +314,19 @@ const Transaction = ({
                 if (daysRemaining !== null) {
                   if (daysRemaining < 0) {
                     return "blink-red"; // Expired
+                  } else if (daysRemaining === 0) {
+                    return "blink-yellow"; // Near expired
                   }
                 }
               } else if (user.userType === 4 && selectedTab === 0) {
+                if (daysRemaining !== null) {
+                  if (daysRemaining < -1) {
+                    return "blink-red"; // Expired
+                  } else if (daysRemaining < 0) {
+                    return "blink-yellow"; // Near expired
+                  }
+                }
+              } else if (user.userType === 5 && selectedTab === 0) {
                 if (daysRemaining !== null) {
                   if (daysRemaining < -1) {
                     return "blink-red"; // Expired

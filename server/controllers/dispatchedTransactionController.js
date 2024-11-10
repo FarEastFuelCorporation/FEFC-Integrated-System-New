@@ -7,6 +7,9 @@ const { fetchData } = require("../utils/getBookedTransactions");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
 const QuotationTransportation = require("../models/QuotationTransportation");
+const Client = require("../models/Client");
+const VehicleType = require("../models/VehicleType");
+const Vehicle = require("../models/Vehicle");
 const statusId = 2;
 
 // Create Dispatched Transaction controller
@@ -245,17 +248,15 @@ async function getDispatchedTransactionsDashboardController(req, res) {
       await ScheduledTransaction.count({
         where: {
           logisticsId: "0577d985-8f6f-47c7-be3c-20ca86021154",
-          scheduledDate: {
-            [Op.between]: [startDate, endDate],
-          },
         },
         include: [
           {
             model: DispatchedTransaction,
             as: "DispatchedTransaction",
-            required: false, // LEFT JOIN to include rows even without matching DispatchedTransaction
+            required: false, // LEFT JOIN
             where: {
               id: null, // Ensure no matching DispatchedTransaction
+              deletedAt: null, // Exclude rows where DispatchedTransaction is soft deleted
             },
           },
         ],
@@ -265,21 +266,23 @@ async function getDispatchedTransactionsDashboardController(req, res) {
       await ScheduledTransaction.count({
         where: {
           logisticsId: "0577d985-8f6f-47c7-be3c-20ca86021154",
-          scheduledDate: {
-            [Op.between]: [startDate, endDate],
-          },
         },
         include: [
           {
             model: DispatchedTransaction,
             as: "DispatchedTransaction",
-            required: true, // Ensures only records with a corresponding DispatchedTransaction are counted
+            required: true, // INNER JOIN (only include rows with matching DispatchedTransaction)
+            where: {
+              id: { [Op.ne]: null }, // Ensure there is a matching DispatchedTransaction
+              deletedAt: null, // Exclude soft-deleted DispatchedTransaction
+            },
           },
         ],
       });
 
     // Fetch all dispatched transactions between the provided date range
     const dispatchedTransactions = await DispatchedTransaction.findAll({
+      attributes: ["id", "dispatchedDate", "dispatchedTime"],
       where: {
         dispatchedDate: {
           [Op.between]: [startDate, endDate],
@@ -289,21 +292,44 @@ async function getDispatchedTransactionsDashboardController(req, res) {
         {
           model: ReceivedTransaction,
           as: "ReceivedTransaction",
+          attributes: ["id"],
           required: false,
+        },
+        {
+          model: Vehicle,
+          as: "Vehicle",
+          attributes: ["plateNumber"],
         },
         {
           model: ScheduledTransaction,
           as: "ScheduledTransaction",
+          attributes: ["scheduledDate", "scheduledTime"],
           required: false,
           include: {
             model: BookedTransaction,
             as: "BookedTransaction",
+            attributes: ["id"],
             required: false,
-            include: {
-              model: QuotationTransportation,
-              as: "QuotationTransportation",
-              required: false,
-            },
+            include: [
+              {
+                model: QuotationTransportation,
+                as: "QuotationTransportation",
+                required: false,
+                attributes: ["unitPrice"],
+                include: [
+                  {
+                    model: VehicleType,
+                    as: "VehicleType",
+                    attributes: ["typeOfVehicle"],
+                  },
+                ],
+              },
+              {
+                model: Client,
+                as: "Client",
+                attributes: ["clientName"],
+              },
+            ],
           },
         },
       ],
@@ -315,6 +341,11 @@ async function getDispatchedTransactionsDashboardController(req, res) {
 
     // Initialize variable for income calculation
     let income = 0;
+
+    // Create an object to store the count of trips per client
+    const clientTrips = {};
+    const vehicleTrips = {};
+    const vehicleTypeTrips = {};
 
     // Iterate through dispatched transactions and compare dates and times
     dispatchedTransactions.forEach((dispatch) => {
@@ -352,16 +383,66 @@ async function getDispatchedTransactionsDashboardController(req, res) {
           }
         }
       }
+      const client = dispatch.ScheduledTransaction?.BookedTransaction?.Client;
+      const vehicle = dispatch.Vehicle;
+      const quotationTransportation =
+        dispatch.ScheduledTransaction?.BookedTransaction
+          ?.QuotationTransportation;
+      const unitPrice = quotationTransportation
+        ? quotationTransportation.unitPrice
+        : 0; // Default to 0 if unitPrice is not available
+      const vehicleType = quotationTransportation?.VehicleType;
+
+      if (client) {
+        const { id, clientName } = client; // Use clientName from the Client model
+
+        if (clientTrips[clientName]) {
+          clientTrips[clientName].count += 1;
+          clientTrips[clientName].totalIncome += unitPrice; // Add unitPrice to totalIncome for the client
+        } else {
+          clientTrips[clientName] = {
+            id: clientName,
+            header: clientName,
+            count: 1,
+            totalIncome: unitPrice, // Initialize totalIncome with the unitPrice
+          };
+        }
+      }
+      if (vehicle) {
+        const { plateNumber } = vehicle; // Use plateNumber from the Vehicle model
+        if (vehicleTrips[plateNumber]) {
+          vehicleTrips[plateNumber].count += 1;
+          vehicleTrips[plateNumber].totalIncome += unitPrice; // Add unitPrice to totalIncome for the vehicle
+        } else {
+          vehicleTrips[plateNumber] = {
+            id: plateNumber,
+            header: plateNumber,
+            count: 1,
+            totalIncome: unitPrice, // Initialize totalIncome with the unitPrice
+          };
+        }
+      }
+      // Process vehicle type trips and income
+      if (vehicleType) {
+        const { typeOfVehicle } = vehicleType;
+        if (vehicleTypeTrips[typeOfVehicle]) {
+          vehicleTypeTrips[typeOfVehicle].count += 1;
+          vehicleTypeTrips[typeOfVehicle].totalIncome += unitPrice; // Add unitPrice to totalIncome for the vehicle type
+        } else {
+          vehicleTypeTrips[typeOfVehicle] = {
+            id: typeOfVehicle,
+            header: typeOfVehicle,
+            count: 1,
+            totalIncome: unitPrice, // Initialize totalIncome with the unitPrice
+          };
+        }
+      }
     });
 
-    console.log("On-time Dispatches:", ontimeDispatch);
-    console.log("Late Dispatches:", lateDispatch);
-    console.log("Total Income:", income);
-
-    console.log("Total Income:", income);
-    console.log("On-time Dispatches:", ontimeDispatch);
-    console.log("Late Dispatches:", lateDispatch);
-    console.log("Total Income:", income);
+    // Convert clientTrips object to an array of { id, clientName, count }
+    const clientTripsArray = Object.values(clientTrips);
+    const vehicleTripsArray = Object.values(vehicleTrips);
+    const vehicleTypeTripsArray = Object.values(vehicleTypeTrips);
 
     const totalDispatch = dispatchedTransactions.length;
     const onTimePercentage =
@@ -372,15 +453,6 @@ async function getDispatchedTransactionsDashboardController(req, res) {
       scheduledTransactionsNoDispatchCount -
       scheduledTransactionsWithDispatchCount;
 
-    // Log the results for debugging
-    console.log(
-      "Total Schedule With Dispatch:",
-      scheduledTransactionsWithDispatchCount
-    );
-    console.log("Total Dispatches:", totalDispatch);
-    console.log("On-time Dispatches:", ontimeDispatch);
-    console.log("Late Dispatches:", lateDispatch);
-
     // Respond with the updated data
     res.status(200).json({
       pending,
@@ -390,6 +462,9 @@ async function getDispatchedTransactionsDashboardController(req, res) {
       lateDispatch,
       income,
       dispatchedTransactions,
+      clientTripsArray,
+      vehicleTripsArray,
+      vehicleTypeTripsArray,
     });
   } catch (error) {
     console.error("Error:", error);

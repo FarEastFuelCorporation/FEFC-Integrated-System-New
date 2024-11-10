@@ -26,6 +26,8 @@ import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
 import DayNavigator from "../../../../../OtherComponents/DayNavigator";
 import axios from "axios";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
+import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const Dashboard = () => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -34,6 +36,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true); // Add loading state
 
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedSummaryTab, setSelectedSummaryTab] = useState(0);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [pendingDispatch, setPendingDispatch] = useState(0);
@@ -43,6 +46,9 @@ const Dashboard = () => {
   const [totalDispatch, setTotalDispatch] = useState(0);
   const [income, setIncome] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [clientTrips, setClientTrips] = useState([]);
+  const [vehicleTrips, setVehicleTrips] = useState([]);
+  const [vehicleTypeTrips, setVehicleTypeTrips] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,6 +70,9 @@ const Dashboard = () => {
         setLateDispatch(response.data.lateDispatch);
         setIncome(response.data.income);
         setTransactions(response.data.dispatchedTransactions);
+        setClientTrips(response.data.clientTripsArray);
+        setVehicleTrips(response.data.vehicleTripsArray);
+        setVehicleTypeTrips(response.data.vehicleTypeTripsArray);
 
         setLoading(false); // Set loading to false once data is fetched
       } catch (error) {
@@ -78,6 +87,23 @@ const Dashboard = () => {
     setSelectedTab(newValue);
   };
 
+  const handleChangeSummaryTab = (event, newValue) => {
+    setSelectedSummaryTab(newValue);
+  };
+
+  const summaryData =
+    selectedSummaryTab === 0
+      ? clientTrips
+      : selectedSummaryTab === 1
+      ? vehicleTrips
+      : vehicleTypeTrips;
+  const summaryHeader =
+    selectedSummaryTab === 0
+      ? "Client"
+      : selectedSummaryTab === 1
+      ? "Vehicle"
+      : "Vehicle Type";
+
   const data = [
     { id: "Pending", label: "Pending", value: pendingDispatch },
     { id: "On-Time", label: "On-Time", value: onTimeDispatch },
@@ -85,6 +111,104 @@ const Dashboard = () => {
   ];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const renderCellWithWrapText = (params) => (
+    <div className={"wrap-text"} style={{ textAlign: "center" }}>
+      {params.value}
+    </div>
+  );
+
+  const columns = [
+    {
+      field: "clientName",
+      headerName: "Client Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return (
+          params.row.ScheduledTransaction?.BookedTransaction?.Client
+            ?.clientName || ""
+        );
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "typeOfVehicle",
+      headerName: "Type of Vehicle",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return (
+          params.row.ScheduledTransaction?.BookedTransaction
+            ?.QuotationTransportation?.VehicleType?.typeOfVehicle || ""
+        );
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "vehicle",
+      headerName: "Vehicle",
+      headerAlign: "center",
+      align: "center",
+      width: 50,
+      valueGetter: (params) => {
+        return params.row.Vehicle?.plateNumber || "";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "income",
+      headerName: "Income",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return (
+          formatNumber(
+            params.row.ScheduledTransaction?.BookedTransaction
+              ?.QuotationTransportation?.unitPrice
+          ) || ""
+        );
+      },
+      renderCell: renderCellWithWrapText,
+    },
+  ];
+
+  const columnsSummary = [
+    {
+      field: "header",
+      headerName: summaryHeader,
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "count",
+      headerName: "Trips",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "income",
+      headerName: "Income",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return formatNumber(params.row.totalIncome) || "";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+  ];
 
   return (
     <Box m="20px">
@@ -103,34 +227,53 @@ const Dashboard = () => {
           Download Reports
         </Button>
       </Box>
-      <Tabs
-        value={selectedTab}
-        onChange={handleChangeTab}
+      <Box
         sx={{
-          "& .Mui-selected": {
-            backgroundColor: colors.greenAccent[400],
-            boxShadow: "none",
-            borderBottom: `1px solid ${colors.grey[100]}`,
-          },
-          "& .MuiTab-root > span": {
-            paddingRight: "10px",
-          },
+          width: "100%",
+          height: isMobile ? "100px" : "auto",
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: "center",
+          justifyContent: isMobile ? "none" : "space-between",
         }}
       >
-        <Tab label="Daily" />
-        <Tab label="Weekly" />
-        <Tab label="Monthly" />
-      </Tabs>
+        <Tabs
+          value={selectedTab}
+          onChange={handleChangeTab}
+          sx={{
+            "& .Mui-selected": {
+              backgroundColor: colors.greenAccent[400],
+              boxShadow: "none",
+              borderBottom: `1px solid ${colors.grey[100]}`,
+            },
+            "& .MuiTab-root > span": {
+              paddingRight: "10px",
+            },
+          }}
+        >
+          <Tab label="Daily" />
+          <Tab label="Weekly" />
+          <Tab label="Monthly" />
+        </Tabs>
+        <Box mt={isMobile ? 0 : -3}>
+          {selectedTab === 0 && (
+            <DayNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
+          )}
+          {selectedTab === 1 && (
+            <WeekNavigator
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
+            />
+          )}
+          {selectedTab === 2 && (
+            <MonthNavigator
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
+            />
+          )}
+        </Box>
+      </Box>
       <hr />
-      {selectedTab === 0 && (
-        <DayNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
-      )}
-      {selectedTab === 1 && (
-        <WeekNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
-      )}
-      {selectedTab === 2 && (
-        <MonthNavigator setStartDate={setStartDate} setEndDate={setEndDate} />
-      )}
       <Grid container spacing={3} sx={{ marginTop: "20px" }}>
         <Grid item xs={12} sm={2.5}>
           <Card sx={{ minHeight: 50 }}>
@@ -169,7 +312,7 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Total Dispatch
+                      Total Dispatches
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
                       {totalDispatch}
@@ -306,7 +449,7 @@ const Dashboard = () => {
                         Total Dispatches
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        180
+                        {totalDispatch}
                       </Typography>
                     </Box>
                     <LocalShippingIcon
@@ -332,7 +475,7 @@ const Dashboard = () => {
                         Client Satisfaction
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        92.31%
+                        {onTimePercentage}%
                       </Typography>
                     </Box>
                     <StarBorderPurple500Icon
@@ -358,7 +501,7 @@ const Dashboard = () => {
                         Generated Income
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        106,500.00
+                        {formatNumber(income)}
                       </Typography>
                     </Box>
                     <PaidIcon
@@ -482,80 +625,88 @@ const Dashboard = () => {
           </Card>
         </Grid>
       </Grid>
-      <Grid container spacing={3} sx={{ marginTop: 0 }}>
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 400 }}>
+      <Grid container spacing={3} sx={{ marginTop: isMobile ? 3 : 0 }}>
+        <Grid item xs={12} sm={7.5}>
+          <Card sx={{ minHeight: 450 }}>
             <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Available Vehicles
-                  </Typography>
-                </Box>
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Details:
+                </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 400 }}>
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Available Drivers
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 400 }}>
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Available Truck Helpers
-                  </Typography>
-                </Box>
-              </Box>
+              <CustomDataGridStyles height={"372px"} margin={0}>
+                <DataGrid
+                  rows={transactions ? transactions : []}
+                  columns={columns}
+                  getRowId={(row) => row.id}
+                  hideFooter
+                  initialState={{
+                    sorting: {
+                      sortModel: [{ field: "clientName", sort: "asc" }],
+                    },
+                  }}
+                />
+              </CustomDataGridStyles>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={4.5}>
-          <Card sx={{ minHeight: 400 }}>
+          <Card sx={{ minHeight: 450 }}>
             <CardContent>
               <Box
                 sx={{
+                  width: "100%",
+                  height: isMobile ? "100px" : "auto",
                   display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  justifyContent: isMobile ? "none" : "space-between",
+                  height: 30,
                 }}
               >
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Maintenance Alerts:
+                    Summary:
                   </Typography>
                 </Box>
+                <Tabs
+                  value={selectedSummaryTab}
+                  onChange={handleChangeSummaryTab}
+                  sx={{
+                    "& .MuiTab-root": {
+                      height: 30, // Set height for each Tab
+                      minHeight: 30, // Ensure minimum height of 20px for the Tab
+                      paddingY: 0, // Remove vertical padding
+                    },
+                    "& .Mui-selected": {
+                      backgroundColor: colors.greenAccent[400],
+                      boxShadow: "none",
+                      borderBottom: `1px solid ${colors.grey[100]}`,
+                    },
+                    "& .MuiTab-root > span": {
+                      paddingRight: "10px",
+                    },
+                    height: 20,
+                  }}
+                >
+                  <Tab label="Client" />
+                  <Tab label="Vehicle" />
+                  <Tab label="Vehicle Type" />
+                </Tabs>
               </Box>
+              <CustomDataGridStyles height={"372px"} margin={0}>
+                <DataGrid
+                  rows={summaryData ? summaryData : []}
+                  columns={columnsSummary}
+                  getRowId={(row) => row.id}
+                  hideFooter
+                  initialState={{
+                    sorting: {
+                      sortModel: [{ field: "clientName", sort: "asc" }],
+                    },
+                  }}
+                />
+              </CustomDataGridStyles>
             </CardContent>
           </Card>
         </Grid>

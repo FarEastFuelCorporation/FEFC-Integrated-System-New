@@ -337,11 +337,15 @@ const Transaction = ({
               }
               return ""; // Default class if no blinking is needed
             }}
-            initialState={{
-              sorting: {
-                sortModel: [{ field: "remainingDays", sort: "asc" }], // Default sorting by remaining days
-              },
-            }}
+            initialState={
+              selectedTab === 0
+                ? {
+                    sorting: {
+                      sortModel: [{ field: "haulingDate", sort: "asc" }],
+                    },
+                  }
+                : {}
+            }
           />
         </CustomDataGridStyles>
         <Modal

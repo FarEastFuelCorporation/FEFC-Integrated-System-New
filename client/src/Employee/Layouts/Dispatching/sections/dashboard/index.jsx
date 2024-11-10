@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Grid,
   Tab,
   Tabs,
@@ -27,7 +28,8 @@ import DayNavigator from "../../../../../OtherComponents/DayNavigator";
 import axios from "axios";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import LoadingSpinnerComponent from "../../../../../OtherComponents/LoadingSpinnerComponent";
 
 const Dashboard = () => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -278,31 +280,9 @@ const Dashboard = () => {
         <Grid item xs={12} sm={2.5}>
           <Card sx={{ minHeight: 50 }}>
             <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Pending Dispatches
-                  </Typography>
-                  <Typography variant="h4" color="textSecondary">
-                    {pendingDispatch}
-                  </Typography>
-                </Box>
-                <PendingActionsIcon
-                  sx={{ fontSize: 40, marginRight: 2 }}
-                  color="secondary"
-                />
-              </Box>
-            </CardContent>
-          </Card>
-          {!isMobile && (
-            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
-              <CardContent>
+              {loading ? (
+                <CircularProgress size={20} color="secondary" />
+              ) : (
                 <Box
                   sx={{
                     display: "flex",
@@ -312,131 +292,26 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Total Dispatches
+                      Pending Dispatches
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {totalDispatch}
+                      {pendingDispatch}
                     </Typography>
                   </Box>
-                  <LocalShippingIcon
+                  <PendingActionsIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
                 </Box>
-              </CardContent>
-            </Card>
-          )}
-        </Grid>
-
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 50 }}>
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    On-Time Dispatches
-                  </Typography>
-                  <Typography variant="h4" color="textSecondary">
-                    {onTimeDispatch}
-                  </Typography>
-                </Box>
-                <SentimentVerySatisfiedIcon
-                  sx={{ fontSize: 40, marginRight: 2 }}
-                  color="secondary"
-                />
-              </Box>
+              )}
             </CardContent>
           </Card>
           {!isMobile && (
             <Card sx={{ minHeight: 50, marginTop: "20px" }}>
               <CardContent>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6" gutterBottom>
-                      Client Satisfaction
-                    </Typography>
-                    <Typography variant="h4" color="textSecondary">
-                      {onTimePercentage}%
-                    </Typography>
-                  </Box>
-                  <StarBorderPurple500Icon
-                    sx={{ fontSize: 40, marginRight: 2 }}
-                    color="secondary"
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-          )}
-        </Grid>
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 50 }}>
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Late Dispatches
-                  </Typography>
-                  <Typography variant="h4" color="textSecondary">
-                    {lateDispatch}
-                  </Typography>
-                </Box>
-                <SentimentVeryDissatisfiedIcon
-                  sx={{ fontSize: 40, marginRight: 2 }}
-                  color="secondary"
-                />
-              </Box>
-            </CardContent>
-          </Card>
-          {!isMobile && (
-            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
-              <CardContent>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6" gutterBottom>
-                      Generated Income
-                    </Typography>
-                    <Typography variant="h4" color="textSecondary">
-                      {formatNumber(income)}
-                    </Typography>
-                  </Box>
-                  <PaidIcon
-                    sx={{ fontSize: 40, marginRight: 2 }}
-                    color="secondary"
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-          )}
-        </Grid>
-        {isMobile && (
-          <>
-            <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 50 }}>
-                <CardContent>
+                {loading ? (
+                  <CircularProgress size={20} color="secondary" />
+                ) : (
                   <Box
                     sx={{
                       display: "flex",
@@ -457,12 +332,47 @@ const Dashboard = () => {
                       color="secondary"
                     />
                   </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 50 }}>
-                <CardContent>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+
+        <Grid item xs={12} sm={2.5}>
+          <Card sx={{ minHeight: 50 }}>
+            <CardContent>
+              {loading ? (
+                <CircularProgress size={20} color="secondary" />
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      On-Time Dispatches
+                    </Typography>
+                    <Typography variant="h4" color="textSecondary">
+                      {onTimeDispatch}
+                    </Typography>
+                  </Box>
+                  <SentimentVerySatisfiedIcon
+                    sx={{ fontSize: 40, marginRight: 2 }}
+                    color="secondary"
+                  />
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+          {!isMobile && (
+            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
+              <CardContent>
+                {loading ? (
+                  <CircularProgress size={20} color="secondary" />
+                ) : (
                   <Box
                     sx={{
                       display: "flex",
@@ -483,12 +393,46 @@ const Dashboard = () => {
                       color="secondary"
                     />
                   </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 50 }}>
-                <CardContent>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+        <Grid item xs={12} sm={2.5}>
+          <Card sx={{ minHeight: 50 }}>
+            <CardContent>
+              {loading ? (
+                <CircularProgress size={20} color="secondary" />
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      Late Dispatches
+                    </Typography>
+                    <Typography variant="h4" color="textSecondary">
+                      {lateDispatch}
+                    </Typography>
+                  </Box>
+                  <SentimentVeryDissatisfiedIcon
+                    sx={{ fontSize: 40, marginRight: 2 }}
+                    color="secondary"
+                  />
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+          {!isMobile && (
+            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
+              <CardContent>
+                {loading ? (
+                  <CircularProgress size={20} color="secondary" />
+                ) : (
                   <Box
                     sx={{
                       display: "flex",
@@ -509,6 +453,100 @@ const Dashboard = () => {
                       color="secondary"
                     />
                   </Box>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+        {isMobile && (
+          <>
+            <Grid item xs={12} sm={2.5}>
+              <Card sx={{ minHeight: 50 }}>
+                <CardContent>
+                  {loading ? (
+                    <CircularProgress size={20} color="secondary" />
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" gutterBottom>
+                          Total Dispatches
+                        </Typography>
+                        <Typography variant="h4" color="textSecondary">
+                          {totalDispatch}
+                        </Typography>
+                      </Box>
+                      <LocalShippingIcon
+                        sx={{ fontSize: 40, marginRight: 2 }}
+                        color="secondary"
+                      />
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={2.5}>
+              <Card sx={{ minHeight: 50 }}>
+                <CardContent>
+                  {loading ? (
+                    <CircularProgress size={20} color="secondary" />
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" gutterBottom>
+                          Client Satisfaction
+                        </Typography>
+                        <Typography variant="h4" color="textSecondary">
+                          {onTimePercentage}%
+                        </Typography>
+                      </Box>
+                      <StarBorderPurple500Icon
+                        sx={{ fontSize: 40, marginRight: 2 }}
+                        color="secondary"
+                      />
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={2.5}>
+              <Card sx={{ minHeight: 50 }}>
+                <CardContent>
+                  {loading ? (
+                    <CircularProgress size={20} color="secondary" />
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" gutterBottom>
+                          Generated Income
+                        </Typography>
+                        <Typography variant="h4" color="textSecondary">
+                          {formatNumber(income)}
+                        </Typography>
+                      </Box>
+                      <PaidIcon
+                        sx={{ fontSize: 40, marginRight: 2 }}
+                        color="secondary"
+                      />
+                    </Box>
+                  )}
                 </CardContent>
               </Card>
             </Grid>

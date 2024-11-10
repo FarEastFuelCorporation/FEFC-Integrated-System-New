@@ -16,7 +16,7 @@ const MarketingRoutes = ({ user, onUpdateUser }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebar user={user} />}>
-      <Route path="" element={<Dashboard />} />
+      <Route path="" element={<Dashboard user={user} />} />
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
       <Route path="logistics" element={<Logistics user={user} />} />

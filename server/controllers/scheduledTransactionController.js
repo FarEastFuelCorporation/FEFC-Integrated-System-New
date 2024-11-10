@@ -1,8 +1,16 @@
 // controllers/scheduledTransactionController.js
 
+const { Op } = require("sequelize");
 const BookedTransaction = require("../models/BookedTransaction");
+const DispatchedTransaction = require("../models/DispatchedTransaction");
+const ReceivedTransaction = require("../models/ReceivedTransaction");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
+const Vehicle = require("../models/Vehicle");
+const QuotationTransportation = require("../models/QuotationTransportation");
+const VehicleType = require("../models/VehicleType");
+const Client = require("../models/Client");
+const Employee = require("../models/Employee");
 const statusId = 1;
 
 // Create Scheduled Transaction controller
@@ -207,9 +215,267 @@ async function deleteScheduledTransactionController(req, res) {
   }
 }
 
+// Get Dispatched Transactions Dashboard controller
+async function getScheduledTransactionsDashboardController(req, res) {
+  try {
+    const { startDate, endDate } = req.params;
+    const { selectedEmployee } = req.query;
+    const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
+
+    console.log(selectedEmployee);
+
+    // Log the dates for debugging
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+
+    const pendingCount = await BookedTransaction.count({
+      where: { statusId: 1 },
+    });
+
+    const clients = await Client.findAll({
+      attributes: ["clientName", "createdBy", "createdAt"],
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["employeeId", "firstName", "lastName"],
+        },
+      ],
+    });
+
+    // Create an array of objects with employee names and client counts
+    const clientCountByEmployee = clients.reduce((acc, client) => {
+      const { employeeId, firstName, lastName } = client.Employee;
+      const employeeName = `${firstName} ${lastName}`;
+
+      // Check if the employee already exists in the accumulator
+      if (acc[employeeName]) {
+        acc[employeeName].count += 1;
+      } else {
+        acc[employeeName] = {
+          employeeId,
+          employeeName,
+          count: 1,
+        };
+      }
+
+      return acc;
+    }, {});
+
+    // Convert the accumulator object into an array of objects
+    const clientCountByEmployeeData = Object.values(clientCountByEmployee);
+
+    // Check if the selectedEmployee is in clientCountByEmployeeData
+    const isEmployeeValid = clientCountByEmployeeData.some(
+      (employee) => employee.employeeId === selectedEmployee
+    );
+
+    // Build the query to include Employee filter conditionally
+    const employeeWhereClause = isEmployeeValid
+      ? { employeeId: selectedEmployee } // If selectedEmployee is found in the data, filter by employeeId
+      : {}; // If not, no filter for Employee
+
+    const clientsToReturn = await Client.findAll({
+      attributes: ["clientName", "createdBy", "createdAt"],
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["employeeId", "firstName", "lastName"],
+          where: employeeWhereClause,
+        },
+      ],
+    });
+
+    console.log(isEmployeeValid);
+    console.log(employeeWhereClause);
+
+    // Fetch all dispatched transactions between the provided date range
+    const scheduledTransactions = await ScheduledTransaction.findAll({
+      attributes: ["id", "logisticsId", "scheduledDate", "scheduledTime"],
+      where: {
+        scheduledDate: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      include: [
+        {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          attributes: ["id", "haulingDate", "haulingTime"],
+          required: false,
+          include: [
+            {
+              model: Client,
+              as: "Client",
+              attributes: ["clientName"],
+              include: [
+                {
+                  model: Employee,
+                  as: "Employee",
+                  attributes: ["employeeId", "firstName", "lastName"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Initialize counters for on-time and late dispatches
+    let onTimeSchedule = 0;
+    let lateSchedule = 0;
+    const result = {};
+
+    console.log("scheduledTransactions", scheduledTransactions.length);
+
+    // Iterate through dispatched transactions and compare dates and times
+    scheduledTransactions.forEach((transaction) => {
+      const bookedTransaction = transaction.BookedTransaction;
+      const bookedTransactionEmployeeId =
+        transaction.BookedTransaction.Client.Employee.employeeId;
+      if (bookedTransaction) {
+        const haulingDate = new Date(bookedTransaction.haulingDate);
+        const haulingTime = bookedTransaction.haulingTime.split(":"); // split time into hours and minutes
+        haulingDate.setHours(haulingTime[0], haulingTime[1], 0); // set the time to scheduled time
+
+        const scheduledDate = new Date(transaction.scheduledDate);
+        const scheduledTime = transaction.scheduledTime.split(":");
+        scheduledDate.setHours(scheduledTime[0], scheduledTime[1], 0); // set the time to dispatched time
+
+        if (isEmployeeValid) {
+          if (bookedTransactionEmployeeId === selectedEmployee) {
+            // Compare dispatched time and date with scheduled time and date
+            if (scheduledDate <= haulingDate) {
+              // On time
+              onTimeSchedule++;
+            } else {
+              // Late
+              lateSchedule++;
+            }
+          }
+        } else {
+          if (scheduledDate <= haulingDate) {
+            // On time
+            onTimeSchedule++;
+          } else {
+            // Late
+            lateSchedule++;
+          }
+        }
+      }
+
+      if (isEmployeeValid) {
+        if (bookedTransactionEmployeeId === selectedEmployee) {
+          const clientName =
+            transaction.BookedTransaction.Client?.clientName || "";
+          const createdBy = transaction.BookedTransaction.Client?.Employee
+            ? `${transaction.BookedTransaction.Client.Employee.firstName} ${transaction.BookedTransaction.Client.Employee.lastName}`
+            : "";
+
+          // Initialize counts for inhouse and other logistics
+          let inHouseLogistics = 0;
+          let otherLogistics = 0;
+          let total = 0;
+
+          // Check logisticsId of the current transaction (ScheduledTransaction) directly
+          if (transaction.logisticsId === matchingLogisticsId) {
+            inHouseLogistics++; // Increment for inhouse logistics
+            total++;
+          } else {
+            otherLogistics++; // Increment for other logistics
+            total++;
+          }
+
+          // Consolidate the result by clientName
+          if (result[clientName]) {
+            result[clientName].inHouseLogistics += inHouseLogistics;
+            result[clientName].otherLogistics += otherLogistics;
+            result[clientName].total += total;
+          } else {
+            result[clientName] = {
+              id: clientName,
+              clientName,
+              inHouseLogistics,
+              otherLogistics,
+              total,
+              createdBy,
+            };
+          }
+        }
+      } else {
+        const clientName =
+          transaction.BookedTransaction.Client?.clientName || "";
+        const createdBy = transaction.BookedTransaction.Client?.Employee
+          ? `${transaction.BookedTransaction.Client.Employee.firstName} ${transaction.BookedTransaction.Client.Employee.lastName}`
+          : "";
+
+        // Initialize counts for inhouse and other logistics
+        let inHouseLogistics = 0;
+        let otherLogistics = 0;
+        let total = 0;
+
+        // Check logisticsId of the current transaction (ScheduledTransaction) directly
+        if (transaction.logisticsId === matchingLogisticsId) {
+          inHouseLogistics++; // Increment for inhouse logistics
+          total++;
+        } else {
+          otherLogistics++; // Increment for other logistics
+          total++;
+        }
+
+        // Consolidate the result by clientName
+        if (result[clientName]) {
+          result[clientName].inHouseLogistics += inHouseLogistics;
+          result[clientName].otherLogistics += otherLogistics;
+          result[clientName].total += total;
+        } else {
+          result[clientName] = {
+            id: clientName,
+            clientName,
+            inHouseLogistics,
+            otherLogistics,
+            total,
+            createdBy,
+          };
+        }
+      }
+    });
+
+    const totalSchedule = onTimeSchedule + lateSchedule;
+    const onTimePercentage =
+      totalSchedule > 0
+        ? ((onTimeSchedule / totalSchedule) * 100).toFixed(2)
+        : "0.00";
+
+    const pending = pendingCount;
+    const totalClients = clientsToReturn.length;
+    const resultArray = Object.values(result);
+
+    const filteredResultArray = resultArray.filter((item) => item.id !== "");
+
+    // Respond with the updated data
+    res.status(200).json({
+      pending,
+      totalSchedule,
+      onTimeSchedule,
+      onTimePercentage,
+      lateSchedule,
+      scheduledTransactions,
+      totalClients,
+      clientCountByEmployeeData,
+      result: filteredResultArray,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 module.exports = {
   createScheduledTransactionController,
   getScheduledTransactionsController,
   updateScheduledTransactionController,
   deleteScheduledTransactionController,
+  getScheduledTransactionsDashboardController,
 };

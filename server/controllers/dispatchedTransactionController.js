@@ -247,7 +247,7 @@ async function getDispatchedTransactionsDashboardController(req, res) {
     const scheduledTransactionsNoDispatchCount =
       await ScheduledTransaction.count({
         where: {
-          logisticsId: "0577d985-8f6f-47c7-be3c-20ca86021154",
+          logisticsId: matchingLogisticsId,
         },
         include: [
           {
@@ -265,7 +265,7 @@ async function getDispatchedTransactionsDashboardController(req, res) {
     const scheduledTransactionsWithDispatchCount =
       await ScheduledTransaction.count({
         where: {
-          logisticsId: "0577d985-8f6f-47c7-be3c-20ca86021154",
+          logisticsId: matchingLogisticsId,
         },
         include: [
           {
@@ -348,15 +348,15 @@ async function getDispatchedTransactionsDashboardController(req, res) {
     const vehicleTypeTrips = {};
 
     // Iterate through dispatched transactions and compare dates and times
-    dispatchedTransactions.forEach((dispatch) => {
-      const scheduledTransaction = dispatch.ScheduledTransaction;
+    dispatchedTransactions.forEach((transaction) => {
+      const scheduledTransaction = transaction.ScheduledTransaction;
       if (scheduledTransaction) {
         const scheduledDate = new Date(scheduledTransaction.scheduledDate);
         const scheduledTime = scheduledTransaction.scheduledTime.split(":"); // split time into hours and minutes
         scheduledDate.setHours(scheduledTime[0], scheduledTime[1], 0); // set the time to scheduled time
 
-        const dispatchedDate = new Date(dispatch.dispatchedDate);
-        const dispatchedTime = dispatch.dispatchedTime.split(":");
+        const dispatchedDate = new Date(transaction.dispatchedDate);
+        const dispatchedTime = transaction.dispatchedTime.split(":");
         dispatchedDate.setHours(dispatchedTime[0], dispatchedTime[1], 0); // set the time to dispatched time
 
         // Compare dispatched time and date with scheduled time and date
@@ -383,10 +383,11 @@ async function getDispatchedTransactionsDashboardController(req, res) {
           }
         }
       }
-      const client = dispatch.ScheduledTransaction?.BookedTransaction?.Client;
-      const vehicle = dispatch.Vehicle;
+      const client =
+        transaction.ScheduledTransaction?.BookedTransaction?.Client;
+      const vehicle = transaction.Vehicle;
       const quotationTransportation =
-        dispatch.ScheduledTransaction?.BookedTransaction
+        transaction.ScheduledTransaction?.BookedTransaction
           ?.QuotationTransportation;
       const unitPrice = quotationTransportation
         ? quotationTransportation.unitPrice

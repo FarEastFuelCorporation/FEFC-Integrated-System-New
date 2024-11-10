@@ -1,11 +1,15 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   Button,
   Card,
   CardContent,
   CircularProgress,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Tab,
   Tabs,
   Typography,
@@ -17,10 +21,10 @@ import { tokens } from "../../../../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { ResponsivePie } from "@nivo/pie";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-import PaidIcon from "@mui/icons-material/Paid";
+import PeopleIcon from "@mui/icons-material/People";
 import StarBorderPurple500Icon from "@mui/icons-material/StarBorderPurple500";
 import WeekNavigator from "../../../../../OtherComponents/WeekNavigator";
 import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
@@ -30,67 +34,185 @@ import { formatNumber } from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
 
-const Dashboard = () => {
+const Dashboard = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(true); // Add loading state
 
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedDetailsTab, setSelectedDetailsTab] = useState(1);
   const [selectedSummaryTab, setSelectedSummaryTab] = useState(0);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [pendingDispatch, setPendingDispatch] = useState(0);
-  const [onTimeDispatch, setOnTimeDispatch] = useState(0);
+  const [onTimeSchedule, setOnTimeSchedule] = useState(0);
   const [onTimePercentage, setOnTimePercentage] = useState(0);
-  const [lateDispatch, setLateDispatch] = useState(0);
-  const [totalDispatch, setTotalDispatch] = useState(0);
-  const [income, setIncome] = useState(0);
+  const [lateSchedule, setLateSchedule] = useState(0);
+  const [totalSchedule, setTotalSchedule] = useState(0);
+  const [totalClients, setTotalClients] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [clientTrips, setClientTrips] = useState([]);
   const [vehicleTrips, setVehicleTrips] = useState([]);
   const [vehicleTypeTrips, setVehicleTypeTrips] = useState([]);
+  const [clientCountByEmployeeData, setClientCountByEmployeeData] = useState(
+    []
+  );
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [updatedTransactions, setUpdatedTransactions] = useState([]);
+  const [filterValue, setFilterValue] = useState(""); // To track the filter input value
+  const [sortModel, setSortModel] = useState([
+    { field: "clientName", sort: "asc" },
+  ]);
 
+  // useCallback to memoize fetchData function
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      // Ensure dates are formatted correctly
+      const formattedStartDate = startDate.toISOString().split("T")[0];
+      const formattedEndDate = endDate.toISOString().split("T")[0];
+
+      const response = await axios.get(
+        `${apiUrl}/api/scheduledTransaction/dashboard/${formattedStartDate}/${formattedEndDate}`,
+        {
+          params: {
+            selectedEmployee: selectedEmployee || undefined, // Pass selectedEmployee if it's defined
+          },
+        }
+      );
+
+      setPendingDispatch(response.data.pending);
+      setTotalSchedule(response.data.totalSchedule);
+      setOnTimeSchedule(response.data.onTimeSchedule);
+      setOnTimePercentage(response.data.onTimePercentage);
+      setLateSchedule(response.data.lateSchedule);
+      setTotalClients(response.data.totalClients);
+      setClientTrips(response.data.clientTripsArray);
+      setVehicleTrips(response.data.vehicleTripsArray);
+      setVehicleTypeTrips(response.data.vehicleTypeTripsArray);
+      setTransactions(response.data.result);
+      setClientCountByEmployeeData(response.data.clientCountByEmployeeData);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  }, [apiUrl, startDate, endDate, selectedEmployee]); // Dependencies that trigger the callback
+
+  // Effect to fetch data when startDate, endDate, selectedEmployee, or apiUrl changes
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true); // Set loading to false once data is fetched
-
-        // Ensure dates are formatted correctly
-        const formattedStartDate = startDate.toISOString().split("T")[0];
-        const formattedEndDate = endDate.toISOString().split("T")[0];
-
-        const response = await axios.get(
-          `${apiUrl}/api/dispatchedTransaction/dashboard/${formattedStartDate}/${formattedEndDate}`
-        );
-
-        setPendingDispatch(response.data.pending);
-        setTotalDispatch(response.data.totalDispatch);
-        setOnTimeDispatch(response.data.ontimeDispatch);
-        setOnTimePercentage(response.data.onTimePercentage);
-        setLateDispatch(response.data.lateDispatch);
-        setIncome(response.data.income);
-        setTransactions(response.data.dispatchedTransactions);
-        setClientTrips(response.data.clientTripsArray);
-        setVehicleTrips(response.data.vehicleTripsArray);
-        setVehicleTypeTrips(response.data.vehicleTypeTripsArray);
-
-        setLoading(false); // Set loading to false once data is fetched
-      } catch (error) {
-        console.error("Error fetching employeeData:", error);
-      }
-    };
-
     fetchData();
-  }, [apiUrl, startDate, endDate]);
+  }, [fetchData]); // Dependencies array includes fetchData which is memoized by useCallback
+
+  // Effect to fetch data when the selected tab changes to 1
+  useEffect(() => {
+    if (selectedDetailsTab === 1) {
+      fetchData(); // Fetch data when tab changes to 1
+    }
+  }, [selectedDetailsTab, fetchData]); // Only re-run when selectedDetailsTab changes
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
+  const handleChangeDetailsTab = (event, newValue) => {
+    setSelectedDetailsTab(newValue); // Change the selected tab
+
+    setSelectedEmployee("");
+
+    if (newValue === 1) {
+      // If the tab is 1, fetch data
+      fetchData();
+    }
+  };
+
   const handleChangeSummaryTab = (event, newValue) => {
     setSelectedSummaryTab(newValue);
   };
+
+  // Handle selection change
+  const handleSelectChange = (event) => {
+    setSelectedEmployee(event.target.value);
+  };
+
+  // Calculate totals for the "Total" row
+  const getTotalRow = (filteredTransactions) => {
+    const totalInHouseLogistics = filteredTransactions.reduce(
+      (sum, transaction) => sum + transaction.inHouseLogistics,
+      0
+    );
+    const totalOtherLogistics = filteredTransactions.reduce(
+      (sum, transaction) => sum + transaction.otherLogistics,
+      0
+    );
+    const totalLogistics = filteredTransactions.reduce(
+      (sum, transaction) => sum + transaction.total,
+      0
+    );
+
+    return {
+      id: "total",
+      clientName: "Total",
+      inHouseLogistics: totalInHouseLogistics,
+      otherLogistics: totalOtherLogistics,
+      total: totalLogistics,
+      createdBy: "", // You can leave this empty or use a placeholder like "Total"
+    };
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (event) => {
+    const value = event.target.value;
+    setFilterValue(value); // Update the filter value
+  };
+
+  // Handle sort changes
+  const handleSortModelChange = (newSortModel) => {
+    setSortModel(newSortModel);
+  };
+
+  useEffect(() => {
+    let filteredTransactions = [...transactions];
+
+    // Step 1: Remove "Total" row (if it exists) before filtering or sorting
+    filteredTransactions = filteredTransactions.filter(
+      (transaction) => transaction.id !== "total"
+    );
+
+    // Step 2: Apply filter across all columns if filterValue is set
+    if (filterValue) {
+      filteredTransactions = filteredTransactions.filter((transaction) => {
+        // Loop through each property of the transaction and check if it includes the filter value
+        return Object.values(transaction)
+          .join(" ") // Convert all values of the transaction to a single string
+          .toLowerCase()
+          .includes(filterValue.toLowerCase()); // Check if filter value is a part of any of the fields
+      });
+    }
+
+    // Step 3: Apply sorting (if any)
+    if (sortModel.length > 0) {
+      const sortField = sortModel[0]?.field;
+      const sortOrder = sortModel[0]?.sort;
+
+      filteredTransactions.sort((a, b) => {
+        if (a[sortField] < b[sortField]) {
+          return sortOrder === "asc" ? -1 : 1;
+        }
+        if (a[sortField] > b[sortField]) {
+          return sortOrder === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    // Step 4: Add the "Total" row back at the end
+    const totalRow = getTotalRow(filteredTransactions);
+    setUpdatedTransactions([...filteredTransactions, totalRow]);
+  }, [transactions, filterValue, sortModel]); // Depend on transactions, filterValue, and sortModel
 
   const summaryData =
     selectedSummaryTab === 0
@@ -107,8 +229,8 @@ const Dashboard = () => {
 
   const data = [
     { id: "Pending", label: "Pending", value: pendingDispatch },
-    { id: "On-Time", label: "On-Time", value: onTimeDispatch },
-    { id: "Late", label: "Late", value: lateDispatch },
+    { id: "On-Time", label: "On-Time", value: onTimeSchedule },
+    { id: "Late", label: "Late", value: lateSchedule },
   ];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -127,55 +249,43 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return (
-          params.row.ScheduledTransaction?.BookedTransaction?.Client
-            ?.clientName || ""
-        );
-      },
+
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "typeOfVehicle",
-      headerName: "Type of Vehicle",
+      field: "inHouseLogistics",
+      headerName: "FEFC Logistics",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "otherLogistics",
+      headerName: "Other Logistics",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "total",
+      headerName: "Total",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "createdBy",
+      headerName: "Account Handler",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return (
-          params.row.ScheduledTransaction?.BookedTransaction
-            ?.QuotationTransportation?.VehicleType?.typeOfVehicle || ""
-        );
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "vehicle",
-      headerName: "Vehicle",
-      headerAlign: "center",
-      align: "center",
-      width: 50,
-      valueGetter: (params) => {
-        return params.row.Vehicle?.plateNumber || "";
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "income",
-      headerName: "Income",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      valueGetter: (params) => {
-        return (
-          formatNumber(
-            params.row.ScheduledTransaction?.BookedTransaction
-              ?.QuotationTransportation?.unitPrice
-          ) || ""
-        );
-      },
       renderCell: renderCellWithWrapText,
     },
   ];
@@ -277,7 +387,7 @@ const Dashboard = () => {
       <hr />
       <Grid container spacing={3} sx={{ marginTop: "20px" }}>
         <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 50 }}>
+          <Card sx={{ minHeight: 90 }}>
             <CardContent>
               {loading ? (
                 <CircularProgress size={20} color="secondary" />
@@ -291,10 +401,10 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      On-Time Dispatches
+                      On-Time Schedules
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {onTimeDispatch}
+                      {onTimeSchedule}
                     </Typography>
                   </Box>
                   <SentimentVerySatisfiedIcon
@@ -306,7 +416,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           {!isMobile && (
-            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
+            <Card sx={{ minHeight: 90, marginTop: "20px" }}>
               <CardContent>
                 {loading ? (
                   <CircularProgress size={20} color="secondary" />
@@ -320,7 +430,7 @@ const Dashboard = () => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Pending Dispatches
+                        Pending Schedules
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
                         {pendingDispatch}
@@ -338,7 +448,7 @@ const Dashboard = () => {
         </Grid>
 
         <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 50 }}>
+          <Card sx={{ minHeight: 90 }}>
             <CardContent>
               {loading ? (
                 <CircularProgress size={20} color="secondary" />
@@ -352,10 +462,10 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Late Dispatches
+                      Late Schedules
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {lateDispatch}
+                      {lateSchedule}
                     </Typography>
                   </Box>
                   <SentimentVeryDissatisfiedIcon
@@ -367,7 +477,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           {!isMobile && (
-            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
+            <Card sx={{ minHeight: 90, marginTop: "20px" }}>
               <CardContent>
                 {loading ? (
                   <CircularProgress size={20} color="secondary" />
@@ -398,7 +508,7 @@ const Dashboard = () => {
           )}
         </Grid>
         <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 50 }}>
+          <Card sx={{ minHeight: 90 }}>
             <CardContent>
               {loading ? (
                 <CircularProgress size={20} color="secondary" />
@@ -412,13 +522,13 @@ const Dashboard = () => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Total Dispatches
+                      Total Schedules
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {totalDispatch}
+                      {totalSchedule}
                     </Typography>
                   </Box>
-                  <LocalShippingIcon
+                  <CalendarMonthIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -427,7 +537,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           {!isMobile && (
-            <Card sx={{ minHeight: 50, marginTop: "20px" }}>
+            <Card sx={{ minHeight: 90, marginTop: "20px" }}>
               <CardContent>
                 {loading ? (
                   <CircularProgress size={20} color="secondary" />
@@ -441,13 +551,13 @@ const Dashboard = () => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Generated Income
+                        Total Clients
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {formatNumber(income)}
+                        {totalClients}
                       </Typography>
                     </Box>
-                    <PaidIcon
+                    <PeopleIcon
                       sx={{ fontSize: 40, marginRight: 2 }}
                       color="secondary"
                     />
@@ -460,7 +570,7 @@ const Dashboard = () => {
         {isMobile && (
           <>
             <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 50 }}>
+              <Card sx={{ minHeight: 90 }}>
                 <CardContent>
                   {loading ? (
                     <CircularProgress size={20} color="secondary" />
@@ -474,7 +584,7 @@ const Dashboard = () => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Pending Dispatches
+                          Pending Schedules
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
                           {pendingDispatch}
@@ -490,7 +600,7 @@ const Dashboard = () => {
               </Card>
             </Grid>
             <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 50 }}>
+              <Card sx={{ minHeight: 90 }}>
                 <CardContent>
                   {loading ? (
                     <CircularProgress size={20} color="secondary" />
@@ -520,7 +630,7 @@ const Dashboard = () => {
               </Card>
             </Grid>
             <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 50 }}>
+              <Card sx={{ minHeight: 90 }}>
                 <CardContent>
                   {loading ? (
                     <CircularProgress size={20} color="secondary" />
@@ -534,13 +644,13 @@ const Dashboard = () => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Generated Income
+                          Total Clients
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {formatNumber(income)}
+                          {totalClients}
                         </Typography>
                       </Box>
-                      <PaidIcon
+                      <PeopleIcon
                         sx={{ fontSize: 40, marginRight: 2 }}
                         color="secondary"
                       />
@@ -666,22 +776,103 @@ const Dashboard = () => {
         <Grid item xs={12} sm={7.5}>
           <Card sx={{ minHeight: 450 }}>
             <CardContent>
-              <Box mt={1} mb={2}>
-                <Typography variant="h6" gutterBottom>
-                  Details:
-                </Typography>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: isMobile ? "100px" : "auto",
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  alignItems: "center",
+                  justifyContent: isMobile ? "none" : "space-between",
+                }}
+              >
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    Details:
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 3 }}>
+                  <Box>
+                    {selectedDetailsTab === 0 && (
+                      <FormControl
+                        sx={{ width: "200px", height: "30px", padding: 0 }}
+                      >
+                        <InputLabel
+                          id="employee-select-label"
+                          sx={{ padding: 0 }}
+                          style={{
+                            color: colors.grey[100],
+                          }}
+                          shrink={true}
+                        >
+                          Select Employee
+                        </InputLabel>
+                        <Select
+                          labelId="employee-select-label"
+                          id="employeeSelect"
+                          value={selectedEmployee}
+                          onChange={handleSelectChange}
+                          label="Select Employee"
+                          sx={{
+                            height: "30px",
+                            paddingTop: 0,
+                            paddingBottom: 0,
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <MenuItem value="">
+                            <em>None</em>
+                          </MenuItem>
+                          {clientCountByEmployeeData.map((employee) => (
+                            <MenuItem
+                              key={employee.employeeId}
+                              value={employee.employeeId}
+                            >
+                              {employee.employeeName}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                  </Box>
+                  <Tabs
+                    value={selectedDetailsTab}
+                    onChange={handleChangeDetailsTab}
+                    sx={{
+                      "& .MuiTab-root": {
+                        height: 30, // Set height for each Tab
+                        minHeight: 30, // Ensure minimum height of 20px for the Tab
+                        paddingY: 0, // Remove vertical padding
+                      },
+                      "& .Mui-selected": {
+                        backgroundColor: colors.greenAccent[400],
+                        boxShadow: "none",
+                        borderBottom: `1px solid ${colors.grey[100]}`,
+                      },
+                      "& .MuiTab-root > span": {
+                        paddingRight: "10px",
+                      },
+                      height: 20,
+                    }}
+                  >
+                    <Tab label="Individual" />
+                    <Tab label="Team" />
+                  </Tabs>
+                </Box>
               </Box>
               <CustomDataGridStyles height={"372px"} margin={0}>
                 <DataGrid
-                  rows={transactions ? transactions : []}
+                  rows={updatedTransactions ? updatedTransactions : []}
                   columns={columns}
                   getRowId={(row) => row.id}
                   hideFooter
                   initialState={{
                     sorting: {
-                      sortModel: [{ field: "clientName", sort: "asc" }],
+                      sortModel: [{ field: "total", sort: "asc" }],
                     },
                   }}
+                  onSortModelChange={handleSortModelChange}
                 />
               </CustomDataGridStyles>
             </CardContent>
@@ -700,12 +891,12 @@ const Dashboard = () => {
                   justifyContent: isMobile ? "none" : "space-between",
                 }}
               >
-                <Box>
+                <Box mb={3}>
                   <Typography variant="h6" gutterBottom>
                     Summary:
                   </Typography>
                 </Box>
-                <Tabs
+                {/* <Tabs
                   value={selectedSummaryTab}
                   onChange={handleChangeSummaryTab}
                   sx={{
@@ -728,7 +919,7 @@ const Dashboard = () => {
                   <Tab label="Client" />
                   <Tab label="Vehicle" />
                   <Tab label="Vehicle Type" />
-                </Tabs>
+                </Tabs> */}
               </Box>
               <CustomDataGridStyles height={"372px"} margin={0}>
                 <DataGrid

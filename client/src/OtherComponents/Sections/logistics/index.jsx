@@ -18,7 +18,7 @@ import { tokens } from "../../../theme";
 import SuccessMessage from "../../SuccessMessage";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import LoadingSpinner from "../../LoadingSpinner";
-import ConfirmationDialog from "../../ConfirmationDialog";
+// import ConfirmationDialog from "../../ConfirmationDialog";
 
 const Logistics = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -47,9 +47,9 @@ const Logistics = ({ user }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialog, setDialog] = useState(false);
-  const [dialogAction, setDialogAction] = useState(false);
+  // const [openDialog, setOpenDialog] = useState(false);
+  // const [dialog, setDialog] = useState(false);
+  // const [dialogAction, setDialogAction] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -301,12 +301,12 @@ const Logistics = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <ConfirmationDialog
+      {/* <ConfirmationDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         onConfirm={dialogAction}
         text={dialog}
-      />
+      /> */}
       <CustomDataGridStyles>
         <DataGrid
           rows={logistics ? logistics : []}

@@ -29,7 +29,6 @@ import axios from "axios";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
-import LoadingSpinnerComponent from "../../../../../OtherComponents/LoadingSpinnerComponent";
 
 const Dashboard = () => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -667,7 +666,7 @@ const Dashboard = () => {
         <Grid item xs={12} sm={7.5}>
           <Card sx={{ minHeight: 450 }}>
             <CardContent>
-              <Box>
+              <Box mt={1} mb={2}>
                 <Typography variant="h6" gutterBottom>
                   Details:
                 </Typography>
@@ -699,7 +698,6 @@ const Dashboard = () => {
                   flexDirection: isMobile ? "column" : "row",
                   alignItems: "center",
                   justifyContent: isMobile ? "none" : "space-between",
-                  height: 30,
                 }}
               >
                 <Box>

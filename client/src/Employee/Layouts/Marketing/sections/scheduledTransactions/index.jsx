@@ -226,8 +226,6 @@ const ScheduledTransactions = ({ user }) => {
           formData
         );
 
-        console.log(newTransaction);
-
         // Merging new data with previous state data
         // setPendingTransactions((prevPendingTransactions) => [
         //   ...prevPendingTransactions,

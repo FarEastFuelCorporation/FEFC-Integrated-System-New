@@ -9,7 +9,7 @@ const WeekNavigator = ({ setStartDate, setEndDate }) => {
   const handlePreviousWeek = () => {
     setCurrentDate((prevDate) => {
       const newDate = new Date(prevDate);
-      newDate.setDate(prevDate.getDate() - 7);
+      newDate.setDate(prevDate.getDate() - 7); // Go back 7 days
       return newDate;
     });
   };
@@ -17,7 +17,7 @@ const WeekNavigator = ({ setStartDate, setEndDate }) => {
   const handleNextWeek = () => {
     setCurrentDate((prevDate) => {
       const newDate = new Date(prevDate);
-      newDate.setDate(prevDate.getDate() + 7);
+      newDate.setDate(prevDate.getDate() + 7); // Go forward 7 days
       return newDate;
     });
   };
@@ -26,31 +26,41 @@ const WeekNavigator = ({ setStartDate, setEndDate }) => {
   useEffect(() => {
     const startOfWeek = new Date(currentDate);
     const day = startOfWeek.getDay();
-    const diffToMonday = day === 0 ? -6 : 1 - day; // Adjust if Sunday (0) to get Monday
-    startOfWeek.setDate(currentDate.getDate() + diffToMonday); // Start on Monday
+    const diffToSaturday = day === 0 ? -1 : 6 - day; // Adjust to get Saturday as the start
+    startOfWeek.setDate(currentDate.getDate() + diffToSaturday); // Start on Saturday
 
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Sunday
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Friday (6 days after Saturday)
 
     // Pass the start and end dates to the parent component
     setStartDate(startOfWeek);
     setEndDate(endOfWeek);
   }, [currentDate, setStartDate, setEndDate]);
 
+  const getWeekNumber = (date) => {
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date - startOfYear) / (24 * 60 * 60 * 1000));
+    return Math.ceil((days + 1) / 7); // Week number calculation
+  };
+
   const formatWeek = (date) => {
     const startOfWeek = new Date(date);
     const day = startOfWeek.getDay();
-    const diffToMonday = day === 0 ? -6 : 1 - day; // Adjust if Sunday (0) to get Monday
-    startOfWeek.setDate(date.getDate() + diffToMonday); // Start on Monday
+    const diffToSaturday = day === 0 ? -1 : 6 - day; // Adjust to get Saturday as the start
+    startOfWeek.setDate(date.getDate() + diffToSaturday); // Start on Saturday
 
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Sunday
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Friday (6 days after Saturday)
 
-    const options = { month: "short", day: "numeric", year: "numeric" };
-    return `${startOfWeek.toLocaleDateString(
+    const options = { month: "short", day: "numeric" };
+    const weekNumber = getWeekNumber(startOfWeek);
+    const year = startOfWeek.getFullYear(); // Extract the year
+
+    // Format the week with the year at the end
+    return `Week ${weekNumber}: ${startOfWeek.toLocaleDateString(
       undefined,
       options
-    )} - ${endOfWeek.toLocaleDateString(undefined, options)}`;
+    )} - ${endOfWeek.toLocaleDateString(undefined, options)}, ${year}`;
   };
 
   return (
@@ -60,7 +70,7 @@ const WeekNavigator = ({ setStartDate, setEndDate }) => {
           <ArrowLeftIcon sx={{ fontSize: 50 }} />
         </IconButton>
       </Grid>
-      <Grid item>
+      <Grid item mx={-1}>
         <Typography variant="h5">{formatWeek(currentDate)}</Typography>
       </Grid>
       <Grid item>

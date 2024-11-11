@@ -8,6 +8,7 @@ const {
   createEmployeeAttachmentController,
   getEmployeeAttachmentsController,
   getEmployeeAttachmentController,
+  getEmployeeAttachmentFullController,
   deleteEmployeeAttachmentController,
 } = require("../controllers/employeeAttachmentController");
 
@@ -23,6 +24,9 @@ router.get("/", getEmployeeAttachmentsController);
 
 // Get Employee Attachment route
 router.get("/:id", getEmployeeAttachmentController);
+
+// Get Employee Attachment Full route
+router.get("/full/:id", getEmployeeAttachmentFullController);
 
 // Delete Booked Transaction route
 router.delete("/:id", deleteEmployeeAttachmentController);

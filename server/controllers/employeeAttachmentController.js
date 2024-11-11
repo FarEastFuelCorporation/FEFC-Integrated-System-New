@@ -30,6 +30,7 @@ async function createEmployeeAttachmentController(req, res) {
     const newAttachment = await EmployeeAttachment.findByPk(
       newAttachmentData.id,
       {
+        attributes: { exclude: ["attachment"] },
         include: [
           {
             model: Employee,
@@ -76,6 +77,7 @@ async function getEmployeeAttachmentController(req, res) {
     const employeeId = req.params.id;
     // Fetch Employee Attachment from the database
     const employeeAttachments = await EmployeeAttachment.findAll({
+      attributes: { exclude: ["attachment"] },
       where: { employeeId },
       include: [
         {
@@ -87,6 +89,26 @@ async function getEmployeeAttachmentController(req, res) {
     });
 
     res.json({ employeeAttachments });
+  } catch (error) {
+    // Handling errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Get Employee Attachment controller
+async function getEmployeeAttachmentFullController(req, res) {
+  try {
+    const id = req.params.id;
+    // Fetch Employee Attachment from the database
+    const employeeAttachment = await EmployeeAttachment.findAll({
+      where: { id },
+      attributes: ["attachment"],
+    });
+
+    console.log(employeeAttachment);
+
+    res.json({ employeeAttachment });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -135,5 +157,6 @@ module.exports = {
   createEmployeeAttachmentController,
   getEmployeeAttachmentsController,
   getEmployeeAttachmentController,
+  getEmployeeAttachmentFullController,
   deleteEmployeeAttachmentController,
 };

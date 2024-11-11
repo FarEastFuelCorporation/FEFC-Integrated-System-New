@@ -24,6 +24,7 @@ const ReceivedTransactions = ({ user }) => {
     pttNo: "",
     manifestNo: "",
     pullOutFormNo: "",
+    truckScaleNo: "",
     manifestWeight: 0,
     clientWeight: 0,
     grossWeight: 0,
@@ -107,6 +108,7 @@ const ReceivedTransactions = ({ user }) => {
       pttNo: "",
       manifestNo: "",
       pullOutFormNo: "",
+      truckScaleNo: "",
       manifestWeight: 0,
       clientWeight: 0,
       grossWeight: 0,
@@ -156,6 +158,7 @@ const ReceivedTransactions = ({ user }) => {
         pttNo: receivedTransaction.pttNo,
         manifestNo: receivedTransaction.manifestNo,
         pullOutFormNo: receivedTransaction.pullOutFormNo,
+        truckScaleNo: receivedTransaction.truckScaleNo,
         manifestWeight: receivedTransaction.manifestWeight,
         clientWeight: receivedTransaction.clientWeight,
         grossWeight: receivedTransaction.grossWeight,
@@ -217,6 +220,7 @@ const ReceivedTransactions = ({ user }) => {
       pttNo,
       manifestNo,
       pullOutFormNo,
+      truckScaleNo,
       manifestWeight,
       clientWeight,
       grossWeight,
@@ -233,6 +237,7 @@ const ReceivedTransactions = ({ user }) => {
       !pttNo ||
       !manifestNo ||
       !pullOutFormNo ||
+      !truckScaleNo ||
       !manifestWeight ||
       !clientWeight ||
       !grossWeight ||

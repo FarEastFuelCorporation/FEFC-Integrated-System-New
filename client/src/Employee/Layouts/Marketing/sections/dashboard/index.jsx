@@ -257,8 +257,7 @@ const Dashboard = ({ user }) => {
       headerName: "FEFC Logistics",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 80,
+      width: 100,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -266,8 +265,7 @@ const Dashboard = ({ user }) => {
       headerName: "Other Logistics",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 80,
+      width: 100,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -275,8 +273,7 @@ const Dashboard = ({ user }) => {
       headerName: "Total",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 80,
+      width: 100,
       renderCell: renderCellWithWrapText,
     },
     {

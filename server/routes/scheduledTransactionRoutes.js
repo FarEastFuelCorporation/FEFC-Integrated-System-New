@@ -22,7 +22,7 @@ router.put("/:id", updateScheduledTransactionController);
 // Delete Scheduled Transaction route
 router.delete("/:id", deleteScheduledTransactionController);
 
-// Get Dispatched Transactions Dashboard route
+// Get Scheduled Transactions Dashboard route
 router.get(
   "/dashboard/:startDate/:endDate/",
   getScheduledTransactionsDashboardController

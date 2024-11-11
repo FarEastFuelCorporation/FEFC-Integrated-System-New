@@ -165,20 +165,40 @@ const ReceiveModal = ({
           }}
           autoComplete="off"
         />
-        <TextField
-          label="Pull Out Form No."
-          name="pullOutFormNo"
-          value={formData.pullOutFormNo}
-          onChange={handleInputChange}
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <TextField
+              label="Pull Out Form No."
+              name="pullOutFormNo"
+              value={formData.pullOutFormNo}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Truck Scale No."
+              name="truckScaleNo"
+              value={formData.truckScaleNo}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+        </Grid>
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <TextField

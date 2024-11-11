@@ -7,6 +7,7 @@ const {
   getReceivedTransactionsController,
   updateReceivedTransactionController,
   deleteReceivedTransactionController,
+  getReceivedTransactionsDashboardController,
 } = require("../controllers/receivedTransactionController");
 
 // Create Received Transaction route
@@ -20,5 +21,11 @@ router.put("/:id", updateReceivedTransactionController);
 
 // Delete Received Transaction route
 router.delete("/:id", deleteReceivedTransactionController);
+
+// Get Received Transactions Dashboard route
+router.get(
+  "/dashboard/:startDate/:endDate/",
+  getReceivedTransactionsDashboardController
+);
 
 module.exports = router;

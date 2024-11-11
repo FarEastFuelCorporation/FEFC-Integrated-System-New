@@ -49,6 +49,10 @@ const ReceivedTransaction = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    truckScaleNo: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     manifestWeight: {
       type: DataTypes.FLOAT,
       allowNull: true,

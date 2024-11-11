@@ -10,7 +10,7 @@ import { timestampDate, parseTimeString } from "../Functions";
 const CertifiedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  console.log(row);
   const certifiedTransaction =
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .CertifiedTransaction[0];

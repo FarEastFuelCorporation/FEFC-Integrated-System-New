@@ -1,8 +1,15 @@
 // controllers/receivedTransactionController.js
 
+const { Op } = require("sequelize");
+const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
+const DispatchedTransaction = require("../models/DispatchedTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
+const Client = require("../models/Client");
+const QuotationWaste = require("../models/QuotationWaste");
+const TypeOfWaste = require("../models/TypeOfWaste");
 const statusId = 2;
 const additionalStatusId = 3;
 
@@ -246,61 +253,56 @@ async function getReceivedTransactionsDashboardController(req, res) {
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
 
-    const scheduledTransactionsNoDispatchCount =
-      await ScheduledTransaction.count({
-        where: {
-          logisticsId: matchingLogisticsId,
-        },
-        include: [
-          {
-            model: DispatchedTransaction,
-            as: "DispatchedTransaction",
-            required: false, // LEFT JOIN
-            where: {
-              id: null, // Ensure no matching DispatchedTransaction
-              deletedAt: null, // Exclude rows where DispatchedTransaction is soft deleted
-            },
-          },
-        ],
-      });
+    const [result] = await sequelize.query(
+      `
+        SELECT COUNT(*) AS scheduledTransactionCount
+        FROM ScheduledTransactions st
+        LEFT JOIN ReceivedTransactions rt ON st.id = rt.scheduledTransactionId
+        WHERE st.logisticsId != :matchingLogisticsId
+          AND rt.id IS NULL
+          AND st.deletedAt IS NULL
+          AND rt.deletedAt IS NULL;
+      `,
+      {
+        replacements: { matchingLogisticsId },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
-    const scheduledTransactionsWithDispatchCount =
-      await ScheduledTransaction.count({
-        where: {
-          logisticsId: matchingLogisticsId,
-        },
-        include: [
-          {
-            model: DispatchedTransaction,
-            as: "DispatchedTransaction",
-            required: true, // INNER JOIN (only include rows with matching DispatchedTransaction)
-            where: {
-              id: { [Op.ne]: null }, // Ensure there is a matching DispatchedTransaction
-              deletedAt: null, // Exclude soft-deleted DispatchedTransaction
-            },
-          },
-        ],
-      });
+    const scheduledTransactionCount = result.scheduledTransactionCount;
+
+    console.log(scheduledTransactionCount);
+
+    const [result2] = await sequelize.query(
+      `
+        SELECT COUNT(*) AS dispatchedTransactionCount
+        FROM DispatchedTransactions dt
+        LEFT JOIN ReceivedTransactions rt ON dt.id = rt.dispatchedTransactionId
+        WHERE rt.id IS NULL
+          AND dt.deletedAt IS NULL
+          AND rt.deletedAt IS NULL;
+      `,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const dispatchedTransactionCount = result2.dispatchedTransactionCount;
+
+    console.log(dispatchedTransactionCount);
 
     // Fetch all dispatched transactions between the provided date range
-    const dispatchedTransactions = await DispatchedTransaction.findAll({
-      attributes: ["id", "dispatchedDate", "dispatchedTime"],
+    const receivedTransactions = await ReceivedTransaction.findAll({
+      attributes: ["id", "receivedDate", "receivedTime", "netWeight"],
       where: {
-        dispatchedDate: {
+        receivedDate: {
           [Op.between]: [startDate, endDate],
         },
       },
       include: [
         {
-          model: ReceivedTransaction,
-          as: "ReceivedTransaction",
+          model: DispatchedTransaction,
+          as: "DispatchedTransaction",
           attributes: ["id"],
           required: false,
-        },
-        {
-          model: Vehicle,
-          as: "Vehicle",
-          attributes: ["plateNumber"],
         },
         {
           model: ScheduledTransaction,
@@ -314,22 +316,21 @@ async function getReceivedTransactionsDashboardController(req, res) {
             required: false,
             include: [
               {
-                model: QuotationTransportation,
-                as: "QuotationTransportation",
-                required: false,
-                attributes: ["unitPrice"],
-                include: [
-                  {
-                    model: VehicleType,
-                    as: "VehicleType",
-                    attributes: ["typeOfVehicle"],
-                  },
-                ],
-              },
-              {
                 model: Client,
                 as: "Client",
                 attributes: ["clientName"],
+              },
+              {
+                model: QuotationWaste,
+                as: "QuotationWaste",
+                attributes: ["wasteName"],
+                include: [
+                  {
+                    model: TypeOfWaste,
+                    as: "TypeOfWaste",
+                    attributes: ["wasteCode"],
+                  },
+                ],
               },
             ],
           },
@@ -338,136 +339,153 @@ async function getReceivedTransactionsDashboardController(req, res) {
     });
 
     // Initialize counters for on-time and late dispatches
-    let ontimeDispatch = 0;
-    let lateDispatch = 0;
+    let onTimeReceived = 0;
+    let lateReceived = 0;
 
-    // Initialize variable for income calculation
-    let income = 0;
-
-    // Create an object to store the count of trips per client
-    const clientTrips = {};
-    const vehicleTrips = {};
-    const vehicleTypeTrips = {};
+    // Initialize variable for totalWeight calculation
+    let totalWeight = 0;
 
     // Iterate through dispatched transactions and compare dates and times
-    dispatchedTransactions.forEach((transaction) => {
+    // Iterate through dispatched transactions and compare dates and times
+    receivedTransactions.forEach((transaction) => {
       const scheduledTransaction = transaction.ScheduledTransaction;
-      if (scheduledTransaction) {
-        const scheduledDate = new Date(scheduledTransaction.scheduledDate);
-        const scheduledTime = scheduledTransaction.scheduledTime.split(":"); // split time into hours and minutes
-        scheduledDate.setHours(scheduledTime[0], scheduledTime[1], 0); // set the time to scheduled time
+      const dispatchedTransaction = transaction.DispatchedTransaction;
 
-        const dispatchedDate = new Date(transaction.dispatchedDate);
-        const dispatchedTime = transaction.dispatchedTime.split(":");
-        dispatchedDate.setHours(dispatchedTime[0], dispatchedTime[1], 0); // set the time to dispatched time
+      const receivedDate = new Date(transaction.receivedDate);
+      const receivedTime = transaction.receivedTime?.split(":"); // Safely access receivedTime
+      if (receivedTime) {
+        receivedDate.setHours(receivedTime[0], receivedTime[1], 0); // Set the time to received time
+      }
 
-        // Compare dispatched time and date with scheduled time and date
-        if (dispatchedDate <= scheduledDate) {
+      if (dispatchedTransaction) {
+        const dispatchedDate = new Date(dispatchedTransaction.dispatchedDate);
+        const dispatchedTime = dispatchedTransaction.dispatchedTime?.split(":"); // Safely access dispatchedTime
+        if (dispatchedTime) {
+          dispatchedDate.setHours(dispatchedTime[0], dispatchedTime[1], 0); // Set the time to scheduled time
+        }
+
+        // Calculate the difference in milliseconds
+        const timeDifference = receivedDate - dispatchedDate;
+        const hoursDifference = timeDifference / (1000 * 60 * 60); // Convert milliseconds to hours
+
+        // Check if the difference exceeds48 hours
+        if (hoursDifference <= 48) {
           // On time
-          ontimeDispatch++;
+          onTimeReceived++;
         } else {
           // Late
-          lateDispatch++;
+          lateReceived++;
+        }
+      } else if (scheduledTransaction) {
+        const scheduledDate = new Date(scheduledTransaction.scheduledDate);
+        const scheduledTime = scheduledTransaction.scheduledTime?.split(":"); // Safely access scheduledTime
+        if (scheduledTime) {
+          scheduledDate.setHours(scheduledTime[0], scheduledTime[1], 0); // Set the time to scheduled time
         }
 
-        // Calculate the total income from QuotationTransportation's unitPrice
-        if (scheduledTransaction?.BookedTransaction) {
-          // Directly access the QuotationTransportation since BookedTransaction is an object
-          const bookedTransaction = scheduledTransaction.BookedTransaction;
-          const quotationTransportation =
-            bookedTransaction?.QuotationTransportation;
+        // Calculate the difference in milliseconds
+        const timeDifference = receivedDate - scheduledDate;
+        const hoursDifference = timeDifference / (1000 * 60 * 60); // Convert milliseconds to hours
 
-          if (
-            quotationTransportation &&
-            typeof quotationTransportation.unitPrice === "number"
-          ) {
-            income += quotationTransportation.unitPrice || 0;
-          }
-        }
-      }
-      const client =
-        transaction.ScheduledTransaction?.BookedTransaction?.Client;
-      const vehicle = transaction.Vehicle;
-      const quotationTransportation =
-        transaction.ScheduledTransaction?.BookedTransaction
-          ?.QuotationTransportation;
-      const unitPrice = quotationTransportation
-        ? quotationTransportation.unitPrice
-        : 0; // Default to 0 if unitPrice is not available
-      const vehicleType = quotationTransportation?.VehicleType;
-
-      if (client) {
-        const { id, clientName } = client; // Use clientName from the Client model
-
-        if (clientTrips[clientName]) {
-          clientTrips[clientName].count += 1;
-          clientTrips[clientName].totalIncome += unitPrice; // Add unitPrice to totalIncome for the client
+        // Check if the difference exceeds48 hours
+        if (hoursDifference <= 48) {
+          // On time
+          onTimeReceived++;
         } else {
-          clientTrips[clientName] = {
-            id: clientName,
-            header: clientName,
-            count: 1,
-            totalIncome: unitPrice, // Initialize totalIncome with the unitPrice
-          };
+          // Late
+          lateReceived++;
         }
       }
-      if (vehicle) {
-        const { plateNumber } = vehicle; // Use plateNumber from the Vehicle model
-        if (vehicleTrips[plateNumber]) {
-          vehicleTrips[plateNumber].count += 1;
-          vehicleTrips[plateNumber].totalIncome += unitPrice; // Add unitPrice to totalIncome for the vehicle
-        } else {
-          vehicleTrips[plateNumber] = {
-            id: plateNumber,
-            header: plateNumber,
-            count: 1,
-            totalIncome: unitPrice, // Initialize totalIncome with the unitPrice
-          };
-        }
-      }
-      // Process vehicle type trips and income
-      if (vehicleType) {
-        const { typeOfVehicle } = vehicleType;
-        if (vehicleTypeTrips[typeOfVehicle]) {
-          vehicleTypeTrips[typeOfVehicle].count += 1;
-          vehicleTypeTrips[typeOfVehicle].totalIncome += unitPrice; // Add unitPrice to totalIncome for the vehicle type
-        } else {
-          vehicleTypeTrips[typeOfVehicle] = {
-            id: typeOfVehicle,
-            header: typeOfVehicle,
-            count: 1,
-            totalIncome: unitPrice, // Initialize totalIncome with the unitPrice
-          };
-        }
-      }
+
+      const netWeight = transaction.netWeight;
+      totalWeight += netWeight;
     });
 
-    // Convert clientTrips object to an array of { id, clientName, count }
-    const clientTripsArray = Object.values(clientTrips);
-    const vehicleTripsArray = Object.values(vehicleTrips);
-    const vehicleTypeTripsArray = Object.values(vehicleTypeTrips);
+    // Process the received transactions into an object with unique keys
+    const processedTransactionsObject = receivedTransactions.reduce(
+      (acc, transaction, index) => {
+        const clientName =
+          transaction.ScheduledTransaction?.BookedTransaction?.Client
+            ?.clientName || null;
+        transaction.ScheduledTransaction?.BookedTransaction?.Client
+          ?.clientName || null;
+        const wasteName =
+          transaction.ScheduledTransaction?.BookedTransaction?.QuotationWaste
+            ?.wasteName || null;
+        const wasteCode =
+          transaction.ScheduledTransaction?.BookedTransaction?.QuotationWaste
+            ?.TypeOfWaste?.wasteCode || null;
+        const netWeight = transaction.netWeight;
 
-    const totalDispatch = dispatchedTransactions.length;
-    const onTimePercentage =
-      totalDispatch > 0
-        ? ((ontimeDispatch / totalDispatch) * 100).toFixed(2)
+        // Creating a key for each entry (using index or any unique identifier)
+        const key = `transaction_${index}`;
+
+        // Assigning the processed data to the key
+        acc[key] = {
+          id: index++,
+          clientName,
+          wasteName,
+          wasteCode,
+          netWeight,
+        };
+
+        return acc;
+      },
+      {}
+    );
+
+    // Consolidate client data by summing net weight and counting trips
+    const clientSummary = receivedTransactions.reduce((acc, transaction) => {
+      const clientName =
+        transaction.ScheduledTransaction?.BookedTransaction?.Client
+          ?.clientName || null;
+      const netWeight = transaction.netWeight;
+
+      if (clientName) {
+        // If the client already exists in the accumulator, add to the existing summary
+        if (acc[clientName]) {
+          acc[clientName].trips += 1; // Increment trips count
+          acc[clientName].totalNetWeight += netWeight; // Add to total weight
+        } else {
+          // Otherwise, initialize the summary for this client
+          acc[clientName] = {
+            id: clientName,
+            clientName,
+            trips: 1,
+            netWeight,
+          };
+        }
+      }
+
+      return acc;
+    }, {});
+
+    const transaction = Object.values(processedTransactionsObject);
+    const transactionSummary = Object.values(clientSummary);
+
+    const totalReceived = onTimeReceived + lateReceived;
+    const onTimeReceivedPercentage =
+      totalReceived > 0
+        ? ((onTimeReceived / totalReceived) * 100).toFixed(2)
         : "0.00";
-    const pending =
-      scheduledTransactionsNoDispatchCount -
-      scheduledTransactionsWithDispatchCount;
+    const pending = scheduledTransactionCount + dispatchedTransactionCount;
+
+    console.log(pending);
+    console.log(totalReceived);
+    console.log(onTimeReceived);
+    console.log(onTimeReceivedPercentage);
+    console.log(lateReceived);
 
     // Respond with the updated data
     res.status(200).json({
       pending,
-      totalDispatch,
-      ontimeDispatch,
-      onTimePercentage,
-      lateDispatch,
-      income,
-      dispatchedTransactions,
-      clientTripsArray,
-      vehicleTripsArray,
-      vehicleTypeTripsArray,
+      totalReceived,
+      onTimeReceived,
+      onTimeReceivedPercentage,
+      lateReceived,
+      transaction,
+      transactionSummary,
+      totalWeight,
     });
   } catch (error) {
     console.error("Error:", error);

@@ -24,7 +24,7 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-import PeopleIcon from "@mui/icons-material/People";
+import ScaleIcon from "@mui/icons-material/Scale";
 import StarBorderPurple500Icon from "@mui/icons-material/StarBorderPurple500";
 import WeekNavigator from "../../../../../OtherComponents/WeekNavigator";
 import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
@@ -41,29 +41,16 @@ const Dashboard = ({ user }) => {
   const [loading, setLoading] = useState(true); // Add loading state
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedDetailsTab, setSelectedDetailsTab] = useState(1);
-  const [selectedSummaryTab, setSelectedSummaryTab] = useState(0);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [pendingDispatch, setPendingDispatch] = useState(0);
-  const [onTimeSchedule, setOnTimeSchedule] = useState(0);
+  const [pending, setPending] = useState(0);
+  const [onTime, setOnTime] = useState(0);
   const [onTimePercentage, setOnTimePercentage] = useState(0);
-  const [lateSchedule, setLateSchedule] = useState(0);
-  const [totalSchedule, setTotalSchedule] = useState(0);
-  const [totalClients, setTotalClients] = useState(0);
+  const [late, setLate] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [totalWeight, setTotalWeight] = useState(0);
   const [transactions, setTransactions] = useState([]);
-  const [clientTrips, setClientTrips] = useState([]);
-  const [vehicleTrips, setVehicleTrips] = useState([]);
-  const [vehicleTypeTrips, setVehicleTypeTrips] = useState([]);
-  const [clientCountByEmployeeData, setClientCountByEmployeeData] = useState(
-    []
-  );
-  const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [updatedTransactions, setUpdatedTransactions] = useState([]);
-  const [filterValue, setFilterValue] = useState(""); // To track the filter input value
-  const [sortModel, setSortModel] = useState([
-    { field: "clientName", sort: "asc" },
-  ]);
+  const [transactionsSummary, setTransactionsSummary] = useState([]);
 
   // useCallback to memoize fetchData function
   const fetchData = useCallback(async () => {
@@ -75,162 +62,38 @@ const Dashboard = ({ user }) => {
       const formattedEndDate = endDate.toISOString().split("T")[0];
 
       const response = await axios.get(
-        `${apiUrl}/api/scheduledTransaction/dashboard/${formattedStartDate}/${formattedEndDate}`,
-        {
-          params: {
-            selectedEmployee: selectedEmployee || undefined, // Pass selectedEmployee if it's defined
-          },
-        }
+        `${apiUrl}/api/receivedTransaction/dashboard/${formattedStartDate}/${formattedEndDate}`
       );
 
-      setPendingDispatch(response.data.pending);
-      setTotalSchedule(response.data.totalSchedule);
-      setOnTimeSchedule(response.data.onTimeSchedule);
-      setOnTimePercentage(response.data.onTimePercentage);
-      setLateSchedule(response.data.lateSchedule);
-      setTotalClients(response.data.totalClients);
-      setClientTrips(response.data.clientTripsArray);
-      setVehicleTrips(response.data.vehicleTripsArray);
-      setVehicleTypeTrips(response.data.vehicleTypeTripsArray);
-      setTransactions(response.data.result);
-      setClientCountByEmployeeData(response.data.clientCountByEmployeeData);
+      setPending(response.data.pending);
+      setTotal(response.data.totalReceived);
+      setOnTime(response.data.onTimeReceived);
+      setOnTimePercentage(response.data.onTimeReceivedPercentage);
+      setLate(response.data.lateReceived);
+      setTotalWeight(response.data.totalWeight);
+      setTransactions(response.data.transaction);
+      setTransactionsSummary(response.data.transactionSummary);
 
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
       setLoading(false);
     }
-  }, [apiUrl, startDate, endDate, selectedEmployee]); // Dependencies that trigger the callback
+  }, [apiUrl, startDate, endDate]); // Dependencies that trigger the callback
 
   // Effect to fetch data when startDate, endDate, selectedEmployee, or apiUrl changes
   useEffect(() => {
     fetchData();
   }, [fetchData]); // Dependencies array includes fetchData which is memoized by useCallback
 
-  // Effect to fetch data when the selected tab changes to 1
-  useEffect(() => {
-    if (selectedDetailsTab === 1) {
-      fetchData(); // Fetch data when tab changes to 1
-    }
-  }, [selectedDetailsTab, fetchData]); // Only re-run when selectedDetailsTab changes
-
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
-  const handleChangeDetailsTab = (event, newValue) => {
-    setSelectedDetailsTab(newValue); // Change the selected tab
-
-    setSelectedEmployee("");
-
-    if (newValue === 1) {
-      // If the tab is 1, fetch data
-      fetchData();
-    }
-  };
-
-  const handleChangeSummaryTab = (event, newValue) => {
-    setSelectedSummaryTab(newValue);
-  };
-
-  // Handle selection change
-  const handleSelectChange = (event) => {
-    setSelectedEmployee(event.target.value);
-  };
-
-  // Calculate totals for the "Total" row
-  const getTotalRow = (filteredTransactions) => {
-    const totalInHouseLogistics = filteredTransactions.reduce(
-      (sum, transaction) => sum + transaction.inHouseLogistics,
-      0
-    );
-    const totalOtherLogistics = filteredTransactions.reduce(
-      (sum, transaction) => sum + transaction.otherLogistics,
-      0
-    );
-    const totalLogistics = filteredTransactions.reduce(
-      (sum, transaction) => sum + transaction.total,
-      0
-    );
-
-    return {
-      id: "total",
-      clientName: "Total",
-      inHouseLogistics: totalInHouseLogistics,
-      otherLogistics: totalOtherLogistics,
-      total: totalLogistics,
-      createdBy: "", // You can leave this empty or use a placeholder like "Total"
-    };
-  };
-
-  // Handle filter changes
-  const handleFilterChange = (event) => {
-    const value = event.target.value;
-    setFilterValue(value); // Update the filter value
-  };
-
-  // Handle sort changes
-  const handleSortModelChange = (newSortModel) => {
-    setSortModel(newSortModel);
-  };
-
-  useEffect(() => {
-    let filteredTransactions = [...transactions];
-
-    // Step 1: Remove "Total" row (if it exists) before filtering or sorting
-    filteredTransactions = filteredTransactions.filter(
-      (transaction) => transaction.id !== "total"
-    );
-
-    // Step 2: Apply filter across all columns if filterValue is set
-    if (filterValue) {
-      filteredTransactions = filteredTransactions.filter((transaction) => {
-        // Loop through each property of the transaction and check if it includes the filter value
-        return Object.values(transaction)
-          .join(" ") // Convert all values of the transaction to a single string
-          .toLowerCase()
-          .includes(filterValue.toLowerCase()); // Check if filter value is a part of any of the fields
-      });
-    }
-
-    // Step 3: Apply sorting (if any)
-    if (sortModel.length > 0) {
-      const sortField = sortModel[0]?.field;
-      const sortOrder = sortModel[0]?.sort;
-
-      filteredTransactions.sort((a, b) => {
-        if (a[sortField] < b[sortField]) {
-          return sortOrder === "asc" ? -1 : 1;
-        }
-        if (a[sortField] > b[sortField]) {
-          return sortOrder === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    // Step 4: Add the "Total" row back at the end
-    const totalRow = getTotalRow(filteredTransactions);
-    setUpdatedTransactions([...filteredTransactions, totalRow]);
-  }, [transactions, filterValue, sortModel]); // Depend on transactions, filterValue, and sortModel
-
-  const summaryData =
-    selectedSummaryTab === 0
-      ? clientTrips
-      : selectedSummaryTab === 1
-      ? vehicleTrips
-      : vehicleTypeTrips;
-  const summaryHeader =
-    selectedSummaryTab === 0
-      ? "Client"
-      : selectedSummaryTab === 1
-      ? "Vehicle"
-      : "Vehicle Type";
-
   const data = [
-    { id: "Pending", label: "Pending", value: pendingDispatch },
-    { id: "On-Time", label: "On-Time", value: onTimeSchedule },
-    { id: "Late", label: "Late", value: lateSchedule },
+    { id: "Pending", label: "Pending", value: pending },
+    { id: "On-Time", label: "On-Time", value: onTime },
+    { id: "Late", label: "Late", value: late },
   ];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -249,48 +112,42 @@ const Dashboard = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "inHouseLogistics",
-      headerName: "FEFC Logistics",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "otherLogistics",
-      headerName: "Other Logistics",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "total",
-      headerName: "Total",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "createdBy",
-      headerName: "Account Handler",
+      field: "wasteName",
+      headerName: "Waste Name",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "wasteCode",
+      headerName: "Waste Code",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "netWeight",
+      headerName: "Weight",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+      valueGetter: (params) => {
+        return formatNumber(params.row.netWeight);
+      },
       renderCell: renderCellWithWrapText,
     },
   ];
 
   const columnsSummary = [
     {
-      field: "header",
-      headerName: summaryHeader,
+      field: "clientName",
+      headerName: "Client Name",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -298,7 +155,7 @@ const Dashboard = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "count",
+      field: "trips",
       headerName: "Trips",
       headerAlign: "center",
       align: "center",
@@ -306,13 +163,13 @@ const Dashboard = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "income",
-      headerName: "Income",
+      field: "netWeight",
+      headerName: "Weight",
       headerAlign: "center",
       align: "center",
       width: 100,
       valueGetter: (params) => {
-        return formatNumber(params.row.totalIncome) || "";
+        return formatNumber(params.row.netWeight) || "";
       },
       renderCell: renderCellWithWrapText,
     },
@@ -401,7 +258,7 @@ const Dashboard = ({ user }) => {
                       On-Time Receive
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {onTimeSchedule}
+                      {onTime}
                     </Typography>
                   </Box>
                   <SentimentVerySatisfiedIcon
@@ -430,7 +287,7 @@ const Dashboard = ({ user }) => {
                         Pending Receive
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {pendingDispatch}
+                        {pending}
                       </Typography>
                     </Box>
                     <PendingActionsIcon
@@ -462,7 +319,7 @@ const Dashboard = ({ user }) => {
                       Late Receive
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {lateSchedule}
+                      {late}
                     </Typography>
                   </Box>
                   <SentimentVeryDissatisfiedIcon
@@ -522,7 +379,7 @@ const Dashboard = ({ user }) => {
                       Total Receive
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {totalSchedule}
+                      {total}
                     </Typography>
                   </Box>
                   <CalendarMonthIcon
@@ -548,13 +405,13 @@ const Dashboard = ({ user }) => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Total Clients
+                        Total Received (KG)
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {totalClients}
+                        {formatNumber(totalWeight)}
                       </Typography>
                     </Box>
-                    <PeopleIcon
+                    <ScaleIcon
                       sx={{ fontSize: 40, marginRight: 2 }}
                       color="secondary"
                     />
@@ -584,7 +441,7 @@ const Dashboard = ({ user }) => {
                           Pending Receive
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {pendingDispatch}
+                          {pending}
                         </Typography>
                       </Box>
                       <PendingActionsIcon
@@ -641,13 +498,13 @@ const Dashboard = ({ user }) => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Total Clients
+                          Total Received (KG)
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {totalClients}
+                          {formatNumber(totalWeight)}
                         </Typography>
                       </Box>
-                      <PeopleIcon
+                      <ScaleIcon
                         sx={{ fontSize: 40, marginRight: 2 }}
                         color="secondary"
                       />
@@ -783,93 +640,23 @@ const Dashboard = ({ user }) => {
                   justifyContent: isMobile ? "none" : "space-between",
                 }}
               >
-                <Box>
+                <Box mb={1}>
                   <Typography variant="h6" gutterBottom>
                     Details:
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", gap: 3 }}>
-                  <Box>
-                    {selectedDetailsTab === 0 && (
-                      <FormControl
-                        sx={{ width: "200px", height: "30px", padding: 0 }}
-                      >
-                        <InputLabel
-                          id="employee-select-label"
-                          sx={{ padding: 0 }}
-                          style={{
-                            color: colors.grey[100],
-                          }}
-                          shrink={true}
-                        >
-                          Select Employee
-                        </InputLabel>
-                        <Select
-                          labelId="employee-select-label"
-                          id="employeeSelect"
-                          value={selectedEmployee}
-                          onChange={handleSelectChange}
-                          label="Select Employee"
-                          sx={{
-                            height: "30px",
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <MenuItem value="">
-                            <em>None</em>
-                          </MenuItem>
-                          {clientCountByEmployeeData.map((employee) => (
-                            <MenuItem
-                              key={employee.employeeId}
-                              value={employee.employeeId}
-                            >
-                              {employee.employeeName}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                  </Box>
-                  <Tabs
-                    value={selectedDetailsTab}
-                    onChange={handleChangeDetailsTab}
-                    sx={{
-                      "& .MuiTab-root": {
-                        height: 30, // Set height for each Tab
-                        minHeight: 30, // Ensure minimum height of 20px for the Tab
-                        paddingY: 0, // Remove vertical padding
-                      },
-                      "& .Mui-selected": {
-                        backgroundColor: colors.greenAccent[400],
-                        boxShadow: "none",
-                        borderBottom: `1px solid ${colors.grey[100]}`,
-                      },
-                      "& .MuiTab-root > span": {
-                        paddingRight: "10px",
-                      },
-                      height: 20,
-                    }}
-                  >
-                    <Tab label="Individual" />
-                    <Tab label="Team" />
-                  </Tabs>
-                </Box>
               </Box>
               <CustomDataGridStyles height={"372px"} margin={0}>
                 <DataGrid
-                  rows={updatedTransactions ? updatedTransactions : []}
+                  rows={transactions ? transactions : []}
                   columns={columns}
                   getRowId={(row) => row.id}
                   hideFooter
                   initialState={{
                     sorting: {
-                      sortModel: [{ field: "total", sort: "asc" }],
+                      sortModel: [{ field: "clientName", sort: "asc" }],
                     },
                   }}
-                  onSortModelChange={handleSortModelChange}
                 />
               </CustomDataGridStyles>
             </CardContent>
@@ -888,39 +675,15 @@ const Dashboard = ({ user }) => {
                   justifyContent: isMobile ? "none" : "space-between",
                 }}
               >
-                <Box mb={3}>
+                <Box mb={1}>
                   <Typography variant="h6" gutterBottom>
                     Summary:
                   </Typography>
                 </Box>
-                {/* <Tabs
-                  value={selectedSummaryTab}
-                  onChange={handleChangeSummaryTab}
-                  sx={{
-                    "& .MuiTab-root": {
-                      height: 30, // Set height for each Tab
-                      minHeight: 30, // Ensure minimum height of 20px for the Tab
-                      paddingY: 0, // Remove vertical padding
-                    },
-                    "& .Mui-selected": {
-                      backgroundColor: colors.greenAccent[400],
-                      boxShadow: "none",
-                      borderBottom: `1px solid ${colors.grey[100]}`,
-                    },
-                    "& .MuiTab-root > span": {
-                      paddingRight: "10px",
-                    },
-                    height: 20,
-                  }}
-                >
-                  <Tab label="Client" />
-                  <Tab label="Vehicle" />
-                  <Tab label="Vehicle Type" />
-                </Tabs> */}
               </Box>
               <CustomDataGridStyles height={"372px"} margin={0}>
                 <DataGrid
-                  rows={summaryData ? summaryData : []}
+                  rows={transactionsSummary ? transactionsSummary : []}
                   columns={columnsSummary}
                   getRowId={(row) => row.id}
                   hideFooter

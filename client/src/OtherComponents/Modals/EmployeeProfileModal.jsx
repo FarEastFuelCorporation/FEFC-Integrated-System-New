@@ -265,7 +265,6 @@ const EmployeeProfileModal = ({
           onClick={async () => {
             try {
               const documentId = params.row.id; // Get the document ID
-              console.log(documentId);
 
               // Fetch the attachment from the API using the document ID
               const response = await axios.get(
@@ -275,7 +274,6 @@ const EmployeeProfileModal = ({
 
               // Convert the response data (arraybuffer) into a byte array
               const byteArray = new Uint8Array(response.data);
-              console.log(byteArray); // Log the raw byteArray for inspection
 
               // Determine MIME type based on magic number (first few bytes)
               let mimeType = "application/octet-stream"; // Default MIME type
@@ -326,7 +324,6 @@ const EmployeeProfileModal = ({
                 { responseType: "arraybuffer" }
               );
               const byteArray = new Uint8Array(response.data);
-              console.log(byteArray);
               const attachment = response.data.employeeAttachment[0].attachment; // Access the attachment data
               const fileName = params.row.fileName; // Access the file name
 

@@ -266,36 +266,37 @@ const EmployeeProfileModal = ({
             try {
               const documentId = params.row.id; // Get the document ID
               console.log(documentId);
+
               // Fetch the attachment from the API using the document ID
               const response = await axios.get(
                 `${apiUrl}/api/employeeAttachment/full/${documentId}`,
-                { responseType: "arraybuffer" }
+                { responseType: "arraybuffer" } // Get binary data
               );
+
+              // Convert the response data (arraybuffer) into a byte array
               const byteArray = new Uint8Array(response.data);
-              console.log(response.data);
-              const attachment = response.data.employeeAttachment[0].attachment; // Access the attachment data
-              console.log(attachment);
-              if (attachment) {
-                const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
+              console.log(byteArray); // Log the raw byteArray for inspection
 
-                // Determine the MIME type based on the file's magic number (first few bytes)
-                let mimeType = "application/octet-stream"; // Default MIME type
-                const magicNumbers = byteArray.slice(0, 4).join(",");
+              // Determine MIME type based on magic number (first few bytes)
+              let mimeType = "application/octet-stream"; // Default MIME type
+              const magicNumbers = byteArray.slice(0, 4).join(",");
 
-                // Common magic numbers
-                if (magicNumbers.startsWith("255,216,255")) {
-                  mimeType = "image/jpeg";
-                } else if (magicNumbers.startsWith("137,80,78,71")) {
-                  mimeType = "image/png";
-                } else if (magicNumbers.startsWith("37,80,68,70")) {
-                  mimeType = "application/pdf";
-                }
-                // Add more magic numbers as necessary
-
-                const blob = new Blob([byteArray], { type: mimeType });
-                const url = URL.createObjectURL(blob); // Create an object URL from the Blob
-                window.open(url, "_blank"); // Open the URL in a new tab
+              // Common magic numbers for determining MIME type
+              if (magicNumbers.startsWith("255,216,255")) {
+                mimeType = "image/jpeg"; // JPEG image
+              } else if (magicNumbers.startsWith("137,80,78,71")) {
+                mimeType = "image/png"; // PNG image
+              } else if (magicNumbers.startsWith("37,80,68,70")) {
+                mimeType = "application/pdf"; // PDF file
               }
+              // Add more magic numbers as needed for other file types
+
+              // Create a Blob from the byteArray with the determined MIME type
+              const blob = new Blob([byteArray], { type: mimeType });
+              const url = URL.createObjectURL(blob); // Create an object URL from the Blob
+
+              // Open the file in a new tab
+              window.open(url, "_blank"); // Open the URL in a new tab
             } catch (error) {
               console.error("Error fetching document file:", error);
             }

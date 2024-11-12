@@ -243,7 +243,7 @@ async function deleteReceivedTransactionController(req, res) {
   }
 }
 
-// Get Dispatched Transactions Dashboard controller
+// Get Received Transactions Dashboard controller
 async function getReceivedTransactionsDashboardController(req, res) {
   try {
     const { startDate, endDate } = req.params;
@@ -407,8 +407,6 @@ async function getReceivedTransactionsDashboardController(req, res) {
         const clientName =
           transaction.ScheduledTransaction?.BookedTransaction?.Client
             ?.clientName || null;
-        transaction.ScheduledTransaction?.BookedTransaction?.Client
-          ?.clientName || null;
         const wasteName =
           transaction.ScheduledTransaction?.BookedTransaction?.QuotationWaste
             ?.wasteName || null;

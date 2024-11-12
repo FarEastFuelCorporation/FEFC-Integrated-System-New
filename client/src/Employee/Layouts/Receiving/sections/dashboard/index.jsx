@@ -5,11 +5,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   Tab,
   Tabs,
   Typography,
@@ -255,7 +251,7 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      On-Time Receive
+                      On-Time Received
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
                       {onTime}
@@ -284,7 +280,7 @@ const Dashboard = ({ user }) => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Pending Receive
+                        Pending To Receive
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
                         {pending}
@@ -316,7 +312,7 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Late Receive
+                      Late Received
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
                       {late}
@@ -376,7 +372,7 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Total Receive
+                      Total Received
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
                       {total}
@@ -438,7 +434,7 @@ const Dashboard = ({ user }) => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Pending Receive
+                          Pending To Receive
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
                           {pending}

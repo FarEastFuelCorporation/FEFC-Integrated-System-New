@@ -31,9 +31,15 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
   const billedTransaction = row.BilledTransaction[0];
 
+  const certifiedTransaction =
+    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+      .CertifiedTransaction[0];
+
   const sortedWasteTransaction =
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;
+
+  const typeOfWeight = certifiedTransaction.typeOfWeight;
 
   // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
   const aggregatedWasteTransactions = Object.values(
@@ -66,8 +72,12 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
   // Calculate amounts and credits based on vatCalculation and mode
   aggregatedWasteTransactions.forEach((item) => {
-    const { weight, QuotationWaste } = item;
-    const totalWeightPrice = weight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+    const { weight, clientWeight, QuotationWaste } = item;
+
+    const selectedWeight =
+      typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+    const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 
     const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
@@ -188,6 +198,11 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
   const invoiceNumber = row.BilledTransaction[0].serviceInvoiceNumber || "";
 
+  const totalRows = 17;
+  const transactionRows = aggregatedWasteTransactions.length;
+  const hasChargeRow = row.QuotationTransportation.mode === "CHARGE" ? 1 : 0;
+  const blankRowsNeeded = totalRows - (transactionRows + hasChargeRow);
+
   const generatePDFContent = () => (
     <Box
       ref={certificateRef}
@@ -282,7 +297,9 @@ const BillingStatementForm = ({ row, verify = null }) => {
                     <TableCell
                       sx={bodyCellStyles({ width: 60, notCenter: true })}
                     >
-                      {`${formatNumber(waste.weight)} `}
+                      {typeOfWeight === "CLIENT WEIGHT"
+                        ? `${formatNumber(waste.clientWeight)}`
+                        : `${formatNumber(waste.weight)}`}
                     </TableCell>
                     <TableCell sx={bodyCellStyles({ width: 40 })}>
                       {row.QuotationWaste.unit}
@@ -295,9 +312,13 @@ const BillingStatementForm = ({ row, verify = null }) => {
                     <TableCell
                       sx={bodyCellStyles({ width: 80, notCenter: true })}
                     >
-                      {formatNumber(
-                        waste.weight * waste.QuotationWaste.unitPrice
-                      )}
+                      {typeOfWeight === "CLIENT WEIGHT"
+                        ? `${formatNumber(
+                            waste.clientWeight * waste.QuotationWaste.unitPrice
+                          )}`
+                        : `${formatNumber(
+                            waste.weight * waste.QuotationWaste.unitPrice
+                          )}`}
                     </TableCell>
                     <TableCell
                       sx={bodyCellStyles({ width: 85, isLastCell: true })}
@@ -346,7 +367,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
                 </TableRow>
               )}
 
-              {Array.from({ length: 12 }, (_, index) => (
+              {Array.from({ length: blankRowsNeeded }, (_, index) => (
                 <TableRow key={index + 1} sx={{ border: "black" }}>
                   <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                   <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>

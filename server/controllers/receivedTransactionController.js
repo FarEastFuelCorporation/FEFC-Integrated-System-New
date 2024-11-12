@@ -318,7 +318,7 @@ async function getReceivedTransactionsDashboardController(req, res) {
               {
                 model: Client,
                 as: "Client",
-                attributes: ["clientName"],
+                attributes: ["clientId", "clientName"],
               },
               {
                 model: QuotationWaste,
@@ -436,20 +436,23 @@ async function getReceivedTransactionsDashboardController(req, res) {
 
     // Consolidate client data by summing net weight and counting trips
     const clientSummary = receivedTransactions.reduce((acc, transaction) => {
+      const clientId =
+        transaction.ScheduledTransaction?.BookedTransaction?.Client?.clientId ||
+        null;
       const clientName =
         transaction.ScheduledTransaction?.BookedTransaction?.Client
           ?.clientName || null;
       const netWeight = transaction.netWeight;
 
-      if (clientName) {
+      if (clientId) {
         // If the client already exists in the accumulator, add to the existing summary
-        if (acc[clientName]) {
-          acc[clientName].trips += 1; // Increment trips count
-          acc[clientName].totalNetWeight += netWeight; // Add to total weight
+        if (acc[clientId]) {
+          acc[clientId].trips += 1; // Increment trips count
+          acc[clientId].netWeight += netWeight; // Add to total weight
         } else {
           // Otherwise, initialize the summary for this client
-          acc[clientName] = {
-            id: clientName,
+          acc[clientId] = {
+            id: clientId,
             clientName,
             trips: 1,
             netWeight,

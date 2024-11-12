@@ -310,7 +310,15 @@ const Transaction = ({
                     params.row.ScheduledTransaction[0].scheduledDate
                   )
                 : calculateRemainingDays(params.row.haulingDate);
-              if (user.userType === 3 && selectedTab === 0) {
+              if (user.userType === 2 && selectedTab === 0) {
+                if (daysRemaining !== null) {
+                  if (daysRemaining < 0) {
+                    return "blink-red"; // Expired
+                  } else if (daysRemaining === 0) {
+                    return "blink-yellow"; // Near expired
+                  }
+                }
+              } else if (user.userType === 3 && selectedTab === 0) {
                 if (daysRemaining !== null) {
                   if (daysRemaining < 0) {
                     return "blink-red"; // Expired

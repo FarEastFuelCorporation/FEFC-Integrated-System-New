@@ -137,10 +137,8 @@ const ReceivedTransactions = ({ user }) => {
   };
 
   const handleEditClick = (row) => {
-    const typeToEdit = inProgressTransactions.find(
-      (type) => type.id === row.id
-    );
-
+    const typeToEdit = row;
+    console.log(typeToEdit);
     if (typeToEdit) {
       const receivedTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};

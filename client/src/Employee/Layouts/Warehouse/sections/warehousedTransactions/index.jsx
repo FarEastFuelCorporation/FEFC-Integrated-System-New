@@ -110,9 +110,7 @@ const WarehousedTransactions = ({ user }) => {
   };
 
   const handleEditClick = (row) => {
-    const typeToEdit = inProgressTransactions.find(
-      (type) => type.id === row.id
-    );
+    const typeToEdit = row;
 
     if (typeToEdit) {
       const warehousedTransaction =

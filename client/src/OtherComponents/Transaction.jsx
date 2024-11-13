@@ -360,19 +360,6 @@ const Transaction = ({
               }
               return ""; // Default class if no blinking is needed
             }}
-            initialState={
-              selectedTab === 0
-                ? {
-                    sorting: {
-                      sortModel: [{ field: "haulingDate", sort: "asc" }],
-                    },
-                  }
-                : {
-                    sorting: {
-                      sortModel: [{ field: "transactionId", sort: "desc" }],
-                    },
-                  }
-            }
           />
         </CustomDataGridStyles>
         <Modal

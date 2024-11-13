@@ -191,7 +191,7 @@ export const PlasticCreditsFooter2 = ({ row, qrCodeURL }) => {
 
       <Box mt={2}>
         <Typography sx={{ fontSize: "10.5px" }}>
-          Note: This is a computer generated certificate. To verify the
+          Note: This is a system generated certificate. To verify the
           authenticity of this file, kindly scan the generated QR Code using
           your QR Code scanner / reader
         </Typography>

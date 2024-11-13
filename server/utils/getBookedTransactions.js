@@ -321,7 +321,7 @@ const getPendingTransactions = async (
 
     const queryOptions = {
       where: whereConditions,
-      order: [["transactionId", "DESC"]],
+      order: [["haulingDate", "DESC"]],
     };
 
     if (partial) {
@@ -475,6 +475,9 @@ const fetchDataFull = async (id) => {
   try {
     const transaction = await BookedTransaction.findByPk(id, {
       include: getIncludeOptions(),
+      order: [
+        ["transactionId", "DESC"], // This orders BookedTransaction records by id in descending order.
+      ],
     });
 
     // Return the results as an object or process them as needed

@@ -209,7 +209,7 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
         </Box>
       </Box>
       <Typography sx={{ fontSize: "10px" }}>
-        Note: This is a computer generated quotation. To verify the authenticity
+        Note: This is a system generated quotation. To verify the authenticity
         of this file, kindly scan the generated QR Code using your QR Code
         scanner / reader
       </Typography>

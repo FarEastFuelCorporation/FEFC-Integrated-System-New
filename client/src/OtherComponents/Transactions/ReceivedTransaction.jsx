@@ -140,6 +140,12 @@ const ReceivedTransaction = ({ row }) => {
                 : "N/A"}
             </Typography>
             <Typography variant="h5">
+              Truck Scale No:{" "}
+              {receivedTransaction.truckScaleNo
+                ? receivedTransaction.truckScaleNo
+                : "N/A"}
+            </Typography>
+            <Typography variant="h5">
               Manifest Weight:{" "}
               {receivedTransaction.manifestWeight
                 ? `${formatWeight(receivedTransaction.manifestWeight)} Kg`

@@ -152,8 +152,6 @@ const Attachments = ({ row, user }) => {
           attachmentCreatedBy: `${newAttachmentData.Employee.firstName} ${newAttachmentData.Employee.lastName}`,
         };
 
-        console.log(processedNewAttachment);
-
         // Update the attachmentData with the new processed attachment
         setAttachmentData((prevAttachmentData) => [
           ...prevAttachmentData,

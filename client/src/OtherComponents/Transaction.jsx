@@ -217,7 +217,6 @@ const Transaction = ({
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
               setRow(response.data.transaction.transaction);
-              console.log(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {
               console.error("Error fetching document file:", error);

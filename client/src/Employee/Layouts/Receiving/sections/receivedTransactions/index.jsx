@@ -138,7 +138,6 @@ const ReceivedTransactions = ({ user }) => {
 
   const handleEditClick = (row) => {
     const typeToEdit = row;
-    console.log(typeToEdit);
     if (typeToEdit) {
       const receivedTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};

@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Box, useTheme, IconButton, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import DeleteIcon from "@mui/icons-material/Delete";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
 import axios from "axios";
 import { tokens } from "../theme";
 import AttachmentModal from "./TransactionModals/AttachmentModal";
 import LoadingSpinner from "./LoadingSpinner";
+import ConfirmationDialog from "./ConfirmationDialog";
+import SuccessMessage from "./SuccessMessage";
 
-const Attachments = ({
-  row,
-  user,
-  setSuccessMessage,
-  setShowSuccessMessage,
-}) => {
+const Attachments = ({ row, user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -33,9 +31,14 @@ const Attachments = ({
   const [attachmentData, setAttachmentData] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(false); // Add loading state
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   useEffect(() => {
     if (row && row.Attachment) {
@@ -43,6 +46,7 @@ const Attachments = ({
         ...attachment,
         attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
       }));
+      console.log(mappedAttachmentData);
       setAttachmentData(mappedAttachmentData); // Update state with mapped data
     } else {
       setAttachmentData([]); // Clear attachment data if no attachments
@@ -81,6 +85,31 @@ const Attachments = ({
   const handleAttachmentInputChange = (e) => {
     const { name, value } = e.target;
     setAttachmentFormData({ ...attachmentFormData, [name]: value });
+  };
+
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Attachment?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
+
+  const handleConfirmDelete = async (id) => {
+    try {
+      setLoading(true);
+      await axios.delete(`${apiUrl}/api/attachment/${id}`);
+
+      // Filter out the deleted attachment from each state
+      setAttachmentData((prevAttachmentData) =>
+        prevAttachmentData.filter((attachment) => attachment.id !== id)
+      );
+      setSuccessMessage("Attachment Deleted Successfully!");
+      setShowSuccessMessage(true);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
+    }
   };
 
   const handleAttachmentFormSubmit = async (e) => {
@@ -122,6 +151,8 @@ const Attachments = ({
           ...newAttachmentData,
           attachmentCreatedBy: `${newAttachmentData.Employee.firstName} ${newAttachmentData.Employee.lastName}`,
         };
+
+        console.log(processedNewAttachment);
 
         // Update the attachmentData with the new processed attachment
         setAttachmentData((prevAttachmentData) => [
@@ -303,6 +334,23 @@ const Attachments = ({
         );
       },
     },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+          >
+            <DeleteIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
+    },
   ];
 
   return (
@@ -317,6 +365,18 @@ const Attachments = ({
       }}
     >
       <LoadingSpinner isLoading={loading} />
+      {showSuccessMessage && (
+        <SuccessMessage
+          message={successMessage}
+          onClose={() => setShowSuccessMessage(false)}
+        />
+      )}
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Box
         sx={{
           display: "flex",

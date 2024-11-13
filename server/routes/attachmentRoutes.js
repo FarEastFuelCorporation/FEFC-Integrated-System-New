@@ -8,6 +8,7 @@ const {
   createAttachmentController,
   getAttachmentsController,
   getAttachmentController,
+  deleteAttachmentController,
 } = require("../controllers/attachmentController");
 
 // Create Attachment route
@@ -18,5 +19,8 @@ router.get("/", getAttachmentsController);
 
 // Get Attachment route
 router.get("/:id", getAttachmentController);
+
+// Delete Attachment route
+router.delete("/:id", deleteAttachmentController);
 
 module.exports = router;

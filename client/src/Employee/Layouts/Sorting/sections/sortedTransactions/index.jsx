@@ -220,7 +220,7 @@ const SortedTransactions = ({ user }) => {
       );
 
       fetchData();
-      setSuccessMessage("Received Transaction deleted successfully!");
+      setSuccessMessage("Sorted Transaction deleted successfully!");
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);
       setLoading(false);

@@ -54,6 +54,8 @@ const Transaction = ({
   setShowSuccessMessage,
   openTransactionModal,
   setOpenTransactionModal,
+  selectedIds,
+  setSelectedIds,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -302,6 +304,16 @@ const Transaction = ({
             rows={transactions ? transactions : []}
             columns={columns}
             getRowId={(row) => row.id}
+            checkboxSelection
+            onSelectionModelChange={(selectionModel) => {
+              console.log("Checkbox clicked");
+              console.log("Selected row IDs:", selectionModel);
+            }}
+            sx={{
+              "& .MuiDataGrid-checkboxInput.Mui-checked": {
+                color: "secondary.main", // Use the secondary color from the theme
+              },
+            }}
             getRowClassName={(params) => {
               const daysRemaining = params.row.ScheduledTransaction?.[0]
                 ?.scheduledDate

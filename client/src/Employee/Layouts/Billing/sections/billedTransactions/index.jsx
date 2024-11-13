@@ -51,6 +51,7 @@ const BilledTransactions = ({ user }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -61,6 +62,7 @@ const BilledTransactions = ({ user }) => {
       );
 
       // For pending transactions
+      console.log(billedTransactionResponse.data.pendingTransactions);
       setPendingTransactions(
         billedTransactionResponse.data.pendingTransactions
       );
@@ -292,6 +294,8 @@ const BilledTransactions = ({ user }) => {
         setShowSuccessMessage={setShowSuccessMessage}
         openTransactionModal={openTransactionModal}
         setOpenTransactionModal={setOpenTransactionModal}
+        selectedIds={selectedIds}
+        setSelectedIds={setSelectedIds}
       />
       <Modal
         user={user}

@@ -61,8 +61,10 @@ const Attendance = () => {
   const [dataList, setdataList] = useState([]);
   const [urlInput, setUrlInput] = useState("");
   const [birthdayCelebrants, setBirthdayCelebrants] = useState([]);
+  const [isBirthday, setIsBirthday] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const audioRef = useRef(null);
   const videoRef = useRef(null);
   const debounceTimeout = useRef(null);
@@ -100,15 +102,10 @@ const Attendance = () => {
       if (isPlaying) {
         // Set timeout to update states after 5 seconds
         timeoutId = setTimeout(() => {
-          setShowData(false);
-          setShowDataList(true);
           toggleAudioAndVideo();
         }, 15000);
       } else {
-        timeoutId = setTimeout(() => {
-          setShowData(false);
-          setShowDataList(true);
-        }, 5000);
+        timeoutId = setTimeout(() => {}, 5000);
       }
 
       // Cleanup function to clear the timeout
@@ -124,22 +121,26 @@ const Attendance = () => {
         const response = await axios.post(
           `${apiUrl}/api/attendance/${inputId}`
         );
-        const birthday = new Date(
-          response.data.employeeData.IdInformation.birthday
-        );
-        if (isToday(birthday)) {
-          toggleAudioAndVideo();
-        }
 
+        setIsBirthday(false);
+        setShowVideo(false);
         setAttendanceData(response.data.attendance);
         setEmployeeData(response.data.employeeData);
         setPicture(response.data.picture);
         setViolationsData(response.data.violations);
         setShowDataList(false);
+        setShowData(true);
+
+        const birthday = new Date(response.data.employeeData.birthday);
+        if (isToday(birthday)) {
+          setIsBirthday(true);
+          setShowVideo(true);
+          toggleAudioAndVideo();
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      setShowData(true);
+
       setLoading(false);
     },
     [apiUrl, toggleAudioAndVideo]
@@ -162,7 +163,6 @@ const Attendance = () => {
         const createdAt = new Date(item.createdAt);
         const dateFormatted = format(createdAt, "MMMM dd, yyyy");
         const timeInFormatted = format(createdAt, "hh:mm:ss a");
-
         const birthday = new Date(item.IdInformation.birthday); // Parse birthday
 
         setIsPlayingVideo(false);
@@ -242,10 +242,13 @@ const Attendance = () => {
         clearTimeout(idleTimeout.current);
       }
 
-      // Set a new idle timeout to refresh the page after 10 seconds of inactivity
+      // Set timeout duration based on conditions
+      const timeoutDuration = showData ? (isBirthday ? 15000 : 5000) : 15000;
+
+      // Set a new idle timeout to refresh the page after the specified duration
       idleTimeout.current = setTimeout(() => {
-        window.location.reload(); // Reload the page after 10 seconds of inactivity
-      }, 15000);
+        window.location.reload(); // Reload the page after the specified inactivity duration
+      }, timeoutDuration);
     };
 
     // Add event listeners for user activity
@@ -263,7 +266,7 @@ const Attendance = () => {
         clearTimeout(idleTimeout.current);
       }
     };
-  }, []);
+  }, [isBirthday, showData]);
 
   // Define columns for DataGrid
   const columns = [
@@ -404,7 +407,6 @@ const Attendance = () => {
                   justifyContent: "space-between",
                   px: "20px",
                   marginTop: "-40px",
-                  mb: 2,
                 }}
               >
                 <Typography
@@ -457,10 +459,12 @@ const Attendance = () => {
               height: "calc(100vh - 100px)",
             }}
           >
-            {isPlaying && (
+            {showVideo && (
               <video
                 ref={videoRef}
                 src={birthday}
+                autoPlay
+                loop
                 muted
                 style={{
                   position: "absolute",

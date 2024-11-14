@@ -46,7 +46,6 @@ const Attachments = ({ row, user }) => {
         ...attachment,
         attachmentCreatedBy: `${attachment.Employee.firstName} ${attachment.Employee.lastName}`, // Concatenate names
       }));
-      console.log(mappedAttachmentData);
       setAttachmentData(mappedAttachmentData); // Update state with mapped data
     } else {
       setAttachmentData([]); // Clear attachment data if no attachments

@@ -37,9 +37,6 @@ const Navbar = () => {
     location.pathname === "/login" ||
     location.pathname === "/";
 
-  const segments = location.pathname.split("/");
-  const client = segments[1] === "certificate";
-
   const handleLogout = async () => {
     try {
       // Make a request to logout endpoint
@@ -129,7 +126,7 @@ const Navbar = () => {
             )}
           </IconButton>
         </Box>
-        {!isAuthPage && !client ? (
+        {!isAuthPage && location.pathname !== "/attendance" && (
           <Box display="flex" gap={2}>
             <Button onClick={handleLogout} color="inherit">
               <Typography variant="h5" style={{ marginLeft: "10px" }}>
@@ -137,7 +134,8 @@ const Navbar = () => {
               </Typography>
             </Button>
           </Box>
-        ) : (
+        )}
+        {isAuthPage && (
           <>
             <Box sx={{ display: { xs: "none", md: "flex" } }} gap={2}>
               <Button component={Link} to="/" color="inherit">

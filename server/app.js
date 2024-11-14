@@ -94,8 +94,9 @@ async function initializeApp() {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: true });
 
-    // await syncIdInformationToLocal();
     // await handleAttendanceSync();
+
+    // await syncIdInformationToLocal();
     // await syncSpecificEmployeeToLocal(24116);
     console.log("Models synced successfully.");
   } catch (error) {

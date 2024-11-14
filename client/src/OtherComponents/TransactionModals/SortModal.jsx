@@ -369,7 +369,7 @@ const SortModal = ({
                     {quotations.map((quotation) =>
                       quotation.QuotationWaste.map((waste) => (
                         <MenuItem key={waste.id} value={waste.id}>
-                          {waste.wasteName}
+                          {waste.wasteName} - {waste.unit}
                         </MenuItem>
                       ))
                     )}

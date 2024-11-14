@@ -219,7 +219,7 @@ const BookModal = ({
           {quotationsData.map((q, index) =>
             q.QuotationWaste.map((waste, wasteIndex) => (
               <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
-                {waste.wasteName}
+                {waste.wasteName} - {waste.unit}
               </MenuItem>
             ))
           )}

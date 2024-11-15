@@ -38,6 +38,8 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;
 
+  console.log(row);
+
   const typeOfWeight = certifiedTransaction.typeOfWeight;
 
   const handleDownloadPDF = () => {
@@ -206,10 +208,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                         }`}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>
-                    {
-                      waste.TreatedWasteTransaction[0].TreatmentMachine
-                        .TreatmentProcess.treatmentProcess
-                    }
+                    {waste.TreatmentProcess?.treatmentProcess}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(true)}>
                     {waste.TreatedWasteTransaction.reduce(

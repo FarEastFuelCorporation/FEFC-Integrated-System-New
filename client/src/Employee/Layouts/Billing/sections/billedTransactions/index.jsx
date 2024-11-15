@@ -14,6 +14,7 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 
 const BilledTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -260,10 +261,10 @@ const BilledTransactions = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
-        {user.userType === "GEN" && (
+        {user.userType === 8 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
-              <PostAddIcon sx={{ fontSize: "40px" }} />
+              <ReceiptIcon sx={{ fontSize: "40px" }} />
             </IconButton>
           </Box>
         )}

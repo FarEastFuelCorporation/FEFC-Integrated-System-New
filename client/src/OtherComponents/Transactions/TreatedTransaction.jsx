@@ -29,10 +29,10 @@ const TreatedTransaction = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const sortedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction;
+    row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.SortedTransaction;
 
   const sortedWasteTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+    row.ScheduledTransaction[0]?.ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;
 
   // Get the bookedTransactionId from ScheduledTransaction

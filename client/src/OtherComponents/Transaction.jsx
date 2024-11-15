@@ -76,6 +76,18 @@ const Transaction = ({
     setSelectedSubTab(newValue);
   };
 
+  const handleSelectionChange = (newSelectionModel) => {
+    if (Array.isArray(newSelectionModel)) {
+      setSelectedIds(newSelectionModel);
+    } else {
+      console.error("Selection model is not an array:", newSelectionModel);
+    }
+  };
+
+  const logSelectedIds = () => {
+    console.log("Selected IDs:", selectedIds);
+  };
+
   const transactions =
     selectedTab === 0
       ? pendingTransactions
@@ -100,6 +112,19 @@ const Transaction = ({
       {params.value}
     </div>
   );
+
+  // const transactions = [
+  //   { id: 1, name: "John Doe", amount: 100 },
+  //   { id: 2, name: "Jane Smith", amount: 200 },
+  //   { id: 3, name: "Alice Johnson", amount: 300 },
+  //   { id: 4, name: "Bob Brown", amount: 150 },
+  // ];
+
+  // const columns = [
+  //   { field: "id", headerName: "ID", width: 90 },
+  //   { field: "name", headerName: "Name", width: 150 },
+  //   { field: "amount", headerName: "Amount", width: 110 },
+  // ];
 
   const columns = [
     {
@@ -218,6 +243,7 @@ const Transaction = ({
               const response = await axios.get(
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
+              console.log(response.data.transaction.transaction);
               setRow(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {
@@ -238,6 +264,9 @@ const Transaction = ({
 
   return (
     <Box mt="40px">
+      <Button variant="contained" color="primary" onClick={logSelectedIds}>
+        Log Selected IDs
+      </Button>
       <Card>
         <Tabs
           value={selectedTab}
@@ -300,14 +329,13 @@ const Transaction = ({
         </Tabs>
         <CustomDataGridStyles height={"70vh"} margin={0}>
           <DataGrid
-            // rows={[]}
             rows={transactions ? transactions : []}
             columns={columns}
             getRowId={(row) => row.id}
             checkboxSelection
-            onSelectionModelChange={(selectionModel) => {
-              console.log("Checkbox clicked");
-              console.log("Selected row IDs:", selectionModel);
+            onSelectionModelChange={(newSelectionModel) => {
+              console.log("Selection Model:", newSelectionModel); // Log the selection model for debugging
+              handleSelectionChange(newSelectionModel);
             }}
             sx={{
               "& .MuiDataGrid-checkboxInput.Mui-checked": {

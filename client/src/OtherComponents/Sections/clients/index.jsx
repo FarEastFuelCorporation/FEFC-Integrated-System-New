@@ -341,7 +341,6 @@ const Clients = ({ user }) => {
         align: "center",
         sortable: false,
         width: 60,
-
         renderCell: (params) =>
           params.row.createdBy === user.id ? (
             <IconButton

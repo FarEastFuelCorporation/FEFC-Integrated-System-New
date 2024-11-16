@@ -63,7 +63,6 @@ const BilledTransactions = ({ user }) => {
       );
 
       // For pending transactions
-      console.log(billedTransactionResponse.data.pendingTransactions);
       setPendingTransactions(
         billedTransactionResponse.data.pendingTransactions
       );

@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
   MenuItem,
+  Autocomplete,
 } from "@mui/material";
 import axios from "axios";
 import { tokens } from "../../theme";
@@ -179,27 +180,45 @@ const BookModal = ({
           />
         </div>
         {user.userType === "TRP" && (
-          <TextField
-            label="Client Name"
-            name="transporterClientId"
-            value={formData.transporterClientId}
-            onChange={handleInputChangeAndFilter}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            {transporterClient.map((transporterClient, index) => (
-              <MenuItem key={`${index}`} value={transporterClient.id}>
-                {transporterClient.clientName}
-              </MenuItem>
-            ))}
-          </TextField>
+          <>
+            <Autocomplete
+              multiple
+              options={transporterClient} // Options for the dropdown
+              // getOptionLabel={(option) => option.clientName} // Display clientName in the dropdown
+
+              getOptionLabel={(option) =>
+                option.clientName === "" ? "" : option.clientName
+              }
+              // value={formData.transporterClientId || []} // Current selected values
+
+              value={transporterClient.filter((emp) =>
+                formData.transporterClientId.includes(emp.id)
+              )}
+              onChange={(event, newValue) => {
+                handleInputChangeAndFilter({
+                  target: {
+                    name: "transporterClientId",
+                    value: newValue.map((option) => option.id), // Map selected values to their IDs
+                  },
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Client Name"
+                  placeholder="Select clients"
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              )}
+            />
+          </>
         )}
         <TextField
           label="Waste Name"

@@ -38,8 +38,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;
 
-  console.log(row);
-
   const typeOfWeight = certifiedTransaction.typeOfWeight;
 
   const handleDownloadPDF = () => {

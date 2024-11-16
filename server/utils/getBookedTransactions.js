@@ -64,11 +64,6 @@ const getIncludeOptions = () => [
     as: "Client",
   },
   {
-    model: TransporterClient,
-    as: "TransporterClient",
-    required: false,
-  },
-  {
     model: Attachment,
     as: "Attachment",
     required: false,

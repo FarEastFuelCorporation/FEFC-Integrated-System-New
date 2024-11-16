@@ -40,6 +40,8 @@ async function getTransporterClientsController(req, res) {
       order: [["clientName", "ASC"]],
     });
 
+    console.log(transporterClients);
+
     res.json({ transporterClients });
   } catch (error) {
     console.error("Error:", error);

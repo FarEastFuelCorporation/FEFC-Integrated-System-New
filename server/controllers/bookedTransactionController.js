@@ -48,10 +48,9 @@ async function createBookedTransactionController(req, res) {
       transactionData.quotationTransportationId = quotationTransportationId;
     }
 
-    if (transporterClientId && transporterClientId !== "") {
-      console.log("pass");
-      transactionData.transporterClientId = transporterClientId;
-    }
+    const concatenatedString = transporterClientId.join(". ");
+
+    transactionData.transporterClientId = concatenatedString;
 
     console.log("transactionData", transactionData);
 

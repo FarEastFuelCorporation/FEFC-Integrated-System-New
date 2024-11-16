@@ -263,7 +263,6 @@ const Transaction = ({
               const response = await axios.get(
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
-              console.log(response.data.transaction.transaction);
               setRow(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {
@@ -611,7 +610,7 @@ const Transaction = ({
 
                   <CustomAccordionDetails>
                     {!Number.isInteger(user.userType) && (
-                      <BookedTransaction row={row} />
+                      <BookedTransaction row={row} user={user} />
                     )}
                     {user.userType === 2 && <ScheduledTransaction row={row} />}
                     {user.userType === 3 && <DispatchedTransaction row={row} />}
@@ -749,7 +748,7 @@ const Transaction = ({
                       {row.statusId >= 1 && <ScheduledTransaction row={row} />}
                       {Number.isInteger(user.userType) && (
                         <>
-                          <BookedTransaction row={row} />
+                          <BookedTransaction row={row} user={user} />
                         </>
                       )}
                     </CustomAccordionDetails>

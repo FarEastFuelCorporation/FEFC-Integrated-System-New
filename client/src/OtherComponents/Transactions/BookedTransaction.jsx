@@ -1,14 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import { format } from "date-fns";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
 import { timestampDate, parseTimeString } from "../Functions";
+import axios from "axios";
 
 const BookedTransaction = ({ row, user }) => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const [transporterClient, setTransporterClientData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const transporterClientResponse = await axios.get(
+          `${apiUrl}/api/transporterClient`
+        );
+
+        setTransporterClientData(
+          transporterClientResponse.data.transporterClients
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [apiUrl, user.id]);
+
+  // Step 1: Split the transporterClientId into individual IDs
+  const ids = row.transporterClientId.split(". ");
+
+  // Step 2: Search the transporterClientData for each ID and get the clientNames
+  const clientNames = ids
+    .map((id) => {
+      const client = transporterClient.find((client) => client.id === id);
+      return client ? client.clientName : null; // Return clientName or null if not found
+    })
+    .filter((name) => name !== null); // Filter out null values (in case some IDs do not match)
+
+  // Step 3: Join the clientNames with ' / ' separator
+  const result = clientNames.join(" / ");
+
   return (
     <Box sx={{ my: 3, position: "relative" }}>
       <CircleLogo>
@@ -67,11 +104,7 @@ const BookedTransaction = ({ row, user }) => {
           ? format(parseTimeString(row.haulingTime), "hh:mm aa")
           : ""}
       </Typography>
-      {row.TransporterClient && (
-        <Typography variant="h5">
-          Client Name: {row.TransporterClient.clientName}
-        </Typography>
-      )}
+      {result && <Typography variant="h5">Client Name: {result}</Typography>}
       <Typography variant="h5">
         Waste Name:{" "}
         {row.QuotationWaste.wasteName ? row.QuotationWaste.wasteName : ""}

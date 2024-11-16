@@ -170,17 +170,6 @@ TransporterClient.belongsTo(Client, {
   onDelete: "CASCADE",
 });
 
-TransporterClient.hasMany(BookedTransaction, {
-  as: "BookedTransaction",
-  foreignKey: "transporterClientId",
-  sourceKey: "id",
-});
-BookedTransaction.belongsTo(TransporterClient, {
-  as: "TransporterClient",
-  foreignKey: "transporterClientId",
-  targetKey: "id",
-});
-
 Client.hasMany(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "createdBy",

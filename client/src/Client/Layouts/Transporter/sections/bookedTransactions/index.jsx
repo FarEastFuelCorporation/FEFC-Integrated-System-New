@@ -16,6 +16,7 @@ const BookedTransactions = ({ user }) => {
     () => ({
       id: "",
       quotationWasteId: "",
+      transporterClientId: [],
       quotationTransportationId: "",
       haulingDate: "",
       haulingTime: "",

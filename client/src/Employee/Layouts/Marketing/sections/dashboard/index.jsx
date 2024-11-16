@@ -311,10 +311,12 @@ const Dashboard = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.totalIncome) || "";
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.totalIncome) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 

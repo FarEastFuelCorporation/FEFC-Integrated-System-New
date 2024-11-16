@@ -124,8 +124,14 @@ body,
 }
 
 .wrap-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  line-height: normal;
   white-space: normal !important;
   word-wrap: break-word !important;
+  text-align: center;
 }
 
 /* TableStyles.css */

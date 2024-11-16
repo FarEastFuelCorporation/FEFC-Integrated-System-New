@@ -256,10 +256,14 @@ const WorkSchedule = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.IdInformation.last_name}, ${params.row.IdInformation.first_name} ${params.row.IdInformation.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.IdInformation.last_name}, ${params.row.IdInformation.first_name} ${params.row.IdInformation.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
@@ -267,10 +271,12 @@ const WorkSchedule = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.IdInformation.designation;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.IdInformation.designation || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
       headerClassName: "wrap-header-text",
     },
     {
@@ -296,91 +302,126 @@ const WorkSchedule = ({ user }) => {
       headerName: "Monday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let monday;
+
         const { mondayIn, mondayOut } = params.row;
-        return formatTimeRange(mondayIn, mondayOut);
+        monday = formatTimeRange(mondayIn, mondayOut);
+
+        let value = {};
+        value.value = monday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "tuesdaySchedule",
       headerName: "Tuesday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let tuesday;
+
         const { tuesdayIn, tuesdayOut } = params.row;
-        return formatTimeRange(tuesdayIn, tuesdayOut);
+        tuesday = formatTimeRange(tuesdayIn, tuesdayOut);
+
+        let value = {};
+        value.value = tuesday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "wednesdaySchedule",
       headerName: "Wednesday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let wednesday;
+
         const { wednesdayIn, wednesdayOut } = params.row;
-        return formatTimeRange(wednesdayIn, wednesdayOut);
+        wednesday = formatTimeRange(wednesdayIn, wednesdayOut);
+
+        let value = {};
+        value.value = wednesday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "thursdaySchedule",
       headerName: "Thursday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let thursday;
+
         const { thursdayIn, thursdayOut } = params.row;
-        return formatTimeRange(thursdayIn, thursdayOut);
+        thursday = formatTimeRange(thursdayIn, thursdayOut);
+
+        let value = {};
+        value.value = thursday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "fridaySchedule",
       headerName: "Friday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let friday;
+
         const { fridayIn, fridayOut } = params.row;
-        return formatTimeRange(fridayIn, fridayOut);
+        friday = formatTimeRange(fridayIn, fridayOut);
+
+        let value = {};
+        value.value = friday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "saturdaySchedule",
       headerName: "Saturday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let saturday;
+
         const { saturdayIn, saturdayOut } = params.row;
-        return formatTimeRange(saturdayIn, saturdayOut);
+        saturday = formatTimeRange(saturdayIn, saturdayOut);
+
+        let value = {};
+        value.value = saturday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "sundaySchedule",
       headerName: "Sunday Schedule",
       headerAlign: "center",
       align: "center",
-      width: 80,
-      valueGetter: (params) => {
+      width: 120,
+      renderCell: (params) => {
+        let sunday;
+
         const { sundayIn, sundayOut } = params.row;
-        return formatTimeRange(sundayIn, sundayOut);
+        sunday = formatTimeRange(sundayIn, sundayOut);
+
+        let value = {};
+        value.value = sunday || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
-      headerClassName: "wrap-header-text",
     },
     {
       field: "remarks",
@@ -388,10 +429,12 @@ const WorkSchedule = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.remarks ? params.row.remarks : "NO REMARKS";
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.remarks ? params.row.remarks : "NO REMARKS";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
       headerClassName: "wrap-header-text",
     },
     {

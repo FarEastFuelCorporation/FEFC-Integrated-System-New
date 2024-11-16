@@ -24,6 +24,10 @@ import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import {
+  formatDate3,
+  formatTime4,
+} from "../../../../../OtherComponents/Functions";
 
 const Leave = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -388,20 +392,12 @@ const Leave = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.startDate) return "";
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatDate3(params.row.startDate) || "";
 
-        // Format departure date
-        const date = new Date(params.row.startDate);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
-
-        return dateFormat;
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "endDate",
@@ -409,20 +405,12 @@ const Leave = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.endDate) return "";
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatDate3(params.row.endDate) || "";
 
-        // Format departure date
-        const date = new Date(params.row.endDate);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
-
-        return dateFormat;
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "duration",
@@ -440,13 +428,19 @@ const Leave = ({ user }) => {
       align: "center",
       sortable: false,
       width: 100,
-      valueGetter: (params) => {
+      renderCell: (params) => {
+        let approval;
         if (!params.row.isApproved) {
-          return "WAITING FOR APPROVAL";
+          approval = "WAITING FOR APPROVAL";
+        } else {
+          approval = params.row.isApproved;
         }
-        return params.row.isApproved;
+
+        let value = {};
+        value.value = approval || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "isNoted",
@@ -455,13 +449,19 @@ const Leave = ({ user }) => {
       align: "center",
       sortable: false,
       width: 100,
-      valueGetter: (params) => {
+      renderCell: (params) => {
+        let approval;
         if (!params.row.isNoted) {
-          return "WAITING FOR APPROVAL";
+          approval = "WAITING FOR APPROVAL";
+        } else {
+          approval = params.row.isNoted;
         }
-        return params.row.isNoted;
+
+        let value = {};
+        value.value = approval || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "edit",

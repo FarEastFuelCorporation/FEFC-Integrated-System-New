@@ -349,7 +349,7 @@ const Attendance = () => {
         onChange={handleInputChange}
         autoFocus
         autoComplete="off"
-        style={{ position: "absolute", top: "20px" }} // Position it as needed
+        style={{ position: "absolute", top: "120px" }} // Position it as needed
       />
 
       <Box

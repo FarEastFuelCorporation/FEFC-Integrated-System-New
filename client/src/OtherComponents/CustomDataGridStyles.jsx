@@ -23,6 +23,10 @@ const CustomDataGridStyles = ({ children, height, margin = "40px 0 0 0" }) => {
           backgroundColor: colors.blueAccent[700],
           borderBottom: "none",
         },
+        "& .MuiDataGrid-root .MuiDataGrid-container--top [role=row]": {
+          backgroundColor: colors.blueAccent[700],
+          borderBottom: "none",
+        },
         "& .MuiDataGrid-virtualScroller": {
           backgroundColor: colors.primary[400],
           overflowY: "auto", // Ensure scrolling works

@@ -482,18 +482,26 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 120,
-      valueGetter: (params) => {
-        if (params.row.termsCharge === "N/A") {
-          return "N/A";
-        } else {
-          let days = params.row.termsChargeDays;
-          days =
-            days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
+      renderCell: (params) => {
+        let termsCharge;
 
-          return `${days} ${params.row.termsCharge}`;
+        if (params.row?.termsCharge) {
+          if (params.row?.termsCharge === "N/A") {
+            termsCharge = "N/A";
+          } else {
+            let days = params.row.termsChargeDays;
+            days =
+              days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
+
+            termsCharge = `${days} ${params.row.termsCharge}`;
+          }
         }
+
+        let value = {};
+        value.value = termsCharge || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "termsBuying",
@@ -501,18 +509,26 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (params.row.termsBuying === "N/A") {
-          return "N/A";
-        } else {
-          let days = params.row.termsBuyingDays;
-          days =
-            days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
+      renderCell: (params) => {
+        let termsBuying;
 
-          return `${days} ${params.row.termsBuying}`;
+        if (params.row?.termsBuying) {
+          if (params.row?.termsBuying === "N/A") {
+            termsBuying = "N/A";
+          } else {
+            let days = params.row.termsBuyingDays;
+            days =
+              days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
+
+            termsBuying = `${days} ${params.row.termsBuying}`;
+          }
         }
+
+        let value = {};
+        value.value = termsBuying || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "scopeOfWork",
@@ -529,11 +545,17 @@ const Quotations = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 120,
-      valueFormatter: (params) => {
-        if (!params.value) return ""; // Handle empty or null values
-        return format(new Date(params.value), "MMMM dd yyyy");
+      renderCell: (params) => {
+        let validity;
+
+        if (!params.value) validity = "";
+        validity = format(new Date(params.value), "MMMM dd yyyy");
+
+        let value = {};
+        value.value = validity || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "view",

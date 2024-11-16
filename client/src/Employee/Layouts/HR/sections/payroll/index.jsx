@@ -484,14 +484,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Monday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Monday
           ? formatNumber(
               calculateHours(params.row.Monday, params.row, "monday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "Tuesday",
@@ -499,14 +501,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Tuesday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Tuesday
           ? formatNumber(
               calculateHours(params.row.Tuesday, params.row, "tuesday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "Wednesday",
@@ -514,14 +518,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Wednesday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Wednesday
           ? formatNumber(
               calculateHours(params.row.Wednesday, params.row, "wednesday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "Thursday",
@@ -529,14 +535,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Thursday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Thursday
           ? formatNumber(
               calculateHours(params.row.Thursday, params.row, "thursday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "Friday",
@@ -544,14 +552,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Friday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Friday
           ? formatNumber(
               calculateHours(params.row.Friday, params.row, "friday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "Saturday",
@@ -559,14 +569,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Saturday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Saturday
           ? formatNumber(
               calculateHours(params.row.Saturday, params.row, "saturday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "Sunday",
@@ -574,14 +586,16 @@ const Payroll = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return params.row.Sunday
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Sunday
           ? formatNumber(
               calculateHours(params.row.Sunday, params.row, "sunday")
             )
           : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "edit",

@@ -639,10 +639,12 @@ const EmployeeRecords = ({ user }) => {
       headerName: "First Name",
       width: 100,
       headerAlign: "center",
-      valueGetter: (params) => {
-        return `${params.row.firstName} ${params.row.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value = `${params.row.firstName} ${params.row.affix}` || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "middleName",
@@ -684,20 +686,28 @@ const EmployeeRecords = ({ user }) => {
       headerName: "Birthday",
       width: 80,
       headerAlign: "center",
-      valueGetter: (params) => {
-        return params.row.birthday ? formatDate3(params.row.birthday) : null;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.birthday
+          ? formatDate3(params.row.birthday)
+          : null || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "dateHire",
       headerName: "Date Hire",
       width: 80,
       headerAlign: "center",
-      valueGetter: (params) => {
-        return params.row.dateHire ? formatDate3(params.row.dateHire) : null;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.dateHire
+          ? formatDate3(params.row.dateHire)
+          : null;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "employeeType",
@@ -720,13 +730,16 @@ const EmployeeRecords = ({ user }) => {
       headerName: "Department",
       width: 200,
       headerAlign: "center",
-      valueGetter: (params) => {
+      renderCell: (params) => {
         const department = departments.find(
           (department) => department.id === params.value
         );
-        return department ? department.department : "(No Data)";
+
+        let value = {};
+        value.value = department ? department.department : "(No Data)";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "mobileNumber",

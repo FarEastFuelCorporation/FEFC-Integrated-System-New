@@ -16,6 +16,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 import { tokens } from "../../../../../theme";
+import { formatDate3 } from "../../../../../OtherComponents/Functions";
 
 const Leave = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -153,10 +154,14 @@ const Leave = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
@@ -165,10 +170,12 @@ const Leave = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.Employee.designation;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Employee.designation || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "typeOfLeave",
@@ -194,20 +201,18 @@ const Leave = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
+      renderCell: (params) => {
         if (!params.row.startDate) return "";
 
         // Format departure date
         const date = new Date(params.row.startDate);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const dateFormat = formatDate3(date);
 
-        return dateFormat;
+        let value = {};
+        value.value = dateFormat || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "endDate",
@@ -215,20 +220,18 @@ const Leave = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
+      renderCell: (params) => {
         if (!params.row.endDate) return "";
 
         // Format departure date
         const date = new Date(params.row.endDate);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const dateFormat = formatDate3(date);
 
-        return dateFormat;
+        let value = {};
+        value.value = dateFormat || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "duration",
@@ -244,12 +247,15 @@ const Leave = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
-      valueGetter: (params) => {
+      renderCell: (params) => {
+        const isApproved = params.row.isApproved;
+        let buttonGroup;
+
         if (
-          params.row.isApproved === "APPROVED" &&
+          isApproved === "APPROVED" &&
           new Date(params.row.startDate) >= new Date()
         ) {
-          return (
+          buttonGroup = (
             <Box
               sx={{
                 display: "flex",
@@ -258,7 +264,7 @@ const Leave = ({ user }) => {
                 alignItems: "center",
               }}
             >
-              <Typography>{params.row.isApproved}</Typography>
+              <Typography>{isApproved}</Typography>
               <IconButton
                 color="error"
                 onClick={() => handleDisapprovedClick(params.row.id)}
@@ -268,10 +274,10 @@ const Leave = ({ user }) => {
             </Box>
           );
         } else if (
-          params.row.isApproved === "DISAPPROVED" &&
+          isApproved === "DISAPPROVED" &&
           new Date(params.row.startDate) >= new Date()
         ) {
-          return (
+          buttonGroup = (
             <Box
               sx={{
                 display: "flex",
@@ -280,7 +286,7 @@ const Leave = ({ user }) => {
                 alignItems: "center",
               }}
             >
-              <Typography>{params.row.isApproved}</Typography>
+              <Typography>{isApproved}</Typography>
               <IconButton
                 color="success"
                 onClick={() => handleApprovedClick(params.row.id)}
@@ -289,8 +295,8 @@ const Leave = ({ user }) => {
               </IconButton>
             </Box>
           );
-        } else if (!params.row.isApproved || params.row.isApproved === null) {
-          return (
+        } else if (!isApproved || isApproved === null) {
+          buttonGroup = (
             <>
               <IconButton
                 color="success"
@@ -306,10 +312,15 @@ const Leave = ({ user }) => {
               </IconButton>
             </>
           );
+        } else {
+          buttonGroup = <Typography>{isApproved}</Typography>;
         }
-        return params.row.isApproved;
+
+        let value = {};
+        value.value = <div>{buttonGroup}</div> || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
       sortComparator: (v1, v2, params1, params2) => {
         if (params1.row.isApproved === null) return -1;
         if (params2.row.isApproved === null) return 1;
@@ -323,13 +334,20 @@ const Leave = ({ user }) => {
       align: "center",
       sortable: false,
       width: 100,
-      valueGetter: (params) => {
+      renderCell: (params) => {
+        let isNOted;
+
         if (!params.row.isNoted && params.row.isApproved) {
-          return "WAITING FOR APPROVAL";
+          isNOted = "WAITING FOR APPROVAL";
+        } else {
+          isNOted = params.row.isNoted;
         }
-        return params.row.isNoted;
+
+        let value = {};
+        value.value = isNOted || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 
@@ -349,10 +367,14 @@ const Leave = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
@@ -361,10 +383,12 @@ const Leave = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.Employee.designation;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Employee.designation || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "totalVacationLeave",
@@ -400,14 +424,14 @@ const Leave = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return (
+      renderCell: (params) => {
+        let value =
           params.row.totalVacationLeave +
           params.row.totalSickLeave +
-          params.row.totalEmergencyLeave
-        );
+          params.row.totalEmergencyLeave;
+
+        return value;
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 

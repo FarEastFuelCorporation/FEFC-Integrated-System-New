@@ -127,13 +127,14 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return (
+      renderCell: (params) => {
+        let value = {};
+        value.value =
           params.row.ScheduledTransaction?.BookedTransaction?.Client
-            ?.clientName || ""
-        );
+            ?.clientName || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "typeOfVehicle",
@@ -142,13 +143,14 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return (
+      renderCell: (params) => {
+        let value = {};
+        value.value =
           params.row.ScheduledTransaction?.BookedTransaction
-            ?.QuotationTransportation?.VehicleType?.typeOfVehicle || ""
-        );
+            ?.QuotationTransportation?.VehicleType?.typeOfVehicle || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "vehicle",
@@ -156,10 +158,12 @@ const Dashboard = () => {
       headerAlign: "center",
       align: "center",
       width: 50,
-      valueGetter: (params) => {
-        return params.row.Vehicle?.plateNumber || "";
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Vehicle?.plateNumber || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "income",
@@ -168,15 +172,16 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return (
+      renderCell: (params) => {
+        let value = {};
+        value.value =
           formatNumber(
             params.row.ScheduledTransaction?.BookedTransaction
               ?.QuotationTransportation?.unitPrice
-          ) || ""
-        );
+          ) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 
@@ -204,10 +209,12 @@ const Dashboard = () => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.totalIncome) || "";
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.totalIncome) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 

@@ -304,11 +304,14 @@ const Clients = ({ user }) => {
       headerName: "Account Handler",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      valueGetter: (params) => {
-        return `${params.row.Employee.firstName} ${params.row.Employee.lastName}`;
+      width: 150,
+      renderCell: (params) => {
+        const employee = params.row.Employee;
+        let fullName = {};
+        fullName.value = `${employee.firstName} ${employee.lastName}`;
+
+        return renderCellWithWrapText(fullName);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 

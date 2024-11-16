@@ -98,10 +98,13 @@ const SortedTransaction = ({ row }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return params.row.TreatmentProcess.treatmentProcess;
+
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.TreatmentProcess.treatmentProcess || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "weight",

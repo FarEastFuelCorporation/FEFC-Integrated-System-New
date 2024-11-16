@@ -20,6 +20,10 @@ import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import {
+  formatDate3,
+  formatTime4,
+} from "../../../../../OtherComponents/Functions";
 
 const Overtime = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -230,17 +234,15 @@ const Overtime = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.dateStart) return "";
-        if (!params.row.timeStart) return "";
+      renderCell: (params) => {
+        let start;
+
+        if (!params.row.dateStart) return (start = "");
+        if (!params.row.timeStart) return (start = "");
 
         // Format departure date
         const date = new Date(params.row.dateStart);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const dateFormat = formatDate3(date);
 
         // Format departure time
         const [hours, minutes, seconds] = params.row.timeStart.split(":");
@@ -249,16 +251,15 @@ const Overtime = ({ user }) => {
         timeFormat.setMinutes(minutes);
         timeFormat.setSeconds(seconds);
 
-        const timeString = timeFormat.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24:30 PM"
+        const timeString = formatTime4(timeFormat);
 
-        return `${dateFormat} ${timeString}`;
+        start = `${dateFormat} ${timeString}`;
+
+        let value = {};
+        value.value = start || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "end",
@@ -266,17 +267,15 @@ const Overtime = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.dateStart) return "";
-        if (!params.row.timeEnd) return "";
+      renderCell: (params) => {
+        let end;
+
+        if (!params.row.dateEnd) return (end = "");
+        if (!params.row.timeEnd) return (end = "");
 
         // Format departure date
-        const date = new Date(params.row.dateStart);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const date = new Date(params.row.dateEnd);
+        const dateFormat = formatDate3(date);
 
         // Format departure time
         const [hours, minutes, seconds] = params.row.timeEnd.split(":");
@@ -285,16 +284,15 @@ const Overtime = ({ user }) => {
         timeFormat.setMinutes(minutes);
         timeFormat.setSeconds(seconds);
 
-        const timeString = timeFormat.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24:30 PM"
+        const timeString = formatTime4(timeFormat);
 
-        return `${dateFormat} ${timeString}`;
+        end = `${dateFormat} ${timeString}`;
+
+        let value = {};
+        value.value = end || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "purpose",
@@ -312,13 +310,18 @@ const Overtime = ({ user }) => {
       align: "center",
       sortable: false,
       width: 100,
-      valueGetter: (params) => {
+      renderCell: (params) => {
+        let approval;
         if (!params.row.isApproved) {
-          return "WAITING FOR APPROVAL";
+          approval = "WAITING FOR APPROVAL";
         }
-        return params.row.isApproved;
+        approval = params.row.isApproved;
+
+        let value = {};
+        value.value = approval || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "edit",

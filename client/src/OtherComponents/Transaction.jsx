@@ -142,10 +142,13 @@ const Transaction = ({
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.Client.clientName;
+      renderCell: (params) => {
+        const clientName = params.row.Client.clientName;
+        let value = {};
+        value.value = clientName;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "haulingDate",
@@ -154,17 +157,25 @@ const Transaction = ({
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
+      renderCell: (params) => {
+        let haulingDate;
         if (params.row.ScheduledTransaction[0]) {
-          return format(
+          haulingDate = format(
             new Date(params.row.ScheduledTransaction[0].scheduledDate),
             "MMMM dd, yyyy"
           );
         } else {
-          return format(new Date(params.row.haulingDate), "MMMM dd, yyyy");
+          haulingDate = format(
+            new Date(params.row.haulingDate),
+            "MMMM dd, yyyy"
+          );
         }
+
+        let value = {};
+        value.value = haulingDate;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "haulingTime",
@@ -173,16 +184,22 @@ const Transaction = ({
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
+      renderCell: (params) => {
         const scheduledTime = params.row.ScheduledTransaction[0]
           ? params.row.ScheduledTransaction[0].scheduledTime
           : params.row.haulingTime;
 
         const parsedTime = parse(scheduledTime, "HH:mm:ss", new Date());
 
-        return format(parsedTime, "hh:mm a");
+        let haulingTime;
+
+        haulingTime = format(parsedTime, "hh:mm a");
+
+        let value = {};
+        value.value = haulingTime;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "status",
@@ -191,35 +208,38 @@ const Transaction = ({
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        switch (params.row.statusId) {
-          case 1:
-            return "BOOKED";
-          case 2:
-            return "SCHEDULED";
-          case 3:
-            return "DISPATCHED";
-          case 4:
-            return "RECEIVED";
-          case 5:
-            return "SORTED";
-          case 6:
-            return "TREATED";
-          case 7:
-            return "CERTIFIED";
-          case 8:
-            return "BILLED";
-          case 9:
-            return "APPROVED";
-          case 10:
-            return "DISTRIBUTED";
-          case 11:
-            return "COLLECTED";
-          default:
-            return "UNKNOWN"; // Optional: Handle unexpected status IDs
+      renderCell: (params) => {
+        let status;
+
+        if (params.row.statusId === 1) {
+          status = "BOOKED";
+        } else if (params.row.statusId === 2) {
+          status = "SCHEDULED";
+        } else if (params.row.statusId === 3) {
+          status = "DISPATCHED";
+        } else if (params.row.statusId === 4) {
+          status = "RECEIVED";
+        } else if (params.row.statusId === 5) {
+          status = "SORTED";
+        } else if (params.row.statusId === 6) {
+          status = "TREATED";
+        } else if (params.row.statusId === 7) {
+          status = "CERTIFIED";
+        } else if (params.row.statusId === 8) {
+          status = "BILLED";
+        } else if (params.row.statusId === 9) {
+          status = "APPROVED";
+        } else if (params.row.statusId === 10) {
+          status = "DISTRIBUTED";
+        } else if (params.row.statusId === 11) {
+          status = "COLLECTED";
         }
+
+        let value = {};
+        value.value = status;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "view",

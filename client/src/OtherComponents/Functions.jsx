@@ -144,6 +144,16 @@ export function formatTime3(isoString) {
   return `${hours}:${minutes}:${seconds} ${ampm}`;
 }
 
+export const formatTime4 = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  });
+};
+
 export const calculateRemainingDays = (expirationDate) => {
   if (expirationDate === null) {
     return null; // Handle invalid dates

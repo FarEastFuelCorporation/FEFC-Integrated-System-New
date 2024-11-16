@@ -133,10 +133,12 @@ const Dashboard = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        return formatNumber(params.row.netWeight);
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.netWeight) || 0;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 
@@ -164,10 +166,12 @@ const Dashboard = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.netWeight) || "";
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.netWeight) || 0;
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 

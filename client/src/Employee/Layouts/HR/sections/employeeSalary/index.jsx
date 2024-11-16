@@ -234,10 +234,12 @@ const EmployeeSalary = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 100,
-      valueGetter: (params) => {
-        return params.row.employeeId;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.employeeId || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "employeeName",
@@ -246,10 +248,14 @@ const EmployeeSalary = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
@@ -258,10 +264,12 @@ const EmployeeSalary = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.Employee.designation;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Employee.designation || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "payrollType",
@@ -297,10 +305,12 @@ const EmployeeSalary = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.salary);
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.salary) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "dayAllowance",
@@ -309,10 +319,12 @@ const EmployeeSalary = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.dayAllowance);
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.dayAllowance) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "nightAllowance",
@@ -321,10 +333,12 @@ const EmployeeSalary = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.nightAllowance);
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatNumber(params.row.nightAllowance) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "edit",

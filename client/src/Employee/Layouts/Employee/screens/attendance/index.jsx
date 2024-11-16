@@ -6,6 +6,10 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
+import {
+  formatDate3,
+  formatTime4,
+} from "../../../../../OtherComponents/Functions";
 
 const Attendance = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -45,39 +49,32 @@ const Attendance = ({ user }) => {
 
   const columns = [
     {
-      field: "formattedDate", // Custom field for date
+      field: "formattedDate",
       headerName: "Date",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params) => {
-        const date = new Date(params.row.createdAt);
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatDate3(params.row.createdAt) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
-      field: "formattedTime", // Custom field for time
+      field: "formattedTime",
       headerName: "Time",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params) => {
-        const date = new Date(params.row.createdAt);
-        return date.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24 PM"
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatTime4(params.row.createdAt) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "status",

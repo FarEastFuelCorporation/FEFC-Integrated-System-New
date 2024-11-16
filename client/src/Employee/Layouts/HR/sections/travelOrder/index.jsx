@@ -7,6 +7,10 @@ import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridS
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import {
+  formatDate3,
+  formatTime4,
+} from "../../../../../OtherComponents/Functions";
 
 const TravelOrder = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -103,10 +107,14 @@ const TravelOrder = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
@@ -115,10 +123,12 @@ const TravelOrder = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return params.row.Employee.designation;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Employee.designation || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "destination",
@@ -144,17 +154,15 @@ const TravelOrder = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.departureDate) return "";
-        if (!params.row.departureTime) return "";
+      renderCell: (params) => {
+        let departure;
+
+        if (!params.row.departureDate) return (departure = "");
+        if (!params.row.departureTime) return (departure = "");
 
         // Format departure date
         const date = new Date(params.row.departureDate);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const dateFormat = formatDate3(date);
 
         // Format departure time
         const [hours, minutes, seconds] = params.row.departureTime.split(":");
@@ -163,16 +171,15 @@ const TravelOrder = ({ user }) => {
         timeFormat.setMinutes(minutes);
         timeFormat.setSeconds(seconds);
 
-        const timeString = timeFormat.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24:30 PM"
+        const timeString = formatTime4(timeFormat);
 
-        return `${dateFormat} ${timeString}`;
+        departure = `${dateFormat} ${timeString}`;
+
+        let value = {};
+        value.value = departure || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "formattedArrival",
@@ -180,36 +187,32 @@ const TravelOrder = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.arrivalDate) return "";
-        if (!params.row.arrivalTime) return "";
+      renderCell: (params) => {
+        let arrival;
+
+        if (!params.row.arrivalDate) return (arrival = "");
+        if (!params.row.arrivalTime) return (arrival = "");
 
         // Format arrival date
         const date = new Date(params.row.arrivalDate);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const dateFormat = formatDate3(date);
 
-        // Extract hours, minutes, and seconds from arrivalTime
+        // Format arrival time
         const [hours, minutes, seconds] = params.row.arrivalTime.split(":");
         const timeFormat = new Date();
         timeFormat.setHours(hours);
         timeFormat.setMinutes(minutes);
-        timeFormat.setSeconds(seconds); // Set seconds
+        timeFormat.setSeconds(seconds);
 
-        // Format arrival time with seconds
-        const timeString = timeFormat.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24:30 PM"
+        const timeString = formatTime4(timeFormat);
 
-        return `${dateFormat} ${timeString}`;
+        arrival = `${dateFormat} ${timeString}`;
+
+        let value = {};
+        value.value = arrival || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
 
     {
@@ -218,14 +221,21 @@ const TravelOrder = ({ user }) => {
       headerAlign: "center",
       align: "center",
       sortable: false,
-      width: 100,
-      valueGetter: (params) => {
+      flex: 1,
+      minWidth: 100,
+      renderCell: (params) => {
+        let approval;
         if (!params.row.isApproved) {
-          return "FOR APPROVAL";
+          approval = "WAITING FOR APPROVAL";
+        } else {
+          approval = params.row.isApproved;
         }
-        return params.row.isApproved;
+
+        let value = {};
+        value.value = approval || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "isNoted",
@@ -234,28 +244,38 @@ const TravelOrder = ({ user }) => {
       align: "center",
       sortable: false,
       width: 100,
-      valueGetter: (params) => {
-        if (!params.row.isNoted && params.row.isApproved) {
-          return (
-            <>
-              <IconButton
-                color="success"
-                onClick={() => handleApprovedClick(params.row.id)}
-              >
-                <i className="fa-solid fa-thumbs-up"></i>
-              </IconButton>
-              <IconButton
-                color="error"
-                onClick={() => handleDisapprovedClick(params.row.id)}
-              >
-                <i className="fa-solid fa-thumbs-down"></i>
-              </IconButton>
-            </>
-          );
-        }
-        return params.row.isNoted;
+      renderCell: (params) => {
+        let isNoted = params.row.isNoted;
+
+        // If isNoted is falsy and isApproved is truthy, show the buttons
+        const buttonGroup = !isNoted && params.row.isApproved && (
+          <>
+            <IconButton
+              color="success"
+              onClick={() => handleApprovedClick(params.row.id)}
+            >
+              <i className="fa-solid fa-thumbs-up"></i>
+            </IconButton>
+            <IconButton
+              color="error"
+              onClick={() => handleDisapprovedClick(params.row.id)}
+            >
+              <i className="fa-solid fa-thumbs-down"></i>
+            </IconButton>
+          </>
+        );
+
+        let value = {};
+        value.value =
+          (
+            <div>
+              {isNoted && <span>{isNoted}</span>}
+              {buttonGroup}
+            </div>
+          ) || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "formattedOut",
@@ -263,23 +283,22 @@ const TravelOrder = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.out) return "";
+      renderCell: (params) => {
+        let out;
+
+        if (!params.row.out) return (out = "");
+        // Format out date
         const date = new Date(params.row.out);
-        const dateFomrat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
-        const timeFomrat = date.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24 PM"
-        return `${dateFomrat} ${timeFomrat}`;
+        const dateFormat = formatDate3(date);
+        const timeFomrat = formatTime4(date);
+
+        out = `${dateFormat} ${timeFomrat}`;
+
+        let value = {};
+        value.value = out || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "formattedIn",
@@ -287,23 +306,22 @@ const TravelOrder = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.in) return "";
+      renderCell: (params) => {
+        let timeIn;
+
+        if (!params.row.in) return (timeIn = "");
+        // Format in date
         const date = new Date(params.row.in);
-        const dateFomrat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
-        const timeFomrat = date.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24 PM"
-        return `${dateFomrat} ${timeFomrat}`;
+        const dateFormat = formatDate3(date);
+        const timeFomrat = formatTime4(date);
+
+        timeIn = `${dateFormat} ${timeFomrat}`;
+
+        let value = {};
+        value.value = timeIn || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
   ];
 

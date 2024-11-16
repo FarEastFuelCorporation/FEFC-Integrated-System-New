@@ -8,6 +8,10 @@ import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridS
 import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import {
+  formatDate3,
+  formatTime4,
+} from "../../../../../OtherComponents/Functions";
 
 const Overtime = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -105,10 +109,12 @@ const Overtime = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 100,
-      valueGetter: (params) => {
-        return params.row.employeeId;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.employeeId || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "employeeName",
@@ -117,10 +123,14 @@ const Overtime = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",
@@ -129,10 +139,12 @@ const Overtime = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      valueGetter: (params) => {
-        return params.row.Employee.designation;
+      renderCell: (params) => {
+        let value = {};
+        value.value = params.row.Employee.designation || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "start",
@@ -140,17 +152,15 @@ const Overtime = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.dateStart) return "";
-        if (!params.row.timeStart) return "";
+      renderCell: (params) => {
+        let start;
+
+        if (!params.row.dateStart) return (start = "");
+        if (!params.row.timeStart) return (start = "");
 
         // Format departure date
         const date = new Date(params.row.dateStart);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const dateFormat = formatDate3(date);
 
         // Format departure time
         const [hours, minutes, seconds] = params.row.timeStart.split(":");
@@ -159,16 +169,15 @@ const Overtime = ({ user }) => {
         timeFormat.setMinutes(minutes);
         timeFormat.setSeconds(seconds);
 
-        const timeString = timeFormat.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24:30 PM"
+        const timeString = formatTime4(timeFormat);
 
-        return `${dateFormat} ${timeString}`;
+        start = `${dateFormat} ${timeString}`;
+
+        let value = {};
+        value.value = start || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "end",
@@ -176,17 +185,15 @@ const Overtime = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 120,
-      valueGetter: (params) => {
-        if (!params.row.dateStart) return "";
-        if (!params.row.timeEnd) return "";
+      renderCell: (params) => {
+        let end;
+
+        if (!params.row.dateEnd) return (end = "");
+        if (!params.row.timeEnd) return (end = "");
 
         // Format departure date
-        const date = new Date(params.row.dateStart);
-        const dateFormat = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }); // Format to "October 15, 2024"
+        const date = new Date(params.row.dateEnd);
+        const dateFormat = formatDate3(date);
 
         // Format departure time
         const [hours, minutes, seconds] = params.row.timeEnd.split(":");
@@ -195,16 +202,15 @@ const Overtime = ({ user }) => {
         timeFormat.setMinutes(minutes);
         timeFormat.setSeconds(seconds);
 
-        const timeString = timeFormat.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }); // Format to "12:24:30 PM"
+        const timeString = formatTime4(timeFormat);
 
-        return `${dateFormat} ${timeString}`;
+        end = `${dateFormat} ${timeString}`;
+
+        let value = {};
+        value.value = end || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "purpose",
@@ -221,10 +227,51 @@ const Overtime = ({ user }) => {
       headerAlign: "center",
       align: "center",
       sortable: false,
-      width: 100,
-      valueGetter: (params) => {
-        if (!params.row.isApproved) {
-          return (
+      width: 150,
+      renderCell: (params) => {
+        const isApproved = params.row.isApproved;
+        let buttonGroup;
+
+        if (isApproved === "APPROVED") {
+          buttonGroup = (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography>{isApproved}</Typography>
+              <IconButton
+                color="error"
+                onClick={() => handleDisapprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-down"></i>
+              </IconButton>
+            </Box>
+          );
+        } else if (isApproved === "DISAPPROVED") {
+          buttonGroup = (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography>{isApproved}</Typography>
+              <IconButton
+                color="success"
+                onClick={() => handleApprovedClick(params.row.id)}
+              >
+                <i className="fa-solid fa-thumbs-up"></i>
+              </IconButton>
+            </Box>
+          );
+        } else if (!isApproved || isApproved === null) {
+          buttonGroup = (
             <>
               <IconButton
                 color="success"
@@ -240,10 +287,20 @@ const Overtime = ({ user }) => {
               </IconButton>
             </>
           );
+        } else {
+          buttonGroup = <Typography>{isApproved}</Typography>;
         }
-        return params.row.isApproved;
+
+        let value = {};
+        value.value = <div>{buttonGroup}</div> || "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
+      sortComparator: (v1, v2, params1, params2) => {
+        if (params1.row.isApproved === null) return -1;
+        if (params2.row.isApproved === null) return 1;
+        return params1.row.isApproved - params2.row.isApproved;
+      },
     },
   ];
 

@@ -178,12 +178,14 @@ const VehicleProfileModal = ({
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        if (params.row.Employee) {
-          return `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}`;
-        }
+      renderCell: (params) => {
+        let value = {};
+        value.value =
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
+          "";
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "createdAt",

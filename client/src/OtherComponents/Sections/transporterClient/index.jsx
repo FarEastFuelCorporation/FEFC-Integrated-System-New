@@ -54,14 +54,16 @@ const TransporterClient = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/api/transporterClient`);
+      const response = await axios.get(
+        `${apiUrl}/api/transporterClient/${user.id}`
+      );
 
       setTransporterClients(response.data.transporterClients);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [apiUrl]);
+  }, [apiUrl, user.id]);
 
   useEffect(() => {
     fetchData();

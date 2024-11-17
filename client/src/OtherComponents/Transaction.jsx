@@ -278,7 +278,6 @@ const Transaction = ({
       ),
     },
   ];
-  console.log(user.userType);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -354,7 +353,6 @@ const Transaction = ({
             getRowId={(row) => row.id}
             checkboxSelection={user.userType === 8}
             onSelectionModelChange={(newSelectionModel) => {
-              console.log("Selection Model:", newSelectionModel); // Log the selection model for debugging
               handleSelectionChange(newSelectionModel);
             }}
             sx={{

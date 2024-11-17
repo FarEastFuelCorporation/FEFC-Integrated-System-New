@@ -485,8 +485,29 @@ const fetchDataFull = async (id) => {
   }
 };
 
+const fetchDataFullMultiple = async (ids) => {
+  try {
+    const transactions = await BookedTransaction.findAll({
+      where: { transactionId: ids }, // Fetch records matching the provided IDs
+      include: getIncludeOptions(),
+      order: [
+        ["transactionId", "DESC"], // Order records by transactionId in descending order
+      ],
+    });
+
+    // Return the fetched transactions
+    return {
+      transactions,
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   fetchData,
   fetchDataFull,
+  fetchDataFullMultiple,
   getIncludeOptions,
 };

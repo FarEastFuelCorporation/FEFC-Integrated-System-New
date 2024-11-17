@@ -27,7 +27,7 @@ const BilledTransactions = ({ user }) => {
 
   const initialFormData = {
     id: "",
-    bookedTransactionId: "",
+    bookedTransactionId: [],
     billingNumber: "",
     billedDate: "",
     billedTime: "",
@@ -88,9 +88,10 @@ const BilledTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
+    console.log(selectedIds);
     setFormData({
       id: "",
-      bookedTransactionId: row.id,
+      bookedTransactionId: selectedIds,
       billingNumber: "",
       billedDate: "",
       billedTime: "",

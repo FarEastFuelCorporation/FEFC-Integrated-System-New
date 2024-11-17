@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createBilledTransactionController,
   getBilledTransactionsController,
+  getBilledStatementsController,
   updateBilledTransactionController,
   deleteBilledTransactionController,
 } = require("../controllers/billedTransactionController");
@@ -14,6 +15,9 @@ router.post("/", createBilledTransactionController);
 
 // Get Billed Transactions route
 router.get("/", getBilledTransactionsController);
+
+// Get Billed Statements route
+router.get("/multiple/:billingNumber", getBilledStatementsController);
 
 // Update Billed Transaction route
 router.put("/:id", updateBilledTransactionController);

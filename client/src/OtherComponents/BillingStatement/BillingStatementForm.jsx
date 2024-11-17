@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Table,
@@ -18,6 +18,7 @@ import jsPDF from "jspdf";
 import BillingStatementFooter from "./BillingStatementFooter";
 import BillingStatementHeader from "./BillingStatementHeader";
 import { formatDate2, formatNumber } from "../Functions";
+import axios from "axios";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
@@ -29,34 +30,35 @@ const BillingStatementForm = ({ row, verify = null }) => {
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
 
+  const [transactions, setTransactions] = useState([]);
+
   const billedTransaction = row.BilledTransaction[0];
 
-  const certifiedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0];
+  console.log(row);
+  console.log(billedTransaction.billingNumber);
 
-  const sortedWasteTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .SortedWasteTransaction;
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    try {
+      // setLoading(true);
+      const billingStatementResponse = await axios.get(
+        `${REACT_APP_API_URL}/api/billedTransaction/multiple/${billedTransaction.billingNumber}`
+      );
 
-  const typeOfWeight = certifiedTransaction.typeOfWeight;
+      // For pending transactions
+      console.log(billingStatementResponse.data.bookedTransactions);
+      setTransactions(billingStatementResponse.data.bookedTransactions);
 
-  // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
-  const aggregatedWasteTransactions = Object.values(
-    sortedWasteTransaction.reduce((acc, current) => {
-      const { id } = current.QuotationWaste;
+      // setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [REACT_APP_API_URL, billedTransaction.billingNumber]);
 
-      // If the `QuotationWaste.id` is already in the accumulator, add the weight
-      if (acc[id]) {
-        acc[id].weight += current.weight;
-      } else {
-        // Otherwise, set the initial object in the accumulator
-        acc[id] = { ...current, weight: current.weight };
-      }
-
-      return acc;
-    }, {})
-  );
+  // Fetch data when component mounts or apiUrl/processDataTransaction changes
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const amounts = {
     vatExclusive: 0,
@@ -70,58 +72,100 @@ const BillingStatementForm = ({ row, verify = null }) => {
     nonVatable: 0,
   };
 
-  // Calculate amounts and credits based on vatCalculation and mode
-  aggregatedWasteTransactions.forEach((item) => {
-    const { weight, clientWeight, QuotationWaste } = item;
+  const totalRows = 17;
+  let hasChargeRow = 0;
+  let transactionRows = 0;
+  let blankRowsNeeded = 0;
 
-    const selectedWeight =
-      typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+  transactions.forEach((transaction) => {
+    const certifiedTransaction =
+      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+        .SortedTransaction[0].CertifiedTransaction[0];
 
-    const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+    const typeOfWeight = certifiedTransaction.typeOfWeight;
 
-    const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+    const sortedWasteTransaction =
+      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+        .SortedTransaction[0].SortedWasteTransaction;
 
-    switch (QuotationWaste.vatCalculation) {
-      case "VAT EXCLUSIVE":
-        target.vatExclusive += totalWeightPrice;
-        break;
-      case "VAT INCLUSIVE":
-        target.vatInclusive += totalWeightPrice;
-        break;
-      case "NON VATABLE":
-        target.nonVatable += totalWeightPrice;
-        break;
-      default:
-        break;
-    }
-  });
+    // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
+    const aggregatedWasteTransactions = Object.values(
+      sortedWasteTransaction.reduce((acc, current) => {
+        const { id } = current.QuotationWaste;
 
-  const transpoFee = row.QuotationTransportation.unitPrice;
-  const transpoVatCalculation = row.QuotationTransportation.vatCalculation;
-  const transpoMode = row.QuotationTransportation.mode;
+        // If the `QuotationWaste.id` is already in the accumulator, add the weight
+        if (acc[id]) {
+          acc[id].weight += current.weight;
+        } else {
+          // Otherwise, set the initial object in the accumulator
+          acc[id] = { ...current, weight: current.weight };
+        }
 
-  const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
-    // Check if the mode is "CHARGE"
-    if (transpoMode === "CHARGE") {
-      // Add the transportation fee based on VAT calculation
-      switch (transpoVatCalculation) {
+        return acc;
+      }, {})
+    );
+
+    // Calculate amounts and credits based on vatCalculation and mode
+    aggregatedWasteTransactions.forEach((item) => {
+      const { weight, clientWeight, QuotationWaste } = item;
+
+      const selectedWeight =
+        typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+      const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+      const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+      switch (QuotationWaste.vatCalculation) {
         case "VAT EXCLUSIVE":
-          amounts.vatExclusive += transpoFee;
+          target.vatExclusive += totalWeightPrice;
           break;
         case "VAT INCLUSIVE":
-          amounts.vatInclusive += transpoFee;
+          target.vatInclusive += totalWeightPrice;
           break;
         case "NON VATABLE":
-          amounts.nonVatable += transpoFee;
+          target.nonVatable += totalWeightPrice;
           break;
         default:
           break;
       }
-    }
-  };
+    });
 
-  // Call the function to add transportation fee
-  addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    transactionRows += aggregatedWasteTransactions.length;
+
+    const transpoFee = transaction.QuotationTransportation.unitPrice;
+    const transpoVatCalculation =
+      transaction.QuotationTransportation.vatCalculation;
+    const transpoMode = transaction.QuotationTransportation.mode;
+
+    const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
+      // Check if the mode is "CHARGE"
+      if (transpoMode === "CHARGE") {
+        // Add the transportation fee based on VAT calculation
+        switch (transpoVatCalculation) {
+          case "VAT EXCLUSIVE":
+            amounts.vatExclusive += transpoFee;
+            break;
+          case "VAT INCLUSIVE":
+            amounts.vatInclusive += transpoFee;
+            break;
+          case "NON VATABLE":
+            amounts.nonVatable += transpoFee;
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    // Call the function to add transportation fee
+    addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+
+    hasChargeRow +=
+      transaction.QuotationTransportation.mode === "CHARGE" ? 1 : 0;
+  });
+
+  blankRowsNeeded = totalRows - (transactionRows + hasChargeRow);
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
@@ -197,11 +241,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
   });
 
   const invoiceNumber = row.BilledTransaction[0].serviceInvoiceNumber || "";
-
-  const totalRows = 17;
-  const transactionRows = aggregatedWasteTransactions.length;
-  const hasChargeRow = row.QuotationTransportation.mode === "CHARGE" ? 1 : 0;
-  const blankRowsNeeded = totalRows - (transactionRows + hasChargeRow);
 
   const generatePDFContent = () => (
     <Box
@@ -280,92 +319,181 @@ const BillingStatementForm = ({ row, verify = null }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {aggregatedWasteTransactions.map((waste, index) => {
-                return (
-                  <TableRow key={index} sx={{ border: "black" }}>
-                    <TableCell sx={bodyCellStyles({ width: 60 })}>
-                      {formatDate2(row.haulingDate)}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}>
-                      {invoiceNumber}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles()}>
-                      {waste.QuotationWaste.wasteName}
-                    </TableCell>
+              {transactions.map((transaction, index) => {
+                // Check if aggregatedWasteTransactions need to be mapped
+                const aggregatedWasteTransactions =
+                  transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
+                    (acc, current) => {
+                      const { id } = current.QuotationWaste;
 
-                    <TableCell
-                      sx={bodyCellStyles({ width: 60, notCenter: true })}
-                    >
-                      {typeOfWeight === "CLIENT WEIGHT"
-                        ? `${formatNumber(waste.clientWeight)}`
-                        : `${formatNumber(waste.weight)}`}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}>
-                      {row.QuotationWaste.unit}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({ width: 80, notCenter: true })}
-                    >
-                      {formatNumber(waste.QuotationWaste.unitPrice)}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({ width: 80, notCenter: true })}
-                    >
-                      {typeOfWeight === "CLIENT WEIGHT"
-                        ? `${formatNumber(
-                            waste.clientWeight * waste.QuotationWaste.unitPrice
-                          )}`
-                        : `${formatNumber(
-                            waste.weight * waste.QuotationWaste.unitPrice
-                          )}`}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({ width: 85, isLastCell: true })}
-                    >
-                      {row.QuotationWaste.vatCalculation}
-                    </TableCell>
-                  </TableRow>
-                );
+                      if (acc[id]) {
+                        acc[id].weight += current.weight;
+                      } else {
+                        acc[id] = { ...current, weight: current.weight };
+                      }
+
+                      return acc;
+                    },
+                    {}
+                  );
+
+                const invoiceNumber =
+                  transaction.BilledTransaction[0].serviceInvoiceNumber;
+                const typeOfWeight =
+                  transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                    .SortedTransaction[0].CertifiedTransaction[0].typeOfWeight;
+
+                const wasteRows = Object.values(
+                  aggregatedWasteTransactions
+                ).map((waste, idx) => {
+                  // Determine the font color based on the mode
+                  const fontColor =
+                    waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
+
+                  return (
+                    <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 60 }),
+                          color: fontColor,
+                        }}
+                      >
+                        {formatDate2(transaction.haulingDate)}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 40 }),
+                          color: fontColor,
+                        }}
+                      ></TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 40 }),
+                          color: fontColor,
+                        }}
+                      >
+                        {invoiceNumber}
+                      </TableCell>
+                      <TableCell sx={{ ...bodyCellStyles(), color: fontColor }}>
+                        {waste.QuotationWaste.wasteName}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 60, notCenter: true }),
+                          color: fontColor,
+                        }}
+                      >
+                        {typeOfWeight === "CLIENT WEIGHT"
+                          ? `${formatNumber(waste.clientWeight)}`
+                          : `${formatNumber(waste.weight)}`}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 40 }),
+                          color: fontColor,
+                        }}
+                      >
+                        {waste.QuotationWaste.unit}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 80, notCenter: true }),
+                          color: fontColor,
+                        }}
+                      >
+                        {formatNumber(waste.QuotationWaste.unitPrice)}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 80, notCenter: true }),
+                          color: fontColor,
+                        }}
+                      >
+                        {typeOfWeight === "CLIENT WEIGHT"
+                          ? `${formatNumber(
+                              waste.clientWeight *
+                                waste.QuotationWaste.unitPrice
+                            )}`
+                          : `${formatNumber(
+                              waste.weight * waste.QuotationWaste.unitPrice
+                            )}`}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 85, isLastCell: true }),
+                          color: fontColor,
+                        }}
+                      >
+                        {waste.QuotationWaste.vatCalculation}
+                      </TableCell>
+                    </TableRow>
+                  );
+                });
+
+                // Add the transportation row if applicable
+                const transpoRows =
+                  transaction.QuotationTransportation.mode === "CHARGE"
+                    ? [
+                        <TableRow
+                          key={`transpo-${index}`}
+                          sx={{ border: "black" }}
+                        >
+                          <TableCell sx={bodyCellStyles({ width: 60 })}>
+                            {formatDate2(transaction.haulingDate)}
+                          </TableCell>
+                          <TableCell
+                            sx={bodyCellStyles({ width: 40 })}
+                          ></TableCell>
+                          <TableCell sx={bodyCellStyles({ width: 40 })}>
+                            {invoiceNumber}
+                          </TableCell>
+                          <TableCell sx={bodyCellStyles()}>
+                            {`TRANS FEE ${transaction.QuotationTransportation.VehicleType.typeOfVehicle}`}
+                          </TableCell>
+                          <TableCell
+                            sx={bodyCellStyles({ width: 60, notCenter: true })}
+                          >
+                            {`${formatNumber(1)}`}
+                          </TableCell>
+                          <TableCell sx={bodyCellStyles({ width: 40 })}>
+                            {transaction.QuotationTransportation.unit}
+                          </TableCell>
+                          <TableCell
+                            sx={bodyCellStyles({ width: 80, notCenter: true })}
+                          >
+                            {formatNumber(
+                              transaction.QuotationTransportation.unitPrice
+                            )}
+                          </TableCell>
+                          <TableCell
+                            sx={bodyCellStyles({ width: 80, notCenter: true })}
+                          >
+                            {formatNumber(
+                              transaction.QuotationTransportation.unitPrice
+                            )}
+                          </TableCell>
+                          <TableCell
+                            sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                          >
+                            {transaction.QuotationTransportation.vatCalculation}
+                          </TableCell>
+                        </TableRow>,
+                      ]
+                    : [];
+
+                // Combine waste and transportation rows for alternating display
+                const combinedRows = [];
+
+                wasteRows.forEach((wasteRow, idx) => {
+                  combinedRows.push(wasteRow);
+                  if (transpoRows.length > 0) {
+                    // Push transpo row after every waste row
+                    combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
+                  }
+                });
+
+                return combinedRows;
               })}
-              {row.QuotationTransportation.mode === "CHARGE" && (
-                <TableRow key={"index" + 1} sx={{ border: "black" }}>
-                  <TableCell sx={bodyCellStyles({ width: 60 })}>
-                    {formatDate2(row.haulingDate)}
-                  </TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}>
-                    {invoiceNumber}
-                  </TableCell>
-                  <TableCell sx={bodyCellStyles()}>
-                    {`TRANS FEE ${row.QuotationTransportation.VehicleType.typeOfVehicle}`}
-                  </TableCell>
-
-                  <TableCell
-                    sx={bodyCellStyles({ width: 60, notCenter: true })}
-                  >
-                    {`${formatNumber(1)} `}
-                  </TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}>
-                    {row.QuotationTransportation.unit}
-                  </TableCell>
-                  <TableCell
-                    sx={bodyCellStyles({ width: 80, notCenter: true })}
-                  >
-                    {formatNumber(row.QuotationTransportation.unitPrice)}
-                  </TableCell>
-                  <TableCell
-                    sx={bodyCellStyles({ width: 80, notCenter: true })}
-                  >
-                    {formatNumber(row.QuotationTransportation.unitPrice)}
-                  </TableCell>
-                  <TableCell
-                    sx={bodyCellStyles({ width: 85, isLastCell: true })}
-                  >
-                    {row.QuotationTransportation.vatCalculation}
-                  </TableCell>
-                </TableRow>
-              )}
 
               {Array.from({ length: blankRowsNeeded }, (_, index) => (
                 <TableRow key={index + 1} sx={{ border: "black" }}>

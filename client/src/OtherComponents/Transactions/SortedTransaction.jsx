@@ -65,6 +65,13 @@ const SortedTransaction = ({ row }) => {
     </div>
   );
 
+  const rowHeight = 52; // Default row height in Material-UI DataGrid
+  const headerHeight = 56; // Default header height
+  const sortedWasteTransactionHeight =
+    sortedWasteTransaction.length * rowHeight + headerHeight;
+  const sortedScrapTransactionHeight =
+    sortedScrapTransaction.length * rowHeight + headerHeight;
+
   const columns = [
     {
       field: "sortedDate",
@@ -212,11 +219,15 @@ const SortedTransaction = ({ row }) => {
               </Typography>
               <DataGrid
                 sx={{
+                  "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard": {
+                    height: sortedWasteTransactionHeight,
+                  },
                   "& .MuiDataGrid-root": {
                     border: "none",
                     width: "100%",
+                    minHeight: "52px",
                   },
-                  "& .MuiDataGrid-overlayWrapper": {
+                  "&.MuiDataGrid-overlayWrapper": {
                     minHeight: "52px",
                   },
                   "& .name-column--cell": {
@@ -268,6 +279,9 @@ const SortedTransaction = ({ row }) => {
               </Typography>
               <DataGrid
                 sx={{
+                  "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard": {
+                    height: sortedScrapTransactionHeight,
+                  },
                   "& .MuiDataGrid-root": {
                     border: "none",
                     width: "100%",

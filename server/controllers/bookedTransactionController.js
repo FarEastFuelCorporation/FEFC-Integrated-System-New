@@ -2,7 +2,11 @@
 
 const BookedTransaction = require("../models/BookedTransaction");
 const generateTransactionId = require("../utils/generateTransactionId");
-const { fetchData, fetchDataFull } = require("../utils/getBookedTransactions");
+const {
+  fetchData,
+  fetchDataFull,
+  fetchDataFullMultiple,
+} = require("../utils/getBookedTransactions");
 const statusId = 1;
 
 // Create Booked Transaction controller
@@ -48,9 +52,11 @@ async function createBookedTransactionController(req, res) {
       transactionData.quotationTransportationId = quotationTransportationId;
     }
 
-    const concatenatedString = transporterClientId.join(". ");
+    if (transporterClientId) {
+      const concatenatedString = transporterClientId.join(". ");
 
-    transactionData.transporterClientId = concatenatedString;
+      transactionData.transporterClientId = concatenatedString;
+    }
 
     console.log("transactionData", transactionData);
 
@@ -115,6 +121,7 @@ async function updateBookedTransactionController(req, res) {
     console.log("Updating booked transaction with ID:", id);
 
     let {
+      transporterClientId,
       quotationWasteId,
       quotationTransportationId,
       haulingDate,
@@ -145,6 +152,12 @@ async function updateBookedTransactionController(req, res) {
       updatedBookedTransaction.remarks = remarks;
       updatedBookedTransaction.statusId = statusId;
       updatedBookedTransaction.updatedBy = createdBy;
+
+      if (transporterClientId) {
+        const concatenatedString = transporterClientId.join(". ");
+
+        updatedBookedTransaction.transporterClientId = concatenatedString;
+      }
 
       // Save the updated booked transaction
       await updatedBookedTransaction.save();

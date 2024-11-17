@@ -4,7 +4,10 @@ const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
 const generateBillingNumber = require("../utils/generateBillingNumber");
-const { fetchData } = require("../utils/getBookedTransactions");
+const {
+  fetchData,
+  getIncludeOptions,
+} = require("../utils/getBookedTransactions");
 const transactionStatusId = 7;
 
 // Create Billed Transaction controller
@@ -13,7 +16,7 @@ async function createBilledTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
-      bookedTransactionId,
+      bookedTransactionId, // Now an array
       billedDate,
       billedTime,
       serviceInvoiceNumber,
@@ -25,59 +28,62 @@ async function createBilledTransactionController(req, res) {
 
     console.log("req.body", req.body);
 
+    if (!Array.isArray(bookedTransactionId)) {
+      throw new Error("bookedTransactionId must be an array");
+    }
+
     remarks = remarks && remarks.toUpperCase();
 
     const billingNumber = await generateBillingNumber();
 
-    // Create BilledTransaction entry
-    await BilledTransaction.create(
-      {
-        bookedTransactionId,
-        billingNumber,
-        billedDate,
-        billedTime,
-        serviceInvoiceNumber,
-        billedAmount,
-        remarks,
-        createdBy,
-      },
-      { transaction }
-    );
+    // Iterate over the bookedTransactionId array and create multiple entries
+    for (const id of bookedTransactionId) {
+      // Create BilledTransaction entry
+      await BilledTransaction.create(
+        {
+          bookedTransactionId: id,
+          billingNumber,
+          billedDate,
+          billedTime,
+          serviceInvoiceNumber,
+          billedAmount,
+          remarks,
+          createdBy,
+        },
+        { transaction }
+      );
 
-    // Update the status of the booked transaction
-    const updatedBookedTransaction = await BookedTransaction.findByPk(
-      bookedTransactionId,
-      { transaction }
-    );
-
-    if (updatedBookedTransaction) {
-      updatedBookedTransaction.statusId = statusId;
-      await updatedBookedTransaction.save({ transaction });
-
-      // Commit the transaction
-      await transaction.commit();
-
-      // Fetch updated transaction data
-      const data = await fetchData(statusId);
-
-      // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      // Update the status of the booked transaction
+      const updatedBookedTransaction = await BookedTransaction.findByPk(id, {
+        transaction,
       });
-    } else {
-      // If booked transaction with the specified ID was not found
-      await transaction.rollback();
-      res.status(404).json({
-        message: `Booked Transaction with ID ${bookedTransactionId} not found`,
-      });
+
+      if (updatedBookedTransaction) {
+        updatedBookedTransaction.statusId = statusId;
+        await updatedBookedTransaction.save({ transaction });
+      } else {
+        // If booked transaction with the specified ID was not found
+        throw new Error(`Booked Transaction with ID ${id} not found`);
+      }
     }
+
+    // Commit the transaction
+    await transaction.commit();
+
+    // Fetch updated transaction data
+    const data = await fetchData(statusId);
+
+    // Respond with the updated data
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
     await transaction.rollback();
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: error.message || "Internal server error" });
   }
 }
 
@@ -92,6 +98,40 @@ async function getBilledTransactionsController(req, res) {
       pendingTransactions: data.pending,
       inProgressTransactions: data.inProgress,
       finishedTransactions: data.finished,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get Billed Transactions controller
+async function getBilledStatementsController(req, res) {
+  try {
+    const billingNumber = req.params.billingNumber;
+
+    const transactions = await BilledTransaction.findAll({
+      where: { billingNumber }, // Match records with the given billingNumber
+      attributes: ["bookedTransactionId"], // Fetch only the bookedTransactionId field
+    });
+
+    // Extract the bookedTransactionId values into an array
+    const bookedTransactionIds = transactions.map(
+      (transaction) => transaction.bookedTransactionId
+    );
+
+    console.log("bookedTransactionIds", bookedTransactionIds);
+
+    // Pass the IDs to the next query
+    const bookedTransactions = await BookedTransaction.findAll({
+      where: { id: bookedTransactionIds },
+      include: getIncludeOptions(),
+      order: [["transactionId", "DESC"]],
+    });
+
+    // Respond with the updated data
+    res.status(200).json({
+      bookedTransactions,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -242,6 +282,7 @@ async function deleteBilledTransactionController(req, res) {
 module.exports = {
   createBilledTransactionController,
   getBilledTransactionsController,
+  getBilledStatementsController,
   updateBilledTransactionController,
   deleteBilledTransactionController,
 };

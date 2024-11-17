@@ -37,7 +37,7 @@ import CollectedTransaction from "./Transactions/CollectedTransaction";
 import BillingDistributionTransaction from "./Transactions/BillingDistributionTransaction";
 import WarehousedTransaction from "./Transactions/WarehousedTransaction";
 import CustomDataGridStyles from "./CustomDataGridStyles";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import { calculateRemainingDays } from "./Functions";
 import axios from "axios";
 
@@ -64,6 +64,8 @@ const Transaction = ({
   const [loading, setLoading] = useState(false);
   const [loadingRowId, setLoadingRowId] = useState(null);
 
+  const apiRef = useGridApiRef();
+
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [row, setRow] = useState(null);
@@ -76,16 +78,11 @@ const Transaction = ({
     setSelectedSubTab(newValue);
   };
 
-  const handleSelectionChange = (newSelectionModel) => {
-    if (Array.isArray(newSelectionModel)) {
-      setSelectedIds(newSelectionModel);
-    } else {
-      console.error("Selection model is not an array:", newSelectionModel);
+  const handleSelection = (newSelection) => {
+    if (JSON.stringify(selectedIds) !== JSON.stringify(newSelection)) {
+      setSelectedIds(newSelection);
+      console.log("Selected Row IDs:", newSelection);
     }
-  };
-
-  const logSelectedIds = () => {
-    console.log("Selected IDs:", selectedIds);
   };
 
   const transactions =
@@ -113,19 +110,6 @@ const Transaction = ({
     </div>
   );
 
-  // const transactions = [
-  //   { id: 1, name: "John Doe", amount: 100 },
-  //   { id: 2, name: "Jane Smith", amount: 200 },
-  //   { id: 3, name: "Alice Johnson", amount: 300 },
-  //   { id: 4, name: "Bob Brown", amount: 150 },
-  // ];
-
-  // const columns = [
-  //   { field: "id", headerName: "ID", width: 90 },
-  //   { field: "name", headerName: "Name", width: 150 },
-  //   { field: "amount", headerName: "Amount", width: 110 },
-  // ];
-
   const columns = [
     {
       field: "transactionId",
@@ -141,22 +125,18 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
-      renderCell: (params) => {
-        const clientName = params.row.Client.clientName;
-        let value = {};
-        value.value = clientName;
-
-        return renderCellWithWrapText(value);
+      minWidth: 300,
+      valueGetter: (params) => {
+        return params.row.Client.clientName;
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "haulingDate",
       headerName: "Hauling Date",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      width: 150,
       renderCell: (params) => {
         let haulingDate;
         if (params.row.ScheduledTransaction[0]) {
@@ -182,8 +162,7 @@ const Transaction = ({
       headerName: "Hauling Time",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      width: 150,
       renderCell: (params) => {
         const scheduledTime = params.row.ScheduledTransaction[0]
           ? params.row.ScheduledTransaction[0].scheduledTime
@@ -206,8 +185,7 @@ const Transaction = ({
       headerName: "Status",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 200,
+      width: 150,
       renderCell: (params) => {
         let status;
 
@@ -283,9 +261,6 @@ const Transaction = ({
 
   return (
     <Box mt="40px">
-      <Button variant="contained" color="primary" onClick={logSelectedIds}>
-        Log Selected IDs
-      </Button>
       <Card>
         <Tabs
           value={selectedTab}
@@ -348,18 +323,13 @@ const Transaction = ({
         </Tabs>
         <CustomDataGridStyles height={"70vh"} margin={0}>
           <DataGrid
+            apiRef={apiRef}
             rows={transactions ? transactions : []}
             columns={columns}
-            getRowId={(row) => row.id}
             checkboxSelection={user.userType === 8}
-            onSelectionModelChange={(newSelectionModel) => {
-              handleSelectionChange(newSelectionModel);
-            }}
-            sx={{
-              "& .MuiDataGrid-checkboxInput.Mui-checked": {
-                color: "secondary.main", // Use the secondary color from the theme
-              },
-            }}
+            onSelectionModelChange={
+              user.userType === 8 ? handleSelection : undefined
+            }
             getRowClassName={(params) => {
               const daysRemaining = params.row.ScheduledTransaction?.[0]
                 ?.scheduledDate

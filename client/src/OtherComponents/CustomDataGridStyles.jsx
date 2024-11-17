@@ -11,6 +11,9 @@ const CustomDataGridStyles = ({ children, height, margin = "40px 0 0 0" }) => {
       height={height ? height : "75vh"}
       width="100%"
       sx={{
+        "& .MuiDataGrid-checkboxInput.Mui-checked": {
+          color: "secondary.main", // Use the secondary color from the theme
+        },
         "& .MuiDataGrid-root": {
           border: "none",
           width: "100%",

@@ -199,6 +199,9 @@ const TreatedTransaction = ({
 
   const employeeNames = consolidateEmployeeNames(sortedWasteTransaction);
 
+  const rowHeight = 52; // Default row height in Material-UI DataGrid
+  const headerHeight = 56; // Default header height
+
   const columns = [
     {
       field: "treatedDate",
@@ -324,101 +327,111 @@ const TreatedTransaction = ({
         )}
       </Box>
       {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
-        sortedWasteTransaction.map((waste, index) => (
-          <Box key={index} sx={{ my: 2 }}>
-            <Box
-              sx={{
-                my: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "end",
-              }}
-            >
-              <Typography variant="h5">
-                Waste Name: {waste.wasteName}
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2 }}>
-                {sortedWasteTransaction[index].treatedWeight !== waste.weight &&
-                  user.userType === 6 && (
-                    <Button
-                      sx={{
-                        backgroundColor: `${colors.greenAccent[700]}`,
-                        color: `${colors.grey[100]}`,
-                      }}
-                      onClick={() => handleOpenModal(row, waste)}
-                    >
-                      Treat
-                    </Button>
-                  )}
-                <Box
-                  sx={{
-                    padding: "5px",
-                    borderRadius: "5px",
-                    backgroundColor:
-                      sortedWasteTransaction[index].treatedWeight ===
-                      waste.weight
-                        ? colors.greenAccent[700]
-                        : "red",
-                    color: "white",
-                  }}
-                >
-                  <Typography variant="h6">
-                    {formatWeight(sortedWasteTransaction[index].treatedWeight)}{" "}
-                    Kg Treated /{formatWeight(waste.weight)} Kg
-                  </Typography>
+        sortedWasteTransaction.map((waste, index) => {
+          const treatedWasteTransactionHeight =
+            waste.TreatedWasteTransaction.length * rowHeight + headerHeight;
+          return (
+            <Box key={index} sx={{ my: 2 }}>
+              <Box
+                sx={{
+                  my: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "end",
+                }}
+              >
+                <Typography variant="h5">
+                  Waste Name: {waste.wasteName}
+                </Typography>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  {sortedWasteTransaction[index].treatedWeight !==
+                    waste.weight &&
+                    user.userType === 6 && (
+                      <Button
+                        sx={{
+                          backgroundColor: `${colors.greenAccent[700]}`,
+                          color: `${colors.grey[100]}`,
+                        }}
+                        onClick={() => handleOpenModal(row, waste)}
+                      >
+                        Treat
+                      </Button>
+                    )}
+                  <Box
+                    sx={{
+                      padding: "5px",
+                      borderRadius: "5px",
+                      backgroundColor:
+                        sortedWasteTransaction[index].treatedWeight ===
+                        waste.weight
+                          ? colors.greenAccent[700]
+                          : "red",
+                      color: "white",
+                    }}
+                  >
+                    <Typography variant="h6">
+                      {formatWeight(
+                        sortedWasteTransaction[index].treatedWeight
+                      )}{" "}
+                      Kg Treated /{formatWeight(waste.weight)} Kg
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
+              <DataGrid
+                sx={{
+                  "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard": {
+                    height: treatedWasteTransactionHeight,
+                  },
+                  "& .MuiDataGrid-root": {
+                    border: "none",
+                    width: "100%",
+                  },
+                  "& .MuiDataGrid-overlayWrapper": {
+                    minHeight: "52px",
+                  },
+                  "& .name-column--cell": {
+                    color: colors.greenAccent[300],
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.blueAccent[700],
+                    borderBottom: "none",
+                  },
+                  "& .MuiDataGrid-columnHeaderTitle": {
+                    whiteSpace: "normal !important",
+                    wordWrap: "break-word !important",
+                    lineHeight: "1.2 !important",
+                  },
+                  "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.primary[400],
+                  },
+                  "& .MuiDataGrid-toolbarContainer": {
+                    display: "none",
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    display: "none",
+                  },
+                }}
+                rows={
+                  waste.TreatedWasteTransaction
+                    ? waste.TreatedWasteTransaction
+                    : []
+                }
+                columns={columns}
+                components={{ Toolbar: GridToolbar }}
+                getRowId={(row) => (row.id ? row.id : [])}
+                localeText={{ noRowsLabel: "No Treated Transactions" }}
+                initialState={{
+                  sortModel: [
+                    { field: "treatedDate", sort: "asc" },
+                    { field: "treatedTime", sort: "asc" },
+                    { field: "machineName", sort: "asc" },
+                  ],
+                }}
+              />
             </Box>
-            <DataGrid
-              sx={{
-                "& .MuiDataGrid-root": {
-                  border: "none",
-                  width: "100%",
-                },
-                "& .MuiDataGrid-overlayWrapper": {
-                  minHeight: "52px",
-                },
-                "& .name-column--cell": {
-                  color: colors.greenAccent[300],
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: colors.blueAccent[700],
-                  borderBottom: "none",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  whiteSpace: "normal !important",
-                  wordWrap: "break-word !important",
-                  lineHeight: "1.2 !important",
-                },
-                "& .MuiDataGrid-virtualScroller": {
-                  backgroundColor: colors.primary[400],
-                },
-                "& .MuiDataGrid-toolbarContainer": {
-                  display: "none",
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  display: "none",
-                },
-              }}
-              rows={
-                waste.TreatedWasteTransaction
-                  ? waste.TreatedWasteTransaction
-                  : []
-              }
-              columns={columns}
-              components={{ Toolbar: GridToolbar }}
-              getRowId={(row) => (row.id ? row.id : [])}
-              localeText={{ noRowsLabel: "No Treated Transactions" }}
-              initialState={{
-                sortModel: [
-                  { field: "treatedDate", sort: "asc" },
-                  { field: "treatedTime", sort: "asc" },
-                  { field: "machineName", sort: "asc" },
-                ],
-              }}
-            />
-          </Box>
-        ))
+          );
+        })
       ) : (
         <Typography variant="h5">No Sorted Waste Transactions</Typography>
       )}

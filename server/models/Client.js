@@ -69,6 +69,10 @@ const Client = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    billerTinNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     clientPicture: {
       type: DataTypes.BLOB("long"),
       allowNull: true,

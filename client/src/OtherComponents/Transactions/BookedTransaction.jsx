@@ -33,18 +33,22 @@ const BookedTransaction = ({ row, user }) => {
   }, [apiUrl, user.id]);
 
   // Step 1: Split the transporterClientId into individual IDs
-  const ids = row.transporterClientId.split(". ");
+  const ids = row.transporterClientId?.split(". ");
 
   // Step 2: Search the transporterClientData for each ID and get the clientNames
-  const clientNames = ids
-    .map((id) => {
-      const client = transporterClient.find((client) => client.id === id);
-      return client ? client.clientName : null; // Return clientName or null if not found
-    })
-    .filter((name) => name !== null); // Filter out null values (in case some IDs do not match)
+  let result;
 
-  // Step 3: Join the clientNames with ' / ' separator
-  const result = clientNames.join(" / ");
+  if (ids) {
+    const clientNames = ids
+      .map((id) => {
+        const client = transporterClient.find((client) => client.id === id);
+        return client ? client.clientName : null; // Return clientName or null if not found
+      })
+      .filter((name) => name !== null); // Filter out null values (in case some IDs do not match)
+
+    // Step 3: Join the clientNames with ' / ' separator
+    result = clientNames.join(" / ");
+  }
 
   return (
     <Box sx={{ my: 3, position: "relative" }}>

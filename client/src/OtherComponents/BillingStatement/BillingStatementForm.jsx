@@ -34,9 +34,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
   const billedTransaction = row.BilledTransaction[0];
 
-  console.log(row);
-  console.log(billedTransaction.billingNumber);
-
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
@@ -46,7 +43,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
       );
 
       // For pending transactions
-      console.log(billingStatementResponse.data.bookedTransactions);
       setTransactions(billingStatementResponse.data.bookedTransactions);
 
       // setLoading(false);

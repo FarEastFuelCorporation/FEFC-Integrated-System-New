@@ -81,7 +81,6 @@ const Transaction = ({
   const handleSelection = (newSelection) => {
     if (JSON.stringify(selectedIds) !== JSON.stringify(newSelection)) {
       setSelectedIds(newSelection);
-      console.log("Selected Row IDs:", newSelection);
     }
   };
 

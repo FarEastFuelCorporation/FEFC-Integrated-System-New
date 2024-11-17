@@ -236,8 +236,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
     height: "20px",
   });
 
-  const invoiceNumber = row.BilledTransaction[0].serviceInvoiceNumber || "";
-
   const generatePDFContent = () => (
     <Box
       ref={certificateRef}
@@ -315,181 +313,213 @@ const BillingStatementForm = ({ row, verify = null }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {transactions.map((transaction, index) => {
-                // Check if aggregatedWasteTransactions need to be mapped
-                const aggregatedWasteTransactions =
-                  transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
-                    (acc, current) => {
-                      const { id } = current.QuotationWaste;
+              {transactions
+                .sort(
+                  (a, b) => new Date(a.haulingDate) - new Date(b.haulingDate)
+                ) // Sort transactions by haulingDate from oldest to newest
+                .map((transaction, index) => {
+                  // Check if aggregatedWasteTransactions need to be mapped
+                  const aggregatedWasteTransactions =
+                    transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
+                      (acc, current) => {
+                        const { id } = current.QuotationWaste;
 
-                      if (acc[id]) {
-                        acc[id].weight += current.weight;
-                      } else {
-                        acc[id] = { ...current, weight: current.weight };
-                      }
+                        if (acc[id]) {
+                          acc[id].weight += current.weight;
+                        } else {
+                          acc[id] = { ...current, weight: current.weight };
+                        }
 
-                      return acc;
-                    },
-                    {}
-                  );
+                        return acc;
+                      },
+                      {}
+                    );
 
-                const invoiceNumber =
-                  transaction.BilledTransaction[0].serviceInvoiceNumber;
-                const typeOfWeight =
-                  transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                    .SortedTransaction[0].CertifiedTransaction[0].typeOfWeight;
+                  const invoiceNumber =
+                    transaction.BilledTransaction[0].serviceInvoiceNumber;
+                  const typeOfWeight =
+                    transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                      .SortedTransaction[0].CertifiedTransaction[0]
+                      .typeOfWeight;
 
-                const wasteRows = Object.values(
-                  aggregatedWasteTransactions
-                ).map((waste, idx) => {
-                  // Determine the font color based on the mode
-                  const fontColor =
-                    waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
+                  const wasteRows = Object.values(
+                    aggregatedWasteTransactions
+                  ).map((waste, idx) => {
+                    // Determine the font color based on the mode
+                    const fontColor =
+                      waste.QuotationWaste.mode === "BUYING"
+                        ? "red"
+                        : "inherit";
 
-                  return (
-                    <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 60 }),
-                          color: fontColor,
-                        }}
-                      >
-                        {formatDate2(transaction.haulingDate)}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 40 }),
-                          color: fontColor,
-                        }}
-                      ></TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 40 }),
-                          color: fontColor,
-                        }}
-                      >
-                        {invoiceNumber}
-                      </TableCell>
-                      <TableCell sx={{ ...bodyCellStyles(), color: fontColor }}>
-                        {waste.QuotationWaste.wasteName}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 60, notCenter: true }),
-                          color: fontColor,
-                        }}
-                      >
-                        {typeOfWeight === "CLIENT WEIGHT"
-                          ? `${formatNumber(waste.clientWeight)}`
-                          : `${formatNumber(waste.weight)}`}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 40 }),
-                          color: fontColor,
-                        }}
-                      >
-                        {waste.QuotationWaste.unit}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 80, notCenter: true }),
-                          color: fontColor,
-                        }}
-                      >
-                        {formatNumber(waste.QuotationWaste.unitPrice)}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 80, notCenter: true }),
-                          color: fontColor,
-                        }}
-                      >
-                        {typeOfWeight === "CLIENT WEIGHT"
-                          ? `${formatNumber(
-                              waste.clientWeight *
-                                waste.QuotationWaste.unitPrice
-                            )}`
-                          : `${formatNumber(
-                              waste.weight * waste.QuotationWaste.unitPrice
-                            )}`}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({ width: 85, isLastCell: true }),
-                          color: fontColor,
-                        }}
-                      >
-                        {waste.QuotationWaste.vatCalculation}
-                      </TableCell>
-                    </TableRow>
-                  );
-                });
-
-                // Add the transportation row if applicable
-                const transpoRows =
-                  transaction.QuotationTransportation.mode === "CHARGE"
-                    ? [
-                        <TableRow
-                          key={`transpo-${index}`}
-                          sx={{ border: "black" }}
+                    return (
+                      <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 60, color: fontColor }),
+                          }}
                         >
-                          <TableCell sx={bodyCellStyles({ width: 60 })}>
-                            {formatDate2(transaction.haulingDate)}
-                          </TableCell>
-                          <TableCell
-                            sx={bodyCellStyles({ width: 40 })}
-                          ></TableCell>
-                          <TableCell sx={bodyCellStyles({ width: 40 })}>
-                            {invoiceNumber}
-                          </TableCell>
-                          <TableCell sx={bodyCellStyles()}>
-                            {`TRANS FEE ${transaction.QuotationTransportation.VehicleType.typeOfVehicle}`}
-                          </TableCell>
-                          <TableCell
-                            sx={bodyCellStyles({ width: 60, notCenter: true })}
-                          >
-                            {`${formatNumber(1)}`}
-                          </TableCell>
-                          <TableCell sx={bodyCellStyles({ width: 40 })}>
-                            {transaction.QuotationTransportation.unit}
-                          </TableCell>
-                          <TableCell
-                            sx={bodyCellStyles({ width: 80, notCenter: true })}
-                          >
-                            {formatNumber(
-                              transaction.QuotationTransportation.unitPrice
-                            )}
-                          </TableCell>
-                          <TableCell
-                            sx={bodyCellStyles({ width: 80, notCenter: true })}
-                          >
-                            {formatNumber(
-                              transaction.QuotationTransportation.unitPrice
-                            )}
-                          </TableCell>
-                          <TableCell
-                            sx={bodyCellStyles({ width: 85, isLastCell: true })}
-                          >
-                            {transaction.QuotationTransportation.vatCalculation}
-                          </TableCell>
-                        </TableRow>,
-                      ]
-                    : [];
+                          {formatDate2(transaction.haulingDate)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                          }}
+                        ></TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                          }}
+                        >
+                          {invoiceNumber}
+                        </TableCell>
+                        <TableCell
+                          sx={{ ...bodyCellStyles({ color: fontColor }) }}
+                        >
+                          {waste.QuotationWaste.wasteName}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 60,
+                              notCenter: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {typeOfWeight === "CLIENT WEIGHT"
+                            ? `${formatNumber(waste.clientWeight)}`
+                            : `${formatNumber(waste.weight)}`}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                          }}
+                        >
+                          {waste.QuotationWaste.unit}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 80,
+                              notCenter: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {formatNumber(waste.QuotationWaste.unitPrice)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 80,
+                              notCenter: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {typeOfWeight === "CLIENT WEIGHT"
+                            ? `${formatNumber(
+                                waste.clientWeight *
+                                  waste.QuotationWaste.unitPrice
+                              )}`
+                            : `${formatNumber(
+                                waste.weight * waste.QuotationWaste.unitPrice
+                              )}`}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 85,
+                              isLastCell: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {waste.QuotationWaste.vatCalculation}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  });
 
-                // Combine waste and transportation rows for alternating display
-                const combinedRows = [];
+                  // Add the transportation row if applicable
+                  const transpoRows =
+                    transaction.QuotationTransportation.mode === "CHARGE"
+                      ? [
+                          <TableRow
+                            key={`transpo-${index}`}
+                            sx={{ border: "black" }}
+                          >
+                            <TableCell sx={bodyCellStyles({ width: 60 })}>
+                              {formatDate2(transaction.haulingDate)}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({ width: 40 })}
+                            ></TableCell>
+                            <TableCell sx={bodyCellStyles({ width: 40 })}>
+                              {invoiceNumber}
+                            </TableCell>
+                            <TableCell sx={bodyCellStyles()}>
+                              {`TRANS FEE ${transaction.QuotationTransportation.VehicleType.typeOfVehicle}`}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 60,
+                                notCenter: true,
+                              })}
+                            >
+                              {`${formatNumber(1)}`}
+                            </TableCell>
+                            <TableCell sx={bodyCellStyles({ width: 40 })}>
+                              {transaction.QuotationTransportation.unit}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                              })}
+                            >
+                              {formatNumber(
+                                transaction.QuotationTransportation.unitPrice
+                              )}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                              })}
+                            >
+                              {formatNumber(
+                                transaction.QuotationTransportation.unitPrice
+                              )}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                              })}
+                            >
+                              {
+                                transaction.QuotationTransportation
+                                  .vatCalculation
+                              }
+                            </TableCell>
+                          </TableRow>,
+                        ]
+                      : [];
 
-                wasteRows.forEach((wasteRow, idx) => {
-                  combinedRows.push(wasteRow);
-                  if (transpoRows.length > 0) {
-                    // Push transpo row after every waste row
-                    combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
-                  }
-                });
+                  // Combine waste and transportation rows for alternating display
+                  const combinedRows = [];
 
-                return combinedRows;
-              })}
+                  wasteRows.forEach((wasteRow, idx) => {
+                    combinedRows.push(wasteRow);
+                    if (transpoRows.length > 0) {
+                      // Push transpo row after every waste row
+                      combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
+                    }
+                  });
+
+                  return combinedRows;
+                })}
 
               {Array.from({ length: blankRowsNeeded }, (_, index) => (
                 <TableRow key={index + 1} sx={{ border: "black" }}>

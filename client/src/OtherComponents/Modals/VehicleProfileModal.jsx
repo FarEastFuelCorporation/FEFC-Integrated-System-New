@@ -40,6 +40,19 @@ const VehicleProfileModal = ({
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const rowHeight = 52; // Default row height in Material-UI DataGrid
+  const headerHeight = 56; // Default header height
+
+  const attachmentTableHeight =
+    attachmentData.length === 0
+      ? rowHeight + headerHeight
+      : attachmentData.length * rowHeight + headerHeight;
+
+  const maintenanceTableHeight =
+    maintenanceData.length === 0
+      ? rowHeight + headerHeight
+      : maintenanceData.length * rowHeight + headerHeight;
+
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.plateNumber) {
       return;
@@ -655,6 +668,10 @@ const VehicleProfileModal = ({
                     </Typography>
                     <DataGrid
                       sx={{
+                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
+                          {
+                            height: maintenanceTableHeight,
+                          },
                         "& .MuiDataGrid-root": {
                           border: "none",
                           width: "100%",
@@ -755,6 +772,10 @@ const VehicleProfileModal = ({
                     </Typography>
                     <DataGrid
                       sx={{
+                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
+                          {
+                            height: attachmentTableHeight,
+                          },
                         "& .MuiDataGrid-root": {
                           border: "none",
                           width: "100%",

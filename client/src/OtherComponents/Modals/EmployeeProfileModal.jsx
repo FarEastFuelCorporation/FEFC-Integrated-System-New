@@ -57,7 +57,7 @@ const EmployeeProfileModal = ({
 
   console.log(attachmentData.length);
 
-  const treatedWasteTransactionHeight =
+  const attachmentTableHeight =
     attachmentData.length === 0
       ? rowHeight + headerHeight
       : attachmentData.length * rowHeight + headerHeight;
@@ -1274,7 +1274,7 @@ const EmployeeProfileModal = ({
                       sx={{
                         "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
                           {
-                            height: treatedWasteTransactionHeight,
+                            height: attachmentTableHeight,
                           },
                         "& .MuiDataGrid-root": {
                           border: "none",

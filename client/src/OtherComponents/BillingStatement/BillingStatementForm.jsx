@@ -25,6 +25,10 @@ const modifyApiUrlPort = (url) => {
   return url.replace(portPattern, ":3000");
 };
 
+const pageHeight = 895; // Full page height (A4 paper size in pixels)
+const defaultHeaderHeight = 150; // Default approximate height for header
+const defaultFooterHeight = 100; // Default approximate height for footer
+
 const BillingStatementForm = ({ row, verify = null }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
@@ -241,7 +245,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
       ref={certificateRef}
       sx={{
         position: "absolute",
-        left: verify ? "0" : "-9999px",
+        // left: verify ? "0" : "-9999px",
         padding: "123px 38px 38px 76px",
         minHeight: "1056px", // Ensure at least one page height
         width: "816px",

@@ -52,6 +52,16 @@ const EmployeeProfileModal = ({
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
 
+  const rowHeight = 52; // Default row height in Material-UI DataGrid
+  const headerHeight = 56; // Default header height
+
+  console.log(attachmentData.length);
+
+  const treatedWasteTransactionHeight =
+    attachmentData.length === 0
+      ? rowHeight + headerHeight
+      : attachmentData.length * rowHeight + headerHeight;
+
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.employeeId) {
       return;
@@ -1262,6 +1272,10 @@ const EmployeeProfileModal = ({
                     </Typography>
                     <DataGrid
                       sx={{
+                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
+                          {
+                            height: treatedWasteTransactionHeight,
+                          },
                         "& .MuiDataGrid-root": {
                           border: "none",
                           width: "100%",

@@ -104,6 +104,7 @@ const SortedTransactions = ({ user }) => {
   const handleOpenModal = (row) => {
     setFormData({
       id: "",
+      statusId: row.statusId,
       clientId: row.Client.clientId,
       bookedTransactionId: row.id,
       receivedTransactionId:

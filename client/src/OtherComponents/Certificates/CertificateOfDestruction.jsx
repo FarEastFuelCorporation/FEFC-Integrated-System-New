@@ -194,7 +194,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                     {waste.wasteName}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>
-                    {row.QuotationWaste.TypeOfWaste.wasteCode}
+                    {waste.QuotationWaste.TypeOfWaste.wasteCode}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>
                     {typeOfWeight === "CLIENT WEIGHT"

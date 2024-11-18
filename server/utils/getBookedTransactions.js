@@ -125,6 +125,13 @@ const getIncludeOptions = () => [
                   {
                     model: QuotationWaste,
                     as: "QuotationWaste",
+                    include: [
+                      {
+                        model: TypeOfWaste,
+                        as: "TypeOfWaste",
+                        attributes: ["wasteCode"],
+                      },
+                    ],
                   },
                   {
                     model: TreatmentProcess,

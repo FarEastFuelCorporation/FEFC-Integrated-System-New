@@ -100,8 +100,6 @@ const Navbar = () => {
             fontFamily="Times New Roman"
             fontWeight="bold"
             color="#ffbf00"
-            component={Link}
-            to="/"
             style={{ textDecoration: "none" }}
           >
             FAR EAST FUEL CORPORATION

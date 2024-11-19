@@ -109,7 +109,14 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
         </Typography>
       </Box>
       <Box display="grid" gridTemplateColumns="50% 50%">
-        <Box sx={{ height: "100%", border: "1px solid black", padding: 1 }}>
+        <Box
+          sx={{
+            height: "100%",
+            border: "1px solid black",
+            borderBottom: "none",
+            padding: 1,
+          }}
+        >
           <Typography fontWeight="bold">{clientData.billerName}</Typography>
           <Typography fontSize="12px">{clientData.billerAddress}</Typography>
           <Typography fontSize="12px">
@@ -128,6 +135,7 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
           sx={{
             height: "100%",
             border: "1px solid black",
+            borderBottom: "none",
             borderLeft: "none",
             padding: "5px 10px",
           }}

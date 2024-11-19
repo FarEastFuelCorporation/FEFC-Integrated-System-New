@@ -1,43 +1,64 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Box,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
   TableRow,
-  Paper,
-  Button,
   Typography,
 } from "@mui/material";
 
 import letterhead from "../../images/letterhead.jpg";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import BillingStatementFooter from "./BillingStatementFooter";
 import BillingStatementHeader from "./BillingStatementHeader";
-import { formatDate2, formatNumber } from "../Functions";
+import { formatNumber } from "../Functions";
 import axios from "axios";
+import BillingContent from "./BillingContent";
+import BillingTableHead from "./BillingTableHead";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
   return url.replace(portPattern, ":3000");
 };
 
-const pageHeight = 895; // Full page height (A4 paper size in pixels)
+const pageHeight = 795; // Full page height (A4 paper size in pixels)
 const defaultHeaderHeight = 350; // Default approximate height for header
-const defaultHeaderHeight2 = 90; // Default approximate height for header
 const defaultFooterHeight = 120; // Default approximate height for footer
 
-const BillingStatementForm = ({ row, verify = null }) => {
+const BillingStatementForm = ({ row, verify = null, statementRef }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
 
   const [transactions, setTransactions] = useState([]);
 
+  const [pagesContent, setPagesContent] = useState([]);
+  const contentRef = useRef(null);
+  const headerRef = useRef(null);
+  const footerRef = useRef(null);
+
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [footerHeight, setFooterHeight] = useState(0);
+  const [heightsReady, setHeightsReady] = useState(false);
+  const [isDoneCalculation, setIsDoneCalculation] = useState(false);
+  const [isFetched, setIsFetched] = useState(false);
+
   const billedTransaction = row.BilledTransaction[0];
+
+  // Calculate header and footer heights
+  const calculateRemainingHeight = useCallback(() => {
+    const headerH = headerRef.current?.offsetHeight || defaultHeaderHeight;
+    const footerH = footerRef.current?.offsetHeight || defaultFooterHeight;
+    setHeaderHeight(headerH);
+    setFooterHeight(footerH);
+    setHeightsReady(true);
+  }, []);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -49,7 +70,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
       // For pending transactions
       setTransactions(billingStatementResponse.data.bookedTransactions);
-
+      setIsFetched(true);
       // setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -72,11 +93,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
     vatInclusive: 0,
     nonVatable: 0,
   };
-
-  const totalRows = 17;
-  let hasChargeRow = 0;
-  let transactionRows = 0;
-  let blankRowsNeeded = 0;
 
   transactions.forEach((transaction) => {
     const certifiedTransaction =
@@ -132,8 +148,6 @@ const BillingStatementForm = ({ row, verify = null }) => {
       }
     });
 
-    transactionRows += aggregatedWasteTransactions.length;
-
     const transpoFee = transaction.QuotationTransportation.unitPrice;
     const transpoVatCalculation =
       transaction.QuotationTransportation.vatCalculation;
@@ -161,419 +175,279 @@ const BillingStatementForm = ({ row, verify = null }) => {
 
     // Call the function to add transportation fee
     addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
-
-    hasChargeRow +=
-      transaction.QuotationTransportation.mode === "CHARGE" ? 1 : 0;
   });
-
-  blankRowsNeeded = totalRows - (transactionRows + hasChargeRow);
-
-  const handleDownloadPDF = () => {
-    const input = certificateRef.current;
-    const pageHeight = 1056;
-    const pageWidth = 816;
-
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [pageWidth, pageHeight], // Page size in px
-      });
-
-      // Add the captured image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-
-      // Save the generated PDF
-      pdf.save(`${"B24-09-001"}-${row.Client.clientName}.pdf`);
-    });
-  };
-
-  const handleOpenPDFInNewTab = () => {
-    const input = certificateRef.current;
-    const pageHeight = 1056;
-    const pageWidth = 816;
-
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [pageWidth, pageHeight], // Page size in px
-      });
-
-      // Add the captured image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-
-      // Generate the PDF and open it in a new tab
-      const pdfUrl = pdf.output("bloburl");
-      window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
-    });
-  };
 
   const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;
 
-  const headerCellStyles = (isLastCell) => ({
-    fontWeight: "bold",
-    fontSize: "12px",
-    padding: "2px",
-    border: "1px solid black",
-    borderRight: isLastCell ? "1px solid black" : "none",
-    color: "black",
-    textAlign: "center",
-    fontFamily: "'Poppins', sans-serif",
-  });
+  // Recalculate height and generate content whenever row or heights change
+  useEffect(() => {
+    // Reset states when the row changes
+    setPagesContent([]);
+    setHeightsReady(false);
+    setIsDoneCalculation(false);
 
-  const bodyCellStyles = ({
-    isLastCell = false,
-    notCenter = false,
-    width = "auto",
-  } = {}) => ({
-    fontSize: "10px",
+    calculateRemainingHeight();
+  }, [row, calculateRemainingHeight]);
+
+  // Define column widths here
+  const columnWidths = {
+    waste: [
+      "60px",
+      "40px",
+      "40px",
+      "auto",
+      "60px",
+      "50px",
+      "70px",
+      "70px",
+      "90px",
+    ],
+  };
+
+  const getCellStyle = (
+    isLastCell,
+    width,
+    alignRight = false,
+    black = true
+  ) => ({
     padding: "2px",
     border: "1px solid black",
     borderTop: "none",
     borderRight: isLastCell ? "1px solid black" : "none",
-    color: "black",
-    textAlign: notCenter ? "right" : "center",
-    width: typeof width === "number" ? `${width}px` : width, // Apply width as px if it's a number, otherwise use as-is
-    fontFamily: "'Poppins', sans-serif",
-    height: "20px",
+    color: black ? "black" : "white",
+    width: width, // Apply the width
+    textAlign: alignRight ? "end" : "center",
+    minHeight: "22.26px",
+    height: "100%",
   });
 
-  const generatePDFContent = () => (
-    <Box
-      ref={certificateRef}
-      sx={{
-        position: "absolute",
-        left: verify ? "0" : "-9999px",
-        padding: "123px 38px 38px 76px",
-        minHeight: "1056px", // Ensure at least one page height
-        width: "816px",
-        backgroundColor: "white",
-        color: "black",
-        zIndex: 2,
-      }}
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "816px",
-          height: "1056px",
-          zIndex: 0,
-          backgroundImage: `url(${letterhead})`,
-          backgroundSize: "cover",
-          pointerEvents: "none", // Ensure the background image is not clickable
-        }}
-      />
-      <Box sx={{ zIndex: 1, position: "relative" }}>
-        <BillingStatementHeader row={row} amounts={amounts} credits={credits} />
-
+  return (
+    <>
+      {isFetched && (
         <Box>
-          {" "}
-          <Typography
-            sx={{
-              variant: "h5",
-              fontWeight: "bold",
-              textAlign: "center",
-              border: "1px solid black",
-              borderBottom: "none",
-              backgroundColor: "lightgray",
-            }}
-          >
-            DETAILS
-          </Typography>
-        </Box>
-        <TableContainer
-          component={Paper}
-          sx={{
-            "& .MuiPaper-root": {
-              backgroundColor: "white",
-              color: "black !important",
-            },
-            "& .MuiTableContainer-root": {
-              backgroundColor: "white",
-              color: "black !important",
-            },
-            fontFamily: "Times New Roman",
-            backgroundColor: "white",
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ border: "black" }}>
-                <TableCell sx={headerCellStyles(false)}>Date</TableCell>
-                <TableCell sx={headerCellStyles(false)}>D.R.#</TableCell>
-                <TableCell sx={headerCellStyles(false)}>S.I.#</TableCell>
-                <TableCell sx={headerCellStyles(false)}>Description</TableCell>
-                <TableCell sx={headerCellStyles(false)}>Qty</TableCell>
-                <TableCell sx={headerCellStyles(false)}>Unit</TableCell>
-                <TableCell sx={headerCellStyles(false)}>Unit Price</TableCell>
-                <TableCell sx={headerCellStyles(false)}>Amount</TableCell>
-                <TableCell sx={headerCellStyles(true)}>
-                  Vat Calculation
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {transactions
-                .sort(
-                  (a, b) => new Date(a.haulingDate) - new Date(b.haulingDate)
-                ) // Sort transactions by haulingDate from oldest to newest
-                .map((transaction, index) => {
-                  // Check if aggregatedWasteTransactions need to be mapped
-                  const aggregatedWasteTransactions =
-                    transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
-                      (acc, current) => {
-                        const { id } = current.QuotationWaste;
+          <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+            {/* Header */}
+            <Box ref={headerRef} sx={{ zIndex: 1 }}>
+              <BillingStatementHeader
+                row={row}
+                amounts={amounts}
+                credits={credits}
+              />
+            </Box>
 
-                        if (acc[id]) {
-                          acc[id].weight += current.weight;
-                        } else {
-                          acc[id] = { ...current, weight: current.weight };
-                        }
+            {/* Content */}
+            <Box ref={contentRef} sx={{ zIndex: 1 }}>
+              <BillingContent
+                transactions={transactions}
+                pageHeight={pageHeight}
+                headerHeight={headerHeight}
+                footerHeight={footerHeight}
+                setPagesContent={setPagesContent}
+                setIsDoneCalculation={setIsDoneCalculation}
+                heightsReady={heightsReady}
+              />
+            </Box>
 
-                        return acc;
-                      },
-                      {}
-                    );
+            {/* Footer */}
+            <Box ref={footerRef} sx={{ zIndex: 1 }}>
+              <BillingStatementFooter row={row} qrCodeURL={qrCodeURL} />
+            </Box>
+          </Box>
 
-                  const invoiceNumber =
-                    transaction.BilledTransaction[0].serviceInvoiceNumber;
-                  const typeOfWeight =
-                    transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                      .SortedTransaction[0].CertifiedTransaction[0]
-                      .typeOfWeight;
+          {isDoneCalculation && (
+            <Box ref={statementRef}>
+              {pagesContent.map((tableData, index) => {
+                if (!tableData || tableData.length === 0) {
+                  return null; // Return null if there's no data
+                }
 
-                  const wasteRows = Object.values(
-                    aggregatedWasteTransactions
-                  ).map((waste, idx) => {
-                    // Determine the font color based on the mode
-                    const fontColor =
-                      waste.QuotationWaste.mode === "BUYING"
-                        ? "red"
-                        : "inherit";
+                const bodyRows = {
+                  BillingTableHead: {
+                    header: null,
+                    content: [],
+                  },
+                  QuotationTransportationTableHead: {
+                    header: null,
+                    content: [],
+                  },
+                };
 
-                    return (
-                      <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
+                // Process each item in the tableData
+                tableData.forEach((item, index) => {
+                  bodyRows.BillingTableHead.header = <BillingTableHead />;
+
+                  const waste = item; // Assuming item contains waste details
+                  bodyRows.BillingTableHead.content.push(
+                    <TableBody key={`waste-body-${index}`}>
+                      <TableRow key={index} sx={{ border: "black" }}>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 60, color: fontColor }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[0])}
                         >
-                          {formatDate2(transaction.haulingDate)}
+                          {waste[0]}
                         </TableCell>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
-                          }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[1])}
                         >
-                          {invoiceNumber}
+                          {waste[1]}
                         </TableCell>
                         <TableCell
-                          sx={{ ...bodyCellStyles({ color: fontColor }) }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[2])}
                         >
-                          {waste.QuotationWaste.wasteName}
+                          {waste[2]}
                         </TableCell>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 60,
-                              notCenter: true,
-                              color: fontColor,
-                            }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[3])}
                         >
-                          {typeOfWeight === "CLIENT WEIGHT"
-                            ? `${formatNumber(waste.clientWeight)}`
-                            : `${formatNumber(waste.weight)}`}
+                          {waste[3]}
                         </TableCell>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[4],
+                            true,
+                            formatNumber(waste[4]) == 0.0 ? false : true
+                          )}
                         >
-                          {waste.QuotationWaste.unit}
+                          {formatNumber(waste[4])}
                         </TableCell>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 80,
-                              notCenter: true,
-                              color: fontColor,
-                            }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[5])}
                         >
-                          {formatNumber(waste.QuotationWaste.unitPrice)}
+                          {waste[5] == 0.0 ? "" : waste[5]}
                         </TableCell>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 80,
-                              notCenter: true,
-                              color: fontColor,
-                            }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[6], true)}
                         >
-                          {typeOfWeight === "CLIENT WEIGHT"
-                            ? `${formatNumber(
-                                waste.clientWeight *
-                                  waste.QuotationWaste.unitPrice
-                              )}`
-                            : `${formatNumber(
-                                waste.weight * waste.QuotationWaste.unitPrice
-                              )}`}
+                          {waste[6]}
                         </TableCell>
                         <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 85,
-                              isLastCell: true,
-                              color: fontColor,
-                            }),
-                          }}
+                          align="center"
+                          sx={getCellStyle(false, columnWidths.waste[7], true)}
                         >
-                          {waste.QuotationWaste.vatCalculation}
+                          {waste[7]}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={getCellStyle(true, columnWidths.waste[8])}
+                        >
+                          {waste[8]}
                         </TableCell>
                       </TableRow>
-                    );
-                  });
+                    </TableBody>
+                  );
+                });
 
-                  // Add the transportation row if applicable
-                  const transpoRows =
-                    transaction.QuotationTransportation.mode === "CHARGE"
-                      ? [
-                          <TableRow
-                            key={`transpo-${index}`}
-                            sx={{ border: "black" }}
-                          >
-                            <TableCell sx={bodyCellStyles({ width: 60 })}>
-                              {formatDate2(transaction.haulingDate)}
-                            </TableCell>
-                            <TableCell
-                              sx={bodyCellStyles({ width: 40 })}
-                            ></TableCell>
-                            <TableCell sx={bodyCellStyles({ width: 40 })}>
-                              {invoiceNumber}
-                            </TableCell>
-                            <TableCell sx={bodyCellStyles()}>
-                              {`TRANS FEE ${transaction.QuotationTransportation.VehicleType.typeOfVehicle}`}
-                            </TableCell>
-                            <TableCell
-                              sx={bodyCellStyles({
-                                width: 60,
-                                notCenter: true,
-                              })}
+                return (
+                  <Box
+                    key={`PageBox${index}`}
+                    sx={{
+                      position: "relative",
+                      minHeight: "1056px",
+                      width: "816px",
+                      backgroundColor: "white",
+                      color: "black",
+                    }}
+                  >
+                    {/* Background Image */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        zIndex: 0,
+                        top: 0,
+                        left: 0,
+                        width: "816px",
+                        height: "1056px",
+                        backgroundImage: `url(${letterhead})`,
+                        backgroundSize: "cover",
+                        pointerEvents: "none",
+                      }}
+                    />
+
+                    {/* Content */}
+                    <Box
+                      className="pdf_container"
+                      sx={{
+                        position: "absolute",
+                        zIndex: 1,
+                        padding: "123px 38px 38px 76px",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      {/* Render Header only on the first page */}
+                      {index === 0 && (
+                        <Box>
+                          <BillingStatementHeader
+                            row={row}
+                            amounts={amounts}
+                            credits={credits}
+                          />
+                        </Box>
+                      )}
+
+                      {bodyRows.BillingTableHead.content.length > 1 && (
+                        <>
+                          {bodyRows.BillingTableHead.header && (
+                            <Typography
+                              variant="h5"
+                              fontWeight="bold"
+                              textAlign="center"
+                              sx={{
+                                borderTop: "1px solid black",
+                                borderLeft: "1px solid black",
+                                borderRight: "1px solid black",
+                                backgroundColor: "lightgray",
+                              }}
                             >
-                              {`${formatNumber(1)}`}
-                            </TableCell>
-                            <TableCell sx={bodyCellStyles({ width: 40 })}>
-                              {transaction.QuotationTransportation.unit}
-                            </TableCell>
-                            <TableCell
-                              sx={bodyCellStyles({
-                                width: 80,
-                                notCenter: true,
-                              })}
-                            >
-                              {formatNumber(
-                                transaction.QuotationTransportation.unitPrice
-                              )}
-                            </TableCell>
-                            <TableCell
-                              sx={bodyCellStyles({
-                                width: 80,
-                                notCenter: true,
-                              })}
-                            >
-                              {formatNumber(
-                                transaction.QuotationTransportation.unitPrice
-                              )}
-                            </TableCell>
-                            <TableCell
-                              sx={bodyCellStyles({
-                                width: 85,
-                                isLastCell: true,
-                              })}
-                            >
-                              {
-                                transaction.QuotationTransportation
-                                  .vatCalculation
-                              }
-                            </TableCell>
-                          </TableRow>,
-                        ]
-                      : [];
+                              DETAILS
+                            </Typography>
+                          )}
 
-                  // Combine waste and transportation rows for alternating display
-                  const combinedRows = [];
+                          {/* Render Waste Table */}
+                          <Table>
+                            {bodyRows.BillingTableHead.header}
 
-                  wasteRows.forEach((wasteRow, idx) => {
-                    combinedRows.push(wasteRow);
-                    if (transpoRows.length > 0) {
-                      // Push transpo row after every waste row
-                      combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
-                    }
-                  });
+                            {bodyRows.BillingTableHead.content}
+                          </Table>
+                        </>
+                      )}
 
-                  return combinedRows;
-                })}
+                      {index === pagesContent.length - 1 && (
+                        <Box>
+                          <BillingStatementFooter
+                            row={row}
+                            qrCodeURL={qrCodeURL}
+                          />
+                        </Box>
+                      )}
+                    </Box>
 
-              {Array.from({ length: blankRowsNeeded }, (_, index) => (
-                <TableRow key={index + 1} sx={{ border: "black" }}>
-                  <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-                  <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-                  <TableCell
-                    sx={bodyCellStyles({ width: 85, isLastCell: true })}
-                  ></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-      <BillingStatementFooter row={row} qrCodeURL={qrCodeURL} />
-    </Box>
-  );
-
-  return (
-    <Box>
-      {verify ? (
-        ""
-      ) : (
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleDownloadPDF}
-          >
-            Download Billing Statement
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleOpenPDFInNewTab}
-          >
-            View Billing Statement
-          </Button>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: "20px",
+                        right: "40px",
+                      }}
+                    >
+                      <Typography variant="h5" fontWeight="bold">
+                        Page {index + 1} / {pagesContent.length}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
         </Box>
       )}
-
-      {generatePDFContent()}
-    </Box>
+    </>
   );
 };
 

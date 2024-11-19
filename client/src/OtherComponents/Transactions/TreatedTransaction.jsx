@@ -329,7 +329,9 @@ const TreatedTransaction = ({
       {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
         sortedWasteTransaction.map((waste, index) => {
           const treatedWasteTransactionHeight =
-            waste.TreatedWasteTransaction.length * rowHeight + headerHeight;
+            waste.TreatedWasteTransaction.length === 0
+              ? rowHeight + headerHeight
+              : waste.TreatedWasteTransaction.length * rowHeight + headerHeight;
           return (
             <Box key={index} sx={{ my: 2 }}>
               <Box

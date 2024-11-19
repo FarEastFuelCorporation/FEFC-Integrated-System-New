@@ -7,12 +7,11 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import QuotationTransportationTableHead from "./QuotationTransportationTableHead";
-import QuotationWasteTableHead from "./QuotationWasteTableHead";
-import { formatNumber } from "../Functions";
+import { formatDate2, formatNumber } from "../Functions";
+import BillingTableHead from "./BillingTableHead";
 
 const BillingContent = ({
-  quotationData,
+  transactions,
   pageHeight,
   headerHeight,
   footerHeight,
@@ -21,13 +20,13 @@ const BillingContent = ({
   heightsReady,
 }) => {
   const wasteTableRef = useRef(null);
-  const transportTableRef = useRef(null);
-
-  const quotationWaste = quotationData?.QuotationWaste || [];
-  const quotationTransportation = quotationData?.QuotationTransportation || [];
 
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
+
+  console.log(pageHeight);
+  console.log(headerHeight);
+  console.log(firstPageHeight);
 
   // Helper function to calculate total height of rows and divide into pages
   const calculatePageContent = useCallback(() => {
@@ -57,6 +56,8 @@ const BillingContent = ({
         }
         currentPageHeight += elementHeight;
         availableHeight -= elementHeight;
+        console.log(elementHeight);
+        console.log(availableHeight);
       } else {
         addPage(); // Save current page and start a new one
         if (element !== null) {
@@ -70,30 +71,17 @@ const BillingContent = ({
     // Get the height of the Typography elements
     const wasteDetailsHeadingHeight =
       wasteTableRef.current?.previousSibling?.offsetHeight || 30; // Assume 30px if not found
-    const transportationDetailsHeadingHeight =
-      transportTableRef.current?.previousSibling?.offsetHeight || 30; // Assume 30px if not found
 
     // Combine rows from both tables
     const wasteRows = wasteTableRef.current?.querySelectorAll("tr") || [];
-    const transportRows =
-      transportTableRef.current?.querySelectorAll("tr") || [];
 
     // Add WASTE DETAILS header
     addElementToPage(null, wasteDetailsHeadingHeight);
 
     // Add Waste rows
-    wasteRows.forEach((row) => {
-      const rowHeight = row.offsetHeight; // Measure the actual row height
-      const cells = Array.from(row.children); // Get <td> elements from the <tr>
-      const cellContents = cells.map((cell) => cell.textContent.trim()); // Extract content from each <td>
-      addElementToPage(cellContents, rowHeight); // Push the contents of the row
-    });
-
-    // Add TRANSPORTATION DETAILS header
-    addElementToPage(null, transportationDetailsHeadingHeight);
-
-    // Add Transportation rows
-    transportRows.forEach((row) => {
+    wasteRows.forEach((row, index) => {
+      // Skip the first row (index 0)
+      if (index === 0) return;
       const rowHeight = row.offsetHeight; // Measure the actual row height
       const cells = Array.from(row.children); // Get <td> elements from the <tr>
       const cellContents = cells.map((cell) => cell.textContent.trim()); // Extract content from each <td>
@@ -114,7 +102,9 @@ const BillingContent = ({
       addPage();
     }
 
+    console.log(pages); // Store the pages content in state
     setPagesContent(pages); // Store the pages content in state
+    console.log();
     setIsDoneCalculation(true); // Indicate that the calculation is done
   }, [
     firstPageHeight,
@@ -126,114 +116,265 @@ const BillingContent = ({
 
   useEffect(() => {
     if (heightsReady) {
-      if (wasteTableRef.current || transportTableRef.current) {
+      if (wasteTableRef.current) {
         calculatePageContent();
       }
     }
   }, [heightsReady, calculatePageContent]);
 
-  // Helper function to generate styles for TableCell
-  const getCellStyle = (isLastCell) => ({
-    padding: "4px",
+  const bodyCellStyles = ({
+    isLastCell = false,
+    notCenter = false,
+    width = "auto",
+  } = {}) => ({
+    fontSize: "10px",
+    padding: "2px",
     border: "1px solid black",
     borderTop: "none",
-    borderRight: isLastCell ? "1px solid black" : "none", // Use "1px solid black" for the last cell
+    borderRight: isLastCell ? "1px solid black" : "none",
     color: "black",
+    textAlign: notCenter ? "right" : "center",
+    width: typeof width === "number" ? `${width}px` : width, // Apply width as px if it's a number, otherwise use as-is
+    fontFamily: "'Poppins', sans-serif",
+    height: "20px",
   });
 
   return (
     <Box>
-      {/* Waste Details */}
-      {quotationWaste.length !== 0 && (
-        <Box className="account_details" mt={1}>
-          <Typography variant="h5" fontWeight="bold" textAlign="center">
-            WASTE CLASSIFICATION
-          </Typography>
-          <Table ref={wasteTableRef}>
-            <QuotationWasteTableHead row={quotationData} />
-            <TableBody id="table_data">
-              {quotationWaste.map((waste, index) => (
-                <TableRow key={index} sx={{ border: "black" }}>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {index + 1}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.wasteName}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {formatNumber(waste.quantity ? waste.quantity : 1)}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.unit}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.unitPrice}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.quantity
-                      ? waste.quantity * waste.unitPrice
-                      : waste.unitPrice}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.mode}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(true)}>
-                    {waste.vatCalculation}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
-      )}
-      {/* Transportation Details */}
-      {quotationTransportation.length !== 0 && (
-        <Box className="account_details" mt={1}>
-          <Typography variant="h5" fontWeight="bold" textAlign="center">
-            TRANSPORTATION DETAILS
-          </Typography>
-          <Table ref={transportTableRef}>
-            <QuotationTransportationTableHead row={quotationData} />
-            <TableBody id="table_data">
-              {quotationTransportation.map((transportation, index) => (
-                <TableRow key={index} sx={{ border: "black" }}>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {index + 1}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.VehicleType.typeOfVehicle}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.haulingArea}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {formatNumber(
-                      transportation.quantity ? transportation.quantity : 1
-                    )}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.unit}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.unitPrice}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.quantity
-                      ? transportation.quantity * transportation.unitPrice
-                      : transportation.unitPrice}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {transportation.mode}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(true)}>
-                    {transportation.vatCalculation}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
-      )}
+      <Box>
+        {" "}
+        <Typography
+          sx={{
+            variant: "h5",
+            fontWeight: "bold",
+            textAlign: "center",
+            border: "1px solid black",
+            borderBottom: "none",
+            backgroundColor: "lightgray",
+          }}
+        >
+          DETAILS
+        </Typography>
+      </Box>
+      <Table ref={wasteTableRef}>
+        <BillingTableHead />
+        <TableBody>
+          {transactions
+            .sort((a, b) => new Date(a.haulingDate) - new Date(b.haulingDate)) // Sort transactions by haulingDate from oldest to newest
+            .map((transaction, index) => {
+              // Check if aggregatedWasteTransactions need to be mapped
+              const aggregatedWasteTransactions =
+                transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
+                  (acc, current) => {
+                    const { id } = current.QuotationWaste;
+
+                    if (acc[id]) {
+                      acc[id].weight += current.weight;
+                    } else {
+                      acc[id] = { ...current, weight: current.weight };
+                    }
+
+                    return acc;
+                  },
+                  {}
+                );
+
+              const invoiceNumber =
+                transaction.BilledTransaction[0].serviceInvoiceNumber;
+              const typeOfWeight =
+                transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                  .SortedTransaction[0].CertifiedTransaction[0].typeOfWeight;
+
+              const wasteRows = Object.values(aggregatedWasteTransactions).map(
+                (waste, idx) => {
+                  // Determine the font color based on the mode
+                  const fontColor =
+                    waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
+
+                  return (
+                    <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 60, color: fontColor }),
+                        }}
+                      >
+                        {formatDate2(transaction.haulingDate)}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 40, color: fontColor }),
+                        }}
+                      ></TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 40, color: fontColor }),
+                        }}
+                      >
+                        {invoiceNumber}
+                      </TableCell>
+                      <TableCell
+                        sx={{ ...bodyCellStyles({ color: fontColor }) }}
+                      >
+                        {waste.QuotationWaste.wasteName}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 60,
+                            notCenter: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {typeOfWeight === "CLIENT WEIGHT"
+                          ? `${formatNumber(waste.clientWeight)}`
+                          : `${formatNumber(waste.weight)}`}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({ width: 40, color: fontColor }),
+                        }}
+                      >
+                        {waste.QuotationWaste.unit}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 80,
+                            notCenter: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {formatNumber(waste.QuotationWaste.unitPrice)}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 80,
+                            notCenter: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {typeOfWeight === "CLIENT WEIGHT"
+                          ? `${formatNumber(
+                              waste.clientWeight *
+                                waste.QuotationWaste.unitPrice
+                            )}`
+                          : `${formatNumber(
+                              waste.weight * waste.QuotationWaste.unitPrice
+                            )}`}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 85,
+                            isLastCell: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {waste.QuotationWaste.vatCalculation}
+                      </TableCell>
+                    </TableRow>
+                  );
+                }
+              );
+
+              // Add the transportation row if applicable
+              const transpoRows =
+                transaction.QuotationTransportation.mode === "CHARGE"
+                  ? [
+                      <TableRow
+                        key={`transpo-${index}`}
+                        sx={{ border: "black" }}
+                      >
+                        <TableCell sx={bodyCellStyles({ width: 60 })}>
+                          {formatDate2(transaction.haulingDate)}
+                        </TableCell>
+                        <TableCell
+                          sx={bodyCellStyles({ width: 40 })}
+                        ></TableCell>
+                        <TableCell sx={bodyCellStyles({ width: 40 })}>
+                          {invoiceNumber}
+                        </TableCell>
+                        <TableCell sx={bodyCellStyles()}>
+                          {`TRANS FEE ${transaction.QuotationTransportation.VehicleType.typeOfVehicle}`}
+                        </TableCell>
+                        <TableCell
+                          sx={bodyCellStyles({
+                            width: 60,
+                            notCenter: true,
+                          })}
+                        >
+                          {`${formatNumber(1)}`}
+                        </TableCell>
+                        <TableCell sx={bodyCellStyles({ width: 40 })}>
+                          {transaction.QuotationTransportation.unit}
+                        </TableCell>
+                        <TableCell
+                          sx={bodyCellStyles({
+                            width: 80,
+                            notCenter: true,
+                          })}
+                        >
+                          {formatNumber(
+                            transaction.QuotationTransportation.unitPrice
+                          )}
+                        </TableCell>
+                        <TableCell
+                          sx={bodyCellStyles({
+                            width: 80,
+                            notCenter: true,
+                          })}
+                        >
+                          {formatNumber(
+                            transaction.QuotationTransportation.unitPrice
+                          )}
+                        </TableCell>
+                        <TableCell
+                          sx={bodyCellStyles({
+                            width: 85,
+                            isLastCell: true,
+                          })}
+                        >
+                          {transaction.QuotationTransportation.vatCalculation}
+                        </TableCell>
+                      </TableRow>,
+                    ]
+                  : [];
+
+              // Combine waste and transportation rows for alternating display
+              const combinedRows = [];
+
+              wasteRows.forEach((wasteRow, idx) => {
+                combinedRows.push(wasteRow);
+                if (transpoRows.length > 0) {
+                  // Push transpo row after every waste row
+                  combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
+                }
+                combinedRows.push(
+                  <TableRow key={index + 1} sx={{ border: "black" }}>
+                    <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                    ></TableCell>
+                  </TableRow>
+                );
+              });
+              console.log(combinedRows);
+              return combinedRows;
+            })}
+        </TableBody>
+      </Table>
     </Box>
   );
 };

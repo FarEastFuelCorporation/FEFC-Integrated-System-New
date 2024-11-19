@@ -24,9 +24,7 @@ const BillingStatementFooter = ({ row, qrCodeURL }) => {
   }, [isApproved]);
 
   return (
-    <Box
-      sx={{ position: "absolute", width: "calc(100% - 114px)", bottom: "38px" }}
-    >
+    <Box sx={{ width: "100%" }}>
       {/* Footer */}
       <Typography mt={1} sx={{ fontSize: "10px", textAlign: "center" }}>
         Please examine your BILLING STATEMENT for any errors. If no error is

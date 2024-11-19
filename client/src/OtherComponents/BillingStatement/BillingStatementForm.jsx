@@ -246,7 +246,7 @@ const BillingStatementForm = ({ row, verify = null }) => {
       ref={certificateRef}
       sx={{
         position: "absolute",
-        // left: verify ? "0" : "-9999px",
+        left: verify ? "0" : "-9999px",
         padding: "123px 38px 38px 76px",
         minHeight: "1056px", // Ensure at least one page height
         width: "816px",

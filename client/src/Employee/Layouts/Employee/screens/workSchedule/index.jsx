@@ -243,7 +243,7 @@ const WorkSchedule = ({ user }) => {
       </Box>
       <hr />
 
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}

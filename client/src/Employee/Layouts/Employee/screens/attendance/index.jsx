@@ -104,7 +104,7 @@ const Attendance = ({ user }) => {
         </Typography>
       </Box>
       <hr />
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}

@@ -467,7 +467,7 @@ const Leave = ({ user }) => {
         onConfirm={dialogAction}
         text={dialog}
       />
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles>
         <hr />
         <Tabs
           value={selectedTab}

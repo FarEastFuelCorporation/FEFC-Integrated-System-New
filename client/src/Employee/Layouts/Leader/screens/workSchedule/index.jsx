@@ -510,7 +510,7 @@ const WorkSchedule = ({ user }) => {
         onConfirm={dialogAction}
         text={dialog}
       />
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}

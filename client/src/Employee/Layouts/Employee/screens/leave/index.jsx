@@ -569,7 +569,7 @@ const Leave = ({ user }) => {
           {`Emergency Leave`}
         </Button>
       </Box>
-      <CustomDataGridStyles height={"auto"}>
+      <CustomDataGridStyles>
         <DataGrid
           rows={dataRecords ? dataRecords : []}
           columns={columns}

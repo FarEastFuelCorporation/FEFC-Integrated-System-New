@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../../../../../OtherComponents/Header";
-import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
@@ -88,7 +87,6 @@ const BilledTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
-    console.log(selectedIds);
     setFormData({
       id: "",
       bookedTransactionId: selectedIds,

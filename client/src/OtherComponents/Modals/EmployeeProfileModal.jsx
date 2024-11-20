@@ -55,8 +55,6 @@ const EmployeeProfileModal = ({
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
 
-  console.log(attachmentData.length);
-
   const attachmentTableHeight =
     attachmentData.length === 0
       ? rowHeight + headerHeight
@@ -335,7 +333,6 @@ const EmployeeProfileModal = ({
                 `${apiUrl}/api/employeeAttachment/full/${documentId}`,
                 { responseType: "arraybuffer" }
               );
-              const byteArray = new Uint8Array(response.data);
               const attachment = response.data.employeeAttachment[0].attachment; // Access the attachment data
               const fileName = params.row.fileName; // Access the file name
 

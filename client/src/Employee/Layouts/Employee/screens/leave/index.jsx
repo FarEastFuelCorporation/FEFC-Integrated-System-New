@@ -24,10 +24,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import { tokens } from "../../../../../theme";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
-import {
-  formatDate3,
-  formatTime4,
-} from "../../../../../OtherComponents/Functions";
+import { formatDate3 } from "../../../../../OtherComponents/Functions";
 
 const Leave = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;

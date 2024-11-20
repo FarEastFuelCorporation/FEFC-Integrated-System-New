@@ -61,7 +61,6 @@ const BillingApprovalTransaction = ({ row, user }) => {
   };
 
   const handleOpenPDFInNewTab = () => {
-    console.log(certificateRef);
     const input = certificateRef.current;
 
     const pageHeight = 1056;

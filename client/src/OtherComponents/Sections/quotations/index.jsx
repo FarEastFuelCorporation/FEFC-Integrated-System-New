@@ -202,7 +202,6 @@ const Quotations = ({ user }) => {
   };
 
   const handleViewPDF = () => {
-    console.log(certificateRef);
     const input = certificateRef.current;
 
     const pageHeight = 1056;

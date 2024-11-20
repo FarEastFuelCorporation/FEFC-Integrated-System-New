@@ -256,6 +256,19 @@ const Transaction = ({
     },
   ];
 
+  // Add the conditional column if userType is 8 or above
+  if (user.userType >= 8) {
+    columns.splice(columns.length - 1, 0, {
+      field: "billingNumber", // Same field name as in the original columns
+      headerName: "Billing Number",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => params.row.BilledTransaction?.[0]?.billingNumber,
+      renderCell: renderCellWithWrapText,
+    });
+  }
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (

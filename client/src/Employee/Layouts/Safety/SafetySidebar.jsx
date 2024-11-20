@@ -11,6 +11,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
@@ -28,6 +29,7 @@ const SafetySidebar = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
+      "/dashboard/employee": "Employee Records",
       "/dashboard/clients": "Clients",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
@@ -110,6 +112,14 @@ const SafetySidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={""}
+        />
+        <BottomNavItem
+          label="Employee"
+          value="Employee Records"
+          icon={ContactsOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"employee"}
         />
         <BottomNavItem
           label="Clients"
@@ -254,6 +264,14 @@ const SafetySidebar = ({ user }) => {
             >
               Data
             </Typography>
+            <Item
+              title="Employee Records"
+              to="employee"
+              icon={<ContactsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
             <Item
               title="Clients"
               to="clients"

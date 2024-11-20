@@ -294,6 +294,12 @@ const getIncludeOptionsPartial = () => [
       },
     ],
   },
+  {
+    model: BilledTransaction,
+    as: "BilledTransaction",
+    attributes: ["billingNumber"],
+    required: false,
+  },
 ];
 
 // Get Pending Transactions (where statusId equals given value)

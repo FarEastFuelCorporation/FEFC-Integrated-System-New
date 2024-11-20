@@ -11,7 +11,6 @@ import {
 import letterhead from "../../images/letterhead.jpg";
 import BillingStatementFooter from "./BillingStatementFooter";
 import BillingStatementHeader from "./BillingStatementHeader";
-import { formatNumber } from "../Functions";
 import axios from "axios";
 import BillingContent from "./BillingContent";
 import BillingTableHead from "./BillingTableHead";
@@ -303,16 +302,16 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
                             false,
                             columnWidths.waste[4],
                             true,
-                            formatNumber(waste[4]) == 0.0 ? false : true
+                            waste[4] ? true : false
                           )}
                         >
-                          {formatNumber(waste[4])}
+                          {waste[4] ? waste[4] : 0}
                         </TableCell>
                         <TableCell
                           align="center"
                           sx={getCellStyle(false, columnWidths.waste[5])}
                         >
-                          {waste[5] == 0.0 ? "" : waste[5]}
+                          {waste[5] ? waste[5] : ""}
                         </TableCell>
                         <TableCell
                           align="center"

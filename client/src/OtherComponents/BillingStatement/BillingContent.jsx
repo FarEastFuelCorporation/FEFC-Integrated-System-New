@@ -24,10 +24,6 @@ const BillingContent = ({
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
 
-  console.log(pageHeight);
-  console.log(headerHeight);
-  console.log(firstPageHeight);
-
   // Helper function to calculate total height of rows and divide into pages
   const calculatePageContent = useCallback(() => {
     const pages = [];
@@ -56,8 +52,6 @@ const BillingContent = ({
         }
         currentPageHeight += elementHeight;
         availableHeight -= elementHeight;
-        console.log(elementHeight);
-        console.log(availableHeight);
       } else {
         addPage(); // Save current page and start a new one
         if (element !== null) {
@@ -102,9 +96,7 @@ const BillingContent = ({
       addPage();
     }
 
-    console.log(pages); // Store the pages content in state
     setPagesContent(pages); // Store the pages content in state
-    console.log();
     setIsDoneCalculation(true); // Indicate that the calculation is done
   }, [
     firstPageHeight,
@@ -370,7 +362,6 @@ const BillingContent = ({
                   </TableRow>
                 );
               });
-              console.log(combinedRows);
               return combinedRows;
             })}
         </TableBody>

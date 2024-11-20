@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Table,
@@ -34,7 +28,6 @@ const defaultFooterHeight = 120; // Default approximate height for footer
 const BillingStatementForm = ({ row, verify = null, statementRef }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
-  const certificateRef = useRef();
 
   const [transactions, setTransactions] = useState([]);
 

@@ -208,27 +208,28 @@ const BilledTransaction = ({ row, user }) => {
             }`}
           </Typography>
           {row.statusId === 8 && (
-            <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
-              <BillingStatementForm statementRef={certificateRef} row={row} />
-            </Box>
+            <>
+              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+                <BillingStatementForm statementRef={certificateRef} row={row} />
+              </Box>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleDownloadPDF}
+                >
+                  Download Billing Statement
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleOpenPDFInNewTab}
+                >
+                  View Billing Statement
+                </Button>
+              </Box>
+            </>
           )}
-
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleDownloadPDF}
-            >
-              Download Billing Statement
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleOpenPDFInNewTab}
-            >
-              View Billing Statement
-            </Button>
-          </Box>
 
           <br />
           <hr />

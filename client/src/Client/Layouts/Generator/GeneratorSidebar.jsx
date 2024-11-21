@@ -67,6 +67,7 @@ const GeneratorSidebar = ({ user }) => {
     billerAddress: "",
     billerContactPerson: "",
     billerContactNumber: "",
+    billerTinNumber: "",
     clientPicture: "",
   });
 
@@ -106,6 +107,7 @@ const GeneratorSidebar = ({ user }) => {
 
   const initializeClientDetails = useCallback(() => {
     const { clientDetails } = user || {};
+    console.log(clientDetails);
     setClientDetails({
       id: clientDetails?.id || "",
       clientId: clientDetails?.clientId || "",
@@ -118,6 +120,7 @@ const GeneratorSidebar = ({ user }) => {
       billerAddress: clientDetails?.billerAddress || "",
       billerContactPerson: clientDetails?.billerContactPerson || "",
       billerContactNumber: clientDetails?.billerContactNumber || "",
+      billerTinNumber: clientDetails?.billerTinNumber || "",
       clientPicture: clientDetails?.clientPicture || "",
     });
   }, [user]);
@@ -174,6 +177,7 @@ const GeneratorSidebar = ({ user }) => {
         "billerContactNumber",
         clientDetails.billerContactNumber
       );
+      formDataToSend.append("billerTinNumber", clientDetails.billerTinNumber);
       formDataToSend.append("clientPicture", clientDetails.clientPicture);
       formDataToSend.append("submittedBy", clientDetails.submittedBy);
       // Add clientPicture if it's selected
@@ -181,7 +185,7 @@ const GeneratorSidebar = ({ user }) => {
         formDataToSend.append("clientPicture", selectedFile);
       }
       // Update existing client
-      await axios.put(
+      const response = await axios.put(
         `${apiUrl}/api/client/${clientDetails.id}`,
         formDataToSend,
         {
@@ -200,9 +204,29 @@ const GeneratorSidebar = ({ user }) => {
         reader.readAsDataURL(selectedFile);
       }
 
+      const data = response.data.client;
+
+      console.log(response);
+      console.log(data);
+
+      setClientDetails({
+        id: data?.id || "",
+        clientId: data?.clientId || "",
+        clientName: data?.clientName || "",
+        address: data?.address || "",
+        natureOfBusiness: data?.natureOfBusiness || "",
+        contactNumber: data?.contactNumber || "",
+        clientType: data?.clientType || "",
+        billerName: data?.billerName || "",
+        billerAddress: data?.billerAddress || "",
+        billerContactPerson: data?.billerContactPerson || "",
+        billerContactNumber: data?.billerContactNumber || "",
+        billerTinNumber: data?.billerTinNumber || "",
+        clientPicture: data?.clientPicture || "",
+      });
+
       setSuccessMessage("Client updated successfully!");
       setShowSuccessMessage(true); // Show the success message
-      initializeClientDetails();
       handleCloseModal();
     } catch (error) {
       console.error("Error:", error);
@@ -517,6 +541,14 @@ const GeneratorSidebar = ({ user }) => {
             label="Biller Contact Number"
             name="billerContactNumber"
             value={clientDetails.billerContactNumber}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Biller TIN Number"
+            name="billerTinNumber"
+            value={clientDetails.billerTinNumber}
             onChange={handleInputChange}
           />
           <input

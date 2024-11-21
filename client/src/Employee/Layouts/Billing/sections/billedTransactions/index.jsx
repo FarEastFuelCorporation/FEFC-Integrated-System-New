@@ -21,6 +21,7 @@ const BilledTransactions = ({ user }) => {
   // Create refs for the input fields
   const billedDateRef = useRef();
   const billedTimeRef = useRef();
+  const billingNumberRef = useRef();
   const serviceInvoiceNumberRef = useRef();
   const remarksRef = useRef();
 
@@ -30,6 +31,7 @@ const BilledTransactions = ({ user }) => {
     billingNumber: "",
     billedDate: "",
     billedTime: "",
+    billingNumber: "",
     serviceInvoiceNumber: "",
     billedAmount: 0,
     remarks: "",
@@ -93,6 +95,7 @@ const BilledTransactions = ({ user }) => {
       billingNumber: "",
       billedDate: "",
       billedTime: "",
+      billingNumber: "",
       serviceInvoiceNumber: "",
       billedAmount: 0,
       remarks: "",
@@ -133,6 +136,7 @@ const BilledTransactions = ({ user }) => {
         billingNumber: billedTransaction.billingNumber,
         billedDate: billedTransaction.billedDate,
         billedTime: billedTransaction.billedTime,
+        billingNumber: billedTransaction.billingNumber,
         serviceInvoiceNumber: billedTransaction.serviceInvoiceNumber,
         billedAmount: billedTransaction.billedAmount,
         remarks: billedTransaction.remarks,
@@ -193,6 +197,11 @@ const BilledTransactions = ({ user }) => {
       validationErrors.push("Billed Time is required.");
     }
 
+    // Validate billingNumber
+    if (!data.billingNumber) {
+      validationErrors.push("BIlling Number is required.");
+    }
+
     // Validate serviceInvoiceNumber
     if (!data.serviceInvoiceNumber) {
       validationErrors.push("Service Invoice Number is required.");
@@ -217,6 +226,7 @@ const BilledTransactions = ({ user }) => {
       ...formData,
       billedDate: billedDateRef.current.value,
       billedTime: billedTimeRef.current.value,
+      billingNumber: billingNumberRef.current.value,
       serviceInvoiceNumber: serviceInvoiceNumberRef.current.value,
       remarks: remarksRef.current.value,
     };
@@ -311,6 +321,7 @@ const BilledTransactions = ({ user }) => {
         refs={{
           billedDateRef,
           billedTimeRef,
+          billingNumberRef,
           serviceInvoiceNumberRef,
           remarksRef,
         }}

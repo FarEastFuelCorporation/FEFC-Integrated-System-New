@@ -19,6 +19,7 @@ async function createBilledTransactionController(req, res) {
       bookedTransactionId, // Now an array
       billedDate,
       billedTime,
+      billingNumber,
       serviceInvoiceNumber,
       billedAmount,
       remarks,
@@ -34,7 +35,7 @@ async function createBilledTransactionController(req, res) {
 
     remarks = remarks && remarks.toUpperCase();
 
-    const billingNumber = await generateBillingNumber();
+    // const billingNumber = await generateBillingNumber();
 
     // Iterate over the bookedTransactionId array and create multiple entries
     for (const id of bookedTransactionId) {
@@ -153,6 +154,7 @@ async function updateBilledTransactionController(req, res) {
         bookedTransactionId,
         billedDate,
         billedTime,
+        billingNumber,
         serviceInvoiceNumber,
         billedAmount,
         remarks,
@@ -163,48 +165,66 @@ async function updateBilledTransactionController(req, res) {
       // Uppercase the remarks if present
       const updatedRemarks = remarks && remarks.toUpperCase();
 
-      // Find the billed transaction by UUID (id)
-      const billedTransaction = await BilledTransaction.findByPk(id);
+      // Find the billed transaction by ID
+      const billedTransaction = await BilledTransaction.findByPk(id, {
+        attributes: ["billingNumber"],
+      });
 
       if (billedTransaction) {
-        // Update billed transaction attributes
-        billedTransaction.billedDate = billedDate;
-        billedTransaction.billedTime = billedTime;
-        billedTransaction.serviceInvoiceNumber = serviceInvoiceNumber;
-        billedTransaction.billedAmount = billedAmount;
-        billedTransaction.remarks = updatedRemarks;
-        billedTransaction.updatedBy = updatedBy;
+        // Retrieve all billed transactions with the same billingNumber
+        const billedTransactions = await BilledTransaction.findAll({
+          where: { billingNumber: billedTransaction.billingNumber },
+        });
 
-        // Save the updated billed transaction
-        await billedTransaction.save({ transaction });
+        if (billedTransactions.length > 0) {
+          // Update each related billed transaction
+          for (const transactionEntry of billedTransactions) {
+            transactionEntry.billedDate = billedDate;
+            transactionEntry.billedTime = billedTime;
+            transactionEntry.billingNumber = billingNumber;
+            transactionEntry.serviceInvoiceNumber = serviceInvoiceNumber;
+            transactionEntry.billedAmount = billedAmount;
+            transactionEntry.remarks = updatedRemarks;
+            transactionEntry.updatedBy = updatedBy;
 
-        // Update the status of the booked transaction
-        const updatedBookedTransaction = await BookedTransaction.findByPk(
-          bookedTransactionId,
-          { transaction }
-        );
+            // Save changes for each transaction
+            await transactionEntry.save({ transaction });
+          }
 
-        if (updatedBookedTransaction) {
-          updatedBookedTransaction.statusId = statusId;
-          await updatedBookedTransaction.save({ transaction });
+          // Update the status of the booked transaction
+          const updatedBookedTransaction = await BookedTransaction.findByPk(
+            bookedTransactionId,
+            { transaction }
+          );
 
-          // Commit the transaction
-          await transaction.commit();
+          if (updatedBookedTransaction) {
+            updatedBookedTransaction.statusId = statusId;
+            await updatedBookedTransaction.save({ transaction });
 
-          // Fetch updated transaction data
-          const data = await fetchData(statusId);
+            // Commit the transaction
+            await transaction.commit();
 
-          // Respond with the updated data
-          res.status(200).json({
-            pendingTransactions: data.pending,
-            inProgressTransactions: data.inProgress,
-            finishedTransactions: data.finished,
-          });
+            // Fetch updated transaction data
+            const data = await fetchData(statusId);
+
+            // Respond with the updated data
+            res.status(200).json({
+              pendingTransactions: data.pending,
+              inProgressTransactions: data.inProgress,
+              finishedTransactions: data.finished,
+            });
+          } else {
+            // If booked transaction with the specified ID was not found
+            await transaction.rollback();
+            res.status(404).json({
+              message: `Booked Transaction with ID ${bookedTransactionId} not found`,
+            });
+          }
         } else {
-          // If booked transaction with the specified ID was not found
+          // If no related billed transactions were found
           await transaction.rollback();
           res.status(404).json({
-            message: `Booked Transaction with ID ${bookedTransactionId} not found`,
+            message: `No related Billed Transactions found for billingNumber ${billedTransaction.billingNumber}`,
           });
         }
       } else {

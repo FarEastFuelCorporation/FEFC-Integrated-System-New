@@ -122,10 +122,12 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
           <Typography fontSize="12px">
             TIN NUMBER: {clientData.billerTinNumber}
           </Typography>
-          {/* <Typography fontSize="12px">
-            {" "}
-            BUSINESS STYLE: {clientData.natureOfBusiness}
-          </Typography> */}
+          {clientData.natureOfBusiness && (
+            <Typography fontSize="12px">
+              {" "}
+              BUSINESS STYLE: {clientData.natureOfBusiness}
+            </Typography>
+          )}
           <Box display="flex" fontSize="10px">
             <Typography id="contact_number" pl={1}></Typography>
           </Box>

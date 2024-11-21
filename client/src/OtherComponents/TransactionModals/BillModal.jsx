@@ -84,6 +84,21 @@ const BillModal = ({
               autoComplete="off"
             />
             <TextField
+              label="Billing Number"
+              inputRef={refs.billingNumberRef}
+              defaultValue={formData.billingNumber}
+              fullWidth
+              type="text"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+            <TextField
               label="Service Invoice Number"
               inputRef={refs.serviceInvoiceNumberRef}
               defaultValue={formData.serviceInvoiceNumber}

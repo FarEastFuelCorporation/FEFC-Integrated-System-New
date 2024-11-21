@@ -55,6 +55,8 @@ const Overtime = require("../models/Overtime");
 const EmployeeSalary = require("../models/EmployeeSalary");
 const VehicleAttachment = require("../models/VehicleAttachment");
 const TransporterClient = require("../models/TransporterClient");
+const Medicine = require("../models/Medicine");
+const MedicineLog = require("../models/MedicineLog");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -501,6 +503,39 @@ Employee.hasMany(CollectedTransaction, {
 CollectedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(Medicine, {
+  as: "Medicine",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+Medicine.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(MedicineLog, {
+  as: "MedicineLog",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+MedicineLog.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(MedicineLog, {
+  as: "EmployeeMedicineLog",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+});
+MedicineLog.belongsTo(Employee, {
+  as: "MedicineLogEmployee",
+  foreignKey: "employeeId",
   targetKey: "employeeId",
 });
 
@@ -1042,6 +1077,17 @@ PlasticTransaction.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
   targetKey: "clientId",
+});
+
+Medicine.hasMany(MedicineLog, {
+  as: "MedicineLog",
+  foreignKey: "medicineId",
+  sourceKey: "id",
+});
+MedicineLog.belongsTo(Medicine, {
+  as: "Medicine",
+  foreignKey: "medicineId",
+  targetKey: "id",
 });
 
 // Export the associations

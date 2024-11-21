@@ -53,6 +53,8 @@ const employeeSalaryRoutes = require("./employeeSalaryRoutes");
 const attendanceRecordRoutes = require("./attendanceRecordRoutes");
 const employeeAttachmentRoutes = require("./employeeAttachmentRoutes");
 const departmentRoutes = require("./departmentRoutes");
+const medicineRoutes = require("./medicineRoutes");
+const medicineLogRoutes = require("./medicineLogRoutes");
 const { error404Controller } = require("../controllers/othersController");
 
 // Route to check authentication status
@@ -117,6 +119,8 @@ router.use("/employeeSalary", employeeSalaryRoutes);
 router.use("/attendanceRecord", attendanceRecordRoutes);
 router.use("/employeeAttachment", employeeAttachmentRoutes);
 router.use("/department", departmentRoutes);
+router.use("/medicine", medicineRoutes);
+router.use("/medicineLog", medicineLogRoutes);
 
 router.use(error404Controller);
 

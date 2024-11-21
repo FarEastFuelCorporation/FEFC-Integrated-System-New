@@ -12,6 +12,7 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -29,6 +30,7 @@ const HealthOfficerSidebar = ({ user }) => {
     () => ({
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/employee": "Employee Records",
+      "/dashboard/medicine": "Medicine Inventory",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -118,6 +120,14 @@ const HealthOfficerSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"employee"}
+        />
+        <BottomNavItem
+          label="Medicine"
+          value="Medicine Inventory"
+          icon={MedicalServicesIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"medicine"}
         />
         <BottomNavItem
           label="Documents"
@@ -258,6 +268,14 @@ const HealthOfficerSidebar = ({ user }) => {
               title="Employee Records"
               to="employee"
               icon={<ContactsOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Medicine Inventory"
+              to="medicine"
+              icon={<MedicalServicesIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

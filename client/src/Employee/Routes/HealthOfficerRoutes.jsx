@@ -6,6 +6,7 @@ import EmployeeRecords from "../Layouts/HR/sections/employeeRecords";
 import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../Layouts/HealthOfficer/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import Medicines from "../../OtherComponents/Sections/medicines";
 
 const HealthOfficerRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -13,6 +14,7 @@ const HealthOfficerRoutes = ({ user, onUpdateUser }) => (
     <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="employee" element={<EmployeeRecords user={user} />} />
+      <Route path="medicine" element={<Medicines user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

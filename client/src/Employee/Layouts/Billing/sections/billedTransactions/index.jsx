@@ -28,7 +28,6 @@ const BilledTransactions = ({ user }) => {
   const initialFormData = {
     id: "",
     bookedTransactionId: [],
-    billingNumber: "",
     billedDate: "",
     billedTime: "",
     billingNumber: "",
@@ -92,7 +91,6 @@ const BilledTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: selectedIds,
-      billingNumber: "",
       billedDate: "",
       billedTime: "",
       billingNumber: "",
@@ -133,7 +131,6 @@ const BilledTransactions = ({ user }) => {
             ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
             ?.BilledTransaction?.[0]?.BilledCertified?.certifiedTransactionId,
         ],
-        billingNumber: billedTransaction.billingNumber,
         billedDate: billedTransaction.billedDate,
         billedTime: billedTransaction.billedTime,
         billingNumber: billedTransaction.billingNumber,

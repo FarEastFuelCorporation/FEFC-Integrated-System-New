@@ -43,6 +43,10 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
 
   const billedTransaction = row.BilledTransaction[0];
 
+  console.log(row);
+
+  const hasFixedRate = row.QuotationWaste?.hasFixedRate;
+
   // Calculate header and footer heights
   const calculateRemainingHeight = useCallback(() => {
     const headerH = headerRef.current?.offsetHeight || defaultHeaderHeight;
@@ -114,31 +118,104 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
       }, {})
     );
 
-    // Calculate amounts and credits based on vatCalculation and mode
-    aggregatedWasteTransactions.forEach((item) => {
-      const { weight, clientWeight, QuotationWaste } = item;
+    if (hasFixedRate) {
+      let totalWeight = 0;
+      let vatCalculation;
+      let fixedWeight;
+      let fixedPrice;
+      let unitPrice;
+      let target;
 
-      const selectedWeight =
-        typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+      aggregatedWasteTransactions.forEach((item) => {
+        const { weight, clientWeight, QuotationWaste } = item;
 
-      const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+        const selectedWeight =
+          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
-      const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+        totalWeight += selectedWeight; // Total weight multiplied by unit price
 
-      switch (QuotationWaste.vatCalculation) {
+        target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        vatCalculation = QuotationWaste.vatCalculation;
+        fixedWeight = QuotationWaste.fixedWeight;
+        fixedPrice = QuotationWaste.fixedPrice;
+        unitPrice = QuotationWaste.unitPrice;
+
+        // switch (QuotationWaste.vatCalculation) {
+        //   case "VAT EXCLUSIVE":
+        //     target.vatExclusive += totalWeightPrice;
+        //     break;
+        //   case "VAT INCLUSIVE":
+        //     target.vatInclusive += totalWeightPrice;
+        //     break;
+        //   case "NON VATABLE":
+        //     target.nonVatable += totalWeightPrice;
+        //     break;
+        //   default:
+        //     break;
+        // }
+      });
+
+      switch (vatCalculation) {
         case "VAT EXCLUSIVE":
-          target.vatExclusive += totalWeightPrice;
+          target.vatExclusive = fixedPrice;
           break;
         case "VAT INCLUSIVE":
-          target.vatInclusive += totalWeightPrice;
+          target.vatInclusive = fixedPrice;
           break;
         case "NON VATABLE":
-          target.nonVatable += totalWeightPrice;
+          target.nonVatable = fixedPrice;
           break;
         default:
           break;
       }
-    });
+
+      if (totalWeight > fixedWeight) {
+        const excessWeight = totalWeight - fixedWeight;
+
+        const excessPrice = excessWeight * unitPrice;
+
+        switch (vatCalculation) {
+          case "VAT EXCLUSIVE":
+            target.vatExclusive += excessPrice;
+            break;
+          case "VAT INCLUSIVE":
+            target.vatInclusive += excessPrice;
+            break;
+          case "NON VATABLE":
+            target.nonVatable += excessPrice;
+            break;
+          default:
+            break;
+        }
+      }
+    } else {
+      // Calculate amounts and credits based on vatCalculation and mode
+      aggregatedWasteTransactions.forEach((item) => {
+        const { weight, clientWeight, QuotationWaste } = item;
+
+        const selectedWeight =
+          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+        const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        switch (QuotationWaste.vatCalculation) {
+          case "VAT EXCLUSIVE":
+            target.vatExclusive += totalWeightPrice;
+            break;
+          case "VAT INCLUSIVE":
+            target.vatInclusive += totalWeightPrice;
+            break;
+          case "NON VATABLE":
+            target.nonVatable += totalWeightPrice;
+            break;
+          default:
+            break;
+        }
+      });
+    }
 
     const transpoFee = transaction.QuotationTransportation.unitPrice;
     const transpoVatCalculation =
@@ -317,19 +394,19 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
                           align="center"
                           sx={getCellStyle(false, columnWidths.waste[6], true)}
                         >
-                          {waste[6]}
+                          {hasFixedRate && waste[0] !== "" ? "" : waste[6]}
                         </TableCell>
                         <TableCell
                           align="center"
                           sx={getCellStyle(false, columnWidths.waste[7], true)}
                         >
-                          {waste[7]}
+                          {hasFixedRate && waste[0] !== "" ? "" : waste[7]}
                         </TableCell>
                         <TableCell
                           align="center"
                           sx={getCellStyle(true, columnWidths.waste[8])}
                         >
-                          {waste[8]}
+                          {hasFixedRate && waste[0] !== "" ? "" : waste[8]}
                         </TableCell>
                       </TableRow>
                     </TableBody>

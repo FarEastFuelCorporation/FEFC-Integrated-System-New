@@ -21,6 +21,21 @@ const BillingContent = ({
 }) => {
   const wasteTableRef = useRef(null);
 
+  console.log(transactions);
+
+  const hasFixedRate = transactions?.[0]?.QuotationWaste?.hasFixedRate;
+  const fixedWeight = transactions?.[0]?.QuotationWaste?.fixedWeight;
+  const unit = transactions?.[0]?.QuotationWaste?.unit;
+  const unitPrice = transactions?.[0]?.QuotationWaste?.unitPrice;
+  const fixedPrice = transactions?.[0]?.QuotationWaste?.fixedPrice;
+  const vatCalculation = transactions?.[0]?.QuotationWaste?.vatCalculation;
+
+  let totalWeight = 0;
+
+  console.log(hasFixedRate);
+  console.log(fixedPrice);
+  console.log(vatCalculation);
+
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
 
@@ -69,6 +84,8 @@ const BillingContent = ({
     // Combine rows from both tables
     const wasteRows = wasteTableRef.current?.querySelectorAll("tr") || [];
 
+    console.log(wasteRows);
+
     // Add WASTE DETAILS header
     addElementToPage(null, wasteDetailsHeadingHeight);
 
@@ -96,6 +113,7 @@ const BillingContent = ({
       addPage();
     }
 
+    console.log(pages); // Store the pages content in state
     setPagesContent(pages); // Store the pages content in state
     setIsDoneCalculation(true); // Indicate that the calculation is done
   }, [
@@ -183,6 +201,10 @@ const BillingContent = ({
                   const fontColor =
                     waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
 
+                  totalWeight +=
+                    typeOfWeight === "CLIENT WEIGHT"
+                      ? waste.clientWeight
+                      : waste.weight;
                   return (
                     <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                       <TableCell
@@ -347,7 +369,7 @@ const BillingContent = ({
                   combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
                 }
                 combinedRows.push(
-                  <TableRow key={index + 1} sx={{ border: "black" }}>
+                  <TableRow key={`space-${index}`} sx={{ border: "black" }}>
                     <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                     <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
                     <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -364,6 +386,81 @@ const BillingContent = ({
               });
               return combinedRows;
             })}
+          {hasFixedRate && (
+            <TableRow key={`add-${1}`} sx={{ border: "black" }}>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({})}>TOTAL</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 60 })}>
+                {formatNumber(totalWeight)}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell
+                sx={bodyCellStyles({ width: 85, isLastCell: true })}
+              ></TableCell>
+            </TableRow>
+          )}
+
+          {hasFixedRate && (
+            <TableRow key={`add-${2}`} sx={{ border: "black" }}>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({})}>
+                FIRST {`${formatNumber(fixedWeight)}`}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 60 })}>
+                {formatNumber(fixedWeight)}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}>
+                {formatNumber(fixedPrice)}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
+                {vatCalculation}
+              </TableCell>
+            </TableRow>
+          )}
+          {hasFixedRate && totalWeight > fixedWeight && (
+            <TableRow key={`add-${2}`} sx={{ border: "black" }}>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({})}>EXCESS QUANTITY:</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 60 })}>
+                {formatNumber(totalWeight - fixedWeight)}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}>
+                {unitPrice}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}>
+                {formatNumber((totalWeight - fixedWeight) * unitPrice)}
+              </TableCell>
+              <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
+                {vatCalculation}
+              </TableCell>
+            </TableRow>
+          )}
+          {hasFixedRate && (
+            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell
+                sx={bodyCellStyles({ width: 85, isLastCell: true })}
+              ></TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </Box>

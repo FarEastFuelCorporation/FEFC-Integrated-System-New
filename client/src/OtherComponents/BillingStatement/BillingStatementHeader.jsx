@@ -69,11 +69,8 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row.BilledTransaction[0].BillingApprovalTransaction
-                ? formatDateFull(
-                    row.BilledTransaction[0].BillingApprovalTransaction
-                      .approvedDate
-                  )
+              {row.BilledTransaction[0]
+                ? formatDateFull(row.BilledTransaction[0].billedDate)
                 : ""}
             </Typography>
           </Box>

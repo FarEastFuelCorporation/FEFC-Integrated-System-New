@@ -152,10 +152,12 @@ async function updateClientController(req, res) {
       // Save the updated client
       await updatedClient.save();
 
-      const clients = await Client.findAll();
+      const client = await Client.findByPk(id);
+      
+      console.log(client)
 
       // Respond with the updated client object
-      res.json({ clients });
+      res.json({ client });
     } else {
       // If client with the specified ID was not found
       res.status(404).json({ message: `Client with ID ${id} not found` });

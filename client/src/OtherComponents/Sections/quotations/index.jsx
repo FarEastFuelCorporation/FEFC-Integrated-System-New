@@ -289,7 +289,7 @@ const Quotations = ({ user }) => {
 
       // Capture the content of the current page using html2canvas
       html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg");
 
         if (pageIndex === 0) {
           // Add the first page

@@ -46,7 +46,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     const pageWidth = 816;
 
     html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL("image/jpeg");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",

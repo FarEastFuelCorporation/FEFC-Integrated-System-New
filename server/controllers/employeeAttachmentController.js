@@ -3,6 +3,20 @@
 const Employee = require("../models/Employee");
 const EmployeeAttachment = require("../models/EmployeeAttachment");
 
+// Helper function to determine MIME type
+function determineMimeType(buffer) {
+  const magicNumbers = Array.from(new Uint8Array(buffer.slice(0, 4))).join(",");
+
+  if (magicNumbers.startsWith("255,216,255")) {
+    return "image/jpeg";
+  } else if (magicNumbers.startsWith("137,80,78,71")) {
+    return "image/png";
+  } else if (magicNumbers.startsWith("37,80,68,70")) {
+    return "application/pdf";
+  }
+  return "application/octet-stream"; // Default MIME type
+}
+
 // Create Employee Attachment controller
 async function createEmployeeAttachmentController(req, res) {
   try {
@@ -100,17 +114,31 @@ async function getEmployeeAttachmentController(req, res) {
 async function getEmployeeAttachmentFullController(req, res) {
   try {
     const id = req.params.id;
+
     // Fetch Employee Attachment from the database
-    const employeeAttachment = await EmployeeAttachment.findAll({
+    const employeeAttachment = await EmployeeAttachment.findOne({
       where: { id },
       attributes: ["attachment"],
     });
 
-    console.log(employeeAttachment);
+    // Check if attachment exists
+    if (!employeeAttachment || !employeeAttachment.attachment) {
+      return res.status(404).json({ message: "Attachment not found" });
+    }
 
-    res.json({ employeeAttachment });
+    const attachmentBuffer = employeeAttachment.attachment; // Binary data of the attachment
+
+    // Determine MIME type based on file signature or metadata (optional enhancement)
+    // For now, let's assume you know the file type
+    const mimeType = determineMimeType(attachmentBuffer);
+
+    // Set headers for the response
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Content-Disposition", "inline"); // For viewing in the browser
+
+    // Send the binary attachment
+    res.send(attachmentBuffer);
   } catch (error) {
-    // Handling errors
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
   }

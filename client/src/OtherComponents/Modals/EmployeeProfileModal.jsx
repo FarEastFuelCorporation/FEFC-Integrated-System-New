@@ -282,14 +282,10 @@ const EmployeeProfileModal = ({
                 { responseType: "arraybuffer" } // Get binary data
               );
 
-              console.log(response);
-
               // Create a Blob from the response data
               const blob = new Blob([response.data], {
                 type: response.headers["content-type"], // Use the Content-Type from the response header
               });
-
-              console.log(blob);
 
               // Create an object URL for the Blob
               const url = URL.createObjectURL(blob);

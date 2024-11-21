@@ -457,22 +457,22 @@ const Medicines = ({ user }) => {
             },
           }}
         >
-          <Tab label={"Log"} />
           <Tab label={"Summary"} />
+          <Tab label={"Log"} />
         </Tabs>
         <hr />
         {selectedTab === 0 && (
           <DataGrid
-            rows={dataRecords ? dataRecords : []}
-            columns={columns}
+            rows={dataRecords2 ? dataRecords2 : []}
+            columns={columns2}
             components={{ Toolbar: GridToolbar }}
             getRowId={(row) => row.id}
           />
         )}
         {selectedTab === 1 && (
           <DataGrid
-            rows={dataRecords2 ? dataRecords2 : []}
-            columns={columns2}
+            rows={dataRecords ? dataRecords : []}
+            columns={columns}
             components={{ Toolbar: GridToolbar }}
             getRowId={(row) => row.id}
           />

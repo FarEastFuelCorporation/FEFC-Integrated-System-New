@@ -30,7 +30,7 @@ const HealthOfficerSidebar = ({ user }) => {
     () => ({
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/employee": "Employee Records",
-      "/dashboard/medicine": "Medicine Inventory",
+      "/dashboard/medicine": "Medicine Records",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -123,7 +123,7 @@ const HealthOfficerSidebar = ({ user }) => {
         />
         <BottomNavItem
           label="Medicine"
-          value="Medicine Inventory"
+          value="Medicine Records"
           icon={MedicalServicesIcon}
           selected={selected}
           setSelected={setSelected}
@@ -273,7 +273,7 @@ const HealthOfficerSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
-              title="Medicine Inventory"
+              title="Medicine Records"
               to="medicine"
               icon={<MedicalServicesIcon />}
               selected={selected}

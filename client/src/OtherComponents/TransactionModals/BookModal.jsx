@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Modal,
@@ -83,30 +83,32 @@ const BookModal = ({
     fetchData();
   }, [apiUrl, user.id]);
 
-  const filterVehicleTypes = (selectedWasteId) => {
-    // Find the quotation where QuotationWaste contains the selected waste ID
-    const matchingQuotation = quotationsData.find((q) =>
-      q.QuotationWaste.some((waste) => waste.id === selectedWasteId)
-    );
-
-    // If a matching quotation is found, map the relevant QuotationTransportation data
-    if (matchingQuotation) {
-      const filteredData = matchingQuotation.QuotationTransportation.map(
-        (transport) => ({
-          id: transport.vehicleTypeId,
-          quotationTransportationId: transport.id,
-          typeOfVehicle: transport.VehicleType.typeOfVehicle,
-        })
+  const filterVehicleTypes = useCallback(
+    (selectedWasteId) => {
+      // Find the quotation where QuotationWaste contains the selected waste ID
+      const matchingQuotation = quotationsData.find((q) =>
+        q.QuotationWaste.some((waste) => waste.id === selectedWasteId)
       );
 
-      // Update the state with the filtered vehicle types
-      setFilteredVehicleTypes(filteredData);
-    } else {
-      // If no match found, clear filtered vehicle types
-      setFilteredVehicleTypes([]);
-    }
-  };
+      // If a matching quotation is found, map the relevant QuotationTransportation data
+      if (matchingQuotation) {
+        const filteredData = matchingQuotation.QuotationTransportation.map(
+          (transport) => ({
+            id: transport.vehicleTypeId,
+            quotationTransportationId: transport.id,
+            typeOfVehicle: transport.VehicleType.typeOfVehicle,
+          })
+        );
 
+        // Update the state with the filtered vehicle types
+        setFilteredVehicleTypes(filteredData);
+      } else {
+        // If no match found, clear filtered vehicle types
+        setFilteredVehicleTypes([]);
+      }
+    },
+    [quotationsData, setFilteredVehicleTypes] // Dependencies
+  );
   // Function to handle input changes
   const handleInputChangeAndFilter = (event) => {
     const { name, value } = event.target;
@@ -119,6 +121,12 @@ const BookModal = ({
       filterVehicleTypes(value); // Pass the selected waste ID to the filter function
     }
   };
+
+  useEffect(() => {
+    if (formData.quotationWasteId) {
+      filterVehicleTypes(formData.quotationWasteId);
+    }
+  }, [formData.quotationWasteId, filterVehicleTypes]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -243,7 +251,7 @@ const BookModal = ({
             ))
           )}
         </TextField>
-        {filteredVehicleTypes.length > 0 && (
+        {(filteredVehicleTypes.length > 0 || formData.quotationWasteId) && (
           <TextField
             label="Vehicle Type"
             name="quotationTransportationId"

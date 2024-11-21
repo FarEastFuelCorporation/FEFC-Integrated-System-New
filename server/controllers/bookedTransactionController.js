@@ -165,12 +165,10 @@ async function updateBookedTransactionController(req, res) {
       // fetch transactions
       const transactionId = updatedBookedTransaction.transactionId;
 
-      const newTransaction = await fetchData(
-        statusId,
-        null,
-        null,
-        transactionId
-      );
+      const newTransaction = await fetchData(1, null, null, transactionId);
+
+      console.log(newTransaction.pending);
+      console.log(newTransaction.inProgress);
 
       // Respond with the updated data
       res.status(201).json({

@@ -560,6 +560,21 @@ const Transaction = ({
                                 </IconButton>
                               </div>
                             )}
+                          {!Number.isInteger(user.userType) &&
+                            row.statusId < 3 && (
+                              <div style={{ display: "flex" }}>
+                                <IconButton
+                                  onClick={() => handleEditClick(row)}
+                                >
+                                  <EditIcon sx={{ color: "#ff9800" }} />
+                                </IconButton>
+                                <IconButton
+                                  onClick={() => handleDeleteClick(row)}
+                                >
+                                  <DeleteIcon sx={{ color: "#f44336" }} />
+                                </IconButton>
+                              </div>
+                            )}
                         </Grid>
                       ) : (
                         <Grid

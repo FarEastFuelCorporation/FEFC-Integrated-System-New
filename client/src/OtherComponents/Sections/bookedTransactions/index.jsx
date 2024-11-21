@@ -98,11 +98,15 @@ const BookedTransactions = ({ user }) => {
 
   const handleEditClick = useCallback(
     (row) => {
-      const typeToEdit = pendingTransactions.find((type) => type.id === row.id);
+      let typeToEdit = pendingTransactions.find((type) => type.id === row.id);
+
+      typeToEdit = typeToEdit
+        ? ""
+        : inProgressTransactions.find((type) => type.id === row.id);
+
       if (typeToEdit) {
         setFormData({
           ...typeToEdit,
-          statusId: 1,
           createdBy: user.id,
         });
         handleOpenModal();
@@ -112,7 +116,7 @@ const BookedTransactions = ({ user }) => {
         );
       }
     },
-    [pendingTransactions, user.id]
+    [pendingTransactions, inProgressTransactions, user.id]
   );
 
   const handleDeleteClick = (id) => {

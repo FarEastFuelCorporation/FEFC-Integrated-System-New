@@ -249,43 +249,67 @@ async function updateBilledTransactionController(req, res) {
 // Delete Billed Transaction controller
 async function deleteBilledTransactionController(req, res) {
   try {
-    const id = req.params.id;
-    const { deletedBy, bookedTransactionId } = req.body;
-
-    console.log(bookedTransactionId);
+    const id = req.params.id; // ID of the billed transaction to delete
+    const { deletedBy } = req.body;
 
     console.log("Soft deleting billed transaction with ID:", id);
 
     // Find the billed transaction by UUID (id)
-    const billedTransactionToDelete = await BilledTransaction.findByPk(id);
+    const billedTransactionToDelete = await BilledTransaction.findByPk(id, {
+      attributes: ["billingNumber"],
+    });
 
     if (billedTransactionToDelete) {
-      // Update the deletedBy field
-      billedTransactionToDelete.updatedBy = deletedBy;
-      billedTransactionToDelete.deletedBy = deletedBy;
-      await billedTransactionToDelete.save();
-
-      const updatedBookedTransaction = await BookedTransaction.findByPk(
-        bookedTransactionId
-      );
-      console.log(updatedBookedTransaction);
-
-      updatedBookedTransaction.statusId = 7;
-
-      await updatedBookedTransaction.save();
-
-      // Soft delete the billed transaction (sets deletedAt timestamp)
-      await billedTransactionToDelete.destroy();
-
-      // fetch transactions
-      const data = await fetchData(transactionStatusId);
-
-      // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+      // Retrieve all billed transactions with the same billingNumber
+      const billedTransactions = await BilledTransaction.findAll({
+        where: { billingNumber: billedTransactionToDelete.billingNumber },
       });
+
+      if (billedTransactions.length > 0) {
+        // Soft delete each billed transaction
+        for (const transactionEntry of billedTransactions) {
+          transactionEntry.updatedBy = deletedBy;
+          transactionEntry.deletedBy = deletedBy;
+          await transactionEntry.save();
+          await transactionEntry.destroy(); // Soft delete (sets deletedAt timestamp)
+        }
+
+        // Retrieve all related BookedTransactions by billingNumber
+        const bookedTransactionIds = billedTransactions.map(
+          (transaction) => transaction.bookedTransactionId
+        );
+
+        const updatedBookedTransactions = await BookedTransaction.findAll({
+          where: { id: bookedTransactionIds },
+        });
+
+        if (updatedBookedTransactions.length > 0) {
+          // Update status of all related booked transactions
+          for (const bookedTransaction of updatedBookedTransactions) {
+            bookedTransaction.statusId = 7; // Status for "deleted" or equivalent
+            bookedTransaction.updatedBy = deletedBy;
+            await bookedTransaction.save();
+          }
+        } else {
+          console.warn(
+            `No Booked Transactions found for IDs: ${bookedTransactionIds}`
+          );
+        }
+
+        // Fetch updated transaction data
+        const data = await fetchData(7); // Replace with relevant statusId if needed
+
+        // Respond with the updated data
+        res.status(200).json({
+          pendingTransactions: data.pending,
+          inProgressTransactions: data.inProgress,
+          finishedTransactions: data.finished,
+        });
+      } else {
+        res.status(404).json({
+          message: `No related Billed Transactions found for billingNumber ${billedTransactionToDelete.billingNumber}`,
+        });
+      }
     } else {
       // If billed transaction with the specified ID was not found
       res

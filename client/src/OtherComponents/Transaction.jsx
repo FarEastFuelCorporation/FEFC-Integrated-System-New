@@ -616,9 +616,11 @@ const Transaction = ({
                     {user.userType === 3 && <DispatchedTransaction row={row} />}
                     {user.userType === 4 && <ReceivedTransaction row={row} />}
                     {user.userType === 5 && <SortedTransaction row={row} />}
-                    {user.userType === 6 && <WarehousedTransaction row={row} />}
+                    {user.userType === 14 && (
+                      <WarehousedTransaction row={row} />
+                    )}
 
-                    {user.userType === 8 && (
+                    {user.userType === 6 && (
                       <TreatedTransaction
                         row={row}
                         handleOpenModal={handleOpenModal}
@@ -626,7 +628,7 @@ const Transaction = ({
                         user={user}
                       />
                     )}
-                    {user.userType === 9 && (
+                    {user.userType === 7 && (
                       <CertifiedTransaction
                         row={row}
                         handleOpenModal={handleOpenModal}
@@ -634,7 +636,7 @@ const Transaction = ({
                         user={user}
                       />
                     )}
-                    {user.userType === 10 && (
+                    {user.userType === 8 && (
                       <BilledTransaction
                         row={row}
                         handleOpenModal={handleOpenModal}
@@ -642,7 +644,7 @@ const Transaction = ({
                         user={user}
                       />
                     )}
-                    {user.userType === 11 && (
+                    {user.userType === 9 && (
                       <BillingApprovalTransaction
                         row={row}
                         handleOpenModal={handleOpenModal}
@@ -650,7 +652,7 @@ const Transaction = ({
                         user={user}
                       />
                     )}
-                    {user.userType === 12 && (
+                    {user.userType === 10 && (
                       <BillingDistributionTransaction
                         row={row}
                         handleOpenModal={handleOpenModal}
@@ -658,7 +660,7 @@ const Transaction = ({
                         user={user}
                       />
                     )}
-                    {user.userType === 13 && (
+                    {user.userType === 11 && (
                       <CollectedTransaction
                         row={row}
                         handleOpenModal={handleOpenModal}

@@ -140,7 +140,7 @@ const WarehousedTransaction = ({ row }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Warehousing
+              For Warehouse In
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -168,7 +168,7 @@ const WarehousedTransaction = ({ row }) => {
           >
             <Grid item xs={12} md={6}>
               <Typography variant="h4" color={colors.greenAccent[400]}>
-                Warehoused
+                Warehoused In
               </Typography>
             </Grid>
             <Grid

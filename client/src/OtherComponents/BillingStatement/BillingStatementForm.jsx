@@ -217,10 +217,10 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
       });
     }
 
-    const transpoFee = transaction.QuotationTransportation.unitPrice;
+    const transpoFee = transaction.QuotationTransportation?.unitPrice || 0;
     const transpoVatCalculation =
-      transaction.QuotationTransportation.vatCalculation;
-    const transpoMode = transaction.QuotationTransportation.mode;
+      transaction.QuotationTransportation?.vatCalculation;
+    const transpoMode = transaction.QuotationTransportation?.mode;
 
     const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
       // Check if the mode is "CHARGE"

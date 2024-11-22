@@ -298,7 +298,7 @@ const BillingContent = ({
 
               // Add the transportation row if applicable
               const transpoRows =
-                transaction.QuotationTransportation.mode === "CHARGE"
+                transaction.QuotationTransportation?.mode === "CHARGE"
                   ? [
                       <TableRow
                         key={`transpo-${index}`}
@@ -314,7 +314,7 @@ const BillingContent = ({
                           {invoiceNumber}
                         </TableCell>
                         <TableCell sx={bodyCellStyles()}>
-                          {`TRANS FEE ${transaction.QuotationTransportation.VehicleType.typeOfVehicle}`}
+                          {`TRANS FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
                         </TableCell>
                         <TableCell
                           sx={bodyCellStyles({
@@ -325,7 +325,7 @@ const BillingContent = ({
                           {`${formatNumber(1)}`}
                         </TableCell>
                         <TableCell sx={bodyCellStyles({ width: 40 })}>
-                          {transaction.QuotationTransportation.unit}
+                          {transaction.QuotationTransportation?.unit}
                         </TableCell>
                         <TableCell
                           sx={bodyCellStyles({
@@ -334,7 +334,7 @@ const BillingContent = ({
                           })}
                         >
                           {formatNumber(
-                            transaction.QuotationTransportation.unitPrice
+                            transaction.QuotationTransportation?.unitPrice
                           )}
                         </TableCell>
                         <TableCell
@@ -344,7 +344,7 @@ const BillingContent = ({
                           })}
                         >
                           {formatNumber(
-                            transaction.QuotationTransportation.unitPrice
+                            transaction.QuotationTransportation?.unitPrice
                           )}
                         </TableCell>
                         <TableCell
@@ -353,7 +353,7 @@ const BillingContent = ({
                             isLastCell: true,
                           })}
                         >
-                          {transaction.QuotationTransportation.vatCalculation}
+                          {transaction.QuotationTransportation?.vatCalculation}
                         </TableCell>
                       </TableRow>,
                     ]

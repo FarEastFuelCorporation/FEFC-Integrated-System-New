@@ -206,7 +206,7 @@ const BilledTransaction = ({ row, user }) => {
               billedTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
-          {row.statusId === 8 && (
+          {row.statusId === 10 && (
             <>
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingStatementForm statementRef={certificateRef} row={row} />

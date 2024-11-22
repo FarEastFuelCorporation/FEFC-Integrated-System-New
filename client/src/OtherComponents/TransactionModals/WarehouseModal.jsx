@@ -3,7 +3,7 @@ import { Box, Modal, Button } from "@mui/material";
 
 import WarehouseModalForm from "./WarehouseModalForm";
 
-const WarehouseModal = ({ open, onClose, onSubmit }) => {
+const WarehouseModal = ({ open, onClose, handleFormSubmit }) => {
   return (
     <Modal
       open={open}
@@ -30,12 +30,16 @@ const WarehouseModal = ({ open, onClose, onSubmit }) => {
         }}
       >
         <h2>Warehoused Transaction</h2>
-        <WarehouseModalForm onSubmit={onSubmit} />
+        <WarehouseModalForm onSubmit={handleFormSubmit} />
         <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button onClick={onClose} variant="contained" color="error">
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={onSubmit}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleFormSubmit}
+          >
             {/* {formData.id ? "Update" : "Sort"} */}
             Submit
           </Button>

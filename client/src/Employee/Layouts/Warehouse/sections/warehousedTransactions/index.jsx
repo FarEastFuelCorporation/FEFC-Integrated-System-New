@@ -42,7 +42,7 @@ const WarehousedTransactions = ({ user }) => {
       warehousedDate: "",
       warehousedTime: "",
       remarks: "",
-      statusId: 5,
+      statusId: 7,
       createdBy: user.id,
     },
   });
@@ -255,7 +255,7 @@ const WarehousedTransactions = ({ user }) => {
       />
       <Transaction
         user={user}
-        buttonText={"Warehouse"}
+        buttonText={"Warehouse In"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
@@ -271,7 +271,7 @@ const WarehousedTransactions = ({ user }) => {
             user={user}
             open={openModal}
             onClose={handleCloseModal}
-            onSubmit={handleSubmit(onSubmit)}
+            handleFormSubmit={handleSubmit(onSubmit)}
           />
         </form>
       </FormProvider>

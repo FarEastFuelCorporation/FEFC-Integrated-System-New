@@ -101,7 +101,7 @@ const TreatedTransactions = ({ user }) => {
         },
       ],
       remarks: "",
-      statusId: 6,
+      statusId: 8,
       createdBy: user.id,
     });
     setOpenModal(true);

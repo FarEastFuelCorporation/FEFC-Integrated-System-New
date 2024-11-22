@@ -8,7 +8,9 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
   datePlusOneMonth.setMonth(today.getMonth() + 1);
   const clientData = row.Client;
 
-  const vat = amounts.vatExclusive * 0.12;
+  const vat =
+    amounts.vatExclusive * 0.12 +
+    (amounts.vatInclusive - amounts.vatInclusive / 1.12);
 
   const termsChargeDays = parseInt(
     row.QuotationWaste.Quotation.termsChargeDays
@@ -151,7 +153,13 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               Total Amount Payable:
             </Typography>
             <Typography sx={{ fontWeight: "bold" }}>
-              {formatNumber(amounts.vatInclusive + amounts.vatExclusive + vat)}
+              {formatNumber(
+                amounts.vatInclusive -
+                  vat +
+                  amounts.vatExclusive +
+                  vat +
+                  amounts.nonVatable
+              )}
             </Typography>
           </Box>
           <Box
@@ -161,7 +169,7 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
             }}
           >
             <Typography>Total Non-Vatable Sale:</Typography>
-            <Typography>{formatNumber(amounts.vatInclusive)}</Typography>
+            <Typography>{formatNumber(amounts.nonVatable)}</Typography>
           </Box>
           <Box
             sx={{
@@ -170,7 +178,9 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
             }}
           >
             <Typography>Total Vatable Sale:</Typography>
-            <Typography>{formatNumber(amounts.vatExclusive)}</Typography>
+            <Typography>
+              {formatNumber(amounts.vatExclusive + amounts.vatInclusive / 1.12)}
+            </Typography>
           </Box>
           <Box
             sx={{
@@ -208,9 +218,11 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
             </Typography>
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
               {formatNumber(
-                amounts.vatInclusive +
+                amounts.vatInclusive -
+                  vat +
                   amounts.vatExclusive +
-                  vat -
+                  vat +
+                  amounts.nonVatable -
                   credits.vatInclusive
               )}
             </Typography>

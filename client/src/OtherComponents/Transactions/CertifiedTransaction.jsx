@@ -16,7 +16,7 @@ const CertifiedTransaction = ({ row, user }) => {
 
   return (
     <Box>
-      {row.statusId === 6 ? (
+      {row.statusId === 8 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <ApprovalIcon

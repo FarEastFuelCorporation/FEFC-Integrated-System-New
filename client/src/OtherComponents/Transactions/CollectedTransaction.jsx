@@ -128,7 +128,7 @@ const CollectedTransaction = ({ row, user }) => {
 
   return (
     <Box>
-      {row.statusId === 10 ? (
+      {row.statusId === 12 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <PaidIcon

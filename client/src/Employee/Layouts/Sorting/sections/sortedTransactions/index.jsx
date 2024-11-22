@@ -58,9 +58,8 @@ const SortedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const sortedTransactionResponse = await axios.get(
-        `${apiUrl}/api/sortedTransaction`
-      );
+      const response = await axios.get(`${apiUrl}/api/sortedTransaction`);
+
       // Helper function to filter by submitTo "SORTING"
       const filterBySubmitToSorting = (transactions) => {
         return transactions.filter((transaction) => {
@@ -73,19 +72,19 @@ const SortedTransactions = ({ user }) => {
 
       // For pending transactions
       const filteredPendingTransactions = filterBySubmitToSorting(
-        sortedTransactionResponse.data.pendingTransactions
+        response.data.pendingTransactions
       );
       setPendingTransactions(filteredPendingTransactions);
 
       // For in progress transactions
       const filteredInProgressTransactions = filterBySubmitToSorting(
-        sortedTransactionResponse.data.inProgressTransactions
+        response.data.inProgressTransactions
       );
       setInProgressTransactions(filteredInProgressTransactions);
 
       // For finished transactions
       const filteredFinishedTransactions = filterBySubmitToSorting(
-        sortedTransactionResponse.data.finishedTransactions
+        response.data.finishedTransactions
       );
       setFinishedTransactions(filteredFinishedTransactions);
 

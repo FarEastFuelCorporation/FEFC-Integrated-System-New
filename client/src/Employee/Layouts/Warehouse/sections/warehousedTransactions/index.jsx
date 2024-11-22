@@ -65,15 +65,35 @@ const WarehousedTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${apiUrl}/api/warehousedTransaction`);
+      const response = await axios.get(`${apiUrl}/api/warehousedTransaction`);
 
-      setPendingTransactions(filterBySubmitToSorting(data.pendingTransactions));
-      setInProgressTransactions(
-        filterBySubmitToSorting(data.inProgressTransactions)
+      // Helper function to filter by submitTo "SORTING"
+      const filterBySubmitToWarehouse = (transactions) => {
+        return transactions.filter((transaction) => {
+          const scheduledTransaction = transaction.ScheduledTransaction?.[0];
+          const receivedTransaction =
+            scheduledTransaction?.ReceivedTransaction?.[0];
+          return receivedTransaction?.submitTo === "WAREHOUSE";
+        });
+      };
+
+      // For pending transactions
+      const filteredPendingTransactions = filterBySubmitToWarehouse(
+        response.data.pendingTransactions
       );
-      setFinishedTransactions(
-        filterBySubmitToSorting(data.finishedTransactions)
+      setPendingTransactions(filteredPendingTransactions);
+
+      // For in progress transactions
+      const filteredInProgressTransactions = filterBySubmitToWarehouse(
+        response.data.inProgressTransactions
       );
+      setInProgressTransactions(filteredInProgressTransactions);
+
+      // For finished transactions
+      const filteredFinishedTransactions = filterBySubmitToWarehouse(
+        response.data.finishedTransactions
+      );
+      setFinishedTransactions(filteredFinishedTransactions);
 
       setLoading(false);
     } catch (error) {

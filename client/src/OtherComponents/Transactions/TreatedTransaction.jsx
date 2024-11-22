@@ -281,7 +281,7 @@ const TreatedTransaction = ({
         />
       </CircleLogo>
       <Box>
-        {statusId === 5 ? (
+        {statusId === 5 || statusId === 7 ? (
           <Box>
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
               For Treatment

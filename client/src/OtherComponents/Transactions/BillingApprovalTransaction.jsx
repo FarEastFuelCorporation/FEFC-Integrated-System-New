@@ -106,7 +106,7 @@ const BillingApprovalTransaction = ({ row, user }) => {
 
   return (
     <Box>
-      {row.statusId === 8 ? (
+      {row.statusId === 10 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <AssignmentTurnedInIcon

@@ -261,7 +261,7 @@ const Transaction = ({
   ];
 
   // Add the conditional column if userType is 8 or above
-  if (user.userType >= 8) {
+  if (user.userType >= 8 && user.userType <= 13) {
     columns.splice(columns.length - 1, 0, {
       field: "billingNumber", // Same field name as in the original columns
       headerName: "Billing Number",

@@ -286,7 +286,7 @@ async function deleteBilledTransactionController(req, res) {
         if (updatedBookedTransactions.length > 0) {
           // Update status of all related booked transactions
           for (const bookedTransaction of updatedBookedTransactions) {
-            bookedTransaction.statusId = 7; // Status for "deleted" or equivalent
+            bookedTransaction.statusId = transactionStatusId; // Status for "deleted" or equivalent
             bookedTransaction.updatedBy = deletedBy;
             await bookedTransaction.save();
           }
@@ -297,7 +297,7 @@ async function deleteBilledTransactionController(req, res) {
         }
 
         // Fetch updated transaction data
-        const data = await fetchData(7); // Replace with relevant statusId if needed
+        const data = await fetchData(transactionStatusId); // Replace with relevant statusId if needed
 
         // Respond with the updated data
         res.status(200).json({

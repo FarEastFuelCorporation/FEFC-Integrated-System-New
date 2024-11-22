@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { Box, IconButton } from "@mui/material";
 import Header from "../../../HR/sections/Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -23,15 +29,6 @@ const getInitialWarehousedItemValues = () => ({
   unit: "",
   description: "",
 });
-
-// Helper function to filter by submitTo "SORTING"
-const filterBySubmitToSorting = (transactions) => {
-  return transactions.filter((transaction) => {
-    const scheduledTransaction = transaction.ScheduledTransaction?.[0];
-    const receivedTransaction = scheduledTransaction?.ReceivedTransaction?.[0];
-    return receivedTransaction?.submitTo === "WAREHOUSE";
-  });
-};
 
 const WarehousedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);

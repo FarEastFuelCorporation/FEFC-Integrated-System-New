@@ -34,7 +34,7 @@ const BilledTransactions = ({ user }) => {
     serviceInvoiceNumber: "",
     billedAmount: 0,
     remarks: "",
-    statusId: 8,
+    statusId: 10,
     createdBy: user.id,
   };
 

@@ -4,7 +4,7 @@ const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
-const transactionStatusId = 9;
+const transactionStatusId = 11;
 
 // Create Billing Distribution Transaction controller
 async function createBillingDistributionTransactionController(req, res) {

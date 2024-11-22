@@ -8,7 +8,7 @@ const {
   fetchData,
   getIncludeOptions,
 } = require("../utils/getBookedTransactions");
-const transactionStatusId = 7;
+const transactionStatusId = 9;
 
 // Create Billed Transaction controller
 async function createBilledTransactionController(req, res) {

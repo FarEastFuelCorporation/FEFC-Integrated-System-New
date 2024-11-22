@@ -5,7 +5,7 @@ const BookedTransaction = require("../models/BookedTransaction");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const generateCertificateNumber = require("../utils/generateCertificateNumber");
 const { fetchData } = require("../utils/getBookedTransactions");
-const transactionStatusId = 6;
+const transactionStatusId = 8;
 
 // Create Certified Transaction controller
 async function createCertifiedTransactionController(req, res) {

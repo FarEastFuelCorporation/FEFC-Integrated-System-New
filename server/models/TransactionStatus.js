@@ -5,7 +5,7 @@ const sequelize = require("../config/database");
 
 const TransactionStatus = sequelize.define("TransactionStatus", {
   id: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
     autoIncrement: true,

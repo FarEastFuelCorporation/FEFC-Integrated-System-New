@@ -30,7 +30,7 @@ const BillingApprovalTransactions = ({ user }) => {
     approvedDate: "",
     approvedTime: "",
     remarks: "",
-    statusId: 9,
+    statusId: 11,
     createdBy: user.id,
   };
 

@@ -31,7 +31,7 @@ const BillingDistributionTransactions = ({ user }) => {
     distributedTime: "",
     collectedAmount: 0,
     remarks: "",
-    statusId: 10,
+    statusId: 12,
     createdBy: user.id,
   };
 

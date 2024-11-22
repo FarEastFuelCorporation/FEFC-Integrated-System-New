@@ -6,6 +6,7 @@ const TreatedTransaction = require("../models/TreatedTransaction");
 const TreatedWasteTransaction = require("../models/TreatedWasteTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
 const transactionStatusId = 5;
+const additionalStatusId = 7;
 
 // Create Treated Transaction controller
 async function createTreatedTransactionController(req, res) {
@@ -96,7 +97,7 @@ async function createTreatedTransactionController(req, res) {
 async function getTreatedTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(transactionStatusId);
+    const data = await fetchData(transactionStatusId, null, additionalStatusId);
 
     // Respond with the updated data
     res.status(200).json({

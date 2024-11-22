@@ -5,7 +5,7 @@ const BookedTransaction = require("../models/BookedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
-const transactionStatusId = 8;
+const transactionStatusId = 10;
 
 // Create Billing Approval Transaction controller
 async function createBillingApprovalTransactionController(req, res) {

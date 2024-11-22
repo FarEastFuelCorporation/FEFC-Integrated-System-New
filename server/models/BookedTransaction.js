@@ -40,7 +40,7 @@ const BookedTransaction = sequelize.define(
       allowNull: false,
     },
     statusId: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     remarks: {

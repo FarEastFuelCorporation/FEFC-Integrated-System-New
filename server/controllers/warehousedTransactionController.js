@@ -3,6 +3,7 @@
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const WarehousedTransaction = require("../models/WarehousedTransaction");
+const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 const { fetchData } = require("../utils/getBookedTransactions");
 const statusId = 4;
 
@@ -14,12 +15,9 @@ async function createWarehousedTransactionController(req, res) {
     let {
       bookedTransactionId,
       receivedTransactionId,
-      sortedDate,
-      sortedTime,
-      totalSortedWeight,
-      discrepancyWeight,
-      sortedWastes,
-      sortedScraps,
+      warehousedDate,
+      warehousedTime,
+      warehousedItems,
       remarks,
       statusId,
       createdBy,
@@ -33,53 +31,42 @@ async function createWarehousedTransactionController(req, res) {
     const newWarehousedTransaction = await WarehousedTransaction.create(
       {
         receivedTransactionId,
-        sortedDate,
-        sortedTime,
-        totalSortedWeight,
-        discrepancyWeight,
+        warehousedDate,
+        warehousedTime,
         remarks,
         createdBy,
       },
       { transaction: transaction }
     );
 
-    // Adding sorted wastes to SortedWasteTransaction table
-    if (sortedWastes && sortedWastes.length > 0) {
-      const sortedWastePromises = sortedWastes.map((waste) => {
-        let wasteName = waste.wasteName;
+    console.log(warehousedItems);
 
-        wasteName = wasteName && wasteName.toUpperCase();
+    // Adding warehousedItems to WarehousedTransactionItem table
+    if (warehousedItems && warehousedItems.length > 0) {
+      const warehousedItemsPromises = warehousedItems.map((item) => {
+        let description = item.description;
 
-        return SortedWasteTransaction.create(
+        description = description && description.toUpperCase();
+
+        return WarehousedTransactionItem.create(
           {
-            sortedTransactionId: newWarehousedTransaction.id,
-            quotationWasteId: waste.quotationWasteId,
-            wasteName: wasteName,
-            weight: waste.weight,
-            clientWeight: waste.clientWeight,
-            formNo: waste.formNo,
+            warehousedTransactionId: newWarehousedTransaction.id,
+            gatePass: item.gatePass,
+            warehouse: item.warehouse,
+            area: item.area,
+            section: item.section,
+            level: item.level,
+            palletNumber: item.palletNumber,
+            steamNumber: item.steamNumber,
+            quantity: item.quantity,
+            unit: item.unit,
+            description: item.description,
           },
           { transaction: transaction }
         );
       });
 
-      await Promise.all(sortedWastePromises);
-    }
-
-    // Adding sorted scraps to SortedScrapTransaction table
-    if (sortedScraps && sortedScraps.length > 0) {
-      const sortedScrapPromises = sortedScraps.map((scrap) => {
-        return SortedScrapTransaction.create(
-          {
-            sortedTransactionId: newWarehousedTransaction.id,
-            scrapTypeId: scrap.scrapTypeId,
-            weight: scrap.weight,
-          },
-          { transaction: transaction }
-        );
-      });
-
-      await Promise.all(sortedScrapPromises);
+      await Promise.all(warehousedItemsPromises);
     }
 
     const updatedBookedTransaction = await BookedTransaction.findByPk(
@@ -326,7 +313,7 @@ async function deleteWarehousedTransactionController(req, res) {
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = 4;
+      updatedBookedTransaction.statusId = statusId;
 
       await updatedBookedTransaction.save();
 

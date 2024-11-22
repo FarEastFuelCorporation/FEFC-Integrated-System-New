@@ -8,7 +8,6 @@ import {
   Button,
 } from "@mui/material";
 import { tokens } from "../../theme";
-// import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
 
 const BillModal = ({
   open,
@@ -151,7 +150,6 @@ const BillModal = ({
           </Button>
         </Box>
       </Modal>
-      {/* <CertificateOfDestruction /> */}
     </Box>
   );
 };

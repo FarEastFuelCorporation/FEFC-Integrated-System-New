@@ -112,11 +112,6 @@ const BilledTransactions = ({ user }) => {
     setFormData(initialFormData);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const handleEditClick = (row) => {
     const typeToEdit = row;
 
@@ -309,7 +304,6 @@ const BilledTransactions = ({ user }) => {
         onClose={handleCloseModal}
         formData={formData}
         setFormData={setFormData}
-        handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}

@@ -29,6 +29,7 @@ const Quotation = require("../models/Quotation");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const Logistics = require("../models/Logistics");
 const TransporterClient = require("../models/TransporterClient");
+const WarehousedTransaction = require("../models/WarehousedTransaction");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -206,6 +207,11 @@ const getIncludeOptions = () => [
             ],
           },
           {
+            model: WarehousedTransaction,
+            as: "WarehousedTransaction",
+            required: false,
+          },
+          {
             model: Employee,
             as: "Employee",
             attributes: ["firstName", "lastName"],
@@ -362,7 +368,7 @@ const getInProgressTransactions = async (
     const whereConditions = {
       statusId: {
         [Op.gt]: additionalStatusId ? additionalStatusId : statusId,
-        [Op.lt]: 11,
+        [Op.lt]: 13,
       },
     };
 
@@ -403,7 +409,7 @@ const getFinishedTransactions = async (
 ) => {
   try {
     // Build the base where conditions
-    const whereConditions = { statusId: 11 };
+    const whereConditions = { statusId: 13 };
 
     // If user is provided, add the condition for createdBy (or whatever the user field is)
     if (user) {

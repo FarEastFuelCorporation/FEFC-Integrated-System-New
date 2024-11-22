@@ -9,49 +9,69 @@ import { Box, IconButton } from "@mui/material";
 import Header from "../../../HR/sections/Header";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import axios from "axios";
-import { useForm, FormProvider } from "react-hook-form";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
-const getInitialWarehousedItemValues = () => ({
-  warehousedTransactionId: "",
-  gatePass: "",
-  warehouse: "",
-  area: "",
-  section: "",
-  level: "",
-  palletNumber: "",
-  steamNumber: "",
-  quantity: 0,
-  unit: "",
-  description: "",
-});
-
 const WarehousedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
-  const methods = useForm({
-    defaultValues: {
-      warehousedItems: [getInitialWarehousedItemValues()],
-      warehousedDate: "",
-      warehousedTime: "",
-      remarks: "",
-      statusId: 7,
-      createdBy: user.id,
+  const warehousedDateRef = useRef();
+  const warehousedTimeRef = useRef();
+  const remarksRef = useRef();
+  const warehousedItemsRef = useRef([
+    {
+      description: "",
+      quantity: 0,
+      gatePass: "",
+      warehouse: "",
+      area: "",
+      section: "",
+      level: "",
+      palletNumber: "",
+      steamNumber: "",
+      unit: "",
     },
-  });
+  ]);
 
-  const { reset, handleSubmit } = methods;
+  const initialFormData = {
+    id: "",
+    bookedTransactionId: "",
+    receivedTransactionId: "",
+    warehousedDate: "",
+    warehousedTime: "",
+    warehousedItems: [
+      [
+        {
+          description: "",
+          quantity: 0,
+          gatePass: "",
+          warehouse: "",
+          area: "",
+          section: "",
+          level: "",
+          palletNumber: "",
+          steamNumber: "",
+          unit: "",
+        },
+      ],
+    ],
+    remarks: "",
+    statusId: 6,
+    createdBy: user.id,
+  };
 
   const [openModal, setOpenModal] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [inProgressTransactions, setInProgressTransactions] = useState([]);
   const [finishedTransactions, setFinishedTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialog, setDialog] = useState(false);
@@ -105,25 +125,38 @@ const WarehousedTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
-    const initialValues = {
+    setFormData({
       id: "",
       bookedTransactionId: row.id,
       receivedTransactionId:
         row.ScheduledTransaction[0].ReceivedTransaction[0].id,
       warehousedDate: "",
       warehousedTime: "",
-      warehousedItems: [getInitialWarehousedItemValues()],
+      warehousedItems: [
+        [
+          {
+            description: "",
+            quantity: 0,
+            gatePass: "",
+            warehouse: "",
+            area: "",
+            section: "",
+            level: "",
+            palletNumber: "",
+            steamNumber: "",
+            unit: "",
+          },
+        ],
+      ],
       remarks: "",
-      statusId: 5,
+      statusId: 6,
       createdBy: user.id,
-    };
-    reset(initialValues); // Reset the form with initial values
+    });
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    reset();
   };
 
   const handleEditClick = (row) => {
@@ -133,7 +166,8 @@ const WarehousedTransactions = ({ user }) => {
       const warehousedTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
           .SortedTransaction?.[0] || {};
-      const initialValues = {
+
+      setFormData({
         id: warehousedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         receivedTransactionId:
@@ -154,13 +188,12 @@ const WarehousedTransactions = ({ user }) => {
               unit: item.unit || "",
               description: item.description || "",
             }))
-          : [getInitialWarehousedItemValues()],
+          : [],
         remarks: warehousedTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,
-      };
+      });
 
-      reset(initialValues); // Reset form data with fetched values
       setOpenModal(true);
     } else {
       console.error(
@@ -168,17 +201,18 @@ const WarehousedTransactions = ({ user }) => {
       );
     }
   };
-  const handleDeleteClick = (id) => {
+  const handleDeleteClick = (row) => {
+    console.log(row);
     setOpenDialog(true);
     setDialog("Are you sure you want to Delete this Warehoused Transaction?");
-    setDialogAction(() => () => handleConfirmDelete(id));
+    setDialogAction(() => () => handleConfirmDelete(row));
   };
 
   const handleConfirmDelete = async (row) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/warehousedTransaction/${row.ScheduledTransaction[0].ReceivedTransaction?.[0].SortedTransaction?.[0].id}`,
+        `${apiUrl}/api/warehousedTransaction/${row.ScheduledTransaction[0].ReceivedTransaction?.[0].WarehousedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,
@@ -188,7 +222,7 @@ const WarehousedTransactions = ({ user }) => {
       );
 
       fetchData();
-      setSuccessMessage("Received Transaction deleted successfully!");
+      setSuccessMessage("Warehoused In Transaction deleted successfully!");
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);
       setLoading(false);
@@ -199,17 +233,63 @@ const WarehousedTransactions = ({ user }) => {
     }
   };
 
-  const onSubmit = async (data) => {
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log(warehousedItemsRef);
+
+    // Initialize an array to hold warehoused item data
+    const warehousedItemsData = [];
+
+    // Loop through each item form in warehousedItemsRef.current
+    warehousedItemsRef.current.forEach((itemRef, index) => {
+      const itemData = {
+        description: itemRef.querySelector(`[name='description-${index}']`)
+          .value,
+        unit: itemRef.querySelector(`[name='unit-${index}']`).value,
+        quantity: itemRef.querySelector(`[name='quantity-${index}']`).value,
+        gatePass: itemRef.querySelector(`[name='gatePass-${index}']`).value,
+        warehouse: itemRef.querySelector(`[name='warehouse-${index}']`).value,
+        area: itemRef.querySelector(`[name='area-${index}']`).value,
+        section: itemRef.querySelector(`[name='section-${index}']`).value,
+        level: itemRef.querySelector(`[name='level-${index}']`).value,
+        palletNumber: itemRef.querySelector(`[name='palletNumber-${index}']`)
+          .value,
+        steamNumber: itemRef.querySelector(`[name='steamNumber-${index}']`)
+          .value,
+      };
+
+      // Push the item data to the array
+      warehousedItemsData.push(itemData);
+    });
+
+    // Set formData from refs before validation
+    const updatedFormData = {
+      ...formData,
+      warehousedDate: warehousedDateRef.current.value,
+      warehousedTime: warehousedTimeRef.current.value,
+      remarks: remarksRef.current.value,
+      warehousedItems: warehousedItemsData,
+    };
+
+    console.log(updatedFormData);
+
     try {
       setLoading(true);
-      if (data.id) {
-        await axios.put(`${apiUrl}/api/warehousedTransaction/${data.id}`, data);
+      if (updatedFormData.id) {
+        await axios.put(
+          `${apiUrl}/api/warehousedTransaction/${updatedFormData.id}`,
+          updatedFormData
+        );
 
-        setSuccessMessage("Warehoused Transaction Updated Successfully!");
+        setSuccessMessage("Warehoused In Transaction Updated Successfully!");
       } else {
-        await axios.post(`${apiUrl}/api/warehousedTransaction`, data);
+        await axios.post(
+          `${apiUrl}/api/warehousedTransaction`,
+          updatedFormData
+        );
 
-        setSuccessMessage("Warehoused Transaction Submitted Successfully!");
+        setSuccessMessage("Warehoused In Transaction Submitted Successfully!");
       }
 
       fetchData();
@@ -262,16 +342,24 @@ const WarehousedTransactions = ({ user }) => {
         openTransactionModal={openTransactionModal}
         setOpenTransactionModal={setOpenTransactionModal}
       />
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Modal
-            user={user}
-            open={openModal}
-            onClose={handleCloseModal}
-            handleFormSubmit={handleSubmit(onSubmit)}
-          />
-        </form>
-      </FormProvider>
+      <Modal
+        user={user}
+        open={openModal}
+        onClose={handleCloseModal}
+        formData={formData}
+        setFormData={setFormData}
+        handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
+        showErrorMessage={showErrorMessage}
+        setShowErrorMessage={setShowErrorMessage}
+        refs={{
+          warehousedDateRef,
+          warehousedTimeRef,
+          warehousedItemsRef,
+          remarksRef,
+        }}
+      />
     </Box>
   );
 };

@@ -115,7 +115,7 @@ async function getTreatedTransactionsController(req, res) {
 async function deleteTreatedTransactionController(req, res) {
   try {
     const id = req.params.id;
-    const { deletedBy, bookedTransactionId } = req.body;
+    const { deletedBy, bookedTransactionId, submitTo } = req.body;
 
     console.log(bookedTransactionId);
     console.log("Soft deleting sorted transaction with ID:", id);
@@ -162,7 +162,8 @@ async function deleteTreatedTransactionController(req, res) {
       bookedTransactionId
     );
 
-    updatedBookedTransaction.statusId = 5;
+    updatedBookedTransaction.statusId =
+      submitTo === "SORTING" ? transactionStatusId : additionalStatusId;
     await updatedBookedTransaction.save();
 
     // Soft delete the TreatedWasteTransaction

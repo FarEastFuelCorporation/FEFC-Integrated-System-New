@@ -121,12 +121,13 @@ const TreatedTransactions = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleDeleteClick = (id) => {
+  const handleDeleteClick = (row) => {
+    console.log(row);
     setOpenDialog(true);
     setDialog(
       "Are you sure you want to Delete this Treated Waste Transaction?"
     );
-    setDialogAction(() => () => handleConfirmDelete(id));
+    setDialogAction(() => () => handleConfirmDelete(row));
   };
 
   const handleConfirmDelete = async (row) => {
@@ -136,6 +137,7 @@ const TreatedTransactions = ({ user }) => {
         data: {
           deletedBy: user.id,
           bookedTransactionId: row.bookedTransactionId,
+          submitTo: row.submitTo,
         },
       });
 

@@ -32,11 +32,13 @@ const TreatedTransaction = ({
     row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.SortedTransaction;
 
   const sortedWasteTransaction =
-    row.ScheduledTransaction[0]?.ReceivedTransaction[0].SortedTransaction[0]
-      .SortedWasteTransaction;
+    row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.SortedTransaction[0]
+      ?.SortedWasteTransaction;
 
   // Get the bookedTransactionId from ScheduledTransaction
   const bookedTransactionId = row.ScheduledTransaction[0].bookedTransactionId;
+  const submitTo =
+    row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.submitTo;
 
   // Loop through each SortedWasteTransaction
   sortedWasteTransaction.forEach((sortedTransaction) => {
@@ -58,6 +60,7 @@ const TreatedTransaction = ({
                 treatedTransaction.TreatmentMachine.TreatmentProcess
                   .treatmentProcess, // Add treatmentProcess attribute
               bookedTransactionId: bookedTransactionId, // Add bookedTransactionId attribute
+              submitTo: submitTo,
             };
           }
           return treatedTransaction; // Return as is if no TreatmentMachine is present

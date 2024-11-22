@@ -94,7 +94,7 @@ const CollectedTransactions = ({ user }) => {
       collectedTime: "",
       collectedAmount: 0,
       remarks: "",
-      statusId: 11,
+      statusId: 13,
       createdBy: user.id,
     });
     setOpenModal(true);

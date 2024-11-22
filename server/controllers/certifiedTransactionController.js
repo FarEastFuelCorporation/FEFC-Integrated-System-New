@@ -198,7 +198,7 @@ async function deleteCertifiedTransactionController(req, res) {
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = 6;
+      updatedBookedTransaction.statusId = transactionStatusId;
 
       await updatedBookedTransaction.save();
 

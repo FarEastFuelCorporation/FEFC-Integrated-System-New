@@ -203,7 +203,7 @@ async function deleteCollectedTransactionController(req, res) {
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = 10;
+      updatedBookedTransaction.statusId = transactionStatusId;
 
       await updatedBookedTransaction.save();
 

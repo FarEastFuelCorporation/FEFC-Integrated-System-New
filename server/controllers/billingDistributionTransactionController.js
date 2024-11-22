@@ -200,7 +200,7 @@ async function deleteBillingDistributionTransactionController(req, res) {
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = 9;
+      updatedBookedTransaction.statusId = transactionStatusId;
 
       await updatedBookedTransaction.save();
 

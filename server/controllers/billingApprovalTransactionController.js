@@ -253,7 +253,7 @@ async function deleteBillingApprovalTransactionController(req, res) {
         bt.bookedTransactionId
       );
       if (bookedTransaction) {
-        bookedTransaction.statusId = 8; // Update to the desired status
+        bookedTransaction.statusId = transactionStatusId; // Update to the desired status
         await bookedTransaction.save();
       }
     }

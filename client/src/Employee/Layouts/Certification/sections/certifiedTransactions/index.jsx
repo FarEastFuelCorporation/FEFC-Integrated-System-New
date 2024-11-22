@@ -87,7 +87,7 @@ const CertifiedTransactions = ({ user }) => {
       typeOfCertificate: "",
       typeOfWeight: "",
       remarks: "",
-      statusId: 7,
+      statusId: 9,
       createdBy: user.id,
     });
     setOpenModal(true);

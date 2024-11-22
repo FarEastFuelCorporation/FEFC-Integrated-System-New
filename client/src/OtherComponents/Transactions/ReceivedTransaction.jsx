@@ -167,6 +167,10 @@ const ReceivedTransaction = ({ row }) => {
               Net Weight: {formatWeight(receivedTransaction.netWeight)} Kg
             </Typography>
             <Typography variant="h5">
+              Submit To:{" "}
+              {receivedTransaction.submitTo ? receivedTransaction.submitTo : ""}
+            </Typography>
+            <Typography variant="h5">
               Remarks:{" "}
               {receivedTransaction.receivedRemarks
                 ? receivedTransaction.receivedRemarks

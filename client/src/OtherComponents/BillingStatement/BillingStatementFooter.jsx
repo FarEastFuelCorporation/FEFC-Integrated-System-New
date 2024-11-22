@@ -79,7 +79,7 @@ const BillingStatementFooter = ({ row, qrCodeURL }) => {
         </Box>
         <Box sx={{ border: "1px solid black", borderLeft: "none" }}>
           <Typography variant="h6" pl={2}>
-            Checked By:
+            Noted By:
           </Typography>
           <Box mt={3} position="relative">
             {approved && (

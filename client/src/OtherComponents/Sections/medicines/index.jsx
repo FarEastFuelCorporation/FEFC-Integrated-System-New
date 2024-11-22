@@ -32,6 +32,7 @@ const Medicines = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedFormTab, setSelectedFormTab] = useState(0);
 
   const initialFormData = {
     id: "",
@@ -52,7 +53,6 @@ const Medicines = ({ user }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [openLogModal, setOpenLogModal] = useState(false);
   const [formLogData, setFormLogData] = useState(initialLogFormData);
 
   const [dataRecords, setRecords] = useState([]);
@@ -63,6 +63,8 @@ const Medicines = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorLogMessage, setErrorLogMessage] = useState("");
+  const [showErrorLogMessage, setShowErrorLogMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialog, setDialog] = useState(false);
@@ -70,6 +72,9 @@ const Medicines = ({ user }) => {
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
+  };
+  const handleChangeFormTab = (event, newValue) => {
+    setSelectedFormTab(newValue);
   };
 
   const fetchData = useCallback(async () => {
@@ -110,15 +115,25 @@ const Medicines = ({ user }) => {
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
+    clearFormLogData();
   };
 
   const clearFormData = () => {
     setFormData(initialFormData);
   };
 
+  const clearFormLogData = () => {
+    setFormLogData(initialLogFormData);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleInputLogChange = (e) => {
+    const { name, value } = e.target;
+    setFormLogData({ ...formLogData, [name]: value });
   };
 
   const handleEditClick = (id) => {
@@ -195,24 +210,6 @@ const Medicines = ({ user }) => {
     }
   };
 
-  const handleOpenLogModal = () => {
-    setOpenLogModal(true);
-  };
-
-  const handleCloseLogModal = () => {
-    setOpenLogModal(false);
-    clearFormLogData();
-  };
-
-  const clearFormLogData = () => {
-    setFormData(initialFormData);
-  };
-
-  const handleInputLogChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const handleEditLogClick = (id) => {
     // const typeToEdit = departments.find((type) => type.id === id);
     // if (typeToEdit) {
@@ -255,25 +252,28 @@ const Medicines = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { medicineName } = formData;
+    const { medicineName } = formLogData;
 
     // Check if all required fields are filled
     if (!medicineName) {
-      setErrorMessage("Please fill all required fields.");
-      setShowErrorMessage(true);
+      setErrorLogMessage("Please fill all required fields.");
+      setShowErrorLogMessage(true);
       return;
     }
 
     try {
       setLoading(true);
-      if (formData.id) {
+      if (formLogData.id) {
         // Update existing department
-        await axios.put(`${apiUrl}/api/medicine/${formData.id}`, formData);
+        await axios.put(
+          `${apiUrl}/api/medicineLog/${formLogData.id}`,
+          formLogData
+        );
 
         setSuccessMessage("Medicine Updated Successfully!");
       } else {
         // Add new department
-        await axios.post(`${apiUrl}/api/medicine`, formData);
+        await axios.post(`${apiUrl}/api/medicineLog`, formLogData);
 
         setSuccessMessage("Medicine Added Successfully!");
       }
@@ -487,7 +487,8 @@ const Medicines = ({ user }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 600,
+            height: 550,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
@@ -496,146 +497,43 @@ const Medicines = ({ user }) => {
             gap: 2,
           }}
         >
-          <Typography variant="h6" component="h2">
-            {formData.id ? "Update Medicine Record" : "Add New Medicine Record"}
-          </Typography>
-          <Typography variant="h6" component="h2" color="error">
-            {showErrorMessage && errorMessage}
-          </Typography>
-          <TextField
-            label="Medicine Name"
-            name="medicineName"
-            value={formData.medicineName}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
+          <Tabs
+            value={selectedFormTab}
+            onChange={handleChangeFormTab}
+            sx={{
+              "& .Mui-selected": {
+                backgroundColor: colors.greenAccent[400],
+                boxShadow: "none",
+                borderBottom: `1px solid ${colors.grey[100]}`,
+              },
+              "& .MuiTab-root > span": {
+                paddingRight: "10px",
               },
             }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Created By"
-            name="createdBy"
-            value={formData.createdBy}
-            onChange={handleInputChange}
-            fullWidth
-            autoComplete="off"
-            style={{ display: "none" }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFormSubmit}
           >
-            {formData.id ? "Update Medicine" : "Add Medicine"}
-          </Button>
-        </Box>
-      </Modal>
-      <Modal open={openLogModal} onClose={handleCloseLogModal}>
-        <Box
-          component="form"
-          onSubmit={handleFormLogSubmit}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <Typography variant="h6" component="h2">
-            {formData.id ? "Update Medicine Log" : "Add New Medicine Log"}
-          </Typography>
-          <Typography variant="h6" component="h2" color="error">
-            {showErrorMessage && errorMessage}
-          </Typography>
-          <div style={{ width: "100%", display: "flex", gap: "20px" }}>
-            <TextField
-              label="Transaction Date"
-              name="transactionDate"
-              value={formData.transactionDate}
-              onChange={handleInputChange}
-              fullWidth
-              type="date"
-              required
-              InputLabelProps={{
-                shrink: true,
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
+            <Tab
+              label={
+                formData.id
+                  ? "Update Medicine Record"
+                  : "Add New Medicine Record"
+              }
             />
-            <TextField
-              label="Transaction Time"
-              name="transactionTime"
-              value={formData.transactionTime}
-              onChange={handleInputChange}
-              fullWidth
-              type="time"
-              required
-              InputLabelProps={{
-                shrink: true,
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
+            <Tab
+              label={
+                formData.id ? "Update Medicine Log" : "Add New Medicine Log"
+              }
             />
-          </div>
-          <FormControl fullWidth required>
-            <InputLabel
-              id="transaction-label" // Ensure this matches the labelId in Select
-              sx={{
-                color: colors.grey[100], // Use the sx prop for styling
-              }}
-            >
-              Transaction
-            </InputLabel>
-            <Select
-              labelId="transaction-label" // Matches the id of InputLabel
-              name="transaction" // Name for the input
-              value={formData.transaction || ""} // Controlled value from state
-              onChange={handleInputChange} // Handler for value changes
-              inputProps={{
-                id: "transaction", // Unique id for accessibility
-              }}
-            >
-              <MenuItem value="RE-STOCK">RE-STOCK</MenuItem>
-              <MenuItem value="ISSUANCE">ISSUANCE</MenuItem>
-            </Select>
-          </FormControl>
-          <Autocomplete
-            options={medicinesData}
-            getOptionLabel={(option) =>
-              option.employeeId === "" ? "" : option.medicineName
-            }
-            value={
-              medicinesData.find((emp) => emp.id === formData.medicineName) ||
-              null
-            }
-            onChange={(event, newValue) => {
-              handleInputChange({
-                target: {
-                  name: "medicineName",
-                  value: newValue ? newValue.id : "",
-                },
-              });
-            }}
-            renderInput={(params) => (
+          </Tabs>
+          {selectedFormTab === 0 && (
+            <Box>
+              <Typography variant="h6" component="h2" color="error" mb={2}>
+                {showErrorMessage && errorMessage}
+              </Typography>
               <TextField
-                {...params}
-                label="Choose Medicine"
+                label="Medicine Name"
                 name="medicineName"
+                value={formData.medicineName}
+                onChange={handleInputChange}
                 fullWidth
                 required
                 InputLabelProps={{
@@ -645,49 +543,132 @@ const Medicines = ({ user }) => {
                 }}
                 autoComplete="off"
               />
-            )}
-          />{" "}
-          <TextField
-            label="Quantity"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleInputChange}
-            type="number"
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <Autocomplete
-            options={employeesData}
-            getOptionLabel={(option) =>
-              option.employeeId === ""
-                ? ""
-                : `${option.firstName} ${option.lastName}`
-            }
-            value={
-              employeesData.find(
-                (emp) => emp.employeeId === formData.driverId
-              ) || null
-            }
-            onChange={(event, newValue) => {
-              handleInputChange({
-                target: {
-                  name: "employeeId",
-                  value: newValue ? newValue.employeeId : "",
-                },
-              });
-            }}
-            renderInput={(params) => (
               <TextField
-                {...params}
-                label="Choose Employee"
-                name="employeeId"
+                label="Created By"
+                name="createdBy"
+                value={formData.createdBy}
+                onChange={handleInputChange}
                 fullWidth
-                required
+                autoComplete="off"
+                style={{ display: "none" }}
+              />
+
+              <Box
+                mt={2}
+                sx={{ width: "100%", display: "flex", justifyContent: "end" }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleFormSubmit}
+                >
+                  {formData.id ? "Update Medicine" : "Add Medicine"}
+                </Button>
+              </Box>
+            </Box>
+          )}
+          {selectedFormTab === 1 && (
+            <Box>
+              <Typography variant="h6" component="h2" color="error" mb={2}>
+                {showErrorLogMessage && errorLogMessage}
+              </Typography>
+              <div style={{ width: "100%", display: "flex", gap: "20px" }}>
+                <TextField
+                  label="Transaction Date"
+                  name="transactionDate"
+                  value={formLogData.transactionDate}
+                  onChange={handleInputChange}
+                  fullWidth
+                  type="date"
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Transaction Time"
+                  name="transactionTime"
+                  value={formLogData.transactionTime}
+                  onChange={handleInputChange}
+                  fullWidth
+                  type="time"
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </div>
+              <FormControl fullWidth required>
+                <InputLabel
+                  id="transaction-label" // Ensure this matches the labelId in Select
+                  sx={{
+                    color: colors.grey[100], // Use the sx prop for styling
+                  }}
+                >
+                  Transaction
+                </InputLabel>
+                <Select
+                  labelId="transaction-label" // Matches the id of InputLabel
+                  name="transaction" // Name for the input
+                  value={formLogData.transaction || ""} // Controlled value from state
+                  onChange={handleInputChange} // Handler for value changes
+                  inputProps={{
+                    id: "transaction", // Unique id for accessibility
+                  }}
+                >
+                  <MenuItem value="RE-STOCK">RE-STOCK</MenuItem>
+                  <MenuItem value="ISSUANCE">ISSUANCE</MenuItem>
+                </Select>
+              </FormControl>
+              <Autocomplete
+                options={medicinesData}
+                getOptionLabel={(option) =>
+                  option.employeeId === "" ? "" : option.medicineName
+                }
+                value={
+                  medicinesData.find(
+                    (emp) => emp.id === formLogData.medicineName
+                  ) || null
+                }
+                onChange={(event, newValue) => {
+                  handleInputChange({
+                    target: {
+                      name: "medicineName",
+                      value: newValue ? newValue.id : "",
+                    },
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Choose Medicine"
+                    name="medicineName"
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                )}
+              />{" "}
+              <TextField
+                label="Quantity"
+                name="quantity"
+                value={formLogData.quantity}
+                onChange={handleInputChange}
+                type="number"
+                fullWidth
                 InputLabelProps={{
                   style: {
                     color: colors.grey[100],
@@ -695,37 +676,78 @@ const Medicines = ({ user }) => {
                 }}
                 autoComplete="off"
               />
-            )}
-          />{" "}
-          <TextField
-            label="Reason"
-            name="reason"
-            value={formData.reason}
-            onChange={handleInputChange}
-            fullWidth
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Created By"
-            name="createdBy"
-            value={formData.createdBy}
-            onChange={handleInputChange}
-            fullWidth
-            autoComplete="off"
-            style={{ display: "none" }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFormSubmit}
-          >
-            {formData.id ? "Update Medicine Log" : "Add Medicine Log"}
-          </Button>
+              <Autocomplete
+                options={employeesData}
+                getOptionLabel={(option) =>
+                  option.employeeId === ""
+                    ? ""
+                    : `${option.firstName} ${option.lastName}`
+                }
+                value={
+                  employeesData.find(
+                    (emp) => emp.employeeId === formLogData.driverId
+                  ) || null
+                }
+                onChange={(event, newValue) => {
+                  handleInputChange({
+                    target: {
+                      name: "employeeId",
+                      value: newValue ? newValue.employeeId : "",
+                    },
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Choose Employee"
+                    name="employeeId"
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                )}
+              />{" "}
+              <TextField
+                label="Reason"
+                name="reason"
+                value={formLogData.reason}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+              <TextField
+                label="Created By"
+                name="createdBy"
+                value={formLogData.createdBy}
+                onChange={handleInputChange}
+                fullWidth
+                autoComplete="off"
+                style={{ display: "none" }}
+              />
+              <Box
+                mt={2}
+                sx={{ width: "100%", display: "flex", justifyContent: "end" }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleFormLogSubmit}
+                >
+                  {formData.id ? "Update Medicine Log" : "Add Medicine Log"}
+                </Button>
+              </Box>
+            </Box>
+          )}
         </Box>
       </Modal>
     </Box>

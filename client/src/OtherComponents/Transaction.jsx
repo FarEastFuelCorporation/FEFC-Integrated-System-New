@@ -199,16 +199,20 @@ const Transaction = ({
         } else if (params.row.statusId === 5) {
           status = "SORTED";
         } else if (params.row.statusId === 6) {
-          status = "TREATED";
+          status = "WARHOUSED IN";
         } else if (params.row.statusId === 7) {
-          status = "CERTIFIED";
+          status = "WARHOUSED OUT";
         } else if (params.row.statusId === 8) {
-          status = "BILLED";
+          status = "TREATED";
         } else if (params.row.statusId === 9) {
-          status = "APPROVED";
+          status = "CERTIFIED";
         } else if (params.row.statusId === 10) {
-          status = "DISTRIBUTED";
+          status = "BILLED";
         } else if (params.row.statusId === 11) {
+          status = "APPROVED";
+        } else if (params.row.statusId === 12) {
+          status = "DISTRIBUTED";
+        } else if (params.row.statusId === 13) {
           status = "COLLECTED";
         }
 

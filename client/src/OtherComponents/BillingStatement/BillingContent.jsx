@@ -29,12 +29,14 @@ const BillingContent = ({
   const unitPrice = transactions?.[0]?.QuotationWaste?.unitPrice;
   const fixedPrice = transactions?.[0]?.QuotationWaste?.fixedPrice;
   const vatCalculation = transactions?.[0]?.QuotationWaste?.vatCalculation;
+  const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
 
   let totalWeight = 0;
 
   console.log(hasFixedRate);
   console.log(fixedPrice);
   console.log(vatCalculation);
+  console.log(remarks);
 
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
@@ -452,6 +454,21 @@ const BillingContent = ({
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell
+                sx={bodyCellStyles({ width: 85, isLastCell: true })}
+              ></TableCell>
+            </TableRow>
+          )}
+          {remarks && (
+            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({})}>{remarks}</TableCell>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>

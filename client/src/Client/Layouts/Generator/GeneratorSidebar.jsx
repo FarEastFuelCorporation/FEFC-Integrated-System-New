@@ -475,6 +475,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Client Name"
             name="clientName"
+            autoComplete="off"
             value={clientDetails.clientName}
             onChange={handleInputChange}
           />
@@ -483,6 +484,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Address"
             name="address"
+            autoComplete="off"
             value={clientDetails.address}
             onChange={handleInputChange}
           />
@@ -491,6 +493,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Nature of Business"
             name="natureOfBusiness"
+            autoComplete="off"
             value={clientDetails.natureOfBusiness}
             onChange={handleInputChange}
           />
@@ -499,6 +502,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Contact Number"
             name="contactNumber"
+            autoComplete="off"
             value={clientDetails.contactNumber}
             onChange={handleInputChange}
           />
@@ -507,6 +511,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Client Type"
             name="clientType"
+            autoComplete="off"
             value={clientDetails.clientType}
             onChange={handleInputChange}
             disabled
@@ -516,6 +521,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Biller Name"
             name="billerName"
+            autoComplete="off"
             value={clientDetails.billerName}
             onChange={handleInputChange}
           />
@@ -524,6 +530,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Biller Address"
             name="billerAddress"
+            autoComplete="off"
             value={clientDetails.billerAddress}
             onChange={handleInputChange}
           />
@@ -532,6 +539,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Biller Contact Person"
             name="billerContactPerson"
+            autoComplete="off"
             value={clientDetails.billerContactPerson}
             onChange={handleInputChange}
           />
@@ -540,6 +548,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Biller Contact Number"
             name="billerContactNumber"
+            autoComplete="off"
             value={clientDetails.billerContactNumber}
             onChange={handleInputChange}
           />
@@ -548,6 +557,7 @@ const GeneratorSidebar = ({ user }) => {
             fullWidth
             label="Biller TIN Number"
             name="billerTinNumber"
+            autoComplete="off"
             value={clientDetails.billerTinNumber}
             onChange={handleInputChange}
           />

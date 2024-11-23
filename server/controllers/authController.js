@@ -135,6 +135,8 @@ async function createEmployeeLoginController(req, res) {
       ],
     });
 
+    // let employeePicture;
+
     const employeePicture = await IdInformation.findOne({
       where: { employee_id: employeeId },
       attributes: ["profile_picture"],

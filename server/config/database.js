@@ -17,7 +17,7 @@ const sequelize = new Sequelize({
     max: 60, // Maximum number of connections
     min: 0, // Minimum number of connections
     acquire: 60000, // Maximum time in ms to acquire a connection
-    idle: 60000, // Time in ms before releasing an idle connection
+    idle: 10000, // Time in ms before releasing an idle connection
   },
 });
 

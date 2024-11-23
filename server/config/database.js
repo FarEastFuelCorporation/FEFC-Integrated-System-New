@@ -14,10 +14,10 @@ const sequelize = new Sequelize({
   port: process.env.DB_PORT,
   timezone: "+08:00",
   pool: {
-    max: 10, // Maximum number of connections
+    max: 60, // Maximum number of connections
     min: 0, // Minimum number of connections
     acquire: 60000, // Maximum time in ms to acquire a connection
-    idle: 10000, // Time in ms before releasing an idle connection
+    idle: 60000, // Time in ms before releasing an idle connection
   },
 });
 

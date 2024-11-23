@@ -236,7 +236,7 @@ const WarehousedTransactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(warehousedItemsRef);
+    console.log(warehousedItemsRef.current);
 
     // Initialize an array to hold warehoused item data
     const warehousedItemsData = [];

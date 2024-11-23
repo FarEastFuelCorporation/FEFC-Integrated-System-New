@@ -103,7 +103,10 @@ const WarehouseModal = ({
     forceUpdate();
   };
 
-  const [, forceUpdate] = React.useReducer((x) => x + 1, 0); // To re-render manually
+  // Force re-render helper
+  const [, setRender] = React.useState(0);
+  const forceUpdate = () => setRender((prev) => prev + 1);
+
   return (
     <Box>
       <Modal open={open} onClose={onClose}>

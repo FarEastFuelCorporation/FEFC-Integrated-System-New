@@ -97,6 +97,12 @@ const CertifiedTransaction = ({ row, user }) => {
               : ""}
           </Typography>
           <Typography variant="h5">
+            Type of Weight:{" "}
+            {certifiedTransaction.typeOfWeight
+              ? certifiedTransaction.typeOfWeight
+              : ""}
+          </Typography>
+          <Typography variant="h5">
             Certified Date:{" "}
             {certifiedTransaction.certifiedDate
               ? format(

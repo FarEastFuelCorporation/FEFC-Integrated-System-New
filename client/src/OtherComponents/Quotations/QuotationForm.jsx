@@ -310,7 +310,9 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                         align="center"
                         sx={getCellStyle(false, columnWidths.transportation[4])}
                       >
-                        {transportation[4]}
+                        {transportation[5] === "FREE OF CHARGE"
+                          ? "0.00"
+                          : transportation[4]}
                       </TableCell>
                       <TableCell
                         align="center"

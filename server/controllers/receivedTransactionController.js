@@ -42,8 +42,6 @@ async function createReceivedTransactionController(req, res) {
 
     remarks = remarks && remarks.toUpperCase();
 
-    statusId = submitTo === "SORTING" ? 5 : 6;
-
     // Creating a new transaction
     await ReceivedTransaction.create({
       bookedTransactionId,
@@ -147,8 +145,6 @@ async function updateReceivedTransactionController(req, res) {
     } = req.body;
 
     remarks = remarks && remarks.toUpperCase();
-
-    statusId = submitTo === "SORTING" ? 5 : 6;
 
     // Find the booked transaction by UUID (id) and update it
     const updatedReceivedTransaction = await ReceivedTransaction.findByPk(id);

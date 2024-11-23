@@ -365,7 +365,7 @@ const SortModal = ({
                     label="Category"
                     fullWidth
                     required
-                    disabled={formData.statusId === 5}
+                    disabled={formData.statusId === 4}
                   >
                     {quotations.map((quotation) =>
                       quotation.QuotationWaste.map((waste) => (
@@ -387,7 +387,7 @@ const SortModal = ({
                   }
                   fullWidth
                   required
-                  disabled={formData.statusId === 5}
+                  disabled={formData.statusId === 4}
                   InputLabelProps={{
                     style: {
                       color: colors.grey[100],
@@ -420,7 +420,7 @@ const SortModal = ({
                     label="Treatment Process"
                     fullWidth
                     required
-                    disabled={formData.statusId === 5}
+                    disabled={formData.statusId === 4}
                   >
                     {treatmentProcesses.map((treatmentProcess) => (
                       <MenuItem
@@ -444,7 +444,7 @@ const SortModal = ({
                   type="number"
                   fullWidth
                   required
-                  disabled={formData.statusId === 5}
+                  disabled={formData.statusId === 4}
                   InputLabelProps={{
                     style: {
                       color: colors.grey[100],
@@ -464,7 +464,7 @@ const SortModal = ({
                   type="number"
                   fullWidth
                   required
-                  disabled={formData.statusId === 5}
+                  disabled={formData.statusId === 4}
                   InputLabelProps={{
                     style: {
                       color: colors.grey[100],
@@ -535,7 +535,7 @@ const SortModal = ({
                     label="Category"
                     fullWidth
                     required
-                    disabled={formData.statusId === 5}
+                    disabled={formData.statusId === 4}
                   >
                     {scrapTypes.map((scrapType) => (
                       <MenuItem key={scrapType.id} value={scrapType.id}>
@@ -555,7 +555,7 @@ const SortModal = ({
                   }
                   type="number"
                   fullWidth
-                  disabled={formData.statusId === 5}
+                  disabled={formData.statusId === 4}
                   InputLabelProps={{
                     style: {
                       color: colors.grey[100],

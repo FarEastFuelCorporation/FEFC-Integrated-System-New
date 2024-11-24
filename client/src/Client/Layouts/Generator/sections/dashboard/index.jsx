@@ -106,7 +106,6 @@ const Dashboard = ({ user }) => {
       setAllCount(allCount);
       setTransactions(billedTransactionsDetail);
       setBilledTransactions(billedTransactions);
-      console.log(billedTransactions);
 
       // Destructure data from the second response
       const { totals } = calculateResponse.data;

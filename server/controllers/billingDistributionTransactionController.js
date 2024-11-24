@@ -56,6 +56,9 @@ async function createBillingDistributionTransactionController(req, res) {
       const { bookedTransactionId: bookedTransactionIdFromDB } =
         billedTransaction;
 
+      const billingApprovalTransactionId =
+        billedTransaction.BillingApprovalTransaction.id;
+
       // Create BillingDistributionTransaction entry
       await BillingDistributionTransaction.create(
         {

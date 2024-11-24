@@ -535,6 +535,7 @@ async function geBookedTransactionsDashboardFullController(req, res) {
           terms: 0,
           termsRemarks: "",
           haulingDate: "",
+          distributedDate: "",
         };
       }
 
@@ -551,6 +552,12 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         transaction.BookedTransaction.ScheduledTransaction?.[0]?.scheduledDate;
 
       totals[billingNumber].haulingDate = scheduledDate;
+
+      const distributedDate =
+        transaction.BillingApprovalTransaction?.BillingDistributionTransaction
+          ?.distributedDate;
+
+      totals[billingNumber].distributedDate = distributedDate;
 
       const termsChargeDays =
         transaction.BookedTransaction.QuotationWaste?.Quotation

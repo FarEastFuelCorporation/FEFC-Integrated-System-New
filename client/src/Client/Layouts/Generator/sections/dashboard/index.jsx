@@ -106,6 +106,7 @@ const Dashboard = ({ user }) => {
       setAllCount(allCount);
       setTransactions(billedTransactionsDetail);
       setBilledTransactions(billedTransactions);
+      console.log(billedTransactions);
 
       // Destructure data from the second response
       const { totals } = calculateResponse.data;
@@ -347,10 +348,6 @@ const Dashboard = ({ user }) => {
       valueGetter: (params) => {
         const billingNumber = params.row.billingNumber;
 
-        const distributedDate =
-          params.row.BillingApprovalTransaction?.BillingDistributionTransaction
-            ?.distributedDate;
-
         // If secondaryLoading is true, show the CircularProgress
         if (secondaryLoading) {
           return (
@@ -370,6 +367,7 @@ const Dashboard = ({ user }) => {
         const termsRemarks = totals[billingNumber]?.termsRemarks;
         const terms = totals[billingNumber]?.terms;
         const haulingDate = totals[billingNumber]?.haulingDate;
+        const distributedDate = totals[billingNumber]?.distributedDate;
 
         // Helper function to add days to a date
         const addDaysToDate = (dateStr, daysToAdd) => {

@@ -93,9 +93,9 @@ const CollectedTransaction = ({ row, user }) => {
     }
   });
 
-  const transpoFee = row.QuotationTransportation.unitPrice;
-  const transpoVatCalculation = row.QuotationTransportation.vatCalculation;
-  const transpoMode = row.QuotationTransportation.mode;
+  const transpoFee = row.QuotationTransportation?.unitPrice;
+  const transpoVatCalculation = row.QuotationTransportation?.vatCalculation;
+  const transpoMode = row.QuotationTransportation?.mode;
 
   const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
     // Check if the mode is "CHARGE"

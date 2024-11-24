@@ -122,7 +122,6 @@ const TreatedTransactions = ({ user }) => {
   };
 
   const handleDeleteClick = (row) => {
-    console.log(row);
     setOpenDialog(true);
     setDialog(
       "Are you sure you want to Delete this Treated Waste Transaction?"

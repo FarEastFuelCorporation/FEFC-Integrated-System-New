@@ -202,7 +202,6 @@ const WarehousedTransactions = ({ user }) => {
     }
   };
   const handleDeleteClick = (row) => {
-    console.log(row);
     setOpenDialog(true);
     setDialog("Are you sure you want to Delete this Warehoused Transaction?");
     setDialogAction(() => () => handleConfirmDelete(row));
@@ -235,8 +234,6 @@ const WarehousedTransactions = ({ user }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(warehousedItemsRef.current);
 
     // Initialize an array to hold warehoused item data
     const warehousedItemsData = [];
@@ -271,8 +268,6 @@ const WarehousedTransactions = ({ user }) => {
       remarks: remarksRef.current.value,
       warehousedItems: warehousedItemsData,
     };
-
-    console.log(updatedFormData);
 
     try {
       setLoading(true);

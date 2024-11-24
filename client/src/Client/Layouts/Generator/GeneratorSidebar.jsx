@@ -107,7 +107,6 @@ const GeneratorSidebar = ({ user }) => {
 
   const initializeClientDetails = useCallback(() => {
     const { clientDetails } = user || {};
-    console.log(clientDetails);
     setClientDetails({
       id: clientDetails?.id || "",
       clientId: clientDetails?.clientId || "",
@@ -205,9 +204,6 @@ const GeneratorSidebar = ({ user }) => {
       }
 
       const data = response.data.client;
-
-      console.log(response);
-      console.log(data);
 
       setClientDetails({
         id: data?.id || "",

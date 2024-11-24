@@ -85,14 +85,9 @@ const Medicines = ({ user }) => {
       const employeeResponse = await axios.get(`${apiUrl}/api/employee`);
       const medicineResponse = await axios.get(`${apiUrl}/api/medicine`);
 
-      console.log(response);
-      console.log(responseLog);
-
       const medicines = response.data.medicines;
       const medicineLogs = responseLog.data.medicineLogs;
 
-      console.log(medicineLogs);
-      console.log(medicines);
       setRecords(medicineLogs);
       setRecords2(medicines); // Assuming you're storing this in the `records` state
       setEmployeesData(employeeResponse.data.employees);

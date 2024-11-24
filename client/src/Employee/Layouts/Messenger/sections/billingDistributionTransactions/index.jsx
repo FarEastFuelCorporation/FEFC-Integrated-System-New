@@ -243,6 +243,7 @@ const BillingDistributionTransactions = ({ user }) => {
       fetchData();
 
       setShowSuccessMessage(true);
+      setOpenTransactionModal(false);
       handleCloseModal();
 
       setLoading(false);

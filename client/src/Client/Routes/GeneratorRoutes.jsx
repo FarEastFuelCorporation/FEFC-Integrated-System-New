@@ -9,7 +9,7 @@ import Quotations from "../../OtherComponents/Sections/quotations";
 const GeneratorRoutes = ({ user }) => (
   <Routes>
     <Route path="/" element={<UserDashboard user={user} />}>
-      <Route path="" element={<Dashboard />} />
+      <Route path="" element={<Dashboard user={user} />} />
       <Route path="transactions" element={<BookedTransactions user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="calendar" element={<Calendar />} />

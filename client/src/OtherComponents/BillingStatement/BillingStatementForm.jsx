@@ -41,11 +41,9 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
   const [isDoneCalculation, setIsDoneCalculation] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
 
-  const billedTransaction = row.BilledTransaction[0];
+  const billedTransaction = row?.BilledTransaction[0] || "";
 
-  console.log(row);
-
-  const hasFixedRate = row.QuotationWaste?.hasFixedRate;
+  const hasFixedRate = row?.QuotationWaste?.hasFixedRate;
 
   // Calculate header and footer heights
   const calculateRemainingHeight = useCallback(() => {

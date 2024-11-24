@@ -215,7 +215,7 @@ async function deleteScheduledTransactionController(req, res) {
   }
 }
 
-// Get Dispatched Transactions Dashboard controller
+// Get Scheduled Transactions Dashboard controller
 async function getScheduledTransactionsDashboardController(req, res) {
   try {
     const { startDate, endDate } = req.params;

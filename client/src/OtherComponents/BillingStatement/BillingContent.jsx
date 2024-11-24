@@ -21,8 +21,6 @@ const BillingContent = ({
 }) => {
   const wasteTableRef = useRef(null);
 
-  console.log(transactions);
-
   const hasFixedRate = transactions?.[0]?.QuotationWaste?.hasFixedRate;
   const fixedWeight = transactions?.[0]?.QuotationWaste?.fixedWeight;
   const unit = transactions?.[0]?.QuotationWaste?.unit;
@@ -32,11 +30,6 @@ const BillingContent = ({
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
 
   let totalWeight = 0;
-
-  console.log(hasFixedRate);
-  console.log(fixedPrice);
-  console.log(vatCalculation);
-  console.log(remarks);
 
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
@@ -86,8 +79,6 @@ const BillingContent = ({
     // Combine rows from both tables
     const wasteRows = wasteTableRef.current?.querySelectorAll("tr") || [];
 
-    console.log(wasteRows);
-
     // Add WASTE DETAILS header
     addElementToPage(null, wasteDetailsHeadingHeight);
 
@@ -115,7 +106,6 @@ const BillingContent = ({
       addPage();
     }
 
-    console.log(pages); // Store the pages content in state
     setPagesContent(pages); // Store the pages content in state
     setIsDoneCalculation(true); // Indicate that the calculation is done
   }, [

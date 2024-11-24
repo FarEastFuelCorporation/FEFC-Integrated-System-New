@@ -1,15 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   Box,
   Button,
   Card,
   CardContent,
   CircularProgress,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   Tab,
   Tabs,
   Typography,
@@ -18,219 +14,177 @@ import {
 } from "@mui/material";
 import Header from "../../../../../OtherComponents/Header";
 import { tokens } from "../../../../../theme";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { ResponsivePie } from "@nivo/pie";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
-import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-import PeopleIcon from "@mui/icons-material/People";
+import EventRepeatIcon from "@mui/icons-material/EventRepeat";
+import ApprovalIcon from "@mui/icons-material/Approval";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import StarBorderPurple500Icon from "@mui/icons-material/StarBorderPurple500";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import WeekNavigator from "../../../../../OtherComponents/WeekNavigator";
 import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
 import DayNavigator from "../../../../../OtherComponents/DayNavigator";
 import axios from "axios";
-import { formatNumber } from "../../../../../OtherComponents/Functions";
+import {
+  formatDate3,
+  formatNumber,
+  formatTime2,
+} from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid } from "@mui/x-data-grid";
+import BillingStatementForm from "../../../../../OtherComponents/BillingStatement/BillingStatementForm";
 
 const Dashboard = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
+  const certificateRef = useRef();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(true); // Add loading state
+  const [loadingRowId, setLoadingRowId] = useState(null);
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedDetailsTab, setSelectedDetailsTab] = useState(1);
-  const [selectedSummaryTab, setSelectedSummaryTab] = useState(0);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [pendingDispatch, setPendingDispatch] = useState(0);
-  const [onTimeSchedule, setOnTimeSchedule] = useState(0);
-  const [onTimePercentage, setOnTimePercentage] = useState(0);
-  const [lateSchedule, setLateSchedule] = useState(0);
-  const [totalSchedule, setTotalSchedule] = useState(0);
-  const [totalClients, setTotalClients] = useState(0);
+  const [pending, setPending] = useState(0);
+  const [inProgress, setInProgress] = useState(0);
+  const [certified, setCertified] = useState(0);
+  const [billed, setBilled] = useState(0);
+  const [allCount, setAllCount] = useState(0);
   const [transactions, setTransactions] = useState([]);
-  const [clientTrips, setClientTrips] = useState([]);
-  const [vehicleTrips, setVehicleTrips] = useState([]);
-  const [vehicleTypeTrips, setVehicleTypeTrips] = useState([]);
-  const [clientCountByEmployeeData, setClientCountByEmployeeData] = useState(
-    []
-  );
-  const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [updatedTransactions, setUpdatedTransactions] = useState([]);
-  const [filterValue, setFilterValue] = useState(""); // To track the filter input value
-  const [sortModel, setSortModel] = useState([
-    { field: "clientName", sort: "asc" },
-  ]);
+  const [billedTransactions, setBilledTransactions] = useState([]);
+  const [totals, setTotals] = useState([]);
+  const [secondaryLoading, setSecondaryLoading] = useState([]);
+
+  const [row, setRow] = useState(null);
 
   // useCallback to memoize fetchData function
   const fetchData = useCallback(async () => {
+    // Return early if dependencies are invalid
+    if (!startDate || !endDate || !user?.id) {
+      console.error(
+        "Invalid dependencies: startDate, endDate, or user.id is missing."
+      );
+      return;
+    }
+
     try {
-      setLoading(true);
+      setLoading(true); // Main loading state
+      setSecondaryLoading(true); // Secondary loading state for the 2nd API call
 
       // Ensure dates are formatted correctly
       const formattedStartDate = startDate.toISOString().split("T")[0];
       const formattedEndDate = endDate.toISOString().split("T")[0];
 
-      const response = await axios.get(
-        `${apiUrl}/api/scheduledTransaction/dashboard/${formattedStartDate}/${formattedEndDate}`,
-        {
-          params: {
-            selectedEmployee: selectedEmployee || undefined, // Pass selectedEmployee if it's defined
-          },
-        }
-      );
+      // Start both fetch requests concurrently using Promise.all
+      const [response, calculateResponse] = await Promise.all([
+        axios.get(
+          `${apiUrl}/api/bookedTransaction/dashboard/${formattedStartDate}/${formattedEndDate}/${user.id}`
+        ),
+        axios.get(
+          `${apiUrl}/api/bookedTransaction/dashboard/full/${formattedStartDate}/${formattedEndDate}/${user.id}`
+        ),
+      ]);
 
-      setPendingDispatch(response.data.pending);
-      setTotalSchedule(response.data.totalSchedule);
-      setOnTimeSchedule(response.data.onTimeSchedule);
-      setOnTimePercentage(response.data.onTimePercentage);
-      setLateSchedule(response.data.lateSchedule);
-      setTotalClients(response.data.totalClients);
-      setClientTrips(response.data.clientTripsArray);
-      setVehicleTrips(response.data.vehicleTripsArray);
-      setVehicleTypeTrips(response.data.vehicleTypeTripsArray);
-      setTransactions(response.data.result);
-      setClientCountByEmployeeData(response.data.clientCountByEmployeeData);
+      // Destructure data from the first response
+      const {
+        pendingCount,
+        inProgressCount,
+        certifiedCount,
+        billedCount,
+        allCount,
+        billedTransactions,
+        billedTransactionsDetail,
+      } = response.data;
 
-      setLoading(false);
+      // Update states related to the first API call
+      setPending(pendingCount);
+      setInProgress(inProgressCount);
+      setCertified(certifiedCount);
+      setBilled(billedCount);
+      setAllCount(allCount);
+      setTransactions(billedTransactionsDetail);
+      setBilledTransactions(billedTransactions);
+
+      // Destructure data from the second response
+      const { totals } = calculateResponse.data;
+
+      // Update states related to the second API call
+      setTotals(totals);
+
+      // Set loading states to false
+      setLoading(false); // For the first API call once it's done
+      setSecondaryLoading(false); // For the second API call once it's done
     } catch (error) {
-      console.error("Error fetching data:", error);
+      // Handle error with descriptive messages
+      console.error("Error fetching data:", error.message || error);
+      console.error("Stack Trace:", error.stack || "No stack trace available");
+
+      // Ensure both loading states are set to false in case of an error
       setLoading(false);
+      setSecondaryLoading(false);
     }
-  }, [apiUrl, startDate, endDate, selectedEmployee]); // Dependencies that trigger the callback
+  }, [apiUrl, startDate, endDate, user?.id]); // Ensure all dependencies are included
 
   // Effect to fetch data when startDate, endDate, selectedEmployee, or apiUrl changes
   useEffect(() => {
     fetchData();
   }, [fetchData]); // Dependencies array includes fetchData which is memoized by useCallback
 
-  // Effect to fetch data when the selected tab changes to 1
-  useEffect(() => {
-    if (selectedDetailsTab === 1) {
-      fetchData(); // Fetch data when tab changes to 1
-    }
-  }, [selectedDetailsTab, fetchData]); // Only re-run when selectedDetailsTab changes
-
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
-  const handleChangeDetailsTab = (event, newValue) => {
-    setSelectedDetailsTab(newValue); // Change the selected tab
+  const handleOpenPDFInNewTab = () => {
+    const input = certificateRef.current;
 
-    setSelectedEmployee("");
-
-    if (newValue === 1) {
-      // If the tab is 1, fetch data
-      fetchData();
+    if (!input) {
+      console.error("PDF generation failed: certificateRef is not ready.");
+      return;
     }
-  };
 
-  const handleChangeSummaryTab = (event, newValue) => {
-    setSelectedSummaryTab(newValue);
-  };
+    const pageHeight = 1056;
+    const pageWidth = 816;
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [pageWidth, pageHeight], // Page size in px
+    });
 
-  // Handle selection change
-  const handleSelectChange = (event) => {
-    setSelectedEmployee(event.target.value);
-  };
+    const processPage = (pageIndex, pages) => {
+      if (pageIndex >= pages.length) {
+        const pdfOutput = pdf.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfOutput);
+        window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
+        return;
+      }
 
-  // Calculate totals for the "Total" row
-  const getTotalRow = (filteredTransactions) => {
-    const totalInHouseLogistics = filteredTransactions.reduce(
-      (sum, transaction) => sum + transaction.inHouseLogistics,
-      0
-    );
-    const totalOtherLogistics = filteredTransactions.reduce(
-      (sum, transaction) => sum + transaction.otherLogistics,
-      0
-    );
-    const totalLogistics = filteredTransactions.reduce(
-      (sum, transaction) => sum + transaction.total,
-      0
-    );
+      html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
 
-    return {
-      id: "total",
-      clientName: "Total",
-      inHouseLogistics: totalInHouseLogistics,
-      otherLogistics: totalOtherLogistics,
-      total: totalLogistics,
-      createdBy: "", // You can leave this empty or use a placeholder like "Total"
+        if (pageIndex === 0) {
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        } else {
+          pdf.addPage([pageWidth, pageHeight]);
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        }
+
+        processPage(pageIndex + 1, pages);
+      });
     };
+
+    const pages = Array.from(input.children); // Assuming each page is a child of input
+    processPage(0, pages); // Start processing pages from the first one
+    setLoadingRowId(null);
+    setRow(null);
   };
-
-  // Handle filter changes
-  const handleFilterChange = (event) => {
-    const value = event.target.value;
-    setFilterValue(value); // Update the filter value
-  };
-
-  // Handle sort changes
-  const handleSortModelChange = (newSortModel) => {
-    setSortModel(newSortModel);
-  };
-
-  useEffect(() => {
-    let filteredTransactions = [...transactions];
-
-    // Step 1: Remove "Total" row (if it exists) before filtering or sorting
-    filteredTransactions = filteredTransactions.filter(
-      (transaction) => transaction.id !== "total"
-    );
-
-    // Step 2: Apply filter across all columns if filterValue is set
-    if (filterValue) {
-      filteredTransactions = filteredTransactions.filter((transaction) => {
-        // Loop through each property of the transaction and check if it includes the filter value
-        return Object.values(transaction)
-          .join(" ") // Convert all values of the transaction to a single string
-          .toLowerCase()
-          .includes(filterValue.toLowerCase()); // Check if filter value is a part of any of the fields
-      });
-    }
-
-    // Step 3: Apply sorting (if any)
-    if (sortModel.length > 0) {
-      const sortField = sortModel[0]?.field;
-      const sortOrder = sortModel[0]?.sort;
-
-      filteredTransactions.sort((a, b) => {
-        if (a[sortField] < b[sortField]) {
-          return sortOrder === "asc" ? -1 : 1;
-        }
-        if (a[sortField] > b[sortField]) {
-          return sortOrder === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    // Step 4: Add the "Total" row back at the end
-    const totalRow = getTotalRow(filteredTransactions);
-    setUpdatedTransactions([...filteredTransactions, totalRow]);
-  }, [transactions, filterValue, sortModel]); // Depend on transactions, filterValue, and sortModel
-
-  const summaryData =
-    selectedSummaryTab === 0
-      ? clientTrips
-      : selectedSummaryTab === 1
-      ? vehicleTrips
-      : vehicleTypeTrips;
-  const summaryHeader =
-    selectedSummaryTab === 0
-      ? "Client"
-      : selectedSummaryTab === 1
-      ? "Vehicle"
-      : "Vehicle Type";
 
   const data = [
-    { id: "Pending", label: "Pending", value: pendingDispatch },
-    { id: "On-Time", label: "On-Time", value: onTimeSchedule },
-    { id: "Late", label: "Late", value: lateSchedule },
+    { id: "Pending", label: "Pending", value: pending },
+    { id: "In Progress", label: "In Progress", value: inProgress },
+    { id: "Certified", label: "Certified", value: certified },
+    { id: "Billed", label: "Billed", value: billed },
   ];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -243,99 +197,332 @@ const Dashboard = ({ user }) => {
 
   const columns = [
     {
-      field: "clientName",
-      headerName: "Client Name",
+      field: "transactionId",
+      headerName: "Transaction Id",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
-
+      valueGetter: (params) => {
+        return params.row.BookedTransaction.transactionId;
+      },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "inHouseLogistics",
-      headerName: "FEFC Logistics",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "otherLogistics",
-      headerName: "Other Logistics",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "total",
-      headerName: "Total",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "createdBy",
-      headerName: "Account Handler",
+      field: "haulingDate",
+      headerName: "Hauling Date",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
+      valueGetter: (params) => {
+        return formatDate3(params.row.BookedTransaction.haulingDate);
+      },
       renderCell: renderCellWithWrapText,
     },
-  ];
-
-  const columnsSummary = [
     {
-      field: "header",
-      headerName: summaryHeader,
+      field: "haulingTime",
+      headerName: "Hauling Time",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
+      valueGetter: (params) => {
+        return formatTime2(params.row.BookedTransaction.haulingTime);
+      },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "count",
-      headerName: "Trips",
+      field: "status",
+      headerName: "Status",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "income",
-      headerName: "Income",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
+      width: 150,
       renderCell: (params) => {
+        let status;
+        const statusId = params.row.BookedTransaction.statusId;
+
+        if (statusId === 1) {
+          status = "BOOKED";
+        } else if (statusId === 2) {
+          status = "SCHEDULED";
+        } else if (statusId === 3) {
+          status = "DISPATCHED";
+        } else if (statusId === 4) {
+          status = "RECEIVED";
+        } else if (statusId === 5) {
+          status = "SORTED";
+        } else if (statusId === 6) {
+          status = "WARHOUSED IN";
+        } else if (statusId === 7) {
+          status = "WARHOUSED OUT";
+        } else if (statusId === 8) {
+          status = "TREATED";
+        } else if (statusId === 9) {
+          status = "CERTIFIED";
+        } else if (statusId === 10) {
+          status = "BILLED";
+        } else if (statusId === 11) {
+          status = "APPROVED";
+        } else if (statusId === 12) {
+          status = "DISTRIBUTED";
+        } else if (statusId === 13) {
+          status = "COLLECTED";
+        }
+
         let value = {};
-        value.value = formatNumber(params.row.totalIncome) || "";
+        value.value = status;
 
         return renderCellWithWrapText(value);
       },
     },
   ];
 
+  const columnsSummary = [
+    {
+      field: "billingNumber",
+      headerName: "Billing Number",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return params.row.billingNumber;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "billedDate",
+      headerName: "Billed Date",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        return formatDate3(params.row.billedDate);
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "billedAmount",
+      headerName: "Billed Amount",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        const billingNumber = params.row.billingNumber;
+
+        // If secondaryLoading is true, show the CircularProgress
+        if (secondaryLoading) {
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={24} color="secondary" />
+            </Box>
+          );
+        }
+
+        // Retrieve the billedAmount from the totals object using the billingNumber
+        const billingTotal = totals[billingNumber];
+
+        // If there is a valid billingTotal, extract the billedAmount
+        if (billingTotal && billingTotal.total) {
+          return formatNumber(billingTotal.total); // Adjust this if you want a different amount type
+        }
+
+        // Return a placeholder or empty string if no billedAmount is found
+        return "-";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "dueDate",
+      headerName: "Due Date",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        const billingNumber = params.row.billingNumber;
+
+        const distributedDate =
+          params.row.BillingApprovalTransaction?.BillingDistributionTransaction
+            ?.distributedDate;
+
+        // If secondaryLoading is true, show the CircularProgress
+        if (secondaryLoading) {
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={24} color="secondary" />
+            </Box>
+          );
+        }
+
+        // Retrieve termsRemarks, terms, and haulingDate from totals
+        const termsRemarks = totals[billingNumber]?.termsRemarks;
+        const terms = totals[billingNumber]?.terms;
+        const haulingDate = totals[billingNumber]?.haulingDate;
+
+        // Helper function to add days to a date
+        const addDaysToDate = (dateStr, daysToAdd) => {
+          const date = new Date(dateStr);
+          date.setDate(date.getDate() + daysToAdd);
+          return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+        };
+
+        let dueDate = "Pending"; // Default value if no condition is met
+
+        if (termsRemarks === "UPON RECEIVING OF DOCUMENTS" && distributedDate) {
+          // Add the terms to the distributedDate
+          dueDate = formatDate3(addDaysToDate(distributedDate, terms));
+        } else if (
+          termsRemarks === "UPON HAULING" ||
+          termsRemarks === "ON PICKUP" ||
+          termsRemarks === "ON DELIVERY"
+        ) {
+          // Add the terms to the haulingDate
+          dueDate = formatDate3(addDaysToDate(haulingDate, terms));
+        }
+
+        // Store the computed dueDate into the row for use in remainingDays column
+        params.row.dueDate = dueDate;
+
+        return dueDate;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "remainingDays",
+      headerName: "Remaining Days",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) => {
+        const dueDate = params.row.dueDate;
+
+        // If no due date is available, return "Pending"
+        if (dueDate === "Pending") {
+          return "Pending";
+        }
+
+        // Get the current date
+        const currentDate = new Date();
+
+        // Parse the dueDate string into a Date object
+        const dueDateObj = new Date(dueDate);
+
+        // Calculate the difference in time (milliseconds)
+        const timeDifference = dueDateObj - currentDate;
+
+        // If the due date is in the future, calculate the remaining days
+        if (timeDifference > 0) {
+          const remainingDays = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Convert milliseconds to days
+          if (remainingDays > 1) {
+            return `${remainingDays} Days`;
+          } else if (remainingDays === 1) {
+            return "1 Day";
+          } else {
+            return "Due Date"; // If remainingDays is 0, show "Due Date"
+          }
+        }
+
+        // If the due date is in the past, calculate how overdue it is
+        const overdueDays = Math.ceil(
+          Math.abs(timeDifference) / (1000 * 3600 * 24)
+        ); // Convert milliseconds to days
+        if (overdueDays === 1) {
+          return "1 Day Overdue";
+        } else {
+          return `${overdueDays} Days Overdue`;
+        }
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "view",
+      headerName: "View",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <Box sx={{ position: "relative" }}>
+            {/* Render BillingStatementForm in a hidden position */}
+
+            <Button
+              color="secondary"
+              variant="contained"
+              disabled={loadingRowId === params.row.id}
+              onClick={async () => {
+                try {
+                  const id = params.row.id; // Get the document ID
+                  setLoadingRowId(id); // Track which row is loading
+
+                  // Fetch the transaction details
+                  const response = await axios.get(
+                    `${apiUrl}/api/bookedTransaction/full/bill/${id}`
+                  );
+
+                  // Update the state with fetched data
+                  setRow(response.data.transaction.transaction);
+                } catch (error) {
+                  console.error("Error fetching transaction details:", error);
+                } finally {
+                  // Reset loading row ID
+                }
+              }}
+            >
+              {loadingRowId === params.row.id ? "Loading..." : "View"}
+            </Button>
+          </Box>
+        );
+      },
+    },
+  ];
+
+  // Memoize waitForRender with useCallback
+  const waitForRender = useCallback(() => {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (certificateRef.current) {
+          clearInterval(interval); // Clear the interval once it's ready
+          resolve();
+        }
+      }, 100); // Check every 100ms
+    });
+  }, [row]);
+
+  useEffect(() => {
+    // If row has been updated, proceed to generate the PDF
+    if (row) {
+      // Wait for the form to render and then generate the PDF
+      waitForRender().then(() => {
+        handleOpenPDFInNewTab();
+      });
+    }
+  }, [row, waitForRender]);
+
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your Dashboard" />
-        <Button
-          sx={{
-            backgroundColor: colors.blueAccent[700],
-            color: colors.grey[100],
-            fontSize: "14px",
-            fontWeight: "bold",
-            padding: "10px 20px",
-          }}
-        >
-          <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-          Download Reports
-        </Button>
+      </Box>
+      <Box sx={{ position: "absolute", left: "-9999px", zIndex: -1 }}>
+        {row && (
+          <BillingStatementForm
+            statementRef={certificateRef} // Pass ref here
+            row={row} // Ensure `row` is correctly updated
+          />
+        )}
       </Box>
       <Box
         sx={{
@@ -400,13 +587,13 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      On-Time Schedules
+                      Pending
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {onTimeSchedule}
+                      {pending}
                     </Typography>
                   </Box>
-                  <SentimentVerySatisfiedIcon
+                  <PendingActionsIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -429,13 +616,13 @@ const Dashboard = ({ user }) => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Pending Schedules
+                        BIlled
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {pendingDispatch}
+                        {billed}
                       </Typography>
                     </Box>
-                    <PendingActionsIcon
+                    <ReceiptIcon
                       sx={{ fontSize: 40, marginRight: 2 }}
                       color="secondary"
                     />
@@ -461,13 +648,13 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Late Schedules
+                      In Progress
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {lateSchedule}
+                      {inProgress}
                     </Typography>
                   </Box>
-                  <SentimentVeryDissatisfiedIcon
+                  <EventRepeatIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -490,10 +677,12 @@ const Dashboard = ({ user }) => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Client Satisfaction
+                        Completion Rate
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {onTimePercentage}%
+                        {isNaN((billed / allCount) * 100)
+                          ? "0.00%"
+                          : formatNumber((billed / allCount) * 100) + "%"}
                       </Typography>
                     </Box>
                     <StarBorderPurple500Icon
@@ -521,13 +710,13 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Total Schedules
+                      Certified
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
-                      {totalSchedule}
+                      {certified}
                     </Typography>
                   </Box>
-                  <CalendarMonthIcon
+                  <ApprovalIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />
@@ -550,13 +739,13 @@ const Dashboard = ({ user }) => {
                   >
                     <Box>
                       <Typography variant="h6" gutterBottom>
-                        Total Clients
+                        Total
                       </Typography>
                       <Typography variant="h4" color="textSecondary">
-                        {totalClients}
+                        {allCount}
                       </Typography>
                     </Box>
-                    <PeopleIcon
+                    <AssignmentIcon
                       sx={{ fontSize: 40, marginRight: 2 }}
                       color="secondary"
                     />
@@ -583,13 +772,13 @@ const Dashboard = ({ user }) => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Pending Schedules
+                          Billed
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {pendingDispatch}
+                          {billed}
                         </Typography>
                       </Box>
-                      <PendingActionsIcon
+                      <ReceiptIcon
                         sx={{ fontSize: 40, marginRight: 2 }}
                         color="secondary"
                       />
@@ -613,10 +802,12 @@ const Dashboard = ({ user }) => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Client Satisfaction
+                          Completion Rate
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {onTimePercentage}%
+                          {isNaN((billed / allCount) * 100)
+                            ? "0.00%"
+                            : formatNumber((billed / allCount) * 100) + "%"}
                         </Typography>
                       </Box>
                       <StarBorderPurple500Icon
@@ -643,13 +834,13 @@ const Dashboard = ({ user }) => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Total Clients
+                          Total
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {totalClients}
+                          {allCount}
                         </Typography>
                       </Box>
-                      <PeopleIcon
+                      <AssignmentIcon
                         sx={{ fontSize: 40, marginRight: 2 }}
                         color="secondary"
                       />
@@ -785,84 +976,15 @@ const Dashboard = ({ user }) => {
                   justifyContent: isMobile ? "none" : "space-between",
                 }}
               >
-                <Box>
+                <Box mb={3}>
                   <Typography variant="h6" gutterBottom>
                     Details:
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", gap: 3 }}>
-                  <Box>
-                    {selectedDetailsTab === 0 && (
-                      <FormControl
-                        sx={{ width: "200px", height: "30px", padding: 0 }}
-                      >
-                        <InputLabel
-                          id="employee-select-label"
-                          sx={{ padding: 0 }}
-                          style={{
-                            color: colors.grey[100],
-                          }}
-                          shrink={true}
-                        >
-                          Select Employee
-                        </InputLabel>
-                        <Select
-                          labelId="employee-select-label"
-                          id="employeeSelect"
-                          value={selectedEmployee}
-                          onChange={handleSelectChange}
-                          label="Select Employee"
-                          sx={{
-                            height: "30px",
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <MenuItem value="">
-                            <em>None</em>
-                          </MenuItem>
-                          {clientCountByEmployeeData.map((employee) => (
-                            <MenuItem
-                              key={employee.employeeId}
-                              value={employee.employeeId}
-                            >
-                              {employee.employeeName}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                  </Box>
-                  <Tabs
-                    value={selectedDetailsTab}
-                    onChange={handleChangeDetailsTab}
-                    sx={{
-                      "& .MuiTab-root": {
-                        height: 30, // Set height for each Tab
-                        minHeight: 30, // Ensure minimum height of 20px for the Tab
-                        paddingY: 0, // Remove vertical padding
-                      },
-                      "& .Mui-selected": {
-                        backgroundColor: colors.greenAccent[400],
-                        boxShadow: "none",
-                        borderBottom: `1px solid ${colors.grey[100]}`,
-                      },
-                      "& .MuiTab-root > span": {
-                        paddingRight: "10px",
-                      },
-                      height: 20,
-                    }}
-                  >
-                    <Tab label="Individual" />
-                    <Tab label="Team" />
-                  </Tabs>
-                </Box>
               </Box>
               <CustomDataGridStyles height={"372px"} margin={0}>
                 <DataGrid
-                  rows={updatedTransactions ? updatedTransactions : []}
+                  rows={transactions ? transactions : []}
                   columns={columns}
                   getRowId={(row) => row.id}
                   hideFooter
@@ -871,7 +993,6 @@ const Dashboard = ({ user }) => {
                       sortModel: [{ field: "total", sort: "asc" }],
                     },
                   }}
-                  onSortModelChange={handleSortModelChange}
                 />
               </CustomDataGridStyles>
             </CardContent>
@@ -892,37 +1013,13 @@ const Dashboard = ({ user }) => {
               >
                 <Box mb={3}>
                   <Typography variant="h6" gutterBottom>
-                    Summary:
+                    Billing Summary:
                   </Typography>
                 </Box>
-                {/* <Tabs
-                  value={selectedSummaryTab}
-                  onChange={handleChangeSummaryTab}
-                  sx={{
-                    "& .MuiTab-root": {
-                      height: 30, // Set height for each Tab
-                      minHeight: 30, // Ensure minimum height of 20px for the Tab
-                      paddingY: 0, // Remove vertical padding
-                    },
-                    "& .Mui-selected": {
-                      backgroundColor: colors.greenAccent[400],
-                      boxShadow: "none",
-                      borderBottom: `1px solid ${colors.grey[100]}`,
-                    },
-                    "& .MuiTab-root > span": {
-                      paddingRight: "10px",
-                    },
-                    height: 20,
-                  }}
-                >
-                  <Tab label="Client" />
-                  <Tab label="Vehicle" />
-                  <Tab label="Vehicle Type" />
-                </Tabs> */}
               </Box>
               <CustomDataGridStyles height={"372px"} margin={0}>
                 <DataGrid
-                  rows={summaryData ? summaryData : []}
+                  rows={billedTransactions ? billedTransactions : []}
                   columns={columnsSummary}
                   getRowId={(row) => row.id}
                   hideFooter

@@ -205,7 +205,7 @@ const Dashboard = ({ user }) => {
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        return params.row.BookedTransaction.transactionId;
+        return params.row.transactionId;
       },
       renderCell: renderCellWithWrapText,
     },
@@ -217,7 +217,7 @@ const Dashboard = ({ user }) => {
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        return formatDate3(params.row.BookedTransaction.haulingDate);
+        return formatDate3(params.row.haulingDate);
       },
       renderCell: renderCellWithWrapText,
     },
@@ -229,7 +229,7 @@ const Dashboard = ({ user }) => {
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        return formatTime2(params.row.BookedTransaction.haulingTime);
+        return formatTime2(params.row.haulingTime);
       },
       renderCell: renderCellWithWrapText,
     },
@@ -241,7 +241,7 @@ const Dashboard = ({ user }) => {
       width: 150,
       renderCell: (params) => {
         let status;
-        const statusId = params.row.BookedTransaction.statusId;
+        const statusId = params.row.statusId;
 
         if (statusId === 1) {
           status = "BOOKED";
@@ -264,9 +264,9 @@ const Dashboard = ({ user }) => {
         } else if (statusId === 10) {
           status = "BILLED";
         } else if (statusId === 11) {
-          status = "APPROVED";
+          status = "BILLING APPROVED";
         } else if (statusId === 12) {
-          status = "DISTRIBUTED";
+          status = "BILLING DISTRIBUTED";
         } else if (statusId === 13) {
           status = "COLLECTED";
         }

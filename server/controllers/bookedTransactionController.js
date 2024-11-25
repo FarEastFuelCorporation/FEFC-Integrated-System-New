@@ -364,49 +364,14 @@ async function geBookedTransactionsDashboardController(req, res) {
       group: ["billingNumber"], // Group by billingNumber to get unique values
     });
 
-    const billedTransactions = await BilledTransaction.findAll({
-      attributes: [
-        "id",
-        "billingNumber",
-        "billedAmount",
-        "billedDate",
-        "billedTime",
-      ],
-      include: [
-        {
-          model: BookedTransaction,
-          as: "BookedTransaction",
-          where: {
-            createdBy: clientId,
-            haulingDate: {
-              [Op.between]: [startDate, endDate],
-            },
-          },
+    const bookedTransactions = await BookedTransaction.findAll({
+      where: {
+        createdBy: clientId,
+        haulingDate: {
+          [Op.between]: [startDate, endDate],
         },
-        {
-          model: BillingApprovalTransaction,
-          as: "BillingApprovalTransaction",
-          required: false,
-          include: [
-            {
-              model: BillingDistributionTransaction,
-              as: "BillingDistributionTransaction",
-              required: false,
-              include: [
-                {
-                  model: CollectedTransaction,
-                  as: "CollectedTransaction",
-                  required: false,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      group: ["BilledTransaction.id"],
+      },
     });
-
-    console.log(billedTransactions);
 
     // Respond with the updated data
     res.status(200).json({
@@ -416,7 +381,7 @@ async function geBookedTransactionsDashboardController(req, res) {
       billedCount,
       allCount,
       billedTransactions: uniqueBillingNumbers,
-      billedTransactionsDetail: billedTransactions,
+      billedTransactionsDetail: bookedTransactions,
     });
   } catch (error) {
     console.error("Error:", error);

@@ -20,12 +20,18 @@ import axios from "axios";
 
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import { tokens } from "../../../theme";
-import { formatDate3, formatTime4 } from "../../Functions";
+import {
+  formatDate3,
+  formatTime2,
+  formatTime3,
+  formatTime4,
+} from "../../Functions";
 import LoadingSpinner from "../../LoadingSpinner";
 import SuccessMessage from "../../SuccessMessage";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import Header from "../../Header";
+import { format, parse } from "date-fns";
 
 const Medicines = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -41,8 +47,8 @@ const Medicines = ({ user }) => {
   };
   const initialLogFormData = {
     id: "",
-    medicineName: "",
-    employeeId: "",
+    medicineId: "",
+    employeeId: null,
     reason: "",
     transaction: "",
     quantity: 0,
@@ -89,9 +95,11 @@ const Medicines = ({ user }) => {
       const medicineLogs = responseLog.data.medicineLogs;
 
       setRecords(medicineLogs);
+      console.log(medicineLogs);
       setRecords2(medicines); // Assuming you're storing this in the `records` state
       setEmployeesData(employeeResponse.data.employees);
       setMedicinesData(medicineResponse.data.medicines);
+      console.log(medicineResponse.data.medicines);
 
       setLoading(false);
     } catch (error) {
@@ -243,15 +251,67 @@ const Medicines = ({ user }) => {
     }
   };
 
+  const validateMedicineId = (medicineId, errors) => {
+    if (!medicineId) errors.push("Medicine Name is required.");
+  };
+
+  const validateEmployeeId = (employeeId, errors) => {
+    if (!employeeId) errors.push("Employee is required.");
+  };
+
+  const validateReason = (reason, errors) => {
+    if (!reason || reason.trim() === "") errors.push("Reason is required.");
+  };
+
+  const validateTransaction = (transaction, errors) => {
+    if (!transaction || transaction.trim() === "")
+      errors.push("Transaction type is required.");
+  };
+
+  const validateQuantity = (quantity, errors) => {
+    if (!quantity || isNaN(quantity) || quantity <= 0) {
+      errors.push("Quantity must be a positive number.");
+    }
+  };
+
+  const validateTransactionDate = (transactionDate, errors) => {
+    if (!transactionDate) {
+      errors.push("Transaction date is required.");
+    } else {
+      const today = new Date().toISOString().split("T")[0];
+      if (new Date(transactionDate) > new Date(today)) {
+        errors.push("Transaction date cannot be in the future.");
+      }
+    }
+  };
+
+  const validateTransactionTime = (transactionTime, errors) => {
+    if (!transactionTime) errors.push("Transaction time is required.");
+  };
+
+  const validateFormLogData = (formLogData) => {
+    const errors = [];
+
+    validateMedicineId(formLogData.medicineId, errors);
+    validateTransaction(formLogData.transaction, errors);
+    if (formLogData.transaction === "ISSUANCE") {
+      validateEmployeeId(formLogData.employeeId, errors);
+      validateReason(formLogData.reason, errors);
+    }
+    validateQuantity(formLogData.quantity, errors);
+    validateTransactionDate(formLogData.transactionDate, errors);
+    validateTransactionTime(formLogData.transactionTime, errors);
+
+    return errors;
+  };
+
   const handleFormLogSubmit = async (e) => {
     e.preventDefault();
 
-    // Perform client-side validation
-    const { medicineName } = formLogData;
-
-    // Check if all required fields are filled
-    if (!medicineName) {
-      setErrorLogMessage("Please fill all required fields.");
+    // Validate form data
+    const errors = validateFormLogData(formLogData);
+    if (errors.length > 0) {
+      setErrorLogMessage(errors.join(" "));
       setShowErrorLogMessage(true);
       return;
     }
@@ -265,12 +325,12 @@ const Medicines = ({ user }) => {
           formLogData
         );
 
-        setSuccessMessage("Medicine Updated Successfully!");
+        setSuccessMessage("Medicine Log Updated Successfully!");
       } else {
         // Add new department
         await axios.post(`${apiUrl}/api/medicineLog`, formLogData);
 
-        setSuccessMessage("Medicine Added Successfully!");
+        setSuccessMessage("Medicine Log Added Successfully!");
       }
 
       fetchData();
@@ -289,42 +349,6 @@ const Medicines = ({ user }) => {
   );
 
   const columns = [
-    {
-      field: "medicineName",
-      headerName: "Medicine Name",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "transaction",
-      headerName: "Transaction",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "quantity",
-      headerName: "Quantity",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 200,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "reason",
-      headerName: "Reason",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 200,
-      renderCell: renderCellWithWrapText,
-    },
     {
       field: "transactionDate",
       headerName: "Transaction Date",
@@ -353,15 +377,67 @@ const Medicines = ({ user }) => {
       renderCell: (params) => {
         if (!params.row.transactionTime) return "";
 
-        // Format transactionTime
-        const date = new Date(params.row.transactionTime);
-        const dateFormat = formatTime4(date);
+        const parsedTime = parse(
+          params.row.transactionTime,
+          "HH:mm:ss",
+          new Date()
+        );
+
+        let haulingTime;
+
+        haulingTime = format(parsedTime, "hh:mm a");
 
         let value = {};
-        value.value = dateFormat || "";
+        value.value = haulingTime;
 
         return renderCellWithWrapText(value);
       },
+    },
+    {
+      field: "medicineName",
+      headerName: "Medicine Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params) => {
+        return params.row.Medicine.medicineName;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transaction",
+      headerName: "Transaction",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "submittedBy",
+      headerName: "Submitted By",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params) => {
+        if (params.row.Employee) {
+          return `${params.row.Employee.firstName} ${params.row.Employee.lastName}`;
+        } else {
+          return;
+        }
+      },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "issuedTo",
@@ -370,11 +446,18 @@ const Medicines = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
+      valueGetter: (params) => {
+        if (params.row.MedicineLogEmployee) {
+          return `${params.row.MedicineLogEmployee.firstName} ${params.row.MedicineLogEmployee.lastName}`;
+        } else {
+          return;
+        }
+      },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "issuedBy",
-      headerName: "Issued By",
+      field: "reason",
+      headerName: "Reason",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -482,8 +565,8 @@ const Medicines = ({ user }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 600,
-            height: 550,
+            maxWidth: 600,
+            height: "auto",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
@@ -567,12 +650,15 @@ const Medicines = ({ user }) => {
               <Typography variant="h6" component="h2" color="error" mb={2}>
                 {showErrorLogMessage && errorLogMessage}
               </Typography>
-              <div style={{ width: "100%", display: "flex", gap: "20px" }}>
+              <Box
+                style={{ width: "100%", display: "flex", gap: "20px" }}
+                sx={{ mb: 3 }}
+              >
                 <TextField
                   label="Transaction Date"
                   name="transactionDate"
                   value={formLogData.transactionDate}
-                  onChange={handleInputChange}
+                  onChange={handleInputLogChange}
                   fullWidth
                   type="date"
                   required
@@ -588,7 +674,7 @@ const Medicines = ({ user }) => {
                   label="Transaction Time"
                   name="transactionTime"
                   value={formLogData.transactionTime}
-                  onChange={handleInputChange}
+                  onChange={handleInputLogChange}
                   fullWidth
                   type="time"
                   required
@@ -600,8 +686,8 @@ const Medicines = ({ user }) => {
                   }}
                   autoComplete="off"
                 />
-              </div>
-              <FormControl fullWidth required>
+              </Box>
+              <FormControl fullWidth required sx={{ mb: 3 }}>
                 <InputLabel
                   id="transaction-label" // Ensure this matches the labelId in Select
                   sx={{
@@ -614,7 +700,7 @@ const Medicines = ({ user }) => {
                   labelId="transaction-label" // Matches the id of InputLabel
                   name="transaction" // Name for the input
                   value={formLogData.transaction || ""} // Controlled value from state
-                  onChange={handleInputChange} // Handler for value changes
+                  onChange={handleInputLogChange} // Handler for value changes
                   inputProps={{
                     id: "transaction", // Unique id for accessibility
                   }}
@@ -624,19 +710,20 @@ const Medicines = ({ user }) => {
                 </Select>
               </FormControl>
               <Autocomplete
+                sx={{ mb: 3 }}
                 options={medicinesData}
                 getOptionLabel={(option) =>
-                  option.employeeId === "" ? "" : option.medicineName
+                  option.id === "" ? "" : option.medicineName
                 }
                 value={
                   medicinesData.find(
-                    (emp) => emp.id === formLogData.medicineName
+                    (emp) => emp.id === formLogData.medicineId
                   ) || null
                 }
                 onChange={(event, newValue) => {
-                  handleInputChange({
+                  handleInputLogChange({
                     target: {
-                      name: "medicineName",
+                      name: "medicineId",
                       value: newValue ? newValue.id : "",
                     },
                   });
@@ -658,10 +745,11 @@ const Medicines = ({ user }) => {
                 )}
               />{" "}
               <TextField
+                sx={{ mb: 3 }}
                 label="Quantity"
                 name="quantity"
                 value={formLogData.quantity}
-                onChange={handleInputChange}
+                onChange={handleInputLogChange}
                 type="number"
                 fullWidth
                 InputLabelProps={{
@@ -671,33 +759,52 @@ const Medicines = ({ user }) => {
                 }}
                 autoComplete="off"
               />
-              <Autocomplete
-                options={employeesData}
-                getOptionLabel={(option) =>
-                  option.employeeId === ""
-                    ? ""
-                    : `${option.firstName} ${option.lastName}`
-                }
-                value={
-                  employeesData.find(
-                    (emp) => emp.employeeId === formLogData.driverId
-                  ) || null
-                }
-                onChange={(event, newValue) => {
-                  handleInputChange({
-                    target: {
-                      name: "employeeId",
-                      value: newValue ? newValue.employeeId : "",
-                    },
-                  });
-                }}
-                renderInput={(params) => (
+              {formLogData.transaction === "ISSUANCE" && (
+                <>
+                  <Autocomplete
+                    sx={{ mb: 3 }}
+                    options={employeesData}
+                    getOptionLabel={(option) =>
+                      option.employeeId === ""
+                        ? ""
+                        : `${option.firstName} ${option.lastName}`
+                    }
+                    value={
+                      employeesData.find(
+                        (emp) => emp.employeeId === formLogData.employeeId
+                      ) || null
+                    }
+                    onChange={(event, newValue) => {
+                      handleInputLogChange({
+                        target: {
+                          name: "employeeId",
+                          value: newValue ? newValue.employeeId : null,
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Choose Employee"
+                        name="employeeId"
+                        fullWidth
+                        required
+                        InputLabelProps={{
+                          style: {
+                            color: colors.grey[100],
+                          },
+                        }}
+                        autoComplete="off"
+                      />
+                    )}
+                  />
                   <TextField
-                    {...params}
-                    label="Choose Employee"
-                    name="employeeId"
+                    sx={{ mb: 3 }}
+                    label="Reason"
+                    name="reason"
+                    value={formLogData.reason}
+                    onChange={handleInputLogChange}
                     fullWidth
-                    required
                     InputLabelProps={{
                       style: {
                         color: colors.grey[100],
@@ -705,26 +812,13 @@ const Medicines = ({ user }) => {
                     }}
                     autoComplete="off"
                   />
-                )}
-              />{" "}
-              <TextField
-                label="Reason"
-                name="reason"
-                value={formLogData.reason}
-                onChange={handleInputChange}
-                fullWidth
-                InputLabelProps={{
-                  style: {
-                    color: colors.grey[100],
-                  },
-                }}
-                autoComplete="off"
-              />
+                </>
+              )}
               <TextField
                 label="Created By"
                 name="createdBy"
                 value={formLogData.createdBy}
-                onChange={handleInputChange}
+                onChange={handleInputLogChange}
                 fullWidth
                 autoComplete="off"
                 style={{ display: "none" }}

@@ -19,11 +19,11 @@ const MedicineLog = sequelize.define(
     },
     employeeId: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     reason: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     transaction: {
       type: DataTypes.ENUM,

@@ -209,9 +209,9 @@ const Transaction = ({
         } else if (params.row.statusId === 10) {
           status = "BILLED";
         } else if (params.row.statusId === 11) {
-          status = "APPROVED";
+          status = "BILLING APPROVED";
         } else if (params.row.statusId === 12) {
-          status = "DISTRIBUTED";
+          status = "BILLING DISTRIBUTED";
         } else if (params.row.statusId === 13) {
           status = "COLLECTED";
         }

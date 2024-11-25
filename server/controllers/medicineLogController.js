@@ -9,20 +9,33 @@ const Employee = require("../models/Employee");
 async function createMedicineController(req, res) {
   try {
     // Extracting data from the request body
-    let { medicineName, createdBy } = req.body;
+    let {
+      transactionDate,
+      transactionTime,
+      medicineId,
+      employeeId,
+      quantity,
+      transaction,
+      reason,
+      createdBy,
+    } = req.body;
 
-    medicineName = medicineName && medicineName.toUpperCase();
+    reason = reason && reason.toUpperCase();
 
     // Creating a new medicines
-    await Medicine.create({
-      medicineName,
+    await MedicineLog.create({
+      transactionDate,
+      transactionTime,
+      medicineId,
+      employeeId,
+      quantity,
+      transaction,
+      reason,
       createdBy,
     });
 
     // Fetch all medicines from the database
-    const medicines = await Medicine.findAll({
-      order: [["medicineName", "ASC"]],
-    });
+    const medicines = await Medicine.findAll();
 
     // Respond with the updated data
     res.json({ medicines });
@@ -38,12 +51,12 @@ async function getMedicinesController(req, res) {
   try {
     // Fetch all medicine logs from the database
     const medicineLogs = await MedicineLog.findAll({
-      attributes: ["medicineId", "transaction", "quantity"],
       include: [
         {
           model: Employee,
           as: "MedicineLogEmployee",
           attributes: ["firstName", "lastName"],
+          required: false,
         },
         {
           model: Employee,
@@ -58,50 +71,8 @@ async function getMedicinesController(req, res) {
       ],
     });
 
-    // Calculate total quantities for each medicine
-    const medicineQuantities = {};
-
-    medicineLogs.forEach((log) => {
-      const { medicineId, transaction, quantity } = log;
-
-      if (!medicineQuantities[medicineId]) {
-        medicineQuantities[medicineId] = 0;
-      }
-
-      // Adjust the quantity based on the transaction type
-      if (transaction === "RE-STOCK") {
-        medicineQuantities[medicineId] += quantity;
-      } else if (transaction === "ISSUANCE") {
-        medicineQuantities[medicineId] -= quantity;
-      }
-    });
-
-    // Format logs with IssuedBy and IssuedTo attributes
-    const formattedLogs = medicineLogs.map((log) => ({
-      id: log.id,
-      medicineId: log.medicineId,
-      medicineName: log.Medicine.medicineName,
-      transaction: log.transaction,
-      quantity: log.quantity,
-      reason: log.reason,
-      transactionDate: log.transactionDate,
-      transactionTime: log.transactionTime,
-      issuedBy: log.Employee
-        ? {
-            id: log.Employee.id,
-            name: `${log.Employee.firstName} ${log.Employee.lastName}`,
-          }
-        : null,
-      issuedTo: log.MedicineLogEmployee
-        ? {
-            id: log.MedicineLogEmployee.id,
-            name: `${log.MedicineLogEmployee.firstName} ${log.MedicineLogEmployee.lastName}`,
-          }
-        : null,
-    }));
-
     // Respond with the combined data
-    res.status(200).json({ medicineLogs: formattedLogs });
+    res.status(200).json({ medicineLogs });
   } catch (error) {
     console.error("Error fetching medicines or logs:", error);
     res.status(500).json({ message: "Internal Server Error" });

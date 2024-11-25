@@ -105,6 +105,7 @@ const Dashboard = ({ user }) => {
       setBilled(billedCount);
       setAllCount(allCount);
       setTransactions(billedTransactionsDetail);
+      console.log(billedTransactionsDetail);
       setBilledTransactions(billedTransactions);
 
       // Destructure data from the second response
@@ -284,6 +285,7 @@ const Dashboard = ({ user }) => {
       headerName: "Billing Number",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 100,
       valueGetter: (params) => {
         return params.row.billingNumber;
@@ -295,6 +297,7 @@ const Dashboard = ({ user }) => {
       headerName: "Billed Date",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 100,
       valueGetter: (params) => {
         return formatDate3(params.row.billedDate);
@@ -306,6 +309,7 @@ const Dashboard = ({ user }) => {
       headerName: "Billed Amount",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 100,
       valueGetter: (params) => {
         const billingNumber = params.row.billingNumber;
@@ -343,6 +347,7 @@ const Dashboard = ({ user }) => {
       headerName: "Due Date",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 100,
       valueGetter: (params) => {
         const billingNumber = params.row.billingNumber;
@@ -401,6 +406,7 @@ const Dashboard = ({ user }) => {
       headerName: "Remaining Days",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 100,
       valueGetter: (params) => {
         const dueDate = params.row.dueDate;

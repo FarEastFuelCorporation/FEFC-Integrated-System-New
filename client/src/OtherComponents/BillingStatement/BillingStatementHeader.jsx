@@ -154,10 +154,10 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
             </Typography>
             <Typography sx={{ fontWeight: "bold" }}>
               {formatNumber(
-                amounts.vatInclusive +
+                amounts.nonVatable +
                   amounts.vatExclusive +
-                  vat +
-                  amounts.nonVatable
+                  amounts.vatInclusive / 1.12 +
+                  vat
               )}
             </Typography>
           </Box>
@@ -217,10 +217,10 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
             </Typography>
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
               {formatNumber(
-                amounts.vatInclusive +
+                amounts.nonVatable +
                   amounts.vatExclusive +
-                  vat +
-                  amounts.nonVatable -
+                  amounts.vatInclusive / 1.12 +
+                  vat -
                   credits.vatInclusive
               )}
             </Typography>

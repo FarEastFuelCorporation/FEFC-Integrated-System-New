@@ -406,6 +406,8 @@ async function geBookedTransactionsDashboardController(req, res) {
       group: ["BilledTransaction.id"],
     });
 
+    console.log(billedTransactions);
+
     // Respond with the updated data
     res.status(200).json({
       pendingCount,

@@ -496,7 +496,7 @@ const Dashboard = ({ user }) => {
         }
       }, 100); // Check every 100ms
     });
-  }, [row]);
+  }, []);
 
   useEffect(() => {
     // If row has been updated, proceed to generate the PDF

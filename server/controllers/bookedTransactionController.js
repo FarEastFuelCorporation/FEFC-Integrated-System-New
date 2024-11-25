@@ -294,7 +294,9 @@ async function geBookedTransactionsDashboardController(req, res) {
 
     const certifiedCount = await BookedTransaction.count({
       where: {
-        statusId: 9,
+        statusId: {
+          [Op.gte]: 9, // Change to greater than or equal to 9
+        },
         createdBy: clientId,
         haulingDate: {
           [Op.between]: [startDate, endDate],
@@ -304,7 +306,9 @@ async function geBookedTransactionsDashboardController(req, res) {
 
     const billedCount = await BookedTransaction.count({
       where: {
-        statusId: { [Op.between]: [10, 13] },
+        statusId: {
+          [Op.gte]: 10, // Change to greater than or equal to 9
+        },
         createdBy: clientId,
         haulingDate: {
           [Op.between]: [startDate, endDate],

@@ -211,6 +211,7 @@ async function getEmployeeRecordsFullController(req, res) {
   try {
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
+      attributes: { exclude: ["signature"] },
       order: [["employeeId", "ASC"]],
       include: [
         {

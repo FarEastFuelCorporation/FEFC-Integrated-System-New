@@ -120,6 +120,9 @@ async function createQuotationController(req, res) {
     );
 
     const quotations = await Quotation.findAll({
+      where: {
+        id: quotation.id,
+      },
       include: [
         {
           model: QuotationWaste,
@@ -155,7 +158,7 @@ async function createQuotationController(req, res) {
 // Get Quotations controller
 async function getQuotationsController(req, res) {
   try {
-    // Fetch all clients from the database
+    // Fetch all quotations from the database
     const quotations = await Quotation.findAll({
       include: [
         {
@@ -172,10 +175,6 @@ async function getQuotationsController(req, res) {
               as: "Quotation",
             },
           ],
-          order: [
-            ["wasteName", "ASC"],
-            ["mode", "ASC"],
-          ],
         },
         {
           model: QuotationTransportation,
@@ -184,7 +183,6 @@ async function getQuotationsController(req, res) {
             {
               model: VehicleType,
               as: "VehicleType",
-              order: [["typeOfVehicle", "ASC"]],
             },
             {
               model: Quotation,
@@ -195,6 +193,7 @@ async function getQuotationsController(req, res) {
         {
           model: Client,
           as: "Client",
+          attributes: { exclude: ["clientPicture"] },
         },
         {
           model: IdInformation,
@@ -205,13 +204,29 @@ async function getQuotationsController(req, res) {
       where: {
         status: "active",
       },
-      order: [["quotationCode", "ASC"]],
+      order: [["quotationCode", "ASC"]], // Ordering at the top level
     });
 
-    res.json({ quotations });
+    // Flatten and format the data
+    const flattenedData = quotations.map((item) => {
+      const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
+      return {
+        ...quotation,
+        clientPicture: quotation.Client ? quotation.Client.clientPicture : null,
+        clientName: quotation.Client ? quotation.Client.clientName : null,
+        quotationWastes: quotation.QuotationWaste || [],
+        quotationTransportation: quotation.QuotationTransportation || [],
+        validity: quotation.validity
+          ? new Date(quotation.validity).toISOString().split("T")[0]
+          : null, // Convert timestamp to yyyy-mm-dd format
+      };
+    });
+
+    // Send the formatted data
+    res.json({ quotations: flattenedData });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
+    console.error("Error fetching quotations:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
@@ -298,6 +313,7 @@ async function updateQuotationController(req, res) {
       contactPerson,
       remarks,
       isOneTime,
+      isRevised,
       createdBy,
       quotationWastes, // This should be an array of quotation wastes
       quotationTransportation, // This should be an array of quotation transportation
@@ -314,100 +330,224 @@ async function updateQuotationController(req, res) {
     revisionNumber = (parseInt(revisionNumber) + 1).toString().padStart(2, "0");
 
     if (updatedQuotation) {
-      // Update quotation attributes
-      updatedQuotation.status = "inactive";
+      if (isRevised) {
+        // Update quotation attributes
+        updatedQuotation.status = "inactive";
 
-      // Save the updated quotation
-      await updatedQuotation.save();
+        // Save the updated quotation
+        await updatedQuotation.save();
 
-      // Create the quotation record
-      const quotation = await Quotation.create({
-        quotationCode,
-        revisionNumber,
-        validity,
-        clientId,
-        termsChargeDays,
-        termsCharge,
-        termsBuyingDays,
-        termsBuying,
-        scopeOfWork,
-        contactPerson,
-        remarks,
-        isOneTime,
-        createdBy,
-      });
+        // Create the quotation record
+        const quotation = await Quotation.create({
+          quotationCode,
+          revisionNumber,
+          validity,
+          clientId,
+          termsChargeDays,
+          termsCharge,
+          termsBuyingDays,
+          termsBuying,
+          scopeOfWork,
+          contactPerson,
+          remarks,
+          isOneTime,
+          createdBy,
+        });
 
-      // Create the quotation wastes associated with this quotation
-      await Promise.all(
-        quotationWastes.map(async (waste) => {
-          let {
-            wasteId,
-            wasteName,
-            mode,
-            quantity,
-            unit,
-            unitPrice,
-            vatCalculation,
-            hasFixedRate,
-            fixedWeight,
-            fixedPrice,
-          } = waste;
+        // Create the quotation wastes associated with this quotation
+        await Promise.all(
+          quotationWastes.map(async (waste) => {
+            let {
+              wasteId,
+              wasteName,
+              mode,
+              quantity,
+              unit,
+              unitPrice,
+              vatCalculation,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
+            } = waste;
 
-          wasteName = wasteName && wasteName.toUpperCase();
+            wasteName = wasteName && wasteName.toUpperCase();
 
-          return await QuotationWaste.create({
-            quotationId: quotation.id,
-            wasteId,
-            wasteName,
-            mode,
-            quantity,
-            unit,
-            unitPrice,
-            vatCalculation,
-            hasFixedRate,
-            fixedWeight,
-            fixedPrice,
-            createdBy,
-          });
-        })
-      );
+            return await QuotationWaste.create({
+              quotationId: quotation.id,
+              wasteId,
+              wasteName,
+              mode,
+              quantity,
+              unit,
+              unitPrice,
+              vatCalculation,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
+              createdBy,
+            });
+          })
+        );
 
-      // Create the quotation transportation associated with this quotation
-      await Promise.all(
-        quotationTransportation.map(async (transportation) => {
-          let {
-            vehicleTypeId,
-            haulingArea,
-            mode,
-            quantity,
-            unit,
-            unitPrice,
-            vatCalculation,
-            hasFixedRate,
-            fixedWeight,
-            fixedPrice,
-          } = transportation;
+        // Create the quotation transportation associated with this quotation
+        await Promise.all(
+          quotationTransportation.map(async (transportation) => {
+            let {
+              vehicleTypeId,
+              haulingArea,
+              mode,
+              quantity,
+              unit,
+              unitPrice,
+              vatCalculation,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
+            } = transportation;
 
-          haulingArea = haulingArea && haulingArea.toUpperCase();
+            haulingArea = haulingArea && haulingArea.toUpperCase();
 
-          return await QuotationTransportation.create({
-            quotationId: quotation.id,
-            vehicleTypeId,
-            haulingArea,
-            mode,
-            quantity,
-            unit,
-            unitPrice,
-            vatCalculation,
-            hasFixedRate,
-            fixedWeight,
-            fixedPrice,
-            createdBy,
-          });
-        })
-      );
+            return await QuotationTransportation.create({
+              quotationId: quotation.id,
+              vehicleTypeId,
+              haulingArea,
+              mode,
+              quantity,
+              unit,
+              unitPrice,
+              vatCalculation,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
+              createdBy,
+            });
+          })
+        );
+      } else {
+        // Update quotation details
+        updatedQuotation.validity = validity;
+        updatedQuotation.termsChargeDays = termsChargeDays;
+        updatedQuotation.termsCharge = termsCharge;
+        updatedQuotation.termsBuyingDays = termsBuyingDays;
+        updatedQuotation.termsBuying = termsBuying;
+        updatedQuotation.scopeOfWork = scopeOfWork;
+        updatedQuotation.contactPerson = contactPerson;
+        updatedQuotation.remarks = remarks;
+
+        // Save the updated quotation
+        await updatedQuotation.save();
+
+        // Update the quotation wastes
+        await Promise.all(
+          quotationWastes.map(async (waste) => {
+            const {
+              id,
+              wasteId,
+              wasteName,
+              mode,
+              quantity,
+              unit,
+              unitPrice,
+              vatCalculation,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
+            } = waste;
+
+            const existingWaste = await QuotationWaste.findByPk(id);
+
+            if (existingWaste) {
+              // Update existing waste
+              existingWaste.wasteName = wasteName && wasteName.toUpperCase();
+              existingWaste.mode = mode;
+              existingWaste.quantity = quantity;
+              existingWaste.unit = unit;
+              existingWaste.unitPrice = unitPrice;
+              existingWaste.vatCalculation = vatCalculation;
+              existingWaste.hasFixedRate = hasFixedRate;
+              existingWaste.fixedWeight = fixedWeight;
+              existingWaste.fixedPrice = fixedPrice;
+
+              await existingWaste.save();
+            } else {
+              // Create new waste if it doesn't exist
+              await QuotationWaste.create({
+                quotationId: updatedQuotation.id,
+                wasteId,
+                wasteName: wasteName && wasteName.toUpperCase(),
+                mode,
+                quantity,
+                unit,
+                unitPrice,
+                vatCalculation,
+                hasFixedRate,
+                fixedWeight,
+                fixedPrice,
+                createdBy,
+              });
+            }
+          })
+        );
+
+        // Update the quotation transportation
+        await Promise.all(
+          quotationTransportation.map(async (transportation) => {
+            const {
+              id,
+              vehicleTypeId,
+              haulingArea,
+              mode,
+              quantity,
+              unit,
+              unitPrice,
+              vatCalculation,
+              hasFixedRate,
+              fixedWeight,
+              fixedPrice,
+            } = transportation;
+
+            const existingTransportation =
+              await QuotationTransportation.findByPk(id);
+
+            if (existingTransportation) {
+              // Update existing transportation
+              existingTransportation.haulingArea =
+                haulingArea && haulingArea.toUpperCase();
+              existingTransportation.mode = mode;
+              existingTransportation.quantity = quantity;
+              existingTransportation.unit = unit;
+              existingTransportation.unitPrice = unitPrice;
+              existingTransportation.vatCalculation = vatCalculation;
+              existingTransportation.hasFixedRate = hasFixedRate;
+              existingTransportation.fixedWeight = fixedWeight;
+              existingTransportation.fixedPrice = fixedPrice;
+
+              await existingTransportation.save();
+            } else {
+              // Create new transportation if it doesn't exist
+              await QuotationTransportation.create({
+                quotationId: updatedQuotation.id,
+                vehicleTypeId,
+                haulingArea: haulingArea && haulingArea.toUpperCase(),
+                mode,
+                quantity,
+                unit,
+                unitPrice,
+                vatCalculation,
+                hasFixedRate,
+                fixedWeight,
+                fixedPrice,
+                createdBy,
+              });
+            }
+          })
+        );
+      }
 
       const quotations = await Quotation.findAll({
+        where: {
+          id: updatedQuotation.id,
+        },
         include: [
           {
             model: QuotationWaste,

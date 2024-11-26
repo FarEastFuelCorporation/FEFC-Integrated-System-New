@@ -26,6 +26,35 @@ import QuotationForm from "../../Quotations/QuotationForm";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
 
+// Define a sorting function for QuotationWaste
+const sortQuotationWaste = (a, b) => {
+  // First sort by mode
+  if (a.mode < b.mode) return -1;
+  if (a.mode > b.mode) return 1;
+
+  // If modes are equal, sort by wasteName
+  if (a.wasteName < b.wasteName) return -1;
+  if (a.wasteName > b.wasteName) return 1;
+
+  return 0; // They are equal
+};
+
+// Define a sorting function for QuotationTransportation
+const sortQuotationTransportation = (a, b) => {
+  // First sort by mode
+  if (a.mode < b.mode) return -1;
+  if (a.mode > b.mode) return 1;
+
+  // If modes are equal, sort by typeOfVehicle from VehicleType
+  const vehicleTypeA = a.VehicleType?.typeOfVehicle || "";
+  const vehicleTypeB = b.VehicleType?.typeOfVehicle || "";
+
+  if (vehicleTypeA < vehicleTypeB) return -1;
+  if (vehicleTypeA > vehicleTypeB) return 1;
+
+  return 0; // They are equal
+};
+
 const Quotations = ({ user }) => {
   const certificateRef = useRef();
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -43,6 +72,7 @@ const Quotations = ({ user }) => {
     contactPerson: "",
     remarks: "",
     isOneTime: false,
+    isRevised: false,
     createdBy: user.id,
     quotationWastes: [
       {
@@ -108,59 +138,7 @@ const Quotations = ({ user }) => {
         response = await axios.get(`${apiUrl}/api/quotation`);
       }
 
-      const flattenedData = response.data.quotations.map((item) => ({
-        ...item,
-        clientPicture: item.Client ? item.Client.clientPicture : null,
-        clientName: item.Client ? item.Client.clientName : null,
-        quotationWastes: item.QuotationWaste ? item.QuotationWaste : [],
-        quotationTransportation: item.QuotationTransportation
-          ? item.QuotationTransportation
-          : [],
-        validity: item.validity
-          ? new Date(item.validity).toISOString().split("T")[0]
-          : null, // Convert timestamp to yyyy-mm-dd format
-      }));
-
-      // Define a sorting function for QuotationWaste
-      const sortQuotationWaste = (a, b) => {
-        // First sort by mode
-        if (a.mode < b.mode) return -1;
-        if (a.mode > b.mode) return 1;
-
-        // If modes are equal, sort by wasteName
-        if (a.wasteName < b.wasteName) return -1;
-        if (a.wasteName > b.wasteName) return 1;
-
-        return 0; // They are equal
-      };
-
-      // Define a sorting function for QuotationTransportation
-      const sortQuotationTransportation = (a, b) => {
-        // First sort by mode
-        if (a.mode < b.mode) return -1;
-        if (a.mode > b.mode) return 1;
-
-        // If modes are equal, sort by typeOfVehicle from VehicleType
-        const vehicleTypeA = a.VehicleType?.typeOfVehicle || "";
-        const vehicleTypeB = b.VehicleType?.typeOfVehicle || "";
-
-        if (vehicleTypeA < vehicleTypeB) return -1;
-        if (vehicleTypeA > vehicleTypeB) return 1;
-
-        return 0; // They are equal
-      };
-
-      // Iterate over each item in flattenedData
-      flattenedData.forEach((item) => {
-        if (Array.isArray(item.QuotationWaste)) {
-          item.QuotationWaste.sort(sortQuotationWaste);
-        }
-        if (Array.isArray(item.QuotationTransportation)) {
-          item.QuotationTransportation.sort(sortQuotationTransportation);
-        }
-      });
-
-      setQuotationsData(flattenedData);
+      setQuotationsData(response.data.quotations);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching quotationsData:", error);
@@ -188,11 +166,16 @@ const Quotations = ({ user }) => {
 
   const handleViewClick = (row) => {
     setLoading(true);
-    const quotationToView = quotationsData.find(
-      (quotation) => quotation.id === row.QuotationWaste[0].quotationId
-    );
+    console.log(row);
 
-    setSelectedQuotation(quotationToView); // Set the selected quotation
+    if (Array.isArray(row.QuotationWaste)) {
+      row.QuotationWaste.sort(sortQuotationWaste);
+    }
+    if (Array.isArray(row.QuotationTransportation)) {
+      row.QuotationTransportation.sort(sortQuotationTransportation);
+    }
+
+    setSelectedQuotation(row); // Set the selected quotation
 
     setIsDownload(false);
     // Set the flag to show the form
@@ -252,10 +235,7 @@ const Quotations = ({ user }) => {
   }, [isContentReady]);
 
   const handleDownloadClick = (row) => {
-    const quotationToDownload = quotationsData.find(
-      (quotation) => quotation.id === row.QuotationWaste[0].quotationId
-    );
-    setSelectedQuotation(quotationToDownload); // Set the selected quotation
+    setSelectedQuotation(row); // Set the selected quotation
     // Use a timeout to allow the component to render before downloading
 
     setIsDownload(true);
@@ -263,7 +243,7 @@ const Quotations = ({ user }) => {
     setShowQuotationForm(true);
 
     if (showQuotationForm) {
-      handleDownloadPDF(quotationToDownload);
+      handleDownloadPDF(row);
     }
   };
 
@@ -335,6 +315,7 @@ const Quotations = ({ user }) => {
         contactPerson: quotationToEdit.contactPerson,
         remarks: quotationToEdit.remarks,
         isOneTime: quotationToEdit.isOneTime,
+        isRevised: quotationToEdit.isRevised,
         createdBy: user.id,
         quotationWastes: quotationToEdit.quotationWastes
           ? quotationToEdit.quotationWastes
@@ -376,20 +357,33 @@ const Quotations = ({ user }) => {
     e.preventDefault();
 
     try {
+      let response;
       setLoading(true);
       if (formData.id) {
         // Update existing quotation
-        await axios.put(`${apiUrl}/api/quotation/${formData.id}`, formData);
+        response = await axios.put(
+          `${apiUrl}/api/quotation/${formData.id}`,
+          formData
+        );
+
+        setQuotationsData((prevQuotationsData) => [
+          ...prevQuotationsData.filter(
+            (transaction) => transaction.id !== formData.id
+          ),
+          ...response.data.quotations,
+        ]);
 
         setSuccessMessage("Quotation Updated Successfully!");
       } else {
         // Add new quotation
-        await axios.post(`${apiUrl}/api/quotation`, formData);
+        response = await axios.post(`${apiUrl}/api/quotation`, formData);
+
+        const quotation = response.data.quotations;
+        setQuotationsData((prevData) => [...prevData, quotation]);
 
         setSuccessMessage("Quotation Added Successfully!");
       }
 
-      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
       setLoading(false);

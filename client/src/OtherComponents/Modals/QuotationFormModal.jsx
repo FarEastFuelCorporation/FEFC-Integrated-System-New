@@ -234,6 +234,24 @@ const QuotationFormModal = ({
           }
           label="One Time Quotation"
         />
+        {formData.id && (
+          <FormControlLabel
+            sx={{ marginTop: "20px" }}
+            control={
+              <Checkbox
+                name="isRevised"
+                checked={!!formData.isRevised}
+                color="secondary"
+                onChange={(e) =>
+                  handleInputChange({
+                    target: { name: e.target.name, value: e.target.checked },
+                  })
+                }
+              />
+            }
+            label="Revised"
+          />
+        )}
         <form onSubmit={handleFormSubmit} style={{ marginTop: "20px" }}>
           <Grid container spacing={2}>
             <Grid item xs={1}>

@@ -113,23 +113,15 @@ const EmployeeRecords = ({ user }) => {
       setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
       setDepartments(departmentResponse.data.departments);
       setLoading(false);
-
+      console.log("first");
       // Now fetch the full data with pictures
       setLoadingPicture(true);
       const fullEmployeeRecordResponse = await axios.get(
         `${apiUrl}/api/employeeRecord/full`
       );
-      setEmployeeRecord((prevRecords) => {
-        return prevRecords.map((record) => {
-          const fullRecord =
-            fullEmployeeRecordResponse.data.employeeRecords.find(
-              (r) => r.employeeId === record.employeeId
-            );
-          return fullRecord
-            ? { ...record, picture: fullRecord.picture }
-            : record;
-        });
-      });
+      console.log(fullEmployeeRecordResponse.data.employeeRecords);
+      console.log("second");
+      setEmployeeRecord(fullEmployeeRecordResponse.data.employeeRecords);
       setLoadingPicture(false);
     } catch (error) {
       console.error("Error fetching employeeData:", error);

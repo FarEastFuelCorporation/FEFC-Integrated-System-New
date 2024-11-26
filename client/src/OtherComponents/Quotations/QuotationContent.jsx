@@ -161,6 +161,9 @@ const QuotationContent = ({
                     {waste.wasteName}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
+                    {waste.TypeOfWaste.wasteCode}
+                  </TableCell>
+                  <TableCell align="center" sx={getCellStyle(false)}>
                     {formatNumber(waste.quantity ? waste.quantity : 1)}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
@@ -224,6 +227,9 @@ const QuotationContent = ({
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(false)}>
                     {transportation.mode}
+                  </TableCell>
+                  <TableCell align="center" sx={getCellStyle(true)}>
+                    {transportation.vatCalculation}
                   </TableCell>
                   <TableCell align="center" sx={getCellStyle(true)}>
                     {transportation.vatCalculation}

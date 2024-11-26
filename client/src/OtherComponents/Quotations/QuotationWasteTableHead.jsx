@@ -18,6 +18,7 @@ const QuotationWasteTableHead = ({ row }) => {
       <TableRow>
         <TableCell sx={{ ...cellStyles(false), width: "40px" }}>Item</TableCell>
         <TableCell sx={cellStyles(false)}>Description of Waste</TableCell>
+        <TableCell sx={cellStyles(false)}>Code</TableCell>
         {row.isOneTime && (
           <TableCell sx={{ ...cellStyles(false), width: "40px" }}>
             Qty.

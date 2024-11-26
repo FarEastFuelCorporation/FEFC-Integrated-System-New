@@ -145,6 +145,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
       {isDoneCalculation && (
         <Box ref={ref}>
           {pagesContent.map((tableData, index) => {
+            console.log(tableData);
             if (!tableData || tableData.length === 0) {
               return null; // Return null if there's no data
             }
@@ -165,6 +166,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
               waste: [
                 "40px",
                 "auto",
+                "40px",
                 row.isOneTime && "50px",
                 "40px",
                 "70px",
@@ -207,7 +209,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
               } else if (
                 item[0] &&
                 !isNaN(parseInt(item[0])) &&
-                item.length === 8
+                item.length === 9
               ) {
                 const waste = item; // Assuming item contains waste details
                 bodyRows.QuotationWasteTableHead.content.push(
@@ -225,45 +227,51 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       >
                         {waste[1]}
                       </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={getCellStyle(false, columnWidths.waste[2])}
+                      >
+                        {waste[2]}
+                      </TableCell>
                       {row.isOneTime && (
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[2])}
+                          sx={getCellStyle(false, columnWidths.waste[3])}
                         >
-                          {waste[2]}
+                          {waste[3]}
                         </TableCell>
                       )}
-                      <TableCell
-                        align="center"
-                        sx={getCellStyle(false, columnWidths.waste[3])}
-                      >
-                        {waste[3]}
-                      </TableCell>
                       <TableCell
                         align="center"
                         sx={getCellStyle(false, columnWidths.waste[4])}
                       >
-                        {formatNumber(waste[4])}
+                        {waste[4]}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={getCellStyle(false, columnWidths.waste[5])}
+                      >
+                        {formatNumber(waste[5])}
                       </TableCell>
                       {row.isOneTime && (
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[5])}
+                          sx={getCellStyle(false, columnWidths.waste[6])}
                         >
-                          {formatNumber(waste[5])}
+                          {formatNumber(waste[6])}
                         </TableCell>
                       )}
                       <TableCell
                         align="center"
-                        sx={getCellStyle(false, columnWidths.waste[6])}
+                        sx={getCellStyle(false, columnWidths.waste[7])}
                       >
-                        {waste[6]}
+                        {waste[7]}
                       </TableCell>
                       <TableCell
                         align="center"
-                        sx={getCellStyle(true, columnWidths.waste[7])}
+                        sx={getCellStyle(true, columnWidths.waste[8])}
                       >
-                        {waste[7]}
+                        {waste[8]}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -271,7 +279,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
               } else if (
                 item[0] &&
                 !isNaN(parseInt(item[0])) &&
-                item.length === 9
+                item.length === 10
               ) {
                 const transportation = item; // Assuming item contains transportation details
                 bodyRows.QuotationTransportationTableHead.content.push(

@@ -42,7 +42,7 @@ export const formatWeightWithNA = (weight) => {
   }
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 20,
   }).format(weight);
 };
 

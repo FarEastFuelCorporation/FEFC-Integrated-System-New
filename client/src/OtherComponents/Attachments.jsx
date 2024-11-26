@@ -52,6 +52,14 @@ const Attachments = ({ row, user }) => {
     }
   }, [row]);
 
+  const rowHeight = 52; // Default row height in Material-UI DataGrid
+  const headerHeight = 56; // Default header height
+
+  const treatedWasteTransactionHeight =
+    attachmentData.length === 0
+      ? rowHeight + headerHeight
+      : attachmentData.length * rowHeight + headerHeight;
+
   const handleCloseAttachmentModal = () => {
     setOpenAttachmentModal(false);
     clearAttachmentFormData();
@@ -399,6 +407,9 @@ const Attachments = ({ row, user }) => {
       </Box>
       <DataGrid
         sx={{
+          "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard": {
+            height: treatedWasteTransactionHeight,
+          },
           "& .MuiDataGrid-root": {
             border: "none",
             width: "100%",

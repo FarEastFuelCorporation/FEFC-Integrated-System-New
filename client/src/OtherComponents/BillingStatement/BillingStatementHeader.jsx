@@ -118,9 +118,11 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
         >
           <Typography fontWeight="bold">{clientData.billerName}</Typography>
           <Typography fontSize="12px">{clientData.billerAddress}</Typography>
-          <Typography fontSize="12px">
-            TIN NUMBER: {clientData.billerTinNumber}
-          </Typography>
+          {clientData.billerTinNumber && (
+            <Typography fontSize="12px">
+              TIN NUMBER: {clientData.billerTinNumber}
+            </Typography>
+          )}
           {clientData.natureOfBusiness && (
             <Typography fontSize="12px">
               {" "}

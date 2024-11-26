@@ -166,7 +166,6 @@ const Quotations = ({ user }) => {
 
   const handleViewClick = (row) => {
     setLoading(true);
-    console.log(row);
 
     if (Array.isArray(row.QuotationWaste)) {
       row.QuotationWaste.sort(sortQuotationWaste);

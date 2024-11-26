@@ -88,7 +88,7 @@ const TreatModal = ({
     // Format the number if it's a valid number
     return new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 20,
     }).format(weight);
   };
 

@@ -45,12 +45,10 @@ const Navbar = () => {
       });
 
       if (response.status === 200) {
-        // Clear browser history
-        window.history.pushState(null, "", "/login");
-        navigate("/login", { replace: true }); // Use replace: true to replace current history entry
-      } else {
-        console.error("Logout failed:", response.statusText);
-        // Handle error if necessary
+        // Prevent navigation back to the session by clearing history
+        window.history.replaceState(null, "", response.data.route); // Replace history entry
+        navigate(response.data.route, { replace: true }); // Navigate to login or appropriate route
+        window.location.reload(); // Ensure all in-memory data is cleared      } else {
       }
     } catch (error) {
       console.error("Logout error:", error);
@@ -170,18 +168,18 @@ const Navbar = () => {
                 <ListItem
                   button
                   component={Link}
-                  to="/signup"
+                  to="/client"
                   onClick={() => setDrawerOpen(false)}
                 >
-                  <ListItemText primary="Sign Up" />
+                  <ListItemText primary="Client" />
                 </ListItem>
                 <ListItem
                   button
                   component={Link}
-                  to="/login"
+                  to="/employee"
                   onClick={() => setDrawerOpen(false)}
                 >
-                  <ListItemText primary="Login" />
+                  <ListItemText primary="Employee" />
                 </ListItem>
               </List>
             </Drawer>

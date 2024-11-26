@@ -1,24 +1,19 @@
 // controllers/othersController.js
 
-async function homeController(req, res) {
-  try {
-    // Access the session variable
-    const username = req.session.username || "Guest";
-
-    // Render the 'home' view and pass the session data
-    const viewsData = {
-      pageTitle: "FAR EAST FUEL CORPORATION",
-      username,
-    };
-    // res.render("home", viewsData);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
-
 async function logoutController(req, res) {
   try {
+    console.log(req.session);
+
+    let route;
+
+    if (Number.isInteger(req.session?.user?.userType)) {
+      route = "/employee";
+    } else if (!Number.isInteger(req.session?.user?.userType)) {
+      route = "/client";
+    } else {
+      route = "/";
+    }
+
     // Destroy the session
     req.session.destroy((err) => {
       if (err) {
@@ -32,7 +27,7 @@ async function logoutController(req, res) {
         res.setHeader("Cache-Control", "no-store");
 
         // Redirect to the login page after successful logout
-        res.status(200).send("Logged out successfully");
+        res.status(200).json({ route });
       }
     });
   } catch (error) {
@@ -46,7 +41,6 @@ async function error404Controller(req, res, next) {
 }
 
 module.exports = {
-  homeController,
   logoutController,
   error404Controller,
 };

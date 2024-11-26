@@ -48,7 +48,7 @@ app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));
 
 // Set Cache-Control header to prevent caching
 app.use((req, res, next) => {
-  res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   next();
 });
 

@@ -57,7 +57,7 @@ const App = () => {
         })
         .catch((error) => {
           console.error("Error fetching session data:", error);
-          navigate("/login");
+          navigate("/");
         })
         .finally(() => {
           setLoading(false);

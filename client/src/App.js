@@ -13,8 +13,6 @@ import axios from "axios";
 
 import Navbar from "./OtherComponents/Navbar";
 import LandingPage from "./OtherComponents/LandingPage";
-import Login from "./Auth/Login";
-import Signup from "./Auth/Signup";
 import Dashboard from "./OtherComponents/Dashboard";
 import LoadingSpinner from "./OtherComponents/LoadingSpinner";
 import Certificate from "./OtherComponents/Certificates/Certificate";
@@ -24,6 +22,8 @@ import VerifyPlasticCredit from "./OtherComponents/Certificates/PlasticCredits/V
 import VerifyPlasticWasteDiversion from "./OtherComponents/Certificates/PlasticCredits/VerifyPlasticWasteDiversion";
 import Attendance from "./OtherComponents/Sections/attendance";
 import VerifyTravelOrder from "./Employee/Layouts/Employee/screens/travelOrder/VerifyTravelOrder";
+import Client from "./Auth/Client";
+import Employee from "./Auth/Employee";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -92,8 +92,11 @@ const App = () => {
             path="/travelOrderVerify/:id"
             element={<VerifyTravelOrder />}
           />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
+          <Route path="/client" element={<Client onLogin={handleLogin} />} />
+          <Route
+            path="/employee"
+            element={<Employee onLogin={handleLogin} />}
+          />
           {user ? (
             <Route
               path="/dashboard/*"

@@ -33,8 +33,8 @@ const Navbar = () => {
 
   // Check if the current route is either "/signup" or "/login"
   const isAuthPage =
-    location.pathname === "/signup" ||
-    location.pathname === "/login" ||
+    location.pathname === "/client" ||
+    location.pathname === "/employee" ||
     location.pathname === "/";
 
   const handleLogout = async () => {
@@ -139,11 +139,11 @@ const Navbar = () => {
               <Button component={Link} to="/" color="inherit">
                 <Typography variant="h5">Home</Typography>
               </Button>
-              <Button component={Link} to="/signup" color="inherit">
-                <Typography variant="h5">Sign Up</Typography>
+              <Button component={Link} to="/client" color="inherit">
+                <Typography variant="h5">Client</Typography>
               </Button>
-              <Button component={Link} to="/login" color="inherit">
-                <Typography variant="h5">Login</Typography>
+              <Button component={Link} to="/employee" color="inherit">
+                <Typography variant="h5">Employee</Typography>
               </Button>
             </Box>
             <IconButton

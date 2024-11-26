@@ -1,33 +1,33 @@
 import React, { useState } from "react";
 import LandingPage from "../OtherComponents/LandingPage";
-import EmployeeLogin from "./Employee/EmployeeLogin";
 import ClientLogin from "./Client/ClientLogin";
+import ClientSignup from "./Client/ClientSignup";
 
-const Login = ({ onLogin }) => {
-  const [showEmployeeLogin, setShowEmployeeLogin] = useState(true);
+const Client = ({ onLogin }) => {
+  const [showClientLogin, setShowClientLogin] = useState(true);
 
   const toggleLoginForm = () => {
-    setShowEmployeeLogin(!showEmployeeLogin);
+    setShowClientLogin(!showClientLogin);
   };
 
   return (
     <div className="login-page">
       <LandingPage />
       <div className="login-container">
-        {showEmployeeLogin ? (
-          <EmployeeLogin onLogin={onLogin} />
-        ) : (
+        {showClientLogin ? (
           <ClientLogin onLogin={onLogin} />
+        ) : (
+          <ClientSignup onLogin={onLogin} />
         )}
         <br />
         <button className="button-switch" onClick={toggleLoginForm}>
-          {showEmployeeLogin
-            ? "Switch to Client Login"
-            : "Switch to Employee Login"}
+          {showClientLogin
+            ? "Switch to Client Sign Up"
+            : "Switch to Client Login"}
         </button>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Client;

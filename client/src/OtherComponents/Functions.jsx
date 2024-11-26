@@ -22,6 +22,13 @@ export const formatWeight = (weight) => {
   }).format(weight);
 };
 
+export const formatWeight2 = (weight) => {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 20,
+  }).format(weight);
+};
+
 export const formatNumber = (weight) => {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,

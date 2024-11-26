@@ -18,6 +18,7 @@ import {
   parseTimeString,
   formatWeight,
   formatWeightWithNA,
+  formatWeight2,
 } from "../Functions";
 
 const TreatedTransaction = ({
@@ -375,10 +376,10 @@ const TreatedTransaction = ({
                     }}
                   >
                     <Typography variant="h6">
-                      {formatWeight(
+                      {formatWeight2(
                         sortedWasteTransaction[index].treatedWeight
                       )}{" "}
-                      Kg Treated /{formatWeight(waste.weight)} Kg
+                      Kg Treated /{formatWeight2(waste.weight)} Kg
                     </Typography>
                   </Box>
                 </Box>

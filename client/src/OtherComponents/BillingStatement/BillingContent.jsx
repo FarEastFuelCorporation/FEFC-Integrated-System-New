@@ -7,7 +7,7 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import { formatDate2, formatNumber } from "../Functions";
+import { formatDate2, formatNumber, formatNumber2 } from "../Functions";
 import BillingTableHead from "./BillingTableHead";
 
 const BillingContent = ({
@@ -233,8 +233,8 @@ const BillingContent = ({
                         }}
                       >
                         {typeOfWeight === "CLIENT WEIGHT"
-                          ? `${formatNumber(waste.clientWeight)}`
-                          : `${formatNumber(waste.weight)}`}
+                          ? `${formatNumber2(waste.clientWeight)}`
+                          : `${formatNumber2(waste.weight)}`}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -252,7 +252,7 @@ const BillingContent = ({
                           }),
                         }}
                       >
-                        {formatNumber(waste.QuotationWaste.unitPrice)}
+                        {formatNumber2(waste.QuotationWaste.unitPrice)}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -325,7 +325,9 @@ const BillingContent = ({
                             notCenter: true,
                           })}
                         >
-                          {`${formatNumber(1)}`}
+                          {`${formatNumber2(
+                            transaction.QuotationTransportation?.quantity
+                          )}`}
                         </TableCell>
                         <TableCell sx={bodyCellStyles({ width: 40 })}>
                           {transaction.QuotationTransportation?.unit}
@@ -336,7 +338,7 @@ const BillingContent = ({
                             notCenter: true,
                           })}
                         >
-                          {formatNumber(
+                          {formatNumber2(
                             transaction.QuotationTransportation?.unitPrice
                           )}
                         </TableCell>
@@ -347,7 +349,8 @@ const BillingContent = ({
                           })}
                         >
                           {formatNumber(
-                            transaction.QuotationTransportation?.unitPrice
+                            transaction.QuotationTransportation?.quantity *
+                              transaction.QuotationTransportation?.unitPrice
                           )}
                         </TableCell>
                         <TableCell
@@ -416,7 +419,7 @@ const BillingContent = ({
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({})}>TOTAL</TableCell>
               <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber(totalWeight)}
+                {formatNumber2(totalWeight)}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
@@ -433,15 +436,15 @@ const BillingContent = ({
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({})}>
-                FIRST {`${formatNumber(fixedWeight)}`}
+                FIRST {`${formatNumber2(fixedWeight)}`}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber(fixedWeight)}
+                {formatNumber2(fixedWeight)}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}>
-                {formatNumber(fixedPrice)}
+                {formatNumber2(fixedPrice)}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
                 {vatCalculation}
@@ -455,14 +458,14 @@ const BillingContent = ({
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({})}>EXCESS QUANTITY:</TableCell>
               <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber(totalWeight - fixedWeight)}
+                {formatNumber2(totalWeight - fixedWeight)}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}>
                 {unitPrice}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}>
-                {formatNumber((totalWeight - fixedWeight) * unitPrice)}
+                {formatNumber2((totalWeight - fixedWeight) * unitPrice)}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
                 {vatCalculation}

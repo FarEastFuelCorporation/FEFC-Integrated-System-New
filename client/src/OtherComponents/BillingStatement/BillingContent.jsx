@@ -283,6 +283,17 @@ const BillingContent = ({
                       >
                         {waste.QuotationWaste.vatCalculation}
                       </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 85,
+                            isLastCell: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {waste.QuotationWaste.mode}
+                      </TableCell>
                     </TableRow>
                   );
                 }
@@ -356,10 +367,14 @@ const BillingContent = ({
 
               wasteRows.forEach((wasteRow, idx) => {
                 combinedRows.push(wasteRow);
-                if (transpoRows.length > 0) {
-                  // Push transpo row after every waste row
-                  combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
-                }
+              });
+
+              if (transpoRows.length > 0) {
+                // Push transpo row after every waste row
+                combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
+              }
+
+              if (index !== transactions.length - 1) {
                 combinedRows.push(
                   <TableRow key={`space-${index}`} sx={{ border: "black" }}>
                     <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
@@ -375,9 +390,25 @@ const BillingContent = ({
                     ></TableCell>
                   </TableRow>
                 );
-              });
+              }
+
               return combinedRows;
             })}
+          {hasFixedRate && (
+            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+              <TableCell
+                sx={bodyCellStyles({ width: 85, isLastCell: true })}
+              ></TableCell>
+            </TableRow>
+          )}
           {hasFixedRate && (
             <TableRow key={`add-${1}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
@@ -438,7 +469,7 @@ const BillingContent = ({
               </TableCell>
             </TableRow>
           )}
-          {hasFixedRate && (
+          {remarks && (
             <TableRow key={`add-${3}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -454,7 +485,7 @@ const BillingContent = ({
             </TableRow>
           )}
           {remarks && (
-            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${4}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>

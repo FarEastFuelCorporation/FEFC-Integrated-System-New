@@ -271,17 +271,12 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     ],
   };
 
-  const getCellStyle = (
-    isLastCell,
-    width,
-    alignRight = false,
-    black = true
-  ) => ({
+  const getCellStyle = (isLastCell, width, alignRight = false, black) => ({
     padding: "2px",
     border: "1px solid black",
     borderTop: "none",
     borderRight: isLastCell ? "1px solid black" : "none",
-    color: black ? "black" : "white",
+    color: black,
     width: width, // Apply the width
     textAlign: alignRight ? "end" : "center",
     minHeight: "22.26px",
@@ -349,25 +344,46 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
                       <TableRow key={index} sx={{ border: "black" }}>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[0])}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[0],
+                            false,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {waste[0]}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[1])}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[1],
+                            false,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {waste[1]}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[2])}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[2],
+
+                            false,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {waste[2]}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[3])}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[3],
+                            false,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {waste[3]}
                         </TableCell>
@@ -377,32 +393,56 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
                             false,
                             columnWidths.waste[4],
                             true,
-                            waste[4] ? true : false
+                            waste[4]
+                              ? waste[9] === "BUYING"
+                                ? "red"
+                                : "black"
+                              : "white"
                           )}
                         >
                           {waste[4] ? waste[4] : 0}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[5])}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[5],
+                            false,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {waste[5] ? waste[5] : ""}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[6], true)}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[6],
+                            true,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {hasFixedRate && waste[0] !== "" ? "" : waste[6]}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(false, columnWidths.waste[7], true)}
+                          sx={getCellStyle(
+                            false,
+                            columnWidths.waste[7],
+                            true,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {hasFixedRate && waste[0] !== "" ? "" : waste[7]}
                         </TableCell>
                         <TableCell
                           align="center"
-                          sx={getCellStyle(true, columnWidths.waste[8])}
+                          sx={getCellStyle(
+                            true,
+                            columnWidths.waste[8],
+                            false,
+                            waste[9] === "BUYING" ? "red" : "black"
+                          )}
                         >
                           {hasFixedRate && waste[0] !== "" ? "" : waste[8]}
                         </TableCell>

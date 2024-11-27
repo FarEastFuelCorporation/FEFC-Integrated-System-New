@@ -16,6 +16,7 @@ const EmployeeSignup = ({ onLogin }) => {
   const [employeeId, setEmployeeId] = useState("");
   const [employeeUsername, setEmployeeUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -24,8 +25,42 @@ const EmployeeSignup = ({ onLogin }) => {
     setIsVisible(!isVisible);
   };
 
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/; // At least 8 characters
+    const hasNumeric = /[0-9]/; // At least 1 numeric character
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/; // At least 1 special character
+    const hasUppercase = /[A-Z]/; // At least 1 uppercase letter
+    const hasLowercase = /[a-z]/; // At least 1 lowercase letter
+
+    if (!minLength.test(password))
+      return "Password must be at least 8 characters long.";
+    if (!hasNumeric.test(password))
+      return "Password must include at least 1 numeric character.";
+    if (!hasSpecial.test(password))
+      return "Password must include at least 1 special character.";
+    if (!hasUppercase.test(password))
+      return "Password must include at least 1 uppercase letter.";
+    if (!hasLowercase.test(password))
+      return "Password must include at least 1 lowercase letter.";
+
+    return null;
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    const error = validatePassword(value);
+    setPasswordError(error);
+  };
+
   const submit = async (e) => {
     e.preventDefault();
+    if (passwordError) {
+      setError("Please fix the password errors before submitting.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -109,7 +144,7 @@ const EmployeeSignup = ({ onLogin }) => {
               value={password}
               autoComplete="off"
               placeholder="Input your Password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
             />
             <FontAwesomeIcon
               icon={isVisible ? faEyeSlash : faEye}
@@ -125,6 +160,7 @@ const EmployeeSignup = ({ onLogin }) => {
               }}
             />
           </div>
+          {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
         </label>
         <br />
         <br />

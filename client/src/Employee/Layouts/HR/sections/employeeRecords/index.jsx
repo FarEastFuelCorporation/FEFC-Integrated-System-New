@@ -113,14 +113,11 @@ const EmployeeRecords = ({ user }) => {
       setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
       setDepartments(departmentResponse.data.departments);
       setLoading(false);
-      console.log("first");
       // Now fetch the full data with pictures
       setLoadingPicture(true);
       const fullEmployeeRecordResponse = await axios.get(
         `${apiUrl}/api/employeeRecord/full`
       );
-      console.log(fullEmployeeRecordResponse.data.employeeRecords);
-      console.log("second");
       setEmployeeRecord(fullEmployeeRecordResponse.data.employeeRecords);
       setLoadingPicture(false);
     } catch (error) {

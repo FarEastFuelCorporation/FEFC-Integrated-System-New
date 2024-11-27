@@ -95,11 +95,9 @@ const Medicines = ({ user }) => {
       const medicineLogs = responseLog.data.medicineLogs;
 
       setRecords(medicineLogs);
-      console.log(medicineLogs);
       setRecords2(medicines); // Assuming you're storing this in the `records` state
       setEmployeesData(employeeResponse.data.employees);
       setMedicinesData(medicineResponse.data.medicines);
-      console.log(medicineResponse.data.medicines);
 
       setLoading(false);
     } catch (error) {

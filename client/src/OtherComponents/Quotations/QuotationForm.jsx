@@ -145,7 +145,6 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
       {isDoneCalculation && (
         <Box ref={ref}>
           {pagesContent.map((tableData, index) => {
-            console.log(tableData);
             if (!tableData || tableData.length === 0) {
               return null; // Return null if there's no data
             }

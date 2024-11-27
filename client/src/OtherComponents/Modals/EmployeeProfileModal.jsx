@@ -388,7 +388,7 @@ const EmployeeProfileModal = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 1050,
+            width: 1200,
             height: "90%",
             overflowY: "scroll",
             bgcolor: "background.paper",
@@ -584,6 +584,7 @@ const EmployeeProfileModal = ({
                   <Tab label="Educational Background" />
                   <Tab label="References" />
                   <Tab label="Attachments" />
+                  <Tab label="Memo" />
                 </Tabs>
                 {selectedTab === 0 && (
                   <Box>

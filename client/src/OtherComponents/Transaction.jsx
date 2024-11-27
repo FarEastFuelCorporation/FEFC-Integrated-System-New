@@ -549,21 +549,43 @@ const Transaction = ({
                             alignItems: "center",
                           }}
                         >
-                          {Number.isInteger(user.userType) &&
-                            user.userType !== 6 && (
-                              <div style={{ display: "flex" }}>
-                                <IconButton
-                                  onClick={() => handleEditClick(row)}
-                                >
-                                  <EditIcon sx={{ color: "#ff9800" }} />
-                                </IconButton>
-                                <IconButton
-                                  onClick={() => handleDeleteClick(row)}
-                                >
-                                  <DeleteIcon sx={{ color: "#f44336" }} />
-                                </IconButton>
-                              </div>
-                            )}
+                          {(() => {
+                            if (
+                              Number.isInteger(user.userType) &&
+                              user.userType !== 6
+                            ) {
+                              if (
+                                (user.userType === 2 && row.statusId === 2) ||
+                                (user.userType === 3 && row.statusId === 3) ||
+                                (user.userType === 4 && row.statusId === 4) ||
+                                (user.userType === 5 && row.statusId === 5) ||
+                                (user.userType === 7 && row.statusId === 9) ||
+                                (user.userType === 8 && row.statusId === 10) ||
+                                (user.userType === 9 && row.statusId === 11) ||
+                                (user.userType === 10 && row.statusId === 12) ||
+                                (user.userType === 11 && row.statusId === 13) ||
+                                (user.userType === 14 &&
+                                  (row.statusId === 6 || row.statusId === 7))
+                              ) {
+                                return (
+                                  <div style={{ display: "flex" }}>
+                                    <IconButton
+                                      onClick={() => handleEditClick(row)}
+                                    >
+                                      <EditIcon sx={{ color: "#ff9800" }} />
+                                    </IconButton>
+
+                                    <IconButton
+                                      onClick={() => handleDeleteClick(row)}
+                                    >
+                                      <DeleteIcon sx={{ color: "#f44336" }} />
+                                    </IconButton>
+                                  </div>
+                                );
+                              }
+                            }
+                            return null; // Default case to return nothing
+                          })()}
                           {!Number.isInteger(user.userType) &&
                             row.statusId < 3 && (
                               <div style={{ display: "flex" }}>

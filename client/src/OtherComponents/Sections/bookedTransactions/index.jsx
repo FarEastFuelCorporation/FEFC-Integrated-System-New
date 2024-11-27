@@ -100,9 +100,11 @@ const BookedTransactions = ({ user }) => {
     (row) => {
       let typeToEdit = pendingTransactions.find((type) => type.id === row.id);
 
-      typeToEdit = typeToEdit
-        ? ""
-        : inProgressTransactions.find((type) => type.id === row.id);
+      typeToEdit =
+        !typeToEdit &&
+        inProgressTransactions.find((type) => type.id === row.id);
+
+      console.log(typeToEdit);
 
       if (typeToEdit) {
         setFormData({
@@ -110,10 +112,12 @@ const BookedTransactions = ({ user }) => {
           createdBy: user.id,
         });
         handleOpenModal();
+        return typeToEdit;
       } else {
         console.error(
           `Booked Transaction with ID ${row.id} not found for editing.`
         );
+        return null;
       }
     },
     [pendingTransactions, inProgressTransactions, user.id]

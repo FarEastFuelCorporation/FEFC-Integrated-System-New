@@ -2,15 +2,27 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../OtherComponents/LoadingSpinner";
+import { useTheme } from "@mui/material";
+import { tokens } from "../../theme";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const EmployeeSignup = ({ onLogin }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
   const navigate = useNavigate();
   const [employeeId, setEmployeeId] = useState("");
   const [employeeUsername, setEmployeeUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const handleClick = () => {
+    setIsVisible(!isVisible);
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -88,16 +100,31 @@ const EmployeeSignup = ({ onLogin }) => {
         <br />
         <label htmlFor="password">
           Password:
-          <input
-            type="password"
-            name="password"
-            id="password"
-            required
-            value={password}
-            autoComplete="off"
-            placeholder="Input your Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              type={isVisible ? "text" : "password"}
+              name="password"
+              id="password"
+              required
+              value={password}
+              autoComplete="off"
+              placeholder="Input your Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <FontAwesomeIcon
+              icon={isVisible ? faEyeSlash : faEye}
+              onClick={handleClick}
+              style={{
+                position: "absolute",
+                right: "20px",
+                top: "45%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                color: colors.primary[500],
+                fontSize: 20,
+              }}
+            />
+          </div>
         </label>
         <br />
         <br />

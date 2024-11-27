@@ -499,7 +499,7 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
                         </Box>
                       )}
 
-                      {bodyRows.BillingTableHead.content.length > 1 && (
+                      {bodyRows.BillingTableHead.content.length >= 1 && (
                         <>
                           {bodyRows.BillingTableHead.header && (
                             <Typography

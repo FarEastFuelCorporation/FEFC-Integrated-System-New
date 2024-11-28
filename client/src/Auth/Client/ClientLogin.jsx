@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../OtherComponents/LoadingSpinner";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -21,7 +15,8 @@ const ClientLogin = ({ onLogin }) => {
   const navigate = useNavigate();
   const [clientUsername, setClientUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [clientId, setEmployeeId] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
+  const [clientId, setClientId] = useState("");
   const [email, setEmail] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [otp, setOtp] = useState("");
@@ -32,6 +27,35 @@ const ClientLogin = ({ onLogin }) => {
   const [isTimer, setIsTimer] = useState(false);
   const [timer, setTimer] = useState(0);
   const [verified, setIsVerified] = useState(false);
+
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/; // At least 8 characters
+    const hasNumeric = /[0-9]/; // At least 1 numeric character
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/; // At least 1 special character
+    const hasUppercase = /[A-Z]/; // At least 1 uppercase letter
+    const hasLowercase = /[a-z]/; // At least 1 lowercase letter
+
+    if (!minLength.test(password))
+      return "Password must be at least 8 characters long.";
+    if (!hasNumeric.test(password))
+      return "Password must include at least 1 numeric character.";
+    if (!hasSpecial.test(password))
+      return "Password must include at least 1 special character.";
+    if (!hasUppercase.test(password))
+      return "Password must include at least 1 uppercase letter.";
+    if (!hasLowercase.test(password))
+      return "Password must include at least 1 lowercase letter.";
+
+    return null;
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    const error = validatePassword(value);
+    setPasswordError(error);
+  };
 
   const handleClick = () => {
     setIsVisible(!isVisible);
@@ -122,6 +146,7 @@ const ClientLogin = ({ onLogin }) => {
         if (prevTimer <= 1) {
           clearInterval(intervalId); // Stop the timer when it reaches 0
           setIsTimer(false);
+          setGeneratedOtp("");
           return 0; // Ensure the timer doesn't go below 0
         }
         return prevTimer - 1; // Decrease the timer by 1 each second
@@ -132,28 +157,49 @@ const ClientLogin = ({ onLogin }) => {
   // Example to start the timer with 60 seconds (you can customize this value)
   useEffect(() => {
     if (isTimer) {
-      startTimer(60); // Start timer with 60 seconds
+      startTimer(90); // Start timer with 60 seconds
     }
   }, [isTimer]);
 
-  const verifyOtp = async (e) => {
-    if (generatedOtp === otp) {
-      setIsVerified(true);
-    } else {
-      setIsVerified(false);
-      setError("OTP did not match");
+  const verifyOtp = async () => {
+    if (!otp) {
+      setError("Please enter the OTP");
+      return;
+    }
+    console.log("clicked");
+
+    try {
+      setLoading(true); // Start loading
+      setError(""); // Clear any existing error
+
+      if (generatedOtp === otp) {
+        setIsVerified(true);
+        console.log("verified");
+      } else {
+        setIsVerified(false);
+        setError("OTP did not match");
+      }
+    } catch (error) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   const submitForgotPassword = async (e) => {
     e.preventDefault();
+    if (passwordError) {
+      setError("Please fix the password errors before submitting.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
       const response = await axios.post(
-        `${apiUrl}/api/clientLogin`,
-        { clientUsername, password },
+        `${apiUrl}/api/clientUpdate`,
+        { clientId, clientUsername, password },
         { withCredentials: true }
       );
 
@@ -165,8 +211,8 @@ const ClientLogin = ({ onLogin }) => {
         console.error("Error response status:", error.response.status);
         console.error("Error response data:", error.response.data);
 
-        if (error.response.status === 401) {
-          setError("Invalid client ID or password");
+        if (error.response.status === 400) {
+          setError(error.response.data.error);
         } else {
           setError("An error occurred. Please try again.");
         }
@@ -184,7 +230,7 @@ const ClientLogin = ({ onLogin }) => {
   };
 
   // To calculate the progress as a percentage
-  const progress = (timer / 60) * 100; // Assuming 10 seconds as total time
+  const progress = (timer / 90) * 100; // Assuming 10 seconds as total time
 
   // Determine color based on time left
   let colorProgress = "green"; // Default color (green)
@@ -198,10 +244,16 @@ const ClientLogin = ({ onLogin }) => {
   return (
     <div>
       <LoadingSpinner isLoading={loading} />
-      <h2>{isLogin ? "Client Login" : "Forgot Password"}</h2>
+      <h2>
+        {!verified
+          ? isLogin
+            ? "Client Login"
+            : "Forgot Password"
+          : "Verified"}
+      </h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {/* Login */}
-      {isLogin && (
+      {isLogin && !verified && (
         <form onSubmit={submit} disabled={loading}>
           <label htmlFor="clientUsername">
             Username:
@@ -246,6 +298,7 @@ const ClientLogin = ({ onLogin }) => {
               />
             </div>
           </label>
+
           <Typography
             onClick={() => setIsLogin(false)}
             style={{
@@ -255,8 +308,9 @@ const ClientLogin = ({ onLogin }) => {
               cursor: "pointer",
             }}
           >
-            Forgot Password
+            Forgot Username or Password
           </Typography>
+
           <br />
           <br />
           <button type="submit" disabled={loading}>
@@ -265,7 +319,7 @@ const ClientLogin = ({ onLogin }) => {
         </form>
       )}
       {/* Forgot Password */}
-      {!isLogin && (
+      {!isLogin && !verified && (
         <form onSubmit={submit} disabled={loading}>
           <label htmlFor="clientId">
             Client ID:
@@ -277,8 +331,8 @@ const ClientLogin = ({ onLogin }) => {
               autoFocus
               value={clientId}
               autoComplete="off"
-              placeholder="Input your Employee ID"
-              onChange={(e) => setEmployeeId(e.target.value)}
+              placeholder="Input your Client ID"
+              onChange={(e) => setClientId(e.target.value)}
             />
           </label>
           <br />
@@ -314,7 +368,7 @@ const ClientLogin = ({ onLogin }) => {
                 style={{
                   position: "absolute",
                   top: "50%",
-                  right: "18px",
+                  right: "19px",
                   transform: "translate(-50%, -50%)",
                   fontWeight: "bold",
                   display: "flex",
@@ -327,7 +381,7 @@ const ClientLogin = ({ onLogin }) => {
                   component="div"
                   sx={{ textAlign: "center" }}
                 >
-                  {timer.toFixed(2)}
+                  {timer.toString().padStart(2, "0")}
                 </Typography>
               </Box>
               {/* Display the timer in the center */}
@@ -362,7 +416,7 @@ const ClientLogin = ({ onLogin }) => {
             </div>
           </label>
 
-          <button onClick={verifyOtp} disabled={loading}>
+          <button type="button" onClick={verifyOtp} disabled={loading}>
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
           <br />
@@ -378,6 +432,73 @@ const ClientLogin = ({ onLogin }) => {
           >
             Back to Login
           </Typography>
+        </form>
+      )}
+
+      {verified && (
+        <form onSubmit={submitForgotPassword} disabled={loading}>
+          <Box style={{ display: "none" }}>
+            <label htmlFor="clientId">
+              Client Id:
+              <input
+                type="text"
+                name="clientId"
+                id="clientId"
+                required
+                autoFocus
+                value={clientId}
+                autoComplete="off"
+              />
+            </label>
+          </Box>
+          <label htmlFor="clientUsername">
+            Client Username:
+            <input
+              type="text"
+              name="clientUsername"
+              id="clientUsername"
+              required
+              value={clientUsername}
+              autoComplete="off"
+              placeholder="Input your Client Username"
+              onChange={(e) => setClientUsername(e.target.value)}
+            />
+          </label>
+          <br />
+          <label htmlFor="password">
+            Password:
+            <div style={{ position: "relative" }}>
+              <input
+                type={isVisible ? "text" : "password"}
+                name="password"
+                id="password"
+                required
+                value={password}
+                autoComplete="off"
+                placeholder="Input your Password"
+                onChange={handlePasswordChange}
+              />
+              <FontAwesomeIcon
+                icon={isVisible ? faEyeSlash : faEye}
+                onClick={handleClick}
+                style={{
+                  position: "absolute",
+                  right: "20px",
+                  top: "45%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  color: colors.primary[500],
+                  fontSize: 20,
+                }}
+              />
+            </div>
+            {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
+          </label>
+          <br />
+          <br />
+          <button type="submit" disabled={loading}>
+            {loading ? "Updating..." : "Update"}
+          </button>
         </form>
       )}
     </div>

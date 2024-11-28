@@ -232,6 +232,59 @@ async function createClientSignupController(req, res) {
   }
 }
 
+// Create Client Update controller
+async function createClientUpdateController(req, res) {
+  try {
+    const { clientId, clientUsername, password } = req.body;
+
+    // Check if the employeeId is in the Employee table
+    const existingClient = await Client.findOne({ where: { clientId } });
+
+    if (!existingClient) {
+      // Employee ID is not valid, send an error response
+      return res.status(400).json({ error: "Invalid Client ID" });
+    }
+
+    // Check if the employeeId is already registered in the User table
+    const existingClientUser = await ClientUser.findOne({
+      where: { clientId },
+    });
+
+    // Hash the password before storing it in the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    existingClientUser.clientUsername = clientUsername;
+    existingClientUser.password = hashedPassword;
+
+    await existingClientUser.save();
+
+    const clientDetails = await Client.findOne({
+      where: { clientId },
+    });
+
+    const clientRole = clientId.substring(0, 3);
+
+    // Set session data
+    req.session.user = {
+      id: clientId,
+      userType: clientRole,
+      clientDetails: clientDetails,
+    };
+
+    // Respond with redirect URL and session details
+    res.status(200).json({
+      user: {
+        id: clientId,
+        userType: clientRole,
+        clientDetails: clientDetails,
+      },
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 // Create Client Login controller
 async function createClientLoginController(req, res) {
   const { clientUsername, password } = req.body;
@@ -363,6 +416,7 @@ module.exports = {
   createEmployeeSignupController,
   createEmployeeLoginController,
   createClientSignupController,
+  createClientUpdateController,
   createClientLoginController,
   clientForgotPasswordController,
   sendOTPController,

@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import LandingPage from "../OtherComponents/LandingPage";
 import ClientLogin from "./Client/ClientLogin";
 import ClientSignup from "./Client/ClientSignup";
+import { Typography, useTheme } from "@mui/material";
+import { tokens } from "../theme";
 
 const Client = ({ onLogin }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const [showClientLogin, setShowClientLogin] = useState(true);
 
-  const toggleLoginForm = () => {
+  const toggleSignupForm = () => {
     setShowClientLogin(!showClientLogin);
   };
 
@@ -20,11 +24,19 @@ const Client = ({ onLogin }) => {
           <ClientSignup onLogin={onLogin} />
         )}
         <br />
-        <button className="button-switch" onClick={toggleLoginForm}>
+        <Typography
+          onClick={toggleSignupForm}
+          style={{
+            textAlign: "right",
+            textDecoration: "none",
+            color: colors.grey[100],
+            cursor: "pointer",
+          }}
+        >
           {showClientLogin
             ? "Switch to Client Sign Up"
             : "Switch to Client Login"}
-        </button>
+        </Typography>
       </div>
     </div>
   );

@@ -115,7 +115,7 @@ async function createBookedTransactionController(req, res) {
 
     try {
       sendEmail(
-        "jmfalar@fareastfuelcorp.com", // Recipient
+        "marketing@fareastfuelcorp.com", // Recipient
         "Booked Transaction", // Subject
         "Please view this email in HTML format.", // Plain-text fallback
         emailBody // HTML content

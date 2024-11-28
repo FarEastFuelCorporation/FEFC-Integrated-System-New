@@ -16,6 +16,10 @@ const Quotation = require("../models/Quotation");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
+const sendEmail = require("../sendEmail");
+const BookedTransactionEmailFormat = require("../utils/emailFormat");
+const VehicleType = require("../models/VehicleType");
+const Client = require("../models/Client");
 const statusId = 1;
 
 // Create Booked Transaction controller
@@ -28,9 +32,6 @@ async function createBookedTransactionController(req, res) {
       quotationTransportationId,
       haulingDate,
       haulingTime,
-      pttNo,
-      manifestNo,
-      pullOutFormNo,
       remarks,
       statusId,
       createdBy,
@@ -45,10 +46,6 @@ async function createBookedTransactionController(req, res) {
       quotationWasteId,
       haulingDate,
       haulingTime,
-      pttNo,
-      manifestNo,
-      pullOutFormNo,
-      remarks,
       statusId,
       createdBy,
     };
@@ -74,6 +71,60 @@ async function createBookedTransactionController(req, res) {
 
     // fetch transactions
     const newTransaction = await fetchData(statusId, null, null, transactionId);
+
+    const quotationWaste = await QuotationWaste.findByPk(quotationWasteId, {
+      attributes: ["wasteName"],
+    });
+
+    const quotationTransportation = await QuotationTransportation.findByPk(
+      quotationTransportationId,
+      {
+        attributes: ["vehicleTypeId"],
+        include: {
+          model: VehicleType,
+          as: "VehicleType",
+          attributes: ["typeOfVehicle"],
+        },
+      }
+    );
+
+    const bookedTransaction = await BookedTransaction.findOne({
+      where: { transactionId },
+      attributes: ["createdBy"],
+      include: {
+        model: Client,
+        as: "Client",
+        attributes: ["clientName"],
+      },
+    });
+
+    const wasteName = quotationWaste ? quotationWaste.wasteName : "";
+    const typeOfVehicle =
+      quotationTransportation?.VehicleType?.typeOfVehicle || "";
+    const clientName = bookedTransaction?.Client?.clientName || "";
+
+    const emailBody = await BookedTransactionEmailFormat(
+      clientName,
+      transactionId,
+      haulingDate,
+      haulingTime,
+      wasteName,
+      typeOfVehicle,
+      remarks
+    );
+
+    try {
+      sendEmail(
+        "jmfalar@fareastfuelcorp.com", // Recipient
+        "Booked Transaction", // Subject
+        "Please view this email in HTML format.", // Plain-text fallback
+        emailBody // HTML content
+      ).catch((emailError) => {
+        console.error("Error sending email:", emailError);
+      });
+    } catch (error) {
+      console.error("Unexpected error when sending email:", error);
+    }
 
     res.status(201).json({
       pendingTransactions: newTransaction.pending,

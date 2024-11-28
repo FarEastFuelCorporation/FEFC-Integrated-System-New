@@ -9,6 +9,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USERNAME, // Your email address (_mainaccount@fareastfuelcorp.com)
     pass: process.env.EMAIL_PASSWORD, // Your cPanel password
   },
+  tls: {
+    rejectUnauthorized: false, // Accept self-signed certificates
+  },
 });
 
 module.exports = transporter;

@@ -254,7 +254,7 @@ async function createEmployeeLoginController(req, res) {
 // Create Client Signup controller
 async function createClientSignupController(req, res) {
   try {
-    const { clientId, clientUsername, password } = req.body;
+    const { clientId, clientUsername, email, password } = req.body;
 
     // Check if the employeeId is in the Employee table
     const existingClient = await Client.findOne({ where: { clientId } });
@@ -263,6 +263,10 @@ async function createClientSignupController(req, res) {
       // Employee ID is not valid, send an error response
       return res.status(400).json({ error: "Invalid Client ID" });
     }
+
+    existingClient.email = email;
+
+    await existingClient.save();
 
     // Check if the employeeId is already registered in the User table
     const existingClientUser = await ClientUser.findOne({

@@ -15,6 +15,7 @@ const ClientSignup = ({ onLogin }) => {
   const navigate = useNavigate();
   const [clientId, setClientId] = useState("");
   const [clientUsername, setClientUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -67,7 +68,7 @@ const ClientSignup = ({ onLogin }) => {
     try {
       const response = await axios.post(
         `${apiUrl}/api/clientSignup`,
-        { clientId, clientUsername, password },
+        { clientId, clientUsername, email, password },
         { withCredentials: true }
       );
 
@@ -129,6 +130,19 @@ const ClientSignup = ({ onLogin }) => {
             autoComplete="off"
             placeholder="Input your Client Username"
             onChange={(e) => setClientUsername(e.target.value)}
+          />
+        </label>
+        <label htmlFor="clientUsername">
+          Email:
+          <input
+            type="email"
+            name="Email"
+            id="Email"
+            required
+            value={email}
+            autoComplete="off"
+            placeholder="Input your Email"
+            onChange={(e) => setEmail(e.target.value)}
           />
         </label>
         <br />

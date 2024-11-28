@@ -87,7 +87,7 @@ async function BookedTransactionEmailFormat(
                 <p>Thank you for your attention to this matter.</p>
               </div>
               <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
+                <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
               </div>
             </div>
           </body>

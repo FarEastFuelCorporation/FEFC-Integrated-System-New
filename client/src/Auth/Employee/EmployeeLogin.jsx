@@ -157,7 +157,7 @@ const EmployeeLogin = ({ onLogin }) => {
   // Example to start the timer with 60 seconds (you can customize this value)
   useEffect(() => {
     if (isTimer) {
-      startTimer(90); // Start timer with 60 seconds
+      startTimer(99); // Start timer with 60 seconds
     }
   }, [isTimer]);
 
@@ -198,7 +198,7 @@ const EmployeeLogin = ({ onLogin }) => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}/api/clientUpdate`,
+        `${apiUrl}/api/employeeUpdate`,
         { employeeId, employeeUsername, password },
         { withCredentials: true }
       );
@@ -230,7 +230,7 @@ const EmployeeLogin = ({ onLogin }) => {
   };
 
   // To calculate the progress as a percentage
-  const progress = (timer / 90) * 100; // Assuming 10 seconds as total time
+  const progress = (timer / 99) * 100; // Assuming 10 seconds as total time
 
   // Determine color based on time left
   let colorProgress = "green"; // Default color (green)

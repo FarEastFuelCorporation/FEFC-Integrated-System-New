@@ -11,10 +11,14 @@ const {
   clientForgotPasswordController,
   sendOTPController,
   createClientUpdateController,
+  createEmployeeUpdateController,
 } = require("../controllers/authController");
 
 // Create Employee Signup route
 router.post("/employeeSignup", createEmployeeSignupController);
+
+// Create Employee Update route
+router.post("/employeeUpdate", createEmployeeUpdateController);
 
 // Create Employee Login route
 router.post("/employeeLogin", createEmployeeLoginController);

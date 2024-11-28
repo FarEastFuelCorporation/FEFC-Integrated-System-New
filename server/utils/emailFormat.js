@@ -1,6 +1,7 @@
 // utils/emailFormat
 
 async function BookedTransactionEmailFormat(
+  clientType,
   clientName,
   transactionId,
   haulingDate,
@@ -64,8 +65,12 @@ async function BookedTransactionEmailFormat(
                   <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                   <tr style="background-color: #007bff; color: white; text-align: left;">
                       <th style="padding: 8px; text-align: center;">Transaction ID</th>
-                      <th style="padding: 8px; text-align: center;">Hauling Date</th>
-                      <th style="padding: 8px; text-align: center;">Hauling Time</th>
+                      <th style="padding: 8px; text-align: center;">${
+                        clientType === "CUS" ? "Delivery Date" : "Hauling Date"
+                      }</th>
+                      <th style="padding: 8px; text-align: center;">${
+                        clientType === "CUS" ? "Delivery Time" : "Hauling Time"
+                      }</th>
                   </tr>
                   <tr>
                       <td style="padding: 8px; text-align: center;">${transactionId}</td>
@@ -73,7 +78,9 @@ async function BookedTransactionEmailFormat(
                       <td style="padding: 8px; text-align: center;">${haulingTime}</td>
                   </tr>
                   <tr style="background-color: #007bff; color: white; text-align: left;">
-                      <th style="padding: 8px; text-align: center;">Waste Name</th>
+                      <th style="padding: 8px; text-align: center;">${
+                        clientType === "CUS" ? "Product" : "Waste Name"
+                      }</th>
                       <th style="padding: 8px; text-align: center;">Type of Vehicle</th>
                       <th style="padding: 8px; text-align: center;">Remarks</th>
                   </tr>

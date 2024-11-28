@@ -17,9 +17,9 @@ const BillingApprovalTransaction = require("../models/BillingApprovalTransaction
 const BillingDistributionTransaction = require("../models/BillingDistributionTransaction");
 const CollectedTransaction = require("../models/CollectedTransaction");
 const sendEmail = require("../sendEmail");
-const BookedTransactionEmailFormat = require("../utils/emailFormat");
 const VehicleType = require("../models/VehicleType");
 const Client = require("../models/Client");
+const { BookedTransactionEmailFormat } = require("../utils/emailFormat");
 const statusId = 1;
 
 // Create Booked Transaction controller
@@ -102,8 +102,11 @@ async function createBookedTransactionController(req, res) {
     const typeOfVehicle =
       quotationTransportation?.VehicleType?.typeOfVehicle || "";
     const clientName = bookedTransaction?.Client?.clientName || "";
+    const clientId = bookedTransaction?.createdBy || "";
+    const clientType = clientId?.slice(0, 3) || "";
 
     const emailBody = await BookedTransactionEmailFormat(
+      clientType,
       clientName,
       transactionId,
       haulingDate,

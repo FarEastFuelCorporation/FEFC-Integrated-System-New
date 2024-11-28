@@ -7,6 +7,9 @@ const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee");
 const IdInformation = require("../models/IdInformation");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const generateOtp = require("../utils/generateOtp");
+const { sendOtpFormat } = require("../utils/emailFormat");
+const sendEmail = require("../sendEmail");
 
 // Create Employee Signup controller
 async function createEmployeeSignupController(req, res) {
@@ -276,9 +279,91 @@ async function createClientLoginController(req, res) {
   }
 }
 
+// Client Forgot Password controller
+async function clientForgotPasswordController(req, res) {
+  const { clientUsername, password } = req.body;
+
+  try {
+    // Find the user with the provided employee ID
+    const user = await ClientUser.findOne({ where: { clientUsername } });
+    const clientId = user.clientId;
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(401).json({ error: "Invalid employee ID or password" });
+    }
+
+    // Check if the password is correct
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Invalid employee ID or password" });
+    }
+
+    const clientDetails = await Client.findOne({
+      where: { clientId },
+    });
+
+    const clientRole = clientId.substring(0, 3);
+
+    // Set session data
+    req.session.user = {
+      id: user.clientId,
+      userType: clientRole,
+      clientDetails: clientDetails,
+    };
+
+    // Respond with redirect URL and session details
+    res.status(200).json({
+      user: {
+        id: user.clientId,
+        userType: clientRole,
+        clientDetails: clientDetails,
+      },
+    });
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+// Send OTP controller
+async function sendOTPController(req, res) {
+  const { email } = req.body;
+
+  try {
+    const otp = generateOtp();
+
+    const emailBody = await sendOtpFormat(otp);
+
+    console.log(emailBody);
+
+    try {
+      sendEmail(
+        email, // Recipient
+        `OTP Verification`, // Subject
+        "Please use the OTP to verify your identity", // Plain-text fallback
+        emailBody // HTML content
+      ).catch((emailError) => {
+        console.error("Error sending email:", emailError);
+      });
+    } catch (error) {
+      console.error("Unexpected error when sending email:", error);
+    }
+
+    res.status(201).json({
+      otp,
+    });
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 module.exports = {
   createEmployeeSignupController,
   createEmployeeLoginController,
   createClientSignupController,
   createClientLoginController,
+  clientForgotPasswordController,
+  sendOTPController,
 };

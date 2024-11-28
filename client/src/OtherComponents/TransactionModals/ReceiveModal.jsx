@@ -209,7 +209,6 @@ const ReceiveModal = ({
               type="number"
               required
               fullWidth
-              disabled={formData.id}
               InputLabelProps={{
                 style: {
                   color: colors.grey[100],
@@ -227,7 +226,6 @@ const ReceiveModal = ({
               type="number"
               required
               fullWidth
-              disabled={formData.id}
               InputLabelProps={{
                 style: {
                   color: colors.grey[100],
@@ -247,7 +245,6 @@ const ReceiveModal = ({
               type="number"
               required
               fullWidth
-              disabled={formData.id}
               InputLabelProps={{
                 style: {
                   color: colors.grey[100],
@@ -265,7 +262,6 @@ const ReceiveModal = ({
               type="number"
               required
               fullWidth
-              disabled={formData.id}
               InputLabelProps={{
                 style: {
                   color: colors.grey[100],
@@ -308,7 +304,6 @@ const ReceiveModal = ({
             value={formData.submitTo}
             onChange={handleInputChange}
             label="Submit To"
-            disabled={formData.id}
           >
             <MenuItem value="SORTING">SORTING</MenuItem>
             <MenuItem value="WAREHOUSE">WAREHOUSE</MenuItem>

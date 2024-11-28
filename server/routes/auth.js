@@ -8,6 +8,8 @@ const {
   createEmployeeLoginController,
   createClientSignupController,
   createClientLoginController,
+  clientForgotPasswordController,
+  sendOTPController,
 } = require("../controllers/authController");
 
 // Create Employee Signup route
@@ -21,5 +23,11 @@ router.post("/clientSignup", createClientSignupController);
 
 // Create Client Login route
 router.post("/clientLogin", createClientLoginController);
+
+// Client Forgot Password route
+router.post("/forgot", clientForgotPasswordController);
+
+// Client Send OTP route
+router.post("/sendOtp", sendOTPController);
 
 module.exports = router;

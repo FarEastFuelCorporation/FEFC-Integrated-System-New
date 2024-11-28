@@ -151,7 +151,7 @@ async function createEmployeeUpdateController(req, res) {
 
     // Set session data
     req.session.user = {
-      id: newUser.employeeId,
+      id: employeeId,
       userType: userType,
       role: role,
       employeeDetails: employeeDetails,
@@ -161,7 +161,7 @@ async function createEmployeeUpdateController(req, res) {
     // Respond with redirect URL and session details
     res.status(200).json({
       user: {
-        id: newUser.employeeId,
+        id: employeeId,
         userType: userType,
         role: role,
         employeeDetails: employeeDetails,

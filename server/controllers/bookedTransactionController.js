@@ -118,7 +118,13 @@ async function createBookedTransactionController(req, res) {
         "marketing@fareastfuelcorp.com", // Recipient
         "Booked Transaction", // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody // HTML content
+        emailBody, // HTML content
+        [
+          "rmangaron@fareastfuelcorp.com",
+          "edevera@fareastfuelcorp.com",
+          "eb.devera410@gmail.com",
+          "cc.duran@fareastfuel.com",
+        ] // cc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
       });

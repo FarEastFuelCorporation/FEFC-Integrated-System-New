@@ -1,10 +1,11 @@
 const transporter = require("./mailer");
 
-const sendEmail = async (to, subject, text, html) => {
+const sendEmail = async (to, subject, text, html, cc = null) => {
   try {
     const mailOptions = {
       from: process.env.EMAIL_USERNAME, // Sender's email address
       to: to, // Recipient's email address
+      cc: cc, // CC recipient(s) (optional)
       subject: subject, // Email subject
       text: text, // Plain text content
       html: html, // HTML content (optional)

@@ -103,6 +103,9 @@ const BilledTransaction = ({ row, user }) => {
     processPage(0, pages); // Start processing pages from the first one
   };
 
+  console.log(row);
+  const isBilled = row.BilledTransaction.length === 0 ? false : true;
+
   return (
     <Box>
       {row.statusId === 9 ? (
@@ -206,7 +209,7 @@ const BilledTransaction = ({ row, user }) => {
               billedTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
-          {row.statusId >= 5 && (
+          {isBilled && (
             <>
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingStatementForm statementRef={certificateRef} row={row} />

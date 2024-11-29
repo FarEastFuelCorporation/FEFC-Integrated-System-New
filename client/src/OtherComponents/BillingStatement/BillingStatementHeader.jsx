@@ -54,7 +54,7 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row.BilledTransaction[0].billingNumber}
+              {row.BilledTransaction?.[0]?.billingNumber}
             </Typography>
             <Typography
               mt={1}

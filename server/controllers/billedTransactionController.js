@@ -9,6 +9,7 @@ const {
   getIncludeOptions,
 } = require("../utils/getBookedTransactions");
 const transactionStatusId = 9;
+const additionalStatusId = [5, 6, 7, 8];
 
 // Create Billed Transaction controller
 async function createBilledTransactionController(req, res) {
@@ -17,6 +18,7 @@ async function createBilledTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId, // Now an array
+      isCertified,
       billedDate,
       billedTime,
       billingNumber,
@@ -59,7 +61,7 @@ async function createBilledTransactionController(req, res) {
         transaction,
       });
 
-      if (updatedBookedTransaction) {
+      if (updatedBookedTransaction && isCertified) {
         updatedBookedTransaction.statusId = statusId;
         await updatedBookedTransaction.save({ transaction });
       } else {
@@ -92,7 +94,7 @@ async function createBilledTransactionController(req, res) {
 async function getBilledTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(transactionStatusId);
+    const data = await fetchData(transactionStatusId, null, additionalStatusId);
 
     // Respond with the updated data
     res.status(200).json({

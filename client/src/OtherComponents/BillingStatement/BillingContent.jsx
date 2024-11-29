@@ -301,9 +301,18 @@ const BillingContent = ({
                 }
               );
 
+              const isTransportation =
+                transactions?.[0]?.ScheduledTransaction?.[0]
+                  .DispatchedTransaction.length === 0
+                  ? false
+                  : true;
+              console.log(transactions);
+              console.log(transactions?.ScheduledTransaction);
+              console.log(isTransportation);
               // Add the transportation row if applicable
               const transpoRows =
-                transaction.QuotationTransportation?.mode === "CHARGE"
+                transaction.QuotationTransportation?.mode === "CHARGE" &&
+                isTransportation
                   ? [
                       <TableRow
                         key={`transpo-${index}`}

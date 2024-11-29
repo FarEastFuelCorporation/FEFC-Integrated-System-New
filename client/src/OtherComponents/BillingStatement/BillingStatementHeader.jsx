@@ -238,9 +238,13 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               Due Date:
             </Typography>
             <Box>
-              <Typography
-                sx={{ fontWeight: "bold" }}
-              >{`${termsChargeDays} DAYS`}</Typography>
+              {termsChargeDays === 0 ? (
+                <Typography sx={{ fontWeight: "bold" }}>{`CASH`}</Typography>
+              ) : (
+                <Typography sx={{ fontWeight: "bold" }}>{`${termsChargeDays} ${
+                  termsChargeDays === 1 ? "DAY" : "DAYS"
+                }`}</Typography>
+              )}
               <Typography sx={{ fontWeight: "bold" }}>
                 {`${termsCharge}`}
               </Typography>

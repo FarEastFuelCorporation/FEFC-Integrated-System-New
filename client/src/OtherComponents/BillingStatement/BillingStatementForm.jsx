@@ -221,7 +221,7 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     const transpoVatCalculation =
       transaction.QuotationTransportation?.vatCalculation;
     const transpoMode = transaction.QuotationTransportation?.mode;
-    const isTransaportation =
+    const isTransportation =
       transaction.ScheduledTransaction?.[0].DispatchedTransaction.length === 0
         ? false
         : true;
@@ -247,7 +247,7 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     };
 
     // Call the function to add transportation fee
-    if (isTransaportation) {
+    if (isTransportation) {
       addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
     }
   });

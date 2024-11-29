@@ -200,6 +200,7 @@ async function BillingApprovalEmailFormat(clientName, transactions) {
         (transaction) => `
         <tr>
           <td>${transaction.transactionId}</td>
+          <td>${transaction.haulingDate}</td>
           <td>${transaction.billingNumber}</td>
         </tr>`
       )
@@ -273,6 +274,7 @@ async function BillingApprovalEmailFormat(clientName, transactions) {
                 <table>
                   <tr>
                       <th>Transaction ID</th>
+                      <th>Hauling Date</th>
                       <th>Billing Number</th>
                   </tr>
                   ${transactionRows}

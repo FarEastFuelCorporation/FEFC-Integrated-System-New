@@ -137,7 +137,7 @@ async function updateCertifiedTransactionController(req, res) {
         certifiedTransaction.typeOfCertificate = typeOfCertificate;
         certifiedTransaction.typeOfWeight = typeOfWeight;
         certifiedTransaction.remarks = updatedRemarks;
-        certifiedTransaction.statusId = statusId;
+        certifiedTransaction.statusId = isBilled ? 10 : statusId;
         certifiedTransaction.updatedBy = createdBy;
 
         // Save the updated certified transaction

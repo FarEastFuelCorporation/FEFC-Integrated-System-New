@@ -8,6 +8,9 @@ const {
   fetchData,
   getIncludeOptions,
 } = require("../utils/getBookedTransactions");
+const { BillingApprovalEmailFormat } = require("../utils/emailFormat");
+const Client = require("../models/Client");
+const sendEmail = require("../sendEmail");
 const transactionStatusId = 9;
 const additionalStatusId = [5, 6, 7, 8];
 
@@ -39,6 +42,9 @@ async function createBilledTransactionController(req, res) {
 
     // const billingNumber = await generateBillingNumber();
 
+    let clientName;
+    let transactions = {};
+
     // Iterate over the bookedTransactionId array and create multiple entries
     for (const id of bookedTransactionId) {
       // Create BilledTransaction entry
@@ -58,8 +64,23 @@ async function createBilledTransactionController(req, res) {
 
       // Update the status of the booked transaction
       const updatedBookedTransaction = await BookedTransaction.findByPk(id, {
+        attributes: ["id", "transactionId", "createdBy"],
+        include: {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
+        },
         transaction,
       });
+
+      clientName = updatedBookedTransaction.Client.clientName;
+
+      if (!transactions[id]) {
+        transactions[id] = {}; // Initialize as an object if not already set
+      }
+
+      transactions[id].transactionId = updatedBookedTransaction.transactionId;
+      transactions[id].billingNumber = billingNumber;
 
       if (updatedBookedTransaction && isCertified) {
         updatedBookedTransaction.statusId = statusId;
@@ -72,6 +93,31 @@ async function createBilledTransactionController(req, res) {
 
     // Commit the transaction
     await transaction.commit();
+
+    const emailBody = await BillingApprovalEmailFormat(
+      clientName,
+      transactions
+    );
+    console.log(emailBody);
+
+    try {
+      sendEmail(
+        "jmfalar@fareastfuelcorp.com", // Recipient
+        `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
+        "Please view this email in HTML format.", // Plain-text fallback
+        emailBody // HTML content
+        // [
+        //   "rmangaron@fareastfuelcorp.com",
+        //   "edevera@fareastfuelcorp.com",
+        //   "eb.devera410@gmail.com",
+        //   "cc.duran@fareastfuel.com",
+        // ] // cc
+      ).catch((emailError) => {
+        console.error("Error sending email:", emailError);
+      });
+    } catch (error) {
+      console.error("Unexpected error when sending email:", error);
+    }
 
     // Fetch updated transaction data
     const data = await fetchData(statusId);

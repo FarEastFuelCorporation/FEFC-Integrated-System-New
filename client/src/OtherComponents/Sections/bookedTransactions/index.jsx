@@ -100,11 +100,9 @@ const BookedTransactions = ({ user }) => {
     (row) => {
       let typeToEdit = pendingTransactions.find((type) => type.id === row.id);
 
-      typeToEdit =
-        !typeToEdit &&
-        inProgressTransactions.find((type) => type.id === row.id);
-
-      console.log(typeToEdit);
+      typeToEdit = typeToEdit
+        ? typeToEdit
+        : inProgressTransactions.find((type) => type.id === row.id);
 
       if (typeToEdit) {
         setFormData({

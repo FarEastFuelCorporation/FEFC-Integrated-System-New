@@ -193,7 +193,7 @@ async function getQuotationsController(req, res) {
         {
           model: Client,
           as: "Client",
-          attributes: { exclude: ["clientPicture"] },
+          // attributes: { exclude: ["clientPicture"] },
         },
         {
           model: IdInformation,

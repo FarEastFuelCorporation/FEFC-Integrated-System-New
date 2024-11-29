@@ -26,6 +26,15 @@ const QuotationContent = ({
   const quotationWaste = quotationData?.QuotationWaste || [];
   const quotationTransportation = quotationData?.QuotationTransportation || [];
 
+  const filteredQuotationWaste = quotationWaste.filter(
+    (item) =>
+      item.TypeOfWaste.wasteCode !== "ANHW" &&
+      item.TypeOfWaste.wasteCode !== "AHW"
+  );
+
+  console.log(quotationWaste);
+  console.log(filteredQuotationWaste);
+
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
 
@@ -144,7 +153,7 @@ const QuotationContent = ({
   return (
     <Box>
       {/* Waste Details */}
-      {quotationWaste.length !== 0 && (
+      {filteredQuotationWaste.length !== 0 && (
         <Box className="account_details" mt={1}>
           <Typography variant="h5" fontWeight="bold" textAlign="center">
             WASTE CLASSIFICATION
@@ -152,7 +161,7 @@ const QuotationContent = ({
           <Table ref={wasteTableRef}>
             <QuotationWasteTableHead row={quotationData} />
             <TableBody id="table_data">
-              {quotationWaste.map((waste, index) => (
+              {filteredQuotationWaste.map((waste, index) => (
                 <TableRow key={index} sx={{ border: "black" }}>
                   <TableCell align="center" sx={getCellStyle(false)}>
                     {index + 1}

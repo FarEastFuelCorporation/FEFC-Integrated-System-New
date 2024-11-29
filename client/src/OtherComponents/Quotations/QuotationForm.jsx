@@ -281,6 +281,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                 item.length === 10
               ) {
                 const transportation = item; // Assuming item contains transportation details
+                console.log(transportation);
                 bodyRows.QuotationTransportationTableHead.content.push(
                   <TableBody key={`transport-body-${index}`}>
                     <TableRow key={index} sx={{ border: "black" }}>
@@ -317,15 +318,15 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                         align="center"
                         sx={getCellStyle(false, columnWidths.transportation[4])}
                       >
-                        {transportation[5] === "FREE OF CHARGE"
-                          ? "0.00"
-                          : transportation[4]}
+                        {transportation[4]}
                       </TableCell>
                       <TableCell
                         align="center"
                         sx={getCellStyle(false, columnWidths.transportation[5])}
                       >
-                        {formatNumber(transportation[5])}
+                        {transportation[7] === "FREE OF CHARGE"
+                          ? "0.00"
+                          : formatNumber(transportation[5])}
                       </TableCell>
                       {row.isOneTime && (
                         <TableCell

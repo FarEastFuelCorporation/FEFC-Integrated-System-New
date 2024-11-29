@@ -5,7 +5,7 @@ async function BookedTransactionEmailFormat(
   clientName,
   transactionId,
   haulingDate,
-  haulingTime,
+  formattedTime,
   wasteName,
   typeOfVehicle,
   remarks
@@ -75,7 +75,7 @@ async function BookedTransactionEmailFormat(
                   <tr>
                       <td style="padding: 8px; text-align: center;">${transactionId}</td>
                       <td style="padding: 8px; text-align: center;">${haulingDate}</td>
-                      <td style="padding: 8px; text-align: center;">${haulingTime}</td>
+                      <td style="padding: 8px; text-align: center;">${formattedTime}</td>
                   </tr>
                   <tr style="background-color: #007bff; color: white; text-align: left;">
                       <th style="padding: 8px; text-align: center;">${

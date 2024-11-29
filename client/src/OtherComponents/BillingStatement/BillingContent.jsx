@@ -29,8 +29,6 @@ const BillingContent = ({
   const vatCalculation = transactions?.[0]?.QuotationWaste?.vatCalculation;
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
 
-  console.log(transactions);
-
   let totalWeight = 0;
 
   const firstPageHeight = pageHeight - headerHeight;
@@ -190,8 +188,6 @@ const BillingContent = ({
                   .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
                   ?.typeOfWeight || "SORTED WEIGHT";
 
-              console.log(typeOfWeight);
-
               const wasteRows = Object.values(aggregatedWasteTransactions).map(
                 (waste, idx) => {
                   // Determine the font color based on the mode
@@ -309,9 +305,6 @@ const BillingContent = ({
                   .DispatchedTransaction.length === 0
                   ? false
                   : true;
-              console.log(transactions);
-              console.log(transactions?.ScheduledTransaction);
-              console.log(isTransportation);
               // Add the transportation row if applicable
               const transpoRows =
                 transaction.QuotationTransportation?.mode === "CHARGE" &&

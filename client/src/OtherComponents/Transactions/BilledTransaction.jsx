@@ -103,7 +103,6 @@ const BilledTransaction = ({ row, user }) => {
     processPage(0, pages); // Start processing pages from the first one
   };
 
-  console.log(row);
   const isBilled = row.BilledTransaction.length === 0 ? false : true;
 
   return (

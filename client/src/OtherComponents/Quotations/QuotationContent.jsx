@@ -32,9 +32,6 @@ const QuotationContent = ({
       item.TypeOfWaste.wasteCode !== "AHW"
   );
 
-  console.log(quotationWaste);
-  console.log(filteredQuotationWaste);
-
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight;
 

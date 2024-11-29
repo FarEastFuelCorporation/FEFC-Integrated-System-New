@@ -571,7 +571,20 @@ async function geBookedTransactionsDashboardFullController(req, res) {
 
     const totals = {}; // To store total amounts for each billingNumber
 
+    const processedIds = new Set();
+
     billedTransactions.forEach((transaction) => {
+      const bookedTransactionId = transaction.BookedTransaction.id;
+      console.log(bookedTransactionId);
+      // Skip processing if this id has already been processed
+      if (processedIds.has(bookedTransactionId)) {
+        console.log(bookedTransactionId);
+        return; // Continue to the next iteration
+      }
+
+      // Mark this id as processed
+      processedIds.add(bookedTransactionId);
+
       const billingNumber = transaction.billingNumber; // Get the billing number
 
       // Ensure the totals object for this billingNumber is initialized
@@ -583,6 +596,7 @@ async function geBookedTransactionsDashboardFullController(req, res) {
           termsRemarks: "",
           haulingDate: "",
           distributedDate: "",
+          isCollected: false,
         };
       }
 
@@ -713,7 +727,7 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         // Calculate amounts and credits based on vatCalculation and mode
         aggregatedWasteTransactions.forEach((item) => {
           const { weight, clientWeight, QuotationWaste } = item;
-          console.log(item);
+
           const selectedWeight =
             typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
@@ -758,9 +772,6 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         : false;
 
       console.log(isTransportation);
-      console.log(
-        transaction.BookedTransaction.ScheduledTransaction.DispatchedTransaction
-      );
 
       const addTranspoFee = (
         transpoFee,
@@ -815,7 +826,7 @@ async function geBookedTransactionsDashboardFullController(req, res) {
 
     // Respond with the updated data
     res.status(200).json({
-      billedTransactions: billedTransactions,
+      billedTransaction: billedTransactions,
       totals,
     });
   } catch (error) {

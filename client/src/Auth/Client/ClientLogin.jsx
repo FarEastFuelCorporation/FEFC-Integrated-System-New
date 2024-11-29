@@ -166,7 +166,6 @@ const ClientLogin = ({ onLogin }) => {
       setError("Please enter the OTP");
       return;
     }
-    console.log("clicked");
 
     try {
       setLoading(true); // Start loading
@@ -174,7 +173,6 @@ const ClientLogin = ({ onLogin }) => {
 
       if (generatedOtp === otp) {
         setIsVerified(true);
-        console.log("verified");
       } else {
         setIsVerified(false);
         setError("OTP did not match");

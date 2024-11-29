@@ -281,7 +281,6 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                 item.length === 10
               ) {
                 const transportation = item; // Assuming item contains transportation details
-                console.log(transportation);
                 bodyRows.QuotationTransportationTableHead.content.push(
                   <TableBody key={`transport-body-${index}`}>
                     <TableRow key={index} sx={{ border: "black" }}>

@@ -74,7 +74,6 @@ const BilledTransactions = ({ user }) => {
         );
 
       // For in progress transactions
-      console.log(billedTransactionResponse.data.inProgressTransactions);
       setInProgressTransactions(filteredInProgressTransactions);
 
       // For finished transactions
@@ -93,7 +92,6 @@ const BilledTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
-    console.log(row);
     setFormData({
       id: "",
       bookedTransactionId: selectedIds,
@@ -125,7 +123,6 @@ const BilledTransactions = ({ user }) => {
 
   const handleEditClick = (row) => {
     const typeToEdit = row;
-    console.log(row);
     if (typeToEdit) {
       const billedTransaction = typeToEdit.BilledTransaction?.[0] || {};
 

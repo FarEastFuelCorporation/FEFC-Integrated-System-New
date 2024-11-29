@@ -108,7 +108,7 @@ const BilledTransaction = ({ row, user }) => {
 
   return (
     <Box>
-      {row.statusId === 9 ? (
+      {!isBilled ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
             <ReceiptIcon

@@ -187,7 +187,10 @@ const BillingContent = ({
                 transaction.BilledTransaction[0].serviceInvoiceNumber;
               const typeOfWeight =
                 transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                  .SortedTransaction[0].CertifiedTransaction[0].typeOfWeight;
+                  .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+                  ?.typeOfWeight || "SORTED WEIGHT";
+
+              console.log(typeOfWeight);
 
               const wasteRows = Object.values(aggregatedWasteTransactions).map(
                 (waste, idx) => {

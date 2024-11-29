@@ -20,6 +20,7 @@ const sendEmail = require("../sendEmail");
 const VehicleType = require("../models/VehicleType");
 const Client = require("../models/Client");
 const { BookedTransactionEmailFormat } = require("../utils/emailFormat");
+const DispatchedTransaction = require("../models/DispatchedTransaction");
 const statusId = 1;
 
 function convertTo12HourFormat(time) {
@@ -537,6 +538,11 @@ async function geBookedTransactionsDashboardFullController(req, res) {
                     },
                   ],
                 },
+                {
+                  model: DispatchedTransaction,
+                  as: "DispatchedTransaction",
+                  required: false,
+                },
               ],
             },
           ],
@@ -746,6 +752,15 @@ async function geBookedTransactionsDashboardFullController(req, res) {
       const transpoVatCalculation =
         transaction.QuotationTransportation?.vatCalculation;
       const transpoMode = transaction.QuotationTransportation?.mode;
+      const isTransportation = transaction.BookedTransaction
+        .ScheduledTransaction.DispatchedTransaction
+        ? true
+        : false;
+
+      console.log(isTransportation);
+      console.log(
+        transaction.BookedTransaction.ScheduledTransaction.DispatchedTransaction
+      );
 
       const addTranspoFee = (
         transpoFee,
@@ -771,9 +786,12 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         }
       };
 
-      // Call the function to add transportation fee
-      addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+      if (isTransportation) {
+        addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+      }
     });
+
+    console.log(totals);
 
     // Add a `total` attribute to each billing number object
     Object.keys(totals).forEach((billingNumber) => {

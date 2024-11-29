@@ -106,6 +106,7 @@ const Dashboard = ({ user }) => {
       setAllCount(allCount);
       setTransactions(billedTransactionsDetail);
       console.log(billedTransactionsDetail);
+      console.log(billedTransactions);
       setBilledTransactions(billedTransactions);
 
       // Destructure data from the second response
@@ -384,26 +385,26 @@ const Dashboard = ({ user }) => {
 
         if (termsRemarks === "UPON RECEIVING OF DOCUMENTS" && distributedDate) {
           // Add the terms to the distributedDate
-          dueDate = formatDate3(addDaysToDate(distributedDate, terms));
+          dueDate = addDaysToDate(distributedDate, terms);
         } else if (
           termsRemarks === "UPON HAULING" ||
           termsRemarks === "ON PICKUP" ||
           termsRemarks === "ON DELIVERY"
         ) {
           // Add the terms to the haulingDate
-          dueDate = formatDate3(addDaysToDate(haulingDate, terms));
+          dueDate = addDaysToDate(haulingDate, terms);
         }
 
         // Store the computed dueDate into the row for use in remainingDays column
         params.row.dueDate = dueDate;
 
-        return dueDate;
+        return formatDate3(dueDate);
       },
       renderCell: renderCellWithWrapText,
     },
     {
       field: "remainingDays",
-      headerName: "Remaining Days",
+      headerName: "Remarks",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -438,11 +439,13 @@ const Dashboard = ({ user }) => {
         }
 
         // If the due date is in the past, calculate how overdue it is
-        const overdueDays = Math.ceil(
+        const overdueDays = Math.floor(
           Math.abs(timeDifference) / (1000 * 3600 * 24)
         ); // Convert milliseconds to days
         if (overdueDays === 1) {
           return "1 Day Overdue";
+        } else if (overdueDays === 0) {
+          return `Due Today`;
         } else {
           return `${overdueDays} Days Overdue`;
         }

@@ -93,7 +93,9 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
         .SortedTransaction[0].CertifiedTransaction[0];
 
-    const typeOfWeight = certifiedTransaction.typeOfWeight;
+    const typeOfWeight = certifiedTransaction.typeOfWeight
+      ? certifiedTransaction.typeOfWeight
+      : "SORTED WEIGHT";
 
     const sortedWasteTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]

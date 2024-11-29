@@ -91,9 +91,9 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
   transactions.forEach((transaction) => {
     const certifiedTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-        .SortedTransaction[0].CertifiedTransaction[0];
+        .SortedTransaction[0].CertifiedTransaction?.[0];
 
-    const typeOfWeight = certifiedTransaction.typeOfWeight
+    const typeOfWeight = certifiedTransaction?.typeOfWeight
       ? certifiedTransaction.typeOfWeight
       : "SORTED WEIGHT";
 
@@ -221,6 +221,10 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     const transpoVatCalculation =
       transaction.QuotationTransportation?.vatCalculation;
     const transpoMode = transaction.QuotationTransportation?.mode;
+    const isTransaportation =
+      transaction.ScheduledTransaction?.[0].DispatchedTransaction.length === 0
+        ? false
+        : true;
 
     const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
       // Check if the mode is "CHARGE"
@@ -243,7 +247,9 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     };
 
     // Call the function to add transportation fee
-    addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    if (isTransaportation) {
+      addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    }
   });
 
   const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;

@@ -29,6 +29,8 @@ const BillingContent = ({
   const vatCalculation = transactions?.[0]?.QuotationWaste?.vatCalculation;
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
 
+  console.log(transactions);
+
   let totalWeight = 0;
 
   const firstPageHeight = pageHeight - headerHeight;

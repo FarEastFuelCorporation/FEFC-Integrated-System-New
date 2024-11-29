@@ -68,10 +68,14 @@ const BilledTransactions = ({ user }) => {
         billedTransactionResponse.data.pendingTransactions
       );
 
+      const filteredInProgressTransactions =
+        billedTransactionResponse.data.inProgressTransactions.filter(
+          (transaction) => transaction.BilledTransaction.length !== 0
+        );
+
       // For in progress transactions
-      setInProgressTransactions(
-        billedTransactionResponse.data.inProgressTransactions
-      );
+      console.log(billedTransactionResponse.data.inProgressTransactions);
+      setInProgressTransactions(filteredInProgressTransactions);
 
       // For finished transactions
       setFinishedTransactions(
@@ -128,7 +132,7 @@ const BilledTransactions = ({ user }) => {
         id: billedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         isCertified:
-          row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          typeToEdit?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
             ?.SortedTransaction?.[0]?.CertifiedTransaction.length === 0
             ? false
             : true,
@@ -169,7 +173,11 @@ const BilledTransactions = ({ user }) => {
         {
           data: {
             deletedBy: user.id,
-            bookedTransactionId: row.id,
+            isCertified:
+              row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                ?.SortedTransaction?.[0]?.CertifiedTransaction.length === 0
+                ? false
+                : true,
           },
         }
       );

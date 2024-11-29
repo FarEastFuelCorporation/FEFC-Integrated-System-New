@@ -154,6 +154,7 @@ async function updateBilledTransactionController(req, res) {
       // Extracting data from the request body
       let {
         bookedTransactionId,
+        isCertified,
         billedDate,
         billedTime,
         billingNumber,
@@ -199,7 +200,7 @@ async function updateBilledTransactionController(req, res) {
             { transaction }
           );
 
-          if (updatedBookedTransaction) {
+          if (updatedBookedTransaction && isCertified) {
             updatedBookedTransaction.statusId = statusId;
             await updatedBookedTransaction.save({ transaction });
 
@@ -252,7 +253,7 @@ async function updateBilledTransactionController(req, res) {
 async function deleteBilledTransactionController(req, res) {
   try {
     const id = req.params.id; // ID of the billed transaction to delete
-    const { deletedBy } = req.body;
+    const { deletedBy, isCertified } = req.body;
 
     console.log("Soft deleting billed transaction with ID:", id);
 
@@ -285,7 +286,7 @@ async function deleteBilledTransactionController(req, res) {
           where: { id: bookedTransactionIds },
         });
 
-        if (updatedBookedTransactions.length > 0) {
+        if (updatedBookedTransactions.length > 0 && isCertified) {
           // Update status of all related booked transactions
           for (const bookedTransaction of updatedBookedTransactions) {
             bookedTransaction.statusId = transactionStatusId; // Status for "deleted" or equivalent

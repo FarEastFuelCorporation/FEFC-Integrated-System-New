@@ -16,6 +16,7 @@ const CertifiedTransactions = ({ user }) => {
     id: "",
     bookedTransactionId: "",
     sortedTransactionId: "",
+    isBilled: false,
     certificateNumber: "",
     certifiedDate: "",
     certifiedTime: "",
@@ -75,12 +76,14 @@ const CertifiedTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
+    console.log(row);
     setFormData({
       id: "",
       bookedTransactionId: row.id,
       sortedTransactionId:
         row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
           .id,
+      isBilled: row.BilledTransaction.length === 0 ? false : true,
       certificateNumber: "",
       certifiedDate: "",
       certifiedTime: "",
@@ -119,8 +122,9 @@ const CertifiedTransactions = ({ user }) => {
         id: certifiedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         sortedTransactionId:
-          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-            ?.SortedTransaction?.[0].id,
+          certifiedTransaction.ScheduledTransaction?.[0]
+            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
+        isBilled: typeToEdit.BilledTransaction.length === 0 ? false : true,
         certificateNumber: certifiedTransaction.certificateNumber,
         certifiedDate: certifiedTransaction.certifiedDate,
         certifiedTime: certifiedTransaction.certifiedTime,

@@ -559,7 +559,9 @@ const Transaction = ({
                                 (user.userType === 3 && row.statusId === 3) ||
                                 (user.userType === 4 && row.statusId === 4) ||
                                 (user.userType === 5 && row.statusId === 5) ||
-                                (user.userType === 7 && row.statusId === 9) ||
+                                (user.userType === 7 &&
+                                  (row.statusId === 9 ||
+                                    row.statusId === 10)) ||
                                 (user.userType === 8 && row.statusId === 10) ||
                                 (user.userType === 9 && row.statusId === 11) ||
                                 (user.userType === 10 && row.statusId === 12) ||

@@ -138,6 +138,8 @@ async function createBookedTransactionController(req, res) {
           "edevera@fareastfuelcorp.com",
           "eb.devera410@gmail.com",
           "cc.duran@fareastfuel.com",
+          "dcardinez@fareastfuelcorp.com",
+          "dm.cardinez@fareastfuel.com",
         ] // cc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
@@ -630,12 +632,17 @@ async function geBookedTransactionsDashboardFullController(req, res) {
           ?.termsBuyingDays;
       const termsBuying =
         transaction.BookedTransaction.QuotationWaste?.Quotation?.termsBuying;
+      const isCollected =
+        transaction.BillingApprovalTransaction.BillingDistributionTransaction
+          ?.CollectedTransaction;
 
       totals[billingNumber].terms =
         termsCharge !== "N/A" ? termsChargeDays : termsBuyingDays;
 
       totals[billingNumber].termsRemarks =
         termsCharge !== "N/A" ? termsCharge : termsBuying;
+
+      totals[billingNumber].isCollected = isCollected ? true : false;
 
       const sortedWasteTransaction =
         transaction.BookedTransaction.ScheduledTransaction[0]

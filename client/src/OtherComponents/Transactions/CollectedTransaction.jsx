@@ -1,15 +1,45 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import PaidIcon from "@mui/icons-material/Paid";
 import { CircleLogo } from "../CustomAccordionStyles";
+import axios from "axios";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
 
 import { timestampDate, parseTimeString, formatNumber } from "../Functions";
 
 const CollectedTransaction = ({ row, user }) => {
+  const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const [transactions, setTransactions] = useState([]);
+
+  const billedTransaction = row?.BilledTransaction[0] || "";
+  const billingNumber = billedTransaction?.billingNumber;
+  const hasFixedRate = row?.QuotationWaste?.hasFixedRate;
+
+  // Fetch data function
+  const fetchData = useCallback(async () => {
+    try {
+      // setLoading(true);
+      const billingStatementResponse = await axios.get(
+        `${REACT_APP_API_URL}/api/billedTransaction/multiple/${billedTransaction.billingNumber}`
+      );
+
+      // For pending transactions
+      setTransactions(billingStatementResponse.data.bookedTransactions);
+
+      // setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [REACT_APP_API_URL, billedTransaction.billingNumber]);
+
+  // Fetch data when component mounts or apiUrl/processDataTransaction changes
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const billingDistributionTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction
@@ -24,40 +54,77 @@ const CollectedTransaction = ({ row, user }) => {
     billingDistributionTransaction?.distributedDate
   );
 
+  const haulingDate = row.haulingDate;
   // Add the terms to the distributedDate
   const termsChargeDays = parseInt(
     row.QuotationWaste.Quotation.termsChargeDays
   );
+  const termsBuyingDays = parseInt(
+    row.QuotationWaste.Quotation.termsBuyingDays
+  );
   const termsCharge = row.QuotationWaste.Quotation.termsCharge;
+  const termsBuying = row.QuotationWaste.Quotation.termsBuying;
+  const termsRemarks = termsCharge !== "N/A" ? termsCharge : termsBuying;
+  const terms = termsCharge !== "N/A" ? termsChargeDays : termsBuyingDays;
 
-  let dueDate;
+  let dueDate = "Pending"; // Default value if no condition is met
 
-  // Create a new Date instance for dueDate by adding terms to distributedDate
-  if (distributedDate) {
-    dueDate = new Date(distributedDate);
-    dueDate.setDate(dueDate.getDate() + termsChargeDays);
+  // Helper function to add days to a date
+  const addDaysToDate = (dateStr, daysToAdd) => {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() + daysToAdd);
+    return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+  };
+
+  if (termsRemarks === "UPON RECEIVING OF DOCUMENTS" && distributedDate) {
+    // Add the terms to the distributedDate
+    dueDate = addDaysToDate(distributedDate, terms);
+  } else if (
+    termsRemarks === "UPON HAULING" ||
+    termsRemarks === "ON PICKUP" ||
+    termsRemarks === "ON DELIVERY"
+  ) {
+    // Add the terms to the haulingDate
+    dueDate = addDaysToDate(haulingDate, terms);
   }
 
-  const sortedWasteTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .SortedWasteTransaction;
+  let remarks;
 
-  // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
-  const aggregatedWasteTransactions = Object.values(
-    sortedWasteTransaction.reduce((acc, current) => {
-      const { id } = current.QuotationWaste;
+  // If no due date is available, return "Pending"
+  if (dueDate === "Pending") {
+    remarks = "Pending";
+  }
 
-      // If the `QuotationWaste.id` is already in the accumulator, add the weight
-      if (acc[id]) {
-        acc[id].weight += current.weight;
-      } else {
-        // Otherwise, set the initial object in the accumulator
-        acc[id] = { ...current, weight: current.weight };
-      }
+  // Get the current date
+  const currentDate = new Date();
 
-      return acc;
-    }, {})
-  );
+  // Parse the dueDate string into a Date object
+  const dueDateObj = new Date(dueDate);
+
+  // Calculate the difference in time (milliseconds)
+  const timeDifference = dueDateObj - currentDate;
+
+  // If the due date is in the future, calculate the remaining days
+  if (timeDifference > 0) {
+    const remainingDays = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Convert milliseconds to days
+    if (remainingDays > 1) {
+      remarks = `${remainingDays} Days`;
+    } else if (remainingDays === 1) {
+      remarks = "1 Day";
+    } else {
+      remarks = "Due Date"; // If remainingDays is 0, show "Due Date"
+    }
+  }
+
+  // If the due date is in the past, calculate how overdue it is
+  const overdueDays = Math.floor(Math.abs(timeDifference) / (1000 * 3600 * 24)); // Convert milliseconds to days
+  if (overdueDays === 1) {
+    remarks = "1 Day Overdue";
+  } else if (overdueDays === 0) {
+    remarks = `Due Today`;
+  } else {
+    remarks = `${overdueDays} Days Overdue`;
+  }
 
   const amounts = {
     vatExclusive: 0,
@@ -71,59 +138,161 @@ const CollectedTransaction = ({ row, user }) => {
     nonVatable: 0,
   };
 
-  // Calculate amounts and credits based on vatCalculation and mode
-  aggregatedWasteTransactions.forEach((item) => {
-    const { weight, QuotationWaste } = item;
-    const totalWeightPrice = weight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+  transactions.forEach((transaction) => {
+    const certifiedTransaction =
+      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+        .SortedTransaction[0].CertifiedTransaction?.[0];
 
-    const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+    const typeOfWeight = certifiedTransaction?.typeOfWeight
+      ? certifiedTransaction.typeOfWeight
+      : "SORTED WEIGHT";
 
-    switch (QuotationWaste.vatCalculation) {
-      case "VAT EXCLUSIVE":
-        target.vatExclusive += totalWeightPrice;
-        break;
-      case "VAT INCLUSIVE":
-        target.vatInclusive += totalWeightPrice;
-        break;
-      case "NON VATABLE":
-        target.nonVatable += totalWeightPrice;
-        break;
-      default:
-        break;
-    }
-  });
+    const sortedWasteTransaction =
+      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+        .SortedTransaction[0].SortedWasteTransaction;
 
-  const transpoFee = row.QuotationTransportation?.unitPrice;
-  const transpoVatCalculation = row.QuotationTransportation?.vatCalculation;
-  const transpoMode = row.QuotationTransportation?.mode;
+    // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
+    const aggregatedWasteTransactions = Object.values(
+      sortedWasteTransaction.reduce((acc, current) => {
+        const { id } = current.QuotationWaste;
 
-  const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
-    // Check if the mode is "CHARGE"
-    if (transpoMode === "CHARGE") {
-      // Add the transportation fee based on VAT calculation
-      switch (transpoVatCalculation) {
+        // If the `QuotationWaste.id` is already in the accumulator, add the weight
+        if (acc[id]) {
+          acc[id].weight += current.weight;
+        } else {
+          // Otherwise, set the initial object in the accumulator
+          acc[id] = { ...current, weight: current.weight };
+        }
+
+        return acc;
+      }, {})
+    );
+
+    if (hasFixedRate) {
+      let totalWeight = 0;
+      let vatCalculation;
+      let fixedWeight;
+      let fixedPrice;
+      let unitPrice;
+      let target;
+
+      aggregatedWasteTransactions.forEach((item) => {
+        const { weight, clientWeight, QuotationWaste } = item;
+
+        const selectedWeight =
+          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+        totalWeight += selectedWeight; // Total weight multiplied by unit price
+
+        target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        vatCalculation = QuotationWaste.vatCalculation;
+        fixedWeight = QuotationWaste.fixedWeight;
+        fixedPrice = QuotationWaste.fixedPrice;
+        unitPrice = QuotationWaste.unitPrice;
+      });
+
+      switch (vatCalculation) {
         case "VAT EXCLUSIVE":
-          amounts.vatExclusive += transpoFee;
+          target.vatExclusive = fixedPrice;
           break;
         case "VAT INCLUSIVE":
-          amounts.vatInclusive += transpoFee;
+          target.vatInclusive = fixedPrice;
           break;
         case "NON VATABLE":
-          amounts.nonVatable += transpoFee;
+          target.nonVatable = fixedPrice;
           break;
         default:
           break;
       }
+
+      if (totalWeight > fixedWeight) {
+        const excessWeight = totalWeight - fixedWeight;
+
+        const excessPrice = excessWeight * unitPrice;
+
+        switch (vatCalculation) {
+          case "VAT EXCLUSIVE":
+            target.vatExclusive += excessPrice;
+            break;
+          case "VAT INCLUSIVE":
+            target.vatInclusive += excessPrice;
+            break;
+          case "NON VATABLE":
+            target.nonVatable += excessPrice;
+            break;
+          default:
+            break;
+        }
+      }
+    } else {
+      // Calculate amounts and credits based on vatCalculation and mode
+      aggregatedWasteTransactions.forEach((item) => {
+        const { weight, clientWeight, QuotationWaste } = item;
+
+        const selectedWeight =
+          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+        const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        switch (QuotationWaste.vatCalculation) {
+          case "VAT EXCLUSIVE":
+            target.vatExclusive += totalWeightPrice;
+            break;
+          case "VAT INCLUSIVE":
+            target.vatInclusive += totalWeightPrice;
+            break;
+          case "NON VATABLE":
+            target.nonVatable += totalWeightPrice;
+            break;
+          default:
+            break;
+        }
+      });
     }
-  };
 
-  // Call the function to add transportation fee
-  addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    const transpoFee = transaction.QuotationTransportation?.unitPrice || 0;
+    const transpoVatCalculation =
+      transaction.QuotationTransportation?.vatCalculation;
+    const transpoMode = transaction.QuotationTransportation?.mode;
+    const isTransportation =
+      transaction.ScheduledTransaction?.[0].DispatchedTransaction.length === 0
+        ? false
+        : true;
 
-  const vat = amounts.vatExclusive * 0.12;
+    const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
+      // Check if the mode is "CHARGE"
+      if (transpoMode === "CHARGE") {
+        // Add the transportation fee based on VAT calculation
+        switch (transpoVatCalculation) {
+          case "VAT EXCLUSIVE":
+            amounts.vatExclusive += transpoFee;
+            break;
+          case "VAT INCLUSIVE":
+            amounts.vatInclusive += transpoFee;
+            break;
+          case "NON VATABLE":
+            amounts.nonVatable += transpoFee;
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    // Call the function to add transportation fee
+    if (isTransportation) {
+      addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    }
+  });
 
   const totalAmountDue = formatNumber(
-    amounts.vatInclusive + amounts.vatExclusive + vat - credits.vatInclusive
+    amounts.vatInclusive +
+      amounts.vatExclusive +
+      amounts.vatExclusive * 0.12 -
+      credits.vatInclusive
   );
 
   return (
@@ -152,17 +321,29 @@ const CollectedTransaction = ({ row, user }) => {
             Pending
           </Typography>
           <Typography variant="h5">
+            Billing Number: {billingNumber ? billingNumber : ""}
+          </Typography>
+          <Typography variant="h5">
             Total Amount Due: {totalAmountDue}
           </Typography>
           <Typography variant="h5">
             Terms:{" "}
-            {termsChargeDays
-              ? `${termsChargeDays} DAYS ${termsCharge}`
-              : "Pending"}
+            {termsRemarks
+              ? `${
+                  terms === 0
+                    ? terms === 1
+                      ? `${terms} DAY`
+                      : "CASH"
+                    : `${terms} DAYS`
+                } ${termsRemarks}`
+              : ""}
           </Typography>
           <Typography variant="h5">
             Due Date:{" "}
             {dueDate ? format(new Date(dueDate), "MMMM dd, yyyy") : "Pending"}
+          </Typography>
+          <Typography variant="h5">
+            Remarks: {remarks ? remarks : "NO REMARKS"}
           </Typography>
 
           <br />

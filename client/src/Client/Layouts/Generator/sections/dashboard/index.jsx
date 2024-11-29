@@ -108,9 +108,11 @@ const Dashboard = ({ user }) => {
       setBilledTransactions(billedTransactions);
 
       // Destructure data from the second response
-      const { totals } = calculateResponse.data;
+      const { totals, billedTransaction } = calculateResponse.data;
 
       // Update states related to the second API call
+      console.log(billedTransaction);
+      console.log(totals);
       setTotals(totals);
 
       // Set loading states to false
@@ -409,6 +411,12 @@ const Dashboard = ({ user }) => {
       width: 100,
       valueGetter: (params) => {
         const dueDate = params.row.dueDate;
+        const billingNumber = params.row.billingNumber;
+        const isCollected = totals[billingNumber]?.isCollected;
+
+        if (isCollected) {
+          return "Collected";
+        }
 
         // If no due date is available, return "Pending"
         if (dueDate === "Pending") {

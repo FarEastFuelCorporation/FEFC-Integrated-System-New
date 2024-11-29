@@ -15,6 +15,7 @@ const BilledTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
 
   const billedTransaction = row.BilledTransaction[0];
+  const billingNumber = billedTransaction?.billingNumber;
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
@@ -191,10 +192,7 @@ const BilledTransaction = ({ row, user }) => {
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Remarks:{" "}
-            {billedTransaction?.remarks
-              ? billedTransaction.remarks
-              : "NO REMARKS"}
+            Billing Number: {billingNumber ? billingNumber : ""}
           </Typography>
           <Typography variant="h5">
             Service Invoice Number:{" "}
@@ -203,12 +201,18 @@ const BilledTransaction = ({ row, user }) => {
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
+            Remarks:{" "}
+            {billedTransaction?.remarks
+              ? billedTransaction.remarks
+              : "NO REMARKS"}
+          </Typography>
+          <Typography variant="h5">
             Billed By:{" "}
             {`${billedTransaction?.Employee?.firstName || ""} ${
               billedTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
-          {isBilled && (
+          {isBilled && row.statusId < 11 && (
             <>
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingStatementForm statementRef={certificateRef} row={row} />

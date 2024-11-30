@@ -23,7 +23,7 @@ async function BookedTransactionEmailFormat(
   clientName,
   transactionId,
   haulingDate,
-  formattedTime,
+  haulingTime,
   wasteName,
   typeOfVehicle,
   remarks
@@ -97,7 +97,9 @@ async function BookedTransactionEmailFormat(
                       <td style="padding: 8px; text-align: center;">${formatDate(
                         haulingDate
                       )}</td>
-                      <td style="padding: 8px; text-align: center;">${formattedTime}</td>
+                      <td style="padding: 8px; text-align: center;">${convertTo12HourFormat(
+                        haulingTime
+                      )}</td>
                   </tr>
                   <tr style="background-color: #007bff; color: white; text-align: left;">
                       <th style="padding: 8px; text-align: center;">${

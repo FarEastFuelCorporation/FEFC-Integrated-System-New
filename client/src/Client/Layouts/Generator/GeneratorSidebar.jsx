@@ -439,14 +439,6 @@ const GeneratorSidebar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-            <Item
-              title="Calendar"
-              to="calendar"
-              icon={<AccountBoxIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
           </Box>
         </Menu>
       </ProSidebar>

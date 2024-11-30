@@ -23,15 +23,6 @@ const { BookedTransactionEmailFormat } = require("../utils/emailFormat");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
 const statusId = 1;
 
-function convertTo12HourFormat(time) {
-  const [hour, minute] = time.split(":").map(Number);
-  const period = hour >= 12 ? "PM" : "AM";
-  const convertedHour = hour % 12 || 12; // Convert 0 to 12 for midnight
-  return `${convertedHour.toString().padStart(2, "0")}:${minute
-    .toString()
-    .padStart(2, "0")} ${period}`;
-}
-
 // Create Booked Transaction controller
 async function createBookedTransactionController(req, res) {
   try {
@@ -114,14 +105,13 @@ async function createBookedTransactionController(req, res) {
     const clientName = bookedTransaction?.Client?.clientName || "";
     const clientId = bookedTransaction?.createdBy || "";
     const clientType = clientId?.slice(0, 3) || "";
-    const formattedTime = convertTo12HourFormat(haulingTime);
 
     const emailBody = await BookedTransactionEmailFormat(
       clientType,
       clientName,
       transactionId,
       haulingDate,
-      formattedTime,
+      haulingTime,
       wasteName,
       typeOfVehicle,
       remarks

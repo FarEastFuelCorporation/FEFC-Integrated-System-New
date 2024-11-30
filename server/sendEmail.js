@@ -11,6 +11,20 @@ const sendEmail = async (
   delay = 2000
 ) => {
   try {
+    if (!to) {
+      console.warn("No primary recipient specified, using CC as fallback.");
+
+      // Check if cc is a non-empty string and use it as the fallback
+      to = cc ? cc : null;
+      cc = null; // Clear CC since it's being used as the `to` field
+    }
+
+    // If there's still no recipient, skip sending
+    if (!to) {
+      console.error("No recipients defined for email. Skipping sending.");
+      return false;
+    }
+
     const mailOptions = {
       from: process.env.EMAIL_USERNAME, // Sender's email address
       to: to, // Recipient's email address

@@ -108,11 +108,9 @@ const Dashboard = ({ user }) => {
       setBilledTransactions(billedTransactions);
 
       // Destructure data from the second response
-      const { totals, billedTransaction } = calculateResponse.data;
+      const { totals } = calculateResponse.data;
 
       // Update states related to the second API call
-      console.log(billedTransaction);
-      console.log(totals);
       setTotals(totals);
 
       // Set loading states to false

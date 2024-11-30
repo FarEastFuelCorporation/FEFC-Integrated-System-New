@@ -131,6 +131,7 @@ const Quotations = ({ user }) => {
       if (
         user.userType === "GEN" ||
         user.userType === "TRP" ||
+        user.userType === "CUS" ||
         user.userType === "IFM"
       ) {
         response = await axios.get(`${apiUrl}/api/quotation/${user.id}`);
@@ -414,67 +415,79 @@ const Quotations = ({ user }) => {
       minWidth: 120,
       renderCell: renderCellWithWrapText,
     },
-    {
-      field: "clientPicture",
-      headerName: "Logo",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 50,
-      renderCell: (params) => {
-        // Check if params.value is valid
-        if (params.value && params.value.data && params.value.type) {
-          try {
-            // Convert Buffer to Uint8Array
-            const uint8Array = new Uint8Array(params.value.data);
-            // Create Blob from Uint8Array
-            const blob = new Blob([uint8Array], { type: params.value.type });
-            // Create object URL from Blob
-            const imageUrl = URL.createObjectURL(blob);
+    // Conditionally render "Logo" column based on userType
+    ...(Number.isInteger(user?.userType)
+      ? [
+          {
+            field: "clientPicture",
+            headerName: "Logo",
+            headerAlign: "center",
+            align: "center",
+            sortable: false,
+            width: 50,
+            renderCell: (params) => {
+              // Check if params.value is valid
+              if (params.value && params.value.data && params.value.type) {
+                try {
+                  // Convert Buffer to Uint8Array
+                  const uint8Array = new Uint8Array(params.value.data);
+                  // Create Blob from Uint8Array
+                  const blob = new Blob([uint8Array], {
+                    type: params.value.type,
+                  });
+                  // Create object URL from Blob
+                  const imageUrl = URL.createObjectURL(blob);
 
-            return (
-              <img
-                src={imageUrl}
-                alt="Logo"
-                style={{ width: 40, height: 40, borderRadius: "50%" }}
-              />
-            );
-          } catch (error) {
-            console.error("Error creating image URL:", error);
-            return (
-              <img
-                src="/assets/unknown.png"
-                alt="Logo"
-                style={{ width: 40, height: 40, borderRadius: "50%" }}
-              />
-            );
-          }
-        } else {
-          return (
-            <img
-              src="/assets/unknown.png"
-              alt="Logo"
-              style={{ width: 40, height: 40, borderRadius: "50%" }}
-            />
-          );
-        }
-      },
-    },
-    {
-      field: "clientName",
-      headerName: "Client Name",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
+                  return (
+                    <img
+                      src={imageUrl}
+                      alt="Logo"
+                      style={{ width: 40, height: 40, borderRadius: "50%" }}
+                    />
+                  );
+                } catch (error) {
+                  console.error("Error creating image URL:", error);
+                  return (
+                    <img
+                      src="/assets/unknown.png"
+                      alt="Logo"
+                      style={{ width: 40, height: 40, borderRadius: "50%" }}
+                    />
+                  );
+                }
+              } else {
+                return (
+                  <img
+                    src="/assets/unknown.png"
+                    alt="Logo"
+                    style={{ width: 40, height: 40, borderRadius: "50%" }}
+                  />
+                );
+              }
+            },
+          },
+        ]
+      : []), // Exclude the column if userType is not an integer
+    // Conditionally render "Client Name" column based on userType
+    ...(Number.isInteger(user?.userType)
+      ? [
+          {
+            field: "clientName",
+            headerName: "Client Name",
+            headerAlign: "center",
+            align: "center",
+            flex: 1,
+            minWidth: 150,
+            renderCell: renderCellWithWrapText,
+          },
+        ]
+      : []), // Exclude the column if userType is not an integer
     {
       field: "termsCharge",
       headerName: "Terms (Charge)",
       headerAlign: "center",
       align: "center",
-      minWidth: 120,
+      minWidth: 200,
       renderCell: (params) => {
         let termsCharge;
 
@@ -501,7 +514,7 @@ const Quotations = ({ user }) => {
       headerName: "Terms (Buying)",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      width: 200,
       renderCell: (params) => {
         let termsBuying;
 

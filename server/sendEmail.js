@@ -1,6 +1,15 @@
 const transporter = require("./mailer");
 
-const sendEmail = async (to, subject, text, html, cc = null, bcc = null) => {
+const sendEmail = async (
+  to,
+  subject,
+  text,
+  html,
+  cc = null,
+  bcc = null,
+  retries = 3,
+  delay = 2000
+) => {
   try {
     const mailOptions = {
       from: process.env.EMAIL_USERNAME, // Sender's email address
@@ -17,8 +26,20 @@ const sendEmail = async (to, subject, text, html, cc = null, bcc = null) => {
     return true; // Return success
   } catch (error) {
     console.error("Error sending email:", error);
-    return false; // Return failure
+    if (retries > 0) {
+      console.log(`Error sending email, retrying... attempts left: ${retries}`);
+      await delayFunction(delay); // Wait for a specified delay before retrying
+      return sendEmail(to, subject, text, html, cc, bcc, retries - 1, delay); // Retry sending email
+    } else {
+      console.error("Failed to send email after multiple attempts:", error);
+      return false; // Return failure after all retries
+    }
   }
+};
+
+// Helper function to introduce delay between retries
+const delayFunction = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 module.exports = sendEmail;

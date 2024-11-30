@@ -56,6 +56,7 @@ const BookModal = ({
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
       setQuotationsData(flattenedData);
+      console.log(flattenedData);
     } else {
       console.error(
         "quotations or quotations.quotations is undefined or not an array"
@@ -244,11 +245,14 @@ const BookModal = ({
           autoComplete="off"
         >
           {quotationsData.map((q, index) =>
-            q.QuotationWaste.map((waste, wasteIndex) => (
-              <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
-                {waste.wasteName} - {waste.unit}
-              </MenuItem>
-            ))
+            q.QuotationWaste.sort((a, b) =>
+              a.wasteName.localeCompare(b.wasteName)
+            ) // Sort wasteName in ascending order
+              .map((waste, wasteIndex) => (
+                <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
+                  {waste.wasteName} - {waste.unit}
+                </MenuItem>
+              ))
           )}
         </TextField>
         {(filteredVehicleTypes.length > 0 || formData.quotationWasteId) && (

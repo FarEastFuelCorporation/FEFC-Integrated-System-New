@@ -24,6 +24,7 @@ import {
 } from "@mui/icons-material";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import axios from "axios";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
@@ -418,7 +419,7 @@ const GeneratorSidebar = ({ user }) => {
             <Item
               title="Quotations"
               to="quotations"
-              icon={<ContactsOutlinedIcon />}
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
@@ -434,6 +435,14 @@ const GeneratorSidebar = ({ user }) => {
               title="Calendar"
               to="calendar"
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Calendar"
+              to="calendar"
+              icon={<AccountBoxIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

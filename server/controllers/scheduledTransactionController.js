@@ -11,6 +11,12 @@ const QuotationTransportation = require("../models/QuotationTransportation");
 const VehicleType = require("../models/VehicleType");
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
+const {
+  ScheduleTransactionEmailFormat,
+  ScheduleTransactionEmailToLogisticsFormat,
+} = require("../utils/emailFormat");
+const sendEmail = require("../sendEmail");
+const QuotationWaste = require("../models/QuotationWaste");
 const statusId = 1;
 
 // Create Scheduled Transaction controller
@@ -30,7 +36,7 @@ async function createScheduledTransactionController(req, res) {
     remarks = remarks && remarks.toUpperCase();
 
     // Creating a new transaction
-    await ScheduledTransaction.create({
+    const scheduledTransaction = await ScheduledTransaction.create({
       bookedTransactionId,
       logisticsId,
       scheduledDate,
@@ -42,7 +48,19 @@ async function createScheduledTransactionController(req, res) {
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       {
-        attributes: ["id", "transactionId", "statusId"],
+        attributes: [
+          "id",
+          "transactionId",
+          "quotationWasteId",
+          "quotationTransportationId",
+          "statusId",
+          "createdBy",
+        ],
+        include: {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName", "email"],
+        },
       }
     );
 
@@ -62,6 +80,117 @@ async function createScheduledTransactionController(req, res) {
         null,
         transactionId
       );
+
+      const quotationWaste = await QuotationWaste.findByPk(
+        updatedBookedTransaction.quotationWasteId,
+        {
+          attributes: ["wasteName"],
+        }
+      );
+
+      const quotationTransportation = await QuotationTransportation.findByPk(
+        updatedBookedTransaction.quotationTransportationId,
+        {
+          attributes: ["vehicleTypeId"],
+          include: {
+            model: VehicleType,
+            as: "VehicleType",
+            attributes: ["typeOfVehicle"],
+          },
+        }
+      );
+
+      const scheduledTransactionData = await ScheduledTransaction.findByPk(
+        scheduledTransaction.id,
+        {
+          attributes: ["createdBy"],
+          include: {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        }
+      );
+
+      const wasteName = quotationWaste ? quotationWaste.wasteName : "";
+      const typeOfVehicle =
+        quotationTransportation?.VehicleType?.typeOfVehicle || "";
+      const clientName = updatedBookedTransaction?.Client?.clientName || "";
+      const clientId = updatedBookedTransaction?.createdBy || "";
+      const clientType = clientId?.slice(0, 3) || "";
+      const scheduledBy = `${scheduledTransactionData.Employee.firstName} ${scheduledTransactionData.Employee.lastName}`;
+      const clientEmail = updatedBookedTransaction?.Client?.email || "";
+
+      const emailBody = await ScheduleTransactionEmailFormat(
+        clientType,
+        clientName,
+        transactionId,
+        scheduledDate,
+        scheduledTime,
+        wasteName,
+        typeOfVehicle,
+        remarks,
+        scheduledBy
+      );
+
+      try {
+        sendEmail(
+          clientEmail, // Recipient
+          `${transactionId} - Scheduled Transaction: ${clientName}`, // Subject
+          "Please view this email in HTML format.", // Plain-text fallback
+          emailBody, // HTML content
+          ["marketing@fareastfuelcorp.com"], // cc
+          [
+            "rmangaron@fareastfuelcorp.com",
+            "edevera@fareastfuelcorp.com",
+            "eb.devera410@gmail.com",
+            "cc.duran@fareastfuel.com",
+            "dcardinez@fareastfuelcorp.com",
+            "dm.cardinez@fareastfuel.com",
+          ] // bcc
+        ).catch((emailError) => {
+          console.error("Error sending email:", emailError);
+        });
+      } catch (error) {
+        console.error("Unexpected error when sending email:", error);
+      }
+
+      if (logisticsId === "0577d985-8f6f-47c7-be3c-20ca86021154") {
+        console.log("pass");
+        const emailBody2 = await ScheduleTransactionEmailToLogisticsFormat(
+          clientType,
+          clientName,
+          transactionId,
+          scheduledDate,
+          scheduledTime,
+          wasteName,
+          typeOfVehicle,
+          remarks,
+          scheduledBy
+        );
+
+        try {
+          sendEmail(
+            "logistics@fareastfuelcorp.com", // Recipient
+            `${transactionId} - Scheduled Transaction: ${clientName}`, // Subject
+            "Please view this email in HTML format.", // Plain-text fallback
+            emailBody2, // HTML content
+            ["marketing@fareastfuelcorp.com"], // cc
+            [
+              "rmangaron@fareastfuelcorp.com",
+              "edevera@fareastfuelcorp.com",
+              "eb.devera410@gmail.com",
+              "cc.duran@fareastfuel.com",
+              "dcardinez@fareastfuelcorp.com",
+              "dm.cardinez@fareastfuel.com",
+            ] // bcc
+          ).catch((emailError) => {
+            console.error("Error sending email:", emailError);
+          });
+        } catch (error) {
+          console.error("Unexpected error when sending email:", error);
+        }
+      }
 
       // Respond with the updated data
       res.status(201).json({

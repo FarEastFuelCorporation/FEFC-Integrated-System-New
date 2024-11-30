@@ -14,15 +14,6 @@ const sendEmail = require("../sendEmail");
 const transactionStatusId = 9;
 const additionalStatusId = [5, 6, 7, 8];
 
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
-}
-
 // Create Billed Transaction controller
 async function createBilledTransactionController(req, res) {
   const transaction = await sequelize.transaction();
@@ -89,9 +80,7 @@ async function createBilledTransactionController(req, res) {
       }
 
       transactions[id].transactionId = updatedBookedTransaction.transactionId;
-      transactions[id].haulingDate = formatDate(
-        updatedBookedTransaction.haulingDate
-      );
+      transactions[id].haulingDate = updatedBookedTransaction.haulingDate;
       transactions[id].billingNumber = billingNumber;
 
       if (updatedBookedTransaction && isCertified) {
@@ -114,7 +103,7 @@ async function createBilledTransactionController(req, res) {
 
     try {
       sendEmail(
-        "dcardinez@fareastfuelcorp.com	", // Recipient
+        "dcardinez@fareastfuelcorp.com", // Recipient
         `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
         emailBody, // HTML content

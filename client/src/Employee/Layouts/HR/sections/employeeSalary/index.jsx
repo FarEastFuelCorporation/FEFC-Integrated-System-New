@@ -248,14 +248,14 @@ const EmployeeSalary = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 200,
-      renderCell: (params) => {
-        let value = {};
-        value.value =
+      valueGetter: (params) => {
+        const value =
           `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
           "";
 
-        return renderCellWithWrapText(value);
+        return value;
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "designation",

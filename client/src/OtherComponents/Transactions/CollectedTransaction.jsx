@@ -108,22 +108,24 @@ const CollectedTransaction = ({ row, user }) => {
   if (timeDifference > 0) {
     const remainingDays = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Convert milliseconds to days
     if (remainingDays > 1) {
-      remarks = `${remainingDays} Days`;
+      remarks = `${remainingDays} Days Before Due Date`;
     } else if (remainingDays === 1) {
-      remarks = "1 Day";
+      remarks = "1 Day Before Due Date";
     } else {
-      remarks = "Due Date"; // If remainingDays is 0, show "Due Date"
+      remarks = "Due Date Today"; // If remainingDays is 0, show "Due Date"
     }
-  }
-
-  // If the due date is in the past, calculate how overdue it is
-  const overdueDays = Math.floor(Math.abs(timeDifference) / (1000 * 3600 * 24)); // Convert milliseconds to days
-  if (overdueDays === 1) {
-    remarks = "1 Day Overdue";
-  } else if (overdueDays === 0) {
-    remarks = `Due Today`;
   } else {
-    remarks = `${overdueDays} Days Overdue`;
+    // If the due date is in the past, calculate how overdue it is
+    const overdueDays = Math.floor(
+      Math.abs(timeDifference) / (1000 * 3600 * 24)
+    ); // Convert milliseconds to days
+    if (overdueDays === 1) {
+      remarks = "1 Day Overdue";
+    } else if (overdueDays === 0) {
+      remarks = `Due Today`;
+    } else {
+      remarks = `${overdueDays} Days Overdue`;
+    }
   }
 
   const amounts = {

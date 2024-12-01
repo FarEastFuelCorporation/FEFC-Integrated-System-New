@@ -80,7 +80,7 @@ async function BookedTransactionEmailFormat(
                 <p>Dear Marketing Department,</p>
                 <p>The following client has successfully booked a ${
                   clientType === "CUS" ? "delivery" : "hauling"
-                }transaction. Please see the details below:</p>
+                } transaction. Please see the details below:</p>
                   <p><strong>Client Name:</strong> ${clientName}</p>
                   <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                   <tr style="background-color: #007bff; color: white; text-align: left;">

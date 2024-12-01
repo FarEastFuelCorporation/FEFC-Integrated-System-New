@@ -565,6 +565,8 @@ async function geBookedTransactionsDashboardFullController(req, res) {
 
     const processedIds = new Set();
 
+    let totalWeight = 0;
+
     billedTransactions.forEach((transaction) => {
       const bookedTransactionId = transaction.BookedTransaction.id;
       console.log(bookedTransactionId);
@@ -661,7 +663,6 @@ async function geBookedTransactionsDashboardFullController(req, res) {
       );
 
       if (hasFixedRate) {
-        let totalWeight = 0;
         let vatCalculation;
         let fixedWeight;
         let fixedPrice;

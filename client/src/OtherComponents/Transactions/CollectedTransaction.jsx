@@ -138,6 +138,8 @@ const CollectedTransaction = ({ row, user }) => {
     nonVatable: 0,
   };
 
+  let totalWeight = 0;
+
   transactions.forEach((transaction) => {
     const certifiedTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
@@ -169,7 +171,6 @@ const CollectedTransaction = ({ row, user }) => {
     );
 
     if (hasFixedRate) {
-      let totalWeight = 0;
       let vatCalculation;
       let fixedWeight;
       let fixedPrice;

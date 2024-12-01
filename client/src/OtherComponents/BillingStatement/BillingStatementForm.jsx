@@ -88,6 +88,8 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     nonVatable: 0,
   };
 
+  let totalWeight = 0;
+
   transactions.forEach((transaction) => {
     const certifiedTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
@@ -119,7 +121,6 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     );
 
     if (hasFixedRate) {
-      let totalWeight = 0;
       let vatCalculation;
       let fixedWeight;
       let fixedPrice;
@@ -169,6 +170,9 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
         default:
           break;
       }
+
+      console.log(totalWeight);
+      console.log(fixedWeight);
 
       if (totalWeight > fixedWeight) {
         const excessWeight = totalWeight - fixedWeight;

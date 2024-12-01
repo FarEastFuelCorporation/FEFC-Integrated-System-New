@@ -405,7 +405,7 @@ const BillingContent = ({
               return combinedRows;
             })}
           {hasFixedRate && (
-            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${1}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -420,7 +420,7 @@ const BillingContent = ({
             </TableRow>
           )}
           {hasFixedRate && (
-            <TableRow key={`add-${1}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${2}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -438,7 +438,7 @@ const BillingContent = ({
           )}
 
           {hasFixedRate && (
-            <TableRow key={`add-${2}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -459,7 +459,7 @@ const BillingContent = ({
             </TableRow>
           )}
           {hasFixedRate && totalWeight > fixedWeight && (
-            <TableRow key={`add-${2}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${4}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -480,7 +480,7 @@ const BillingContent = ({
             </TableRow>
           )}
           {remarks && (
-            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${5}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -495,7 +495,7 @@ const BillingContent = ({
             </TableRow>
           )}
           {remarks && (
-            <TableRow key={`add-${4}`} sx={{ border: "black" }}>
+            <TableRow key={`add-${6}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>

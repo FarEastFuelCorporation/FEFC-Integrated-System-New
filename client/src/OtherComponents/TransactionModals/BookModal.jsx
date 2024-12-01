@@ -56,7 +56,6 @@ const BookModal = ({
           : null, // Convert timestamp to yyyy-mm-dd format
       }));
       setQuotationsData(flattenedData);
-      console.log(flattenedData);
     } else {
       console.error(
         "quotations or quotations.quotations is undefined or not an array"

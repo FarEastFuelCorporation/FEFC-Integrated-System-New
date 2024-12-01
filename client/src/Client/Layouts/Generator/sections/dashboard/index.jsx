@@ -17,10 +17,10 @@ import { tokens } from "../../../../../theme";
 import { ResponsivePie } from "@nivo/pie";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import EventRepeatIcon from "@mui/icons-material/EventRepeat";
-import ApprovalIcon from "@mui/icons-material/Approval";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import StarBorderPurple500Icon from "@mui/icons-material/StarBorderPurple500";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import WeekNavigator from "../../../../../OtherComponents/WeekNavigator";
@@ -139,11 +139,6 @@ const Dashboard = ({ user }) => {
   const handleOpenPDFInNewTab = () => {
     const input = certificateRef.current;
 
-    if (!input) {
-      console.error("PDF generation failed: certificateRef is not ready.");
-      return;
-    }
-
     const pageHeight = 1056;
     const pageWidth = 816;
     const pdf = new jsPDF({
@@ -152,39 +147,47 @@ const Dashboard = ({ user }) => {
       format: [pageWidth, pageHeight], // Page size in px
     });
 
+    // Function to process and add each page
     const processPage = (pageIndex, pages) => {
       if (pageIndex >= pages.length) {
+        // All pages are processed, generate the PDF
         const pdfOutput = pdf.output("blob");
         const pdfUrl = URL.createObjectURL(pdfOutput);
         window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
+        setTimeout(() => {
+          setLoadingRowId(null);
+          setRow(null);
+        }, 0); // Delay state updates
         return;
       }
 
+      // Capture the content of the current page using html2canvas
       html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
 
         if (pageIndex === 0) {
+          // Add the first page
           pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
         } else {
+          // Add subsequent pages
           pdf.addPage([pageWidth, pageHeight]);
           pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
         }
 
+        // Process the next page
         processPage(pageIndex + 1, pages);
       });
     };
 
+    // Break the content into multiple pages if needed
     const pages = Array.from(input.children); // Assuming each page is a child of input
     processPage(0, pages); // Start processing pages from the first one
-    setLoadingRowId(null);
-    setRow(null);
   };
 
   const data = [
     { id: "Pending", label: "Pending", value: pending },
     { id: "In Progress", label: "In Progress", value: inProgress },
-    { id: "Certified", label: "Certified", value: certified },
-    { id: "Billed", label: "Billed", value: billed },
+    { id: "Finished", label: "Finished", value: certified },
   ];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -434,11 +437,11 @@ const Dashboard = ({ user }) => {
         if (timeDifference > 0) {
           const remainingDays = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Convert milliseconds to days
           if (remainingDays > 1) {
-            return `${remainingDays} Days`;
+            return `${remainingDays} Days Before Due Date`;
           } else if (remainingDays === 1) {
-            return "1 Day";
+            return "1 Day Before Due Date";
           } else {
-            return "Due Date"; // If remainingDays is 0, show "Due Date"
+            return "Due Date Today"; // If remainingDays is 0, show "Due Date"
           }
         }
 
@@ -449,7 +452,7 @@ const Dashboard = ({ user }) => {
         if (overdueDays === 1) {
           return "1 Day Overdue";
         } else if (overdueDays === 0) {
-          return `Due Today`;
+          return `Due Date Today`;
         } else {
           return `${overdueDays} Days Overdue`;
         }
@@ -720,13 +723,13 @@ const Dashboard = ({ user }) => {
                 >
                   <Box>
                     <Typography variant="h6" gutterBottom>
-                      Certified
+                      Finished
                     </Typography>
                     <Typography variant="h4" color="textSecondary">
                       {certified}
                     </Typography>
                   </Box>
-                  <ApprovalIcon
+                  <AssignmentTurnedInIcon
                     sx={{ fontSize: 40, marginRight: 2 }}
                     color="secondary"
                   />

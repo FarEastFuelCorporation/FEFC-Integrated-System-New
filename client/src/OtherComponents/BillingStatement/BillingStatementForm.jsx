@@ -171,9 +171,6 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
           break;
       }
 
-      console.log(totalWeight);
-      console.log(fixedWeight);
-
       if (totalWeight > fixedWeight) {
         const excessWeight = totalWeight - fixedWeight;
 

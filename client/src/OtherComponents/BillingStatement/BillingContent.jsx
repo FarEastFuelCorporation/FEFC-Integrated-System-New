@@ -32,7 +32,7 @@ const BillingContent = ({
   let totalWeight = 0;
 
   const firstPageHeight = pageHeight - headerHeight;
-  const nextPageHeight = pageHeight;
+  const nextPageHeight = pageHeight - 95;
 
   // Helper function to calculate total height of rows and divide into pages
   const calculatePageContent = useCallback(() => {

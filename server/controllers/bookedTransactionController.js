@@ -598,7 +598,8 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         transaction.BookedTransaction.ScheduledTransaction[0]
           .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0];
 
-      const typeOfWeight = certifiedTransaction.typeOfWeight;
+      const typeOfWeight =
+        certifiedTransaction?.typeOfWeight || "SORTED WEIGHT";
 
       const hasFixedRate =
         transaction.BookedTransaction.QuotationWaste?.hasFixedRate;

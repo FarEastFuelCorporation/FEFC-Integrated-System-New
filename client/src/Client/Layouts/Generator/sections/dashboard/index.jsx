@@ -399,7 +399,7 @@ const Dashboard = ({ user }) => {
         // Store the computed dueDate into the row for use in remainingDays column
         params.row.dueDate = dueDate;
 
-        return formatDate3(dueDate);
+        return dueDate === "Pending" ? "Pending" : formatDate3(dueDate);
       },
       renderCell: renderCellWithWrapText,
     },

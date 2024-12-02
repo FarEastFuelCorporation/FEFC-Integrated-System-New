@@ -245,6 +245,7 @@ const Transaction = ({
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
               setRow(response.data.transaction.transaction);
+              console.log(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {
               console.error("Error fetching document file:", error);
@@ -753,14 +754,15 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 7 && (
-                        <TreatedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
+                      {row.statusId >= 7 ||
+                        (row.statusId === 5 && (
+                          <TreatedTransaction
+                            row={row}
+                            handleOpenModal={handleOpenModal}
+                            handleDeleteClick={handleDeleteClick}
+                            user={user}
+                          />
+                        ))}
                       {row.statusId >= 4 &&
                         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
                           ?.submitTo === "SORTING" && (

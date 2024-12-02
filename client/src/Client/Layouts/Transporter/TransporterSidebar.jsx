@@ -69,6 +69,7 @@ const TransporterSidebar = ({ user }) => {
     billerAddress: "",
     billerContactPerson: "",
     billerContactNumber: "",
+    billerTinNumber: "",
     clientPicture: "",
   });
 
@@ -120,6 +121,7 @@ const TransporterSidebar = ({ user }) => {
       billerAddress: clientDetails?.billerAddress || "",
       billerContactPerson: clientDetails?.billerContactPerson || "",
       billerContactNumber: clientDetails?.billerContactNumber || "",
+      billerTinNumber: clientDetails?.billerTinNumber || "",
       clientPicture: clientDetails?.clientPicture || "",
     });
   }, [user]);
@@ -176,6 +178,7 @@ const TransporterSidebar = ({ user }) => {
         "billerContactNumber",
         clientDetails.billerContactNumber
       );
+      formDataToSend.append("billerTinNumber", clientDetails.billerTinNumber);
       formDataToSend.append("clientPicture", clientDetails.clientPicture);
       formDataToSend.append("submittedBy", clientDetails.submittedBy);
       // Add clientPicture if it's selected
@@ -183,7 +186,7 @@ const TransporterSidebar = ({ user }) => {
         formDataToSend.append("clientPicture", selectedFile);
       }
       // Update existing client
-      await axios.put(
+      const response = await axios.put(
         `${apiUrl}/api/client/${clientDetails.id}`,
         formDataToSend,
         {
@@ -202,9 +205,26 @@ const TransporterSidebar = ({ user }) => {
         reader.readAsDataURL(selectedFile);
       }
 
+      const data = response.data.client;
+
+      setClientDetails({
+        id: data?.id || "",
+        clientId: data?.clientId || "",
+        clientName: data?.clientName || "",
+        address: data?.address || "",
+        natureOfBusiness: data?.natureOfBusiness || "",
+        contactNumber: data?.contactNumber || "",
+        clientType: data?.clientType || "",
+        billerName: data?.billerName || "",
+        billerAddress: data?.billerAddress || "",
+        billerContactPerson: data?.billerContactPerson || "",
+        billerContactNumber: data?.billerContactNumber || "",
+        billerTinNumber: data?.billerTinNumber || "",
+        clientPicture: data?.clientPicture || "",
+      });
+
       setSuccessMessage("Client updated successfully!");
       setShowSuccessMessage(true); // Show the success message
-      initializeClientDetails();
       handleCloseModal();
     } catch (error) {
       console.error("Error:", error);
@@ -469,6 +489,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Client Name"
             name="clientName"
+            autoComplete="off"
             value={clientDetails.clientName}
             onChange={handleInputChange}
           />
@@ -477,6 +498,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Address"
             name="address"
+            autoComplete="off"
             value={clientDetails.address}
             onChange={handleInputChange}
           />
@@ -485,6 +507,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Nature of Business"
             name="natureOfBusiness"
+            autoComplete="off"
             value={clientDetails.natureOfBusiness}
             onChange={handleInputChange}
           />
@@ -493,6 +516,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Contact Number"
             name="contactNumber"
+            autoComplete="off"
             value={clientDetails.contactNumber}
             onChange={handleInputChange}
           />
@@ -501,6 +525,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Client Type"
             name="clientType"
+            autoComplete="off"
             value={clientDetails.clientType}
             onChange={handleInputChange}
             disabled
@@ -510,6 +535,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Biller Name"
             name="billerName"
+            autoComplete="off"
             value={clientDetails.billerName}
             onChange={handleInputChange}
           />
@@ -518,6 +544,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Biller Address"
             name="billerAddress"
+            autoComplete="off"
             value={clientDetails.billerAddress}
             onChange={handleInputChange}
           />
@@ -526,6 +553,7 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Biller Contact Person"
             name="billerContactPerson"
+            autoComplete="off"
             value={clientDetails.billerContactPerson}
             onChange={handleInputChange}
           />
@@ -534,7 +562,17 @@ const TransporterSidebar = ({ user }) => {
             fullWidth
             label="Biller Contact Number"
             name="billerContactNumber"
+            autoComplete="off"
             value={clientDetails.billerContactNumber}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            label="Biller TIN Number"
+            name="billerTinNumber"
+            autoComplete="off"
+            value={clientDetails.billerTinNumber}
             onChange={handleInputChange}
           />
           <input

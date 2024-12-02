@@ -183,7 +183,7 @@ const Transaction = ({
     },
     {
       field: "status",
-      headerName: "Status",
+      headerName: "Transaction Status",
       headerAlign: "center",
       align: "center",
       width: 150,
@@ -198,50 +198,39 @@ const Transaction = ({
           status = "DISPATCHED";
         } else if (params.row.statusId === 4) {
           status = "RECEIVED";
-        } else if (
-          params.row.statusId === 5 &&
-          params.row.BilledTransaction.length === 0
-        ) {
+        } else if (params.row.statusId === 5) {
           status = "SORTED";
-        } else if (
-          params.row.statusId === 6 &&
-          params.row.BilledTransaction.length === 0
-        ) {
+        } else if (params.row.statusId === 6) {
           status = "WARHOUSED IN";
-        } else if (
-          params.row.statusId === 7 &&
-          params.row.BilledTransaction.length === 0
-        ) {
+        } else if (params.row.statusId === 7) {
           status = "WARHOUSED OUT";
-        } else if (
-          params.row.statusId === 8 &&
-          params.row.BilledTransaction.length === 0
-        ) {
+        } else if (params.row.statusId === 8) {
           status = "TREATED";
-        } else if (
-          params.row.statusId === 9 &&
-          params.row.BilledTransaction.length === 0
-        ) {
+        } else if (params.row.statusId >= 9) {
           status = "CERTIFIED";
-        } else if (
-          (params.row.statusId === 5 ||
-            params.row.statusId === 6 ||
-            params.row.statusId === 7 ||
-            params.row.statusId === 8 ||
-            params.row.statusId === 9 ||
-            params.row.statusId === 10) &&
+        }
+
+        let value = {};
+        value.value = status;
+
+        return renderCellWithWrapText(value);
+      },
+    },
+    {
+      field: "billingStatus",
+      headerName: "Billing Status",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: (params) => {
+        let status;
+
+        if (
           params.row.BilledTransaction?.length > 0 &&
-          !params.row.BilledTransaction?.BillingApprovalTransaction
+          !params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ) {
           status = "BILLED";
         } else if (
-          (params.row.statusId === 5 ||
-            params.row.statusId === 6 ||
-            params.row.statusId === 7 ||
-            params.row.statusId === 8 ||
-            params.row.statusId === 9 ||
-            params.row.statusId === 10 ||
-            params.row.statusId === 11) &&
           params.row.BilledTransaction?.length > 0 &&
           params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ) {
@@ -250,6 +239,8 @@ const Transaction = ({
           status = "BILLING DISTRIBUTED";
         } else if (params.row.statusId === 13) {
           status = "COLLECTED";
+        } else {
+          status = "PENDING";
         }
 
         let value = {};

@@ -109,6 +109,8 @@ const Transaction = ({
     </div>
   );
 
+  console.log(transactions);
+
   const columns = [
     {
       field: "transactionId",
@@ -196,19 +198,53 @@ const Transaction = ({
           status = "DISPATCHED";
         } else if (params.row.statusId === 4) {
           status = "RECEIVED";
-        } else if (params.row.statusId === 5) {
+        } else if (
+          params.row.statusId === 5 &&
+          params.row.BilledTransaction.length === 0
+        ) {
           status = "SORTED";
-        } else if (params.row.statusId === 6) {
+        } else if (
+          params.row.statusId === 6 &&
+          params.row.BilledTransaction.length === 0
+        ) {
           status = "WARHOUSED IN";
-        } else if (params.row.statusId === 7) {
+        } else if (
+          params.row.statusId === 7 &&
+          params.row.BilledTransaction.length === 0
+        ) {
           status = "WARHOUSED OUT";
-        } else if (params.row.statusId === 8) {
+        } else if (
+          params.row.statusId === 8 &&
+          params.row.BilledTransaction.length === 0
+        ) {
           status = "TREATED";
-        } else if (params.row.statusId === 9) {
+        } else if (
+          params.row.statusId === 9 &&
+          params.row.BilledTransaction.length === 0
+        ) {
           status = "CERTIFIED";
-        } else if (params.row.statusId === 10) {
+        } else if (
+          (params.row.statusId === 5 ||
+            params.row.statusId === 6 ||
+            params.row.statusId === 7 ||
+            params.row.statusId === 8 ||
+            params.row.statusId === 9 ||
+            params.row.statusId === 10) &&
+          params.row.BilledTransaction?.length > 0 &&
+          !params.row.BilledTransaction?.BillingApprovalTransaction
+        ) {
           status = "BILLED";
-        } else if (params.row.statusId === 11) {
+        } else if (
+          (params.row.statusId === 5 ||
+            params.row.statusId === 6 ||
+            params.row.statusId === 7 ||
+            params.row.statusId === 8 ||
+            params.row.statusId === 9 ||
+            params.row.statusId === 10 ||
+            params.row.statusId === 11) &&
+          params.row.BilledTransaction?.length > 0 &&
+          params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
+        ) {
           status = "BILLING APPROVED";
         } else if (params.row.statusId === 12) {
           status = "BILLING DISTRIBUTED";
@@ -245,7 +281,6 @@ const Transaction = ({
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
               setRow(response.data.transaction.transaction);
-              console.log(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {
               console.error("Error fetching document file:", error);
@@ -567,7 +602,13 @@ const Transaction = ({
                                 (user.userType === 7 &&
                                   (row.statusId === 9 ||
                                     row.statusId === 10)) ||
-                                (user.userType === 8 && row.statusId === 10) ||
+                                (user.userType === 8 &&
+                                  (row.statusId === 5 ||
+                                    row.statusId === 6 ||
+                                    row.statusId === 7 ||
+                                    row.statusId === 8 ||
+                                    row.statusId === 9 ||
+                                    row.statusId === 10)) ||
                                 (user.userType === 9 && row.statusId === 11) ||
                                 (user.userType === 10 && row.statusId === 12) ||
                                 (user.userType === 11 && row.statusId === 13) ||

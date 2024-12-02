@@ -8,6 +8,7 @@ import {
   Button,
 } from "@mui/material";
 import { tokens } from "../../theme";
+import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 
 const BillModal = ({
   open,
@@ -148,6 +149,12 @@ const BillModal = ({
           >
             {formData.id ? "Update" : "Bill"}
           </Button>
+
+          <BillingStatementForm
+            row={formData.row}
+            review={true}
+            bookedTransactionIds={formData.bookedTransactionId}
+          />
         </Box>
       </Modal>
     </Box>

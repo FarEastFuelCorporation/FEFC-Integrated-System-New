@@ -28,7 +28,6 @@ const BilledTransactions = ({ user }) => {
   const initialFormData = {
     id: "",
     bookedTransactionId: [],
-    isCertified: false,
     billedDate: "",
     billedTime: "",
     billingNumber: "",
@@ -63,10 +62,13 @@ const BilledTransactions = ({ user }) => {
         `${apiUrl}/api/billedTransaction`
       );
 
+      const filteredPendingTransactions =
+        billedTransactionResponse.data.pendingTransactions.filter(
+          (transaction) => transaction.BilledTransaction.length === 0
+        );
+
       // For pending transactions
-      setPendingTransactions(
-        billedTransactionResponse.data.pendingTransactions
-      );
+      setPendingTransactions(filteredPendingTransactions);
 
       const filteredInProgressTransactions =
         billedTransactionResponse.data.inProgressTransactions.filter(
@@ -91,15 +93,25 @@ const BilledTransactions = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  const handleOpenModal = (row) => {
+  const handleOpenModal = async (row) => {
+    const firstSelectedId = selectedIds[0];
+
+    const response = await axios.get(
+      `${apiUrl}/api/bookedTransaction/full/${firstSelectedId}`
+    );
+
+    let newRow;
+
+    if (row.id) {
+      newRow = row;
+    } else {
+      newRow = response.data.transaction.transaction;
+    }
+
     setFormData({
+      row: newRow,
       id: "",
       bookedTransactionId: selectedIds,
-      isCertified:
-        row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.SortedTransaction?.[0]?.CertifiedTransaction.length === 0
-          ? false
-          : true,
       billedDate: "",
       billedTime: "",
       billingNumber: "",
@@ -109,6 +121,7 @@ const BilledTransactions = ({ user }) => {
       statusId: 10,
       createdBy: user.id,
     });
+
     setOpenModal(true);
   };
 
@@ -129,11 +142,6 @@ const BilledTransactions = ({ user }) => {
       setFormData({
         id: billedTransaction.id,
         bookedTransactionId: typeToEdit.id,
-        isCertified:
-          typeToEdit?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-            ?.SortedTransaction?.[0]?.CertifiedTransaction.length === 0
-            ? false
-            : true,
         certifiedTransactionId: [
           typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
             ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0]
@@ -171,11 +179,6 @@ const BilledTransactions = ({ user }) => {
         {
           data: {
             deletedBy: user.id,
-            isCertified:
-              row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-                ?.SortedTransaction?.[0]?.CertifiedTransaction.length === 0
-                ? false
-                : true,
           },
         }
       );

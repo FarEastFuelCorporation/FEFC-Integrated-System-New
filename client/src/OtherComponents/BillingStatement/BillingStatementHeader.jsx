@@ -6,16 +6,16 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
   const today = new Date();
   const datePlusOneMonth = new Date();
   datePlusOneMonth.setMonth(today.getMonth() + 1);
-  const clientData = row.Client;
+  const clientData = row?.Client;
 
   const vat =
     amounts.vatExclusive * 0.12 +
     (amounts.vatInclusive - amounts.vatInclusive / 1.12);
 
   const termsChargeDays = parseInt(
-    row.QuotationWaste.Quotation.termsChargeDays
+    row?.QuotationWaste?.Quotation?.termsChargeDays
   );
-  const termsCharge = row.QuotationWaste.Quotation.termsCharge;
+  const termsCharge = row?.QuotationWaste?.Quotation?.termsCharge;
 
   return (
     <Box>
@@ -54,7 +54,7 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row.BilledTransaction?.[0]?.billingNumber}
+              {row?.BilledTransaction?.[0]?.billingNumber}
             </Typography>
             <Typography
               mt={1}
@@ -71,8 +71,8 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row.BilledTransaction[0]
-                ? formatDateFull(row.BilledTransaction[0].billedDate)
+              {row?.BilledTransaction?.[0]
+                ? formatDateFull(row?.BilledTransaction?.[0]?.billedDate)
                 : ""}
             </Typography>
           </Box>
@@ -116,17 +116,17 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
             padding: 1,
           }}
         >
-          <Typography fontWeight="bold">{clientData.billerName}</Typography>
-          <Typography fontSize="12px">{clientData.billerAddress}</Typography>
-          {clientData.billerTinNumber && (
+          <Typography fontWeight="bold">{clientData?.billerName}</Typography>
+          <Typography fontSize="12px">{clientData?.billerAddress}</Typography>
+          {clientData?.billerTinNumber && (
             <Typography fontSize="12px">
-              TIN NUMBER: {clientData.billerTinNumber}
+              TIN NUMBER: {clientData?.billerTinNumber}
             </Typography>
           )}
-          {clientData.natureOfBusiness && (
+          {clientData?.natureOfBusiness && (
             <Typography fontSize="12px">
               {" "}
-              BUSINESS STYLE: {clientData.natureOfBusiness}
+              BUSINESS STYLE: {clientData?.natureOfBusiness}
             </Typography>
           )}
           <Box display="flex" fontSize="10px">

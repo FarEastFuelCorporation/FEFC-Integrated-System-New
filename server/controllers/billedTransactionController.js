@@ -21,7 +21,6 @@ async function createBilledTransactionController(req, res) {
     // Extracting data from the request body
     let {
       bookedTransactionId, // Now an array
-      isCertified,
       billedDate,
       billedTime,
       billingNumber,
@@ -45,6 +44,22 @@ async function createBilledTransactionController(req, res) {
     let clientName;
     let transactions = {};
 
+    // Check if all bookedTransactionId entries have statusId = 9
+    const bookedTransactions = await BookedTransaction.findAll({
+      where: {
+        id: bookedTransactionId,
+      },
+      attributes: ["id", "statusId"],
+      transaction,
+    });
+
+    // Determine if isCertified should be true
+    const isCertified = bookedTransactions.every(
+      (transaction) => transaction.statusId === 9
+    );
+
+    console.log("isCertified", isCertified);
+
     // Iterate over the bookedTransactionId array and create multiple entries
     for (const id of bookedTransactionId) {
       // Create BilledTransaction entry
@@ -61,6 +76,8 @@ async function createBilledTransactionController(req, res) {
         },
         { transaction }
       );
+
+      console.log("id", id);
 
       // Update the status of the booked transaction
       const updatedBookedTransaction = await BookedTransaction.findByPk(id, {
@@ -83,31 +100,44 @@ async function createBilledTransactionController(req, res) {
       transactions[id].haulingDate = updatedBookedTransaction.haulingDate;
       transactions[id].billingNumber = billingNumber;
 
-      if (updatedBookedTransaction && isCertified) {
-        updatedBookedTransaction.statusId = statusId;
-        await updatedBookedTransaction.save({ transaction });
+      console.log(updatedBookedTransaction);
+      console.log(isCertified);
+
+      if (updatedBookedTransaction) {
+        if (isCertified) {
+          updatedBookedTransaction.statusId = statusId;
+          await updatedBookedTransaction.save({ transaction });
+        }
       } else {
         // If booked transaction with the specified ID was not found
         throw new Error(`Booked Transaction with ID ${id} not found`);
       }
     }
 
+    // Sorting transactions by transactionId
+    const sortedTransactions = Object.values(transactions).sort((a, b) => {
+      if (a.transactionId < b.transactionId) return -1; // Ascending order
+      if (a.transactionId > b.transactionId) return 1;
+      return 0;
+    });
+
     // Commit the transaction
     await transaction.commit();
 
     const emailBody = await BillingApprovalEmailFormat(
       clientName,
-      transactions
+      sortedTransactions
     );
     console.log(emailBody);
 
     try {
       sendEmail(
+        // "jmfalar@fareastfuelcorp.com", // Recipient
         "dcardinez@fareastfuelcorp.com", // Recipient
         `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody, // HTML content
-        ["dm.cardinez@fareastfuel.com"], // cc
+        emailBody,
+        ["dm.cardinez@fareastfuel.com"], // HTML content // cc
         [
           "rmangaron@fareastfuelcorp.com",
           "edevera@fareastfuelcorp.com",
@@ -190,6 +220,30 @@ async function getBilledStatementsController(req, res) {
   }
 }
 
+// Get Billed Transactions controller
+async function getBilledStatementsReviewController(req, res) {
+  try {
+    const bookedTransactionIds = req.params.billingNumber.split(",");
+
+    console.log("bookedTransactionIds", bookedTransactionIds);
+
+    // Pass the IDs to the next query
+    const bookedTransactions = await BookedTransaction.findAll({
+      where: { id: bookedTransactionIds },
+      include: getIncludeOptions(),
+      order: [["transactionId", "DESC"]],
+    });
+
+    // Respond with the updated data
+    res.status(200).json({
+      bookedTransactions,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 // Update Billed Transaction controller
 async function updateBilledTransactionController(req, res) {
   try {
@@ -202,7 +256,6 @@ async function updateBilledTransactionController(req, res) {
       // Extracting data from the request body
       let {
         bookedTransactionId,
-        isCertified,
         billedDate,
         billedTime,
         billingNumber,
@@ -215,6 +268,20 @@ async function updateBilledTransactionController(req, res) {
 
       // Uppercase the remarks if present
       const updatedRemarks = remarks && remarks.toUpperCase();
+
+      // Check if all bookedTransactionId entries have statusId = 9
+      const bookedTransactions = await BookedTransaction.findAll({
+        where: {
+          id: bookedTransactionId,
+        },
+        attributes: ["id", "statusId"],
+        transaction,
+      });
+
+      // Determine if isCertified should be true
+      const isCertified = bookedTransactions.every(
+        (bookedTransaction) => bookedTransaction.statusId === 9
+      );
 
       // Find the billed transaction by ID
       const billedTransaction = await BilledTransaction.findByPk(id, {
@@ -248,9 +315,11 @@ async function updateBilledTransactionController(req, res) {
             { transaction }
           );
 
-          if (updatedBookedTransaction && isCertified) {
-            updatedBookedTransaction.statusId = statusId;
-            await updatedBookedTransaction.save({ transaction });
+          if (updatedBookedTransaction) {
+            if (isCertified) {
+              updatedBookedTransaction.statusId = statusId;
+              await updatedBookedTransaction.save({ transaction });
+            }
 
             // Commit the transaction
             await transaction.commit();
@@ -301,13 +370,13 @@ async function updateBilledTransactionController(req, res) {
 async function deleteBilledTransactionController(req, res) {
   try {
     const id = req.params.id; // ID of the billed transaction to delete
-    const { deletedBy, isCertified } = req.body;
+    const { deletedBy } = req.body;
 
     console.log("Soft deleting billed transaction with ID:", id);
 
     // Find the billed transaction by UUID (id)
     const billedTransactionToDelete = await BilledTransaction.findByPk(id, {
-      attributes: ["billingNumber"],
+      attributes: ["billingNumber", "bookedTransactionId"],
     });
 
     if (billedTransactionToDelete) {
@@ -315,6 +384,24 @@ async function deleteBilledTransactionController(req, res) {
       const billedTransactions = await BilledTransaction.findAll({
         where: { billingNumber: billedTransactionToDelete.billingNumber },
       });
+
+      // Extract all bookedTransactionIds from billedTransactions
+      const bookedTransactionIds = billedTransactions.map(
+        (bookedTransactionId) => bookedTransactionId.bookedTransactionId
+      );
+
+      // Check if all bookedTransactionId entries have statusId = 9
+      const bookedTransactions = await BookedTransaction.findAll({
+        where: {
+          id: bookedTransactionIds,
+        },
+        attributes: ["id", "statusId"],
+      });
+
+      // Determine if isCertified should be true
+      const isCertified = bookedTransactions.every(
+        (bookedTransaction) => bookedTransaction.statusId === 9
+      );
 
       if (billedTransactions.length > 0) {
         // Soft delete each billed transaction
@@ -334,12 +421,14 @@ async function deleteBilledTransactionController(req, res) {
           where: { id: bookedTransactionIds },
         });
 
-        if (updatedBookedTransactions.length > 0 && isCertified) {
+        if (updatedBookedTransactions.length > 0) {
           // Update status of all related booked transactions
-          for (const bookedTransaction of updatedBookedTransactions) {
-            bookedTransaction.statusId = transactionStatusId; // Status for "deleted" or equivalent
-            bookedTransaction.updatedBy = deletedBy;
-            await bookedTransaction.save();
+          if (isCertified) {
+            for (const bookedTransaction of updatedBookedTransactions) {
+              bookedTransaction.statusId = transactionStatusId; // Status for "deleted" or equivalent
+              bookedTransaction.updatedBy = deletedBy;
+              await bookedTransaction.save();
+            }
           }
         } else {
           console.warn(
@@ -378,6 +467,7 @@ module.exports = {
   createBilledTransactionController,
   getBilledTransactionsController,
   getBilledStatementsController,
+  getBilledStatementsReviewController,
   updateBilledTransactionController,
   deleteBilledTransactionController,
 };

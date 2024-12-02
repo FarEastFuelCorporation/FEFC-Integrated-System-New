@@ -11,12 +11,10 @@ const CertifiedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  console.log(row);
   const certifiedTransaction =
     row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
       .SortedTransaction?.[0].CertifiedTransaction?.[0];
 
-  console.log(certifiedTransaction);
   return (
     <Box>
       {row.statusId === 8 ? (

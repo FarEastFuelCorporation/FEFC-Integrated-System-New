@@ -423,7 +423,7 @@ async function CertifiedTransactionEmailFormat(
       <body>
         <div class="container">
           <div class="header">
-            <h1>Scheduled Transaction Confirmation</h1>
+            <h1>Certified Transaction Confirmation</h1>
           </div>
           <div class="content">
             <p>Dear ${clientName},</p>

@@ -182,7 +182,7 @@ const BillingContent = ({
                 );
 
               const invoiceNumber =
-                transaction.BilledTransaction[0].serviceInvoiceNumber;
+                transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
               const typeOfWeight =
                 transaction.ScheduledTransaction[0].ReceivedTransaction[0]
                   .SortedTransaction?.[0]?.CertifiedTransaction?.[0]

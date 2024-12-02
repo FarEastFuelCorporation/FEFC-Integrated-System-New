@@ -24,7 +24,13 @@ const pageHeight = 795; // Full page height (A4 paper size in pixels)
 const defaultHeaderHeight = 350; // Default approximate height for header
 const defaultFooterHeight = 120; // Default approximate height for footer
 
-const BillingStatementForm = ({ row, verify = null, statementRef }) => {
+const BillingStatementForm = ({
+  row,
+  verify = null,
+  statementRef,
+  review = false,
+  bookedTransactionIds,
+}) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
 
@@ -41,7 +47,7 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
   const [isDoneCalculation, setIsDoneCalculation] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
 
-  const billedTransaction = row?.BilledTransaction[0] || "";
+  const billedTransaction = row?.BilledTransaction?.[0] || "";
 
   const hasFixedRate = row?.QuotationWaste?.hasFixedRate;
 
@@ -58,9 +64,18 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
   const fetchData = useCallback(async () => {
     try {
       // setLoading(true);
-      const billingStatementResponse = await axios.get(
-        `${REACT_APP_API_URL}/api/billedTransaction/multiple/${billedTransaction.billingNumber}`
-      );
+
+      let billingStatementResponse;
+
+      if (!review) {
+        billingStatementResponse = await axios.get(
+          `${REACT_APP_API_URL}/api/billedTransaction/multiple/${billedTransaction.billingNumber}`
+        );
+      } else {
+        billingStatementResponse = await axios.get(
+          `${REACT_APP_API_URL}/api/billedTransaction/review/${bookedTransactionIds}`
+        );
+      }
 
       // For pending transactions
       setTransactions(billingStatementResponse.data.bookedTransactions);
@@ -69,7 +84,12 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [REACT_APP_API_URL, billedTransaction.billingNumber]);
+  }, [
+    REACT_APP_API_URL,
+    billedTransaction.billingNumber,
+    review,
+    bookedTransactionIds,
+  ]);
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
   useEffect(() => {

@@ -31,14 +31,14 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   const certificateRef = useRef();
 
   const certifiedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0];
+    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+      .SortedTransaction?.[0].CertifiedTransaction?.[0];
 
   const sortedWasteTransaction =
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;
 
-  const typeOfWeight = certifiedTransaction.typeOfWeight;
+  const typeOfWeight = certifiedTransaction?.typeOfWeight;
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
@@ -58,7 +58,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
 
       // Save the generated PDF
       pdf.save(
-        `${certifiedTransaction.certificateNumber}-${row.Client.clientName}.pdf`
+        `${certifiedTransaction?.certificateNumber}-${row.Client.clientName}.pdf`
       );
     });
   };
@@ -99,7 +99,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     }).format(amount);
   };
 
-  const qrCodeURL = `${apiUrl}/certificate/${certifiedTransaction.id}`;
+  const qrCodeURL = `${apiUrl}/certificate/${certifiedTransaction?.id}`;
 
   const headerCellStyles = (isLastCell) => ({
     fontWeight: "bold",

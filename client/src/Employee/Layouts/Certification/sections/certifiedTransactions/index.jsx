@@ -121,8 +121,8 @@ const CertifiedTransactions = ({ user }) => {
         id: certifiedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         sortedTransactionId:
-          certifiedTransaction.ScheduledTransaction?.[0]
-            ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0].id,
+          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.SortedTransaction?.[0].id,
         isBilled: typeToEdit.BilledTransaction.length === 0 ? false : true,
         certificateNumber: certifiedTransaction.certificateNumber,
         certifiedDate: certifiedTransaction.certifiedDate,

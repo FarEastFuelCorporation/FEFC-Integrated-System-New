@@ -10,10 +10,13 @@ import { timestampDate, parseTimeString } from "../Functions";
 const CertifiedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const certifiedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0];
 
+  console.log(row);
+  const certifiedTransaction =
+    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+      .SortedTransaction?.[0].CertifiedTransaction?.[0];
+
+  console.log(certifiedTransaction);
   return (
     <Box>
       {row.statusId === 8 ? (
@@ -78,44 +81,44 @@ const CertifiedTransaction = ({ row, user }) => {
               }}
             >
               <Typography variant="h5">
-                {certifiedTransaction.createdAt
-                  ? timestampDate(certifiedTransaction.createdAt)
+                {certifiedTransaction?.createdAt
+                  ? timestampDate(certifiedTransaction?.createdAt)
                   : ""}
               </Typography>
             </Grid>
           </Grid>
           <Typography variant="h5">
             Certificate Number:{" "}
-            {certifiedTransaction.certificateNumber
-              ? certifiedTransaction.certificateNumber
+            {certifiedTransaction?.certificateNumber
+              ? certifiedTransaction?.certificateNumber
               : ""}
           </Typography>
           <Typography variant="h5">
             Type of Certificate:{" "}
-            {certifiedTransaction.typeOfCertificate
-              ? certifiedTransaction.typeOfCertificate
+            {certifiedTransaction?.typeOfCertificate
+              ? certifiedTransaction?.typeOfCertificate
               : ""}
           </Typography>
           <Typography variant="h5">
             Type of Weight:{" "}
-            {certifiedTransaction.typeOfWeight
-              ? certifiedTransaction.typeOfWeight
+            {certifiedTransaction?.typeOfWeight
+              ? certifiedTransaction?.typeOfWeight
               : ""}
           </Typography>
           <Typography variant="h5">
             Certified Date:{" "}
-            {certifiedTransaction.certifiedDate
+            {certifiedTransaction?.certifiedDate
               ? format(
-                  new Date(certifiedTransaction.certifiedDate),
+                  new Date(certifiedTransaction?.certifiedDate),
                   "MMMM dd, yyyy"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Certified Time:{" "}
-            {certifiedTransaction.certifiedTime
+            {certifiedTransaction?.certifiedTime
               ? format(
-                  parseTimeString(certifiedTransaction.certifiedTime),
+                  parseTimeString(certifiedTransaction?.certifiedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
@@ -123,17 +126,17 @@ const CertifiedTransaction = ({ row, user }) => {
 
           <Typography variant="h5">
             Remarks:{" "}
-            {certifiedTransaction.remarks
-              ? certifiedTransaction.remarks
+            {certifiedTransaction?.remarks
+              ? certifiedTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Submitted By:{" "}
-            {`${certifiedTransaction.Employee.firstName || ""} ${
-              certifiedTransaction.Employee.lastName || ""
+            {`${certifiedTransaction?.Employee?.firstName || ""} ${
+              certifiedTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
-          <CertificateOfDestruction row={row} />
+          {certifiedTransaction && <CertificateOfDestruction row={row} />}
           <br />
           <hr />
         </Box>

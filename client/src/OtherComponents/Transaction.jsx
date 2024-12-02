@@ -273,6 +273,10 @@ const Transaction = ({
     });
   }
 
+  const certifiedTransaction =
+    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+      .SortedTransaction?.[0].CertifiedTransaction?.[0];
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
@@ -741,7 +745,7 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 8 && (
+                      {row.statusId >= 8 && certifiedTransaction && (
                         <CertifiedTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}

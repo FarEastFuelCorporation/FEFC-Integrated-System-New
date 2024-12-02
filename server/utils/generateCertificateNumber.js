@@ -13,7 +13,7 @@ async function generateCertificateNumber() {
 
     // Find the latest transaction ID with the specified prefix
     const latestTransaction = await CertifiedTransaction.findOne({
-      order: [["createdAt", "DESC"]],
+      order: [["certificateNumber", "DESC"]],
       paranoid: false, // Include soft-deleted records
     });
 
@@ -22,8 +22,7 @@ async function generateCertificateNumber() {
     if (latestTransaction) {
       const latestTransactionId = latestTransaction.certificateNumber;
       const latestYear = latestTransactionId.substring(3, 7);
-      const latestMonth = latestTransactionId.substring(7, 9);
-      if (latestYear === currentYear && latestMonth === currentMonth) {
+      if (latestYear === currentYear) {
         const latestIdNumber = parseInt(latestTransactionId.substring(9), 10);
         newIdNumber = latestIdNumber + 1;
       }

@@ -274,8 +274,8 @@ const Transaction = ({
   }
 
   const certifiedTransaction =
-    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
-      .SortedTransaction?.[0].CertifiedTransaction?.[0];
+    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+      ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 

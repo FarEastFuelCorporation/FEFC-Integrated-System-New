@@ -366,87 +366,124 @@ async function ScheduleTransactionEmailToLogisticsFormat(
   }
 }
 
-async function sendOtpFormat(otp) {
+async function CertifiedTransactionEmailFormat(
+  clientType,
+  clientName,
+  transactionId,
+  scheduledDate,
+  scheduledTime,
+  wasteName,
+  typeOfVehicle,
+  remarks,
+  scheduledBy
+) {
   try {
     const emailTemplate = `
-            <html>
-                <head>
-                    <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        color: #333;
-                    }
-                    .container {
-                        max-width: 600px;
-                        margin: 0 auto;
-                        border: 1px solid #ddd;
-                        padding: 20px;
-                        border-radius: 8px;
-                        background-color: #f9f9f9;
-                    }
-                    .header {
-                        text-align: center;
-                        background-color: #007bff;
-                        color: white;
-                        padding: 10px 0;
-                        border-radius: 8px 8px 0 0;
-                    }
-                    .header h1 {
-                        margin: 0;
-                        font-size: 24px;
-                    }
-                    .content {
-                        margin: 20px 0;
-                    }
-                    .content p {
-                        margin: 10px 0;
-                    }
-                    .otp {
-                        font-size: 30px;
-                        font-weight: bold;
-                        color: #007bff;
-                        text-align: center;
-                        margin-top: 20px;
-                        padding: 10px;
-                        border: 2px solid #007bff;
-                        display: inline-block;
-                        border-radius: 4px;
-                    }
-                    .footer {
-                        text-align: center;
-                        font-size: 12px;
-                        color: #777;
-                        margin-top: 20px;
-                    }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                    <div class="header">
-                        <h1>OTP Verification</h1>
-                    </div>
-                    <div class="content">
-                        <p>Dear Valued User,</p>
-                        <p>We have received a request to verify your identity. Please use the following OTP to complete the process:</p>
-                        <div class="otp">
-                        ${otp}
-                        </div>
-                        <p>If you did not request this OTP, please ignore this email.</p>
-                        <p>Thank you for using our service!</p>
-                    </div>
-                    <div class="footer">
-                        <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
-                    </div>
-                    </div>
-                </body>
-                </html>
-
-          `;
+      <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+          }
+          .header {
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            border-radius: 8px 8px 0 0;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .content {
+            margin: 20px 0;
+          }
+          .content p {
+            margin: 10px 0;
+          }
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Scheduled Transaction Confirmation</h1>
+          </div>
+          <div class="content">
+            <p>Dear ${clientName},</p>
+            <p>We are confirming the booking of your ${
+              clientType === "CUS" ? "delivery" : "hauling"
+            } transaction. Please find the details below:</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <tr style="background-color: #007bff; color: white; text-align: left;">
+                <th style="padding: 8px; text-align: center;">Transaction ID</th>
+                <th style="padding: 8px; text-align: center;">${
+                  clientType === "CUS"
+                    ? "Scheduled Delivery Date"
+                    : "Scheduled Hauling Date"
+                }</th>
+                <th style="padding: 8px; text-align: center;">${
+                  clientType === "CUS"
+                    ? "Scheduled Delivery Time"
+                    : "Scheduled Hauling Time"
+                }</th>
+              </tr>
+              <tr>
+                <td style="padding: 8px; text-align: center;">${transactionId}</td>
+                <td style="padding: 8px; text-align: center;">${formatDate(
+                  scheduledDate
+                )}</td>
+                <td style="padding: 8px; text-align: center;">${convertTo12HourFormat(
+                  scheduledTime
+                )}</td>
+              </tr>
+              <tr style="background-color: #007bff; color: white; text-align: left;">
+                <th style="padding: 8px; text-align: center;">${
+                  clientType === "CUS" ? "Product" : "Waste Name"
+                }</th>
+                <th style="padding: 8px; text-align: center;">Type of Vehicle</th>
+                <th style="padding: 8px; text-align: center;">Remarks</th>
+              </tr>
+              <tr>
+                <td style="padding: 8px; text-align: center;">${wasteName}</td>
+                <td style="padding: 8px; text-align: center;">${typeOfVehicle}</td>
+                <td style="padding: 8px; text-align: center;">${remarks}</td>
+              </tr>
+            </table>
+            <p><strong>Scheduled By:</strong> ${scheduledBy}</p>
+            <p>We kindly ask you to ensure that all necessary arrangements are in place for this scheduled transaction.</p>
+            <p>Thank you for your prompt attention to this matter.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
     return emailTemplate;
   } catch (error) {
-    console.error("Error generating email template:", error);
+    console.error(
+      "Error generating schedule transaction email template:",
+      error
+    );
     throw error;
   }
 }
@@ -554,10 +591,96 @@ async function BillingApprovalEmailFormat(clientName, transactions) {
   }
 }
 
+async function sendOtpFormat(otp) {
+  try {
+    const emailTemplate = `
+            <html>
+                <head>
+                    <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        border: 1px solid #ddd;
+                        padding: 20px;
+                        border-radius: 8px;
+                        background-color: #f9f9f9;
+                    }
+                    .header {
+                        text-align: center;
+                        background-color: #007bff;
+                        color: white;
+                        padding: 10px 0;
+                        border-radius: 8px 8px 0 0;
+                    }
+                    .header h1 {
+                        margin: 0;
+                        font-size: 24px;
+                    }
+                    .content {
+                        margin: 20px 0;
+                    }
+                    .content p {
+                        margin: 10px 0;
+                    }
+                    .otp {
+                        font-size: 30px;
+                        font-weight: bold;
+                        color: #007bff;
+                        text-align: center;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border: 2px solid #007bff;
+                        display: inline-block;
+                        border-radius: 4px;
+                    }
+                    .footer {
+                        text-align: center;
+                        font-size: 12px;
+                        color: #777;
+                        margin-top: 20px;
+                    }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                    <div class="header">
+                        <h1>OTP Verification</h1>
+                    </div>
+                    <div class="content">
+                        <p>Dear Valued User,</p>
+                        <p>We have received a request to verify your identity. Please use the following OTP to complete the process:</p>
+                        <div class="otp">
+                        ${otp}
+                        </div>
+                        <p>If you did not request this OTP, please ignore this email.</p>
+                        <p>Thank you for using our service!</p>
+                    </div>
+                    <div class="footer">
+                        <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+                    </div>
+                    </div>
+                </body>
+                </html>
+
+          `;
+
+    return emailTemplate;
+  } catch (error) {
+    console.error("Error generating email template:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   BookedTransactionEmailFormat,
   ScheduleTransactionEmailFormat,
   ScheduleTransactionEmailToLogisticsFormat,
-  sendOtpFormat,
+  CertifiedTransactionEmailFormat,
   BillingApprovalEmailFormat,
+  sendOtpFormat,
 };

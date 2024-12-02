@@ -222,10 +222,18 @@ const BillingStatementForm = ({ row, verify = null, statementRef }) => {
     const transpoVatCalculation =
       transaction.QuotationTransportation?.vatCalculation;
     const transpoMode = transaction.QuotationTransportation?.mode;
-    const isTransportation =
-      transaction.ScheduledTransaction?.[0].DispatchedTransaction.length === 0
+    let isTransportation =
+      transaction.ScheduledTransaction?.[0]?.DispatchedTransaction.length === 0
         ? false
         : true;
+
+    const logisticsId = transaction.ScheduledTransaction?.[0]?.logisticsId;
+
+    const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
+
+    if (!isTransportation) {
+      isTransportation = logisticsId !== clientVehicle ? true : false;
+    }
 
     const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
       // Check if the mode is "CHARGE"

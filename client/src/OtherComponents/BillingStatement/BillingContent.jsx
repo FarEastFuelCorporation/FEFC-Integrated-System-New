@@ -300,14 +300,24 @@ const BillingContent = ({
                 }
               );
 
-              const isTransportation =
+              let isTransportation =
                 transactions?.[0]?.ScheduledTransaction?.[0]
                   .DispatchedTransaction.length === 0
                   ? false
                   : true;
+
+              const logisticsId =
+                transaction.ScheduledTransaction?.[0]?.logisticsId;
+
+              const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
+
+              if (!isTransportation) {
+                isTransportation = logisticsId !== clientVehicle ? true : false;
+              }
+
               // Add the transportation row if applicable
               const transpoRows =
-                transaction.QuotationTransportation?.mode === "CHARGE" &&
+                transaction?.QuotationTransportation?.mode === "CHARGE" &&
                 isTransportation
                   ? [
                       <TableRow

@@ -76,9 +76,11 @@ const QuotationFormModal = ({
       unit: "",
       unitPrice: 0,
       vatCalculation: "",
+      hasTransportation: true,
       hasFixedRate: false,
       fixedWeight: 0,
       fixedPrice: 0,
+      isMonthly: false,
     };
     const updatedWastes = [...formData.quotationWastes, newWaste];
     handleInputChange({
@@ -99,6 +101,7 @@ const QuotationFormModal = ({
       hasFixedRate: false,
       fixedWeight: 0,
       fixedPrice: 0,
+      isMonthly: false,
     };
     const updatedTransportation = [
       ...formData.quotationTransportation,
@@ -559,7 +562,7 @@ const QuotationFormModal = ({
                       autoComplete="off"
                     />
                   </Grid>
-                  <Grid item xs={1.5}>
+                  <Grid item xs={1}>
                     <FormControl fullWidth required>
                       <InputLabel
                         id={`mode-label-${index}`}
@@ -714,6 +717,24 @@ const QuotationFormModal = ({
                     <FormControlLabel
                       control={
                         <Checkbox
+                          checked={waste.hasTransportation}
+                          onChange={(e) =>
+                            handleWasteInputChangeLocal(
+                              index,
+                              "hasTransportation",
+                              e.target.checked
+                            )
+                          }
+                          color="secondary"
+                        />
+                      }
+                      label="Has Transpo Fee"
+                    />
+                  </Grid>
+                  <Grid item xs={0.5}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
                           checked={waste.hasFixedRate}
                           onChange={(e) =>
                             handleWasteInputChangeLocal(
@@ -722,12 +743,12 @@ const QuotationFormModal = ({
                               e.target.checked
                             )
                           }
+                          color="secondary"
                         />
                       }
                       label="Has Fixed Rate"
                     />
                   </Grid>
-
                   <Grid item xs={0.5} textAlign="right">
                     <IconButton
                       color="error"
@@ -780,6 +801,24 @@ const QuotationFormModal = ({
                               color: colors.grey[100],
                             },
                           }}
+                        />
+                      </Grid>
+                      <Grid item xs={0.5}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={waste.isMonthly}
+                              onChange={(e) =>
+                                handleWasteInputChangeLocal(
+                                  index,
+                                  "isMonthly",
+                                  e.target.checked
+                                )
+                              }
+                              color="secondary"
+                            />
+                          }
+                          label="Monthly"
                         />
                       </Grid>
                     </>
@@ -862,7 +901,7 @@ const QuotationFormModal = ({
                       autoComplete="off"
                     />
                   </Grid>
-                  <Grid item xs={1.5}>
+                  <Grid item xs={1}>
                     <FormControl fullWidth required>
                       <InputLabel
                         id={`mode-label-${index}`}
@@ -1013,7 +1052,7 @@ const QuotationFormModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={0.5}>
+                  <Grid item xs={1}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -1025,12 +1064,12 @@ const QuotationFormModal = ({
                               e.target.checked
                             )
                           }
+                          color="secondary"
                         />
                       }
                       label="Has Fixed Rate"
                     />
                   </Grid>
-
                   <Grid item xs={0.5} textAlign="right">
                     <IconButton
                       color="error"
@@ -1083,6 +1122,24 @@ const QuotationFormModal = ({
                               color: colors.grey[100],
                             },
                           }}
+                        />
+                      </Grid>
+                      <Grid item xs={0.5}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={transportation.isMonthly}
+                              onChange={(e) =>
+                                handleTransportationInputChangeLocal(
+                                  index,
+                                  "isMonthly",
+                                  e.target.checked
+                                )
+                              }
+                              color="secondary"
+                            />
+                          }
+                          label="Monthly"
                         />
                       </Grid>
                     </>

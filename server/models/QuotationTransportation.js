@@ -56,6 +56,11 @@ const QuotationTransportation = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: true,
     },
+    isMonthly: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

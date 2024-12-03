@@ -85,9 +85,11 @@ const Quotations = ({ user }) => {
         unit: "",
         unitPrice: 0,
         vatCalculation: "",
+        hasTransportation: true,
         hasFixedRate: false,
         fixedWeight: 0,
         fixedPrice: 0,
+        isMonthly: false,
       },
     ],
     quotationTransportation: [
@@ -104,6 +106,7 @@ const Quotations = ({ user }) => {
         hasFixedRate: false,
         fixedWeight: 0,
         fixedPrice: 0,
+        isMonthly: false,
       },
     ],
   };

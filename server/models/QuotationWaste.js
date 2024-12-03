@@ -43,6 +43,11 @@ const QuotationWaste = sequelize.define(
     vatCalculation: {
       type: DataTypes.STRING,
     },
+    hasTransportation: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
     hasFixedRate: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -55,6 +60,11 @@ const QuotationWaste = sequelize.define(
     fixedPrice: {
       type: DataTypes.FLOAT,
       allowNull: true,
+    },
+    isMonthly: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     createdAt: {
       type: DataTypes.DATE,

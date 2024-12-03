@@ -50,6 +50,7 @@ const BillingStatementForm = ({
   const billedTransaction = row?.BilledTransaction?.[0] || "";
 
   const hasFixedRate = row?.QuotationWaste?.hasFixedRate;
+  const isMonthly = row?.QuotationWaste?.isMonthly;
 
   // Calculate header and footer heights
   const calculateRemainingHeight = useCallback(() => {
@@ -140,7 +141,7 @@ const BillingStatementForm = ({
       }, {})
     );
 
-    if (hasFixedRate) {
+    if (hasFixedRate && isMonthly) {
       let vatCalculation;
       let fixedWeight;
       let fixedPrice;
@@ -210,6 +211,7 @@ const BillingStatementForm = ({
             break;
         }
       }
+    } else if (hasFixedRate && !isMonthly) {
     } else {
       // Calculate amounts and credits based on vatCalculation and mode
       aggregatedWasteTransactions.forEach((item) => {

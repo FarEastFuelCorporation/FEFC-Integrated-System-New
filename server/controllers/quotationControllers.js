@@ -60,9 +60,11 @@ async function createQuotationController(req, res) {
           unit,
           unitPrice,
           vatCalculation,
+          hasTransportation,
           hasFixedRate,
           fixedWeight,
           fixedPrice,
+          isMonthly,
         } = waste;
 
         wasteName = wasteName && wasteName.toUpperCase();
@@ -76,9 +78,11 @@ async function createQuotationController(req, res) {
           unit,
           unitPrice,
           vatCalculation,
+          hasTransportation,
           hasFixedRate,
           fixedWeight,
           fixedPrice,
+          isMonthly,
           createdBy,
         });
       })
@@ -98,6 +102,7 @@ async function createQuotationController(req, res) {
           hasFixedRate,
           fixedWeight,
           fixedPrice,
+          isMonthly,
         } = transportation;
 
         haulingArea = haulingArea && haulingArea.toUpperCase();
@@ -114,6 +119,7 @@ async function createQuotationController(req, res) {
           hasFixedRate,
           fixedWeight,
           fixedPrice,
+          isMonthly,
           createdBy,
         });
       })
@@ -127,24 +133,47 @@ async function createQuotationController(req, res) {
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          order: [
-            ["wasteName", "ASC"],
-            ["mode", "ASC"],
+          include: [
+            {
+              model: TypeOfWaste,
+              as: "TypeOfWaste",
+              attributes: ["wasteCode"],
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
+            },
           ],
         },
         {
           model: QuotationTransportation,
           as: "QuotationTransportation",
+          include: [
+            {
+              model: VehicleType,
+              as: "VehicleType",
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
+            },
+          ],
         },
         {
           model: Client,
           as: "Client",
+          // attributes: { exclude: ["clientPicture"] },
+        },
+        {
+          model: IdInformation,
+          as: "IdInformation",
+          attributes: ["first_name", "middle_name", "last_name", "signature"],
         },
       ],
       where: {
-        status: "active", // Replace 'status' with your actual column name
+        status: "active",
       },
-      order: [["quotationCode", "ASC"]],
+      order: [["quotationCode", "ASC"]], // Ordering at the top level
     });
 
     // Respond with updated quotation and its wastes
@@ -365,9 +394,11 @@ async function updateQuotationController(req, res) {
               unit,
               unitPrice,
               vatCalculation,
+              hasTransportation,
               hasFixedRate,
               fixedWeight,
               fixedPrice,
+              isMonthly,
             } = waste;
 
             wasteName = wasteName && wasteName.toUpperCase();
@@ -381,9 +412,11 @@ async function updateQuotationController(req, res) {
               unit,
               unitPrice,
               vatCalculation,
+              hasTransportation,
               hasFixedRate,
               fixedWeight,
               fixedPrice,
+              isMonthly,
               createdBy,
             });
           })
@@ -403,6 +436,7 @@ async function updateQuotationController(req, res) {
               hasFixedRate,
               fixedWeight,
               fixedPrice,
+              isMonthly,
             } = transportation;
 
             haulingArea = haulingArea && haulingArea.toUpperCase();
@@ -419,6 +453,7 @@ async function updateQuotationController(req, res) {
               hasFixedRate,
               fixedWeight,
               fixedPrice,
+              isMonthly,
               createdBy,
             });
           })
@@ -449,9 +484,11 @@ async function updateQuotationController(req, res) {
               unit,
               unitPrice,
               vatCalculation,
+              hasTransportation,
               hasFixedRate,
               fixedWeight,
               fixedPrice,
+              isMonthly,
             } = waste;
 
             const existingWaste = await QuotationWaste.findByPk(id);
@@ -464,9 +501,11 @@ async function updateQuotationController(req, res) {
               existingWaste.unit = unit;
               existingWaste.unitPrice = unitPrice;
               existingWaste.vatCalculation = vatCalculation;
+              existingWaste.hasTransportation = hasTransportation;
               existingWaste.hasFixedRate = hasFixedRate;
               existingWaste.fixedWeight = fixedWeight;
               existingWaste.fixedPrice = fixedPrice;
+              existingWaste.isMonthly = isMonthly;
 
               await existingWaste.save();
             } else {
@@ -480,9 +519,11 @@ async function updateQuotationController(req, res) {
                 unit,
                 unitPrice,
                 vatCalculation,
+                hasTransportation,
                 hasFixedRate,
                 fixedWeight,
                 fixedPrice,
+                isMonthly,
                 createdBy,
               });
             }
@@ -504,6 +545,7 @@ async function updateQuotationController(req, res) {
               hasFixedRate,
               fixedWeight,
               fixedPrice,
+              isMonthly,
             } = transportation;
 
             const existingTransportation =
@@ -521,6 +563,7 @@ async function updateQuotationController(req, res) {
               existingTransportation.hasFixedRate = hasFixedRate;
               existingTransportation.fixedWeight = fixedWeight;
               existingTransportation.fixedPrice = fixedPrice;
+              existingTransportation.isMonthly = isMonthly;
 
               await existingTransportation.save();
             } else {
@@ -537,6 +580,7 @@ async function updateQuotationController(req, res) {
                 hasFixedRate,
                 fixedWeight,
                 fixedPrice,
+                isMonthly,
                 createdBy,
               });
             }
@@ -552,24 +596,47 @@ async function updateQuotationController(req, res) {
           {
             model: QuotationWaste,
             as: "QuotationWaste",
-            order: [
-              ["wasteName", "ASC"],
-              ["mode", "ASC"],
+            include: [
+              {
+                model: TypeOfWaste,
+                as: "TypeOfWaste",
+                attributes: ["wasteCode"],
+              },
+              {
+                model: Quotation,
+                as: "Quotation",
+              },
             ],
           },
           {
             model: QuotationTransportation,
             as: "QuotationTransportation",
+            include: [
+              {
+                model: VehicleType,
+                as: "VehicleType",
+              },
+              {
+                model: Quotation,
+                as: "Quotation",
+              },
+            ],
           },
           {
             model: Client,
             as: "Client",
+            // attributes: { exclude: ["clientPicture"] },
+          },
+          {
+            model: IdInformation,
+            as: "IdInformation",
+            attributes: ["first_name", "middle_name", "last_name", "signature"],
           },
         ],
         where: {
-          status: "active", // Replace 'status' with your actual column name
+          status: "active",
         },
-        order: [["quotationCode", "ASC"]],
+        order: [["quotationCode", "ASC"]], // Ordering at the top level
       });
 
       // Respond with the updated quotation and its wastes

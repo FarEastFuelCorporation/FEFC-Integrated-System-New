@@ -115,6 +115,7 @@ const Transaction = ({
       headerName: "Transaction ID",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
@@ -135,6 +136,7 @@ const Transaction = ({
       headerName: "Hauling Date",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 150,
       renderCell: (params) => {
         let haulingDate;
@@ -161,6 +163,7 @@ const Transaction = ({
       headerName: "Hauling Time",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 150,
       renderCell: (params) => {
         const scheduledTime = params.row.ScheduledTransaction[0]
@@ -184,6 +187,7 @@ const Transaction = ({
       headerName: "Transaction Status",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 150,
       renderCell: (params) => {
         let status;
@@ -219,6 +223,7 @@ const Transaction = ({
       headerName: "Billing Status",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       width: 150,
       renderCell: (params) => {
         let status;
@@ -284,6 +289,14 @@ const Transaction = ({
       ),
     },
   ];
+
+  const filteredColumns = columns.filter((column) => {
+    // Hide the 'clientName' column if user.userType is not an integer
+    if (column.field === "clientName" && !Number.isInteger(user.userType)) {
+      return false; // Exclude the column
+    }
+    return true; // Include the column
+  });
 
   // Add the conditional column if userType is 8 or above
   if (user.userType >= 8 && user.userType <= 13) {
@@ -370,7 +383,7 @@ const Transaction = ({
           <DataGrid
             apiRef={apiRef}
             rows={transactions ? transactions : []}
-            columns={columns}
+            columns={filteredColumns}
             checkboxSelection={user.userType === 8}
             onSelectionModelChange={
               user.userType === 8 ? handleSelection : undefined

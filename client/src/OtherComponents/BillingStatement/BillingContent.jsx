@@ -199,6 +199,18 @@ const BillingContent = ({
                       ? waste.clientWeight
                       : waste.weight;
 
+                  // console.log(transaction);
+
+                  const wasteName =
+                    transaction.ScheduledTransaction?.[0]
+                      ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
+                      ?.SortedWasteTransaction?.[0]?.wasteName;
+
+                  const isWasteName =
+                    transaction.BilledTransaction?.[0]?.isWasteName;
+
+                  // console.log(isWasteName);
+
                   return (
                     <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                       <TableCell
@@ -296,6 +308,28 @@ const BillingContent = ({
                       >
                         {waste.QuotationWaste.mode}
                       </TableCell>
+                      {/* <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 85,
+                            isLastCell: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {wasteName}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...bodyCellStyles({
+                            width: 85,
+                            isLastCell: true,
+                            color: fontColor,
+                          }),
+                        }}
+                      >
+                        {isWasteName}
+                      </TableCell> */}
                     </TableRow>
                   );
                 }

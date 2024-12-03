@@ -215,7 +215,7 @@ const BillingStatementForm = ({
             break;
         }
       }
-    } else if (hasFixedRate && !isMonthly) {
+      // } else if (hasFixedRate && !isMonthly) {
     } else {
       // Calculate amounts and credits based on vatCalculation and mode
       aggregatedWasteTransactions.forEach((item) => {
@@ -227,6 +227,11 @@ const BillingStatementForm = ({
         const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        console.log(QuotationWaste.mode === "BUYING" ? "credits" : "amounts");
+        console.log(selectedWeight);
+        console.log(totalWeightPrice);
+        console.log(amounts);
 
         switch (QuotationWaste.vatCalculation) {
           case "VAT EXCLUSIVE":
@@ -382,6 +387,8 @@ const BillingStatementForm = ({
                   bodyRows.BillingTableHead.header = <BillingTableHead />;
 
                   const waste = item; // Assuming item contains waste details
+
+                  // console.log(waste);
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
                       <TableRow key={index} sx={{ border: "black" }}>
@@ -428,7 +435,7 @@ const BillingStatementForm = ({
                             waste[9] === "BUYING" ? "red" : "black"
                           )}
                         >
-                          {waste[3]}
+                          {waste[11] ? waste[10] : waste[3]}
                         </TableCell>
                         <TableCell
                           align="center"

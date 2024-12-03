@@ -121,6 +121,8 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     textAlign: "center",
   });
 
+  console.log(sortedWasteTransaction);
+
   const generatePDFContent = () => (
     <Box
       ref={certificateRef}
@@ -206,7 +208,10 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                         }`}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>
-                    {waste.TreatmentProcess?.treatmentProcess}
+                    {
+                      waste.TreatedWasteTransaction?.[0]?.TreatmentMachine
+                        ?.TreatmentProcess?.treatmentProcess
+                    }
                   </TableCell>
                   <TableCell sx={bodyCellStyles(true)}>
                     {waste.TreatedWasteTransaction.reduce(

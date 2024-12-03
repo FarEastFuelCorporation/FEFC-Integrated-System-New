@@ -141,11 +141,14 @@ const BillingStatementForm = ({
       }, {})
     );
 
+    let hasTransportation;
+
     if (hasFixedRate && isMonthly) {
       let vatCalculation;
       let fixedWeight;
       let fixedPrice;
       let unitPrice;
+
       let target;
 
       aggregatedWasteTransactions.forEach((item) => {
@@ -162,6 +165,7 @@ const BillingStatementForm = ({
         fixedWeight = QuotationWaste.fixedWeight;
         fixedPrice = QuotationWaste.fixedPrice;
         unitPrice = QuotationWaste.unitPrice;
+        hasTransportation = QuotationWaste.hasTransportation;
 
         // switch (QuotationWaste.vatCalculation) {
         //   case "VAT EXCLUSIVE":
@@ -278,7 +282,7 @@ const BillingStatementForm = ({
     };
 
     // Call the function to add transportation fee
-    if (isTransportation) {
+    if (isTransportation && hasTransportation) {
       addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
     }
   });

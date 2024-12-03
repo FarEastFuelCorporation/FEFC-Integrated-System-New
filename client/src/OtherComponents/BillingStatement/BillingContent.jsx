@@ -198,6 +198,7 @@ const BillingContent = ({
                     typeOfWeight === "CLIENT WEIGHT"
                       ? waste.clientWeight
                       : waste.weight;
+
                   return (
                     <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                       <TableCell
@@ -315,10 +316,14 @@ const BillingContent = ({
                 isTransportation = logisticsId !== clientVehicle ? true : false;
               }
 
+              const hasTransportation =
+                transaction.QuotationWaste.hasTransportation;
+
               // Add the transportation row if applicable
               const transpoRows =
                 transaction?.QuotationTransportation?.mode === "CHARGE" &&
-                isTransportation
+                isTransportation &&
+                hasTransportation
                   ? [
                       <TableRow
                         key={`transpo-${index}`}

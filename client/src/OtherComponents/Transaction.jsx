@@ -109,8 +109,6 @@ const Transaction = ({
     </div>
   );
 
-  console.log(transactions);
-
   const columns = [
     {
       field: "transactionId",

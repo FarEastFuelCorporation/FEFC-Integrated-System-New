@@ -228,10 +228,7 @@ const BillingStatementForm = ({
 
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
-        console.log(QuotationWaste.mode === "BUYING" ? "credits" : "amounts");
-        console.log(selectedWeight);
-        console.log(totalWeightPrice);
-        console.log(amounts);
+        hasTransportation = QuotationWaste.hasTransportation;
 
         switch (QuotationWaste.vatCalculation) {
           case "VAT EXCLUSIVE":

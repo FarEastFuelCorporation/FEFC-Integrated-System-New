@@ -121,8 +121,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     textAlign: "center",
   });
 
-  console.log(sortedWasteTransaction);
-
   const generatePDFContent = () => (
     <Box
       ref={certificateRef}

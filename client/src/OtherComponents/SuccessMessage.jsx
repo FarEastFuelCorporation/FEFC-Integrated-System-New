@@ -22,7 +22,7 @@ const SuccessMessage = ({ message, onClose }) => {
     <Box
       sx={{
         position: "absolute",
-        width: "100%",
+        width: "calc(100% - 40px)",
         backgroundColor: "#8bc34a", // Light green color
         color: colors.grey[100],
         padding: "10px 20px",

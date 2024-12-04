@@ -25,6 +25,7 @@ import {
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import HelpIcon from "@mui/icons-material/Help";
 import axios from "axios";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
@@ -41,6 +42,7 @@ const GeneratorSidebar = ({ user }) => {
       "/dashboard/transactions": "Transactions",
       "/dashboard/quotations": "Quotations",
       "/dashboard/calendar": "Calendar",
+      "/dashboard/help": "Help",
     }),
     []
   );
@@ -284,6 +286,14 @@ const GeneratorSidebar = ({ user }) => {
           setSelected={setSelected}
           navigate={"quotations"}
         />
+        <BottomNavItem
+          label="Help"
+          value="Help"
+          icon={HelpIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"help"}
+        />
       </BottomNavigation>
     </Box>
   ) : (
@@ -435,6 +445,14 @@ const GeneratorSidebar = ({ user }) => {
               title="Calendar"
               to="calendar"
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Help"
+              to="help"
+              icon={<HelpIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

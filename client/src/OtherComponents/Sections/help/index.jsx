@@ -57,7 +57,7 @@ const Help = () => {
 
       {pdfUrl && (
         <Box mt={4}>
-          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js">
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <Box
               sx={{
                 border: "1px solid #ccc",

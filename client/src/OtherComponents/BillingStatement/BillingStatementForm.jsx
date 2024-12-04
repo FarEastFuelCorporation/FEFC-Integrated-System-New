@@ -385,9 +385,6 @@ const BillingStatementForm = ({
 
                   const waste = item; // Assuming item contains waste details
 
-                  console.log(waste);
-
-                  // console.log(waste);
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
                       <TableRow key={index} sx={{ border: "black" }}>

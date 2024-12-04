@@ -199,8 +199,6 @@ const BillingContent = ({
                       ? waste.clientWeight
                       : waste.weight;
 
-                  // console.log(transaction);
-
                   const wasteName =
                     transaction.ScheduledTransaction?.[0]
                       ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
@@ -208,8 +206,6 @@ const BillingContent = ({
 
                   const isWasteName =
                     transaction.BilledTransaction?.[0]?.isWasteName;
-
-                  // console.log(isWasteName);
 
                   return (
                     <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>

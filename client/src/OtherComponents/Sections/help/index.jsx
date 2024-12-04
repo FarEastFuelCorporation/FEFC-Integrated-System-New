@@ -54,6 +54,7 @@ const Help = () => {
           </Grid>
         ))}
       </Grid>
+
       {pdfUrl && (
         <Box mt={4}>
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js">

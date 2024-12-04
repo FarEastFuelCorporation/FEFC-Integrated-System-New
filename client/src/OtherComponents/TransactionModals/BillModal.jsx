@@ -6,6 +6,8 @@ import {
   useTheme,
   TextField,
   Button,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { tokens } from "../../theme";
 import BillingStatementForm from "../BillingStatement/BillingStatementForm";
@@ -14,6 +16,7 @@ const BillModal = ({
   open,
   onClose,
   formData,
+  setFormData,
   handleFormSubmit,
   errorMessage,
   showErrorMessage,
@@ -52,6 +55,18 @@ const BillModal = ({
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.isWasteName}
+                onChange={(e) =>
+                  setFormData({ ...formData, isWasteName: e.target.checked })
+                }
+                color="secondary"
+              />
+            }
+            label="By Waste Name"
+          />
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
               label="Billed Date"

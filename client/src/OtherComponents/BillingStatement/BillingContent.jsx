@@ -308,28 +308,33 @@ const BillingContent = ({
                       >
                         {waste.QuotationWaste.mode}
                       </TableCell>
-                      {/* <TableCell
-                        sx={{
-                          ...bodyCellStyles({
-                            width: 85,
-                            isLastCell: true,
-                            color: fontColor,
-                          }),
-                        }}
-                      >
-                        {wasteName}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...bodyCellStyles({
-                            width: 85,
-                            isLastCell: true,
-                            color: fontColor,
-                          }),
-                        }}
-                      >
-                        {isWasteName}
-                      </TableCell> */}
+                      {isWasteName && (
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 85,
+                              isLastCell: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {wasteName}
+                        </TableCell>
+                      )}
+
+                      {isWasteName && (
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 85,
+                              isLastCell: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {isWasteName ? "true" : "false"}
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 }

@@ -14,6 +14,7 @@ import BillingStatementHeader from "./BillingStatementHeader";
 import axios from "axios";
 import BillingContent from "./BillingContent";
 import BillingTableHead from "./BillingTableHead";
+import Decimal from "decimal.js";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
@@ -111,6 +112,8 @@ const BillingStatementForm = ({
 
   let totalWeight = 0;
 
+  console.log(transactions);
+
   transactions.forEach((transaction) => {
     const certifiedTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
@@ -129,19 +132,28 @@ const BillingStatementForm = ({
       sortedWasteTransaction.reduce((acc, current) => {
         const { id } = current.QuotationWaste;
 
+        const currentWeight = new Decimal(current.weight); // Use Decimal.js
+
         // If the `QuotationWaste.id` is already in the accumulator, add the weight
         if (acc[id]) {
-          acc[id].weight += current.weight;
+          acc[id].weight = acc[id].weight.plus(currentWeight);
         } else {
           // Otherwise, set the initial object in the accumulator
-          acc[id] = { ...current, weight: current.weight };
+          acc[id] = { ...current, weight: currentWeight };
         }
 
         return acc;
       }, {})
-    );
+    ).map((item) => ({
+      ...item,
+      weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+    }));
 
     let hasTransportation;
+
+    console.log(aggregatedWasteTransactions);
+    console.log(hasFixedRate);
+    console.log(isMonthly);
 
     if (hasFixedRate && isMonthly) {
       let vatCalculation;
@@ -166,20 +178,6 @@ const BillingStatementForm = ({
         fixedPrice = QuotationWaste.fixedPrice;
         unitPrice = QuotationWaste.unitPrice;
         hasTransportation = QuotationWaste.hasTransportation;
-
-        // switch (QuotationWaste.vatCalculation) {
-        //   case "VAT EXCLUSIVE":
-        //     target.vatExclusive += totalWeightPrice;
-        //     break;
-        //   case "VAT INCLUSIVE":
-        //     target.vatInclusive += totalWeightPrice;
-        //     break;
-        //   case "NON VATABLE":
-        //     target.nonVatable += totalWeightPrice;
-        //     break;
-        //   default:
-        //     break;
-        // }
       });
 
       switch (vatCalculation) {
@@ -215,7 +213,71 @@ const BillingStatementForm = ({
             break;
         }
       }
-      // } else if (hasFixedRate && !isMonthly) {
+    } else if (hasFixedRate && !isMonthly) {
+      let vatCalculation;
+      let fixedWeight;
+      let fixedPrice;
+      let unitPrice;
+
+      let target;
+
+      let usedWeight;
+
+      aggregatedWasteTransactions.forEach((item) => {
+        const { weight, clientWeight, QuotationWaste } = item;
+
+        const selectedWeight =
+          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+        usedWeight = selectedWeight;
+
+        target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        vatCalculation = QuotationWaste.vatCalculation;
+        fixedWeight = QuotationWaste.fixedWeight;
+        fixedPrice = QuotationWaste.fixedPrice;
+        unitPrice = QuotationWaste.unitPrice;
+        hasTransportation = QuotationWaste.hasTransportation;
+      });
+
+      switch (vatCalculation) {
+        case "VAT EXCLUSIVE":
+          target.vatExclusive += fixedPrice;
+          break;
+        case "VAT INCLUSIVE":
+          target.vatInclusive += fixedPrice;
+          break;
+        case "NON VATABLE":
+          target.nonVatable += fixedPrice;
+          break;
+        default:
+          break;
+      }
+
+      console.log(usedWeight);
+      console.log(amounts);
+
+      if (usedWeight > fixedWeight) {
+        const excessWeight = new Decimal(usedWeight)
+          .minus(new Decimal(fixedWeight))
+          .toNumber();
+
+        const excessPrice = excessWeight * unitPrice;
+
+        switch (vatCalculation) {
+          case "VAT EXCLUSIVE":
+            target.vatExclusive += excessPrice;
+            break;
+          case "VAT INCLUSIVE":
+            target.vatInclusive += excessPrice;
+            break;
+          case "NON VATABLE":
+            target.nonVatable += excessPrice;
+            break;
+          default:
+            break;
+        }
+      }
     } else {
       // Calculate amounts and credits based on vatCalculation and mode
       aggregatedWasteTransactions.forEach((item) => {
@@ -468,7 +530,9 @@ const BillingStatementForm = ({
                             waste[9] === "BUYING" ? "red" : "black"
                           )}
                         >
-                          {hasFixedRate && waste[0] !== "" ? "" : waste[6]}
+                          {hasFixedRate && isMonthly && waste[0] !== ""
+                            ? ""
+                            : waste[6]}
                         </TableCell>
                         <TableCell
                           align="center"
@@ -479,7 +543,9 @@ const BillingStatementForm = ({
                             waste[9] === "BUYING" ? "red" : "black"
                           )}
                         >
-                          {hasFixedRate && waste[0] !== "" ? "" : waste[7]}
+                          {hasFixedRate && isMonthly && waste[0] !== ""
+                            ? ""
+                            : waste[7]}
                         </TableCell>
                         <TableCell
                           align="center"
@@ -490,7 +556,9 @@ const BillingStatementForm = ({
                             waste[9] === "BUYING" ? "red" : "black"
                           )}
                         >
-                          {hasFixedRate && waste[0] !== "" ? "" : waste[8]}
+                          {hasFixedRate && isMonthly && waste[0] !== ""
+                            ? ""
+                            : waste[8]}
                         </TableCell>
                       </TableRow>
                     </TableBody>

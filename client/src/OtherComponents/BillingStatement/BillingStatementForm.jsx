@@ -112,8 +112,6 @@ const BillingStatementForm = ({
 
   let totalWeight = 0;
 
-  console.log(transactions);
-
   transactions.forEach((transaction) => {
     const certifiedTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
@@ -150,10 +148,6 @@ const BillingStatementForm = ({
     }));
 
     let hasTransportation;
-
-    console.log(aggregatedWasteTransactions);
-    console.log(hasFixedRate);
-    console.log(isMonthly);
 
     if (hasFixedRate && isMonthly) {
       let vatCalculation;
@@ -253,9 +247,6 @@ const BillingStatementForm = ({
         default:
           break;
       }
-
-      console.log(usedWeight);
-      console.log(amounts);
 
       if (usedWeight > fixedWeight) {
         const excessWeight = new Decimal(usedWeight)

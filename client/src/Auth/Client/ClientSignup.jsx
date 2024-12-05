@@ -160,7 +160,7 @@ const ClientSignup = ({ onLogin }) => {
               onChange={handlePasswordChange}
             />
             <FontAwesomeIcon
-              icon={isVisible ? faEyeSlash : faEye}
+              icon={isVisible ? faEye : faEyeSlash}
               onClick={handleClick}
               style={{
                 position: "absolute",

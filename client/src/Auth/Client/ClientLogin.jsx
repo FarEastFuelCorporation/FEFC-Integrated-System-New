@@ -282,7 +282,7 @@ const ClientLogin = ({ onLogin }) => {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <FontAwesomeIcon
-                icon={isVisible ? faEyeSlash : faEye}
+                icon={isVisible ? faEye : faEyeSlash}
                 onClick={handleClick}
                 style={{
                   position: "absolute",

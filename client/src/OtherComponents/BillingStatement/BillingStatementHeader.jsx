@@ -129,9 +129,12 @@ const BillingStatementHeader = ({ row, amounts, credits }) => {
               BUSINESS STYLE: {clientData?.natureOfBusiness}
             </Typography>
           )}
-          <Box display="flex" fontSize="10px">
-            <Typography id="contact_number" pl={1}></Typography>
-          </Box>
+          {clientData?.billerContactNumber && (
+            <Typography fontSize="12px">
+              {" "}
+              Contact Number: {clientData?.billerContactNumber}
+            </Typography>
+          )}
         </Box>
 
         <Box

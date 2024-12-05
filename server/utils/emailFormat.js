@@ -375,7 +375,7 @@ async function CertifiedTransactionEmailFormat(
   wasteName,
   typeOfVehicle,
   remarks,
-  scheduledBy
+  submittedBy
 ) {
   try {
     const emailTemplate = `
@@ -397,7 +397,7 @@ async function CertifiedTransactionEmailFormat(
           }
           .header {
             text-align: center;
-            background-color: #007bff;
+            background-color: #6f42c1;
             color: white;
             padding: 10px 0;
             border-radius: 8px 8px 0 0;
@@ -423,15 +423,15 @@ async function CertifiedTransactionEmailFormat(
       <body>
         <div class="container">
           <div class="header">
-            <h1>Certified Transaction Confirmation</h1>
+            <h1>Certified Transaction Notification</h1>
           </div>
           <div class="content">
             <p>Dear ${clientName},</p>
-            <p>We are confirming the booking of your ${
+            <p>We are pleased to inform you that your ${
               clientType === "CUS" ? "delivery" : "hauling"
-            } transaction. Please find the details below:</p>
+            } transaction has been treated completely and has been certified. You can now download the certificate directly from the system. Please find the transaction details below:</p>
             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-              <tr style="background-color: #007bff; color: white; text-align: left;">
+              <tr style="background-color: #6f42c1; color: white; text-align: left;">
                 <th style="padding: 8px; text-align: center;">Transaction ID</th>
                 <th style="padding: 8px; text-align: center;">${
                   clientType === "CUS"
@@ -453,7 +453,7 @@ async function CertifiedTransactionEmailFormat(
                   scheduledTime
                 )}</td>
               </tr>
-              <tr style="background-color: #007bff; color: white; text-align: left;">
+              <tr style="background-color: #6f42c1; color: white; text-align: left;">
                 <th style="padding: 8px; text-align: center;">${
                   clientType === "CUS" ? "Product" : "Waste Name"
                 }</th>
@@ -466,9 +466,10 @@ async function CertifiedTransactionEmailFormat(
                 <td style="padding: 8px; text-align: center;">${remarks}</td>
               </tr>
             </table>
-            <p><strong>Scheduled By:</strong> ${scheduledBy}</p>
-            <p>We kindly ask you to ensure that all necessary arrangements are in place for this scheduled transaction.</p>
-            <p>Thank you for your prompt attention to this matter.</p>
+            <p><strong>Submitted By:</strong> ${submittedBy}</p>
+            <p>To access and download the certificate, please log in to your account on our system.</p>
+            <p>If you have any questions or need further assistance, feel free to contact us.</p>
+            <p>Thank you for trusting FAR EAST FUEL CORPORATION.</p>
           </div>
           <div class="footer">
             <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
@@ -481,7 +482,129 @@ async function CertifiedTransactionEmailFormat(
     return emailTemplate;
   } catch (error) {
     console.error(
-      "Error generating schedule transaction email template:",
+      "Error generating certified transaction email template:",
+      error
+    );
+    throw error;
+  }
+}
+
+async function CertifiedTransactionEmailToAccountingFormat(
+  clientType,
+  clientName,
+  transactionId,
+  scheduledDate,
+  scheduledTime,
+  wasteName,
+  typeOfVehicle,
+  remarks,
+  submittedBy
+) {
+  try {
+    const emailTemplate = `
+      <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+          }
+          .header {
+            text-align: center;
+            background-color: #6f42c1;
+            color: white;
+            padding: 10px 0;
+            border-radius: 8px 8px 0 0;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .content {
+            margin: 20px 0;
+          }
+          .content p {
+            margin: 10px 0;
+          }
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Certified Transaction Notification</h1>
+          </div>
+          <div class="content">
+            <p>Dear Accounting Department,</p>
+            <p>We would like to inform you that the following transaction has been fully treated and certified. It is now ready to be billed. Please find the transaction details below:</p>
+            <p><strong>Client Name:</strong> ${clientName}</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <tr style="background-color: #6f42c1; color: white; text-align: left;">
+                <th style="padding: 8px; text-align: center;">Transaction ID</th>
+                <th style="padding: 8px; text-align: center;">${
+                  clientType === "CUS"
+                    ? "Scheduled Delivery Date"
+                    : "Scheduled Hauling Date"
+                }</th>
+                <th style="padding: 8px; text-align: center;">${
+                  clientType === "CUS"
+                    ? "Scheduled Delivery Time"
+                    : "Scheduled Hauling Time"
+                }</th>
+              </tr>
+              <tr>
+                <td style="padding: 8px; text-align: center;">${transactionId}</td>
+                <td style="padding: 8px; text-align: center;">${formatDate(
+                  scheduledDate
+                )}</td>
+                <td style="padding: 8px; text-align: center;">${convertTo12HourFormat(
+                  scheduledTime
+                )}</td>
+              </tr>
+              <tr style="background-color: #6f42c1; color: white; text-align: left;">
+                <th style="padding: 8px; text-align: center;">${
+                  clientType === "CUS" ? "Product" : "Waste Name"
+                }</th>
+                <th style="padding: 8px; text-align: center;">Type of Vehicle</th>
+                <th style="padding: 8px; text-align: center;">Remarks</th>
+              </tr>
+              <tr>
+                <td style="padding: 8px; text-align: center;">${wasteName}</td>
+                <td style="padding: 8px; text-align: center;">${typeOfVehicle}</td>
+                <td style="padding: 8px; text-align: center;">${remarks}</td>
+              </tr>
+            </table>
+            <p><strong>Submitted By:</strong> ${submittedBy}</p>
+            <p>Please proceed with the billing process at your earliest convenience.</p>
+            <p>If you have any questions or need further assistance, feel free to contact us.</p>
+            <p>Thank you for your prompt action.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return emailTemplate;
+  } catch (error) {
+    console.error(
+      "Error generating certified transaction email template for billing:",
       error
     );
     throw error;
@@ -681,6 +804,7 @@ module.exports = {
   ScheduleTransactionEmailFormat,
   ScheduleTransactionEmailToLogisticsFormat,
   CertifiedTransactionEmailFormat,
+  CertifiedTransactionEmailToAccountingFormat,
   BillingApprovalEmailFormat,
   sendOtpFormat,
 };

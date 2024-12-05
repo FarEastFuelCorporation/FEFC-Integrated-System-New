@@ -118,8 +118,8 @@ async function createScheduledTransactionController(req, res) {
       const clientName = updatedBookedTransaction?.Client?.clientName || "";
       const clientId = updatedBookedTransaction?.createdBy || "";
       const clientType = clientId?.slice(0, 3) || "";
-      const scheduledBy = `${scheduledTransactionData.Employee.firstName} ${scheduledTransactionData.Employee.lastName}`;
       const clientEmail = updatedBookedTransaction?.Client?.email || "";
+      const scheduledBy = `${scheduledTransactionData.Employee.firstName} ${scheduledTransactionData.Employee.lastName}`;
 
       const emailBody = await ScheduleTransactionEmailFormat(
         clientType,

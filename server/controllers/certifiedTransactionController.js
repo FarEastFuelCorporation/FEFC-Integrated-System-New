@@ -3,6 +3,17 @@
 const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
+const Client = require("../models/Client");
+const Employee = require("../models/Employee");
+const QuotationTransportation = require("../models/QuotationTransportation");
+const QuotationWaste = require("../models/QuotationWaste");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
+const VehicleType = require("../models/VehicleType");
+const sendEmail = require("../sendEmail");
+const {
+  CertifiedTransactionEmailFormat,
+  CertifiedTransactionEmailToAccountingFormat,
+} = require("../utils/emailFormat");
 const generateCertificateNumber = require("../utils/generateCertificateNumber");
 const { fetchData } = require("../utils/getBookedTransactions");
 const transactionStatusId = 8;
@@ -31,7 +42,7 @@ async function createCertifiedTransactionController(req, res) {
     const certificateNumber = await generateCertificateNumber();
 
     // Create CertifiedTransaction entry
-    await CertifiedTransaction.create(
+    const certifiedTransaction = await CertifiedTransaction.create(
       {
         bookedTransactionId,
         sortedTransactionId,
@@ -49,8 +60,17 @@ async function createCertifiedTransactionController(req, res) {
 
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
-      { transaction }
+      {
+        attributes: ["id", "transactionId", "statusId"],
+        include: {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName", "email"],
+        },
+        transaction,
+      }
     );
+
     if (updatedBookedTransaction) {
       updatedBookedTransaction.statusId = isBilled ? 10 : statusId;
       await updatedBookedTransaction.save({ transaction });
@@ -60,6 +80,122 @@ async function createCertifiedTransactionController(req, res) {
 
       // fetch transactions
       const data = await fetchData(transactionStatusId);
+
+      const scheduledTransactionData = await ScheduledTransaction.findOne({
+        where: { bookedTransactionId },
+        attributes: ["scheduledDate", "scheduledTime"],
+      });
+
+      const quotationWaste = await QuotationWaste.findByPk(
+        updatedBookedTransaction.quotationWasteId,
+        {
+          attributes: ["wasteName"],
+        }
+      );
+
+      const quotationTransportation = await QuotationTransportation.findByPk(
+        updatedBookedTransaction.quotationTransportationId,
+        {
+          attributes: ["vehicleTypeId"],
+          include: {
+            model: VehicleType,
+            as: "VehicleType",
+            attributes: ["typeOfVehicle"],
+          },
+        }
+      );
+
+      const certifiedTransactionData = await CertifiedTransaction.findByPk(
+        certifiedTransaction.id,
+        {
+          attributes: ["createdBy"],
+          include: {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        }
+      );
+
+      const transactionId = updatedBookedTransaction.transactionId;
+      const scheduledDate = scheduledTransactionData.scheduledDate;
+      const scheduledTime = scheduledTransactionData.scheduledTime;
+
+      const wasteName = quotationWaste ? quotationWaste.wasteName : "";
+      const typeOfVehicle =
+        quotationTransportation?.VehicleType?.typeOfVehicle || "";
+      const clientName = updatedBookedTransaction?.Client?.clientName || "";
+      const clientId = updatedBookedTransaction?.createdBy || "";
+      const clientType = clientId?.slice(0, 3) || "";
+      const clientEmail = updatedBookedTransaction?.Client?.email || "";
+      const submittedBy = `${certifiedTransactionData?.Employee?.firstName} ${certifiedTransactionData?.Employee?.lastName}`;
+
+      const emailBody = await CertifiedTransactionEmailFormat(
+        clientType,
+        clientName,
+        transactionId,
+        scheduledDate,
+        scheduledTime,
+        wasteName,
+        typeOfVehicle,
+        remarks,
+        submittedBy
+      );
+      console.log(emailBody);
+
+      try {
+        sendEmail(
+          // "jmfalar@fareastfuelcorp.com", // Recipient
+          clientEmail, // Recipient
+          `${transactionId} - Certified Transaction Notification`, // Subject
+          "Please view this email in HTML format.", // Plain-text fallback
+          emailBody,
+          ["marketing@fareastfuelcorp.com"], // HTML content // cc
+          [
+            "rmangaron@fareastfuelcorp.com",
+            "edevera@fareastfuelcorp.com",
+            "eb.devera410@gmail.com",
+            "cc.duran@fareastfuel.com",
+          ] // bcc
+        ).catch((emailError) => {
+          console.error("Error sending email:", emailError);
+        });
+      } catch (error) {
+        console.error("Unexpected error when sending email:", error);
+      }
+
+      const emailBody2 = await CertifiedTransactionEmailToAccountingFormat(
+        clientType,
+        clientName,
+        transactionId,
+        scheduledDate,
+        scheduledTime,
+        wasteName,
+        typeOfVehicle,
+        remarks,
+        submittedBy
+      );
+
+      try {
+        sendEmail(
+          // "jmfalar@fareastfuelcorp.com", // Recipient
+          "accounting@fareastfuelcorp.com", // Recipient
+          `${transactionId} - For Billing: ${clientName}`, // Subject
+          "Please view this email in HTML format.", // Plain-text fallback
+          emailBody2,
+          ["dm.cardinez@fareastfuel.com"], // HTML content // cc
+          [
+            "rmangaron@fareastfuelcorp.com",
+            "edevera@fareastfuelcorp.com",
+            "eb.devera410@gmail.com",
+            "cc.duran@fareastfuel.com",
+          ] // bcc
+        ).catch((emailError) => {
+          console.error("Error sending email:", emailError);
+        });
+      } catch (error) {
+        console.error("Unexpected error when sending email:", error);
+      }
 
       // Respond with the updated data
       res.status(200).json({

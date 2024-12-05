@@ -7,7 +7,7 @@ const sendEmail = async (
   html,
   cc = null,
   bcc = null,
-  retries = 3,
+  retries = 5,
   delay = 2000
 ) => {
   try {

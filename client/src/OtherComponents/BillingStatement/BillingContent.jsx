@@ -164,7 +164,11 @@ const BillingContent = ({
         <BillingTableHead />
         <TableBody>
           {transactions
-            .sort((a, b) => new Date(a.haulingDate) - new Date(b.haulingDate)) // Sort transactions by haulingDate from oldest to newest
+            .sort(
+              (a, b) =>
+                new Date(a.ScheduledTransaction[0].scheduledDate) -
+                new Date(b.ScheduledTransaction[0].scheduledDate)
+            ) // Sort transactions by haulingDate from oldest to newest
             .map((transaction, index) => {
               // Check if aggregatedWasteTransactions need to be mapped
               const aggregatedWasteTransactions = Object.values(
@@ -195,6 +199,9 @@ const BillingContent = ({
                 transaction.ScheduledTransaction[0].ReceivedTransaction[0]
                   .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
                   ?.typeOfWeight || "SORTED WEIGHT";
+
+              const scheduledTransaction =
+                transaction.ScheduledTransaction?.[0];
 
               const wasteRows = Object.values(aggregatedWasteTransactions).map(
                 (waste, idx) => {
@@ -228,7 +235,7 @@ const BillingContent = ({
                             ...bodyCellStyles({ width: 60, color: fontColor }),
                           }}
                         >
-                          {formatDate2(transaction.haulingDate)}
+                          {formatDate2(scheduledTransaction.scheduledDate)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -363,7 +370,7 @@ const BillingContent = ({
                                 }),
                               }}
                             >
-                              {formatDate2(transaction.haulingDate)}
+                              {formatDate2(scheduledTransaction.scheduledDate)}
                             </TableCell>
                             <TableCell
                               sx={{
@@ -524,7 +531,7 @@ const BillingContent = ({
                         sx={{ border: "black" }}
                       >
                         <TableCell sx={bodyCellStyles({ width: 60 })}>
-                          {formatDate2(transaction.haulingDate)}
+                          {formatDate2(scheduledTransaction.scheduledDate)}
                         </TableCell>
                         <TableCell
                           sx={bodyCellStyles({ width: 40 })}

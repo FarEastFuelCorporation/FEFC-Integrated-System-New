@@ -97,7 +97,7 @@ const BillingContent = ({
       const isFirstCellEmpty = cells[0]?.textContent.trim() === "";
 
       // Set rowHeight based on the first <td> content
-      const rowHeight = isFirstCellEmpty ? 22 : 22;
+      const rowHeight = isFirstCellEmpty ? 22 : row.offsetHeight;
 
       const cellContents = cells.map((cell) => cell.textContent.trim()); // Extract content from each <td>
       addElementToPage(cellContents, rowHeight); // Push the contents of the row

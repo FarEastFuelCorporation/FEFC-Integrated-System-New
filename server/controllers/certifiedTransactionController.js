@@ -61,7 +61,13 @@ async function createCertifiedTransactionController(req, res) {
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       {
-        attributes: ["id", "transactionId", "statusId"],
+        attributes: [
+          "id",
+          "transactionId",
+          "statusId",
+          "quotationWasteId",
+          "quotationTransportationId",
+        ],
         include: {
           model: Client,
           as: "Client",
@@ -150,7 +156,7 @@ async function createCertifiedTransactionController(req, res) {
           `${transactionId} - Certified Transaction Notification`, // Subject
           "Please view this email in HTML format.", // Plain-text fallback
           emailBody,
-          ["marketing@fareastfuelcorp.com"], // HTML content // cc
+          ["marketing@fareastfuelcorp.com", "treatment@fareastfuelcorp.com"], // HTML content // cc
           [
             "rmangaron@fareastfuelcorp.com",
             "edevera@fareastfuelcorp.com",

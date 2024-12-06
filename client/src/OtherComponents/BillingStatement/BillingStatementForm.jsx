@@ -162,8 +162,6 @@ const BillingStatementForm = ({
       weight: item.weight.toNumber(), // Convert Decimal back to a standard number
     }));
 
-    console.log(aggregatedWasteTransactions);
-
     let hasTransportation;
 
     if (hasFixedRate && isMonthly) {
@@ -299,10 +297,6 @@ const BillingStatementForm = ({
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
         hasTransportation = QuotationWaste.hasTransportation;
-
-        console.log(QuotationWaste.unitPrice);
-        console.log(selectedWeight);
-        console.log(totalWeightPrice);
 
         switch (QuotationWaste.vatCalculation) {
           case "VAT EXCLUSIVE":

@@ -91,7 +91,7 @@ const BillModal = ({
                     color="secondary"
                   />
                 }
-                label="Per Transporter's Client"
+                label="By Transporter's Client"
               />
             )}
           </Box>

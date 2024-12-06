@@ -35,9 +35,6 @@ const BillingContent = ({
 
   let totalWeight = 0;
 
-  console.log(isWasteNameToBill);
-  console.log(isPerClientToBill);
-
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight - 50;
 
@@ -91,8 +88,6 @@ const BillingContent = ({
 
     // Add Waste rows
     wasteRows.forEach((row, index) => {
-      console.log(row);
-
       // Skip the first row (index 0)
       if (index === 0) return;
 
@@ -101,12 +96,8 @@ const BillingContent = ({
       // Check if the first <td> content is empty
       const isFirstCellEmpty = cells[0]?.textContent.trim() === "";
 
-      console.log(isFirstCellEmpty);
-
       // Set rowHeight based on the first <td> content
       const rowHeight = isFirstCellEmpty ? 22 : 22;
-
-      console.log(rowHeight);
 
       const cellContents = cells.map((cell) => cell.textContent.trim()); // Extract content from each <td>
       addElementToPage(cellContents, rowHeight); // Push the contents of the row

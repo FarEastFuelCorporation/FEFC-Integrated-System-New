@@ -274,7 +274,6 @@ const Transaction = ({
               const response = await axios.get(
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
-              console.log(response.data.transaction.transaction);
               setRow(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {

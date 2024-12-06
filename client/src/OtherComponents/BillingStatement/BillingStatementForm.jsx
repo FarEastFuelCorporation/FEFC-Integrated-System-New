@@ -82,7 +82,6 @@ const BillingStatementForm = ({
       }
 
       // For pending transactions
-      console.log(billingStatementResponse.data.bookedTransactions);
       setTransactions(billingStatementResponse.data.bookedTransactions);
       setIsFetched(true);
       // setLoading(false);
@@ -398,8 +397,6 @@ const BillingStatementForm = ({
     fontWeight: fontWeight,
   });
 
-  console.log(pagesContent);
-
   return (
     <>
       {isFetched && (
@@ -462,10 +459,6 @@ const BillingStatementForm = ({
                   bodyRows.BillingTableHead.header = <BillingTableHead />;
 
                   const waste = item; // Assuming item contains waste details
-
-                  console.log(waste);
-
-                  console.log(waste[3]);
 
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
@@ -603,8 +596,6 @@ const BillingStatementForm = ({
                     </TableBody>
                   );
                 });
-
-                console.log(bodyRows);
 
                 return (
                   <Box

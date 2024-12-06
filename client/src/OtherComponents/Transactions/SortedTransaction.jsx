@@ -24,7 +24,7 @@ const SortedTransaction = ({ row }) => {
         ...item,
         sortedDate: sortedTransaction.sortedDate,
         sortedTime: sortedTransaction.sortedTime,
-      }))
+      })).sort((a, b) => a.wasteName.localeCompare(b.wasteName))
     : [];
 
   const sortedScrapTransaction = sortedTransaction.SortedScrapTransaction
@@ -32,9 +32,8 @@ const SortedTransaction = ({ row }) => {
         ...item,
         sortedDate: sortedTransaction.sortedDate,
         sortedTime: sortedTransaction.sortedTime,
-        wasteName: item.ScrapType.typeOfScrap,
-        clientWeight: "N/A",
-      }))
+        wasteName: item.ScrapType.typeOfScrap, // Assigning wasteName
+      })).sort((a, b) => a.wasteName.localeCompare(b.wasteName))
     : [];
 
   const formatTimeToHHMMSS = (timeString) => {
@@ -129,6 +128,47 @@ const SortedTransaction = ({ row }) => {
     {
       field: "clientWeight",
       headerName: "Client Weight",
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      minWidth: 150,
+      renderCell: (params) => (
+        <div className={"wrap-text"} style={{ textAlign: "center" }}>
+          {formatWeight(params.value)}
+        </div>
+      ),
+    },
+  ];
+
+  const columns2 = [
+    {
+      field: "sortedDate",
+      headerName: "Sorted Date",
+      headerAlign: "center",
+      align: "center",
+      width: 150,
+      renderCell: renderCellWithFormattedDate,
+    },
+    {
+      field: "sortedTime",
+      headerName: "Sorted Time",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: renderCellWithFormattedTime,
+    },
+    {
+      field: "wasteName",
+      headerName: "Scrap Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "weight",
+      headerName: "Weight",
       headerAlign: "center",
       align: "center",
       flex: 0.5,
@@ -256,13 +296,9 @@ const SortedTransaction = ({ row }) => {
                 columns={columns}
                 components={{ Toolbar: GridToolbar }}
                 getRowId={(row) => (row.id ? row.id : [])}
-                localeText={{ noRowsLabel: "No Treated Transactions" }}
+                localeText={{ noRowsLabel: "No Sorted Waste Transactions" }}
                 initialState={{
-                  sortModel: [
-                    { field: "treatedDate", sort: "asc" },
-                    { field: "treatedTime", sort: "asc" },
-                    { field: "machineName", sort: "asc" },
-                  ],
+                  sortModel: [{ field: "wasteName", sort: "asc" }],
                 }}
               />
             </>
@@ -312,16 +348,12 @@ const SortedTransaction = ({ row }) => {
                   },
                 }}
                 rows={sortedScrapTransaction ? sortedScrapTransaction : []}
-                columns={columns}
+                columns={columns2}
                 components={{ Toolbar: GridToolbar }}
                 getRowId={(row) => (row.id ? row.id : [])}
-                localeText={{ noRowsLabel: "No Treated Transactions" }}
+                localeText={{ noRowsLabel: "No Sorted Scrap Transactions" }}
                 initialState={{
-                  sortModel: [
-                    { field: "treatedDate", sort: "asc" },
-                    { field: "treatedTime", sort: "asc" },
-                    { field: "machineName", sort: "asc" },
-                  ],
+                  sortModel: [{ field: "wasteName", sort: "asc" }],
                 }}
               />
             </>

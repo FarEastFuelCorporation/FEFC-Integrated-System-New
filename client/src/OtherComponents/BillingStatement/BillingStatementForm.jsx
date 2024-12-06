@@ -31,6 +31,7 @@ const BillingStatementForm = ({
   statementRef,
   review = false,
   bookedTransactionIds,
+  isWasteNameToBill = false,
 }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
@@ -125,27 +126,33 @@ const BillingStatementForm = ({
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
         .SortedTransaction[0].SortedWasteTransaction;
 
-    // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
-    const aggregatedWasteTransactions = Object.values(
-      sortedWasteTransaction.reduce((acc, current) => {
-        const { id } = current.QuotationWaste;
+    let aggregatedWasteTransactions;
 
-        const currentWeight = new Decimal(current.weight); // Use Decimal.js
+    if (isWasteNameToBill) {
+      aggregatedWasteTransactions = sortedWasteTransaction;
+    } else {
+      // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
+      aggregatedWasteTransactions = Object.values(
+        sortedWasteTransaction.reduce((acc, current) => {
+          const { id } = current.QuotationWaste;
 
-        // If the `QuotationWaste.id` is already in the accumulator, add the weight
-        if (acc[id]) {
-          acc[id].weight = acc[id].weight.plus(currentWeight);
-        } else {
-          // Otherwise, set the initial object in the accumulator
-          acc[id] = { ...current, weight: currentWeight };
-        }
+          const currentWeight = new Decimal(current.weight); // Use Decimal.js
 
-        return acc;
-      }, {})
-    ).map((item) => ({
-      ...item,
-      weight: item.weight.toNumber(), // Convert Decimal back to a standard number
-    }));
+          // If the `QuotationWaste.id` is already in the accumulator, add the weight
+          if (acc[id]) {
+            acc[id].weight = acc[id].weight.plus(currentWeight);
+          } else {
+            // Otherwise, set the initial object in the accumulator
+            acc[id] = { ...current, weight: currentWeight };
+          }
+
+          return acc;
+        }, {})
+      ).map((item) => ({
+        ...item,
+        weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+      }));
+    }
 
     let hasTransportation;
 
@@ -369,7 +376,13 @@ const BillingStatementForm = ({
     ],
   };
 
-  const getCellStyle = (isLastCell, width, alignRight = false, black) => ({
+  const getCellStyle = (
+    isLastCell,
+    width,
+    alignRight = false,
+    black,
+    fontWeight = "normal"
+  ) => ({
     padding: "2px",
     border: "1px solid black",
     borderTop: "none",
@@ -379,6 +392,7 @@ const BillingStatementForm = ({
     textAlign: alignRight ? "end" : "center",
     minHeight: "22.26px",
     height: "100%",
+    fontWeight: fontWeight,
   });
 
   return (
@@ -405,6 +419,7 @@ const BillingStatementForm = ({
                 setPagesContent={setPagesContent}
                 setIsDoneCalculation={setIsDoneCalculation}
                 heightsReady={heightsReady}
+                isWasteNameToBill={isWasteNameToBill}
               />
             </Box>
 
@@ -434,124 +449,147 @@ const BillingStatementForm = ({
 
                 // Process each item in the tableData
                 tableData.forEach((item, index) => {
+                  if (tableData[index].length === 0) {
+                    return null; // Return null if there's no data
+                  }
+
                   bodyRows.BillingTableHead.header = <BillingTableHead />;
 
                   const waste = item; // Assuming item contains waste details
 
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
-                      <TableRow key={index} sx={{ border: "black" }}>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[0],
-                            false,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {waste[0]}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[1],
-                            false,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {waste[1]}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[2],
+                      {waste[9] === "CLIENT NAME" ? (
+                        <TableRow key={index} sx={{ border: "black" }}>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              true,
+                              columnWidths.waste[3],
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black",
+                              waste[9] === "CLIENT NAME" ? "bold" : "normal"
+                            )}
+                            colSpan={9}
+                          >
+                            {waste[11] === "true" ? waste[10] : waste[3]}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <TableRow key={index} sx={{ border: "black" }}>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[0],
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {waste[0]}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[1],
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {waste[1]}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[2],
 
-                            false,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {waste[2]}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[3],
-                            false,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {waste[11] === "true" ? waste[10] : waste[3]}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[4],
-                            true,
-                            waste[4]
-                              ? waste[9] === "BUYING"
-                                ? "red"
-                                : "black"
-                              : "white"
-                          )}
-                        >
-                          {waste[4] ? waste[4] : 0}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[5],
-                            false,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {waste[5] ? waste[5] : ""}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[6],
-                            true,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {hasFixedRate && isMonthly && waste[0] !== ""
-                            ? ""
-                            : waste[6]}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            false,
-                            columnWidths.waste[7],
-                            true,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {hasFixedRate && isMonthly && waste[0] !== ""
-                            ? ""
-                            : waste[7]}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={getCellStyle(
-                            true,
-                            columnWidths.waste[8],
-                            false,
-                            waste[9] === "BUYING" ? "red" : "black"
-                          )}
-                        >
-                          {hasFixedRate && isMonthly && waste[0] !== ""
-                            ? ""
-                            : waste[8]}
-                        </TableCell>
-                      </TableRow>
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {waste[2]}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[3],
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black",
+                              waste[9] === "CLIENT NAME" ? "bold" : "normal"
+                            )}
+                          >
+                            {waste[11] === "true" ? waste[10] : waste[3]}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[4],
+                              true,
+                              waste[4]
+                                ? waste[9] === "BUYING"
+                                  ? "red"
+                                  : "black"
+                                : "white"
+                            )}
+                          >
+                            {waste[4] ? waste[4] : 0}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[5],
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {waste[5] ? waste[5] : ""}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[6],
+                              true,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {hasFixedRate && isMonthly && waste[0] !== ""
+                              ? ""
+                              : waste[6]}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              false,
+                              columnWidths.waste[7],
+                              true,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {hasFixedRate && isMonthly && waste[0] !== ""
+                              ? ""
+                              : waste[7]}
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={getCellStyle(
+                              true,
+                              columnWidths.waste[8],
+                              false,
+                              waste[9] === "BUYING" ? "red" : "black"
+                            )}
+                          >
+                            {hasFixedRate && isMonthly && waste[0] !== ""
+                              ? ""
+                              : waste[8]}
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   );
                 });

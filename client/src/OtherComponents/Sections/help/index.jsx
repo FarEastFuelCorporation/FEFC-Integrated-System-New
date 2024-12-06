@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import Header from "../../Header";
 
 const guides = [
@@ -24,6 +26,9 @@ const guides = [
 
 const Help = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
+
+  // Initialize the default layout plugin
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const handleCardClick = (url) => {
     setPdfUrl(url); // Display PDF inside the app
@@ -66,7 +71,10 @@ const Help = () => {
                 height: "600px",
               }}
             >
-              <Viewer fileUrl={pdfUrl} />
+              <Viewer
+                fileUrl={pdfUrl}
+                plugins={[defaultLayoutPluginInstance]}
+              />
             </Box>
           </Worker>
         </Box>

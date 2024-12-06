@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Modal,
@@ -21,9 +21,17 @@ const BillModal = ({
   errorMessage,
   showErrorMessage,
   refs,
+  isWasteNameToBill,
+  setIsWasteNameToBill,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const handleCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
+    setIsWasteNameToBill(isChecked); // Update the individual state
+    setFormData({ ...formData, isWasteName: isChecked }); // Update formData state
+  };
 
   return (
     <Box>
@@ -59,9 +67,7 @@ const BillModal = ({
             control={
               <Checkbox
                 checked={formData.isWasteName}
-                onChange={(e) =>
-                  setFormData({ ...formData, isWasteName: e.target.checked })
-                }
+                onChange={handleCheckboxChange}
                 color="secondary"
               />
             }
@@ -169,6 +175,7 @@ const BillModal = ({
             row={formData.row}
             review={true}
             bookedTransactionIds={formData.bookedTransactionId}
+            isWasteNameToBill={isWasteNameToBill}
           />
         </Box>
       </Modal>

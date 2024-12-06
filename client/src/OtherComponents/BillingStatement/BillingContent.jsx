@@ -19,6 +19,7 @@ const BillingContent = ({
   setPagesContent,
   setIsDoneCalculation,
   heightsReady,
+  isWasteNameToBill = false,
 }) => {
   const wasteTableRef = useRef(null);
 
@@ -124,7 +125,7 @@ const BillingContent = ({
         calculatePageContent();
       }
     }
-  }, [heightsReady, calculatePageContent]);
+  }, [heightsReady, calculatePageContent, isWasteNameToBill]);
 
   const bodyCellStyles = ({
     isLastCell = false,
@@ -142,6 +143,8 @@ const BillingContent = ({
     fontFamily: "'Poppins', sans-serif",
     height: "20px",
   });
+
+  let clientNames = [];
 
   return (
     <Box>
@@ -171,27 +174,43 @@ const BillingContent = ({
             ) // Sort transactions by haulingDate from oldest to newest
             .map((transaction, index) => {
               // Check if aggregatedWasteTransactions need to be mapped
-              const aggregatedWasteTransactions = Object.values(
-                transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
-                  (acc, current) => {
-                    const { id } = current.QuotationWaste;
 
-                    const currentWeight = new Decimal(current.weight); // Use Decimal.js
+              let aggregatedWasteTransactions;
 
-                    if (acc[id]) {
-                      acc[id].weight = acc[id].weight.plus(currentWeight);
-                    } else {
-                      acc[id] = { ...current, weight: currentWeight };
-                    }
+              if (isWasteNameToBill) {
+                aggregatedWasteTransactions =
+                  transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                    .SortedTransaction[0].SortedWasteTransaction;
 
-                    return acc;
-                  },
-                  {}
-                )
-              ).map((item) => ({
-                ...item,
-                weight: item.weight.toNumber(), // Convert Decimal back to a standard number
-              }));
+                aggregatedWasteTransactions.sort((a, b) => {
+                  const clientNameA = a.TransporterClient?.clientName || "";
+                  const clientNameB = b.TransporterClient?.clientName || "";
+
+                  return clientNameA.localeCompare(clientNameB); // Compare client names alphabetically
+                });
+              } else {
+                aggregatedWasteTransactions = Object.values(
+                  transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
+                    (acc, current) => {
+                      const { id } = current.QuotationWaste;
+
+                      const currentWeight = new Decimal(current.weight); // Use Decimal.js
+
+                      if (acc[id]) {
+                        acc[id].weight = acc[id].weight.plus(currentWeight);
+                      } else {
+                        acc[id] = { ...current, weight: currentWeight };
+                      }
+
+                      return acc;
+                    },
+                    {}
+                  )
+                ).map((item) => ({
+                  ...item,
+                  weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+                }));
+              }
 
               const invoiceNumber =
                 transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
@@ -227,8 +246,257 @@ const BillingContent = ({
                   const isWasteName =
                     transaction.BilledTransaction?.[0]?.isWasteName;
 
+                  const clientName = waste.TransporterClient?.clientName;
+
+                  let newClient = false;
+
+                  if (clientName) {
+                    newClient = !clientNames.includes(clientName);
+
+                    if (newClient) {
+                      clientNames.push(clientName);
+                    }
+                  }
+
                   return (
                     <>
+                      {/* {newClient && idx !== 0 && (
+                        <TableRow
+                          key={`wasteH0-${idx}`}
+                          sx={{ border: "black" }}
+                        >
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 60,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{ ...bodyCellStyles({ color: fontColor }) }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 60,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {waste.QuotationWaste.mode}
+                          </TableCell>
+                          {isWasteName && (
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {wasteName}
+                            </TableCell>
+                          )}
+
+                          {isWasteName && (
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {isWasteName ? "true" : "false"}
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      )} */}
+                      {newClient && (
+                        <TableRow
+                          key={`wasteH-${idx}`}
+                          sx={{ border: "black" }}
+                        >
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 60,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {clientName}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 60,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {"CLIENT NAME"}
+                          </TableCell>
+                          {isWasteName && (
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {wasteName}
+                            </TableCell>
+                          )}
+                          {isWasteName && (
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {isWasteName ? "true" : "false"}
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      )}
                       <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                         <TableCell
                           sx={{
@@ -253,7 +521,11 @@ const BillingContent = ({
                           sx={{ ...bodyCellStyles({ color: fontColor }) }}
                         >
                           {hasFixedRate && !isMonthly
-                            ? `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                            ? isWasteNameToBill
+                              ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                              : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                            : isWasteNameToBill
+                            ? waste.wasteName
                             : waste.QuotationWaste.wasteName}
                         </TableCell>
                         <TableCell
@@ -394,7 +666,11 @@ const BillingContent = ({
                               sx={{ ...bodyCellStyles({ color: fontColor }) }}
                             >
                               {hasFixedRate && !isMonthly
-                                ? `${waste.QuotationWaste.wasteName} (EXCESS)`
+                                ? isWasteNameToBill
+                                  ? `${waste.wasteName} (EXCESS)`
+                                  : `${waste.QuotationWaste.wasteName} (EXCESS)`
+                                : isWasteNameToBill
+                                ? waste.wasteName
                                 : waste.QuotationWaste.wasteName}
                             </TableCell>
                             <TableCell
@@ -521,72 +797,65 @@ const BillingContent = ({
                 transaction.QuotationWaste.hasTransportation;
 
               // Add the transportation row if applicable
-              const transpoRows =
-                transaction?.QuotationTransportation?.mode === "CHARGE" &&
+              const transpoRows = transaction?.QuotationTransportation?.mode ===
+                "CHARGE" &&
                 isTransportation &&
-                hasTransportation
-                  ? [
-                      <TableRow
-                        key={`transpo-${index}`}
-                        sx={{ border: "black" }}
-                      >
-                        <TableCell sx={bodyCellStyles({ width: 60 })}>
-                          {formatDate2(scheduledTransaction.scheduledDate)}
-                        </TableCell>
-                        <TableCell
-                          sx={bodyCellStyles({ width: 40 })}
-                        ></TableCell>
-                        <TableCell sx={bodyCellStyles({ width: 40 })}>
-                          {invoiceNumber}
-                        </TableCell>
-                        <TableCell sx={bodyCellStyles()}>
-                          {`TRANS FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
-                        </TableCell>
-                        <TableCell
-                          sx={bodyCellStyles({
-                            width: 60,
-                            notCenter: true,
-                          })}
-                        >
-                          {`${formatNumber2(
-                            transaction.QuotationTransportation?.quantity
-                          )}`}
-                        </TableCell>
-                        <TableCell sx={bodyCellStyles({ width: 40 })}>
-                          {transaction.QuotationTransportation?.unit}
-                        </TableCell>
-                        <TableCell
-                          sx={bodyCellStyles({
-                            width: 80,
-                            notCenter: true,
-                          })}
-                        >
-                          {formatNumber2(
-                            transaction.QuotationTransportation?.unitPrice
-                          )}
-                        </TableCell>
-                        <TableCell
-                          sx={bodyCellStyles({
-                            width: 80,
-                            notCenter: true,
-                          })}
-                        >
-                          {formatNumber(
-                            transaction.QuotationTransportation?.quantity *
-                              transaction.QuotationTransportation?.unitPrice
-                          )}
-                        </TableCell>
-                        <TableCell
-                          sx={bodyCellStyles({
-                            width: 85,
-                            isLastCell: true,
-                          })}
-                        >
-                          {transaction.QuotationTransportation?.vatCalculation}
-                        </TableCell>
-                      </TableRow>,
-                    ]
-                  : [];
+                hasTransportation && [
+                  <TableRow key={`transpo-${index}`} sx={{ border: "black" }}>
+                    <TableCell sx={bodyCellStyles({ width: 60 })}>
+                      {formatDate2(scheduledTransaction.scheduledDate)}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {invoiceNumber}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles()}>
+                      {`TRANS FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 60,
+                        notCenter: true,
+                      })}
+                    >
+                      {`${formatNumber2(
+                        transaction.QuotationTransportation?.quantity
+                      )}`}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {transaction.QuotationTransportation?.unit}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 80,
+                        notCenter: true,
+                      })}
+                    >
+                      {formatNumber2(
+                        transaction.QuotationTransportation?.unitPrice
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 80,
+                        notCenter: true,
+                      })}
+                    >
+                      {formatNumber(
+                        transaction.QuotationTransportation?.quantity *
+                          transaction.QuotationTransportation?.unitPrice
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 85,
+                        isLastCell: true,
+                      })}
+                    >
+                      {transaction.QuotationTransportation?.vatCalculation}
+                    </TableCell>
+                  </TableRow>,
+                ];
 
               // Combine waste and transportation rows for alternating display
               const combinedRows = [];

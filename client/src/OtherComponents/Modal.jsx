@@ -30,6 +30,8 @@ const Modal = ({
   setIsDiscrepancy,
   isDiscrepancy,
   refs,
+  isWasteNameToBill,
+  setIsWasteNameToBill,
 }) => {
   let ModalComponent;
   switch (user.userType) {
@@ -164,6 +166,8 @@ const Modal = ({
           showErrorMessage={showErrorMessage}
           setShowErrorMessage={setShowErrorMessage}
           refs={refs}
+          isWasteNameToBill={isWasteNameToBill}
+          setIsWasteNameToBill={setIsWasteNameToBill}
         />
       );
       break;

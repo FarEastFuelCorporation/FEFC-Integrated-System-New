@@ -21,6 +21,10 @@ const SortedWasteTransaction = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    transporterClientId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
     treatmentProcessId: {
       type: DataTypes.UUID,
       allowNull: false,

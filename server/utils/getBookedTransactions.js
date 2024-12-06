@@ -135,6 +135,11 @@ const getIncludeOptions = () => [
                     ],
                   },
                   {
+                    model: TransporterClient,
+                    as: "TransporterClient",
+                    attributes: ["clientName"],
+                  },
+                  {
                     model: TreatmentProcess,
                     as: "TreatmentProcess",
                     attributes: ["treatmentProcess"],

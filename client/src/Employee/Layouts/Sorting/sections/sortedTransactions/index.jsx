@@ -25,6 +25,7 @@ const SortedTransactions = ({ user }) => {
     sortedWastes: [
       {
         quotationWasteId: "",
+        transporterClientId: "",
         treatmentProcessId: "",
         wasteName: "",
         weight: 0,
@@ -116,6 +117,7 @@ const SortedTransactions = ({ user }) => {
       sortedWastes: [
         {
           quotationWasteId: "",
+          transporterClientId: "",
           treatmentProcessId: "",
           wasteName: "",
           weight: 0,
@@ -168,6 +170,7 @@ const SortedTransactions = ({ user }) => {
         sortedWastes: sortedTransaction.SortedWasteTransaction
           ? sortedTransaction.SortedWasteTransaction.map((waste) => ({
               quotationWasteId: waste.quotationWasteId || "",
+              transporterClientId: waste.transporterClientId || "",
               treatmentProcessId: waste.treatmentProcessId || "",
               wasteName: waste.wasteName || "",
               weight: waste.weight || 0,
@@ -177,6 +180,7 @@ const SortedTransactions = ({ user }) => {
           : [
               {
                 quotationWasteId: "",
+                transporterClientId: "",
                 treatmentProcessId: "",
                 wasteName: "",
                 weight: 0,

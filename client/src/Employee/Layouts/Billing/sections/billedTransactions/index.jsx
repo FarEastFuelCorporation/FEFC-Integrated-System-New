@@ -54,6 +54,7 @@ const BilledTransactions = ({ user }) => {
   const [dialogAction, setDialogAction] = useState(false);
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [isWasteNameToBill, setIsWasteNameToBill] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -129,6 +130,7 @@ const BilledTransactions = ({ user }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsWasteNameToBill(false);
     clearFormData();
   };
 
@@ -332,6 +334,8 @@ const BilledTransactions = ({ user }) => {
         setErrorMessage={setErrorMessage}
         showErrorMessage={showErrorMessage}
         setShowErrorMessage={setShowErrorMessage}
+        isWasteNameToBill={isWasteNameToBill}
+        setIsWasteNameToBill={setIsWasteNameToBill}
         refs={{
           billedDateRef,
           billedTimeRef,

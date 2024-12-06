@@ -36,13 +36,17 @@ const TreatedTransaction = ({
     row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.SortedTransaction[0]
       ?.SortedWasteTransaction;
 
+  const sortedWasteTransactionSorted = sortedWasteTransaction.sort((a, b) =>
+    a.wasteName.localeCompare(b.wasteName)
+  );
+
   // Get the bookedTransactionId from ScheduledTransaction
   const bookedTransactionId = row.ScheduledTransaction[0].bookedTransactionId;
   const submitTo =
     row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.submitTo;
 
   // Loop through each SortedWasteTransaction
-  sortedWasteTransaction.forEach((sortedTransaction) => {
+  sortedWasteTransactionSorted.forEach((sortedTransaction) => {
     let treatedWeight = 0; // Initialize total treated weight
 
     // Check if the TreatedWasteTransaction exists and is an array

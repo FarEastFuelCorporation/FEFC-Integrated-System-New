@@ -35,22 +35,31 @@ const SortModal = ({
   const [quotations, setQuotations] = useState([]);
   const [scrapTypes, setScrapTypes] = useState([]);
   const [treatmentProcesses, setTreatmentProcesses] = useState([]);
+  const [transporterClients, setTransporterClients] = useState([]);
 
   useEffect(() => {
     if (open) {
       const fetchData = async () => {
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
-          const [quotationsResponse, scrapTypesResponse, treatmentProcesses] =
-            await Promise.all([
-              axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
-              axios.get(`${apiUrl}/api/scrapType`),
-              axios.get(`${apiUrl}/api/treatmentProcess`),
-            ]);
+          const [
+            quotationsResponse,
+            scrapTypesResponse,
+            treatmentProcesses,
+            transporterClientResponse,
+          ] = await Promise.all([
+            axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
+            axios.get(`${apiUrl}/api/scrapType`),
+            axios.get(`${apiUrl}/api/treatmentProcess`),
+            axios.get(`${apiUrl}/api/transporterClient/${formData.clientId}`),
+          ]);
 
           setQuotations(quotationsResponse.data.quotations);
           setScrapTypes(scrapTypesResponse.data.scrapTypes);
           setTreatmentProcesses(treatmentProcesses.data.treatmentProcesses);
+          setTransporterClients(
+            transporterClientResponse.data.transporterClients
+          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -190,6 +199,7 @@ const SortModal = ({
         ...formData.sortedWastes,
         {
           quotationWasteId: "",
+          transporterClientId: "",
           treatmentProcessId: "",
           wasteName: "",
           weight: 0,
@@ -377,7 +387,7 @@ const SortModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={2.5}>
+              <Grid item xs={2}>
                 <TextField
                   label="Waste Name"
                   name="wasteName"
@@ -396,6 +406,45 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
+              {transporterClients.length > 0 && (
+                <Grid item xs={2}>
+                  <FormControl fullWidth>
+                    <InputLabel
+                      id={`transporterClientId-select-label-${index}`}
+                      style={{
+                        color: colors.grey[100],
+                      }}
+                    >
+                      Transporter's Client
+                    </InputLabel>
+                    <Select
+                      labelId={`transporterClientId-select-label-${index}`}
+                      name={`sortedWastes[${index}].transporterClientId`}
+                      value={waste.transporterClientId || ""}
+                      onChange={(e) =>
+                        handleWasteChange(
+                          index,
+                          "transporterClientId",
+                          e.target.value
+                        )
+                      }
+                      label="Transporter's Client"
+                      fullWidth
+                      required
+                      disabled={formData.statusId === 4}
+                    >
+                      {transporterClients.map((transporterClient) => (
+                        <MenuItem
+                          key={transporterClient.id}
+                          value={transporterClient.id}
+                        >
+                          {transporterClient.clientName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
               <Grid item xs={2}>
                 <FormControl fullWidth>
                   <InputLabel
@@ -433,7 +482,7 @@ const SortModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={1.5}>
+              <Grid item xs={1}>
                 <TextField
                   label="Weight"
                   name="weight"
@@ -453,7 +502,7 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={1.5}>
+              <Grid item xs={1}>
                 <TextField
                   label="Client Weight"
                   name="clientWeight"
@@ -473,7 +522,7 @@ const SortModal = ({
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={1.5}>
+              <Grid item xs={1}>
                 <TextField
                   label="Form No"
                   name="formNo"

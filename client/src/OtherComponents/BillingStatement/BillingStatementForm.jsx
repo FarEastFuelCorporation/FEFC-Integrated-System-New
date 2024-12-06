@@ -32,6 +32,7 @@ const BillingStatementForm = ({
   review = false,
   bookedTransactionIds,
   isWasteNameToBill = false,
+  isPerClientToBill = false,
 }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
@@ -81,6 +82,7 @@ const BillingStatementForm = ({
       }
 
       // For pending transactions
+      console.log(billingStatementResponse.data.bookedTransactions);
       setTransactions(billingStatementResponse.data.bookedTransactions);
       setIsFetched(true);
       // setLoading(false);
@@ -112,6 +114,8 @@ const BillingStatementForm = ({
   };
 
   let totalWeight = 0;
+  let isWasteName = false;
+  let isPerClient = false;
 
   transactions.forEach((transaction) => {
     const certifiedTransaction =
@@ -128,31 +132,30 @@ const BillingStatementForm = ({
 
     let aggregatedWasteTransactions;
 
-    if (isWasteNameToBill) {
-      aggregatedWasteTransactions = sortedWasteTransaction;
-    } else {
-      // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
-      aggregatedWasteTransactions = Object.values(
-        sortedWasteTransaction.reduce((acc, current) => {
-          const { id } = current.QuotationWaste;
+    isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
+    isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;
 
-          const currentWeight = new Decimal(current.weight); // Use Decimal.js
+    // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
+    aggregatedWasteTransactions = Object.values(
+      sortedWasteTransaction.reduce((acc, current) => {
+        const { id } = current.QuotationWaste;
 
-          // If the `QuotationWaste.id` is already in the accumulator, add the weight
-          if (acc[id]) {
-            acc[id].weight = acc[id].weight.plus(currentWeight);
-          } else {
-            // Otherwise, set the initial object in the accumulator
-            acc[id] = { ...current, weight: currentWeight };
-          }
+        const currentWeight = new Decimal(current.weight); // Use Decimal.js
 
-          return acc;
-        }, {})
-      ).map((item) => ({
-        ...item,
-        weight: item.weight.toNumber(), // Convert Decimal back to a standard number
-      }));
-    }
+        // If the `QuotationWaste.id` is already in the accumulator, add the weight
+        if (acc[id]) {
+          acc[id].weight = acc[id].weight.plus(currentWeight);
+        } else {
+          // Otherwise, set the initial object in the accumulator
+          acc[id] = { ...current, weight: currentWeight };
+        }
+
+        return acc;
+      }, {})
+    ).map((item) => ({
+      ...item,
+      weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+    }));
 
     let hasTransportation;
 
@@ -395,6 +398,8 @@ const BillingStatementForm = ({
     fontWeight: fontWeight,
   });
 
+  console.log(pagesContent);
+
   return (
     <>
       {isFetched && (
@@ -419,7 +424,12 @@ const BillingStatementForm = ({
                 setPagesContent={setPagesContent}
                 setIsDoneCalculation={setIsDoneCalculation}
                 heightsReady={heightsReady}
-                isWasteNameToBill={isWasteNameToBill}
+                isWasteNameToBill={
+                  isWasteName ? isWasteName : isWasteNameToBill
+                }
+                isPerClientToBill={
+                  isPerClient ? isPerClient : isPerClientToBill
+                }
               />
             </Box>
 
@@ -441,10 +451,6 @@ const BillingStatementForm = ({
                     header: null,
                     content: [],
                   },
-                  QuotationTransportationTableHead: {
-                    header: null,
-                    content: [],
-                  },
                 };
 
                 // Process each item in the tableData
@@ -456,6 +462,10 @@ const BillingStatementForm = ({
                   bodyRows.BillingTableHead.header = <BillingTableHead />;
 
                   const waste = item; // Assuming item contains waste details
+
+                  console.log(waste);
+
+                  console.log(waste[3]);
 
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
@@ -593,6 +603,8 @@ const BillingStatementForm = ({
                     </TableBody>
                   );
                 });
+
+                console.log(bodyRows);
 
                 return (
                   <Box

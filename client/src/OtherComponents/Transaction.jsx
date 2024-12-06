@@ -274,6 +274,7 @@ const Transaction = ({
               const response = await axios.get(
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
+              console.log(response.data.transaction.transaction);
               setRow(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {
@@ -781,7 +782,8 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 9 && (
+                      {(row.statusId >= 9 ||
+                        row.BilledTransaction.length > 0) && (
                         <BilledTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}

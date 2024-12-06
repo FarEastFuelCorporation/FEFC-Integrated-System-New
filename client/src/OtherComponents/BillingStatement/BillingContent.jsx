@@ -20,6 +20,7 @@ const BillingContent = ({
   setIsDoneCalculation,
   heightsReady,
   isWasteNameToBill = false,
+  isPerClientToBill = false,
 }) => {
   const wasteTableRef = useRef(null);
 
@@ -33,6 +34,9 @@ const BillingContent = ({
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
 
   let totalWeight = 0;
+
+  console.log(isWasteNameToBill);
+  console.log(isPerClientToBill);
 
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight - 50;
@@ -87,10 +91,23 @@ const BillingContent = ({
 
     // Add Waste rows
     wasteRows.forEach((row, index) => {
+      console.log(row);
+
       // Skip the first row (index 0)
       if (index === 0) return;
-      const rowHeight = row.offsetHeight; // Measure the actual row height
+
       const cells = Array.from(row.children); // Get <td> elements from the <tr>
+
+      // Check if the first <td> content is empty
+      const isFirstCellEmpty = cells[0]?.textContent.trim() === "";
+
+      console.log(isFirstCellEmpty);
+
+      // Set rowHeight based on the first <td> content
+      const rowHeight = isFirstCellEmpty ? 22 : 22;
+
+      console.log(rowHeight);
+
       const cellContents = cells.map((cell) => cell.textContent.trim()); // Extract content from each <td>
       addElementToPage(cellContents, rowHeight); // Push the contents of the row
     });
@@ -125,7 +142,12 @@ const BillingContent = ({
         calculatePageContent();
       }
     }
-  }, [heightsReady, calculatePageContent, isWasteNameToBill]);
+  }, [
+    heightsReady,
+    calculatePageContent,
+    isWasteNameToBill,
+    isPerClientToBill,
+  ]);
 
   const bodyCellStyles = ({
     isLastCell = false,
@@ -177,7 +199,7 @@ const BillingContent = ({
 
               let aggregatedWasteTransactions;
 
-              if (isWasteNameToBill) {
+              if (isPerClientToBill) {
                 aggregatedWasteTransactions =
                   transaction.ScheduledTransaction[0].ReceivedTransaction[0]
                     .SortedTransaction[0].SortedWasteTransaction;

@@ -32,6 +32,8 @@ const Modal = ({
   refs,
   isWasteNameToBill,
   setIsWasteNameToBill,
+  isPerClientToBill,
+  setIsPerClientToBill,
 }) => {
   let ModalComponent;
   switch (user.userType) {
@@ -168,6 +170,8 @@ const Modal = ({
           refs={refs}
           isWasteNameToBill={isWasteNameToBill}
           setIsWasteNameToBill={setIsWasteNameToBill}
+          isPerClientToBill={isPerClientToBill}
+          setIsPerClientToBill={setIsPerClientToBill}
         />
       );
       break;

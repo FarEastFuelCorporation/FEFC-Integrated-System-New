@@ -33,6 +33,7 @@ const BilledTransactions = ({ user }) => {
     billingNumber: "",
     serviceInvoiceNumber: "",
     isWasteName: false,
+    isPerClient: false,
     billedAmount: 0,
     remarks: "",
     statusId: 10,
@@ -55,6 +56,7 @@ const BilledTransactions = ({ user }) => {
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isWasteNameToBill, setIsWasteNameToBill] = useState(false);
+  const [isPerClientToBill, setIsPerClientToBill] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -110,8 +112,12 @@ const BilledTransactions = ({ user }) => {
       newRow = response.data.transaction.transaction;
     }
 
+    console.log(newRow);
+    console.log(newRow.createdBy.substring(0, 3));
+
     setFormData({
       row: newRow,
+      clientType: newRow.createdBy.substring(0, 3),
       id: "",
       bookedTransactionId: selectedIds,
       billedDate: "",
@@ -119,6 +125,7 @@ const BilledTransactions = ({ user }) => {
       billingNumber: "",
       serviceInvoiceNumber: "",
       isWasteName: false,
+      isPerClient: false,
       billedAmount: 0,
       remarks: "",
       statusId: 10,
@@ -131,6 +138,7 @@ const BilledTransactions = ({ user }) => {
   const handleCloseModal = () => {
     setOpenModal(false);
     setIsWasteNameToBill(false);
+    setIsPerClientToBill(false);
     clearFormData();
   };
 
@@ -144,6 +152,7 @@ const BilledTransactions = ({ user }) => {
       const billedTransaction = typeToEdit.BilledTransaction?.[0] || {};
 
       setFormData({
+        clientType: row.createdBy.substring(0, 3),
         id: billedTransaction.id,
         bookedTransactionId: typeToEdit.id,
         certifiedTransactionId: [
@@ -156,6 +165,7 @@ const BilledTransactions = ({ user }) => {
         billingNumber: billedTransaction.billingNumber,
         serviceInvoiceNumber: billedTransaction.serviceInvoiceNumber,
         isWasteName: billedTransaction.isWasteName,
+        isPerClient: billedTransaction.isPerClient,
         billedAmount: billedTransaction.billedAmount,
         remarks: billedTransaction.remarks,
         statusId: typeToEdit.statusId,
@@ -336,6 +346,8 @@ const BilledTransactions = ({ user }) => {
         setShowErrorMessage={setShowErrorMessage}
         isWasteNameToBill={isWasteNameToBill}
         setIsWasteNameToBill={setIsWasteNameToBill}
+        isPerClientToBill={isPerClientToBill}
+        setIsPerClientToBill={setIsPerClientToBill}
         refs={{
           billedDateRef,
           billedTimeRef,

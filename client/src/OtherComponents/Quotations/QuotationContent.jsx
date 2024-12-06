@@ -29,6 +29,7 @@ const QuotationContent = ({
   const filteredQuotationWaste = quotationWaste.filter(
     (item) =>
       item.TypeOfWaste.wasteCode !== "ANHW" &&
+      item.TypeOfWaste.wasteCode !== "AHNHW" &&
       item.TypeOfWaste.wasteCode !== "AHW"
   );
 

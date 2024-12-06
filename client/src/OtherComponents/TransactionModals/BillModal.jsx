@@ -23,6 +23,8 @@ const BillModal = ({
   refs,
   isWasteNameToBill,
   setIsWasteNameToBill,
+  isPerClientToBill,
+  setIsPerClientToBill,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -31,6 +33,12 @@ const BillModal = ({
     const isChecked = e.target.checked;
     setIsWasteNameToBill(isChecked); // Update the individual state
     setFormData({ ...formData, isWasteName: isChecked }); // Update formData state
+  };
+
+  const handleCheckboxChange2 = (e) => {
+    const isChecked = e.target.checked;
+    setIsPerClientToBill(isChecked); // Update the individual state
+    setFormData({ ...formData, isPerClient: isChecked }); // Update formData state
   };
 
   return (
@@ -63,16 +71,30 @@ const BillModal = ({
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.isWasteName}
-                onChange={handleCheckboxChange}
-                color="secondary"
+          <Box>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isWasteName}
+                  onChange={handleCheckboxChange}
+                  color="secondary"
+                />
+              }
+              label="By Waste Name"
+            />
+            {formData.clientType === "TRP" && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.isPerClient}
+                    onChange={handleCheckboxChange2}
+                    color="secondary"
+                  />
+                }
+                label="Per Transporter's Client"
               />
-            }
-            label="By Waste Name"
-          />
+            )}
+          </Box>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
               label="Billed Date"
@@ -176,6 +198,7 @@ const BillModal = ({
             review={true}
             bookedTransactionIds={formData.bookedTransactionId}
             isWasteNameToBill={isWasteNameToBill}
+            isPerClientToBill={isPerClientToBill}
           />
         </Box>
       </Modal>

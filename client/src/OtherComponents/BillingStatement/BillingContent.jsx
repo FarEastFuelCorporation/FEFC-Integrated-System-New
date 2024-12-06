@@ -389,7 +389,7 @@ const BillingContent = ({
                           )}
                         </TableRow>
                       )} */}
-                      {newClient && (
+                      {newClient && isPerClientToBill && (
                         <TableRow
                           key={`wasteH-${idx}`}
                           sx={{ border: "black" }}

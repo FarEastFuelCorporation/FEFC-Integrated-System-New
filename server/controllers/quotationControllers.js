@@ -472,6 +472,44 @@ async function updateQuotationController(req, res) {
         // Save the updated quotation
         await updatedQuotation.save();
 
+        const existingWastes = await QuotationWaste.findAll({
+          where: { quotationId: updatedQuotation.id },
+        });
+
+        // Extract the IDs from the incoming quotationWastes
+        const incomingWasteIds = quotationWastes.map((waste) => waste.id);
+
+        // Identify and delete wastes that are no longer present in the incoming data
+        await Promise.all(
+          existingWastes.map(async (existingWaste) => {
+            if (!incomingWasteIds.includes(existingWaste.id)) {
+              // Permanently delete the waste
+              await existingWaste.destroy();
+            }
+          })
+        );
+
+        const existingTransportations = await QuotationTransportation.findAll({
+          where: { quotationId: updatedQuotation.id },
+        });
+
+        // Extract the IDs from the incoming quotationWastes
+        const incomingTransportationIds = quotationTransportation.map(
+          (waste) => waste.id
+        );
+
+        // Identify and delete wastes that are no longer present in the incoming data
+        await Promise.all(
+          existingTransportations.map(async (existingTransportation) => {
+            if (
+              !incomingTransportationIds.includes(existingTransportation.id)
+            ) {
+              // Permanently delete the waste
+              await existingTransportation.destroy();
+            }
+          })
+        );
+
         // Update the quotation wastes
         await Promise.all(
           quotationWastes.map(async (waste) => {

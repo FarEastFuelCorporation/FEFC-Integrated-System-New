@@ -39,7 +39,7 @@ const LoadingSpinner = ({ isLoading }) => {
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <CircularProgress color="primary" size={64} />
+        <CircularProgress color="secondary" size={64} />
         <Typography variant="h6" sx={{ mt: 2 }} color={colors.greenAccent[500]}>
           Loading...
         </Typography>

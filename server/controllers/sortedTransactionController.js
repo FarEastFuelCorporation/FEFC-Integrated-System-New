@@ -57,12 +57,15 @@ async function createSortedTransactionController(req, res) {
         let wasteName = waste.wasteName;
 
         wasteName = wasteName && wasteName.toUpperCase();
+        const transporterClientId = waste.transporterClientId
+          ? waste.transporterClientId
+          : null;
 
         return SortedWasteTransaction.create(
           {
             sortedTransactionId: newSortedTransaction.id,
             quotationWasteId: waste.quotationWasteId,
-            transporterClientId: waste.transporterClientId,
+            transporterClientId: transporterClientId,
             treatmentProcessId: waste.treatmentProcessId,
             wasteName: wasteName,
             weight: waste.weight,
@@ -220,7 +223,9 @@ async function updateSortedTransactionController(req, res) {
           await SortedWasteTransaction.update(
             {
               quotationWasteId: waste.quotationWasteId,
-              transporterClientId: waste.transporterClientId,
+              transporterClientId: waste.transporterClientId
+                ? waste.transporterClientId
+                : null,
               treatmentProcessId: waste.treatmentProcessId,
               wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
@@ -235,7 +240,9 @@ async function updateSortedTransactionController(req, res) {
             {
               sortedTransactionId: id,
               quotationWasteId: waste.quotationWasteId,
-              transporterClientId: waste.transporterClientId,
+              transporterClientId: waste.transporterClientId
+                ? waste.transporterClientId
+                : null,
               treatmentProcessId: waste.treatmentProcessId,
               wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,

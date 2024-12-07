@@ -798,15 +798,14 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 7 ||
-                        (row.statusId === 5 && (
-                          <TreatedTransaction
-                            row={row}
-                            handleOpenModal={handleOpenModal}
-                            handleDeleteClick={handleDeleteClick}
-                            user={user}
-                          />
-                        ))}
+                      {(row.statusId >= 7 || row.statusId === 5) && (
+                        <TreatedTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                       {row.statusId >= 4 &&
                         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
                           ?.submitTo === "SORTING" && (

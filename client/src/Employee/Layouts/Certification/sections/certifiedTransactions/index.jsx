@@ -76,7 +76,6 @@ const CertifiedTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
-    console.log(row);
     setFormData({
       id: "",
       bookedTransactionId: row.id,

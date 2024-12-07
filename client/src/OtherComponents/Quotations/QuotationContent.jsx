@@ -160,8 +160,6 @@ const QuotationContent = ({
             <QuotationWasteTableHead row={quotationData} />
             <TableBody id="table_data">
               {filteredQuotationWaste.map((waste, index) => {
-                console.log(waste);
-
                 const hasFixedRate = waste.hasFixedRate;
                 const fixedWeight = waste.fixedWeight;
                 const fixedPrice = waste.fixedPrice;

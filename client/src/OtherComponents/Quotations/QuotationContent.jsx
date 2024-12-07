@@ -159,39 +159,81 @@ const QuotationContent = ({
           <Table ref={wasteTableRef}>
             <QuotationWasteTableHead row={quotationData} />
             <TableBody id="table_data">
-              {filteredQuotationWaste.map((waste, index) => (
-                <TableRow key={index} sx={{ border: "black" }}>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {index + 1}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.wasteName}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.TypeOfWaste.wasteCode}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {formatNumber(waste.quantity ? waste.quantity : 1)}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.unit}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.unitPrice}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.quantity
-                      ? waste.quantity * waste.unitPrice
-                      : waste.unitPrice}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(false)}>
-                    {waste.mode}
-                  </TableCell>
-                  <TableCell align="center" sx={getCellStyle(true)}>
-                    {waste.vatCalculation}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredQuotationWaste.map((waste, index) => {
+                console.log(waste);
+
+                const hasFixedRate = waste.hasFixedRate;
+                const fixedWeight = waste.fixedWeight;
+                const fixedPrice = waste.fixedPrice;
+
+                return (
+                  <>
+                    {hasFixedRate && (
+                      <TableRow key={`${index}H`} sx={{ border: "black" }}>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {`${waste.wasteName} FIRST ${fixedWeight} ${waste.unit}`}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {waste.TypeOfWaste.wasteCode}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {formatNumber(waste.quantity ? waste.quantity : 1)}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {waste.unit}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {fixedPrice}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {fixedPrice}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(false)}>
+                          {waste.mode}
+                        </TableCell>
+                        <TableCell align="center" sx={getCellStyle(true)}>
+                          {waste.vatCalculation}
+                        </TableCell>
+                      </TableRow>
+                    )}
+
+                    <TableRow key={index} sx={{ border: "black" }}>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {waste.wasteName}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {waste.TypeOfWaste.wasteCode}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {formatNumber(waste.quantity ? waste.quantity : 1)}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {waste.unit}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {waste.unitPrice}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {waste.quantity
+                          ? waste.quantity * waste.unitPrice
+                          : waste.unitPrice}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(false)}>
+                        {waste.mode}
+                      </TableCell>
+                      <TableCell align="center" sx={getCellStyle(true)}>
+                        {waste.vatCalculation}
+                      </TableCell>
+                    </TableRow>
+                  </>
+                );
+              })}
             </TableBody>
           </Table>
         </Box>

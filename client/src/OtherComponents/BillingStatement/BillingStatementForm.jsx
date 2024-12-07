@@ -164,6 +164,7 @@ const BillingStatementForm = ({
 
     let hasTransportation;
 
+    // SMB
     if (hasFixedRate && isMonthly) {
       let vatCalculation;
       let fixedWeight;
@@ -222,7 +223,10 @@ const BillingStatementForm = ({
             break;
         }
       }
-    } else if (hasFixedRate && !isMonthly) {
+    }
+    // LOREAL, RED CROSS
+    else if (hasFixedRate && !isMonthly) {
+      let hasFixedRateIndividual;
       let vatCalculation;
       let fixedWeight;
       let fixedPrice;
@@ -240,13 +244,32 @@ const BillingStatementForm = ({
 
         usedWeight = selectedWeight;
 
+        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
         target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
+        hasFixedRateIndividual = QuotationWaste.hasFixedRate;
         vatCalculation = QuotationWaste.vatCalculation;
         fixedWeight = QuotationWaste.fixedWeight;
         fixedPrice = QuotationWaste.fixedPrice;
         unitPrice = QuotationWaste.unitPrice;
         hasTransportation = QuotationWaste.hasTransportation;
+
+        if (!hasFixedRateIndividual) {
+          switch (QuotationWaste.vatCalculation) {
+            case "VAT EXCLUSIVE":
+              target.vatExclusive += totalWeightPrice;
+              break;
+            case "VAT INCLUSIVE":
+              target.vatInclusive += totalWeightPrice;
+              break;
+            case "NON VATABLE":
+              target.nonVatable += totalWeightPrice;
+              break;
+            default:
+              break;
+          }
+        }
       });
 
       switch (vatCalculation) {

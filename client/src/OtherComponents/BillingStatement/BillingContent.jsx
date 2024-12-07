@@ -271,6 +271,9 @@ const BillingContent = ({
                     }
                   }
 
+                  const hasFixedRateIndividual =
+                    waste.QuotationWaste?.hasFixedRate;
+
                   return (
                     <>
                       {newClient && isPerClientToBill && (
@@ -417,7 +420,7 @@ const BillingContent = ({
                         <TableCell
                           sx={{ ...bodyCellStyles({ color: fontColor }) }}
                         >
-                          {hasFixedRate && !isMonthly
+                          {hasFixedRateIndividual && !isMonthly
                             ? isWasteNameToBill
                               ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
                               : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
@@ -434,7 +437,7 @@ const BillingContent = ({
                             }),
                           }}
                         >
-                          {hasFixedRate &&
+                          {hasFixedRateIndividual &&
                           !isMonthly &&
                           usedWeight > fixedWeight
                             ? formatNumber2(fixedWeight)
@@ -467,7 +470,7 @@ const BillingContent = ({
                             }),
                           }}
                         >
-                          {hasFixedRate && !isMonthly
+                          {hasFixedRateIndividual && !isMonthly
                             ? formatNumber2(fixedPrice)
                             : formatNumber(
                                 new Decimal(usedWeight).toNumber() *
@@ -524,7 +527,7 @@ const BillingContent = ({
                           </TableCell>
                         )}
                       </TableRow>
-                      {hasFixedRate &&
+                      {hasFixedRateIndividual &&
                         !isMonthly &&
                         usedWeight > fixedWeight && (
                           <TableRow
@@ -562,7 +565,7 @@ const BillingContent = ({
                             <TableCell
                               sx={{ ...bodyCellStyles({ color: fontColor }) }}
                             >
-                              {hasFixedRate && !isMonthly
+                              {hasFixedRateIndividual && !isMonthly
                                 ? isWasteNameToBill
                                   ? `${waste.wasteName} (EXCESS)`
                                   : `${waste.QuotationWaste.wasteName} (EXCESS)`

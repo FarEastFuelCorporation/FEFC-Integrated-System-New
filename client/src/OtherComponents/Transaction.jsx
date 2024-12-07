@@ -189,7 +189,7 @@ const Transaction = ({
       align: "center",
       flex: 1,
       width: 150,
-      renderCell: (params) => {
+      valueGetter: (params) => {
         let status;
 
         if (params.row.statusId === 1) {
@@ -212,11 +212,9 @@ const Transaction = ({
           status = "CERTIFIED";
         }
 
-        let value = {};
-        value.value = status;
-
-        return renderCellWithWrapText(value);
+        return status;
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "billingStatus",
@@ -225,7 +223,8 @@ const Transaction = ({
       align: "center",
       flex: 1,
       width: 150,
-      renderCell: (params) => {
+
+      valueGetter: (params) => {
         let status;
 
         if (
@@ -246,11 +245,9 @@ const Transaction = ({
           status = "PENDING";
         }
 
-        let value = {};
-        value.value = status;
-
-        return renderCellWithWrapText(value);
+        return status;
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "view",
@@ -274,6 +271,7 @@ const Transaction = ({
               const response = await axios.get(
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
+              console.log(response.data.transaction.transaction);
               setRow(response.data.transaction.transaction);
               handleOpenTransactionModal(response.data.transaction.transaction);
             } catch (error) {

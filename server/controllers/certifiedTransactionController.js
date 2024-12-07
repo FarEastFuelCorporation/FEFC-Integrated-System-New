@@ -27,6 +27,7 @@ async function createCertifiedTransactionController(req, res) {
       bookedTransactionId,
       sortedTransactionId,
       isBilled,
+      isBillingApproved,
       certifiedDate,
       certifiedTime,
       typeOfCertificate,
@@ -78,7 +79,11 @@ async function createCertifiedTransactionController(req, res) {
     );
 
     if (updatedBookedTransaction) {
-      updatedBookedTransaction.statusId = isBilled ? 10 : statusId;
+      updatedBookedTransaction.statusId = isBilled
+        ? isBillingApproved
+          ? 11
+          : 10
+        : statusId;
       await updatedBookedTransaction.save({ transaction });
 
       // Commit the transaction
@@ -254,7 +259,6 @@ async function updateCertifiedTransactionController(req, res) {
       const {
         bookedTransactionId,
         sortedTransactionId,
-        isBilled,
         certifiedDate,
         certifiedTime,
         typeOfCertificate,
@@ -279,7 +283,6 @@ async function updateCertifiedTransactionController(req, res) {
         certifiedTransaction.typeOfCertificate = typeOfCertificate;
         certifiedTransaction.typeOfWeight = typeOfWeight;
         certifiedTransaction.remarks = updatedRemarks;
-        certifiedTransaction.statusId = isBilled ? 10 : statusId;
         certifiedTransaction.updatedBy = createdBy;
 
         // Save the updated certified transaction

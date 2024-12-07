@@ -11,6 +11,7 @@ const {
 const { BillingApprovalEmailFormat } = require("../utils/emailFormat");
 const Client = require("../models/Client");
 const sendEmail = require("../sendEmail");
+const CertifiedTransaction = require("../models/CertifiedTransaction");
 const transactionStatusId = 9;
 const additionalStatusId = [5, 6, 7, 8];
 
@@ -365,57 +366,45 @@ async function deleteBilledTransactionController(req, res) {
       // Retrieve all billed transactions with the same billingNumber
       const billedTransactions = await BilledTransaction.findAll({
         where: { billingNumber: billedTransactionToDelete.billingNumber },
-      });
-
-      // Extract all bookedTransactionIds from billedTransactions
-      const bookedTransactionIds = billedTransactions.map(
-        (bookedTransactionId) => bookedTransactionId.bookedTransactionId
-      );
-
-      // Check if all bookedTransactionId entries have statusId = 9
-      const bookedTransactions = await BookedTransaction.findAll({
-        where: {
-          id: bookedTransactionIds,
+        include: {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          attributes: ["id", "statusId"],
+          include: {
+            model: CertifiedTransaction,
+            as: "CertifiedTransaction",
+            attributes: ["id"],
+          },
         },
-        attributes: ["id", "statusId"],
       });
-
-      // Determine if isCertified should be true
-      const isCertified = bookedTransactions.every(
-        (bookedTransaction) => bookedTransaction.statusId === 9
-      );
 
       if (billedTransactions.length > 0) {
         // Soft delete each billed transaction
-        for (const transactionEntry of billedTransactions) {
-          transactionEntry.updatedBy = deletedBy;
-          transactionEntry.deletedBy = deletedBy;
-          await transactionEntry.save();
-          await transactionEntry.destroy(); // Soft delete (sets deletedAt timestamp)
-        }
+        for (const billedTransaction of billedTransactions) {
+          billedTransaction.updatedBy = deletedBy;
+          billedTransaction.deletedBy = deletedBy;
+          await billedTransaction.save();
+          await billedTransaction.destroy(); // Soft delete (sets deletedAt timestamp)
 
-        // Retrieve all related BookedTransactions by billingNumber
-        const bookedTransactionIds = billedTransactions.map(
-          (transaction) => transaction.bookedTransactionId
-        );
+          const bookedTransaction = billedTransaction.BookedTransaction;
 
-        const updatedBookedTransactions = await BookedTransaction.findAll({
-          where: { id: bookedTransactionIds },
-        });
+          if (bookedTransaction) {
+            // Update status of all related booked transactions
 
-        if (updatedBookedTransactions.length > 0) {
-          // Update status of all related booked transactions
-          if (isCertified) {
-            for (const bookedTransaction of updatedBookedTransactions) {
+            const isCertified = bookedTransaction.CertifiedTransaction
+              ? true
+              : false;
+
+            if (isCertified) {
               bookedTransaction.statusId = transactionStatusId; // Status for "deleted" or equivalent
               bookedTransaction.updatedBy = deletedBy;
               await bookedTransaction.save();
             }
+          } else {
+            console.warn(
+              `No Booked Transactions found for IDs: ${bookedTransactionIds}`
+            );
           }
-        } else {
-          console.warn(
-            `No Booked Transactions found for IDs: ${bookedTransactionIds}`
-          );
         }
 
         // Fetch updated transaction data

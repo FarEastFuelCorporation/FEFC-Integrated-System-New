@@ -17,6 +17,8 @@ const BillingApprovalTransaction = ({ row, user }) => {
   const billingApprovalTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction;
 
+  console.log(billingApprovalTransaction);
+
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;
@@ -168,40 +170,42 @@ const BillingApprovalTransaction = ({ row, user }) => {
               }}
             >
               <Typography variant="h5">
-                {billingApprovalTransaction.createdAt
-                  ? timestampDate(billingApprovalTransaction.createdAt)
+                {billingApprovalTransaction?.createdAt
+                  ? timestampDate(billingApprovalTransaction?.createdAt)
                   : ""}
               </Typography>
             </Grid>
           </Grid>
           <Typography variant="h5">
             Approved Date:{" "}
-            {billingApprovalTransaction.approvedDate
+            {billingApprovalTransaction?.approvedDate &&
+            billingApprovalTransaction.approvedDate !== "0000-00-00"
               ? format(
-                  new Date(billingApprovalTransaction.approvedDate),
+                  new Date(billingApprovalTransaction?.approvedDate),
                   "MMMM dd, yyyy"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Approved Time:{" "}
-            {billingApprovalTransaction.approvedTime
+            {billingApprovalTransaction?.approvedTime &&
+            billingApprovalTransaction.approvedDate !== "0000-00-00"
               ? format(
-                  parseTimeString(billingApprovalTransaction.approvedTime),
+                  parseTimeString(billingApprovalTransaction?.approvedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {billingApprovalTransaction.remarks
-              ? billingApprovalTransaction.remarks
+            {billingApprovalTransaction?.remarks
+              ? billingApprovalTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Approved By:{" "}
-            {`${billingApprovalTransaction.Employee.firstName || ""} ${
-              billingApprovalTransaction.Employee.lastName || ""
+            {`${billingApprovalTransaction?.Employee.firstName || ""} ${
+              billingApprovalTransaction?.Employee.lastName || ""
             }`}
           </Typography>
           {row.statusId > 10 && (

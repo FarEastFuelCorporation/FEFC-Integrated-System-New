@@ -66,21 +66,29 @@ const BilledTransactions = ({ user }) => {
         `${apiUrl}/api/billedTransaction`
       );
 
-      const filteredPendingTransactions =
+      const filteredPendingTransactionsWithoutBilling =
         billedTransactionResponse.data.pendingTransactions.filter(
           (transaction) => transaction.BilledTransaction.length === 0
         );
 
       // For pending transactions
-      setPendingTransactions(filteredPendingTransactions);
+      setPendingTransactions(filteredPendingTransactionsWithoutBilling);
 
       const filteredInProgressTransactions =
         billedTransactionResponse.data.inProgressTransactions.filter(
           (transaction) => transaction.BilledTransaction.length !== 0
         );
 
+      const filteredPendingTransactionsWithBilling =
+        billedTransactionResponse.data.pendingTransactions.filter(
+          (transaction) => transaction.BilledTransaction.length !== 0
+        );
+
       // For in progress transactions
-      setInProgressTransactions(filteredInProgressTransactions);
+      setInProgressTransactions([
+        ...filteredInProgressTransactions,
+        ...filteredPendingTransactionsWithBilling,
+      ]);
 
       // For finished transactions
       setFinishedTransactions(

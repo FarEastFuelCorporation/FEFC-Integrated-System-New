@@ -19,13 +19,15 @@ export const CertificateOfDestructionFooter1 = ({
 
   const typeOfWeight = certifiedTransaction.typeOfWeight;
 
-  const totalWeight = sortedWasteTransaction.reduce((total, waste) => {
-    // Add the weight of the current waste to the total
+  const weightsByUnit = sortedWasteTransaction.reduce((acc, waste) => {
+    const unit = waste.QuotationWaste?.unit;
+
     const weight =
       typeOfWeight === "CLIENT WEIGHT" ? waste.clientWeight : waste.weight;
 
-    return total + (parseFloat(weight) || 0); // parseFloat to ensure it's a number
-  }, 0);
+    acc[unit] = (acc[unit] || 0) + (parseFloat(weight) || 0); // Group by unit
+    return acc;
+  }, {});
 
   return (
     <Box>
@@ -40,8 +42,16 @@ export const CertificateOfDestructionFooter1 = ({
         }}
       >
         A Total of{" "}
-        <b>{`${formatNumber(totalWeight)} ${row.QuotationWaste.unit}`}</b> That
-        is/are transported by <b>FAR EAST FUEL CORPORATION</b> to our TSD
+        <b>
+          {Object.entries(weightsByUnit)
+            .map(([unit, weight]) => `${formatNumber(weight)} ${unit}`)
+            .reduce((acc, curr, index, arr) => {
+              if (index === 0) return curr; // First item
+              if (index === arr.length - 1) return `${acc} and ${curr}`; // Last item
+              return `${acc}, ${curr}`; // Middle items
+            }, "")}
+        </b>
+        That is/are transported by <b>FAR EAST FUEL CORPORATION</b> to our TSD
         facility located at No. 888 Purok 5, Irabagon St., Barangay Anyatam, San
         Ildefonso, Bulacan with <b>TSD No. OL-TR-R3-14-000152.</b>
       </Typography>

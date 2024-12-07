@@ -30,6 +30,8 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
 
+  console.log(row);
+
   const certifiedTransaction =
     row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
       .SortedTransaction?.[0].CertifiedTransaction?.[0];
@@ -199,10 +201,10 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                   <TableCell sx={bodyCellStyles(false)}>
                     {typeOfWeight === "CLIENT WEIGHT"
                       ? `${formatNumber(waste.clientWeight)} ${
-                          row.QuotationWaste.unit
+                          waste.QuotationWaste.unit
                         }`
                       : `${formatNumber(waste.weight)} ${
-                          row.QuotationWaste.unit
+                          waste.QuotationWaste.unit
                         }`}
                   </TableCell>
                   <TableCell sx={bodyCellStyles(false)}>

@@ -45,22 +45,6 @@ async function createBilledTransactionController(req, res) {
     let clientName;
     let transactions = {};
 
-    // Check if all bookedTransactionId entries have statusId = 9
-    const bookedTransactions = await BookedTransaction.findAll({
-      where: {
-        id: bookedTransactionId,
-      },
-      attributes: ["id", "statusId"],
-      transaction,
-    });
-
-    // Determine if isCertified should be true
-    const isCertified = bookedTransactions.every(
-      (transaction) => transaction.statusId === 9
-    );
-
-    console.log("isCertified", isCertified);
-
     // Iterate over the bookedTransactionId array and create multiple entries
     for (const id of bookedTransactionId) {
       // Create BilledTransaction entry
@@ -83,7 +67,13 @@ async function createBilledTransactionController(req, res) {
 
       // Update the status of the booked transaction
       const updatedBookedTransaction = await BookedTransaction.findByPk(id, {
-        attributes: ["id", "transactionId", "haulingDate", "createdBy"],
+        attributes: [
+          "id",
+          "transactionId",
+          "haulingDate",
+          "createdBy",
+          "statusId",
+        ],
         include: {
           model: Client,
           as: "Client",
@@ -93,6 +83,9 @@ async function createBilledTransactionController(req, res) {
       });
 
       clientName = updatedBookedTransaction.Client.clientName;
+
+      // Determine if isCertified should be true
+      const isCertified = updatedBookedTransaction.statusId === 9;
 
       if (!transactions[id]) {
         transactions[id] = {}; // Initialize as an object if not already set
@@ -270,20 +263,6 @@ async function updateBilledTransactionController(req, res) {
 
       // Uppercase the remarks if present
       const updatedRemarks = remarks && remarks.toUpperCase();
-
-      // Check if all bookedTransactionId entries have statusId = 9
-      const bookedTransactions = await BookedTransaction.findAll({
-        where: {
-          id: bookedTransactionId,
-        },
-        attributes: ["id", "statusId"],
-        transaction,
-      });
-
-      // Determine if isCertified should be true
-      const isCertified = bookedTransactions.every(
-        (bookedTransaction) => bookedTransaction.statusId === 9
-      );
 
       // Find the billed transaction by ID
       const billedTransaction = await BilledTransaction.findByPk(id, {

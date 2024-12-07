@@ -6,6 +6,7 @@ const { fetchData } = require("../utils/getBookedTransactions");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
 const transactionStatusId = 10;
+const additionalStatusId = [5, 6, 7, 8];
 
 // Create Billing Approval Transaction controller
 async function createBillingApprovalTransactionController(req, res) {
@@ -123,7 +124,6 @@ async function updateBillingApprovalTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
-      bookedTransactionId,
       billedTransactionId,
       approvedDate,
       approvedTime,
@@ -138,53 +138,79 @@ async function updateBillingApprovalTransactionController(req, res) {
 
     // Find the billing approval transaction by its billedTransactionId
     const billingApprovalTransaction =
-      await BillingApprovalTransaction.findByPk(id, { transaction });
+      await BillingApprovalTransaction.findByPk(id, {
+        include: {
+          model: BilledTransaction,
+          as: "BilledTransaction",
+          attributes: ["billingNumber"],
+        },
+        transaction,
+      });
 
-    if (billingApprovalTransaction) {
-      // Update the BillingApprovalTransaction fields
-      billingApprovalTransaction.approvedDate = approvedDate;
-      billingApprovalTransaction.approvedTime = approvedTime;
-      billingApprovalTransaction.remarks = remarks;
-      billingApprovalTransaction.updatedBy = updatedBy;
+    const billedTransactions = await BilledTransaction.findAll({
+      attributes: ["bookedTransactionId"],
+      where: {
+        billingNumber:
+          billingApprovalTransaction.BilledTransaction.billingNumber,
+      },
+      include: {
+        model: BillingApprovalTransaction,
+        as: "BillingApprovalTransaction",
+      },
+      transaction,
+    });
 
-      await billingApprovalTransaction.save({ transaction });
+    for (const billedTransaction of billedTransactions) {
+      const billingApproval = billedTransaction.BillingApprovalTransaction;
 
-      // Update the status of the booked transaction
-      const updatedBookedTransaction = await BookedTransaction.findByPk(
-        bookedTransactionId,
-        { transaction }
-      );
+      if (billingApproval) {
+        // Update the BillingApprovalTransaction fields
+        billingApproval.approvedDate = approvedDate;
+        billingApproval.approvedTime = approvedTime;
+        billingApproval.remarks = remarks;
+        billingApproval.updatedBy = updatedBy;
 
-      if (updatedBookedTransaction) {
-        updatedBookedTransaction.statusId = statusId;
-        await updatedBookedTransaction.save({ transaction });
-
-        // Commit the transaction
-        await transaction.commit();
-
-        // Fetch updated transaction data
-        const data = await fetchData(statusId);
-
-        // Respond with the updated data
-        res.status(200).json({
-          pendingTransactions: data.pending,
-          inProgressTransactions: data.inProgress,
-          finishedTransactions: data.finished,
+        await billingApproval.save({
+          transaction,
         });
+
+        // Update the status of the booked transaction
+        const updatedBookedTransaction = await BookedTransaction.findByPk(
+          billedTransaction.bookedTransactionId,
+          { transaction }
+        );
+
+        if (updatedBookedTransaction) {
+          updatedBookedTransaction.statusId = statusId;
+          await updatedBookedTransaction.save({ transaction });
+        } else {
+          // If booked transaction with the specified ID was not found
+          await transaction.rollback();
+          res.status(404).json({
+            message: `Booked Transaction with ID ${bookedTransactionId} not found`,
+          });
+        }
       } else {
-        // If booked transaction with the specified ID was not found
+        // If billed transaction with the specified ID was not found
         await transaction.rollback();
         res.status(404).json({
-          message: `Booked Transaction with ID ${bookedTransactionId} not found`,
+          message: `Billing Approval Transaction with ID ${billedTransactionId} not found`,
         });
       }
-    } else {
-      // If billed transaction with the specified ID was not found
-      await transaction.rollback();
-      res.status(404).json({
-        message: `Billing Approval Transaction with ID ${billedTransactionId} not found`,
-      });
     }
+
+    // Commit the transaction
+    await transaction.commit();
+
+    // Fetch updated transaction data
+    const data = await fetchData(statusId);
+
+    // Respond with the updated data
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);

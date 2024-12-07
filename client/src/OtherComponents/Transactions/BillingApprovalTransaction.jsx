@@ -17,8 +17,6 @@ const BillingApprovalTransaction = ({ row, user }) => {
   const billingApprovalTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction;
 
-  console.log(billingApprovalTransaction);
-
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;

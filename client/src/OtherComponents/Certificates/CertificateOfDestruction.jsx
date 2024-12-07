@@ -30,8 +30,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
 
-  console.log(row);
-
   const certifiedTransaction =
     row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
       .SortedTransaction?.[0].CertifiedTransaction?.[0];

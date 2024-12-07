@@ -120,9 +120,6 @@ const BilledTransactions = ({ user }) => {
       newRow = response.data.transaction.transaction;
     }
 
-    console.log(newRow);
-    console.log(newRow.createdBy.substring(0, 3));
-
     setFormData({
       row: newRow,
       clientType: newRow.createdBy.substring(0, 3),

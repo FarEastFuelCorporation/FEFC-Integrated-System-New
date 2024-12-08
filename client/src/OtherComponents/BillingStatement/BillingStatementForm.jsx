@@ -129,13 +129,11 @@ const BillingStatementForm = ({
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
         .SortedTransaction[0].SortedWasteTransaction;
 
-    let aggregatedWasteTransactions;
-
     isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
     isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;
 
     // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
-    aggregatedWasteTransactions = Object.values(
+    const aggregatedWasteTransactions = Object.values(
       sortedWasteTransaction.reduce((acc, current) => {
         const { id } = current.QuotationWaste;
 

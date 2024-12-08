@@ -1,6 +1,7 @@
 // controllers/bookedTransactionController.js
 
 const { Op } = require("sequelize");
+const Decimal = require("decimal.js");
 const BookedTransaction = require("../models/BookedTransaction");
 const generateTransactionId = require("../utils/generateTransactionId");
 const { fetchData, fetchDataFull } = require("../utils/getBookedTransactions");
@@ -567,6 +568,18 @@ async function geBookedTransactionsDashboardFullController(req, res) {
 
     let totalWeight = 0;
 
+    billedTransactions.sort((a, b) => {
+      const dateA = new Date(
+        a.BookedTransaction.ScheduledTransaction[0].scheduledDate
+      );
+      const dateB = new Date(
+        b.BookedTransaction.ScheduledTransaction[0].scheduledDate
+      );
+
+      // Sort in ascending order; for descending, switch dateA and dateB
+      return dateA - dateB;
+    });
+
     billedTransactions.forEach((transaction) => {
       const bookedTransactionId = transaction.BookedTransaction.id;
       console.log(bookedTransactionId);
@@ -626,7 +639,7 @@ async function geBookedTransactionsDashboardFullController(req, res) {
       const termsBuying =
         transaction.BookedTransaction.QuotationWaste?.Quotation?.termsBuying;
       const isCollected =
-        transaction.BillingApprovalTransaction.BillingDistributionTransaction
+        transaction.BillingApprovalTransaction?.BillingDistributionTransaction
           ?.CollectedTransaction;
 
       totals[billingNumber].terms =
@@ -646,28 +659,39 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         sortedWasteTransaction.reduce((acc, current) => {
           const { id } = current.QuotationWaste;
 
-          // If the `QuotationWaste.id` is already in the accumulator, add the weights
+          const currentWeight = new Decimal(current.weight); // Use Decimal.js
+          const currentClientWeight = new Decimal(current.clientWeight); // Use Decimal.js
+
+          // If the `QuotationWaste.id` is already in the accumulator, add the weight
           if (acc[id]) {
-            acc[id].weight += current.weight;
-            acc[id].clientWeight += current.clientWeight || 0; // Safely add clientWeight
+            acc[id].weight = acc[id].weight.plus(currentWeight);
+            acc[id].clientWeight =
+              acc[id].clientWeight.plus(currentClientWeight);
           } else {
             // Otherwise, set the initial object in the accumulator
             acc[id] = {
               ...current,
-              weight: current.weight,
-              clientWeight: current.clientWeight || 0, // Initialize clientWeight if missing
+              weight: currentWeight,
+              clientWeight: currentClientWeight,
             };
           }
 
           return acc;
         }, {})
-      );
+      ).map((item) => ({
+        ...item,
+        weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+      }));
 
-      if (hasFixedRate) {
+      let hasTransportation;
+
+      // SMB
+      if (hasFixedRate && isMonthly) {
         let vatCalculation;
         let fixedWeight;
         let fixedPrice;
         let unitPrice;
+
         let target;
 
         aggregatedWasteTransactions.forEach((item) => {
@@ -687,6 +711,7 @@ async function geBookedTransactionsDashboardFullController(req, res) {
           fixedWeight = QuotationWaste.fixedWeight;
           fixedPrice = QuotationWaste.fixedPrice;
           unitPrice = QuotationWaste.unitPrice;
+          hasTransportation = QuotationWaste.hasTransportation;
         });
 
         switch (vatCalculation) {
@@ -722,6 +747,93 @@ async function geBookedTransactionsDashboardFullController(req, res) {
               break;
           }
         }
+      }
+      // LOREAL, RED CROSS
+      else if (hasFixedRate && !isMonthly) {
+        let hasFixedRateIndividual;
+        let vatCalculation;
+        let fixedWeight;
+        let fixedPrice;
+        let unitPrice;
+
+        let target;
+
+        let usedWeight;
+
+        aggregatedWasteTransactions.forEach((item) => {
+          const { weight, clientWeight, QuotationWaste } = item;
+
+          const selectedWeight =
+            typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+          usedWeight = selectedWeight;
+
+          const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+          target =
+            QuotationWaste.mode === "BUYING"
+              ? totals[billingNumber].credits
+              : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+
+          hasFixedRateIndividual = QuotationWaste.hasFixedRate;
+          vatCalculation = QuotationWaste.vatCalculation;
+          fixedWeight = QuotationWaste.fixedWeight;
+          fixedPrice = QuotationWaste.fixedPrice;
+          unitPrice = QuotationWaste.unitPrice;
+          hasTransportation = QuotationWaste.hasTransportation;
+
+          if (!hasFixedRateIndividual) {
+            switch (QuotationWaste.vatCalculation) {
+              case "VAT EXCLUSIVE":
+                target.vatExclusive += totalWeightPrice;
+                break;
+              case "VAT INCLUSIVE":
+                target.vatInclusive += totalWeightPrice;
+                break;
+              case "NON VATABLE":
+                target.nonVatable += totalWeightPrice;
+                break;
+              default:
+                break;
+            }
+          }
+        });
+
+        switch (vatCalculation) {
+          case "VAT EXCLUSIVE":
+            target.vatExclusive += fixedPrice;
+            break;
+          case "VAT INCLUSIVE":
+            target.vatInclusive += fixedPrice;
+            break;
+          case "NON VATABLE":
+            target.nonVatable += fixedPrice;
+            break;
+          default:
+            break;
+        }
+
+        if (usedWeight > fixedWeight) {
+          const excessWeight = new Decimal(usedWeight)
+            .minus(new Decimal(fixedWeight))
+            .toNumber();
+
+          const excessPrice = excessWeight * unitPrice;
+
+          switch (vatCalculation) {
+            case "VAT EXCLUSIVE":
+              target.vatExclusive += excessPrice;
+              break;
+            case "VAT INCLUSIVE":
+              target.vatInclusive += excessPrice;
+              break;
+            case "NON VATABLE":
+              target.nonVatable += excessPrice;
+              break;
+            default:
+              break;
+          }
+        }
       } else {
         // Calculate amounts and credits based on vatCalculation and mode
         aggregatedWasteTransactions.forEach((item) => {
@@ -731,18 +843,17 @@ async function geBookedTransactionsDashboardFullController(req, res) {
             typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
           const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
-
-          console.log(typeOfWeight);
-          console.log(selectedWeight);
-          console.log(weight);
-          console.log(clientWeight);
-          console.log(QuotationWaste.unitPrice);
           console.log(totalWeightPrice);
-
+          console.log(QuotationWaste.wasteName);
           const target =
             QuotationWaste.mode === "BUYING"
               ? totals[billingNumber].credits
               : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+
+          hasTransportation = QuotationWaste.hasTransportation;
+
+          console.log(totals[billingNumber].credits);
+          console.log(totals[billingNumber].amounts);
 
           switch (QuotationWaste.vatCalculation) {
             case "VAT EXCLUSIVE":
@@ -760,23 +871,34 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         });
       }
 
-      // Add transportation fee if applicable
-      const transpoFee = transaction.QuotationTransportation?.unitPrice || 0;
+      const transpoFee =
+        transaction.BookedTransaction.QuotationTransportation?.unitPrice || 0;
+      console.log("transpoFee;", transpoFee);
       const transpoVatCalculation =
-        transaction.QuotationTransportation?.vatCalculation;
-      const transpoMode = transaction.QuotationTransportation?.mode;
-      const isTransportation = transaction.BookedTransaction
-        .ScheduledTransaction.DispatchedTransaction
-        ? true
-        : false;
+        transaction.BookedTransaction.QuotationTransportation?.vatCalculation;
+      const transpoMode =
+        transaction.BookedTransaction.QuotationTransportation?.mode;
+      let isTransportation =
+        transaction.BookedTransaction.ScheduledTransaction?.[0]
+          ?.DispatchedTransaction.length === 0
+          ? false
+          : true;
 
-      console.log(isTransportation);
+      const logisticsId =
+        transaction.BookedTransaction.ScheduledTransaction?.[0]?.logisticsId;
+
+      const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
+
+      if (!isTransportation) {
+        isTransportation = logisticsId !== clientVehicle ? true : false;
+      }
 
       const addTranspoFee = (
         transpoFee,
         transpoVatCalculation,
         transpoMode
       ) => {
+        console.log(transpoFee);
         // Check if the mode is "CHARGE"
         if (transpoMode === "CHARGE") {
           // Add the transportation fee based on VAT calculation
@@ -794,9 +916,12 @@ async function geBookedTransactionsDashboardFullController(req, res) {
               break;
           }
         }
+        console.log(totals[billingNumber].credits);
+        console.log(totals[billingNumber].amounts);
       };
 
-      if (isTransportation) {
+      // Call the function to add transportation fee
+      if (isTransportation && hasTransportation) {
         addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
       }
     });

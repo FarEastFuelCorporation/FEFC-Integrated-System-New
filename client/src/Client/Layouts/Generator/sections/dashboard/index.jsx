@@ -218,10 +218,12 @@ const Dashboard = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      valueGetter: (params) => {
-        return formatDate3(params.row.haulingDate);
+      renderCell: (params) => {
+        let value = {};
+        value.value = formatDate3(params.row.haulingDate);
+
+        return renderCellWithWrapText(value);
       },
-      renderCell: renderCellWithWrapText,
     },
     {
       field: "haulingTime",
@@ -1003,7 +1005,7 @@ const Dashboard = ({ user }) => {
                   hideFooter
                   initialState={{
                     sorting: {
-                      sortModel: [{ field: "total", sort: "asc" }],
+                      sortModel: [{ field: "haulingDate", sort: "asc" }],
                     },
                   }}
                 />

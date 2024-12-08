@@ -115,7 +115,6 @@ const Transaction = ({
       headerName: "Transaction ID",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
@@ -124,7 +123,6 @@ const Transaction = ({
       headerName: "Client Name",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       minWidth: 300,
       valueGetter: (params) => {
         return params.row.Client.clientName;
@@ -136,7 +134,6 @@ const Transaction = ({
       headerName: "Hauling Date",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       width: 150,
       renderCell: (params) => {
         let haulingDate;
@@ -163,7 +160,6 @@ const Transaction = ({
       headerName: "Hauling Time",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       width: 150,
       renderCell: (params) => {
         const scheduledTime = params.row.ScheduledTransaction[0]
@@ -187,7 +183,6 @@ const Transaction = ({
       headerName: "Waste Name",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       minWidth: 300,
       valueGetter: (params) => {
         return params.row.QuotationWaste.wasteName;
@@ -199,7 +194,6 @@ const Transaction = ({
       headerName: "Transaction Status",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       width: 150,
       valueGetter: (params) => {
         let status;
@@ -233,9 +227,7 @@ const Transaction = ({
       headerName: "Billing Status",
       headerAlign: "center",
       align: "center",
-      flex: 1,
       width: 150,
-
       valueGetter: (params) => {
         let status;
 

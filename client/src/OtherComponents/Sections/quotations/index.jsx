@@ -158,8 +158,8 @@ const Quotations = ({ user }) => {
         fullResponse = await axios.get(`${apiUrl}/api/quotation/full`);
 
         setQuotationsData(fullResponse.data.quotations);
-        setLoadingPicture(false);
       }
+      setLoadingPicture(false);
     } catch (error) {
       console.error("Error fetching quotationsData:", error);
     }

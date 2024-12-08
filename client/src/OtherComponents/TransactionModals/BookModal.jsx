@@ -128,8 +128,6 @@ const BookModal = ({
     }
   }, [formData.quotationWasteId, filterVehicleTypes]);
 
-  console.log(quotationsData);
-
   return (
     <Modal open={open} onClose={onClose}>
       <Box

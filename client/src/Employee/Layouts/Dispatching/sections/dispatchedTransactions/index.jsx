@@ -64,10 +64,17 @@ const DispatchedTransactions = ({ user }) => {
         );
       setPendingTransactions(filteredPendingTransactions);
 
+      // For pending transactions
+      const filteredInProgressTransactions =
+        dispatchedTransactionResponse.data.inProgressTransactions.filter(
+          (transaction) =>
+            transaction.ScheduledTransaction &&
+            transaction.ScheduledTransaction[0].logisticsId ===
+              matchingLogisticsId
+        );
+
       // For in-progress transactions
-      setInProgressTransactions(
-        dispatchedTransactionResponse.data.inProgressTransactions
-      );
+      setInProgressTransactions(filteredInProgressTransactions);
 
       // For finished transactions
       setFinishedTransactions(

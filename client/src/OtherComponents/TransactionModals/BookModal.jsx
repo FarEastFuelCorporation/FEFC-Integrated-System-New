@@ -254,7 +254,7 @@ const BookModal = ({
               ))
           )}
         </TextField>
-        {(filteredVehicleTypes.length > 0 || formData.quotationWasteId) && (
+        {filteredVehicleTypes.length > 0 && formData.quotationWasteId && (
           <TextField
             label="Vehicle Type"
             name="quotationTransportationId"

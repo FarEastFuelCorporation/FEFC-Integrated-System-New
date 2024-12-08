@@ -533,6 +533,7 @@ async function updateQuotationController(req, res) {
 
             if (existingWaste) {
               // Update existing waste
+              existingWaste.wasteId = wasteId;
               existingWaste.wasteName = wasteName && wasteName.toUpperCase();
               existingWaste.mode = mode;
               existingWaste.quantity = quantity;
@@ -591,6 +592,7 @@ async function updateQuotationController(req, res) {
 
             if (existingTransportation) {
               // Update existing transportation
+              existingTransportation.vehicleTypeId = vehicleTypeId;
               existingTransportation.haulingArea =
                 haulingArea && haulingArea.toUpperCase();
               existingTransportation.mode = mode;

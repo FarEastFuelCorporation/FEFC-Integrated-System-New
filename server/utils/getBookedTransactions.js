@@ -287,6 +287,11 @@ const getIncludeOptions = () => [
 
 const getIncludeOptionsPartial = () => [
   {
+    model: QuotationWaste,
+    as: "QuotationWaste",
+    attributes: ["wasteName"],
+  },
+  {
     model: Client,
     as: "Client",
     attributes: ["clientName", "address"],

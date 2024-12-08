@@ -183,6 +183,18 @@ const Transaction = ({
       },
     },
     {
+      field: "wasteName",
+      headerName: "Waste Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 300,
+      valueGetter: (params) => {
+        return params.row.QuotationWaste.wasteName;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "status",
       headerName: "Transaction Status",
       headerAlign: "center",

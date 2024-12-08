@@ -176,7 +176,6 @@ const Quotations = ({ user }) => {
   const handleCloseModal = () => {
     setOpenModal(false);
     setFormData(initialFormData);
-    setSuccessMessage("");
   };
 
   const handleInputChange = (e) => {

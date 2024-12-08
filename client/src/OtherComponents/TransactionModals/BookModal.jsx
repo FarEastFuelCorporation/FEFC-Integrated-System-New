@@ -187,7 +187,7 @@ const BookModal = ({
             autoComplete="off"
           />
         </div>
-        {user.userType === "TRP" && (
+        {user.userType === "TRP" && transporterClient.length > 0 && (
           <>
             <Autocomplete
               multiple

@@ -4,7 +4,9 @@ const express = require("express");
 const router = express.Router();
 const {
   getQuotationsController,
+  getQuotationsFullController,
   getQuotationController,
+  getQuotationFullController,
   createQuotationController,
   deleteQuotationController,
   updateQuotationController,
@@ -16,8 +18,14 @@ router.post("/", createQuotationController);
 // Get Quotations route
 router.get("/", getQuotationsController);
 
+// Get Quotations route
+router.get("/full", getQuotationsFullController);
+
 // Get Quotation route
 router.get("/:id", getQuotationController);
+
+// Get Quotation Full route
+router.get("/full/:id", getQuotationFullController);
 
 // Update Quotation route
 router.put("/:id", updateQuotationController);

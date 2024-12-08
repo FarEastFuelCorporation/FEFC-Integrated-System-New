@@ -62,7 +62,7 @@ router.use(othersRoutes);
 router.use("/attendance", attendanceRoutes);
 router.use("/certificate", certificateRoutes);
 router.use("/billing", billingRoutes);
-router.use("/quotation", quotationRoutes);
+router.use("/quotationForm", quotationFormRoutes);
 
 // Route to check authentication status
 router.get("/session", (req, res) => {
@@ -86,7 +86,7 @@ router.use("/client", clientRoutes);
 router.use("/transporterClient", transporterClientRoutes);
 router.use("/document", documentRoutes);
 router.use("/logistics", logisticsRoutes);
-router.use("/quotationForm", quotationFormRoutes);
+router.use("/quotation", quotationRoutes);
 router.use("/typeOfWaste", typeOfWasteRoutes);
 router.use("/treatmentProcess", treatmentProcessRoutes);
 router.use("/vehicleType", vehicleTypeRoutes);

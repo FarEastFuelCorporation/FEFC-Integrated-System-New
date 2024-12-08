@@ -191,6 +191,45 @@ async function getQuotationsController(req, res) {
     const quotations = await Quotation.findAll({
       include: [
         {
+          model: Client,
+          as: "Client",
+          // attributes: { exclude: ["clientPicture"] },
+          attributes: ["clientName"],
+        },
+      ],
+      where: {
+        status: "active",
+      },
+      order: [["quotationCode", "ASC"]], // Ordering at the top level
+    });
+
+    // Flatten and format the data
+    const flattenedData = quotations.map((item) => {
+      const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
+      return {
+        ...quotation,
+        clientName: quotation.Client ? quotation.Client.clientName : null,
+        validity: quotation.validity
+          ? new Date(quotation.validity).toISOString().split("T")[0]
+          : null, // Convert timestamp to yyyy-mm-dd format
+      };
+    });
+
+    // Send the formatted data
+    res.json({ quotations: flattenedData });
+  } catch (error) {
+    console.error("Error fetching quotations:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+// Get Quotations Full controller
+async function getQuotationsFullController(req, res) {
+  try {
+    // Fetch all quotations from the database
+    const quotations = await Quotation.findAll({
+      include: [
+        {
           model: QuotationWaste,
           as: "QuotationWaste",
           include: [
@@ -233,7 +272,6 @@ async function getQuotationsController(req, res) {
       where: {
         status: "active",
       },
-      order: [["quotationCode", "ASC"]], // Ordering at the top level
     });
 
     // Flatten and format the data
@@ -251,7 +289,6 @@ async function getQuotationsController(req, res) {
       };
     });
 
-    // Send the formatted data
     res.json({ quotations: flattenedData });
   } catch (error) {
     console.error("Error fetching quotations:", error);
@@ -321,6 +358,71 @@ async function getQuotationController(req, res) {
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get Quotation Full controller
+async function getQuotationFullController(req, res) {
+  try {
+    const id = req.params.id;
+
+    console.log(id);
+
+    // Fetch all quotations from the database
+    const quotations = await Quotation.findAll({
+      include: [
+        {
+          model: QuotationWaste,
+          as: "QuotationWaste",
+          include: [
+            {
+              model: TypeOfWaste,
+              as: "TypeOfWaste",
+              attributes: ["wasteCode"],
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
+            },
+          ],
+        },
+        {
+          model: QuotationTransportation,
+          as: "QuotationTransportation",
+          include: [
+            {
+              model: VehicleType,
+              as: "VehicleType",
+            },
+            {
+              model: Quotation,
+              as: "Quotation",
+            },
+          ],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: { exclude: ["clientPicture"] },
+        },
+        {
+          model: IdInformation,
+          as: "IdInformation",
+          attributes: ["first_name", "middle_name", "last_name", "signature"],
+        },
+      ],
+      where: {
+        status: "active",
+        id,
+      },
+    });
+
+    console.log(quotations);
+
+    res.json({ quotations });
+  } catch (error) {
+    console.error("Error fetching quotations:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
@@ -724,7 +826,9 @@ async function deleteQuotationController(req, res) {
 
 module.exports = {
   getQuotationsController,
+  getQuotationsFullController,
   getQuotationController,
+  getQuotationFullController,
   createQuotationController,
   updateQuotationController,
   deleteQuotationController,

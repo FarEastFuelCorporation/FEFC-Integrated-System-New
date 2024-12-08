@@ -119,17 +119,6 @@ const Transaction = ({
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "clientName",
-      headerName: "Client Name",
-      headerAlign: "center",
-      align: "center",
-      minWidth: 300,
-      valueGetter: (params) => {
-        return params.row.Client.clientName;
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
       field: "haulingDate",
       headerName: "Hauling Date",
       headerAlign: "center",
@@ -179,10 +168,23 @@ const Transaction = ({
       },
     },
     {
+      field: "clientName",
+      headerName: "Client Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 300,
+      valueGetter: (params) => {
+        return params.row.Client.clientName;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "wasteName",
       headerName: "Waste Name",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       minWidth: 300,
       valueGetter: (params) => {
         return params.row.QuotationWaste.wasteName;

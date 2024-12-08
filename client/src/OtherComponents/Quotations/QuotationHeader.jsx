@@ -66,7 +66,7 @@ const QuotationHeader = ({ quotationData }) => {
         <Typography variant="h5" fontWeight="bold" textAlign="center">
           MAIN OFFICE ADDRESS
         </Typography>
-        {clientData.billerName && (
+        {clientData?.billerName && (
           <Typography variant="h5" fontWeight="bold" textAlign="center">
             FIELD OFFICE ADDRESS
           </Typography>
@@ -77,19 +77,19 @@ const QuotationHeader = ({ quotationData }) => {
           <Typography fontWeight="bold">
             Attention to: {quotationData.contactPerson}
           </Typography>
-          <Typography fontWeight="bold">{clientData.clientName}</Typography>
-          <Typography fontSize="12px">{clientData.address}</Typography>
+          <Typography fontWeight="bold">{clientData?.clientName}</Typography>
+          <Typography fontSize="12px">{clientData?.address}</Typography>
           <Typography fontSize="12px"></Typography>
           <Box display="flex" fontSize="10px">
             <Typography>
-              {clientData.contactNumber
-                ? "Contact #: " + clientData.contactNumber
+              {clientData?.contactNumber
+                ? "Contact #: " + clientData?.contactNumber
                 : ""}
             </Typography>
           </Box>
         </Box>
 
-        {clientData.billerName && (
+        {clientData?.billerName && (
           <Box
             sx={{
               height: "100%",
@@ -98,16 +98,16 @@ const QuotationHeader = ({ quotationData }) => {
               padding: 1,
             }}
           >
-            <Typography fontWeight="bold">{clientData.billerName}</Typography>
+            <Typography fontWeight="bold">{clientData?.billerName}</Typography>
             <Typography fontWeight="bold">
-              {clientData.billerContactPerson}
+              {clientData?.billerContactPerson}
             </Typography>
-            <Typography fontSize="12px">{clientData.billerAddress}</Typography>
+            <Typography fontSize="12px">{clientData?.billerAddress}</Typography>
             <Typography fontSize="12px"></Typography>
             <Box display="flex" fontSize="10px">
               <Typography>
-                {clientData.billerContactNumber
-                  ? "Contact #: " + clientData.billerContactPerson
+                {clientData?.billerContactNumber
+                  ? "Contact #: " + clientData?.billerContactPerson
                   : ""}
               </Typography>
             </Box>

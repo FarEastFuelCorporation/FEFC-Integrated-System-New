@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, CircularProgress, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import PageviewIcon from "@mui/icons-material/Pageview";
@@ -118,6 +118,7 @@ const Quotations = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingPicture, setLoadingPicture] = useState(true);
   const [isContentReady, setIsContentReady] = useState(false);
   const [isDownloadContentReady, setDownloadIsContentReady] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
@@ -130,6 +131,7 @@ const Quotations = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadingPicture(true);
       let response;
       if (
         user.userType === "GEN" ||
@@ -144,6 +146,20 @@ const Quotations = ({ user }) => {
 
       setQuotationsData(response.data.quotations);
       setLoading(false);
+
+      let fullResponse;
+      if (
+        user.userType === "GEN" ||
+        user.userType === "TRP" ||
+        user.userType === "CUS" ||
+        user.userType === "IFM"
+      ) {
+      } else {
+        fullResponse = await axios.get(`${apiUrl}/api/quotation/full`);
+
+        setQuotationsData(fullResponse.data.quotations);
+        setLoadingPicture(false);
+      }
     } catch (error) {
       console.error("Error fetching quotationsData:", error);
     }
@@ -360,33 +376,19 @@ const Quotations = ({ user }) => {
     e.preventDefault();
 
     try {
-      let response;
       setLoading(true);
       if (formData.id) {
         // Update existing quotation
-        response = await axios.put(
-          `${apiUrl}/api/quotation/${formData.id}`,
-          formData
-        );
-
-        setQuotationsData((prevQuotationsData) => [
-          ...prevQuotationsData.filter(
-            (transaction) => transaction.id !== formData.id
-          ),
-          ...response.data.quotations,
-        ]);
+        await axios.put(`${apiUrl}/api/quotation/${formData.id}`, formData);
 
         setSuccessMessage("Quotation Updated Successfully!");
       } else {
         // Add new quotation
-        response = await axios.post(`${apiUrl}/api/quotation`, formData);
-
-        const quotation = response.data.quotations;
-        setQuotationsData((prevData) => [...prevData, quotation]);
+        await axios.post(`${apiUrl}/api/quotation`, formData);
 
         setSuccessMessage("Quotation Added Successfully!");
       }
-
+      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
       setLoading(false);
@@ -429,7 +431,9 @@ const Quotations = ({ user }) => {
             sortable: false,
             width: 50,
             renderCell: (params) => {
-              // Check if params.value is valid
+              if (loadingPicture) {
+                return <CircularProgress size={20} color="secondary" />; // Spinner while loading pictures
+              }
               if (params.value && params.value.data && params.value.type) {
                 try {
                   // Convert Buffer to Uint8Array
@@ -576,7 +580,23 @@ const Quotations = ({ user }) => {
       renderCell: (params) => (
         <IconButton
           color="secondary"
-          onClick={() => handleViewClick(params.row)}
+          disabled={loadingPicture}
+          onClick={async () => {
+            try {
+              const id = params.row.id; // Get the document ID
+
+              // Fetch the attachment from the API using the document ID
+              const response = await axios.get(
+                `${apiUrl}/api/quotation/full/${id}`
+              );
+
+              // Call the view handler with the fetched data
+              handleViewClick(response.data.quotations[0]);
+            } catch (error) {
+              console.error("Error fetching document file:", error);
+              // Optional: Show error message to the user
+            }
+          }}
         >
           <PageviewIcon sx={{ fontSize: "2rem" }} />
         </IconButton>
@@ -592,7 +612,23 @@ const Quotations = ({ user }) => {
       renderCell: (params) => (
         <IconButton
           color="secondary"
-          onClick={() => handleDownloadClick(params.row)}
+          disabled={loadingPicture}
+          onClick={async () => {
+            try {
+              const id = params.row.id; // Get the document ID
+
+              // Fetch the attachment from the API using the document ID
+              const response = await axios.get(
+                `${apiUrl}/api/quotation/full/${id}`
+              );
+
+              // Call the download handler with the fetched data
+              handleDownloadClick(response.data.quotations[0]);
+            } catch (error) {
+              console.error("Error fetching document file:", error);
+              // Optional: Show error message to the user
+            }
+          }}
         >
           <DownloadIcon sx={{ fontSize: "2rem" }} />
         </IconButton>
@@ -670,7 +706,7 @@ const Quotations = ({ user }) => {
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "quotationCode", sort: "asc" }],
+              sortModel: [{ field: "clientName", sort: "asc" }],
             },
           }}
         />

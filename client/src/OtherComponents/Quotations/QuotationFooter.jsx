@@ -18,8 +18,8 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
           REMARKS:
         </Typography>
         <Typography fontSize="12px">
-          {quotationData.remarks ? (
-            quotationData.remarks.split("*").map(
+          {quotationData?.remarks ? (
+            quotationData?.remarks.split("*").map(
               (remark, index) =>
                 remark.trim() && (
                   <Typography key={index} fontSize="12px">
@@ -69,12 +69,12 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 id="charge_input"
                 textAlign="center"
               >
-                {quotationData.termsCharge !== "N/A"
-                  ? quotationData.termsChargeDays === 0
-                    ? `CASH ${quotationData.termsCharge}`
-                    : quotationData.termsChargeDays === 1
-                    ? `${quotationData.termsChargeDays} DAY ${quotationData.termsCharge}`
-                    : `${quotationData.termsChargeDays} DAYS ${quotationData.termsCharge}`
+                {quotationData?.termsCharge !== "N/A"
+                  ? quotationData?.termsChargeDays === 0
+                    ? `CASH ${quotationData?.termsCharge}`
+                    : quotationData?.termsChargeDays === 1
+                    ? `${quotationData?.termsChargeDays} DAY ${quotationData?.termsCharge}`
+                    : `${quotationData?.termsChargeDays} DAYS ${quotationData?.termsCharge}`
                   : "N/A"}
               </Typography>
             </Box>
@@ -91,12 +91,12 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 id="buying_input"
                 textAlign="center"
               >
-                {quotationData.termsBuying !== "N/A"
-                  ? quotationData.termsBuyingDays === 0
-                    ? `CASH ${quotationData.termsBuying}`
-                    : quotationData.termsBuyingDays === 1
-                    ? `${quotationData.termsBuyingDays} DAY ${quotationData.termsBuying}`
-                    : `${quotationData.termsBuyingDays} DAYS ${quotationData.termsBuying}`
+                {quotationData?.termsBuying !== "N/A"
+                  ? quotationData?.termsBuyingDays === 0
+                    ? `CASH ${quotationData?.termsBuying}`
+                    : quotationData?.termsBuyingDays === 1
+                    ? `${quotationData?.termsBuyingDays} DAY ${quotationData?.termsBuying}`
+                    : `${quotationData?.termsBuyingDays} DAYS ${quotationData?.termsBuying}`
                   : "N/A"}
               </Typography>
             </Box>
@@ -128,7 +128,7 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
           </Typography>
           <Box mt={3} position="relative">
             <SignatureComponent
-              signature={quotationData.IdInformation.signature}
+              signature={quotationData?.IdInformation?.signature}
               style={{ top: "-40px", left: "30px" }}
             />
             <Typography
@@ -137,9 +137,9 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
               textAlign="center"
               sx={{ textDecoration: "underline" }}
             >
-              {quotationData.IdInformation.first_name}{" "}
-              {quotationData.IdInformation.middle_name.charAt(0)}{" "}
-              {quotationData.IdInformation.last_name}
+              {quotationData?.IdInformation?.first_name}{" "}
+              {quotationData?.IdInformation?.middle_name.charAt(0)}{" "}
+              {quotationData?.IdInformation?.last_name}
             </Typography>
             <Typography textAlign="center">Marketing Staff / CSR</Typography>
           </Box>

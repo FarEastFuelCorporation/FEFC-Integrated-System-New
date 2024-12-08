@@ -128,6 +128,8 @@ const BookModal = ({
     }
   }, [formData.quotationWasteId, filterVehicleTypes]);
 
+  console.log(quotationsData);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -228,32 +230,34 @@ const BookModal = ({
             />
           </>
         )}
-        <TextField
-          label="Waste Name"
-          name="quotationWasteId"
-          value={formData.quotationWasteId}
-          onChange={handleInputChangeAndFilter}
-          select
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        >
-          {quotationsData.map((q, index) =>
-            q.QuotationWaste.sort((a, b) =>
-              a.wasteName.localeCompare(b.wasteName)
-            ) // Sort wasteName in ascending order
-              .map((waste, wasteIndex) => (
-                <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
-                  {waste.wasteName} - {waste.unit}
-                </MenuItem>
-              ))
-          )}
-        </TextField>
+        {quotationsData && quotationsData.length > 0 && (
+          <TextField
+            label="Waste Name"
+            name="quotationWasteId"
+            value={formData.quotationWasteId}
+            onChange={handleInputChangeAndFilter}
+            select
+            fullWidth
+            required
+            InputLabelProps={{
+              style: {
+                color: colors.grey[100],
+              },
+            }}
+            autoComplete="off"
+          >
+            {quotationsData.map((q, index) =>
+              q.QuotationWaste.sort((a, b) =>
+                a.wasteName.localeCompare(b.wasteName)
+              ) // Sort wasteName in ascending order
+                .map((waste, wasteIndex) => (
+                  <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
+                    {waste.wasteName} - {waste.unit}
+                  </MenuItem>
+                ))
+            )}
+          </TextField>
+        )}
         {filteredVehicleTypes.length > 0 && formData.quotationWasteId && (
           <TextField
             label="Vehicle Type"

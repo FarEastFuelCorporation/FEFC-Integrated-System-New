@@ -127,14 +127,13 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => {
-        let value = {};
-        value.value =
+      valueGetter: (params) => {
+        return (
           params.row.ScheduledTransaction?.BookedTransaction?.Client
-            ?.clientName || "";
-
-        return renderCellWithWrapText(value);
+            ?.clientName || ""
+        );
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "typeOfVehicle",
@@ -143,14 +142,13 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => {
-        let value = {};
-        value.value =
+      valueGetter: (params) => {
+        return (
           params.row.ScheduledTransaction?.BookedTransaction
-            ?.QuotationTransportation?.VehicleType?.typeOfVehicle || "";
-
-        return renderCellWithWrapText(value);
+            ?.QuotationTransportation?.VehicleType?.typeOfVehicle || ""
+        );
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "vehicle",
@@ -158,12 +156,10 @@ const Dashboard = () => {
       headerAlign: "center",
       align: "center",
       width: 50,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Vehicle?.plateNumber || "";
-
-        return renderCellWithWrapText(value);
+      valueGetter: (params) => {
+        return params.row.Vehicle?.plateNumber || "";
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "income",
@@ -172,16 +168,15 @@ const Dashboard = () => {
       align: "center",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => {
-        let value = {};
-        value.value =
+      valueGetter: (params) => {
+        return (
           formatNumber(
             params.row.ScheduledTransaction?.BookedTransaction
               ?.QuotationTransportation?.unitPrice
-          ) || "";
-
-        return renderCellWithWrapText(value);
+          ) || ""
+        );
       },
+      renderCell: renderCellWithWrapText,
     },
   ];
 

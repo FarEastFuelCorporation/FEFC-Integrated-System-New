@@ -114,7 +114,7 @@ async function createScheduledTransactionController(req, res) {
 
       const wasteName = quotationWaste ? quotationWaste.wasteName : "";
       const typeOfVehicle =
-        quotationTransportation?.VehicleType?.typeOfVehicle || "";
+        quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
       const clientName = updatedBookedTransaction?.Client?.clientName || "";
       const clientId = updatedBookedTransaction?.createdBy || "";
       const clientType = clientId?.slice(0, 3) || "";

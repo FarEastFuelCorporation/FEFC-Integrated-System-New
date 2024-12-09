@@ -205,12 +205,12 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                           waste.QuotationWaste.unit
                         }`}
                   </TableCell>
-                  <TableCell sx={bodyCellStyles(false)}>
+                  {/* <TableCell sx={bodyCellStyles(false)}>
                     {
                       waste.TreatedWasteTransaction?.[0]?.TreatmentMachine
                         ?.TreatmentProcess?.treatmentProcess
                     }
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell sx={bodyCellStyles(true)}>
                     {waste.TreatedWasteTransaction.reduce(
                       (latest, transaction) => {

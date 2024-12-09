@@ -102,7 +102,7 @@ async function createBookedTransactionController(req, res) {
 
     const wasteName = quotationWaste ? quotationWaste.wasteName : "";
     const typeOfVehicle =
-      quotationTransportation?.VehicleType?.typeOfVehicle || "";
+      quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
     const clientName = bookedTransaction?.Client?.clientName || "";
     const clientId = bookedTransaction?.createdBy || "";
     const clientType = clientId?.slice(0, 3) || "";
@@ -120,6 +120,7 @@ async function createBookedTransactionController(req, res) {
 
     try {
       sendEmail(
+        // "jmfalar@fareastfuelcorp.com", // Recipient
         "marketing@fareastfuelcorp.com", // Recipient
         `${transactionId} - Booked Transaction: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback

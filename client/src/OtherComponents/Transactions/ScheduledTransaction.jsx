@@ -6,10 +6,13 @@ import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
 import { timestampDate, parseTimeString } from "../Functions";
 
-const ScheduledTransaction = ({ row }) => {
+const ScheduledTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const scheduledData = row.ScheduledTransaction?.[0] || {};
+
+  console.log(user);
+  console.log(user?.userType);
 
   return (
     <Box sx={{ my: 3, position: "relative" }}>
@@ -77,12 +80,14 @@ const ScheduledTransaction = ({ row }) => {
               ? format(parseTimeString(scheduledData.scheduledTime), "hh:mm aa")
               : "Pending"}
           </Typography>
-          <Typography variant="h5">
-            Logistics:{" "}
-            {scheduledData?.Logistics
-              ? scheduledData.Logistics.logisticsName
-              : "CLIENT VEHICLE"}
-          </Typography>
+          {Number.isInteger(user?.userType) && (
+            <Typography variant="h5">
+              Logistics:{" "}
+              {scheduledData?.Logistics
+                ? scheduledData.Logistics.logisticsName
+                : "CLIENT VEHICLE"}
+            </Typography>
+          )}
           <Typography variant="h5">
             Remarks:{" "}
             {scheduledData?.remarks ? scheduledData.remarks : "NO REMARKS"}

@@ -821,7 +821,9 @@ const Transaction = ({
                         )} */}
                       {row.statusId >= 2 && <ReceivedTransaction row={row} />}
                       {row.statusId >= 2 && <DispatchedTransaction row={row} />}
-                      {row.statusId >= 1 && <ScheduledTransaction row={row} />}
+                      {row.statusId >= 1 && (
+                        <ScheduledTransaction row={row} user={user} />
+                      )}
                       {Number.isInteger(user.userType) && (
                         <>
                           <BookedTransaction row={row} user={user} />

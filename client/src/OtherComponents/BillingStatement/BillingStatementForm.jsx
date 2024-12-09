@@ -202,23 +202,25 @@ const BillingStatementForm = ({
           break;
       }
 
-      if (totalWeight > fixedWeight) {
-        const excessWeight = totalWeight - fixedWeight;
+      if (fixedWeight !== 0) {
+        if (totalWeight > fixedWeight) {
+          const excessWeight = totalWeight - fixedWeight;
 
-        const excessPrice = excessWeight * unitPrice;
+          const excessPrice = excessWeight * unitPrice;
 
-        switch (vatCalculation) {
-          case "VAT EXCLUSIVE":
-            target.vatExclusive += excessPrice;
-            break;
-          case "VAT INCLUSIVE":
-            target.vatInclusive += excessPrice;
-            break;
-          case "NON VATABLE":
-            target.nonVatable += excessPrice;
-            break;
-          default:
-            break;
+          switch (vatCalculation) {
+            case "VAT EXCLUSIVE":
+              target.vatExclusive += excessPrice;
+              break;
+            case "VAT INCLUSIVE":
+              target.vatInclusive += excessPrice;
+              break;
+            case "NON VATABLE":
+              target.nonVatable += excessPrice;
+              break;
+            default:
+              break;
+          }
         }
       }
     }

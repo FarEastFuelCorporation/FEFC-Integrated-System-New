@@ -828,12 +828,16 @@ const BillingContent = ({
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({})}>
-                FIRST {`${formatNumber2(fixedWeight)}`}
+                {fixedWeight === 0 ? "" : `FIRST ${formatNumber2(fixedWeight)}`}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber2(fixedWeight)}
+                {fixedWeight === 0
+                  ? formatNumber2(1)
+                  : formatNumber2(fixedWeight)}
               </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
+              <TableCell sx={bodyCellStyles({ width: 40 })}>
+                {fixedWeight === 0 ? "LOT" : unit}
+              </TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}>
                 {formatNumber2(fixedPrice)}
@@ -843,27 +847,30 @@ const BillingContent = ({
               </TableCell>
             </TableRow>
           )}
-          {hasFixedRate && isMonthly && totalWeight > fixedWeight && (
-            <TableRow key={`add-${4}`} sx={{ border: "black" }}>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({})}>EXCESS QUANTITY:</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber2(totalWeight - fixedWeight)}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}>
-                {unitPrice}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}>
-                {formatNumber2((totalWeight - fixedWeight) * unitPrice)}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
-                {vatCalculation}
-              </TableCell>
-            </TableRow>
-          )}
+          {hasFixedRate &&
+            isMonthly &&
+            fixedWeight !== 0 &&
+            totalWeight > fixedWeight && (
+              <TableRow key={`add-${4}`} sx={{ border: "black" }}>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({})}>EXCESS QUANTITY:</TableCell>
+                <TableCell sx={bodyCellStyles({ width: 60 })}>
+                  {formatNumber2(totalWeight - fixedWeight)}
+                </TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}>
+                  {unitPrice}
+                </TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}>
+                  {formatNumber2((totalWeight - fixedWeight) * unitPrice)}
+                </TableCell>
+                <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
+                  {vatCalculation}
+                </TableCell>
+              </TableRow>
+            )}
           {remarks && (
             <TableRow key={`add-${5}`} sx={{ border: "black" }}>
               <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>

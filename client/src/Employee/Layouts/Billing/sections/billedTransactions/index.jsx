@@ -253,9 +253,11 @@ const BilledTransactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    const { row, ...restFormData } = formData;
+
     // Set formData from refs before validation
     const updatedFormData = {
-      ...formData,
+      ...restFormData,
       billedDate: billedDateRef.current.value,
       billedTime: billedTimeRef.current.value,
       billingNumber: billingNumberRef.current.value,

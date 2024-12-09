@@ -132,7 +132,8 @@ async function createBilledTransactionController(req, res) {
         "dcardinez@fareastfuelcorp.com", // Recipient
         `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody["dm.cardinez@fareastfuel.com"], // HTML content // cc
+        emailBody,
+        ["dm.cardinez@fareastfuel.com"], // HTML content // cc
         [
           "rmangaron@fareastfuelcorp.com",
           "edevera@fareastfuelcorp.com",

@@ -22,6 +22,7 @@ const VehicleType = require("../models/VehicleType");
 const Client = require("../models/Client");
 const { BookedTransactionEmailFormat } = require("../utils/emailFormat");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
+const TypeOfWaste = require("../models/TypeOfWaste");
 const statusId = 1;
 
 // Create Booked Transaction controller
@@ -435,6 +436,11 @@ async function geBookedTransactionsDashboardController(req, res) {
         haulingDate: {
           [Op.between]: [startDate, endDate],
         },
+      },
+      include: {
+        model: QuotationWaste,
+        as: "QuotationWaste",
+        attributes: ["wasteName"],
       },
     });
 

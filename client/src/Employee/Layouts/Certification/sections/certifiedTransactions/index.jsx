@@ -83,7 +83,7 @@ const CertifiedTransactions = ({ user }) => {
         row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
           .id,
       isBilled: row.BilledTransaction.length === 0 ? false : true,
-      isBillingApproved: row.BilledTransaction?.[0].BillingApprovalTransaction
+      isBillingApproved: row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ? true
         : false,
       certificateNumber: "",

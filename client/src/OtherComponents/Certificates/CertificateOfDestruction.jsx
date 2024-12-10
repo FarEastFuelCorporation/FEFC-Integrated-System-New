@@ -185,45 +185,47 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {sortedWasteTransaction.map((waste, index) => (
-                <TableRow key={index} sx={{ border: "black" }}>
-                  <TableCell sx={bodyCellStyles(false)}>
-                    {formatDate(row.haulingDate)}
-                  </TableCell>
-                  <TableCell sx={bodyCellStyles(false)}>
-                    {waste.wasteName}
-                  </TableCell>
-                  <TableCell sx={bodyCellStyles(false)}>
-                    {waste.QuotationWaste.TypeOfWaste.wasteCode}
-                  </TableCell>
-                  <TableCell sx={bodyCellStyles(false)}>
-                    {typeOfWeight === "CLIENT WEIGHT"
-                      ? `${formatNumber(waste.clientWeight)} ${
-                          waste.QuotationWaste.unit
-                        }`
-                      : `${formatNumber(waste.weight)} ${
-                          waste.QuotationWaste.unit
-                        }`}
-                  </TableCell>
-                  {/* <TableCell sx={bodyCellStyles(false)}>
-                    {
-                      waste.TreatedWasteTransaction?.[0]?.TreatmentMachine
-                        ?.TreatmentProcess?.treatmentProcess
-                    }
-                  </TableCell> */}
-                  <TableCell sx={bodyCellStyles(true)}>
-                    {waste.TreatedWasteTransaction.reduce(
-                      (latest, transaction) => {
-                        const treatedDate = new Date(transaction.treatedDate);
-                        return treatedDate > new Date(latest)
-                          ? formatDate(transaction.treatedDate)
-                          : formatDate(latest);
-                      },
-                      new Date(0)
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {sortedWasteTransaction.map((waste, index) => {
+                return (
+                  <TableRow key={index} sx={{ border: "black" }}>
+                    <TableCell sx={bodyCellStyles(false)}>
+                      {formatDate(row.haulingDate)}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles(false)}>
+                      {waste.wasteName}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles(false)}>
+                      {waste.QuotationWaste.TypeOfWaste.wasteCode}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles(false)}>
+                      {typeOfWeight === "CLIENT WEIGHT"
+                        ? `${formatNumber(waste.clientWeight)} ${
+                            waste.QuotationWaste.unit
+                          }`
+                        : `${formatNumber(waste.weight)} ${
+                            waste.QuotationWaste.unit
+                          }`}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles(false)}>
+                      {
+                        waste.TreatedWasteTransaction?.[0]?.TreatmentMachine
+                          ?.TreatmentProcess?.treatmentProcess
+                      }
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles(true)}>
+                      {waste.TreatedWasteTransaction.reduce(
+                        (latest, transaction) => {
+                          const treatedDate = new Date(transaction.treatedDate);
+                          return treatedDate > new Date(latest)
+                            ? formatDate(transaction.treatedDate)
+                            : formatDate(latest);
+                        },
+                        new Date(0)
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>

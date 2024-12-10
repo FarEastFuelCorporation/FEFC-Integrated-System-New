@@ -1,56 +1,3 @@
-// import React from "react";
-// import { Box, Modal, Button } from "@mui/material";
-
-// import WarehouseModalForm from "./WarehouseModalForm";
-
-// const WarehouseModal = ({ open, onClose, handleFormSubmit }) => {
-//   return (
-//     <Modal
-//       open={open}
-//       onClose={onClose}
-//       sx={{
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//       }}
-//     >
-//       <Box
-//         sx={{
-//           width: 1400,
-//           maxHeight: "80vh",
-//           bgcolor: "background.paper",
-//           boxShadow: 24,
-//           p: 4,
-//           display: "flex",
-//           flexDirection: "column",
-//           gap: 2,
-//           overflowY: "scroll",
-//           scrollbarWidth: "none",
-//           msOverflowStyle: "none",
-//         }}
-//       >
-//         <h2>Warehoused Transaction</h2>
-//         <WarehouseModalForm onSubmit={handleFormSubmit} />
-//         <Box display="flex" justifyContent="flex-end" mt={2}>
-//           <Button onClick={onClose} variant="contained" color="error">
-//             Cancel
-//           </Button>
-//           <Button
-//             variant="contained"
-//             color="primary"
-//             onClick={handleFormSubmit}
-//           >
-//             {/* {formData.id ? "Update" : "Sort"} */}
-//             Submit
-//           </Button>
-//         </Box>
-//       </Box>
-//     </Modal>
-//   );
-// };
-
-// export default WarehouseModal;
-
 import React from "react";
 import {
   Box,
@@ -82,8 +29,17 @@ const WarehouseModal = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const {
+    warehousedDateRef,
+    warehousedTimeRef,
+    warehousedItemsRefContent,
+    warehousedItemsRef,
+    remarksRef,
+  } = refs;
+
   const handleAddItem = () => {
-    refs.warehousedItemsRef.current.push({
+    // Accessing current warehoused items and adding a new one
+    const newItem = {
       description: "",
       quantity: 0,
       gatePass: "",
@@ -94,13 +50,18 @@ const WarehouseModal = ({
       palletNumber: "",
       steamNumber: "",
       unit: "",
-    });
-    forceUpdate();
+    };
+
+    warehousedItemsRef.current = [...warehousedItemsRef.current, newItem];
+    forceUpdate(); // Trigger re-render
   };
 
   const handleRemoveItem = (index) => {
-    refs.warehousedItemsRef.current.splice(index, 1);
-    forceUpdate();
+    const updatedItems = warehousedItemsRef.current.filter(
+      (_, i) => i !== index
+    );
+    warehousedItemsRef.current = updatedItems;
+    forceUpdate(); // Trigger re-render
   };
 
   // Force re-render helper
@@ -142,7 +103,7 @@ const WarehouseModal = ({
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
               label="Warehouse In Date"
-              inputRef={refs.warehousedDateRef}
+              inputRef={warehousedDateRef}
               defaultValue={formData.warehousedDate}
               fullWidth
               type="date"
@@ -157,7 +118,7 @@ const WarehouseModal = ({
             />
             <TextField
               label="Warehouse In Time"
-              inputRef={refs.warehousedTimeRef}
+              inputRef={warehousedTimeRef}
               defaultValue={formData.warehousedTime}
               fullWidth
               type="time"
@@ -173,9 +134,9 @@ const WarehouseModal = ({
           </div>
 
           {/* Warehoused Items */}
-          <Grid item xs={12} ref={refs.warehousedItemsRef}>
+          <Grid item xs={12} refs={warehousedItemsRefContent}>
             <h3>Warehoused Items</h3>
-            {refs.warehousedItemsRef.current.map((item, index) => (
+            {warehousedItemsRef.current.map((item, index) => (
               <Box key={index}>
                 <Typography my={1}>Item {index + 1}</Typography>
                 <form id={`warehoused-item-${index}`}>
@@ -405,7 +366,7 @@ const WarehouseModal = ({
 
           <TextField
             label="Remarks"
-            inputRef={refs.remarksRef}
+            inputRef={remarksRef}
             defaultValue={formData.remarksRef}
             fullWidth
             InputLabelProps={{

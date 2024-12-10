@@ -11,9 +11,6 @@ const ScheduledTransaction = ({ row, user }) => {
   const colors = tokens(theme.palette.mode);
   const scheduledData = row.ScheduledTransaction?.[0] || {};
 
-  console.log(user);
-  console.log(user?.userType);
-
   return (
     <Box sx={{ my: 3, position: "relative" }}>
       <CircleLogo pending={row.statusId === 1}>

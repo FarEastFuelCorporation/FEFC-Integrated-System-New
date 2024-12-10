@@ -21,6 +21,7 @@ const WarehousedTransactions = ({ user }) => {
   const warehousedDateRef = useRef();
   const warehousedTimeRef = useRef();
   const remarksRef = useRef();
+  const warehousedItemsRefContent = useRef();
   const warehousedItemsRef = useRef([
     {
       description: "",
@@ -235,63 +236,77 @@ const WarehousedTransactions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Initialize an array to hold warehoused item data
-    const warehousedItemsData = [];
+    try {
+      // setLoading(true);
 
-    // Loop through each item form in warehousedItemsRef.current
-    warehousedItemsRef.current.forEach((itemRef, index) => {
-      const itemData = {
-        description: itemRef.querySelector(`[name='description-${index}']`)
-          .value,
-        unit: itemRef.querySelector(`[name='unit-${index}']`).value,
-        quantity: itemRef.querySelector(`[name='quantity-${index}']`).value,
-        gatePass: itemRef.querySelector(`[name='gatePass-${index}']`).value,
-        warehouse: itemRef.querySelector(`[name='warehouse-${index}']`).value,
-        area: itemRef.querySelector(`[name='area-${index}']`).value,
-        section: itemRef.querySelector(`[name='section-${index}']`).value,
-        level: itemRef.querySelector(`[name='level-${index}']`).value,
-        palletNumber: itemRef.querySelector(`[name='palletNumber-${index}']`)
-          .value,
-        steamNumber: itemRef.querySelector(`[name='steamNumber-${index}']`)
-          .value,
+      console.log(warehousedItemsRefContent);
+
+      // Collect warehoused items data
+      const warehousedItemsData = [];
+      warehousedItemsRefContent.current.forEach((itemRef, index) => {
+        if (!itemRef) return;
+
+        const itemData = {
+          description:
+            itemRef.querySelector(`[name='description-${index}']`)?.value || "",
+          unit: itemRef.querySelector(`[name='unit-${index}']`)?.value || "",
+          quantity:
+            itemRef.querySelector(`[name='quantity-${index}']`)?.value || 0,
+          gatePass:
+            itemRef.querySelector(`[name='gatePass-${index}']`)?.value || "",
+          warehouse:
+            itemRef.querySelector(`[name='warehouse-${index}']`)?.value || "",
+          area: itemRef.querySelector(`[name='area-${index}']`)?.value || "",
+          section:
+            itemRef.querySelector(`[name='section-${index}']`)?.value || "",
+          level: itemRef.querySelector(`[name='level-${index}']`)?.value || "",
+          palletNumber:
+            itemRef.querySelector(`[name='palletNumber-${index}']`)?.value ||
+            "",
+          steamNumber:
+            itemRef.querySelector(`[name='steamNumber-${index}']`)?.value || "",
+        };
+
+        // Validate itemData
+        if (!itemData.description || itemData.quantity <= 0) {
+          throw new Error(`Invalid data for item ${index + 1}`);
+        }
+
+        warehousedItemsData.push(itemData);
+      });
+
+      // Set formData from refs before validation
+      const updatedFormData = {
+        ...formData,
+        warehousedDate: warehousedDateRef.current.value,
+        warehousedTime: warehousedTimeRef.current.value,
+        remarks: remarksRef.current.value,
+        warehousedItems: warehousedItemsData,
       };
 
-      // Push the item data to the array
-      warehousedItemsData.push(itemData);
-    });
+      console.log(updatedFormData);
 
-    // Set formData from refs before validation
-    const updatedFormData = {
-      ...formData,
-      warehousedDate: warehousedDateRef.current.value,
-      warehousedTime: warehousedTimeRef.current.value,
-      remarks: remarksRef.current.value,
-      warehousedItems: warehousedItemsData,
-    };
+      // if (updatedFormData.id) {
+      //   await axios.put(
+      //     `${apiUrl}/api/warehousedTransaction/${updatedFormData.id}`,
+      //     updatedFormData
+      //   );
 
-    try {
-      setLoading(true);
-      if (updatedFormData.id) {
-        await axios.put(
-          `${apiUrl}/api/warehousedTransaction/${updatedFormData.id}`,
-          updatedFormData
-        );
+      //   setSuccessMessage("Warehoused In Transaction Updated Successfully!");
+      // } else {
+      //   await axios.post(
+      //     `${apiUrl}/api/warehousedTransaction`,
+      //     updatedFormData
+      //   );
 
-        setSuccessMessage("Warehoused In Transaction Updated Successfully!");
-      } else {
-        await axios.post(
-          `${apiUrl}/api/warehousedTransaction`,
-          updatedFormData
-        );
+      //   setSuccessMessage("Warehoused In Transaction Submitted Successfully!");
+      // }
 
-        setSuccessMessage("Warehoused In Transaction Submitted Successfully!");
-      }
+      // fetchData();
 
-      fetchData();
-
-      setShowSuccessMessage(true);
-      setOpenTransactionModal(false);
-      handleCloseModal();
+      // setShowSuccessMessage(true);
+      // setOpenTransactionModal(false);
+      // handleCloseModal();
 
       setLoading(false);
     } catch (error) {
@@ -351,6 +366,7 @@ const WarehousedTransactions = ({ user }) => {
         refs={{
           warehousedDateRef,
           warehousedTimeRef,
+          warehousedItemsRefContent,
           warehousedItemsRef,
           remarksRef,
         }}

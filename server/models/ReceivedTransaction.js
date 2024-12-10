@@ -78,6 +78,16 @@ const ReceivedTransaction = sequelize.define(
       values: ["SORTING", "WAREHOUSE", "ACCOUNTING"],
       allowNull: true,
     },
+    hasDemurrage: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    demurrageDays: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0,
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

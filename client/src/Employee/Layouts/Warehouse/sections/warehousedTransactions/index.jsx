@@ -21,7 +21,6 @@ const WarehousedTransactions = ({ user }) => {
   const warehousedDateRef = useRef();
   const warehousedTimeRef = useRef();
   const remarksRef = useRef();
-  const warehousedItemsRefContent = useRef();
   const warehousedItemsRef = useRef([
     {
       description: "",
@@ -78,6 +77,8 @@ const WarehousedTransactions = ({ user }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
+
+  const warehousedItemsRefContent = useRef();
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -366,7 +367,6 @@ const WarehousedTransactions = ({ user }) => {
         refs={{
           warehousedDateRef,
           warehousedTimeRef,
-          warehousedItemsRefContent,
           warehousedItemsRef,
           remarksRef,
         }}

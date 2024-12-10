@@ -11,6 +11,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { tokens } from "../../theme";
 
@@ -44,6 +46,12 @@ const ReceiveModal = ({
     }
 
     setFormData(updatedFormData);
+  };
+
+  const handleCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
+    console.log(isChecked);
+    setFormData({ ...formData, hasDemurrage: isChecked }); // Update formData state
   };
 
   return (
@@ -288,6 +296,39 @@ const ReceiveModal = ({
               disabled
             />
           </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.hasDemurrage}
+                  onChange={handleCheckboxChange}
+                  color="secondary"
+                />
+              }
+              label="Has Demurrage"
+            />
+          </Grid>
+          {formData.hasDemurrage && (
+            <Grid item xs={6}>
+              <TextField
+                label="Demurrage Days"
+                name={`demurrageDays`}
+                value={formData.demurrageDays}
+                onChange={handleInputChange}
+                type="number"
+                required
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+          )}
         </Grid>
         <FormControl fullWidth required>
           <InputLabel

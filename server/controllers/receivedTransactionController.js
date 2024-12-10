@@ -34,6 +34,8 @@ async function createReceivedTransactionController(req, res) {
       grossWeight,
       tareWeight,
       netWeight,
+      hasDemurrage,
+      demurrageDays,
       submitTo,
       remarks,
       statusId,
@@ -60,6 +62,8 @@ async function createReceivedTransactionController(req, res) {
       grossWeight,
       tareWeight,
       netWeight,
+      hasDemurrage,
+      demurrageDays,
       submitTo,
       remarks,
       createdBy,
@@ -138,6 +142,8 @@ async function updateReceivedTransactionController(req, res) {
       grossWeight,
       tareWeight,
       netWeight,
+      hasDemurrage,
+      demurrageDays,
       submitTo,
       remarks,
       statusId,
@@ -164,6 +170,8 @@ async function updateReceivedTransactionController(req, res) {
       updatedReceivedTransaction.grossWeight = grossWeight;
       updatedReceivedTransaction.tareWeight = tareWeight;
       updatedReceivedTransaction.netWeight = netWeight;
+      updatedReceivedTransaction.hasDemurrage = hasDemurrage;
+      updatedReceivedTransaction.demurrageDays = demurrageDays;
       updatedReceivedTransaction.submitTo = submitTo;
       updatedReceivedTransaction.remarks = remarks;
       updatedReceivedTransaction.updatedBy = createdBy;

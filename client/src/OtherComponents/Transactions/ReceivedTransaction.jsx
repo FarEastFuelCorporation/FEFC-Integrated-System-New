@@ -166,6 +166,12 @@ const ReceivedTransaction = ({ row }) => {
             <Typography variant="h5">
               Net Weight: {formatWeight(receivedTransaction.netWeight)} Kg
             </Typography>
+            {receivedTransaction.hasDemurrage && (
+              <Typography variant="h5">
+                Demurrage: {receivedTransaction.demurrageDays}{" "}
+                {receivedTransaction.demurrageDays > 1 ? "DAYS" : "DAY"}
+              </Typography>
+            )}
             <Typography variant="h5">
               Submit To:{" "}
               {receivedTransaction.submitTo ? receivedTransaction.submitTo : ""}

@@ -33,7 +33,7 @@ const BillingContent = ({
   const isMonthly = transactions?.[0]?.QuotationWaste?.isMonthly;
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
 
-  let totalWeight = 0;
+  let totalWeight = new Decimal(0);
 
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight - 50;
@@ -262,10 +262,7 @@ const BillingContent = ({
                       ? waste.clientWeight
                       : waste.weight;
 
-                  totalWeight +=
-                    typeOfWeight === "CLIENT WEIGHT"
-                      ? waste.clientWeight
-                      : waste.weight;
+                  totalWeight = totalWeight.plus(usedWeight);
 
                   const wasteName =
                     transaction.ScheduledTransaction?.[0]
@@ -890,7 +887,7 @@ const BillingContent = ({
               <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
               <TableCell sx={bodyCellStyles({})}>TOTAL</TableCell>
               <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber2(totalWeight)}
+                {formatNumber2(totalWeight.toNumber())}
               </TableCell>
               <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
               <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
@@ -929,21 +926,21 @@ const BillingContent = ({
           {hasFixedRate &&
             isMonthly &&
             fixedWeight !== 0 &&
-            totalWeight > fixedWeight && (
+            totalWeight.toNumber() > fixedWeight && (
               <TableRow key={`add-${4}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
                 <TableCell sx={bodyCellStyles({})}>EXCESS QUANTITY:</TableCell>
                 <TableCell sx={bodyCellStyles({ width: 60 })}>
-                  {formatNumber2(totalWeight - fixedWeight)}
+                  {formatNumber2(totalWeight.minus(fixedWeight))}
                 </TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
                 <TableCell sx={bodyCellStyles({ width: 80 })}>
                   {unitPrice}
                 </TableCell>
                 <TableCell sx={bodyCellStyles({ width: 80 })}>
-                  {formatNumber2((totalWeight - fixedWeight) * unitPrice)}
+                  {formatNumber2(totalWeight.minus(fixedWeight) * unitPrice)}
                 </TableCell>
                 <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
                   {vatCalculation}

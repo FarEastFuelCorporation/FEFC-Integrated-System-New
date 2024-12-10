@@ -112,7 +112,7 @@ const BillingStatementForm = ({
     nonVatable: 0,
   };
 
-  let totalWeight = 0;
+  let totalWeight = new Decimal(0);
   let isWasteName = false;
   let isPerClient = false;
 
@@ -184,7 +184,7 @@ const BillingStatementForm = ({
         const selectedWeight =
           typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
-        totalWeight += selectedWeight; // Total weight multiplied by unit price
+        totalWeight = totalWeight.plus(selectedWeight); // Total weight multiplied by unit price
 
         target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
@@ -210,8 +210,8 @@ const BillingStatementForm = ({
       }
 
       if (fixedWeight !== 0) {
-        if (totalWeight > fixedWeight) {
-          const excessWeight = totalWeight - fixedWeight;
+        if (totalWeight.toNumber() > fixedWeight) {
+          const excessWeight = totalWeight.minus(fixedWeight);
 
           const excessPrice = excessWeight * unitPrice;
 

@@ -519,6 +519,17 @@ CollectedTransaction.belongsTo(Employee, {
   targetKey: "employeeId",
 });
 
+Employee.hasMany(WarehousedTransaction, {
+  as: "WarehousedTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+WarehousedTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
 Employee.hasMany(Medicine, {
   as: "Medicine",
   foreignKey: "createdBy",

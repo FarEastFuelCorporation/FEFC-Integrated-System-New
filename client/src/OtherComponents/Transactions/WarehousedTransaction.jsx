@@ -10,32 +10,28 @@ const WarehousedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Extract received transaction data
-  const sortedTransaction =
-    row?.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
-      .SortedTransaction?.[0] || {};
+  console.log(row);
 
   // Extract received transaction data
   const receivedTransaction =
     row?.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};
 
-  const sortedWasteTransaction = sortedTransaction.SortedWasteTransaction
-    ? sortedTransaction.SortedWasteTransaction.map((item) => ({
-        ...item,
-        sortedDate: sortedTransaction.sortedDate,
-        sortedTime: sortedTransaction.sortedTime,
-      }))
-    : [];
+  const warehousedTransaction =
+    receivedTransaction.WarehousedTransaction?.[0] || {};
 
-  const sortedScrapTransaction = sortedTransaction.SortedScrapTransaction
-    ? sortedTransaction.SortedScrapTransaction.map((item) => ({
-        ...item,
-        sortedDate: sortedTransaction.sortedDate,
-        sortedTime: sortedTransaction.sortedTime,
-        wasteName: item.ScrapType.typeOfScrap,
-        clientWeight: "N/A",
-      }))
-    : [];
+  const warehousedTransactionItem =
+    warehousedTransaction.WarehousedTransactionItem
+      ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
+          ...item,
+          warehousedDate: warehousedTransaction.warehousedDate,
+          warehousedTime: warehousedTransaction.warehousedTime,
+        })).sort((a, b) => a.description.localeCompare(b.description))
+      : [];
+
+  const rowHeight = 52; // Default row height in Material-UI DataGrid
+  const headerHeight = 56; // Default header height
+  const warehousedTransactionItemHeight =
+    warehousedTransactionItem.length * rowHeight + headerHeight;
 
   const formatTimeToHHMMSS = (timeString) => {
     const [hours, minutes] = timeString.split(":");
@@ -67,8 +63,8 @@ const WarehousedTransaction = ({ row }) => {
 
   const columns = [
     {
-      field: "sortedDate",
-      headerName: "Sorted Date",
+      field: "warehousedDate",
+      headerName: "Warehoused Date",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -76,8 +72,8 @@ const WarehousedTransaction = ({ row }) => {
       renderCell: renderCellWithFormattedDate,
     },
     {
-      field: "sortedTime",
-      headerName: "Sorted Time",
+      field: "warehousedTime",
+      headerName: "Warehoused Time",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -85,8 +81,8 @@ const WarehousedTransaction = ({ row }) => {
       renderCell: renderCellWithFormattedTime,
     },
     {
-      field: "wasteName",
-      headerName: "Waste Name",
+      field: "description",
+      headerName: "Description",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -185,136 +181,90 @@ const WarehousedTransaction = ({ row }) => {
               }}
             >
               <Typography variant="h5">
-                {sortedTransaction.createdAt
-                  ? timestampDate(sortedTransaction.createdAt)
+                {warehousedTransaction.createdAt
+                  ? timestampDate(warehousedTransaction.createdAt)
                   : ""}
               </Typography>
             </Grid>
           </Grid>
           <Typography variant="subtitle1" gutterBottom>
-            Sorted Wastes
+            Warehoused Items
           </Typography>
-          {sortedWasteTransaction && sortedWasteTransaction.length > 0 && (
-            <DataGrid
-              sx={{
-                "& .MuiDataGrid-root": {
-                  border: "none",
-                  width: "100%",
-                },
-                "& .MuiDataGrid-overlayWrapper": {
-                  minHeight: "52px",
-                },
-                "& .name-column--cell": {
-                  color: colors.greenAccent[300],
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: colors.blueAccent[700],
-                  borderBottom: "none",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  whiteSpace: "normal !important",
-                  wordWrap: "break-word !important",
-                  lineHeight: "1.2 !important",
-                },
-                "& .MuiDataGrid-virtualScroller": {
-                  backgroundColor: colors.primary[400],
-                },
-                "& .MuiDataGrid-toolbarContainer": {
-                  display: "none",
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  display: "none",
-                },
-              }}
-              rows={sortedWasteTransaction ? sortedWasteTransaction : []}
-              columns={columns}
-              components={{ Toolbar: GridToolbar }}
-              getRowId={(row) => (row.id ? row.id : [])}
-              localeText={{ noRowsLabel: "No Treated Transactions" }}
-              initialState={{
-                sortModel: [
-                  { field: "treatedDate", sort: "asc" },
-                  { field: "treatedTime", sort: "asc" },
-                  { field: "machineName", sort: "asc" },
-                ],
-              }}
-            />
-          )}
-          <Typography
-            variant="subtitle1"
-            gutterBottom
-            sx={{ marginTop: "20px" }}
-          >
-            Sorted Scraps
-          </Typography>
-          {sortedScrapTransaction && sortedScrapTransaction.length > 0 && (
-            <DataGrid
-              sx={{
-                "& .MuiDataGrid-root": {
-                  border: "none",
-                  width: "100%",
-                },
-                "& .MuiDataGrid-overlayWrapper": {
-                  minHeight: "52px",
-                },
-                "& .name-column--cell": {
-                  color: colors.greenAccent[300],
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: colors.blueAccent[700],
-                  borderBottom: "none",
-                },
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  whiteSpace: "normal !important",
-                  wordWrap: "break-word !important",
-                  lineHeight: "1.2 !important",
-                },
-                "& .MuiDataGrid-virtualScroller": {
-                  backgroundColor: colors.primary[400],
-                },
-                "& .MuiDataGrid-toolbarContainer": {
-                  display: "none",
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  display: "none",
-                },
-              }}
-              rows={sortedScrapTransaction ? sortedScrapTransaction : []}
-              columns={columns}
-              components={{ Toolbar: GridToolbar }}
-              getRowId={(row) => (row.id ? row.id : [])}
-              localeText={{ noRowsLabel: "No Treated Transactions" }}
-              initialState={{
-                sortModel: [
-                  { field: "treatedDate", sort: "asc" },
-                  { field: "treatedTime", sort: "asc" },
-                  { field: "machineName", sort: "asc" },
-                ],
-              }}
-            />
-          )}
+          {warehousedTransactionItem &&
+            warehousedTransactionItem.length > 0 && (
+              <DataGrid
+                sx={{
+                  "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard": {
+                    height: warehousedTransactionItemHeight,
+                  },
+                  "& .MuiDataGrid-root": {
+                    border: "none",
+                    width: "100%",
+                  },
+                  "& .MuiDataGrid-overlayWrapper": {
+                    minHeight: "52px",
+                  },
+                  "& .name-column--cell": {
+                    color: colors.greenAccent[300],
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.blueAccent[700],
+                    borderBottom: "none",
+                  },
+                  "& .MuiDataGrid-columnHeaderTitle": {
+                    whiteSpace: "normal !important",
+                    wordWrap: "break-word !important",
+                    lineHeight: "1.2 !important",
+                  },
+                  "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.primary[400],
+                  },
+                  "& .MuiDataGrid-toolbarContainer": {
+                    display: "none",
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    display: "none",
+                  },
+                }}
+                rows={
+                  warehousedTransactionItem ? warehousedTransactionItem : []
+                }
+                columns={columns}
+                components={{ Toolbar: GridToolbar }}
+                getRowId={(row) => (row.id ? row.id : [])}
+                localeText={{ noRowsLabel: "No Treated Transactions" }}
+                initialState={{
+                  sortModel: [
+                    { field: "treatedDate", sort: "asc" },
+                    { field: "treatedTime", sort: "asc" },
+                    { field: "machineName", sort: "asc" },
+                  ],
+                }}
+              />
+            )}
+
           <br />
           <Typography variant="h5">
             Batch Weight: {formatWeight(receivedTransaction.netWeight)} Kg
           </Typography>
           <Typography variant="h5">
             Total Sorted Weight:{" "}
-            {formatWeight(sortedTransaction.totalSortedWeight)} Kg
+            {formatWeight(warehousedTransaction.totalSortedWeight)} Kg
           </Typography>
           <Typography variant="h5">
             Discrepancy Weight:{" "}
-            {formatWeight(sortedTransaction.discrepancyWeight)} Kg
+            {formatWeight(warehousedTransaction.discrepancyWeight)} Kg
           </Typography>
           <Typography variant="h5">
             Discrepancy Remarks:{" "}
-            {sortedTransaction.remarks
-              ? sortedTransaction.remarks
+            {warehousedTransaction.remarks
+              ? warehousedTransaction.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Sorted By:{" "}
-            {`${sortedTransaction.Employee.firstName || ""} ${
-              sortedTransaction.Employee.lastName || ""
+            {`${warehousedTransaction.Employee.firstName || ""} ${
+              warehousedTransaction.Employee.lastName || ""
             }`}
           </Typography>
           <br />

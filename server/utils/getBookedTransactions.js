@@ -30,6 +30,7 @@ const BillingDistributionTransaction = require("../models/BillingDistributionTra
 const Logistics = require("../models/Logistics");
 const TransporterClient = require("../models/TransporterClient");
 const WarehousedTransaction = require("../models/WarehousedTransaction");
+const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -215,6 +216,18 @@ const getIncludeOptions = () => [
             model: WarehousedTransaction,
             as: "WarehousedTransaction",
             required: false,
+            include: [
+              {
+                model: WarehousedTransactionItem,
+                as: "WarehousedTransactionItem",
+                required: false,
+              },
+              {
+                model: Employee,
+                as: "Employee",
+                attributes: ["firstName", "lastName"],
+              },
+            ],
           },
           {
             model: Employee,

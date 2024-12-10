@@ -688,9 +688,9 @@ const Transaction = ({
                     {user.userType === 3 && <DispatchedTransaction row={row} />}
                     {user.userType === 4 && <ReceivedTransaction row={row} />}
                     {user.userType === 5 && <SortedTransaction row={row} />}
-                    {/* {user.userType === 14 && (
+                    {user.userType === 14 && (
                       <WarehousedTransaction row={row} />
-                    )} */}
+                    )}
 
                     {user.userType === 6 && (
                       <TreatedTransaction

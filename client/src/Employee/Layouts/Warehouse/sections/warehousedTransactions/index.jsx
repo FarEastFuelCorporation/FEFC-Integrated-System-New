@@ -21,6 +21,7 @@ const WarehousedTransactions = ({ user }) => {
   const warehousedDateRef = useRef();
   const warehousedTimeRef = useRef();
   const remarksRef = useRef();
+  const warehousedItemsRefContent = useRef();
   const warehousedItemsRef = useRef([
     {
       description: "",
@@ -77,8 +78,6 @@ const WarehousedTransactions = ({ user }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
-
-  const warehousedItemsRefContent = useRef();
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -242,9 +241,16 @@ const WarehousedTransactions = ({ user }) => {
 
       console.log(warehousedItemsRefContent);
 
+      console.log(
+        warehousedItemsRefContent.current.querySelectorAll(`[id='item']`)
+      );
+
+      const items =
+        warehousedItemsRefContent.current.querySelectorAll(`[id='item']`);
+
       // Collect warehoused items data
       const warehousedItemsData = [];
-      warehousedItemsRefContent.current.forEach((itemRef, index) => {
+      items.forEach((itemRef, index) => {
         if (!itemRef) return;
 
         const itemData = {
@@ -287,27 +293,27 @@ const WarehousedTransactions = ({ user }) => {
 
       console.log(updatedFormData);
 
-      // if (updatedFormData.id) {
-      //   await axios.put(
-      //     `${apiUrl}/api/warehousedTransaction/${updatedFormData.id}`,
-      //     updatedFormData
-      //   );
+      if (updatedFormData.id) {
+        await axios.put(
+          `${apiUrl}/api/warehousedTransaction/${updatedFormData.id}`,
+          updatedFormData
+        );
 
-      //   setSuccessMessage("Warehoused In Transaction Updated Successfully!");
-      // } else {
-      //   await axios.post(
-      //     `${apiUrl}/api/warehousedTransaction`,
-      //     updatedFormData
-      //   );
+        setSuccessMessage("Warehoused In Transaction Updated Successfully!");
+      } else {
+        await axios.post(
+          `${apiUrl}/api/warehousedTransaction`,
+          updatedFormData
+        );
 
-      //   setSuccessMessage("Warehoused In Transaction Submitted Successfully!");
-      // }
+        setSuccessMessage("Warehoused In Transaction Submitted Successfully!");
+      }
 
-      // fetchData();
+      fetchData();
 
-      // setShowSuccessMessage(true);
-      // setOpenTransactionModal(false);
-      // handleCloseModal();
+      setShowSuccessMessage(true);
+      setOpenTransactionModal(false);
+      handleCloseModal();
 
       setLoading(false);
     } catch (error) {
@@ -370,6 +376,7 @@ const WarehousedTransactions = ({ user }) => {
           warehousedItemsRef,
           remarksRef,
         }}
+        ref={warehousedItemsRefContent}
       />
     </Box>
   );

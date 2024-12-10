@@ -137,12 +137,12 @@ const WarehouseModal = forwardRef(
             </div>
 
             {/* Warehoused Items */}
-            <Grid item xs={12} refs={ref}>
+            <Grid item xs={12} ref={ref}>
               <h3>Warehoused Items</h3>
               {warehousedItemsRef.current.map((item, index) => (
-                <Box key={index}>
+                <Box key={index} id="item">
                   <Typography my={1}>Item {index + 1}</Typography>
-                  <form id={`warehoused-item-${index}`}>
+                  <Box id={`warehoused-item-${index}`}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6} md={6} lg={2}>
                         <TextField
@@ -351,7 +351,7 @@ const WarehouseModal = forwardRef(
                         </IconButton>
                       </Grid>
                     </Grid>
-                  </form>
+                  </Box>
                 </Box>
               ))}
               <Grid

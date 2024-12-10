@@ -256,6 +256,16 @@ const Transaction = ({
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "billingNumber", // Same field name as in the original columns
+      headerName: "Billing Number",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      valueGetter: (params) =>
+        params.row.BilledTransaction?.[0]?.billingNumber || "PENDING",
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "view",
       headerName: "View",
       headerAlign: "center",
@@ -298,23 +308,17 @@ const Transaction = ({
     if (column.field === "clientName" && !Number.isInteger(user.userType)) {
       return false; // Exclude the column
     }
+    if (
+      column.field === "billingNumber" &&
+      user.userType >= 8 &&
+      user.userType <= 13
+    ) {
+      return false; // Exclude the column
+    }
     return true; // Include the column
   });
 
   console.log(user.userType);
-
-  // Add the conditional column if userType is 8 or above
-  if (user.userType >= 8 && user.userType <= 13) {
-    columns.splice(columns.length - 1, 0, {
-      field: "billingNumber", // Same field name as in the original columns
-      headerName: "Billing Number",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      valueGetter: (params) => params.row.BilledTransaction?.[0]?.billingNumber,
-      renderCell: renderCellWithWrapText,
-    });
-  }
 
   const certifiedTransaction =
     row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]

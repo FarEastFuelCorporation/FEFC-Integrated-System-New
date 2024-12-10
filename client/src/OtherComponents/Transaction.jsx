@@ -308,13 +308,6 @@ const Transaction = ({
     if (column.field === "clientName" && !Number.isInteger(user.userType)) {
       return false; // Exclude the column
     }
-    if (
-      column.field === "billingNumber" &&
-      user.userType >= 8 &&
-      user.userType <= 13
-    ) {
-      return false; // Exclude the column
-    }
     return true; // Include the column
   });
 

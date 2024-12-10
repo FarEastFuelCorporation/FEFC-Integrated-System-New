@@ -301,6 +301,8 @@ const Transaction = ({
     return true; // Include the column
   });
 
+  console.log(user.userType);
+
   // Add the conditional column if userType is 8 or above
   if (user.userType >= 8 && user.userType <= 13) {
     columns.splice(columns.length - 1, 0, {

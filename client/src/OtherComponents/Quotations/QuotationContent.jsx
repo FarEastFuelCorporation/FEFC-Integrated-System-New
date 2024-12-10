@@ -164,6 +164,12 @@ const QuotationContent = ({
                 const fixedWeight = waste.fixedWeight;
                 const fixedPrice = waste.fixedPrice;
 
+                console.log(hasFixedRate);
+                console.log(fixedWeight);
+                console.log("check", !hasFixedRate && fixedWeight !== 0);
+                console.log("check2", !hasFixedRate);
+                console.log("check3", fixedWeight !== 0);
+
                 return (
                   <>
                     {hasFixedRate && (
@@ -199,7 +205,8 @@ const QuotationContent = ({
                         </TableCell>
                       </TableRow>
                     )}
-                    {!hasFixedRate && fixedWeight !== 0 && (
+                    {(hasFixedRate && fixedWeight !== 0) ||
+                    (!hasFixedRate && fixedWeight === 0) ? (
                       <TableRow key={index} sx={{ border: "black" }}>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {index + 1}
@@ -231,7 +238,7 @@ const QuotationContent = ({
                           {waste.vatCalculation}
                         </TableCell>
                       </TableRow>
-                    )}
+                    ) : null}
                   </>
                 );
               })}

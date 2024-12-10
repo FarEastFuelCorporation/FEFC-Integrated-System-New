@@ -190,16 +190,12 @@ const BillingContent = ({
 
               let aggregatedWasteTransactions;
 
-              console.log(transaction);
-
               const hasDemurrage =
                 transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
                   ?.hasDemurrage || false;
               const demurrageDays =
                 transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
                   ?.demurrageDays || 0;
-
-              console.log(hasDemurrage);
 
               if (isPerClientToBill) {
                 aggregatedWasteTransactions =

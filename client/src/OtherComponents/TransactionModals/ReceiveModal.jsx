@@ -50,7 +50,6 @@ const ReceiveModal = ({
 
   const handleCheckboxChange = (e) => {
     const isChecked = e.target.checked;
-    console.log(isChecked);
     setFormData({ ...formData, hasDemurrage: isChecked }); // Update formData state
   };
 

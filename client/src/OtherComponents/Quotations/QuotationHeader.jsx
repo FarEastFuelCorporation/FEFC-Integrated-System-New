@@ -64,11 +64,11 @@ const QuotationHeader = ({ quotationData }) => {
       {/* Customer Summary */}
       <Box mt={2} display="grid" gridTemplateColumns="50% 50%">
         <Typography variant="h5" fontWeight="bold" textAlign="center">
-          MAIN OFFICE ADDRESS
+          CLIENT INFORMATION
         </Typography>
         {clientData?.billerName && (
           <Typography variant="h5" fontWeight="bold" textAlign="center">
-            FIELD OFFICE ADDRESS
+            BILLING INFORMATION
           </Typography>
         )}
       </Box>

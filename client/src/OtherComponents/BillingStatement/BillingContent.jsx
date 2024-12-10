@@ -208,11 +208,20 @@ const BillingContent = ({
                       const { id } = current.QuotationWaste;
 
                       const currentWeight = new Decimal(current.weight); // Use Decimal.js
+                      const currentClientWeight = new Decimal(
+                        current.clientWeight
+                      ); // Use Decimal.js
 
                       if (acc[id]) {
                         acc[id].weight = acc[id].weight.plus(currentWeight);
+                        acc[id].clientWeight =
+                          acc[id].clientWeight.plus(currentClientWeight);
                       } else {
-                        acc[id] = { ...current, weight: currentWeight };
+                        acc[id] = {
+                          ...current,
+                          weight: currentWeight,
+                          clientWeight: currentClientWeight,
+                        };
                       }
 
                       return acc;

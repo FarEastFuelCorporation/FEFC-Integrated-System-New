@@ -601,6 +601,13 @@ async function geBookedTransactionsDashboardFullController(req, res) {
 
       const billingNumber = transaction.billingNumber; // Get the billing number
 
+      const hasDemurrage =
+        transaction?.BookedTransaction?.ScheduledTransaction?.[0]
+          ?.ReceivedTransaction?.[0]?.hasDemurrage || false;
+      const demurrageDays =
+        transaction?.BookedTransaction?.ScheduledTransaction?.[0]
+          ?.ReceivedTransaction?.[0]?.demurrageDays || 0;
+
       // Ensure the totals object for this billingNumber is initialized
       if (!totals[billingNumber]) {
         totals[billingNumber] = {
@@ -927,9 +934,46 @@ async function geBookedTransactionsDashboardFullController(req, res) {
         console.log(totals[billingNumber].amounts);
       };
 
+      const addDemurrageFee = (
+        transpoFee,
+        demurrageDays,
+        transpoVatCalculation,
+        transpoMode
+      ) => {
+        // Check if the mode is "CHARGE"
+        if (transpoMode === "CHARGE") {
+          // Add the transportation fee based on VAT calculation
+          switch (transpoVatCalculation) {
+            case "VAT EXCLUSIVE":
+              totals[billingNumber].amounts.vatExclusive +=
+                transpoFee * demurrageDays;
+              break;
+            case "VAT INCLUSIVE":
+              totals[billingNumber].amounts.vatInclusive +=
+                transpoFee * demurrageDays;
+              break;
+            case "NON VATABLE":
+              totals[billingNumber].amounts.nonVatable +=
+                transpoFee * demurrageDays;
+              break;
+            default:
+              break;
+          }
+        }
+      };
+
       // Call the function to add transportation fee
       if (isTransportation && hasTransportation) {
         addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+      }
+
+      if (hasDemurrage) {
+        addDemurrageFee(
+          transpoFee,
+          demurrageDays,
+          transpoVatCalculation,
+          transpoMode
+        );
       }
     });
 

@@ -190,6 +190,17 @@ const BillingContent = ({
 
               let aggregatedWasteTransactions;
 
+              console.log(transaction);
+
+              const hasDemurrage =
+                transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                  ?.hasDemurrage || false;
+              const demurrageDays =
+                transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                  ?.demurrageDays || 0;
+
+              console.log(hasDemurrage);
+
               if (isPerClientToBill) {
                 aggregatedWasteTransactions =
                   transaction.ScheduledTransaction[0].ReceivedTransaction[0]
@@ -766,6 +777,66 @@ const BillingContent = ({
                   </TableRow>,
                 ];
 
+              // Add the transportation row if applicable
+              const demurrageRows = transaction?.QuotationTransportation
+                ?.mode === "CHARGE" &&
+                isTransportation &&
+                hasTransportation &&
+                hasDemurrage && [
+                  <TableRow key={`demurrage-${index}`} sx={{ border: "black" }}>
+                    <TableCell sx={bodyCellStyles({ width: 60 })}>
+                      {formatDate2(scheduledTransaction.scheduledDate)}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {invoiceNumber}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles()}>
+                      {`DEMURRAGE FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 60,
+                        notCenter: true,
+                      })}
+                    >
+                      {`${formatNumber2(demurrageDays)}`}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {transaction.QuotationTransportation?.unit}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 80,
+                        notCenter: true,
+                      })}
+                    >
+                      {formatNumber2(
+                        transaction.QuotationTransportation?.unitPrice
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 80,
+                        notCenter: true,
+                      })}
+                    >
+                      {formatNumber(
+                        demurrageDays *
+                          transaction.QuotationTransportation?.unitPrice
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 85,
+                        isLastCell: true,
+                      })}
+                    >
+                      {transaction.QuotationTransportation?.vatCalculation}
+                    </TableCell>
+                  </TableRow>,
+                ];
+
               // Combine waste and transportation rows for alternating display
               const combinedRows = [];
 
@@ -776,6 +847,9 @@ const BillingContent = ({
               if (transpoRows.length > 0) {
                 // Push transpo row after every waste row
                 combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
+                if (hasDemurrage) {
+                  combinedRows.push(demurrageRows[0]); // Only one transpo row per transaction
+                }
               }
 
               if (index !== transactions.length - 1) {

@@ -132,6 +132,13 @@ const BillingStatementForm = ({
     isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
     isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;
 
+    const hasDemurrage =
+      transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+        ?.hasDemurrage || false;
+    const demurrageDays =
+      transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+        ?.demurrageDays || 0;
+
     // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
     const aggregatedWasteTransactions = Object.values(
       sortedWasteTransaction.reduce((acc, current) => {
@@ -374,9 +381,43 @@ const BillingStatementForm = ({
       }
     };
 
+    const addDemurrageFee = (
+      transpoFee,
+      demurrageDays,
+      transpoVatCalculation,
+      transpoMode
+    ) => {
+      // Check if the mode is "CHARGE"
+      if (transpoMode === "CHARGE") {
+        // Add the transportation fee based on VAT calculation
+        switch (transpoVatCalculation) {
+          case "VAT EXCLUSIVE":
+            amounts.vatExclusive += transpoFee * demurrageDays;
+            break;
+          case "VAT INCLUSIVE":
+            amounts.vatInclusive += transpoFee * demurrageDays;
+            break;
+          case "NON VATABLE":
+            amounts.nonVatable += transpoFee * demurrageDays;
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
     // Call the function to add transportation fee
     if (isTransportation && hasTransportation) {
       addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    }
+
+    if (hasDemurrage) {
+      addDemurrageFee(
+        transpoFee,
+        demurrageDays,
+        transpoVatCalculation,
+        transpoMode
+      );
     }
   });
 

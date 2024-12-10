@@ -311,8 +311,6 @@ const Transaction = ({
     return true; // Include the column
   });
 
-  console.log(user.userType);
-
   const certifiedTransaction =
     row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
       ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0];

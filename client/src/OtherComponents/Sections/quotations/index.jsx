@@ -186,6 +186,8 @@ const Quotations = ({ user }) => {
   const handleViewClick = (row) => {
     setLoading(true);
 
+    console.log(row);
+
     if (Array.isArray(row.QuotationWaste)) {
       row.QuotationWaste.sort(sortQuotationWaste);
     }
@@ -255,6 +257,8 @@ const Quotations = ({ user }) => {
   const handleDownloadClick = (row) => {
     setSelectedQuotation(row); // Set the selected quotation
     // Use a timeout to allow the component to render before downloading
+
+    console.log(row);
 
     setIsDownload(true);
     // Set the flag to show the form
@@ -590,6 +594,7 @@ const Quotations = ({ user }) => {
               );
 
               // Call the view handler with the fetched data
+
               handleViewClick(response.data.quotations[0]);
             } catch (error) {
               console.error("Error fetching document file:", error);

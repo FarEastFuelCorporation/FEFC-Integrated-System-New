@@ -212,8 +212,6 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
               ) {
                 const waste = item; // Assuming item contains waste details
 
-                console.log(waste);
-
                 bodyRows.QuotationWasteTableHead.content.push(
                   <TableBody key={`waste-body-${index}`}>
                     <TableRow key={index} sx={{ border: "black" }}>

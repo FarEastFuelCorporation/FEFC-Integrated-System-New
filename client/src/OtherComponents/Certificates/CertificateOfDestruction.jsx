@@ -202,12 +202,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                 ) : (
                   <>
                     <TableCell sx={headerCellStyles(false)}>
-                      Destruction Process
-                    </TableCell>
-                    <TableCell sx={headerCellStyles(true)}>
-                      Date of Completion
-                    </TableCell>
-                    <TableCell sx={headerCellStyles(false)}>
                       Waste Code
                     </TableCell>
                     <TableCell
@@ -216,6 +210,12 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                       )}
                     >
                       Quantity
+                    </TableCell>
+                    <TableCell sx={headerCellStyles(false)}>
+                      Destruction Process
+                    </TableCell>
+                    <TableCell sx={headerCellStyles(true)}>
+                      Date of Completion
                     </TableCell>
                   </>
                 )}
@@ -250,6 +250,22 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                     ) : (
                       <>
                         <TableCell sx={bodyCellStyles(false)}>
+                          {waste.QuotationWaste.TypeOfWaste.wasteCode}
+                        </TableCell>
+                        <TableCell
+                          sx={bodyCellStyles(
+                            typeOfCertificate === "CERTIFICATE OF ACCEPTANCE"
+                          )}
+                        >
+                          {typeOfWeight === "CLIENT WEIGHT"
+                            ? `${formatNumber(waste.clientWeight)} ${
+                                waste.QuotationWaste.unit
+                              }`
+                            : `${formatNumber(waste.weight)} ${
+                                waste.QuotationWaste.unit
+                              }`}
+                        </TableCell>
+                        <TableCell sx={bodyCellStyles(false)}>
                           {
                             waste.TreatedWasteTransaction?.[0]?.TreatmentMachine
                               ?.TreatmentProcess?.treatmentProcess
@@ -267,22 +283,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                             },
                             new Date(0)
                           )}
-                        </TableCell>
-                        <TableCell sx={bodyCellStyles(false)}>
-                          {waste.QuotationWaste.TypeOfWaste.wasteCode}
-                        </TableCell>
-                        <TableCell
-                          sx={bodyCellStyles(
-                            typeOfCertificate === "CERTIFICATE OF ACCEPTANCE"
-                          )}
-                        >
-                          {typeOfWeight === "CLIENT WEIGHT"
-                            ? `${formatNumber(waste.clientWeight)} ${
-                                waste.QuotationWaste.unit
-                              }`
-                            : `${formatNumber(waste.weight)} ${
-                                waste.QuotationWaste.unit
-                              }`}
                         </TableCell>
                       </>
                     )}

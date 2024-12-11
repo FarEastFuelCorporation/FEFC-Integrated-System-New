@@ -20,6 +20,9 @@ const CertifiedTransactions = ({ user }) => {
     certificateNumber: "",
     certifiedDate: "",
     certifiedTime: "",
+    isDestruction: false,
+    isDisposal: false,
+    isAcceptance: false,
     typeOfCertificate: "",
     typeOfWeight: "",
     remarks: "",
@@ -89,6 +92,9 @@ const CertifiedTransactions = ({ user }) => {
       certificateNumber: "",
       certifiedDate: "",
       certifiedTime: "",
+      isDestruction: false,
+      isDisposal: false,
+      isAcceptance: false,
       typeOfCertificate: "",
       typeOfWeight: "",
       remarks: "",
@@ -120,6 +126,10 @@ const CertifiedTransactions = ({ user }) => {
         typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
           ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0] || {};
 
+      const typeOfCertificateArray = certifiedTransaction.typeOfCertificate
+        ? certifiedTransaction.typeOfCertificate.split(", ")
+        : [];
+
       setFormData({
         id: certifiedTransaction.id,
         bookedTransactionId: typeToEdit.id,
@@ -129,6 +139,13 @@ const CertifiedTransactions = ({ user }) => {
         certificateNumber: certifiedTransaction.certificateNumber,
         certifiedDate: certifiedTransaction.certifiedDate,
         certifiedTime: certifiedTransaction.certifiedTime,
+        isDestruction:
+          typeOfCertificateArray.includes("CERTIFICATE OF DESTRUCTION") ||
+          false,
+        isDisposal:
+          typeOfCertificateArray.includes("CERTIFICATE OF DISPOSAL") || false,
+        isAcceptance:
+          typeOfCertificateArray.includes("CERTIFICATE OF ACCEPTANCE") || false,
         typeOfCertificate: certifiedTransaction.typeOfCertificate,
         typeOfWeight: certifiedTransaction.typeOfWeight,
         remarks: certifiedTransaction.remarks,
@@ -178,6 +195,20 @@ const CertifiedTransactions = ({ user }) => {
 
   const validateForm = () => {
     let validationErrors = [];
+
+    let typeOfCertificate = [];
+
+    if (formData.isDestruction) {
+      typeOfCertificate.push("CERTIFICATE OF DESTRUCTION");
+    }
+    if (formData.isDisposal) {
+      typeOfCertificate.push("CERTIFICATE OF DISPOSAL");
+    }
+    if (formData.isAcceptance) {
+      typeOfCertificate.push("CERTIFICATE OF ACCEPTANCE");
+    }
+
+    formData.typeOfCertificate = typeOfCertificate.join(", ");
 
     // Validate bookedTransactionId
     if (!formData.bookedTransactionId) {

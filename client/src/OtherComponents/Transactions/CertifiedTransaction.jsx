@@ -88,7 +88,7 @@ const CertifiedTransaction = ({ row, user }) => {
           <Typography variant="h5">
             Certificate Number:{" "}
             {certifiedTransaction?.certificateNumber
-              ? certifiedTransaction?.certificateNumber
+              ? certifiedTransaction?.certificateNumber.substring(3)
               : ""}
           </Typography>
           <Typography variant="h5">

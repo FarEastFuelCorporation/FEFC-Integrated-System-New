@@ -11,6 +11,8 @@ import {
   useTheme,
   TextField,
   Button,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { tokens } from "../../theme";
 // import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
@@ -34,6 +36,21 @@ const CertifyModal = ({
       ...prevFormData,
       [name]: value,
     }));
+  };
+
+  const handleCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
+    setFormData({ ...formData, isDestruction: isChecked }); // Update formData state
+  };
+
+  const handleCheckboxChange2 = (e) => {
+    const isChecked = e.target.checked;
+    setFormData({ ...formData, isDisposal: isChecked }); // Update formData state
+  };
+
+  const handleCheckboxChange3 = (e) => {
+    const isChecked = e.target.checked;
+    setFormData({ ...formData, isAcceptance: isChecked }); // Update formData state
   };
 
   return (
@@ -68,6 +85,38 @@ const CertifyModal = ({
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
+          <Box>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isDestruction}
+                  onChange={handleCheckboxChange}
+                  color="secondary"
+                />
+              }
+              label="Certificate of Destruction"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isDisposal}
+                  onChange={handleCheckboxChange2}
+                  color="secondary"
+                />
+              }
+              label="Certificate of Disposal"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isAcceptance}
+                  onChange={handleCheckboxChange3}
+                  color="secondary"
+                />
+              }
+              label="Certificate of Acceptance"
+            />
+          </Box>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
               label="Certified Date"
@@ -103,35 +152,6 @@ const CertifyModal = ({
             />
           </div>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6} lg={6}>
-              <FormControl fullWidth>
-                <InputLabel
-                  id="typeOfCertificate-select-label"
-                  style={{ color: colors.grey[100] }}
-                  required
-                >
-                  Type of Certificate
-                </InputLabel>
-                <Select
-                  labelId="typeOfCertificate-select-label"
-                  name="typeOfCertificate"
-                  value={formData.typeOfCertificate}
-                  onChange={handleInputChange}
-                  label="typeOfCertificate"
-                  fullWidth
-                >
-                  <MenuItem value={"CERTIFICATE OF DESTRUCTION"}>
-                    CERTIFICATE OF DESTRUCTION
-                  </MenuItem>
-                  <MenuItem value={"CERTIFICATE OF DISPOSAL"}>
-                    CERTIFICATE OF DISPOSAL
-                  </MenuItem>
-                  <MenuItem value={"CERTIFICATE OF ACCEPTANCE"}>
-                    CERTIFICATE OF ACCEPTANCE
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <FormControl fullWidth>
                 <InputLabel

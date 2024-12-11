@@ -29,7 +29,7 @@ const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
           C. No.{" "}
         </Typography>
         <Typography id="df_no" sx={{ fontWeight: "bold" }}>
-          {certifiedTransaction.certificateNumber}
+          {`COD${certifiedTransaction.certificateNumber.substring(3)}`}
         </Typography>
       </Box>
       <Box sx={{ textAlign: "justify", mt: 2 }}>

@@ -25,8 +25,11 @@ const CertificateOfAcceptanceHeader = ({ row, certifiedTransaction }) => {
           mt: 2,
         }}
       >
+        <Typography variant="h6" component="h4">
+          C. No.{" "}
+        </Typography>
         <Typography id="df_no" sx={{ fontWeight: "bold" }}>
-          {certifiedTransaction.certificateNumber}
+          {`COA${certifiedTransaction.certificateNumber.substring(3)}`}
         </Typography>
       </Box>
 

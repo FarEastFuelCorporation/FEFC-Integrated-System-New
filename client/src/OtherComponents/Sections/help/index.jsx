@@ -17,6 +17,12 @@ const guides = [
     description: "Step-by-step guide on booking transactions efficiently.",
     pdfUrl: "/guides/BOOKED_TRANSACTION_PROCESS.pdf", // Public folder path
   },
+  {
+    title: "System Transaction Flow",
+    description:
+      "A comprehensive overview of the system's transaction processes, from start to finish, to help you navigate each step with ease.",
+    pdfUrl: "/guides/SYSTEM_TRANSACTION_FLOW.pdf", // Public folder path
+  },
   // {
   //   title: "FAQ",
   //   description: "Answers to frequently asked questions.",

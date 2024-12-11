@@ -6,7 +6,6 @@ const WarehousedTransaction = require("../models/WarehousedTransaction");
 const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 const { fetchData } = require("../utils/getBookedTransactions");
 const statusId = 4;
-const additionalStatusId = 6;
 
 // Create Warehoused Transaction controller
 async function createWarehousedTransactionController(req, res) {
@@ -45,23 +44,19 @@ async function createWarehousedTransactionController(req, res) {
     // Adding warehousedItems to WarehousedTransactionItem table
     if (warehousedItems && warehousedItems.length > 0) {
       const warehousedItemsPromises = warehousedItems.map((item) => {
-        let description = item.description;
-
-        description = description && description.toUpperCase();
-
         return WarehousedTransactionItem.create(
           {
             warehousedTransactionId: newWarehousedTransaction.id,
-            gatePass: item.gatePass,
+            gatePass: item.gatePass && item.gatePass.toUpperCase(),
             warehouse: item.warehouse,
             area: item.area,
             section: item.section,
             level: item.level,
-            palletNumber: item.palletNumber,
-            steamNumber: item.steamNumber,
+            palletNumber: item.palletNumber && item.palletNumber.toUpperCase(),
+            steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
             quantity: item.quantity,
             unit: item.unit,
-            description: description,
+            description: item.description && item.description.toUpperCase(),
           },
           { transaction: transaction }
         );
@@ -110,7 +105,7 @@ async function createWarehousedTransactionController(req, res) {
 async function getWarehousedTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(statusId, null, additionalStatusId);
+    const data = await fetchData(statusId);
 
     // Respond with the updated data
     res.status(200).json({
@@ -188,16 +183,17 @@ async function updateWarehousedTransactionController(req, res) {
           // Update existing item
           await WarehousedTransactionItem.update(
             {
-              description: item.description && item.description.toUpperCase(),
-              gatePass: item.gatePass,
+              gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,
               section: item.section,
               level: item.level,
-              palletNumber: item.palletNumber,
-              steamNumber: item.steamNumber,
+              palletNumber:
+                item.palletNumber && item.palletNumber.toUpperCase(),
+              steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
               quantity: item.quantity,
               unit: item.unit,
+              description: item.description && item.description.toUpperCase(),
             },
             { where: { id: item.id }, transaction }
           );
@@ -206,16 +202,17 @@ async function updateWarehousedTransactionController(req, res) {
           await WarehousedTransactionItem.create(
             {
               warehousedTransactionId: id,
-              description: item.description && item.description.toUpperCase(),
-              gatePass: item.gatePass,
+              gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,
               section: item.section,
               level: item.level,
-              palletNumber: item.palletNumber,
-              steamNumber: item.steamNumber,
+              palletNumber:
+                item.palletNumber && item.palletNumber.toUpperCase(),
+              steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
               quantity: item.quantity,
               unit: item.unit,
+              description: item.description && item.description.toUpperCase(),
             },
             { transaction }
           );

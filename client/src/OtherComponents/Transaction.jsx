@@ -811,11 +811,11 @@ const Transaction = ({
                           ?.submitTo === "SORTING" && (
                           <SortedTransaction row={row} />
                         )}
-                      {/* {row.statusId >= 4 &&
+                      {row.statusId >= 4 &&
                         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
                           ?.submitTo === "WAREHOUSE" && (
                           <WarehousedTransaction row={row} />
-                        )} */}
+                        )}
                       {row.statusId >= 2 && <ReceivedTransaction row={row} />}
                       {row.statusId >= 2 && <DispatchedTransaction row={row} />}
                       {row.statusId >= 1 && (

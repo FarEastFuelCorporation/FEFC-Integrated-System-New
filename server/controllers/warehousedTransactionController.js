@@ -6,6 +6,7 @@ const WarehousedTransaction = require("../models/WarehousedTransaction");
 const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 const { fetchData } = require("../utils/getBookedTransactions");
 const statusId = 4;
+const additionalStatusId = 6;
 
 // Create Warehoused Transaction controller
 async function createWarehousedTransactionController(req, res) {
@@ -60,7 +61,7 @@ async function createWarehousedTransactionController(req, res) {
             steamNumber: item.steamNumber,
             quantity: item.quantity,
             unit: item.unit,
-            description: item.description,
+            description: description,
           },
           { transaction: transaction }
         );
@@ -109,7 +110,7 @@ async function createWarehousedTransactionController(req, res) {
 async function getWarehousedTransactionsController(req, res) {
   try {
     // fetch transactions
-    const data = await fetchData(statusId);
+    const data = await fetchData(statusId, null, additionalStatusId);
 
     // Respond with the updated data
     res.status(200).json({

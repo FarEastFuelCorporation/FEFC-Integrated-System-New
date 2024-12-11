@@ -1,8 +1,9 @@
 // utils/generateCertificateNumber
 
+const { Op } = require("sequelize"); // Import Sequelize operators
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 
-async function generateCertificateNumber() {
+async function generateCertificateNumber(typeOfCertificate) {
   try {
     // Get the current year and month
     const currentDate = new Date();
@@ -11,11 +12,26 @@ async function generateCertificateNumber() {
       .toString()
       .padStart(2, "0");
 
+    const prefix =
+      typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? "COA" : "COD";
+
     // Find the latest transaction ID with the specified prefix
     const latestTransaction = await CertifiedTransaction.findOne({
+      where: {
+        certificateNumber: {
+          [Op.like]: `${prefix}%`, // Match certificateNumber starting with the prefix
+        },
+      },
       order: [["certificateNumber", "DESC"]],
       paranoid: false, // Include soft-deleted records
     });
+
+    // Handle the case where no record is found
+    if (!latestTransaction) {
+      console.log("No transactions found with the specified prefix.");
+    } else {
+      console.log("Latest Transaction:", latestTransaction);
+    }
 
     // Generate the new transaction ID
     let newIdNumber = 1;

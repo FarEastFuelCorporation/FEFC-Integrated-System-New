@@ -40,7 +40,9 @@ async function createCertifiedTransactionController(req, res) {
 
     remarks = remarks && remarks.toUpperCase();
 
-    const certificateNumber = await generateCertificateNumber();
+    const certificateNumber = await generateCertificateNumber(
+      typeOfCertificate
+    );
 
     // Create CertifiedTransaction entry
     const certifiedTransaction = await CertifiedTransaction.create(
@@ -271,6 +273,10 @@ async function updateCertifiedTransactionController(req, res) {
       // Uppercase the remarks if present
       const updatedRemarks = remarks && remarks.toUpperCase();
 
+      const certificateNumber = await generateCertificateNumber(
+        typeOfCertificate
+      );
+
       // Find the certified transaction by UUID (id)
       const certifiedTransaction = await CertifiedTransaction.findByPk(id);
 
@@ -278,6 +284,7 @@ async function updateCertifiedTransactionController(req, res) {
         // Update certified transaction attributes
         certifiedTransaction.bookedTransactionId = bookedTransactionId;
         certifiedTransaction.sortedTransactionId = sortedTransactionId;
+        certifiedTransaction.certificateNumber = certificateNumber;
         certifiedTransaction.certifiedDate = certifiedDate;
         certifiedTransaction.certifiedTime = certifiedTime;
         certifiedTransaction.typeOfCertificate = typeOfCertificate;

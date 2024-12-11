@@ -53,46 +53,46 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     const input = certificateRef.current;
     const pageHeight = 1056;
     const pageWidth = 816;
-
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/jpeg");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [pageWidth, pageHeight], // Page size in px
-      });
-
-      // Add the captured image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-
-      // Save the generated PDF
-      pdf.save(
-        `${certifiedTransaction?.certificateNumber}-${row.Client.clientName}.pdf`
-      );
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [pageWidth, pageHeight], // Page size in px
     });
+
+    // Function to process and add each page
+    const processPage = (pageIndex, pages) => {
+      if (pageIndex >= pages.length) {
+        // All pages are processed, save the PDF
+        pdf.save(
+          `${certifiedTransaction?.certificateNumber.substring(3)}-${
+            row.Client.clientName
+          }.pdf`
+        );
+        return;
+      }
+
+      // Capture the content of the current page using html2canvas
+      html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
+
+        if (pageIndex === 0) {
+          // Add the first page
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        } else {
+          // Add subsequent pages
+          pdf.addPage([pageWidth, pageHeight]);
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        }
+
+        // Process the next page
+        processPage(pageIndex + 1, pages);
+      });
+    };
+
+    // Break the content into multiple pages if needed
+    const pages = Array.from(input.children); // Assuming each page is a child of input
+    processPage(0, pages); // Start processing pages from the first one
   };
-
-  // const handleViewPDF = () => {
-  //   const input = certificateRef.current;
-  //   const pageHeight = 1056;
-  //   const pageWidth = 816;
-
-  //   html2canvas(input, { scale: 2 }).then((canvas) => {
-  //     const imgData = canvas.toDataURL("image/png");
-  //     const pdf = new jsPDF({
-  //       orientation: "portrait",
-  //       unit: "px",
-  //       format: [pageWidth, pageHeight], // Page size in px
-  //     });
-
-  //     // Add the captured image to the PDF
-  //     pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-
-  //     // Open the PDF in a new browser tab
-  //     const pdfUrl = pdf.output("bloburl");
-  //     window.open(pdfUrl, "_blank");
-  //   });
-  // };
 
   const handleViewPDF = () => {
     const input = certificateRef.current;

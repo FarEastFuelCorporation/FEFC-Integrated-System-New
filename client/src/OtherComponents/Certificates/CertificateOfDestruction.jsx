@@ -178,201 +178,197 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     <Box ref={certificateRef}>
       {typeOfCertificateArray.map((typeOfCertificate) => {
         return (
-          <>
+          <Box
+            key={`${typeOfCertificate}`}
+            sx={{
+              position: "absolute",
+              left: verify ? "0" : "-9999px",
+              padding: "123px 38px 38px 76px",
+              minHeight: "1056px", // Ensure at least one page height
+              width: "816px",
+              backgroundColor: "white",
+              color: "black",
+            }}
+          >
             <Box
               sx={{
                 position: "absolute",
-                left: verify ? "0" : "-9999px",
-                padding: "123px 38px 38px 76px",
-                minHeight: "1056px", // Ensure at least one page height
+                top: 0,
+                left: 0,
                 width: "816px",
-                backgroundColor: "white",
-                color: "black",
+                height: "1056px",
+                zIndex: 0,
+                backgroundImage: `url(${letterhead})`,
+                backgroundSize: "cover",
+                pointerEvents: "none", // Ensure the background image is not clickable
               }}
-            >
-              <Box
+            />
+            <Box sx={{ zIndex: 1, position: "relative" }}>
+              {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
+                <CertificateOfAcceptanceHeader
+                  row={row}
+                  certifiedTransaction={certifiedTransaction}
+                />
+              ) : (
+                <CertificateOfDestructionHeader
+                  row={row}
+                  certifiedTransaction={certifiedTransaction}
+                />
+              )}
+              <TableContainer
+                component={Paper}
                 sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "816px",
-                  height: "1056px",
-                  zIndex: 0,
-                  backgroundImage: `url(${letterhead})`,
-                  backgroundSize: "cover",
-                  pointerEvents: "none", // Ensure the background image is not clickable
-                }}
-              />
-              <Box sx={{ zIndex: 1, position: "relative" }}>
-                {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
-                  <CertificateOfAcceptanceHeader
-                    row={row}
-                    certifiedTransaction={certifiedTransaction}
-                  />
-                ) : (
-                  <CertificateOfDestructionHeader
-                    row={row}
-                    certifiedTransaction={certifiedTransaction}
-                  />
-                )}
-                <TableContainer
-                  component={Paper}
-                  sx={{
-                    "& .MuiPaper-root": {
-                      backgroundColor: "white",
-                      color: "black !important",
-                    },
-                    "& .MuiTableContainer-root": {
-                      backgroundColor: "white",
-                      color: "black !important",
-                    },
-                    fontFamily: "Times New Roman",
+                  "& .MuiPaper-root": {
                     backgroundColor: "white",
-                  }}
-                >
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ border: "black" }}>
-                        <TableCell sx={headerCellStyles(false)}>
-                          Date Hauled
-                        </TableCell>
-                        <TableCell sx={headerCellStyles(false)}>
-                          Class and Description of Waste
-                        </TableCell>
+                    color: "black !important",
+                  },
+                  "& .MuiTableContainer-root": {
+                    backgroundColor: "white",
+                    color: "black !important",
+                  },
+                  fontFamily: "Times New Roman",
+                  backgroundColor: "white",
+                }}
+              >
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ border: "black" }}>
+                      <TableCell sx={headerCellStyles(false)}>
+                        Date Hauled
+                      </TableCell>
+                      <TableCell sx={headerCellStyles(false)}>
+                        Class and Description of Waste
+                      </TableCell>
 
-                        {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
-                          <>
-                            <TableCell sx={headerCellStyles(false)}>
-                              Quantity
-                            </TableCell>
-                            <TableCell
-                              sx={headerCellStyles(
-                                typeOfCertificate ===
-                                  "CERTIFICATE OF ACCEPTANCE"
-                              )}
-                            >
-                              Unit
-                            </TableCell>
-                          </>
-                        ) : (
-                          <>
-                            <TableCell sx={headerCellStyles(false)}>
-                              Waste Code
-                            </TableCell>
-                            <TableCell
-                              sx={headerCellStyles(
-                                typeOfCertificate ===
-                                  "CERTIFICATE OF ACCEPTANCE"
-                              )}
-                            >
-                              Quantity
-                            </TableCell>
-                            <TableCell sx={headerCellStyles(false)}>
-                              Destruction Process
-                            </TableCell>
-                            <TableCell sx={headerCellStyles(true)}>
-                              Date of Completion
-                            </TableCell>
-                          </>
-                        )}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {sortedWasteTransaction.map((waste, index) => {
-                        return (
-                          <TableRow key={index} sx={{ border: "black" }}>
-                            <TableCell sx={bodyCellStyles(false)}>
-                              {formatDate(row.haulingDate)}
-                            </TableCell>
-                            <TableCell sx={bodyCellStyles(false)}>
-                              {waste.wasteName}
-                            </TableCell>
-
-                            {typeOfCertificate ===
-                            "CERTIFICATE OF ACCEPTANCE" ? (
-                              <>
-                                <TableCell sx={bodyCellStyles(false)}>
-                                  {typeOfWeight === "CLIENT WEIGHT"
-                                    ? formatNumber(waste.clientWeight)
-                                    : formatNumber(waste.weight)}
-                                </TableCell>
-                                <TableCell
-                                  sx={bodyCellStyles(
-                                    typeOfCertificate ===
-                                      "CERTIFICATE OF ACCEPTANCE"
-                                  )}
-                                >
-                                  {waste.QuotationWaste.unit}
-                                </TableCell>
-                              </>
-                            ) : (
-                              <>
-                                <TableCell sx={bodyCellStyles(false)}>
-                                  {waste.QuotationWaste.TypeOfWaste.wasteCode}
-                                </TableCell>
-                                <TableCell
-                                  sx={bodyCellStyles(
-                                    typeOfCertificate ===
-                                      "CERTIFICATE OF ACCEPTANCE"
-                                  )}
-                                >
-                                  {typeOfWeight === "CLIENT WEIGHT"
-                                    ? `${formatNumber(waste.clientWeight)} ${
-                                        waste.QuotationWaste.unit
-                                      }`
-                                    : `${formatNumber(waste.weight)} ${
-                                        waste.QuotationWaste.unit
-                                      }`}
-                                </TableCell>
-                                <TableCell sx={bodyCellStyles(false)}>
-                                  {
-                                    waste.TreatedWasteTransaction?.[0]
-                                      ?.TreatmentMachine?.TreatmentProcess
-                                      ?.treatmentProcess
-                                  }
-                                </TableCell>
-                                <TableCell sx={bodyCellStyles(true)}>
-                                  {waste.TreatedWasteTransaction.reduce(
-                                    (latest, transaction) => {
-                                      const treatedDate = new Date(
-                                        transaction.treatedDate
-                                      );
-                                      return treatedDate > new Date(latest)
-                                        ? formatDate(transaction.treatedDate)
-                                        : formatDate(latest);
-                                    },
-                                    new Date(0)
-                                  )}
-                                </TableCell>
-                              </>
+                      {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
+                        <>
+                          <TableCell sx={headerCellStyles(false)}>
+                            Quantity
+                          </TableCell>
+                          <TableCell
+                            sx={headerCellStyles(
+                              typeOfCertificate === "CERTIFICATE OF ACCEPTANCE"
                             )}
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                          >
+                            Unit
+                          </TableCell>
+                        </>
+                      ) : (
+                        <>
+                          <TableCell sx={headerCellStyles(false)}>
+                            Waste Code
+                          </TableCell>
+                          <TableCell
+                            sx={headerCellStyles(
+                              typeOfCertificate === "CERTIFICATE OF ACCEPTANCE"
+                            )}
+                          >
+                            Quantity
+                          </TableCell>
+                          <TableCell sx={headerCellStyles(false)}>
+                            Destruction Process
+                          </TableCell>
+                          <TableCell sx={headerCellStyles(true)}>
+                            Date of Completion
+                          </TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sortedWasteTransaction.map((waste, index) => {
+                      return (
+                        <TableRow key={index} sx={{ border: "black" }}>
+                          <TableCell sx={bodyCellStyles(false)}>
+                            {formatDate(row.haulingDate)}
+                          </TableCell>
+                          <TableCell sx={bodyCellStyles(false)}>
+                            {waste.wasteName}
+                          </TableCell>
 
-                {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
-                  <>
-                    <CertificateOfAcceptanceFooter1
-                      row={row}
-                      sortedWasteTransaction={sortedWasteTransaction}
-                    />
-                    <CertificateOfAcceptanceFooter2 qrCodeURL={qrCodeURL} />
-                  </>
-                ) : (
-                  <>
-                    <CertificateOfDestructionFooter1
-                      row={row}
-                      sortedWasteTransaction={sortedWasteTransaction}
-                    />
-                    <CertificateOfDestructionFooter2 qrCodeURL={qrCodeURL} />
-                  </>
-                )}
-              </Box>
+                          {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
+                            <>
+                              <TableCell sx={bodyCellStyles(false)}>
+                                {typeOfWeight === "CLIENT WEIGHT"
+                                  ? formatNumber(waste.clientWeight)
+                                  : formatNumber(waste.weight)}
+                              </TableCell>
+                              <TableCell
+                                sx={bodyCellStyles(
+                                  typeOfCertificate ===
+                                    "CERTIFICATE OF ACCEPTANCE"
+                                )}
+                              >
+                                {waste.QuotationWaste.unit}
+                              </TableCell>
+                            </>
+                          ) : (
+                            <>
+                              <TableCell sx={bodyCellStyles(false)}>
+                                {waste.QuotationWaste.TypeOfWaste.wasteCode}
+                              </TableCell>
+                              <TableCell
+                                sx={bodyCellStyles(
+                                  typeOfCertificate ===
+                                    "CERTIFICATE OF ACCEPTANCE"
+                                )}
+                              >
+                                {typeOfWeight === "CLIENT WEIGHT"
+                                  ? `${formatNumber(waste.clientWeight)} ${
+                                      waste.QuotationWaste.unit
+                                    }`
+                                  : `${formatNumber(waste.weight)} ${
+                                      waste.QuotationWaste.unit
+                                    }`}
+                              </TableCell>
+                              <TableCell sx={bodyCellStyles(false)}>
+                                {
+                                  waste.TreatedWasteTransaction?.[0]
+                                    ?.TreatmentMachine?.TreatmentProcess
+                                    ?.treatmentProcess
+                                }
+                              </TableCell>
+                              <TableCell sx={bodyCellStyles(true)}>
+                                {waste.TreatedWasteTransaction.reduce(
+                                  (latest, transaction) => {
+                                    const treatedDate = new Date(
+                                      transaction.treatedDate
+                                    );
+                                    return treatedDate > new Date(latest)
+                                      ? formatDate(transaction.treatedDate)
+                                      : formatDate(latest);
+                                  },
+                                  new Date(0)
+                                )}
+                              </TableCell>
+                            </>
+                          )}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (
+                <>
+                  <CertificateOfAcceptanceFooter1
+                    row={row}
+                    sortedWasteTransaction={sortedWasteTransaction}
+                  />
+                  <CertificateOfAcceptanceFooter2 qrCodeURL={qrCodeURL} />
+                </>
+              ) : (
+                <>
+                  <CertificateOfDestructionFooter1
+                    row={row}
+                    sortedWasteTransaction={sortedWasteTransaction}
+                  />
+                  <CertificateOfDestructionFooter2 qrCodeURL={qrCodeURL} />
+                </>
+              )}
             </Box>
-          </>
+          </Box>
         );
       })}
     </Box>

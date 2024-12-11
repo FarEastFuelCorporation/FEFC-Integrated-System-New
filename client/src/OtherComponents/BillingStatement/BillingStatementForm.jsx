@@ -117,6 +117,9 @@ const BillingStatementForm = ({
   let isPerClient = false;
 
   transactions.forEach((transaction) => {
+    const hasFixedRate = transaction?.QuotationWaste?.hasFixedRate;
+    const isMonthly = transaction?.QuotationWaste?.isMonthly;
+
     const certifiedTransaction =
       transaction.ScheduledTransaction[0].ReceivedTransaction[0]
         .SortedTransaction[0].CertifiedTransaction?.[0];

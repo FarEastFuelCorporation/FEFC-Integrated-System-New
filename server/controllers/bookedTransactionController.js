@@ -2,6 +2,7 @@
 
 const { Op } = require("sequelize");
 const Decimal = require("decimal.js");
+const sequelize = require("../config/database");
 const BookedTransaction = require("../models/BookedTransaction");
 const generateTransactionId = require("../utils/generateTransactionId");
 const { fetchData, fetchDataFull } = require("../utils/getBookedTransactions");
@@ -471,6 +472,25 @@ async function geBookedTransactionsDashboardFullController(req, res) {
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
 
+    const billingNumberCounts = await BilledTransaction.findAll({
+      attributes: [
+        "billingNumber",
+        [sequelize.fn("COUNT", sequelize.col("billingNumber")), "count"],
+      ],
+      include: [
+        {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          where: {
+            createdBy: clientId,
+          },
+          attributes: [], // Exclude BookedTransaction attributes to avoid conflict
+        },
+      ],
+      group: ["billingNumber"], // Group by billingNumber to get the count for each
+      raw: true, // Return simple objects
+    });
+
     const billedTransactions = await BilledTransaction.findAll({
       attributes: [
         "id",
@@ -573,8 +593,6 @@ async function geBookedTransactionsDashboardFullController(req, res) {
 
     const processedIds = new Set();
 
-    let totalWeight = 0;
-
     billedTransactions.sort((a, b) => {
       const dateA = new Date(
         a.BookedTransaction.ScheduledTransaction[0].scheduledDate
@@ -587,394 +605,425 @@ async function geBookedTransactionsDashboardFullController(req, res) {
       return dateA - dateB;
     });
 
-    billedTransactions.forEach((transaction) => {
-      const bookedTransactionId = transaction.BookedTransaction.id;
-      console.log(bookedTransactionId);
-      // Skip processing if this id has already been processed
-      if (processedIds.has(bookedTransactionId)) {
-        console.log(bookedTransactionId);
-        return; // Continue to the next iteration
-      }
+    billingNumberCounts.forEach((billingNumberTransaction) => {
+      let totalWeight = 0;
+      billedTransactions.forEach((transaction, index) => {
+        const billingNumber = transaction.billingNumber; // Get the billing number
 
-      // Mark this id as processed
-      processedIds.add(bookedTransactionId);
+        if (billingNumberTransaction.billingNumber === billingNumber) {
+          const bookedTransactionId = transaction.BookedTransaction.id;
+          console.log(bookedTransactionId);
+          // Skip processing if this id has already been processed
+          if (processedIds.has(bookedTransactionId)) {
+            console.log(bookedTransactionId);
+            return; // Continue to the next iteration
+          }
 
-      const billingNumber = transaction.billingNumber; // Get the billing number
+          // Mark this id as processed
+          processedIds.add(bookedTransactionId);
 
-      const hasDemurrage =
-        transaction?.BookedTransaction?.ScheduledTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.hasDemurrage || false;
-      const demurrageDays =
-        transaction?.BookedTransaction?.ScheduledTransaction?.[0]
-          ?.ReceivedTransaction?.[0]?.demurrageDays || 0;
+          const hasDemurrage =
+            transaction?.BookedTransaction?.ScheduledTransaction?.[0]
+              ?.ReceivedTransaction?.[0]?.hasDemurrage || false;
+          const demurrageDays =
+            transaction?.BookedTransaction?.ScheduledTransaction?.[0]
+              ?.ReceivedTransaction?.[0]?.demurrageDays || 0;
 
-      // Ensure the totals object for this billingNumber is initialized
-      if (!totals[billingNumber]) {
-        totals[billingNumber] = {
-          amounts: { vatExclusive: 0, vatInclusive: 0, nonVatable: 0 },
-          credits: { vatExclusive: 0, vatInclusive: 0, nonVatable: 0 },
-          terms: 0,
-          termsRemarks: "",
-          haulingDate: "",
-          distributedDate: "",
-          isCollected: false,
-        };
-      }
-
-      const certifiedTransaction =
-        transaction.BookedTransaction.ScheduledTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].CertifiedTransaction[0];
-
-      const typeOfWeight =
-        certifiedTransaction?.typeOfWeight || "SORTED WEIGHT";
-
-      const hasFixedRate =
-        transaction.BookedTransaction.QuotationWaste?.hasFixedRate;
-
-      const scheduledDate =
-        transaction.BookedTransaction.ScheduledTransaction?.[0]?.scheduledDate;
-
-      totals[billingNumber].haulingDate = scheduledDate;
-
-      const distributedDate =
-        transaction.BillingApprovalTransaction?.BillingDistributionTransaction
-          ?.distributedDate;
-
-      totals[billingNumber].distributedDate = distributedDate;
-
-      const termsChargeDays =
-        transaction.BookedTransaction.QuotationWaste?.Quotation
-          ?.termsChargeDays;
-      const termsCharge =
-        transaction.BookedTransaction.QuotationWaste?.Quotation?.termsCharge;
-      const termsBuyingDays =
-        transaction.BookedTransaction.QuotationWaste?.Quotation
-          ?.termsBuyingDays;
-      const termsBuying =
-        transaction.BookedTransaction.QuotationWaste?.Quotation?.termsBuying;
-      const isCollected =
-        transaction.BillingApprovalTransaction?.BillingDistributionTransaction
-          ?.CollectedTransaction;
-
-      totals[billingNumber].terms =
-        termsCharge !== "N/A" ? termsChargeDays : termsBuyingDays;
-
-      totals[billingNumber].termsRemarks =
-        termsCharge !== "N/A" ? termsCharge : termsBuying;
-
-      totals[billingNumber].isCollected = isCollected ? true : false;
-
-      const sortedWasteTransaction =
-        transaction.BookedTransaction.ScheduledTransaction[0]
-          .ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction;
-
-      // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
-      const aggregatedWasteTransactions = Object.values(
-        sortedWasteTransaction.reduce((acc, current) => {
-          const { id } = current.QuotationWaste;
-
-          const currentWeight = new Decimal(current.weight); // Use Decimal.js
-          const currentClientWeight = new Decimal(current.clientWeight); // Use Decimal.js
-
-          // If the `QuotationWaste.id` is already in the accumulator, add the weight
-          if (acc[id]) {
-            acc[id].weight = acc[id].weight.plus(currentWeight);
-            acc[id].clientWeight =
-              acc[id].clientWeight.plus(currentClientWeight);
-          } else {
-            // Otherwise, set the initial object in the accumulator
-            acc[id] = {
-              ...current,
-              weight: currentWeight,
-              clientWeight: currentClientWeight,
+          // Ensure the totals object for this billingNumber is initialized
+          if (!totals[billingNumber]) {
+            totals[billingNumber] = {
+              amounts: { vatExclusive: 0, vatInclusive: 0, nonVatable: 0 },
+              credits: { vatExclusive: 0, vatInclusive: 0, nonVatable: 0 },
+              terms: 0,
+              termsRemarks: "",
+              haulingDate: "",
+              distributedDate: "",
+              isCollected: false,
             };
           }
 
-          return acc;
-        }, {})
-      ).map((item) => ({
-        ...item,
-        weight: item.weight.toNumber(), // Convert Decimal back to a standard number
-      }));
+          const certifiedTransaction =
+            transaction.BookedTransaction.ScheduledTransaction[0]
+              .ReceivedTransaction[0].SortedTransaction[0]
+              .CertifiedTransaction[0];
 
-      let hasTransportation;
+          const typeOfWeight =
+            certifiedTransaction?.typeOfWeight || "SORTED WEIGHT";
 
-      // SMB
-      if (hasFixedRate && isMonthly) {
-        let vatCalculation;
-        let fixedWeight;
-        let fixedPrice;
-        let unitPrice;
+          const hasFixedRate =
+            transaction.BookedTransaction.QuotationWaste?.hasFixedRate;
 
-        let target;
+          const isMonthly =
+            transaction?.BookedTransaction?.QuotationWaste?.isMonthly;
 
-        aggregatedWasteTransactions.forEach((item) => {
-          const { weight, clientWeight, QuotationWaste } = item;
+          const scheduledDate =
+            transaction.BookedTransaction.ScheduledTransaction?.[0]
+              ?.scheduledDate;
 
-          const selectedWeight =
-            typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+          totals[billingNumber].haulingDate = scheduledDate;
 
-          totalWeight += selectedWeight; // Total weight multiplied by unit price
+          const distributedDate =
+            transaction.BillingApprovalTransaction
+              ?.BillingDistributionTransaction?.distributedDate;
 
-          target =
-            QuotationWaste.mode === "BUYING"
-              ? totals[billingNumber].credits
-              : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+          totals[billingNumber].distributedDate = distributedDate;
 
-          vatCalculation = QuotationWaste.vatCalculation;
-          fixedWeight = QuotationWaste.fixedWeight;
-          fixedPrice = QuotationWaste.fixedPrice;
-          unitPrice = QuotationWaste.unitPrice;
-          hasTransportation = QuotationWaste.hasTransportation;
-        });
+          const termsChargeDays =
+            transaction.BookedTransaction.QuotationWaste?.Quotation
+              ?.termsChargeDays;
+          const termsCharge =
+            transaction.BookedTransaction.QuotationWaste?.Quotation
+              ?.termsCharge;
+          const termsBuyingDays =
+            transaction.BookedTransaction.QuotationWaste?.Quotation
+              ?.termsBuyingDays;
+          const termsBuying =
+            transaction.BookedTransaction.QuotationWaste?.Quotation
+              ?.termsBuying;
+          const isCollected =
+            transaction.BillingApprovalTransaction
+              ?.BillingDistributionTransaction?.CollectedTransaction;
 
-        switch (vatCalculation) {
-          case "VAT EXCLUSIVE":
-            target.vatExclusive = fixedPrice;
-            break;
-          case "VAT INCLUSIVE":
-            target.vatInclusive = fixedPrice;
-            break;
-          case "NON VATABLE":
-            target.nonVatable = fixedPrice;
-            break;
-          default:
-            break;
-        }
+          totals[billingNumber].terms =
+            termsCharge !== "N/A" ? termsChargeDays : termsBuyingDays;
 
-        if (totalWeight > fixedWeight) {
-          const excessWeight = totalWeight - fixedWeight;
+          totals[billingNumber].termsRemarks =
+            termsCharge !== "N/A" ? termsCharge : termsBuying;
 
-          const excessPrice = excessWeight * unitPrice;
+          totals[billingNumber].isCollected = isCollected ? true : false;
 
-          switch (vatCalculation) {
-            case "VAT EXCLUSIVE":
-              target.vatExclusive += excessPrice;
-              break;
-            case "VAT INCLUSIVE":
-              target.vatInclusive += excessPrice;
-              break;
-            case "NON VATABLE":
-              target.nonVatable += excessPrice;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-      // LOREAL, RED CROSS
-      else if (hasFixedRate && !isMonthly) {
-        let hasFixedRateIndividual;
-        let vatCalculation;
-        let fixedWeight;
-        let fixedPrice;
-        let unitPrice;
+          const sortedWasteTransaction =
+            transaction.BookedTransaction.ScheduledTransaction[0]
+              .ReceivedTransaction[0].SortedTransaction[0]
+              .SortedWasteTransaction;
 
-        let target;
+          // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
+          const aggregatedWasteTransactions = Object.values(
+            sortedWasteTransaction.reduce((acc, current) => {
+              const { id } = current.QuotationWaste;
 
-        let usedWeight;
+              const currentWeight = new Decimal(current.weight); // Use Decimal.js
+              const currentClientWeight = new Decimal(current.clientWeight); // Use Decimal.js
 
-        aggregatedWasteTransactions.forEach((item) => {
-          const { weight, clientWeight, QuotationWaste } = item;
+              // If the `QuotationWaste.id` is already in the accumulator, add the weight
+              if (acc[id]) {
+                acc[id].weight = acc[id].weight.plus(currentWeight);
+                acc[id].clientWeight =
+                  acc[id].clientWeight.plus(currentClientWeight);
+              } else {
+                // Otherwise, set the initial object in the accumulator
+                acc[id] = {
+                  ...current,
+                  weight: currentWeight,
+                  clientWeight: currentClientWeight,
+                };
+              }
 
-          const selectedWeight =
-            typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+              return acc;
+            }, {})
+          ).map((item) => ({
+            ...item,
+            weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+          }));
 
-          usedWeight = selectedWeight;
+          let hasTransportation;
 
-          const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+          console.log(hasFixedRate);
+          console.log(isMonthly);
 
-          target =
-            QuotationWaste.mode === "BUYING"
-              ? totals[billingNumber].credits
-              : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+          // SMB
+          if (hasFixedRate && isMonthly) {
+            let vatCalculation;
+            let fixedWeight;
+            let fixedPrice;
+            let unitPrice;
 
-          hasFixedRateIndividual = QuotationWaste.hasFixedRate;
-          vatCalculation = QuotationWaste.vatCalculation;
-          fixedWeight = QuotationWaste.fixedWeight;
-          fixedPrice = QuotationWaste.fixedPrice;
-          unitPrice = QuotationWaste.unitPrice;
-          hasTransportation = QuotationWaste.hasTransportation;
+            let target;
 
-          if (!hasFixedRateIndividual) {
-            switch (QuotationWaste.vatCalculation) {
+            aggregatedWasteTransactions.forEach((item) => {
+              const { weight, clientWeight, QuotationWaste } = item;
+
+              const selectedWeight =
+                typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+              totalWeight += selectedWeight.toNumber(); // Total weight multiplied by unit price
+
+              console.log(totalWeight);
+
+              target =
+                QuotationWaste.mode === "BUYING"
+                  ? totals[billingNumber].credits
+                  : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+
+              vatCalculation = QuotationWaste.vatCalculation;
+              fixedWeight = QuotationWaste.fixedWeight;
+              fixedPrice = QuotationWaste.fixedPrice;
+              unitPrice = QuotationWaste.unitPrice;
+              hasTransportation = QuotationWaste.hasTransportation;
+            });
+
+            switch (vatCalculation) {
               case "VAT EXCLUSIVE":
-                target.vatExclusive += totalWeightPrice;
+                target.vatExclusive = fixedPrice;
                 break;
               case "VAT INCLUSIVE":
-                target.vatInclusive += totalWeightPrice;
+                target.vatInclusive = fixedPrice;
                 break;
               case "NON VATABLE":
-                target.nonVatable += totalWeightPrice;
+                target.nonVatable = fixedPrice;
                 break;
               default:
                 break;
             }
-          }
-        });
 
-        switch (vatCalculation) {
-          case "VAT EXCLUSIVE":
-            target.vatExclusive += fixedPrice;
-            break;
-          case "VAT INCLUSIVE":
-            target.vatInclusive += fixedPrice;
-            break;
-          case "NON VATABLE":
-            target.nonVatable += fixedPrice;
-            break;
-          default:
-            break;
+            console.log(index);
+            console.log(billingNumberTransaction);
+            console.log(billingNumberTransaction.count - 1);
+
+            if (index === billingNumberTransaction.count - 1) {
+              if (totalWeight > fixedWeight) {
+                const excessWeight = totalWeight - fixedWeight;
+
+                console.log(excessWeight);
+
+                const excessPrice = excessWeight * unitPrice;
+
+                switch (vatCalculation) {
+                  case "VAT EXCLUSIVE":
+                    target.vatExclusive += excessPrice;
+                    break;
+                  case "VAT INCLUSIVE":
+                    target.vatInclusive += excessPrice;
+                    break;
+                  case "NON VATABLE":
+                    target.nonVatable += excessPrice;
+                    break;
+                  default:
+                    break;
+                }
+              }
+            }
+          }
+          // LOREAL, RED CROSS
+          else if (hasFixedRate && !isMonthly) {
+            let hasFixedRateIndividual;
+            let vatCalculation;
+            let fixedWeight;
+            let fixedPrice;
+            let unitPrice;
+
+            let target;
+
+            let usedWeight;
+
+            aggregatedWasteTransactions.forEach((item) => {
+              const { weight, clientWeight, QuotationWaste } = item;
+
+              const selectedWeight =
+                typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+              usedWeight = selectedWeight;
+
+              const totalWeightPrice =
+                selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+              target =
+                QuotationWaste.mode === "BUYING"
+                  ? totals[billingNumber].credits
+                  : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+
+              hasFixedRateIndividual = QuotationWaste.hasFixedRate;
+              vatCalculation = QuotationWaste.vatCalculation;
+              fixedWeight = QuotationWaste.fixedWeight;
+              fixedPrice = QuotationWaste.fixedPrice;
+              unitPrice = QuotationWaste.unitPrice;
+              hasTransportation = QuotationWaste.hasTransportation;
+
+              if (!hasFixedRateIndividual) {
+                switch (QuotationWaste.vatCalculation) {
+                  case "VAT EXCLUSIVE":
+                    target.vatExclusive += totalWeightPrice;
+                    break;
+                  case "VAT INCLUSIVE":
+                    target.vatInclusive += totalWeightPrice;
+                    break;
+                  case "NON VATABLE":
+                    target.nonVatable += totalWeightPrice;
+                    break;
+                  default:
+                    break;
+                }
+              }
+            });
+
+            switch (vatCalculation) {
+              case "VAT EXCLUSIVE":
+                target.vatExclusive += fixedPrice;
+                break;
+              case "VAT INCLUSIVE":
+                target.vatInclusive += fixedPrice;
+                break;
+              case "NON VATABLE":
+                target.nonVatable += fixedPrice;
+                break;
+              default:
+                break;
+            }
+
+            if (usedWeight > fixedWeight) {
+              const excessWeight = new Decimal(usedWeight)
+                .minus(new Decimal(fixedWeight))
+                .toNumber();
+
+              const excessPrice = excessWeight * unitPrice;
+
+              switch (vatCalculation) {
+                case "VAT EXCLUSIVE":
+                  target.vatExclusive += excessPrice;
+                  break;
+                case "VAT INCLUSIVE":
+                  target.vatInclusive += excessPrice;
+                  break;
+                case "NON VATABLE":
+                  target.nonVatable += excessPrice;
+                  break;
+                default:
+                  break;
+              }
+            }
+          } else {
+            // Calculate amounts and credits based on vatCalculation and mode
+            aggregatedWasteTransactions.forEach((item) => {
+              const { weight, clientWeight, QuotationWaste } = item;
+
+              const selectedWeight =
+                typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+              const totalWeightPrice =
+                selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+              console.log(totalWeightPrice);
+              console.log(QuotationWaste.wasteName);
+              const target =
+                QuotationWaste.mode === "BUYING"
+                  ? totals[billingNumber].credits
+                  : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
+
+              hasTransportation = QuotationWaste.hasTransportation;
+
+              console.log(totals[billingNumber].credits);
+              console.log(totals[billingNumber].amounts);
+
+              switch (QuotationWaste.vatCalculation) {
+                case "VAT EXCLUSIVE":
+                  target.vatExclusive += totalWeightPrice;
+                  break;
+                case "VAT INCLUSIVE":
+                  target.vatInclusive += totalWeightPrice;
+                  break;
+                case "NON VATABLE":
+                  target.nonVatable += totalWeightPrice;
+                  break;
+                default:
+                  break;
+              }
+            });
+          }
+
+          const transpoFee =
+            transaction.BookedTransaction.QuotationTransportation?.unitPrice ||
+            0;
+          console.log("transpoFee;", transpoFee);
+          const transpoVatCalculation =
+            transaction.BookedTransaction.QuotationTransportation
+              ?.vatCalculation;
+          const transpoMode =
+            transaction.BookedTransaction.QuotationTransportation?.mode;
+          let isTransportation =
+            transaction.BookedTransaction.ScheduledTransaction?.[0]
+              ?.DispatchedTransaction.length === 0
+              ? false
+              : true;
+
+          const logisticsId =
+            transaction.BookedTransaction.ScheduledTransaction?.[0]
+              ?.logisticsId;
+
+          const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
+
+          if (!isTransportation) {
+            isTransportation = logisticsId !== clientVehicle ? true : false;
+          }
+
+          const addTranspoFee = (
+            transpoFee,
+            transpoVatCalculation,
+            transpoMode
+          ) => {
+            console.log(transpoFee);
+            // Check if the mode is "CHARGE"
+            if (transpoMode === "CHARGE") {
+              // Add the transportation fee based on VAT calculation
+              switch (transpoVatCalculation) {
+                case "VAT EXCLUSIVE":
+                  totals[billingNumber].amounts.vatExclusive += transpoFee;
+                  break;
+                case "VAT INCLUSIVE":
+                  totals[billingNumber].amounts.vatInclusive += transpoFee;
+                  break;
+                case "NON VATABLE":
+                  totals[billingNumber].amounts.nonVatable += transpoFee;
+                  break;
+                default:
+                  break;
+              }
+            }
+            console.log(totals[billingNumber].credits);
+            console.log(totals[billingNumber].amounts);
+          };
+
+          const addDemurrageFee = (
+            transpoFee,
+            demurrageDays,
+            transpoVatCalculation,
+            transpoMode
+          ) => {
+            // Check if the mode is "CHARGE"
+            if (transpoMode === "CHARGE") {
+              // Add the transportation fee based on VAT calculation
+              switch (transpoVatCalculation) {
+                case "VAT EXCLUSIVE":
+                  totals[billingNumber].amounts.vatExclusive +=
+                    transpoFee * demurrageDays;
+                  break;
+                case "VAT INCLUSIVE":
+                  totals[billingNumber].amounts.vatInclusive +=
+                    transpoFee * demurrageDays;
+                  break;
+                case "NON VATABLE":
+                  totals[billingNumber].amounts.nonVatable +=
+                    transpoFee * demurrageDays;
+                  break;
+                default:
+                  break;
+              }
+            }
+          };
+
+          // Call the function to add transportation fee
+          if (isTransportation && hasTransportation) {
+            addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+          }
+
+          if (hasDemurrage) {
+            addDemurrageFee(
+              transpoFee,
+              demurrageDays,
+              transpoVatCalculation,
+              transpoMode
+            );
+          }
         }
-
-        if (usedWeight > fixedWeight) {
-          const excessWeight = new Decimal(usedWeight)
-            .minus(new Decimal(fixedWeight))
-            .toNumber();
-
-          const excessPrice = excessWeight * unitPrice;
-
-          switch (vatCalculation) {
-            case "VAT EXCLUSIVE":
-              target.vatExclusive += excessPrice;
-              break;
-            case "VAT INCLUSIVE":
-              target.vatInclusive += excessPrice;
-              break;
-            case "NON VATABLE":
-              target.nonVatable += excessPrice;
-              break;
-            default:
-              break;
-          }
-        }
-      } else {
-        // Calculate amounts and credits based on vatCalculation and mode
-        aggregatedWasteTransactions.forEach((item) => {
-          const { weight, clientWeight, QuotationWaste } = item;
-
-          const selectedWeight =
-            typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
-
-          const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
-          console.log(totalWeightPrice);
-          console.log(QuotationWaste.wasteName);
-          const target =
-            QuotationWaste.mode === "BUYING"
-              ? totals[billingNumber].credits
-              : totals[billingNumber].amounts; // Determine if it should go to credits or amounts
-
-          hasTransportation = QuotationWaste.hasTransportation;
-
-          console.log(totals[billingNumber].credits);
-          console.log(totals[billingNumber].amounts);
-
-          switch (QuotationWaste.vatCalculation) {
-            case "VAT EXCLUSIVE":
-              target.vatExclusive += totalWeightPrice;
-              break;
-            case "VAT INCLUSIVE":
-              target.vatInclusive += totalWeightPrice;
-              break;
-            case "NON VATABLE":
-              target.nonVatable += totalWeightPrice;
-              break;
-            default:
-              break;
-          }
-        });
-      }
-
-      const transpoFee =
-        transaction.BookedTransaction.QuotationTransportation?.unitPrice || 0;
-      console.log("transpoFee;", transpoFee);
-      const transpoVatCalculation =
-        transaction.BookedTransaction.QuotationTransportation?.vatCalculation;
-      const transpoMode =
-        transaction.BookedTransaction.QuotationTransportation?.mode;
-      let isTransportation =
-        transaction.BookedTransaction.ScheduledTransaction?.[0]
-          ?.DispatchedTransaction.length === 0
-          ? false
-          : true;
-
-      const logisticsId =
-        transaction.BookedTransaction.ScheduledTransaction?.[0]?.logisticsId;
-
-      const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
-
-      if (!isTransportation) {
-        isTransportation = logisticsId !== clientVehicle ? true : false;
-      }
-
-      const addTranspoFee = (
-        transpoFee,
-        transpoVatCalculation,
-        transpoMode
-      ) => {
-        console.log(transpoFee);
-        // Check if the mode is "CHARGE"
-        if (transpoMode === "CHARGE") {
-          // Add the transportation fee based on VAT calculation
-          switch (transpoVatCalculation) {
-            case "VAT EXCLUSIVE":
-              totals[billingNumber].amounts.vatExclusive += transpoFee;
-              break;
-            case "VAT INCLUSIVE":
-              totals[billingNumber].amounts.vatInclusive += transpoFee;
-              break;
-            case "NON VATABLE":
-              totals[billingNumber].amounts.nonVatable += transpoFee;
-              break;
-            default:
-              break;
-          }
-        }
-        console.log(totals[billingNumber].credits);
-        console.log(totals[billingNumber].amounts);
-      };
-
-      const addDemurrageFee = (
-        transpoFee,
-        demurrageDays,
-        transpoVatCalculation,
-        transpoMode
-      ) => {
-        // Check if the mode is "CHARGE"
-        if (transpoMode === "CHARGE") {
-          // Add the transportation fee based on VAT calculation
-          switch (transpoVatCalculation) {
-            case "VAT EXCLUSIVE":
-              totals[billingNumber].amounts.vatExclusive +=
-                transpoFee * demurrageDays;
-              break;
-            case "VAT INCLUSIVE":
-              totals[billingNumber].amounts.vatInclusive +=
-                transpoFee * demurrageDays;
-              break;
-            case "NON VATABLE":
-              totals[billingNumber].amounts.nonVatable +=
-                transpoFee * demurrageDays;
-              break;
-            default:
-              break;
-          }
-        }
-      };
-
-      // Call the function to add transportation fee
-      if (isTransportation && hasTransportation) {
-        addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
-      }
-
-      if (hasDemurrage) {
-        addDemurrageFee(
-          transpoFee,
-          demurrageDays,
-          transpoVatCalculation,
-          transpoMode
-        );
-      }
+      });
     });
 
     console.log(totals);

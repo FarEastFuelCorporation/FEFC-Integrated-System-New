@@ -46,7 +46,7 @@ async function generateCertificateNumber(typeOfCertificate) {
 
     // Pad the ID number with leading zeros
     const newIdString = newIdNumber.toString().padStart(4, "0");
-    const newTransactionId = `COD${currentYear}${currentMonth}${newIdString}`;
+    const newTransactionId = `${prefix}${currentYear}${currentMonth}${newIdString}`;
 
     return newTransactionId;
   } catch (error) {

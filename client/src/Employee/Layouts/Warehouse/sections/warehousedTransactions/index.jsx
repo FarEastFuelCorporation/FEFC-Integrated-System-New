@@ -168,10 +168,6 @@ const WarehousedTransactions = ({ user }) => {
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
           .WarehousedTransaction?.[0] || {};
 
-      console.log(row);
-      console.log(warehousedTransaction);
-      console.log(warehousedItemsRef);
-
       setFormData({
         id: warehousedTransaction.id,
         bookedTransactionId: typeToEdit.id,
@@ -216,8 +212,6 @@ const WarehousedTransactions = ({ user }) => {
             }))
           : [];
 
-      console.log(warehousedItemsRef);
-
       setOpenModal(true);
     } else {
       console.error(
@@ -261,12 +255,6 @@ const WarehousedTransactions = ({ user }) => {
 
     try {
       setLoading(true);
-
-      console.log(warehousedItemsRefContent);
-
-      console.log(
-        warehousedItemsRefContent.current.querySelectorAll(`[id='item']`)
-      );
 
       const items =
         warehousedItemsRefContent.current.querySelectorAll(`[id='item']`);
@@ -313,8 +301,6 @@ const WarehousedTransactions = ({ user }) => {
         remarks: remarksRef.current.value,
         warehousedItems: warehousedItemsData,
       };
-
-      console.log(updatedFormData);
 
       if (updatedFormData.id) {
         await axios.put(

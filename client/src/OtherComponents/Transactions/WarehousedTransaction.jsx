@@ -10,8 +10,6 @@ const WarehousedTransaction = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  console.log(row);
-
   // Extract received transaction data
   const receivedTransaction =
     row?.ScheduledTransaction?.[0].ReceivedTransaction?.[0] || {};

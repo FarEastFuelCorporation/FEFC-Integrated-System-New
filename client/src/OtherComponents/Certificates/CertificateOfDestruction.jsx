@@ -43,8 +43,6 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
     ? certifiedTransaction.typeOfCertificate.split(", ")
     : [];
 
-  console.log(typeOfCertificateArray);
-
   const sortedWasteTransaction =
     row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
       .SortedWasteTransaction;

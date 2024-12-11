@@ -20,7 +20,7 @@ const guides = [
   {
     title: "System Transaction Flow",
     description:
-      "A comprehensive overview of the system's transaction processes, from start to finish, to help you navigate each step with ease.",
+      "A comprehensive overview of the system's transaction processes.",
     pdfUrl: "/guides/SYSTEM_TRANSACTION_FLOW.pdf", // Public folder path
   },
   // {

@@ -126,6 +126,9 @@ const CertifyModal = ({
                   <MenuItem value={"CERTIFICATE OF DISPOSAL"}>
                     CERTIFICATE OF DISPOSAL
                   </MenuItem>
+                  <MenuItem value={"CERTIFICATE OF ACCEPTANCE"}>
+                    CERTIFICATE OF ACCEPTANCE
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>

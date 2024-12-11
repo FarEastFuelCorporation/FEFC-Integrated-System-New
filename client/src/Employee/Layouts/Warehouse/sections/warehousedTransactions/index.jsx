@@ -22,7 +22,7 @@ const WarehousedTransactions = ({ user }) => {
   const warehousedTimeRef = useRef();
   const remarksRef = useRef();
   const warehousedItemsRefContent = useRef();
-  const warehousedItemsRef = useRef([
+  let warehousedItemsRef = useRef([
     {
       description: "",
       quantity: 0,
@@ -166,7 +166,11 @@ const WarehousedTransactions = ({ user }) => {
     if (typeToEdit) {
       const warehousedTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
-          .SortedTransaction?.[0] || {};
+          .WarehousedTransaction?.[0] || {};
+
+      console.log(row);
+      console.log(warehousedTransaction);
+      console.log(warehousedItemsRef);
 
       setFormData({
         id: warehousedTransaction.id,
@@ -194,6 +198,25 @@ const WarehousedTransactions = ({ user }) => {
         statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
+
+      warehousedItemsRef.current =
+        warehousedTransaction.WarehousedTransactionItem
+          ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
+              warehousedTransactionId: item.warehousedTransactionId || "",
+              gatePass: item.gatePass || "",
+              warehouse: item.warehouse || "",
+              area: item.area || "",
+              section: item.section || "",
+              level: item.level || "",
+              palletNumber: item.palletNumber || "",
+              steamNumber: item.steamNumber || "",
+              quantity: item.quantity || 0,
+              unit: item.unit || "",
+              description: item.description || "",
+            }))
+          : [];
+
+      console.log(warehousedItemsRef);
 
       setOpenModal(true);
     } else {
@@ -237,7 +260,7 @@ const WarehousedTransactions = ({ user }) => {
     e.preventDefault();
 
     try {
-      // setLoading(true);
+      setLoading(true);
 
       console.log(warehousedItemsRefContent);
 

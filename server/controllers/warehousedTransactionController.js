@@ -132,13 +132,11 @@ async function updateWarehousedTransactionController(req, res) {
 
     let {
       receivedTransactionId,
-      sortedDate,
-      sortedTime,
-      totalSortedWeight,
-      discrepancyWeight,
-      sortedWastes,
-      sortedScraps,
+      warehousedDate,
+      warehousedTime,
+      warehousedItems,
       remarks,
+      statusId,
       createdBy,
     } = req.body;
 
@@ -155,113 +153,84 @@ async function updateWarehousedTransactionController(req, res) {
       // Update sorted transaction attributes
       updatedWarehousedTransaction.receivedTransactionId =
         receivedTransactionId;
-      updatedWarehousedTransaction.sortedDate = sortedDate;
-      updatedWarehousedTransaction.sortedTime = sortedTime;
-      updatedWarehousedTransaction.totalSortedWeight = totalSortedWeight;
-      updatedWarehousedTransaction.discrepancyWeight = discrepancyWeight;
+      updatedWarehousedTransaction.warehousedDate = warehousedDate;
+      updatedWarehousedTransaction.warehousedTime = warehousedTime;
       updatedWarehousedTransaction.remarks = remarks;
       updatedWarehousedTransaction.updatedBy = createdBy;
 
       // Save the updated sorted transaction
       await updatedWarehousedTransaction.save({ transaction });
 
-      // Fetch existing sorted wastes and scraps from the database
-      const existingSortedWastes = await SortedWasteTransaction.findAll({
-        where: { sortedTransactionId: id },
-        transaction,
-      });
+      // Fetch existing sorted items and scraps from the database
+      const existingWarehousedTransactionItems =
+        await WarehousedTransactionItem.findAll({
+          where: { warehousedTransactionId: id },
+          transaction,
+        });
 
-      const existingSortedScraps = await SortedScrapTransaction.findAll({
-        where: { sortedTransactionId: id },
-        transaction,
-      });
-
-      // Extract existing sorted waste and scrap IDs
-      const existingWasteIds = existingSortedWastes.map((waste) => waste.id);
-      const existingScrapIds = existingSortedScraps.map((scrap) => scrap.id);
-
-      // Extract updated sorted waste and scrap IDs from the request body
-      const updatedWasteIds = sortedWastes.map((waste) => waste.id);
-      const updatedScrapIds = sortedScraps.map((scrap) => scrap.id);
-
-      // Identify wastes and scraps to delete (those not present in the updated data)
-      const wastesToDelete = existingSortedWastes.filter(
-        (waste) => !updatedWasteIds.includes(waste.id)
+      // Extract existing sorted item and scrap IDs
+      const existingItemIds = existingWarehousedTransactionItems.map(
+        (item) => item.id
       );
 
-      const scrapsToDelete = existingSortedScraps.filter(
-        (scrap) => !updatedScrapIds.includes(scrap.id)
+      // Extract updated sorted item and scrap IDs from the request body
+      const updatedItemIds = warehousedItems.map((item) => item.id);
+
+      // Identify items and scraps to delete (those not present in the updated data)
+      const itemsToDelete = existingWarehousedTransactionItems.filter(
+        (item) => !updatedItemIds.includes(item.id)
       );
 
-      // Identify wastes and scraps to update and create
-      const sortedWastePromises = sortedWastes.map(async (waste) => {
-        if (waste.id && existingWasteIds.includes(waste.id)) {
-          // Update existing waste
-          await SortedWasteTransaction.update(
+      // Identify items and scraps to update and create
+      const warehousedItemPromises = warehousedItems.map(async (item) => {
+        if (item.id && existingItemIds.includes(item.id)) {
+          // Update existing item
+          await WarehousedTransactionItem.update(
             {
-              quotationWasteId: waste.quotationWasteId,
-              wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
-              weight: waste.weight,
-              clientWeight: waste.clientWeight,
-              formNo: waste.formNo,
+              description: item.description && item.description.toUpperCase(),
+              gatePass: item.gatePass,
+              warehouse: item.warehouse,
+              area: item.area,
+              section: item.section,
+              level: item.level,
+              palletNumber: item.palletNumber,
+              steamNumber: item.steamNumber,
+              quantity: item.quantity,
+              unit: item.unit,
             },
-            { where: { id: waste.id }, transaction }
+            { where: { id: item.id }, transaction }
           );
         } else {
-          // Create new waste
-          await SortedWasteTransaction.create(
+          // Create new item
+          await WarehousedTransactionItem.create(
             {
-              sortedTransactionId: id,
-              quotationWasteId: waste.quotationWasteId,
-              wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
-              weight: waste.weight,
-              clientWeight: waste.clientWeight,
-              formNo: waste.formNo,
+              warehousedTransactionId: id,
+              description: item.description && item.description.toUpperCase(),
+              gatePass: item.gatePass,
+              warehouse: item.warehouse,
+              area: item.area,
+              section: item.section,
+              level: item.level,
+              palletNumber: item.palletNumber,
+              steamNumber: item.steamNumber,
+              quantity: item.quantity,
+              unit: item.unit,
             },
             { transaction }
           );
         }
       });
 
-      const sortedScrapPromises = sortedScraps.map(async (scrap) => {
-        if (scrap.id && existingScrapIds.includes(scrap.id)) {
-          // Update existing scrap
-          await SortedScrapTransaction.update(
-            {
-              scrapTypeId: scrap.scrapTypeId,
-              weight: scrap.weight,
-            },
-            { where: { id: scrap.id }, transaction }
-          );
-        } else {
-          // Create new scrap
-          await SortedScrapTransaction.create(
-            {
-              sortedTransactionId: id,
-              scrapTypeId: scrap.scrapTypeId,
-              weight: scrap.weight,
-            },
-            { transaction }
-          );
-        }
-      });
-
-      // Delete wastes and scraps that are no longer present
-      const deleteWastePromises = wastesToDelete.map((waste) =>
-        SortedWasteTransaction.destroy({ where: { id: waste.id }, transaction })
-      );
-
-      const deleteScrapPromises = scrapsToDelete.map((scrap) =>
-        SortedScrapTransaction.destroy({ where: { id: scrap.id }, transaction })
+      // Delete items and scraps that are no longer present
+      const deleteWastePromises = itemsToDelete.map((item) =>
+        WarehousedTransactionItem.destroy({
+          where: { id: item.id },
+          transaction,
+        })
       );
 
       // Wait for all promises to resolve
-      await Promise.all([
-        ...sortedWastePromises,
-        ...sortedScrapPromises,
-        ...deleteWastePromises,
-        ...deleteScrapPromises,
-      ]);
+      await Promise.all([...warehousedItemPromises, ...deleteWastePromises]);
 
       // Commit the transaction
       await transaction.commit();
@@ -300,13 +269,15 @@ async function deleteWarehousedTransactionController(req, res) {
     console.log("Soft deleting sorted transaction with ID:", id);
 
     // Find the sorted transaction by UUID (id)
-    const sortedTransactionToDelete = await WarehousedTransaction.findByPk(id);
+    const warehousedTransactionToDelete = await WarehousedTransaction.findByPk(
+      id
+    );
 
-    if (sortedTransactionToDelete) {
+    if (warehousedTransactionToDelete) {
       // Update the deletedBy field
-      sortedTransactionToDelete.updatedBy = deletedBy;
-      sortedTransactionToDelete.deletedBy = deletedBy;
-      await sortedTransactionToDelete.save();
+      warehousedTransactionToDelete.updatedBy = deletedBy;
+      warehousedTransactionToDelete.deletedBy = deletedBy;
+      await warehousedTransactionToDelete.save();
 
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         bookedTransactionId
@@ -318,7 +289,7 @@ async function deleteWarehousedTransactionController(req, res) {
       await updatedBookedTransaction.save();
 
       // Soft delete the sorted transaction (sets deletedAt timestamp)
-      await sortedTransactionToDelete.destroy();
+      await warehousedTransactionToDelete.destroy();
 
       // fetch transactions
       const data = await fetchData(statusId);

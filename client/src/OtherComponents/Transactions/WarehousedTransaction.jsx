@@ -68,7 +68,7 @@ const WarehousedTransaction = ({ row }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: renderCellWithFormattedDate,
     },
     {
@@ -77,7 +77,7 @@ const WarehousedTransaction = ({ row }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: renderCellWithFormattedTime,
     },
     {
@@ -86,34 +86,89 @@ const WarehousedTransaction = ({ row }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 200,
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "weight",
-      headerName: "Weight",
+      field: "quantity",
+      headerName: "Qty",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
-      renderCell: (params) => (
-        <div className={"wrap-text"} style={{ textAlign: "center" }}>
-          {formatWeight(params.value)}
-        </div>
-      ),
+      minWidth: 50,
+      renderCell: renderCellWithWrapText,
     },
     {
-      field: "clientWeight",
-      headerName: "Client Weight",
+      field: "unit",
+      headerName: "Unit",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
-      renderCell: (params) => (
-        <div className={"wrap-text"} style={{ textAlign: "center" }}>
-          {formatWeight(params.value)}
-        </div>
-      ),
+      minWidth: 50,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "gatePass",
+      headerName: "Gate Pass #",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "warehouse",
+      headerName: "Warehouse",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "section",
+      headerName: "Section",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "area",
+      headerName: "Area",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "level",
+      headerName: "Level",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "palletNumber",
+      headerName: "Pallet #",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "steamNumber",
+      headerName: "Steam #",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      renderCell: renderCellWithWrapText,
     },
   ];
 
@@ -248,15 +303,7 @@ const WarehousedTransaction = ({ row }) => {
             Batch Weight: {formatWeight(receivedTransaction.netWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Total Sorted Weight:{" "}
-            {formatWeight(warehousedTransaction.totalSortedWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
-            Discrepancy Weight:{" "}
-            {formatWeight(warehousedTransaction.discrepancyWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
-            Discrepancy Remarks:{" "}
+            Remarks:{" "}
             {warehousedTransaction.remarks
               ? warehousedTransaction.remarks
               : "NO REMARKS"}

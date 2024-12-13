@@ -637,8 +637,7 @@ const Transaction = ({
                                 (user.userType === 10 && row.statusId === 12) ||
                                 (user.userType === 11 && row.statusId === 13) ||
                                 (user.userType === 11 && row.statusId === 13) ||
-                                (user.userType === 14 && row.statusId === 6) ||
-                                (user.userType === 15 && row.statusId === 7)
+                                (user.userType === 14 && row.statusId === 6)
                               ) {
                                 return (
                                   <div style={{ display: "flex" }}>

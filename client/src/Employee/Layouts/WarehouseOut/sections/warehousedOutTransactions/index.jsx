@@ -118,7 +118,6 @@ const WarehousedOutTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
-    console.log(row);
     const warehousedTransaction =
       row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
         .WarehousedTransaction?.[0] || {};
@@ -176,7 +175,6 @@ const WarehousedOutTransactions = ({ user }) => {
 
   const handleEditClick = (row) => {
     const typeToEdit = row;
-    console.log(row);
     if (typeToEdit) {
       const warehousedOutTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
@@ -229,7 +227,6 @@ const WarehousedOutTransactions = ({ user }) => {
     }
   };
   const handleDeleteClick = (row) => {
-    console.log(row);
     setOpenDialog(true);
     setDialog(
       "Are you sure you want to Delete this Warehoused Out Transaction?"
@@ -330,8 +327,6 @@ const WarehousedOutTransactions = ({ user }) => {
       }
 
       fetchData();
-
-      console.log(updatedFormData);
 
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);

@@ -25,6 +25,8 @@ const BillModal = ({
   setIsWasteNameToBill,
   isPerClientToBill,
   setIsPerClientToBill,
+  isIndividualBillingToBill,
+  setIsIndividualBillingToBill,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -39,6 +41,12 @@ const BillModal = ({
     const isChecked = e.target.checked;
     setIsPerClientToBill(isChecked); // Update the individual state
     setFormData({ ...formData, isPerClient: isChecked }); // Update formData state
+  };
+
+  const handleCheckboxChange3 = (e) => {
+    const isChecked = e.target.checked;
+    setIsIndividualBillingToBill(isChecked); // Update the individual state
+    setFormData({ ...formData, isIndividualBilling: isChecked }); // Update formData state
   };
 
   return (
@@ -83,16 +91,28 @@ const BillModal = ({
               label="By Waste Name"
             />
             {formData.clientType === "TRP" && (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.isPerClient}
-                    onChange={handleCheckboxChange2}
-                    color="secondary"
-                  />
-                }
-                label="By Transporter's Client"
-              />
+              <>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formData.isPerClient}
+                      onChange={handleCheckboxChange2}
+                      color="secondary"
+                    />
+                  }
+                  label="By Transporter's Client"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formData.isIndividualBilling}
+                      onChange={handleCheckboxChange3}
+                      color="secondary"
+                    />
+                  }
+                  label="By Individual Billing"
+                />
+              </>
             )}
           </Box>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
@@ -199,6 +219,7 @@ const BillModal = ({
             bookedTransactionIds={formData.bookedTransactionId}
             isWasteNameToBill={isWasteNameToBill}
             isPerClientToBill={isPerClientToBill}
+            isIndividualBillingToBill={isIndividualBillingToBill}
           />
         </Box>
       </Modal>

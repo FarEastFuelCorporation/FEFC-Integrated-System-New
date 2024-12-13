@@ -34,6 +34,7 @@ const BilledTransactions = ({ user }) => {
     serviceInvoiceNumber: "",
     isWasteName: false,
     isPerClient: false,
+    isIndividualBilling: false,
     billedAmount: 0,
     remarks: "",
     statusId: 10,
@@ -57,6 +58,8 @@ const BilledTransactions = ({ user }) => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [isWasteNameToBill, setIsWasteNameToBill] = useState(false);
   const [isPerClientToBill, setIsPerClientToBill] = useState(false);
+  const [isIndividualBillingToBill, setIsIndividualBillingToBill] =
+    useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -131,6 +134,7 @@ const BilledTransactions = ({ user }) => {
       serviceInvoiceNumber: "",
       isWasteName: false,
       isPerClient: false,
+      isIndividualBilling: false,
       billedAmount: 0,
       remarks: "",
       statusId: 10,
@@ -144,6 +148,7 @@ const BilledTransactions = ({ user }) => {
     setOpenModal(false);
     setIsWasteNameToBill(false);
     setIsPerClientToBill(false);
+    setIsIndividualBillingToBill(false);
     clearFormData();
   };
 
@@ -171,6 +176,7 @@ const BilledTransactions = ({ user }) => {
         serviceInvoiceNumber: billedTransaction.serviceInvoiceNumber,
         isWasteName: billedTransaction.isWasteName,
         isPerClient: billedTransaction.isPerClient,
+        isIndividualBilling: billedTransaction.isIndividualBilling,
         billedAmount: billedTransaction.billedAmount,
         remarks: billedTransaction.remarks,
         statusId: typeToEdit.statusId,
@@ -355,6 +361,8 @@ const BilledTransactions = ({ user }) => {
         setIsWasteNameToBill={setIsWasteNameToBill}
         isPerClientToBill={isPerClientToBill}
         setIsPerClientToBill={setIsPerClientToBill}
+        isIndividualBillingToBill={isIndividualBillingToBill}
+        setIsIndividualBillingToBill={setIsIndividualBillingToBill}
         refs={{
           billedDateRef,
           billedTimeRef,

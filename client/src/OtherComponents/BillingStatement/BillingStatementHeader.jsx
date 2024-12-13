@@ -2,7 +2,12 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { formatDateFull, formatNumber } from "../Functions";
 
-const BillingStatementHeader = ({ row, amounts, credits }) => {
+const BillingStatementHeader = ({
+  row,
+  amounts,
+  credits,
+  isIndividualBillingToBill = false,
+}) => {
   const today = new Date();
   const datePlusOneMonth = new Date();
   datePlusOneMonth.setMonth(today.getMonth() + 1);

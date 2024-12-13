@@ -53,7 +53,6 @@ const WarehouseModal = forwardRef(
               axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
             ]);
 
-            console.log(quotationsResponse.data.quotations);
             setQuotations(quotationsResponse.data.quotations);
           } catch (error) {
             console.error("Error fetching data:", error);
@@ -136,13 +135,10 @@ const WarehouseModal = forwardRef(
       const itemRef = warehousedItemsRef.current[index];
       if (itemRef) {
         itemRef.quotationWasteId = value; // Update the value in the ref
-        console.log("Updated Ref:", warehousedItemsRef.current[index]);
 
         const quotationWasteId = document.querySelector(
           `#quotationWasteId-${index}`
         );
-
-        console.log(value);
 
         setFormData((prev) => ({
           ...prev,

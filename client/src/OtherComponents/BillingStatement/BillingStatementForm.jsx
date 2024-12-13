@@ -33,6 +33,7 @@ const BillingStatementForm = ({
   bookedTransactionIds,
   isWasteNameToBill = false,
   isPerClientToBill = false,
+  isIndividualBillingToBill = false,
 }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
@@ -115,6 +116,7 @@ const BillingStatementForm = ({
   let totalWeight = new Decimal(0);
   let isWasteName = false;
   let isPerClient = false;
+  let isIndividualBilling = false;
 
   transactions.forEach((transaction) => {
     const hasFixedRate = transaction?.QuotationWaste?.hasFixedRate;
@@ -134,6 +136,8 @@ const BillingStatementForm = ({
 
     isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
     isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;
+    isIndividualBilling =
+      transaction?.BilledTransaction?.[0]?.isIndividualBilling;
 
     const hasDemurrage =
       transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
@@ -424,6 +428,82 @@ const BillingStatementForm = ({
     }
   });
 
+  const groupedTransactions = Object.entries(
+    transactions.reduce((acc, transaction) => {
+      // Extract invoiceNumber from BilledTransaction
+      const invoiceNumber =
+        transaction.BilledTransaction?.[0]?.invoiceNumber || null;
+
+      transaction.ScheduledTransaction.forEach((scheduled) => {
+        const { scheduledDate, scheduledTime } = scheduled;
+
+        scheduled.ReceivedTransaction.forEach((received) => {
+          received.SortedTransaction.forEach((sorted) => {
+            const typeOfWeight = sorted.CertifiedTransaction?.[0]?.typeOfWeight;
+
+            sorted.SortedWasteTransaction.forEach((waste) => {
+              const clientId = waste.transporterClientId;
+
+              // Initialize client group if it doesn't exist
+              if (!acc[clientId]) {
+                acc[clientId] = {
+                  transactions: [],
+                  totals: {
+                    vatExclusive: 0,
+                    vatInclusive: 0,
+                    nonVatable: 0,
+                  },
+                };
+              }
+
+              // Create the groupedWaste object
+              const groupedWaste = {
+                ...waste,
+                scheduledDate,
+                scheduledTime,
+                invoiceNumber,
+                typeOfWeight,
+              };
+
+              // Add the groupedWaste to the transactions array
+              acc[clientId].transactions.push(groupedWaste);
+
+              // Process QuotationWaste.mode and vatCalculation
+              const { QuotationWaste } = waste;
+              if (QuotationWaste) {
+                const { vatCalculation } = QuotationWaste;
+
+                // Add the waste amount to the correct vatCalculation total
+                const amount = waste.amount || 0;
+                switch (vatCalculation) {
+                  case "VAT EXCLUSIVE":
+                    acc[clientId].totals.vatExclusive += amount;
+                    break;
+                  case "VAT INCLUSIVE":
+                    acc[clientId].totals.vatInclusive += amount;
+                    break;
+                  case "NON VATABLE":
+                    acc[clientId].totals.nonVatable += amount;
+                    break;
+                  default:
+                    break;
+                }
+              }
+            });
+          });
+        });
+      });
+
+      return acc;
+    }, {})
+  ).map(([transporterClientId, data]) => ({
+    transporterClientId,
+    transactions: data.transactions,
+    totals: data.totals,
+  }));
+
+  console.log("Grouped Transactions:", groupedTransactions);
+
   const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;
 
   // Recalculate height and generate content whenever row or heights change
@@ -500,6 +580,11 @@ const BillingStatementForm = ({
                 isPerClientToBill={
                   isPerClient ? isPerClient : isPerClientToBill
                 }
+                isIndividualBillingToBill={
+                  isIndividualBilling
+                    ? isIndividualBilling
+                    : isIndividualBillingToBill
+                }
               />
             </Box>
 
@@ -532,8 +617,6 @@ const BillingStatementForm = ({
                   bodyRows.BillingTableHead.header = <BillingTableHead />;
 
                   const waste = item; // Assuming item contains waste details
-
-                  console.log(waste);
 
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
@@ -710,7 +793,20 @@ const BillingStatementForm = ({
                       }}
                     >
                       {/* Render Header only on the first page */}
-                      {index === 0 && (
+                      {index === 0 && !isIndividualBillingToBill && (
+                        <Box>
+                          <BillingStatementHeader
+                            row={row}
+                            amounts={amounts}
+                            credits={credits}
+                            isIndividualBillingToBill={
+                              isIndividualBillingToBill
+                            }
+                          />
+                        </Box>
+                      )}
+
+                      {isIndividualBillingToBill && (
                         <Box>
                           <BillingStatementHeader
                             row={row}
@@ -747,7 +843,17 @@ const BillingStatementForm = ({
                         </>
                       )}
 
-                      {index === pagesContent.length - 1 && (
+                      {index === pagesContent.length - 1 &&
+                        !isIndividualBillingToBill && (
+                          <Box>
+                            <BillingStatementFooter
+                              row={row}
+                              qrCodeURL={qrCodeURL}
+                            />
+                          </Box>
+                        )}
+
+                      {isIndividualBillingToBill && (
                         <Box>
                           <BillingStatementFooter
                             row={row}

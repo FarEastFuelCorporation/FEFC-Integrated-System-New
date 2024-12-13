@@ -37,6 +37,8 @@ const Modal = forwardRef(
       setIsWasteNameToBill,
       isPerClientToBill,
       setIsPerClientToBill,
+      isIndividualBillingToBill,
+      setIsIndividualBillingToBill,
     },
     ref
   ) => {
@@ -177,6 +179,8 @@ const Modal = forwardRef(
             setIsWasteNameToBill={setIsWasteNameToBill}
             isPerClientToBill={isPerClientToBill}
             setIsPerClientToBill={setIsPerClientToBill}
+            isIndividualBillingToBill={isIndividualBillingToBill}
+            setIsIndividualBillingToBill={setIsIndividualBillingToBill}
           />
         );
         break;

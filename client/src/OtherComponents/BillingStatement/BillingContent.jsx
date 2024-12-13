@@ -21,6 +21,7 @@ const BillingContent = ({
   heightsReady,
   isWasteNameToBill = false,
   isPerClientToBill = false,
+  isIndividualBillingToBill = false,
 }) => {
   const wasteTableRef = useRef(null);
 
@@ -38,6 +39,46 @@ const BillingContent = ({
   const firstPageHeight = pageHeight - headerHeight;
   const nextPageHeight = pageHeight - 50;
 
+  const groupedTransactions = Object.entries(
+    transactions.reduce((acc, transaction) => {
+      // Extract invoiceNumber from BilledTransaction
+      const invoiceNumber =
+        transaction.BilledTransaction?.[0]?.invoiceNumber || null;
+
+      transaction.ScheduledTransaction.forEach((scheduled) => {
+        const { scheduledDate, scheduledTime } = scheduled; // Extract date and time
+
+        scheduled.ReceivedTransaction.forEach((received) => {
+          received.SortedTransaction.forEach((sorted) => {
+            const typeOfWeight = sorted.CertifiedTransaction?.[0]?.typeOfWeight;
+
+            sorted.SortedWasteTransaction.forEach((waste) => {
+              const clientId = waste.transporterClientId;
+
+              if (!acc[clientId]) {
+                acc[clientId] = []; // Initialize an array for this clientId
+              }
+
+              // Add the waste transaction to the group and include scheduledDate, scheduledTime, and invoiceNumber
+              acc[clientId].push({
+                ...waste,
+                scheduledDate,
+                scheduledTime,
+                invoiceNumber,
+                typeOfWeight,
+              });
+            });
+          });
+        });
+      });
+
+      return acc;
+    }, {})
+  ).map(([transporterClientId, transactions]) => ({
+    transporterClientId,
+    transactions,
+  }));
+
   // Helper function to calculate total height of rows and divide into pages
   const calculatePageContent = useCallback(() => {
     const pages = [];
@@ -50,6 +91,8 @@ const BillingContent = ({
       return availableHeight >= elementHeight; // Ensure it's greater than or equal
     };
 
+    const clientArray = [];
+
     // Helper function to add a page to the pages array
     const addPage = () => {
       pages.push([...currentPage]);
@@ -59,8 +102,20 @@ const BillingContent = ({
     };
 
     // Helper function to add an element to the current page or move to next page
-    const addElementToPage = (element, elementHeight) => {
+    const addElementToPage = (element, elementHeight, cellContent = false) => {
       if (canFitOnPage(elementHeight)) {
+        if (isIndividualBillingToBill) {
+          if (cellContent) {
+            if (clientArray.length === 0) {
+              clientArray.push(cellContent);
+            }
+            if (!clientArray.includes(cellContent)) {
+              addPage();
+              clientArray.push(cellContent);
+            }
+          }
+        }
+
         if (element !== null) {
           currentPage.push(element); // Push the element only if it's not null
         }
@@ -93,6 +148,8 @@ const BillingContent = ({
 
       const cells = Array.from(row.children); // Get <td> elements from the <tr>
 
+      const cellContent = cells[3].textContent;
+
       // Check if the first <td> content is empty
       const isFirstCellEmpty = cells[0]?.textContent.trim() === "";
 
@@ -100,7 +157,7 @@ const BillingContent = ({
       const rowHeight = isFirstCellEmpty ? 22 : row.offsetHeight;
 
       const cellContents = cells.map((cell) => cell.textContent.trim()); // Extract content from each <td>
-      addElementToPage(cellContents, rowHeight); // Push the contents of the row
+      addElementToPage(cellContents, rowHeight, cellContent); // Push the contents of the row
     });
 
     // Add footer only on the last page
@@ -125,6 +182,7 @@ const BillingContent = ({
     nextPageHeight,
     setIsDoneCalculation,
     setPagesContent,
+    isIndividualBillingToBill,
   ]);
 
   useEffect(() => {
@@ -138,6 +196,7 @@ const BillingContent = ({
     calculatePageContent,
     isWasteNameToBill,
     isPerClientToBill,
+    isIndividualBillingToBill,
   ]);
 
   const bodyCellStyles = ({
@@ -156,8 +215,6 @@ const BillingContent = ({
     fontFamily: "'Poppins', sans-serif",
     height: "20px",
   });
-
-  let clientNames = [];
 
   return (
     <Box>
@@ -178,81 +235,83 @@ const BillingContent = ({
       </Box>
       <Table ref={wasteTableRef}>
         <BillingTableHead />
-        <TableBody>
-          {transactions
-            .sort(
-              (a, b) =>
-                new Date(a.ScheduledTransaction[0].scheduledDate) -
-                new Date(b.ScheduledTransaction[0].scheduledDate)
-            ) // Sort transactions by haulingDate from oldest to newest
-            .map((transaction, index) => {
-              // Check if aggregatedWasteTransactions need to be mapped
+        {!isIndividualBillingToBill && (
+          <TableBody>
+            {transactions
+              .sort(
+                (a, b) =>
+                  new Date(a.ScheduledTransaction[0].scheduledDate) -
+                  new Date(b.ScheduledTransaction[0].scheduledDate)
+              ) // Sort transactions by haulingDate from oldest to newest
+              .map((transaction, index) => {
+                // Check if aggregatedWasteTransactions need to be mapped
+                let clientNames = [];
+                let aggregatedWasteTransactions;
 
-              let aggregatedWasteTransactions;
+                const hasDemurrage =
+                  transaction?.ScheduledTransaction?.[0]
+                    ?.ReceivedTransaction?.[0]?.hasDemurrage || false;
+                const demurrageDays =
+                  transaction?.ScheduledTransaction?.[0]
+                    ?.ReceivedTransaction?.[0]?.demurrageDays || 0;
 
-              const hasDemurrage =
-                transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-                  ?.hasDemurrage || false;
-              const demurrageDays =
-                transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-                  ?.demurrageDays || 0;
+                if (isPerClientToBill) {
+                  aggregatedWasteTransactions =
+                    transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                      .SortedTransaction[0].SortedWasteTransaction;
 
-              if (isPerClientToBill) {
-                aggregatedWasteTransactions =
+                  aggregatedWasteTransactions.sort((a, b) => {
+                    const clientNameA = a.TransporterClient?.clientName || "";
+                    const clientNameB = b.TransporterClient?.clientName || "";
+
+                    return clientNameA.localeCompare(clientNameB); // Compare client names alphabetically
+                  });
+                } else {
+                  aggregatedWasteTransactions = Object.values(
+                    transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
+                      (acc, current) => {
+                        const { id } = current.QuotationWaste;
+
+                        const currentWeight = new Decimal(current.weight); // Use Decimal.js
+                        const currentClientWeight = new Decimal(
+                          current.clientWeight
+                        ); // Use Decimal.js
+
+                        if (acc[id]) {
+                          acc[id].weight = acc[id].weight.plus(currentWeight);
+                          acc[id].clientWeight =
+                            acc[id].clientWeight.plus(currentClientWeight);
+                        } else {
+                          acc[id] = {
+                            ...current,
+                            weight: currentWeight,
+                            clientWeight: currentClientWeight,
+                          };
+                        }
+
+                        return acc;
+                      },
+                      {}
+                    )
+                  ).map((item) => ({
+                    ...item,
+                    weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+                  }));
+                }
+
+                const invoiceNumber =
+                  transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
+                const typeOfWeight =
                   transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                    .SortedTransaction[0].SortedWasteTransaction;
+                    .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+                    ?.typeOfWeight || "SORTED WEIGHT";
 
-                aggregatedWasteTransactions.sort((a, b) => {
-                  const clientNameA = a.TransporterClient?.clientName || "";
-                  const clientNameB = b.TransporterClient?.clientName || "";
+                const scheduledTransaction =
+                  transaction.ScheduledTransaction?.[0];
 
-                  return clientNameA.localeCompare(clientNameB); // Compare client names alphabetically
-                });
-              } else {
-                aggregatedWasteTransactions = Object.values(
-                  transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
-                    (acc, current) => {
-                      const { id } = current.QuotationWaste;
-
-                      const currentWeight = new Decimal(current.weight); // Use Decimal.js
-                      const currentClientWeight = new Decimal(
-                        current.clientWeight
-                      ); // Use Decimal.js
-
-                      if (acc[id]) {
-                        acc[id].weight = acc[id].weight.plus(currentWeight);
-                        acc[id].clientWeight =
-                          acc[id].clientWeight.plus(currentClientWeight);
-                      } else {
-                        acc[id] = {
-                          ...current,
-                          weight: currentWeight,
-                          clientWeight: currentClientWeight,
-                        };
-                      }
-
-                      return acc;
-                    },
-                    {}
-                  )
-                ).map((item) => ({
-                  ...item,
-                  weight: item.weight.toNumber(), // Convert Decimal back to a standard number
-                }));
-              }
-
-              const invoiceNumber =
-                transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
-              const typeOfWeight =
-                transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                  .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-                  ?.typeOfWeight || "SORTED WEIGHT";
-
-              const scheduledTransaction =
-                transaction.ScheduledTransaction?.[0];
-
-              const wasteRows = Object.values(aggregatedWasteTransactions).map(
-                (waste, idx) => {
+                const wasteRows = Object.values(
+                  aggregatedWasteTransactions
+                ).map((waste, idx) => {
                   // Determine the font color based on the mode
                   const fontColor =
                     waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
@@ -272,8 +331,6 @@ const BillingContent = ({
                   const isWasteName =
                     transaction.BilledTransaction?.[0]?.isWasteName;
 
-                  console.log(isWasteName);
-
                   const clientName = waste.TransporterClient?.clientName;
 
                   let newClient = false;
@@ -288,9 +345,6 @@ const BillingContent = ({
 
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
-
-                  console.log(waste.wasteName);
-                  console.log(waste.QuotationWaste.wasteName);
 
                   return (
                     <>
@@ -693,296 +747,433 @@ const BillingContent = ({
                         )}
                     </>
                   );
+                });
+
+                let isTransportation =
+                  transactions?.[0]?.ScheduledTransaction?.[0]
+                    .DispatchedTransaction.length === 0
+                    ? false
+                    : true;
+
+                const logisticsId =
+                  transaction.ScheduledTransaction?.[0]?.logisticsId;
+
+                const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
+
+                if (!isTransportation) {
+                  isTransportation =
+                    logisticsId !== clientVehicle ? true : false;
                 }
-              );
 
-              let isTransportation =
-                transactions?.[0]?.ScheduledTransaction?.[0]
-                  .DispatchedTransaction.length === 0
-                  ? false
-                  : true;
+                const hasTransportation =
+                  transaction.QuotationWaste.hasTransportation;
 
-              const logisticsId =
-                transaction.ScheduledTransaction?.[0]?.logisticsId;
-
-              const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
-
-              if (!isTransportation) {
-                isTransportation = logisticsId !== clientVehicle ? true : false;
-              }
-
-              const hasTransportation =
-                transaction.QuotationWaste.hasTransportation;
-
-              // Add the transportation row if applicable
-              const transpoRows = transaction?.QuotationTransportation?.mode ===
-                "CHARGE" &&
-                isTransportation &&
-                hasTransportation && [
-                  <TableRow key={`transpo-${index}`} sx={{ border: "black" }}>
-                    <TableCell sx={bodyCellStyles({ width: 60 })}>
-                      {formatDate2(scheduledTransaction.scheduledDate)}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}>
-                      {invoiceNumber}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles()}>
-                      {`TRANS FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 60,
-                        notCenter: true,
-                      })}
-                    >
-                      {`${formatNumber2(
-                        transaction.QuotationTransportation?.quantity
-                      )}`}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}>
-                      {transaction.QuotationTransportation?.unit}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 80,
-                        notCenter: true,
-                      })}
-                    >
-                      {formatNumber2(
-                        transaction.QuotationTransportation?.unitPrice
-                      )}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 80,
-                        notCenter: true,
-                      })}
-                    >
-                      {formatNumber(
-                        transaction.QuotationTransportation?.quantity *
+                // Add the transportation row if applicable
+                const transpoRows = transaction?.QuotationTransportation
+                  ?.mode === "CHARGE" &&
+                  isTransportation &&
+                  hasTransportation && [
+                    <TableRow key={`transpo-${index}`} sx={{ border: "black" }}>
+                      <TableCell sx={bodyCellStyles({ width: 60 })}>
+                        {formatDate2(scheduledTransaction.scheduledDate)}
+                      </TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}>
+                        {invoiceNumber}
+                      </TableCell>
+                      <TableCell sx={bodyCellStyles()}>
+                        {`TRANS FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 60,
+                          notCenter: true,
+                        })}
+                      >
+                        {`${formatNumber2(
+                          transaction.QuotationTransportation?.quantity
+                        )}`}
+                      </TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}>
+                        {transaction.QuotationTransportation?.unit}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 80,
+                          notCenter: true,
+                        })}
+                      >
+                        {formatNumber2(
                           transaction.QuotationTransportation?.unitPrice
-                      )}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 85,
-                        isLastCell: true,
-                      })}
-                    >
-                      {transaction.QuotationTransportation?.vatCalculation}
-                    </TableCell>
-                  </TableRow>,
-                ];
+                        )}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 80,
+                          notCenter: true,
+                        })}
+                      >
+                        {formatNumber(
+                          transaction.QuotationTransportation?.quantity *
+                            transaction.QuotationTransportation?.unitPrice
+                        )}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 85,
+                          isLastCell: true,
+                        })}
+                      >
+                        {transaction.QuotationTransportation?.vatCalculation}
+                      </TableCell>
+                    </TableRow>,
+                  ];
 
-              // Add the transportation row if applicable
-              const demurrageRows = transaction?.QuotationTransportation
-                ?.mode === "CHARGE" &&
-                isTransportation &&
-                hasTransportation &&
-                hasDemurrage && [
-                  <TableRow key={`demurrage-${index}`} sx={{ border: "black" }}>
-                    <TableCell sx={bodyCellStyles({ width: 60 })}>
-                      {formatDate2(scheduledTransaction.scheduledDate)}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}>
-                      {invoiceNumber}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles()}>
-                      {`DEMURRAGE FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 60,
-                        notCenter: true,
-                      })}
+                // Add the transportation row if applicable
+                const demurrageRows = transaction?.QuotationTransportation
+                  ?.mode === "CHARGE" &&
+                  isTransportation &&
+                  hasTransportation &&
+                  hasDemurrage && [
+                    <TableRow
+                      key={`demurrage-${index}`}
+                      sx={{ border: "black" }}
                     >
-                      {`${formatNumber2(demurrageDays)}`}
-                    </TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}>
-                      {transaction.QuotationTransportation?.unit}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 80,
-                        notCenter: true,
-                      })}
-                    >
-                      {formatNumber2(
-                        transaction.QuotationTransportation?.unitPrice
-                      )}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 80,
-                        notCenter: true,
-                      })}
-                    >
-                      {formatNumber(
-                        demurrageDays *
+                      <TableCell sx={bodyCellStyles({ width: 60 })}>
+                        {formatDate2(scheduledTransaction.scheduledDate)}
+                      </TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}>
+                        {invoiceNumber}
+                      </TableCell>
+                      <TableCell sx={bodyCellStyles()}>
+                        {`DEMURRAGE FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 60,
+                          notCenter: true,
+                        })}
+                      >
+                        {`${formatNumber2(demurrageDays)}`}
+                      </TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}>
+                        {transaction.QuotationTransportation?.unit}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 80,
+                          notCenter: true,
+                        })}
+                      >
+                        {formatNumber2(
                           transaction.QuotationTransportation?.unitPrice
-                      )}
-                    </TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({
-                        width: 85,
-                        isLastCell: true,
-                      })}
-                    >
-                      {transaction.QuotationTransportation?.vatCalculation}
-                    </TableCell>
-                  </TableRow>,
-                ];
+                        )}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 80,
+                          notCenter: true,
+                        })}
+                      >
+                        {formatNumber(
+                          demurrageDays *
+                            transaction.QuotationTransportation?.unitPrice
+                        )}
+                      </TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({
+                          width: 85,
+                          isLastCell: true,
+                        })}
+                      >
+                        {transaction.QuotationTransportation?.vatCalculation}
+                      </TableCell>
+                    </TableRow>,
+                  ];
 
-              // Combine waste and transportation rows for alternating display
-              const combinedRows = [];
+                // Combine waste and transportation rows for alternating display
+                const combinedRows = [];
 
-              wasteRows.forEach((wasteRow, idx) => {
-                combinedRows.push(wasteRow);
-              });
+                wasteRows.forEach((wasteRow, idx) => {
+                  combinedRows.push(wasteRow);
+                });
 
-              if (transpoRows.length > 0) {
-                // Push transpo row after every waste row
-                combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
-                if (hasDemurrage) {
-                  combinedRows.push(demurrageRows[0]); // Only one transpo row per transaction
+                if (transpoRows.length > 0) {
+                  // Push transpo row after every waste row
+                  combinedRows.push(transpoRows[0]); // Only one transpo row per transaction
+                  if (hasDemurrage) {
+                    combinedRows.push(demurrageRows[0]); // Only one transpo row per transaction
+                  }
                 }
-              }
 
-              if (index !== transactions.length - 1) {
-                combinedRows.push(
-                  <TableRow key={`space-${index}`} sx={{ border: "black" }}>
-                    <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-                    <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-                    <TableCell
-                      sx={bodyCellStyles({ width: 85, isLastCell: true })}
-                    ></TableCell>
-                  </TableRow>
-                );
-              }
+                if (index !== transactions.length - 1) {
+                  combinedRows.push(
+                    <TableRow key={`space-${index}`} sx={{ border: "black" }}>
+                      <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                      <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                      <TableCell
+                        sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                      ></TableCell>
+                    </TableRow>
+                  );
+                }
 
-              return combinedRows;
-            })}
-          {hasFixedRate && isMonthly && (
-            <TableRow key={`add-${1}`} sx={{ border: "black" }}>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell
-                sx={bodyCellStyles({ width: 85, isLastCell: true })}
-              ></TableCell>
-            </TableRow>
-          )}
-          {hasFixedRate && isMonthly && (
-            <TableRow key={`add-${2}`} sx={{ border: "black" }}>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({})}>TOTAL</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {formatNumber2(totalWeight.toNumber())}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell
-                sx={bodyCellStyles({ width: 85, isLastCell: true })}
-              ></TableCell>
-            </TableRow>
-          )}
-
-          {hasFixedRate && isMonthly && (
-            <TableRow key={`add-${3}`} sx={{ border: "black" }}>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({})}>
-                {fixedWeight === 0 ? "" : `FIRST ${formatNumber2(fixedWeight)}`}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 60 })}>
-                {fixedWeight === 0
-                  ? formatNumber2(1)
-                  : formatNumber2(fixedWeight)}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}>
-                {fixedWeight === 0 ? "LOT" : unit}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}>
-                {formatNumber2(fixedPrice)}
-              </TableCell>
-              <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
-                {vatCalculation}
-              </TableCell>
-            </TableRow>
-          )}
-          {hasFixedRate &&
-            isMonthly &&
-            fixedWeight !== 0 &&
-            totalWeight.toNumber() > fixedWeight && (
-              <TableRow key={`add-${4}`} sx={{ border: "black" }}>
+                return combinedRows;
+              })}
+            {hasFixedRate && isMonthly && (
+              <TableRow key={`add-${1}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                <TableCell sx={bodyCellStyles({})}>EXCESS QUANTITY:</TableCell>
+                <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell
+                  sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                ></TableCell>
+              </TableRow>
+            )}
+            {hasFixedRate && isMonthly && (
+              <TableRow key={`add-${2}`} sx={{ border: "black" }}>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({})}>TOTAL</TableCell>
                 <TableCell sx={bodyCellStyles({ width: 60 })}>
-                  {formatNumber2(totalWeight.minus(fixedWeight))}
+                  {formatNumber2(totalWeight.toNumber())}
                 </TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}>{unit}</TableCell>
-                <TableCell sx={bodyCellStyles({ width: 80 })}>
-                  {unitPrice}
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell
+                  sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                ></TableCell>
+              </TableRow>
+            )}
+
+            {hasFixedRate && isMonthly && (
+              <TableRow key={`add-${3}`} sx={{ border: "black" }}>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({})}>
+                  {fixedWeight === 0
+                    ? ""
+                    : `FIRST ${formatNumber2(fixedWeight)}`}
                 </TableCell>
+                <TableCell sx={bodyCellStyles({ width: 60 })}>
+                  {fixedWeight === 0
+                    ? formatNumber2(1)
+                    : formatNumber2(fixedWeight)}
+                </TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}>
+                  {fixedWeight === 0 ? "LOT" : unit}
+                </TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 80 })}>
-                  {formatNumber2(totalWeight.minus(fixedWeight) * unitPrice)}
+                  {formatNumber2(fixedPrice)}
                 </TableCell>
                 <TableCell sx={bodyCellStyles({ width: 85, isLastCell: true })}>
                   {vatCalculation}
                 </TableCell>
               </TableRow>
             )}
-          {remarks && (
-            <TableRow key={`add-${5}`} sx={{ border: "black" }}>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell
-                sx={bodyCellStyles({ width: 85, isLastCell: true })}
-              ></TableCell>
-            </TableRow>
-          )}
-          {remarks && (
-            <TableRow key={`add-${6}`} sx={{ border: "black" }}>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({})}>{remarks}</TableCell>
-              <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
-              <TableCell
-                sx={bodyCellStyles({ width: 85, isLastCell: true })}
-              ></TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+            {hasFixedRate &&
+              isMonthly &&
+              fixedWeight !== 0 &&
+              totalWeight.toNumber() > fixedWeight && (
+                <TableRow key={`add-${4}`} sx={{ border: "black" }}>
+                  <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                  <TableCell sx={bodyCellStyles({})}>
+                    EXCESS QUANTITY:
+                  </TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 60 })}>
+                    {formatNumber2(totalWeight.minus(fixedWeight))}
+                  </TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 40 })}>
+                    {unit}
+                  </TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 80 })}>
+                    {unitPrice}
+                  </TableCell>
+                  <TableCell sx={bodyCellStyles({ width: 80 })}>
+                    {formatNumber2(totalWeight.minus(fixedWeight) * unitPrice)}
+                  </TableCell>
+                  <TableCell
+                    sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                  >
+                    {vatCalculation}
+                  </TableCell>
+                </TableRow>
+              )}
+            {remarks && (
+              <TableRow key={`add-${5}`} sx={{ border: "black" }}>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({})}>{""}</TableCell>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell
+                  sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                ></TableCell>
+              </TableRow>
+            )}
+            {remarks && (
+              <TableRow key={`add-${6}`} sx={{ border: "black" }}>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({})}>{remarks}</TableCell>
+                <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell sx={bodyCellStyles({ width: 80 })}></TableCell>
+                <TableCell
+                  sx={bodyCellStyles({ width: 85, isLastCell: true })}
+                ></TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        )}
+        {isIndividualBillingToBill && (
+          <TableBody>
+            {groupedTransactions
+              // Sort transactions by haulingDate from oldest to newest
+              .map((transaction, index) => {
+                const wasteRows = transaction.transactions.map((waste, idx) => {
+                  const fontColor =
+                    waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
+
+                  return (
+                    <>
+                      <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 60, color: fontColor }),
+                          }}
+                        >
+                          {formatDate2(waste.scheduledDate)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                          }}
+                        ></TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                          }}
+                        >
+                          {waste.invoiceNumber}
+                        </TableCell>
+                        <TableCell
+                          sx={{ ...bodyCellStyles({ color: fontColor }) }}
+                        >
+                          {isWasteNameToBill
+                            ? waste.wasteName
+                            : waste.QuotationWaste.wasteName}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 60,
+                              notCenter: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {waste.typeOfWeight === "CLIENT WEIGHT"
+                            ? formatNumber2(waste.clientWeight)
+                            : formatNumber2(waste.weight)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                          }}
+                        >
+                          {waste.QuotationWaste.unit}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 80,
+                              notCenter: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {formatNumber2(waste.QuotationWaste.unitPrice)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 80,
+                              notCenter: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {waste.typeOfWeight === "CLIENT WEIGHT"
+                            ? formatNumber2(
+                                waste.clientWeight *
+                                  waste.QuotationWaste.unitPrice
+                              )
+                            : formatNumber2(
+                                waste.weight * waste.QuotationWaste.unitPrice
+                              )}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 85,
+                              isLastCell: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {waste.QuotationWaste.vatCalculation}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            ...bodyCellStyles({
+                              width: 85,
+                              isLastCell: true,
+                              color: fontColor,
+                            }),
+                          }}
+                        >
+                          {waste.QuotationWaste.mode}
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  );
+                });
+
+                // Combine waste and transportation rows for alternating display
+                const combinedRows = [];
+
+                wasteRows.forEach((wasteRow, idx) => {
+                  combinedRows.push(wasteRow);
+                });
+
+                return combinedRows;
+              })}
+          </TableBody>
+        )}
       </Table>
     </Box>
   );

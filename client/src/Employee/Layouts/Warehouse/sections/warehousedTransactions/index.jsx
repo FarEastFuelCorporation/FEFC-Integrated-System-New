@@ -128,6 +128,7 @@ const WarehousedTransactions = ({ user }) => {
   const handleOpenModal = (row) => {
     setFormData({
       id: "",
+      clientId: row.createdBy,
       bookedTransactionId: row.id,
       receivedTransactionId:
         row.ScheduledTransaction[0].ReceivedTransaction[0].id,
@@ -170,6 +171,7 @@ const WarehousedTransactions = ({ user }) => {
 
       setFormData({
         id: warehousedTransaction.id,
+        clientId: typeToEdit.createdBy,
         bookedTransactionId: typeToEdit.id,
         receivedTransactionId:
           typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0].id,

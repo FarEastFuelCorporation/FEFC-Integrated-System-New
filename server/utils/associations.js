@@ -990,6 +990,19 @@ WarehousedOutTransactionItem.belongsTo(WarehousedTransactionItem, {
   onDelete: "CASCADE",
 });
 
+QuotationWaste.hasMany(WarehousedTransactionItem, {
+  as: "WarehousedTransactionItem",
+  foreignKey: "quotationWasteId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+WarehousedTransactionItem.belongsTo(QuotationWaste, {
+  as: "QuotationWaste",
+  foreignKey: "quotationWasteId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 WarehousedTransaction.hasMany(TreatedTransaction, {
   as: "TreatedTransaction",
   foreignKey: "warehousedTransactionId",

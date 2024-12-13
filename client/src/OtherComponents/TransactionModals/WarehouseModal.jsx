@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
 import {
   Box,
   Modal,
@@ -16,6 +16,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { tokens } from "../../theme";
+import axios from "axios";
 
 const WarehouseModal = forwardRef(
   (
@@ -39,6 +40,28 @@ const WarehouseModal = forwardRef(
       warehousedItemsRef,
       remarksRef,
     } = refs;
+
+    const [quotations, setQuotations] = useState([]);
+
+    useEffect(() => {
+      if (open) {
+        const fetchData = async () => {
+          try {
+            const apiUrl = process.env.REACT_APP_API_URL;
+            const [quotationsResponse] = await Promise.all([
+              axios.get(`${apiUrl}/api/quotation/${formData.clientId}`),
+            ]);
+
+            console.log(quotationsResponse.data.quotations);
+            setQuotations(quotationsResponse.data.quotations);
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        };
+
+        fetchData();
+      }
+    }, [open, formData.clientId]);
 
     const handleAddItem = () => {
       // Accessing current warehoused items and adding a new one
@@ -71,6 +94,46 @@ const WarehouseModal = forwardRef(
     const [, setRender] = React.useState(0);
     const forceUpdate = () => setRender((prev) => prev + 1);
 
+    // const handleWasteCodeChange = useCallback(
+    //   (index, value) => {
+    //     let selectedWasteType = null;
+
+    //     for (let quotation of quotations) {
+    //       selectedWasteType = quotation.QuotationWaste.find(
+    //         (waste) => waste.id === value
+    //       );
+    //       if (selectedWasteType) break;
+    //     }
+
+    //     if (selectedWasteType) {
+    //       const updatedWastes = formData.sortedWastes.map((waste, i) =>
+    //         i === index
+    //           ? {
+    //               ...waste,
+    //               quotationWasteId: value,
+    //               wasteName: selectedWasteType.wasteName,
+    //             }
+    //           : waste
+    //       );
+    //       handleInputChange({
+    //         target: { name: "sortedWastes", value: updatedWastes },
+    //       });
+    //     } else {
+    //       console.warn(`No waste type found for id: ${value}`);
+    //     }
+    //   },
+    //   [quotations, formData, handleInputChange]
+    // );
+
+    const handleCategoryChange = (index, value) => {
+      console.log(value);
+      const quotationWasteId = document.querySelector(
+        `#quotationWasteId-${index}`
+      );
+      console.log(quotationWasteId);
+
+      quotationWasteId.value = value;
+    };
     return (
       <Box>
         <Modal open={open} onClose={onClose}>
@@ -144,7 +207,40 @@ const WarehouseModal = forwardRef(
                   <Typography my={1}>Item {index + 1}</Typography>
                   <Box id={`warehoused-item-${index}`}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6} md={6} lg={2}>
+                      <Grid item xs={3.5}>
+                        <FormControl fullWidth>
+                          <InputLabel
+                            id={`waste-type-select-label-${index}`}
+                            style={{
+                              color: colors.grey[100],
+                            }}
+                          >
+                            Category
+                          </InputLabel>
+                          <Select
+                            labelId={`waste-type-select-label-${index}`}
+                            id={`quotationWasteId-${index}`}
+                            name={`quotationWasteId-${index}`}
+                            defaultValue={item.quotationWasteId || ""}
+                            onChange={(e) =>
+                              handleCategoryChange(index, e.target.value)
+                            }
+                            label="Category"
+                            fullWidth
+                            required
+                            disabled={formData.statusId === 4}
+                          >
+                            {quotations.map((quotation) =>
+                              quotation.QuotationWaste.map((waste) => (
+                                <MenuItem key={waste.id} value={waste.id}>
+                                  {waste.wasteName} - {waste.unit}
+                                </MenuItem>
+                              ))
+                            )}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={6} lg={3.5}>
                         <TextField
                           name={`description-${index}`}
                           label="Description"
@@ -154,7 +250,7 @@ const WarehouseModal = forwardRef(
                           defaultValue={item.description}
                         />
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={2}>
                         <FormControl fullWidth required>
                           <InputLabel id={`unit-label-${index}`}>
                             Unit
@@ -176,7 +272,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={2}>
                         <TextField
                           name={`quantity-${index}`}
                           label="Quantity"
@@ -186,7 +282,15 @@ const WarehouseModal = forwardRef(
                           defaultValue={item.quantity}
                         />
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={0.5}>
+                        <IconButton
+                          onClick={() => handleRemoveItem(index)}
+                          color="error"
+                        >
+                          <RemoveCircleOutlineIcon />
+                        </IconButton>
+                      </Grid>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <TextField
                           name={`gatePass-${index}`}
                           label="Gate Pass"
@@ -219,7 +323,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <FormControl fullWidth required>
                           <InputLabel id={`area-label-${index}`}>
                             Area
@@ -269,7 +373,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <FormControl fullWidth required>
                           <InputLabel id={`section-label-${index}`}>
                             Section
@@ -299,7 +403,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <FormControl fullWidth required>
                           <InputLabel id={`level-label-${index}`}>
                             Level
@@ -322,7 +426,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <TextField
                           name={`palletNumber-${index}`}
                           label="Pallet #"
@@ -332,7 +436,7 @@ const WarehouseModal = forwardRef(
                           defaultValue={item.palletNumber}
                         />
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1}>
+                      <Grid item xs={6} sm={3} md={2} lg={2}>
                         <TextField
                           name={`steamNumber-${index}`}
                           label="Steam Number"
@@ -341,14 +445,6 @@ const WarehouseModal = forwardRef(
                           autoComplete="off"
                           defaultValue={item.steamNumber}
                         />
-                      </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={0.5}>
-                        <IconButton
-                          onClick={() => handleRemoveItem(index)}
-                          color="error"
-                        >
-                          <RemoveCircleOutlineIcon />
-                        </IconButton>
                       </Grid>
                     </Grid>
                   </Box>

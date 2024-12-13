@@ -4,7 +4,12 @@ import WarehouseIcon from "@mui/icons-material/Warehouse";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { tokens } from "../../theme";
-import { timestampDate, formatWeight } from "../Functions";
+import {
+  timestampDate,
+  formatWeight,
+  formatTime2,
+  formatDate4,
+} from "../Functions";
 
 const WarehousedTransaction = ({ row }) => {
   const theme = useTheme();
@@ -47,18 +52,6 @@ const WarehousedTransaction = ({ row }) => {
     </div>
   );
 
-  const renderCellWithFormattedDate = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {formatDate(params.value)}
-    </div>
-  );
-
-  const renderCellWithFormattedTime = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {formatTimeToHHMMSS(params.value)}
-    </div>
-  );
-
   const columns = [
     {
       field: "warehousedDate",
@@ -67,7 +60,10 @@ const WarehousedTransaction = ({ row }) => {
       align: "center",
       flex: 1,
       minWidth: 100,
-      renderCell: renderCellWithFormattedDate,
+      valueGetter: (params) => {
+        return formatDate4(params.row.warehousedDate);
+      },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "warehousedTime",
@@ -76,7 +72,10 @@ const WarehousedTransaction = ({ row }) => {
       align: "center",
       flex: 1,
       minWidth: 100,
-      renderCell: renderCellWithFormattedTime,
+      valueGetter: (params) => {
+        return formatTime2(params.row.warehousedTime);
+      },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "description",

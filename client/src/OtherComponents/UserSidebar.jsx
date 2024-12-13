@@ -21,6 +21,7 @@ import LeaderSideBar from "../Employee/Layouts/Leader/LeaderSideBar";
 import HealthOfficerSidebar from "../Employee/Layouts/HealthOfficer/HealthOfficerSidebar";
 import TransporterSidebar from "../Client/Layouts/Transporter/TransporterSidebar";
 import CustomerSidebar from "../Client/Layouts/Customer/CustomerSidebar";
+import WarehouseOutSidebar from "../Employee/Layouts/WarehouseOut/WarehouseOutSidebar";
 
 const UserSidebar = ({ user }) => {
   const theme = useTheme();
@@ -79,6 +80,9 @@ const UserSidebar = ({ user }) => {
       break;
     case 14:
       sidebar = <WarehouseSidebar user={user} />;
+      break;
+    case 15:
+      sidebar = <WarehouseOutSidebar user={user} />;
       break;
     case 21:
       sidebar = <HRSidebar user={user} />;

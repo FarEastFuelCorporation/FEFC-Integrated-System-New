@@ -21,7 +21,7 @@ import {
   formatWeight2,
 } from "../Functions";
 
-const TreatedTransaction = ({
+const TreatedWarehouseTransaction = ({
   row,
   handleOpenModal,
   handleDeleteClick,
@@ -30,15 +30,16 @@ const TreatedTransaction = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const sortedTransaction =
-    row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.SortedTransaction;
+  const warehousedTransaction =
+    row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+      ?.WarehousedTransaction;
 
-  const sortedWasteTransaction =
-    row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.SortedTransaction[0]
-      ?.SortedWasteTransaction;
+  const warehousedTransactionItem =
+    row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]
+      ?.WarehousedTransaction[0]?.WarehousedTransactionItem;
 
-  const sortedWasteTransactionSorted = sortedWasteTransaction.sort((a, b) =>
-    a.wasteName.localeCompare(b.wasteName)
+  const sortedWarehousedTransactionItem = warehousedTransactionItem.sort(
+    (a, b) => a.description.localeCompare(b.description)
   );
 
   // Get the bookedTransactionId from ScheduledTransaction
@@ -47,41 +48,43 @@ const TreatedTransaction = ({
     row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.submitTo;
 
   // Loop through each SortedWasteTransaction
-  sortedWasteTransactionSorted.forEach((sortedTransaction) => {
+  sortedWarehousedTransactionItem.forEach((warehousedTransactionItem) => {
     let treatedWeight = 0; // Initialize total treated weight
 
     // Check if the TreatedWasteTransaction exists and is an array
-    if (Array.isArray(sortedTransaction.TreatedWasteTransaction)) {
+    if (Array.isArray(warehousedTransactionItem.TreatedWasteTransaction)) {
       // Update each TreatedWasteTransaction by adding machineName, treatmentProcess, and bookedTransactionId
-      sortedTransaction.TreatedWasteTransaction =
-        sortedTransaction.TreatedWasteTransaction.map((treatedTransaction) => {
-          // Add weight to the total treatedWeight
-          treatedWeight += treatedTransaction.weight || 0; // Add weight, default to 0 if undefined
+      warehousedTransactionItem.TreatedWasteTransaction =
+        warehousedTransactionItem.TreatedWasteTransaction.map(
+          (treatedTransaction) => {
+            // Add weight to the total treatedWeight
+            treatedWeight += treatedTransaction.weight || 0; // Add weight, default to 0 if undefined
 
-          if (treatedTransaction.TreatmentMachine) {
-            return {
-              ...treatedTransaction,
-              machineName: treatedTransaction.TreatmentMachine.machineName, // Add machineName attribute
-              treatmentProcess:
-                treatedTransaction.TreatmentMachine.TreatmentProcess
-                  .treatmentProcess, // Add treatmentProcess attribute
-              bookedTransactionId: bookedTransactionId, // Add bookedTransactionId attribute
-              submitTo: submitTo,
-            };
+            if (treatedTransaction.TreatmentMachine) {
+              return {
+                ...treatedTransaction,
+                machineName: treatedTransaction.TreatmentMachine.machineName, // Add machineName attribute
+                treatmentProcess:
+                  treatedTransaction.TreatmentMachine.TreatmentProcess
+                    .treatmentProcess, // Add treatmentProcess attribute
+                bookedTransactionId: bookedTransactionId, // Add bookedTransactionId attribute
+                submitTo: submitTo,
+              };
+            }
+            return treatedTransaction; // Return as is if no TreatmentMachine is present
           }
-          return treatedTransaction; // Return as is if no TreatmentMachine is present
-        });
+        );
     }
 
     // Add the treatedWeight to the SortedWasteTransaction
-    sortedTransaction.treatedWeight = treatedWeight;
+    warehousedTransactionItem.treatedWeight = treatedWeight;
   });
 
-  const totalSortedWeight = sortedWasteTransaction
+  const totalSortedWeight = sortedWarehousedTransactionItem
     .map((transaction) => transaction.weight || 0)
     .reduce((total, weight) => total + weight, 0); // Sum the weights using reduce
 
-  const totalTreatedWeight = sortedWasteTransaction
+  const totalTreatedWeight = sortedWarehousedTransactionItem
     .map((transaction) => transaction.treatedWeight || 0)
     .reduce((total, treatedWeight) => total + treatedWeight, 0); // Sum the weights using reduce
 
@@ -141,11 +144,11 @@ const TreatedTransaction = ({
     return { latestTreatedDate, latestTreatedTime };
   }
 
-  function getLatestTreatedDateAndTimeSubmitted(sortedTransaction) {
+  function getLatestTreatedDateAndTimeSubmitted(warehousedTransaction) {
     let latestTreatedDateTime = null;
 
-    if (sortedTransaction && Array.isArray(sortedTransaction)) {
-      sortedTransaction.forEach((transaction) => {
+    if (warehousedTransaction && Array.isArray(warehousedTransaction)) {
+      warehousedTransaction.forEach((transaction) => {
         if (
           transaction &&
           transaction.TreatedTransaction &&
@@ -170,22 +173,23 @@ const TreatedTransaction = ({
   }
 
   const { latestTreatedDate, latestTreatedTime } = getLatestTreatedDateAndTime(
-    sortedWasteTransaction
+    sortedWarehousedTransactionItem
   );
 
-  const { latestTreatedDateTime } =
-    getLatestTreatedDateAndTimeSubmitted(sortedTransaction);
+  const { latestTreatedDateTime } = getLatestTreatedDateAndTimeSubmitted(
+    warehousedTransaction
+  );
 
   function consolidateEmployeeNames(sortedWasteTransactions) {
     const employeeNames = new Set();
 
     if (sortedWasteTransactions && Array.isArray(sortedWasteTransactions)) {
-      sortedWasteTransactions.forEach((sortedTransaction) => {
+      sortedWasteTransactions.forEach((warehousedTransaction) => {
         if (
-          sortedTransaction &&
-          Array.isArray(sortedTransaction.TreatedWasteTransaction)
+          warehousedTransaction &&
+          Array.isArray(warehousedTransaction.TreatedWasteTransaction)
         ) {
-          sortedTransaction.TreatedWasteTransaction.forEach(
+          warehousedTransaction.TreatedWasteTransaction.forEach(
             (treatedWasteTransaction) => {
               if (
                 treatedWasteTransaction &&
@@ -206,7 +210,9 @@ const TreatedTransaction = ({
     return Array.from(employeeNames);
   }
 
-  const employeeNames = consolidateEmployeeNames(sortedWasteTransaction);
+  const employeeNames = consolidateEmployeeNames(
+    sortedWarehousedTransactionItem
+  );
 
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
@@ -335,8 +341,9 @@ const TreatedTransaction = ({
           </Grid>
         )}
       </Box>
-      {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
-        sortedWasteTransaction.map((waste, index) => {
+      {sortedWarehousedTransactionItem &&
+      sortedWarehousedTransactionItem.length > 0 ? (
+        sortedWarehousedTransactionItem.map((waste, index) => {
           const treatedWasteTransactionHeight =
             waste.TreatedWasteTransaction.length === 0
               ? rowHeight + headerHeight
@@ -355,7 +362,7 @@ const TreatedTransaction = ({
                   Waste Name: {waste.wasteName}
                 </Typography>
                 <Box sx={{ display: "flex", gap: 2 }}>
-                  {sortedWasteTransaction[index].treatedWeight !==
+                  {sortedWarehousedTransactionItem[index].treatedWeight !==
                     waste.weight &&
                     user.userType === 6 && (
                       <Button
@@ -373,7 +380,7 @@ const TreatedTransaction = ({
                       padding: "5px",
                       borderRadius: "5px",
                       backgroundColor:
-                        sortedWasteTransaction[index].treatedWeight ===
+                        sortedWarehousedTransactionItem[index].treatedWeight ===
                         waste.weight
                           ? colors.greenAccent[700]
                           : "red",
@@ -382,7 +389,7 @@ const TreatedTransaction = ({
                   >
                     <Typography variant="h6">
                       {formatWeight2(
-                        sortedWasteTransaction[index].treatedWeight
+                        sortedWarehousedTransactionItem[index].treatedWeight
                       )}{" "}
                       Kg Treated /{formatWeight2(waste.weight)} Kg
                     </Typography>
@@ -450,7 +457,7 @@ const TreatedTransaction = ({
         {" "}
         <Typography variant="h5">
           Finished Treatment Date:{" "}
-          {sortedTransaction[0].isFinishTreated
+          {warehousedTransaction[0].isFinishTreated
             ? latestTreatedDate &&
               format(new Date(latestTreatedDate), "MMMM dd, yyyy")
             : totalTreatedWeight > 0
@@ -459,7 +466,7 @@ const TreatedTransaction = ({
         </Typography>
         <Typography variant="h5">
           Finished Treatment Time:{" "}
-          {sortedTransaction[0].isFinishTreated
+          {warehousedTransaction[0].isFinishTreated
             ? latestTreatedDate &&
               format(parseTimeString(latestTreatedTime), "hh:mm aa")
             : totalTreatedWeight > 0
@@ -483,4 +490,4 @@ const TreatedTransaction = ({
   );
 };
 
-export default TreatedTransaction;
+export default TreatedWarehouseTransaction;

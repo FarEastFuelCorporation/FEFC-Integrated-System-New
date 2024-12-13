@@ -31,6 +31,8 @@ const Logistics = require("../models/Logistics");
 const TransporterClient = require("../models/TransporterClient");
 const WarehousedTransaction = require("../models/WarehousedTransaction");
 const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
+const WarehousedOutTransaction = require("../models/WarehousedOutTransaction");
+const WarehousedOutTransactionItem = require("../models/WarehousedOutTransactionItem");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -221,6 +223,71 @@ const getIncludeOptions = () => [
                 model: WarehousedTransactionItem,
                 as: "WarehousedTransactionItem",
                 required: false,
+                include: [
+                  {
+                    model: WarehousedOutTransactionItem,
+                    as: "WarehousedTransactionItemToOut",
+                    required: false,
+                    include: {
+                      model: WarehousedOutTransaction,
+                      as: "WarehousedOutTransaction",
+                      required: false,
+                    },
+                  },
+                  {
+                    model: TreatedWasteTransaction,
+                    as: "TreatedWasteTransaction",
+                    required: false,
+                    include: [
+                      {
+                        model: TreatmentMachine,
+                        as: "TreatmentMachine",
+                        required: false,
+                        include: [
+                          {
+                            model: TreatmentProcess,
+                            as: "TreatmentProcess",
+                            required: false,
+                          },
+                        ],
+                      },
+                      {
+                        model: TreatedTransaction,
+                        as: "TreatedTransaction",
+                        required: false,
+                        paranoid: true,
+                        include: {
+                          model: Employee,
+                          as: "Employee",
+                          attributes: ["firstName", "lastName"],
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                model: WarehousedOutTransaction,
+                as: "WarehousedOutTransaction",
+                required: false,
+                include: [
+                  {
+                    model: WarehousedOutTransactionItem,
+                    as: "WarehousedOutTransactionItem",
+                    required: false,
+                  },
+                  {
+                    model: Employee,
+                    as: "Employee",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
+              {
+                model: TreatedTransaction,
+                as: "TreatedTransaction",
+                required: false,
+                paranoid: true,
               },
               {
                 model: Employee,

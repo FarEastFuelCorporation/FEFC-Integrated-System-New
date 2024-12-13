@@ -40,6 +40,8 @@ import CustomDataGridStyles from "./CustomDataGridStyles";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import { calculateRemainingDays } from "./Functions";
 import axios from "axios";
+import WarehousedOutTransaction from "./Transactions/WarehousedOutTransaction";
+import TreatedWarehouseTransaction from "./Transactions/TreatedWarehouseTransaction";
 
 const Transaction = ({
   user,
@@ -614,8 +616,9 @@ const Transaction = ({
                                 (user.userType === 9 && row.statusId === 11) ||
                                 (user.userType === 10 && row.statusId === 12) ||
                                 (user.userType === 11 && row.statusId === 13) ||
-                                (user.userType === 14 &&
-                                  (row.statusId === 6 || row.statusId === 7))
+                                (user.userType === 11 && row.statusId === 13) ||
+                                (user.userType === 14 && row.statusId === 6) ||
+                                (user.userType === 15 && row.statusId === 7)
                               ) {
                                 return (
                                   <div style={{ display: "flex" }}>
@@ -691,7 +694,13 @@ const Transaction = ({
                     {user.userType === 14 && (
                       <WarehousedTransaction row={row} />
                     )}
-
+                    {user.userType === 15 && (
+                      <WarehousedOutTransaction
+                        row={row}
+                        user={user}
+                        handleDeleteClick={handleDeleteClick}
+                      />
+                    )}
                     {user.userType === 6 && (
                       <TreatedTransaction
                         row={row}
@@ -798,18 +807,39 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {(row.statusId >= 7 || row.statusId === 5) && (
-                        <TreatedTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
+                      {(row.statusId >= 7 || row.statusId === 5) &&
+                        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                          ?.submitTo === "SORTING" && (
+                          <TreatedTransaction
+                            row={row}
+                            handleOpenModal={handleOpenModal}
+                            handleDeleteClick={handleDeleteClick}
+                            user={user}
+                          />
+                        )}
+                      {(row.statusId >= 7 || row.statusId === 5) &&
+                        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                          ?.submitTo === "WAREHOUSE" && (
+                          <TreatedWarehouseTransaction
+                            row={row}
+                            handleOpenModal={handleOpenModal}
+                            handleDeleteClick={handleDeleteClick}
+                            user={user}
+                          />
+                        )}
                       {row.statusId >= 4 &&
                         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
                           ?.submitTo === "SORTING" && (
                           <SortedTransaction row={row} />
+                        )}
+                      {row.statusId >= 6 &&
+                        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                          ?.submitTo === "WAREHOUSE" && (
+                          <WarehousedOutTransaction
+                            row={row}
+                            user={user}
+                            handleDeleteClick={handleDeleteClick}
+                          />
                         )}
                       {row.statusId >= 4 &&
                         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]

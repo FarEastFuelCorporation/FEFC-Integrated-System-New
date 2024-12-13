@@ -20,6 +20,7 @@ import LeaderRoutes from "../Employee/Routes/LeaderRoutes";
 import HealthOfficerRoutes from "../Employee/Routes/HealthOfficerRoutes";
 import TransporterRoutes from "../Client/Routes/TransporterRoutes";
 import CustomerRoutes from "../Client/Routes/CustomerRoutes";
+import WarehouseOutRoutes from "../Employee/Routes/WarehouseOutRoutes";
 
 const Dashboard = ({ user, onUpdateUser }) => {
   switch (user.userType) {
@@ -124,6 +125,12 @@ const Dashboard = ({ user, onUpdateUser }) => {
       return (
         <RoleProtectedRoute user={user} allowedRoles={[14]}>
           <WarehouseRoutes user={user} onUpdateUser={onUpdateUser} />
+        </RoleProtectedRoute>
+      );
+    case 15:
+      return (
+        <RoleProtectedRoute user={user} allowedRoles={[15]}>
+          <WarehouseOutRoutes user={user} onUpdateUser={onUpdateUser} />
         </RoleProtectedRoute>
       );
     case 21:

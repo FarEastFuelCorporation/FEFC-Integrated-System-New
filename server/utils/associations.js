@@ -57,6 +57,8 @@ const VehicleAttachment = require("../models/VehicleAttachment");
 const TransporterClient = require("../models/TransporterClient");
 const Medicine = require("../models/Medicine");
 const MedicineLog = require("../models/MedicineLog");
+const WarehousedOutTransaction = require("../models/WarehousedOutTransaction");
+const WarehousedOutTransactionItem = require("../models/WarehousedOutTransactionItem");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -530,6 +532,17 @@ WarehousedTransaction.belongsTo(Employee, {
   targetKey: "employeeId",
 });
 
+Employee.hasMany(WarehousedOutTransaction, {
+  as: "WarehousedOutTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+WarehousedOutTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
 Employee.hasMany(Medicine, {
   as: "Medicine",
   foreignKey: "createdBy",
@@ -934,6 +947,71 @@ WarehousedTransaction.hasMany(WarehousedTransactionItem, {
 WarehousedTransactionItem.belongsTo(WarehousedTransaction, {
   as: "WarehousedTransaction",
   foreignKey: "warehousedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+WarehousedTransaction.hasMany(WarehousedOutTransaction, {
+  as: "WarehousedOutTransaction",
+  foreignKey: "warehousedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+WarehousedOutTransaction.belongsTo(WarehousedTransaction, {
+  as: "WarehousedTransaction",
+  foreignKey: "warehousedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+WarehousedOutTransaction.hasMany(WarehousedOutTransactionItem, {
+  as: "WarehousedOutTransactionItem",
+  foreignKey: "warehousedOutTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+WarehousedOutTransactionItem.belongsTo(WarehousedOutTransaction, {
+  as: "WarehousedOutTransaction",
+  foreignKey: "warehousedOutTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+WarehousedTransactionItem.hasMany(WarehousedOutTransactionItem, {
+  as: "WarehousedTransactionItemToOut",
+  foreignKey: "warehousedTransactionItemId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+WarehousedOutTransactionItem.belongsTo(WarehousedTransactionItem, {
+  as: "WarehousedTransactionItem",
+  foreignKey: "warehousedTransactionItemId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+WarehousedTransaction.hasMany(TreatedTransaction, {
+  as: "TreatedTransaction",
+  foreignKey: "warehousedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatedTransaction.belongsTo(WarehousedTransaction, {
+  as: "WarehousedTransaction",
+  foreignKey: "warehousedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+WarehousedTransactionItem.hasMany(TreatedWasteTransaction, {
+  as: "TreatedWasteTransaction",
+  foreignKey: "warehousedTransactionItemId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+TreatedWasteTransaction.belongsTo(WarehousedTransactionItem, {
+  as: "WarehousedTransactionItem",
+  foreignKey: "warehousedTransactionItemId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

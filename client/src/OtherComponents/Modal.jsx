@@ -12,6 +12,7 @@ import BillingApprovalModal from "./TransactionModals/BillingApprovalModal";
 import BillingDistributionModal from "./TransactionModals/BillingDistributionModal";
 import CollectionModal from "./TransactionModals/CollectionModal";
 import WarehouseModal from "./TransactionModals/WarehouseModal";
+import WarehouseOutModal from "./TransactionModals/WarehouseOutModal";
 
 const Modal = forwardRef(
   (
@@ -239,6 +240,26 @@ const Modal = forwardRef(
       case 14:
         ModalComponent = (
           <WarehouseModal
+            user={user}
+            error={error}
+            open={open}
+            onClose={onClose}
+            formData={formData}
+            setFormData={setFormData}
+            handleInputChange={handleInputChange}
+            handleFormSubmit={handleFormSubmit}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            showErrorMessage={showErrorMessage}
+            setShowErrorMessage={setShowErrorMessage}
+            refs={refs}
+            ref={ref}
+          />
+        );
+        break;
+      case 15:
+        ModalComponent = (
+          <WarehouseOutModal
             user={user}
             error={error}
             open={open}

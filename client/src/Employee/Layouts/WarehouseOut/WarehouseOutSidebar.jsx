@@ -19,7 +19,7 @@ import Item from "../../../OtherComponents/Item";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
 
-const WarehouseSidebar = ({ user }) => {
+const WarehouseOutSidebar = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
@@ -182,7 +182,7 @@ const WarehouseSidebar = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  WAREHOUSE IN
+                  WAREHOUSE OUT
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
@@ -294,4 +294,4 @@ const WarehouseSidebar = ({ user }) => {
   );
 };
 
-export default WarehouseSidebar;
+export default WarehouseOutSidebar;

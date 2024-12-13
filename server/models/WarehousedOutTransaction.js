@@ -1,11 +1,11 @@
-// models/TreatedTransaction.js
+// models/WarehousedTransaction.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 
-const TreatedTransaction = sequelize.define(
-  "TreatedTransaction",
+const WarehousedOutTransaction = sequelize.define(
+  "WarehousedOutTransaction",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,13 +13,17 @@ const TreatedTransaction = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    sortedTransactionId: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
     warehousedTransactionId: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
+    },
+    warehousedOutDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    warehousedOutTime: {
+      type: DataTypes.TIME,
+      allowNull: false,
     },
     remarks: {
       type: DataTypes.STRING,
@@ -58,4 +62,4 @@ const TreatedTransaction = sequelize.define(
   }
 );
 
-module.exports = TreatedTransaction;
+module.exports = WarehousedOutTransaction;

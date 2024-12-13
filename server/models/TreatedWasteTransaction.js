@@ -19,7 +19,11 @@ const TreatedWasteTransaction = sequelize.define(
     },
     sortedWasteTransactionId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
+    },
+    warehousedTransactionItemId: {
+      type: DataTypes.UUID,
+      allowNull: true,
     },
     treatmentProcessId: {
       type: DataTypes.UUID,

@@ -289,10 +289,30 @@ const Transaction = ({
               const response = await axios.get(
                 `${apiUrl}/api/bookedTransaction/full/${id}`
               );
-              setRow(response.data.transaction.transaction);
-              handleOpenTransactionModal(response.data.transaction.transaction);
+
+              // Check for errors in the response
+              if (response.data?.error) {
+                throw new Error(response.data.error);
+              }
+
+              // Ensure the data structure is valid
+              if (!response.data?.transaction?.transaction) {
+                throw new Error("Invalid data received from the server.");
+              }
+              console.log(response.data.transaction.transaction);
+              // Only call these functions if there are no errors
+              if (response.data.transaction.transaction) {
+                setRow(response.data.transaction.transaction);
+                handleOpenTransactionModal(
+                  response.data.transaction.transaction
+                );
+              }
             } catch (error) {
               console.error("Error fetching document file:", error);
+              alert(
+                error.response?.data?.message ||
+                  "An error occurred while fetching the transaction. Please try again."
+              );
             } finally {
               setLoading(false);
               setLoadingRowId(null); // Reset the loading row ID after the API call completes

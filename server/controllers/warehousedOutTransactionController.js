@@ -36,7 +36,7 @@ async function createWarehousedOutTransactionController(req, res) {
     console.log(warehousedOutItems);
     console.log(isDone);
 
-    // Creating a new sorted transaction
+    // Creating a new warehoused out transaction
     const newWarehousedTransaction = await WarehousedOutTransaction.create(
       {
         warehousedTransactionId,
@@ -86,7 +86,7 @@ async function createWarehousedOutTransactionController(req, res) {
       await transaction.commit();
 
       // fetch transactions
-      const data = await fetchData(statusId);
+      const data = await fetchData(transactionStatusId);
 
       // Respond with the updated data
       res.status(200).json({
@@ -149,12 +149,12 @@ async function updateWarehousedOutTransactionController(req, res) {
 
     remarks = remarks && remarks.toUpperCase();
 
-    // Find the sorted transaction by ID and update it
+    // Find the warehoused out transaction by ID and update it
     const updatedWarehousedOutTransaction =
       await WarehousedOutTransaction.findByPk(id);
 
     if (updatedWarehousedOutTransaction) {
-      // Update sorted transaction attributes
+      // Update warehoused out transaction attributes
       updatedWarehousedOutTransaction.warehousedTransactionId =
         warehousedTransactionId;
       updatedWarehousedOutTransaction.warehousedOutDate = warehousedOutDate;
@@ -162,22 +162,22 @@ async function updateWarehousedOutTransactionController(req, res) {
       updatedWarehousedOutTransaction.remarks = remarks;
       updatedWarehousedOutTransaction.updatedBy = createdBy;
 
-      // Save the updated sorted transaction
+      // Save the updated warehoused out transaction
       await updatedWarehousedOutTransaction.save({ transaction });
 
-      // Fetch existing sorted items and scraps from the database
+      // Fetch existing warehoused out items and scraps from the database
       const existingWarehousedOutTransactionItems =
         await WarehousedOutTransactionItem.findAll({
           where: { warehousedOutTransactionId: id },
           transaction,
         });
 
-      // Extract existing sorted item and scrap IDs
+      // Extract existing warehoused out item and scrap IDs
       const existingItemIds = existingWarehousedOutTransactionItems.map(
         (item) => item.id
       );
 
-      // Extract updated sorted item and scrap IDs from the request body
+      // Extract updated warehoused out item and scrap IDs from the request body
       const updatedItemIds = warehousedOutItems.map((item) => item.id);
 
       // Identify items and scraps to delete (those not present in the updated data)
@@ -223,7 +223,7 @@ async function updateWarehousedOutTransactionController(req, res) {
       await transaction.commit();
 
       // fetch transactions
-      const data = await fetchData(statusId);
+      const data = await fetchData(transactionStatusId);
 
       // Respond with the updated data
       res.status(200).json({
@@ -232,14 +232,14 @@ async function updateWarehousedOutTransactionController(req, res) {
         finishedTransactions: data.finished,
       });
     } else {
-      // If sorted transaction with the specified ID was not found
+      // If warehoused out transaction with the specified ID was not found
       res
         .status(404)
         .json({ message: `Warehoused Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating sorted transaction:", error);
+    console.error("Error updating warehoused out transaction:", error);
     await transaction.rollback();
     res.status(500).json({ message: "Internal server error" });
   }
@@ -251,14 +251,14 @@ async function deleteWarehousedOutTransactionController(req, res) {
     const id = req.params.id;
     const { deletedBy, bookedTransactionId } = req.body;
 
-    console.log(bookedTransactionId);
+    console.log("id", id);
+    console.log("bookedTransactionId", bookedTransactionId);
 
-    console.log("Soft deleting sorted transaction with ID:", id);
+    console.log("Soft deleting warehoused out transaction with ID:", id);
 
-    // Find the sorted transaction by UUID (id)
-    const warehousedTransactionToDelete = await WarehousedTransaction.findByPk(
-      id
-    );
+    // Find the warehoused out transaction by UUID (id)
+    const warehousedTransactionToDelete =
+      await WarehousedOutTransactionItem.findByPk(id);
 
     if (warehousedTransactionToDelete) {
       // Update the deletedBy field
@@ -271,15 +271,15 @@ async function deleteWarehousedOutTransactionController(req, res) {
       );
       console.log(updatedBookedTransaction);
 
-      updatedBookedTransaction.statusId = statusId;
+      updatedBookedTransaction.statusId = transactionStatusId;
 
       await updatedBookedTransaction.save();
 
-      // Soft delete the sorted transaction (sets deletedAt timestamp)
+      // Soft delete the warehoused out transaction (sets deletedAt timestamp)
       await warehousedTransactionToDelete.destroy();
 
       // fetch transactions
-      const data = await fetchData(statusId);
+      const data = await fetchData(transactionStatusId);
 
       // Respond with the updated data
       res.status(200).json({
@@ -288,14 +288,14 @@ async function deleteWarehousedOutTransactionController(req, res) {
         finishedTransactions: data.finished,
       });
     } else {
-      // If sorted transaction with the specified ID was not found
+      // If warehoused out transaction with the specified ID was not found
       res
         .status(404)
         .json({ message: `Warehoused Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error soft-deleting sorted transaction:", error);
+    console.error("Error soft-deleting warehoused out transaction:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

@@ -25,25 +25,22 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
     receivedTransaction.WarehousedTransaction?.[0] || {};
 
   const warehousedOutTransaction =
-    receivedTransaction.WarehousedTransaction?.[0]
-      .WarehousedOutTransaction?.[0] || {};
+    receivedTransaction?.WarehousedTransaction?.[0]
+      ?.WarehousedOutTransaction?.[0] || {};
 
   const warehousedTransactionItem =
-    warehousedTransaction.WarehousedTransactionItem.sort((a, b) =>
-      a.description.localeCompare(b.description)
-    );
-
-  const warehousedTransactionOutItem = warehousedTransaction
-    ? warehousedTransactionItem.map((transaction) =>
-        transaction.WarehousedOutTransactionItem
-          ? transaction.WarehousedOutTransactionItem.map((item) => ({
-              ...item,
-              warehousedOutDate: item.warehousedOutDate,
-              warehousedOutTime: item.warehousedOutTime,
-            }))
-          : []
-      )
-    : [];
+    warehousedTransaction?.WarehousedTransactionItem
+      ? warehousedTransaction?.WarehousedTransactionItem.sort((a, b) =>
+          a.description.localeCompare(b.description)
+        ).map((item) => ({
+          ...item,
+          WarehousedTransactionItemToOut:
+            item.WarehousedTransactionItemToOut.map((child) => ({
+              ...child,
+              bookedTransactionId: row.id, // Assuming `row.id` is available
+            })),
+        }))
+      : [];
 
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
@@ -141,7 +138,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
 
           {warehousedTransactionItem &&
             warehousedTransactionItem.length > 0 &&
-            warehousedTransactionItem.map((transaction) => {
+            warehousedTransactionItem.map((transaction, index) => {
               const warehousedTransactionOutItemHeight =
                 transaction.WarehousedTransactionItemToOut.length === 0
                   ? rowHeight + headerHeight
@@ -150,7 +147,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
                     headerHeight;
 
               return (
-                <>
+                <Box key={index}>
                   <Typography variant="subtitle1" gutterBottom>
                     {transaction.description}
                   </Typography>
@@ -207,7 +204,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
                       ],
                     }}
                   />
-                </>
+                </Box>
               );
             })}
 
@@ -280,7 +277,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
 
           {warehousedTransactionItem &&
             warehousedTransactionItem.length > 0 &&
-            warehousedTransactionItem.map((transaction) => {
+            warehousedTransactionItem.map((transaction, index) => {
               const warehousedTransactionOutItemHeight =
                 transaction.WarehousedTransactionItemToOut.length === 0
                   ? rowHeight + headerHeight
@@ -289,7 +286,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
                     headerHeight;
 
               return (
-                <>
+                <Box key={index}>
                   <Typography variant="subtitle1" gutterBottom>
                     {transaction.description}
                   </Typography>
@@ -346,24 +343,24 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
                       ],
                     }}
                   />
-                </>
+                </Box>
               );
             })}
 
           <br />
           <Typography variant="h5">
-            Batch Weight: {formatWeight(receivedTransaction.netWeight)} Kg
+            Batch Weight: {formatWeight(receivedTransaction?.netWeight)} Kg
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {warehousedOutTransaction.remarks
-              ? warehousedOutTransaction.remarks
+            {warehousedOutTransaction?.remarks
+              ? warehousedOutTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
             Sorted By:{" "}
-            {`${warehousedOutTransaction.Employee.firstName || ""} ${
-              warehousedOutTransaction.Employee.lastName || ""
+            {`${warehousedOutTransaction?.Employee?.firstName || ""} ${
+              warehousedOutTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
           <br />

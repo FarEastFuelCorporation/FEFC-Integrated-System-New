@@ -118,6 +118,7 @@ const WarehousedOutTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row) => {
+    console.log(row);
     const warehousedTransaction =
       row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
         .WarehousedTransaction?.[0] || {};
@@ -175,7 +176,7 @@ const WarehousedOutTransactions = ({ user }) => {
 
   const handleEditClick = (row) => {
     const typeToEdit = row;
-
+    console.log(row);
     if (typeToEdit) {
       const warehousedOutTransaction =
         typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
@@ -209,6 +210,7 @@ const WarehousedOutTransactions = ({ user }) => {
                 : 0;
 
               return {
+                bookedTransactionId: row.id || "",
                 warehousedTransactionItemId: item.id || "",
                 description: item.description || "",
                 unit: item.unit || "",
@@ -238,15 +240,12 @@ const WarehousedOutTransactions = ({ user }) => {
   const handleConfirmDelete = async (row) => {
     try {
       setLoading(true);
-      await axios.delete(
-        `${apiUrl}/api/warehousedOutTransaction/${row.ScheduledTransaction[0].ReceivedTransaction?.[0].WarehousedTransaction?.[0]?.WarehousedOutTransaction?.[0]?.id}`,
-        {
-          data: {
-            deletedBy: user.id,
-            bookedTransactionId: row.id,
-          },
-        }
-      );
+      await axios.delete(`${apiUrl}/api/warehousedOutTransaction/${row.id}`, {
+        data: {
+          deletedBy: user.id,
+          bookedTransactionId: row.bookedTransactionId,
+        },
+      });
 
       fetchData();
       setSuccessMessage("Warehoused Out Transaction deleted successfully!");

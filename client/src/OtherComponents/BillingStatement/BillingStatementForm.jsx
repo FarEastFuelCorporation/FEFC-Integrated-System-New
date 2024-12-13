@@ -533,6 +533,8 @@ const BillingStatementForm = ({
 
                   const waste = item; // Assuming item contains waste details
 
+                  console.log(waste);
+
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
                       {waste[9] === "CLIENT NAME" ? (
@@ -597,7 +599,7 @@ const BillingStatementForm = ({
                               waste[9] === "CLIENT NAME" ? "bold" : "normal"
                             )}
                           >
-                            {waste[11] === "true" ? waste[10] : waste[3]}
+                            {waste[3]}
                           </TableCell>
                           <TableCell
                             align="center"

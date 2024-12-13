@@ -272,6 +272,8 @@ const BillingContent = ({
                   const isWasteName =
                     transaction.BilledTransaction?.[0]?.isWasteName;
 
+                  console.log(isWasteName);
+
                   const clientName = waste.TransporterClient?.clientName;
 
                   let newClient = false;
@@ -286,6 +288,9 @@ const BillingContent = ({
 
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
+
+                  console.log(waste.wasteName);
+                  console.log(waste.QuotationWaste.wasteName);
 
                   return (
                     <>

@@ -303,6 +303,8 @@ async function updateBilledTransactionController(req, res) {
             { transaction }
           );
 
+          const isCertified = updatedBookedTransaction.statusId === 9;
+
           if (updatedBookedTransaction) {
             if (isCertified) {
               updatedBookedTransaction.statusId = statusId;

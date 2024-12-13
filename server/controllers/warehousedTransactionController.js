@@ -47,6 +47,7 @@ async function createWarehousedTransactionController(req, res) {
         return WarehousedTransactionItem.create(
           {
             warehousedTransactionId: newWarehousedTransaction.id,
+            quotationWasteId: item.quotationWasteId,
             gatePass: item.gatePass && item.gatePass.toUpperCase(),
             warehouse: item.warehouse,
             area: item.area,
@@ -183,6 +184,7 @@ async function updateWarehousedTransactionController(req, res) {
           // Update existing item
           await WarehousedTransactionItem.update(
             {
+              quotationWasteId: item.quotationWasteId,
               gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,
@@ -202,6 +204,7 @@ async function updateWarehousedTransactionController(req, res) {
           await WarehousedTransactionItem.create(
             {
               warehousedTransactionId: id,
+              quotationWasteId: item.quotationWasteId,
               gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,

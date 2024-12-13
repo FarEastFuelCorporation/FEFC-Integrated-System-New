@@ -122,7 +122,7 @@ const BilledTransactions = ({ user }) => {
 
     setFormData({
       row: newRow,
-      clientType: newRow.createdBy.substring(0, 3),
+      clientType: newRow?.createdBy.substring(0, 3),
       id: "",
       bookedTransactionId: selectedIds,
       billedDate: "",

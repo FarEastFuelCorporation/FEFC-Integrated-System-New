@@ -24,6 +24,7 @@ const WarehousedTransactions = ({ user }) => {
   const warehousedItemsRefContent = useRef();
   let warehousedItemsRef = useRef([
     {
+      quotationWasteId: "",
       description: "",
       quantity: 0,
       gatePass: "",
@@ -46,6 +47,7 @@ const WarehousedTransactions = ({ user }) => {
     warehousedItems: [
       [
         {
+          quotationWasteId: "",
           description: "",
           quantity: 0,
           gatePass: "",
@@ -137,6 +139,7 @@ const WarehousedTransactions = ({ user }) => {
       warehousedItems: [
         [
           {
+            quotationWasteId: "",
             description: "",
             quantity: 0,
             gatePass: "",
@@ -159,6 +162,46 @@ const WarehousedTransactions = ({ user }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setFormData({
+      id: "",
+      warehousedDate: "",
+      warehousedTime: "",
+      warehousedItems: [
+        [
+          {
+            quotationWasteId: "",
+            description: "",
+            quantity: 0,
+            gatePass: "",
+            warehouse: "",
+            area: "",
+            section: "",
+            level: "",
+            palletNumber: "",
+            steamNumber: "",
+            unit: "",
+          },
+        ],
+      ],
+      remarks: "",
+      statusId: 6,
+      createdBy: user.id,
+    });
+    warehousedItemsRef.current = [
+      {
+        quotationWasteId: "",
+        description: "",
+        quantity: 0,
+        gatePass: "",
+        warehouse: "",
+        area: "",
+        section: "",
+        level: "",
+        palletNumber: "",
+        steamNumber: "",
+        unit: "",
+      },
+    ];
   };
 
   const handleEditClick = (row) => {
@@ -180,6 +223,7 @@ const WarehousedTransactions = ({ user }) => {
         warehousedItems: warehousedTransaction.WarehousedTransactionItem
           ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
               warehousedTransactionId: item.warehousedTransactionId || "",
+              quotationWasteId: item.quotationWasteId || "",
               gatePass: item.gatePass || "",
               warehouse: item.warehouse || "",
               area: item.area || "",
@@ -201,6 +245,7 @@ const WarehousedTransactions = ({ user }) => {
         warehousedTransaction.WarehousedTransactionItem
           ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
               warehousedTransactionId: item.warehousedTransactionId || "",
+              quotationWasteId: item.quotationWasteId || "",
               gatePass: item.gatePass || "",
               warehouse: item.warehouse || "",
               area: item.area || "",
@@ -272,6 +317,9 @@ const WarehousedTransactions = ({ user }) => {
           unit: itemRef.querySelector(`[name='unit-${index}']`)?.value || "",
           quantity:
             itemRef.querySelector(`[name='quantity-${index}']`)?.value || 0,
+          quotationWasteId:
+            itemRef.querySelector(`[name='quotationWasteId-${index}']`)
+              ?.value || "",
           gatePass:
             itemRef.querySelector(`[name='gatePass-${index}']`)?.value || "",
           warehouse:

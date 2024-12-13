@@ -24,6 +24,7 @@ const WarehouseModal = forwardRef(
       open,
       onClose,
       formData,
+      setFormData,
       handleFormSubmit,
       errorMessage,
       showErrorMessage,
@@ -66,6 +67,7 @@ const WarehouseModal = forwardRef(
     const handleAddItem = () => {
       // Accessing current warehoused items and adding a new one
       const newItem = {
+        quotationWasteId: "",
         description: "",
         quantity: 0,
         gatePass: "",
@@ -79,20 +81,24 @@ const WarehouseModal = forwardRef(
       };
 
       warehousedItemsRef.current = [...warehousedItemsRef.current, newItem];
-      forceUpdate(); // Trigger re-render
+      setFormData((prev) => ({
+        ...prev,
+        warehousedItems: [...prev.warehousedItems, newItem],
+      }));
     };
 
     const handleRemoveItem = (index) => {
       const updatedItems = warehousedItemsRef.current.filter(
         (_, i) => i !== index
       );
-      warehousedItemsRef.current = updatedItems;
-      forceUpdate(); // Trigger re-render
-    };
 
-    // Force re-render helper
-    const [, setRender] = React.useState(0);
-    const forceUpdate = () => setRender((prev) => prev + 1);
+      warehousedItemsRef.current = updatedItems;
+
+      setFormData((prev) => ({
+        ...prev,
+        warehousedItems: prev.warehousedItems.filter((_, i) => i !== index),
+      }));
+    };
 
     // const handleWasteCodeChange = useCallback(
     //   (index, value) => {
@@ -126,14 +132,29 @@ const WarehouseModal = forwardRef(
     // );
 
     const handleCategoryChange = (index, value) => {
-      console.log(value);
-      const quotationWasteId = document.querySelector(
-        `#quotationWasteId-${index}`
-      );
-      console.log(quotationWasteId);
+      // Access the specific element in the warehousedItemsRef using index
+      const itemRef = warehousedItemsRef.current[index];
+      if (itemRef) {
+        itemRef.quotationWasteId = value; // Update the value in the ref
+        console.log("Updated Ref:", warehousedItemsRef.current[index]);
 
-      quotationWasteId.value = value;
+        const quotationWasteId = document.querySelector(
+          `#quotationWasteId-${index}`
+        );
+
+        console.log(value);
+
+        setFormData((prev) => ({
+          ...prev,
+          warehousedItems: prev.warehousedItems.map((item, idx) =>
+            idx === index ? { ...item, quotationWasteId: value } : item
+          ),
+        }));
+
+        quotationWasteId.value = value;
+      }
     };
+
     return (
       <Box>
         <Modal open={open} onClose={onClose}>
@@ -221,7 +242,10 @@ const WarehouseModal = forwardRef(
                             labelId={`waste-type-select-label-${index}`}
                             id={`quotationWasteId-${index}`}
                             name={`quotationWasteId-${index}`}
-                            defaultValue={item.quotationWasteId || ""}
+                            value={
+                              formData?.warehousedItems[index]
+                                ?.quotationWasteId || ""
+                            }
                             onChange={(e) =>
                               handleCategoryChange(index, e.target.value)
                             }
@@ -243,6 +267,7 @@ const WarehouseModal = forwardRef(
                       <Grid item xs={12} sm={6} md={6} lg={3.5}>
                         <TextField
                           name={`description-${index}`}
+                          id={`description-${index}`}
                           label="Description"
                           fullWidth
                           required

@@ -71,7 +71,7 @@ async function getClientsController(req, res) {
   try {
     // Fetch all clients from the database
     const clients = await Client.findAll({
-      attributes: { exclude: ["clientPicture"] },
+      // attributes: { exclude: ["clientPicture"] },
       order: [["clientName", "ASC"]],
       include: {
         model: Employee,

@@ -147,18 +147,18 @@ const Quotations = ({ user }) => {
       setQuotationsData(response.data.quotations);
       setLoading(false);
 
-      // let fullResponse;
-      // if (
-      //   user.userType === "GEN" ||
-      //   user.userType === "TRP" ||
-      //   user.userType === "CUS" ||
-      //   user.userType === "IFM"
-      // ) {
-      // } else {
-      //   fullResponse = await axios.get(`${apiUrl}/api/quotation/full`);
+      let fullResponse;
+      if (
+        user.userType === "GEN" ||
+        user.userType === "TRP" ||
+        user.userType === "CUS" ||
+        user.userType === "IFM"
+      ) {
+      } else {
+        fullResponse = await axios.get(`${apiUrl}/api/quotation/full`);
 
-      //   setQuotationsData(fullResponse.data.quotations);
-      // }
+        setQuotationsData(fullResponse.data.quotations);
+      }
       setLoadingPicture(false);
     } catch (error) {
       console.error("Error fetching quotationsData:", error);

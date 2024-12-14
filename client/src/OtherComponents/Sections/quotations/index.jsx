@@ -157,7 +157,6 @@ const Quotations = ({ user }) => {
       } else {
         fullResponse = await axios.get(`${apiUrl}/api/quotation/full`);
 
-        console.log(fullResponse.data.quotations);
         setQuotationsData(fullResponse.data.quotations);
       }
       setLoadingPicture(false);
@@ -316,9 +315,6 @@ const Quotations = ({ user }) => {
   }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (row) => {
-    console.log(row);
-    console.log(row.quotationWastes);
-
     if (row) {
       setFormData({
         id: row.id,

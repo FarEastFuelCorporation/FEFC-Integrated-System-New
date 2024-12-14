@@ -245,15 +245,12 @@ async function getQuotationsFullController(req, res) {
     const flattenedData = quotations.map((item) => {
       const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
       const clientPicture =
-        quotation.Client &&
-        quotation.Client.clientPicture &&
-        quotation.Client.clientPicture.data
-          ? `data:${quotation.Client.clientPicture.type};base64,${Buffer.from(
-              quotation.Client.clientPicture.data
+        quotation.Client && quotation.Client.clientPicture
+          ? `data:image/png;base64,${Buffer.from(
+              quotation.Client.clientPicture
             ).toString("base64")}`
           : null;
 
-      console.log;
       return {
         ...quotation,
         clientPicture,

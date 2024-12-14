@@ -1054,8 +1054,8 @@ const BillingContent = ({
             {groupedTransactions
               // Sort transactions by haulingDate from oldest to newest
               .map((transaction, index) => {
-                const remarks =
-                  transaction.BilledTransaction?.[0]?.remarks || null;
+                // const remarks =
+                //   transaction.BilledTransaction?.[0]?.remarks || null;
 
                 const wasteRows = transaction.transactions.map((waste, idx) => {
                   const fontColor =

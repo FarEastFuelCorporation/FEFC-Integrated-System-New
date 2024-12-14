@@ -71,6 +71,7 @@ async function getClientsController(req, res) {
   try {
     // Fetch all clients from the database
     const clients = await Client.findAll({
+      attributes: { exclude: ["clientPicture"] },
       order: [["clientName", "ASC"]],
       include: {
         model: Employee,
@@ -153,8 +154,8 @@ async function updateClientController(req, res) {
       await updatedClient.save();
 
       const client = await Client.findByPk(id);
-      
-      console.log(client)
+
+      console.log(client);
 
       // Respond with the updated client object
       res.json({ client });

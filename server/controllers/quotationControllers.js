@@ -230,48 +230,15 @@ async function getQuotationsFullController(req, res) {
     const quotations = await Quotation.findAll({
       include: [
         {
-          model: QuotationWaste,
-          as: "QuotationWaste",
-          include: [
-            {
-              model: TypeOfWaste,
-              as: "TypeOfWaste",
-              attributes: ["wasteCode"],
-            },
-            {
-              model: Quotation,
-              as: "Quotation",
-            },
-          ],
-        },
-        {
-          model: QuotationTransportation,
-          as: "QuotationTransportation",
-          include: [
-            {
-              model: VehicleType,
-              as: "VehicleType",
-            },
-            {
-              model: Quotation,
-              as: "Quotation",
-            },
-          ],
-        },
-        {
           model: Client,
           as: "Client",
-          attributes: { exclude: ["clientPicture"] },
-        },
-        {
-          model: IdInformation,
-          as: "IdInformation",
-          attributes: ["first_name", "middle_name", "last_name", "signature"],
+          attributes: ["clientName", "clientPicture"],
         },
       ],
       where: {
         status: "active",
       },
+      order: [["quotationCode", "ASC"]], // Ordering at the top level
     });
 
     // Flatten and format the data
@@ -281,8 +248,6 @@ async function getQuotationsFullController(req, res) {
         ...quotation,
         clientPicture: quotation.Client ? quotation.Client.clientPicture : null,
         clientName: quotation.Client ? quotation.Client.clientName : null,
-        quotationWastes: quotation.QuotationWaste || [],
-        quotationTransportation: quotation.QuotationTransportation || [],
         validity: quotation.validity
           ? new Date(quotation.validity).toISOString().split("T")[0]
           : null, // Convert timestamp to yyyy-mm-dd format

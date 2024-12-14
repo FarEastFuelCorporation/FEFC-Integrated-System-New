@@ -157,6 +157,7 @@ const Quotations = ({ user }) => {
       } else {
         fullResponse = await axios.get(`${apiUrl}/api/quotation/full`);
 
+        console.log(fullResponse.data.quotations);
         setQuotationsData(fullResponse.data.quotations);
       }
       setLoadingPicture(false);
@@ -314,37 +315,34 @@ const Quotations = ({ user }) => {
     }
   }, [isDownloadContentReady, selectedQuotation]);
 
-  const handleEditClick = (id) => {
-    const quotationToEdit = quotationsData.find(
-      (quotation) => quotation.id === id
-    );
+  const handleEditClick = (row) => {
+    console.log(row);
+    console.log(row.quotationWastes);
 
-    if (quotationToEdit) {
+    if (row) {
       setFormData({
-        id: quotationToEdit.id,
-        clientId: quotationToEdit.clientId,
-        quotationCode: quotationToEdit.quotationCode,
-        validity: quotationToEdit.validity,
-        termsCharge: quotationToEdit.termsCharge,
-        termsChargeDays: quotationToEdit.termsChargeDays,
-        termsBuying: quotationToEdit.termsBuying,
-        termsBuyingDays: quotationToEdit.termsBuyingDays,
-        scopeOfWork: quotationToEdit.scopeOfWork,
-        contactPerson: quotationToEdit.contactPerson,
-        remarks: quotationToEdit.remarks,
-        isOneTime: quotationToEdit.isOneTime,
-        isRevised: quotationToEdit.isRevised,
+        id: row.id,
+        clientId: row.clientId,
+        quotationCode: row.quotationCode,
+        validity: row.validity,
+        termsCharge: row.termsCharge,
+        termsChargeDays: row.termsChargeDays,
+        termsBuying: row.termsBuying,
+        termsBuyingDays: row.termsBuyingDays,
+        scopeOfWork: row.scopeOfWork,
+        contactPerson: row.contactPerson,
+        remarks: row.remarks,
+        isOneTime: row.isOneTime,
+        isRevised: row.isRevised,
         createdBy: user.id,
-        quotationWastes: quotationToEdit.quotationWastes
-          ? quotationToEdit.quotationWastes
-          : [], // Ensure quotationWastes is an array
-        quotationTransportation: quotationToEdit.quotationTransportation
-          ? quotationToEdit.quotationTransportation
+        quotationWastes: row.QuotationWaste ? row.QuotationWaste : [], // Ensure quotationWastes is an array
+        quotationTransportation: row.QuotationTransportation
+          ? row.QuotationTransportation
           : [], // Ensure quotationWastes is an array
       });
       handleOpenModal();
     } else {
-      console.error(`Quotation with ID ${id} not found for editing.`);
+      console.error(`Quotation with ID ${row.id} not found for editing.`);
     }
   };
 
@@ -579,7 +577,6 @@ const Quotations = ({ user }) => {
       renderCell: (params) => (
         <IconButton
           color="secondary"
-          disabled={loadingPicture}
           onClick={async () => {
             try {
               const id = params.row.id; // Get the document ID
@@ -612,7 +609,6 @@ const Quotations = ({ user }) => {
       renderCell: (params) => (
         <IconButton
           color="secondary"
-          disabled={loadingPicture}
           onClick={async () => {
             try {
               const id = params.row.id; // Get the document ID
@@ -648,7 +644,22 @@ const Quotations = ({ user }) => {
         renderCell: (params) => (
           <IconButton
             color="warning"
-            onClick={() => handleEditClick(params.row.id)}
+            onClick={async () => {
+              try {
+                const id = params.row.id; // Get the document ID
+
+                // Fetch the attachment from the API using the document ID
+                const response = await axios.get(
+                  `${apiUrl}/api/quotation/full/${id}`
+                );
+
+                // Call the download handler with the fetched data
+                handleEditClick(response.data.quotations[0]);
+              } catch (error) {
+                console.error("Error fetching document file:", error);
+                // Optional: Show error message to the user
+              }
+            }}
           >
             <EditIcon />
           </IconButton>

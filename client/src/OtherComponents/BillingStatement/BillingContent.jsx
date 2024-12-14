@@ -1080,7 +1080,9 @@ const BillingContent = ({
                             ...bodyCellStyles({ width: 40, color: fontColor }),
                           }}
                         >
-                          {Number(waste.invoiceNumber) + index}
+                          {waste.invoiceNumber
+                            ? Number(waste.invoiceNumber) + index
+                            : ""}
                         </TableCell>
                         <TableCell
                           sx={{ ...bodyCellStyles({ color: fontColor }) }}

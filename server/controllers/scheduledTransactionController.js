@@ -147,6 +147,7 @@ async function createScheduledTransactionController(req, res) {
             "cc.duran@fareastfuel.com",
             "dcardinez@fareastfuelcorp.com",
             "dm.cardinez@fareastfuel.com",
+            "je.soriano@fareastfuel.com",
           ] // bcc
         ).catch((emailError) => {
           console.error("Error sending email:", emailError);

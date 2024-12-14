@@ -134,6 +134,7 @@ async function createBookedTransactionController(req, res) {
           "cc.duran@fareastfuel.com",
           "dcardinez@fareastfuelcorp.com",
           "dm.cardinez@fareastfuel.com",
+          "je.soriano@fareastfuel.com",
         ] // cc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);

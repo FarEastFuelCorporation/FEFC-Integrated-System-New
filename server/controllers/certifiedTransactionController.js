@@ -141,7 +141,10 @@ async function createCertifiedTransactionController(req, res) {
       const scheduledTime = scheduledTransactionData.scheduledTime;
 
       const wasteName = quotationWaste ? quotationWaste.wasteName : "";
-      const wasteCategory = quotationWaste ? quotationWaste.wasteName : "";
+      const wasteCategory = quotationWaste
+        ? quotationWaste.TypeOfWaste.wasteCategory
+        : "";
+      console.log("wasteCategory", wasteCategory);
       const typeOfVehicle =
         quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
       const clientName = updatedBookedTransaction?.Client?.clientName || "";
@@ -159,7 +162,8 @@ async function createCertifiedTransactionController(req, res) {
         wasteName,
         typeOfVehicle,
         remarks,
-        submittedBy
+        submittedBy,
+        wasteCategory
       );
       console.log(emailBody);
 
@@ -176,6 +180,7 @@ async function createCertifiedTransactionController(req, res) {
             "edevera@fareastfuelcorp.com",
             "eb.devera410@gmail.com",
             "cc.duran@fareastfuel.com",
+            "je.soriano@fareastfuel.com",
           ] // bcc
         ).catch((emailError) => {
           console.error("Error sending email:", emailError);
@@ -193,7 +198,8 @@ async function createCertifiedTransactionController(req, res) {
         wasteName,
         typeOfVehicle,
         remarks,
-        submittedBy
+        submittedBy,
+        wasteCategory
       );
 
       try {

@@ -375,7 +375,8 @@ async function CertifiedTransactionEmailFormat(
   wasteName,
   typeOfVehicle,
   remarks,
-  submittedBy
+  submittedBy,
+  wasteCategory
 ) {
   try {
     const emailTemplate = `
@@ -429,7 +430,9 @@ async function CertifiedTransactionEmailFormat(
             <p>Dear ${clientName},</p>
             <p>We are pleased to inform you that your ${
               clientType === "CUS" ? "delivery" : "hauling"
-            } transaction has been treated completely and has been certified. You can now download the certificate directly from the system. Please find the transaction details below:</p>
+            } transaction has been ${
+      wasteCategory === "HW" ? "treated" : "disposed"
+    } completely and has been certified. You can now download the certificate directly from the system. Please find the transaction details below:</p>
             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
               <tr style="background-color: #6f42c1; color: white; text-align: left;">
                 <th style="padding: 8px; text-align: center;">Transaction ID</th>
@@ -498,7 +501,8 @@ async function CertifiedTransactionEmailToAccountingFormat(
   wasteName,
   typeOfVehicle,
   remarks,
-  submittedBy
+  submittedBy,
+  wasteCategory
 ) {
   try {
     const emailTemplate = `
@@ -550,7 +554,9 @@ async function CertifiedTransactionEmailToAccountingFormat(
           </div>
           <div class="content">
             <p>Dear Accounting Department,</p>
-            <p>We would like to inform you that the following transaction has been fully treated and certified. It is now ready to be billed. Please find the transaction details below:</p>
+            <p>We would like to inform you that the following transaction has been fully ${
+              wasteCategory === "HW" ? "treated" : "disposed"
+            } and certified. It is now ready to be billed. Please find the transaction details below:</p>
             <p><strong>Client Name:</strong> ${clientName}</p>
             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
               <tr style="background-color: #6f42c1; color: white; text-align: left;">

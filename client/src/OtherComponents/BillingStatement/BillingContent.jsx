@@ -216,8 +216,6 @@ const BillingContent = ({
     height: "20px",
   });
 
-  console.log(groupedTransactions);
-
   return (
     <Box>
       <Box>
@@ -1062,8 +1060,6 @@ const BillingContent = ({
                 const wasteRows = transaction.transactions.map((waste, idx) => {
                   const fontColor =
                     waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
-                  console.log(waste);
-                  console.log(waste.invoiceNumber);
                   return (
                     <>
                       <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>

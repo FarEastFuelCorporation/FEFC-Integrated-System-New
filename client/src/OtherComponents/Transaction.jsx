@@ -299,7 +299,6 @@ const Transaction = ({
               if (!response.data?.transaction?.transaction) {
                 throw new Error("Invalid data received from the server.");
               }
-              console.log(response.data.transaction.transaction);
               // Only call these functions if there are no errors
               if (response.data.transaction.transaction) {
                 setRow(response.data.transaction.transaction);

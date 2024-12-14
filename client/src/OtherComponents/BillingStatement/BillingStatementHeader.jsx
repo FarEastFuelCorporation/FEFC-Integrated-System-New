@@ -15,11 +15,6 @@ const BillingStatementHeader = ({
   datePlusOneMonth.setMonth(today.getMonth() + 1);
   const clientData = row?.Client;
 
-  console.log(row);
-  console.log(clientData);
-  console.log(groupedTransactions);
-  console.log(isIndividualBillingToBill);
-
   const vat = isIndividualBillingToBill
     ? groupedTransactions?.totals?.amounts.vatExclusive * 0.12 +
       groupedTransactions?.totals?.amounts.vatInclusive -
@@ -32,11 +27,7 @@ const BillingStatementHeader = ({
   );
   const termsCharge = row?.QuotationWaste?.Quotation?.termsCharge;
 
-  console.log(groupedTransactions);
-
   function incrementLastThreeDigits(transactionId, incrementBy = 1) {
-    console.log(transactionId);
-    console.log(incrementBy);
     if (transactionId) {
       // Split the string by '-'
       const parts = transactionId.split("-");
@@ -54,8 +45,6 @@ const BillingStatementHeader = ({
       return `${parts[0]}-${parts[1]}-${incrementedPart}`;
     } else return "";
   }
-
-  console.log(isIndividualBillingToBill);
 
   const billingNumber = isIndividualBillingToBill
     ? incrementLastThreeDigits(

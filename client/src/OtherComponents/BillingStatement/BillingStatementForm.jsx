@@ -428,23 +428,16 @@ const BillingStatementForm = ({
     }
   });
 
-  console.log(isIndividualBilling);
-
   const isIndividualBillingToProcess = isIndividualBilling
     ? isIndividualBilling
     : isIndividualBillingToBill;
-
-  console.log(isIndividualBillingToProcess);
 
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {
       // Extract invoiceNumber from BilledTransaction
 
-      console.log(transaction);
       const invoiceNumber =
         transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
-
-      console.log(invoiceNumber);
 
       transaction.ScheduledTransaction.forEach((scheduled) => {
         const { scheduledDate, scheduledTime } = scheduled;
@@ -483,8 +476,6 @@ const BillingStatementForm = ({
                 invoiceNumber,
                 typeOfWeight,
               };
-
-              console.log(groupedWaste);
 
               // Add the groupedWaste to the transactions array
               acc[clientId].transactions.push(groupedWaste);
@@ -530,8 +521,6 @@ const BillingStatementForm = ({
     transactions: data.transactions,
     totals: data.totals,
   }));
-
-  console.log("Grouped Transactions:", groupedTransactions);
 
   const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;
 
@@ -585,13 +574,13 @@ const BillingStatementForm = ({
         <Box>
           <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
             {/* Header */}
-            {/* <Box ref={headerRef} sx={{ zIndex: 1 }}>
+            <Box ref={headerRef} sx={{ zIndex: 1 }}>
               <BillingStatementHeader
                 row={row}
                 amounts={amounts}
                 credits={credits}
               />
-            </Box> */}
+            </Box>
 
             {/* Content */}
             <Box ref={contentRef} sx={{ zIndex: 1 }}>

@@ -40,40 +40,54 @@ const BillingContent = ({
   const nextPageHeight = pageHeight - 50;
 
   const groupedTransactions = Object.entries(
-    transactions.reduce((acc, transaction) => {
-      // Extract invoiceNumber from BilledTransaction
-      const invoiceNumber =
-        transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
+    // First, sort the transactions by the earliest scheduledDate
+    transactions
+      .sort((a, b) => {
+        // Extract the earliest scheduledDate from the ScheduledTransaction array
+        const dateA = new Date(
+          a.ScheduledTransaction?.[0]?.scheduledDate || "1970-01-01"
+        ).getTime();
+        const dateB = new Date(
+          b.ScheduledTransaction?.[0]?.scheduledDate || "1970-01-01"
+        ).getTime();
 
-      transaction.ScheduledTransaction.forEach((scheduled) => {
-        const { scheduledDate, scheduledTime } = scheduled; // Extract date and time
+        return dateA - dateB;
+      })
+      .reduce((acc, transaction) => {
+        // Extract invoiceNumber from BilledTransaction
+        const invoiceNumber =
+          transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
 
-        scheduled.ReceivedTransaction.forEach((received) => {
-          received.SortedTransaction.forEach((sorted) => {
-            const typeOfWeight = sorted.CertifiedTransaction?.[0]?.typeOfWeight;
+        transaction.ScheduledTransaction.forEach((scheduled) => {
+          const { scheduledDate, scheduledTime } = scheduled; // Extract date and time
 
-            sorted.SortedWasteTransaction.forEach((waste) => {
-              const clientId = waste.transporterClientId;
+          scheduled.ReceivedTransaction.forEach((received) => {
+            received.SortedTransaction.forEach((sorted) => {
+              const typeOfWeight =
+                sorted.CertifiedTransaction?.[0]?.typeOfWeight;
 
-              if (!acc[clientId]) {
-                acc[clientId] = []; // Initialize an array for this clientId
-              }
+              sorted.SortedWasteTransaction.forEach((waste) => {
+                const clientId = waste.transporterClientId;
 
-              // Add the waste transaction to the group and include scheduledDate, scheduledTime, and invoiceNumber
-              acc[clientId].push({
-                ...waste,
-                scheduledDate,
-                scheduledTime,
-                invoiceNumber,
-                typeOfWeight,
+                if (!acc[clientId]) {
+                  acc[clientId] = []; // Initialize an array for this clientId
+                }
+
+                // Add the waste transaction to the group and include scheduledDate, scheduledTime, and invoiceNumber
+                acc[clientId].push({
+                  ...waste,
+                  scheduledDate,
+                  scheduledTime,
+                  invoiceNumber,
+                  typeOfWeight,
+                });
               });
             });
           });
         });
-      });
 
-      return acc;
-    }, {})
+        return acc;
+      }, {})
   ).map(([transporterClientId, transactions]) => ({
     transporterClientId,
     transactions,
@@ -215,6 +229,8 @@ const BillingContent = ({
     fontFamily: "'Poppins', sans-serif",
     height: "20px",
   });
+
+  console.log(groupedTransactions);
 
   return (
     <Box>

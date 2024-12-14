@@ -8,6 +8,7 @@ const Employee = require("../models/Employee");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
+const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
 const sendEmail = require("../sendEmail");
 const {
@@ -103,6 +104,11 @@ async function createCertifiedTransactionController(req, res) {
         updatedBookedTransaction.quotationWasteId,
         {
           attributes: ["wasteName"],
+          include: {
+            model: TypeOfWaste,
+            as: "TypeOfWaste",
+            attributes: ["wasteCategory"],
+          },
         }
       );
 
@@ -135,6 +141,7 @@ async function createCertifiedTransactionController(req, res) {
       const scheduledTime = scheduledTransactionData.scheduledTime;
 
       const wasteName = quotationWaste ? quotationWaste.wasteName : "";
+      const wasteCategory = quotationWaste ? quotationWaste.wasteName : "";
       const typeOfVehicle =
         quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
       const clientName = updatedBookedTransaction?.Client?.clientName || "";

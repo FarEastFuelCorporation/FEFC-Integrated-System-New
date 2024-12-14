@@ -28,6 +28,7 @@ async function createBilledTransactionController(req, res) {
       serviceInvoiceNumber,
       isWasteName,
       isPerClient,
+      isIndividualBilling,
       billedAmount,
       remarks,
       statusId,
@@ -59,6 +60,7 @@ async function createBilledTransactionController(req, res) {
           serviceInvoiceNumber,
           isWasteName,
           isPerClient,
+          isIndividualBilling,
           billedAmount,
           remarks,
           createdBy,
@@ -130,18 +132,18 @@ async function createBilledTransactionController(req, res) {
 
     try {
       sendEmail(
-        // "jmfalar@fareastfuelcorp.com", // Recipient
-        "dcardinez@fareastfuelcorp.com", // Recipient
+        "jmfalar@fareastfuelcorp.com", // Recipient
+        // "dcardinez@fareastfuelcorp.com", // Recipient
         `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody,
-        ["dm.cardinez@fareastfuel.com"], // HTML content // cc
-        [
-          "rmangaron@fareastfuelcorp.com",
-          "edevera@fareastfuelcorp.com",
-          "eb.devera410@gmail.com",
-          "cc.duran@fareastfuel.com",
-        ] // bcc
+        emailBody
+        // ["dm.cardinez@fareastfuel.com"], // HTML content // cc
+        // [
+        //   "rmangaron@fareastfuelcorp.com",
+        //   "edevera@fareastfuelcorp.com",
+        //   "eb.devera410@gmail.com",
+        //   "cc.duran@fareastfuel.com",
+        // ] // bcc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
       });
@@ -260,6 +262,7 @@ async function updateBilledTransactionController(req, res) {
         serviceInvoiceNumber,
         isWasteName,
         isPerClient,
+        isIndividualBilling,
         billedAmount,
         remarks,
         statusId,
@@ -289,6 +292,7 @@ async function updateBilledTransactionController(req, res) {
             transactionEntry.serviceInvoiceNumber = serviceInvoiceNumber;
             transactionEntry.isWasteName = isWasteName;
             transactionEntry.isPerClient = isPerClient;
+            transactionEntry.isIndividualBilling = isIndividualBilling;
             transactionEntry.billedAmount = billedAmount;
             transactionEntry.remarks = updatedRemarks;
             transactionEntry.updatedBy = updatedBy;

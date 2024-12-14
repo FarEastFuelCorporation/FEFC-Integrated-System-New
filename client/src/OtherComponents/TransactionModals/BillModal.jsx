@@ -180,7 +180,7 @@ const BillModal = ({
           <TextField
             label="Remarks"
             inputRef={refs.remarksRef}
-            defaultValue={formData.remarksRef}
+            defaultValue={formData.remarks}
             fullWidth
             InputLabelProps={{
               style: {

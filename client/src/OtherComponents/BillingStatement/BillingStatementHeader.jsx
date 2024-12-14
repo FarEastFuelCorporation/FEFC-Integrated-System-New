@@ -7,20 +7,62 @@ const BillingStatementHeader = ({
   amounts,
   credits,
   isIndividualBillingToBill = false,
+  groupedTransactions,
+  index,
 }) => {
   const today = new Date();
   const datePlusOneMonth = new Date();
   datePlusOneMonth.setMonth(today.getMonth() + 1);
   const clientData = row?.Client;
 
-  const vat =
-    amounts.vatExclusive * 0.12 +
-    (amounts.vatInclusive - amounts.vatInclusive / 1.12);
+  console.log(row);
+  console.log(clientData);
+  console.log(groupedTransactions);
+  console.log(isIndividualBillingToBill);
+
+  const vat = isIndividualBillingToBill
+    ? groupedTransactions?.totals?.amounts.vatExclusive * 0.12 +
+      groupedTransactions?.totals?.amounts.vatInclusive -
+      groupedTransactions?.totals?.amounts.vatInclusive / 1.12
+    : amounts.vatExclusive * 0.12 +
+      (amounts.vatInclusive - amounts.vatInclusive / 1.12);
 
   const termsChargeDays = parseInt(
     row?.QuotationWaste?.Quotation?.termsChargeDays
   );
   const termsCharge = row?.QuotationWaste?.Quotation?.termsCharge;
+
+  console.log(groupedTransactions);
+
+  function incrementLastThreeDigits(transactionId, incrementBy = 1) {
+    console.log(transactionId);
+    console.log(incrementBy);
+    if (transactionId) {
+      // Split the string by '-'
+      const parts = transactionId.split("-");
+
+      // Extract the last part and convert it to a number
+      let lastThreeDigits = parseInt(parts[2], 10);
+
+      // Increment the number by the specified amount
+      lastThreeDigits += incrementBy;
+
+      // Pad with leading zeros to maintain the format
+      const incrementedPart = String(lastThreeDigits).padStart(3, "0");
+
+      // Reconstruct the string
+      return `${parts[0]}-${parts[1]}-${incrementedPart}`;
+    } else return "";
+  }
+
+  console.log(isIndividualBillingToBill);
+
+  const billingNumber = isIndividualBillingToBill
+    ? incrementLastThreeDigits(
+        row?.BilledTransaction?.[0]?.billingNumber,
+        index
+      )
+    : row?.BilledTransaction?.[0]?.billingNumber;
 
   return (
     <Box>
@@ -59,7 +101,7 @@ const BillingStatementHeader = ({
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row?.BilledTransaction?.[0]?.billingNumber}
+              {billingNumber}
             </Typography>
             <Typography
               mt={1}
@@ -164,10 +206,15 @@ const BillingStatementHeader = ({
             </Typography>
             <Typography sx={{ fontWeight: "bold" }}>
               {formatNumber(
-                amounts.nonVatable +
-                  amounts.vatExclusive +
-                  amounts.vatInclusive / 1.12 +
-                  vat
+                isIndividualBillingToBill
+                  ? groupedTransactions?.totals?.amounts.nonVatable +
+                      groupedTransactions?.totals?.amounts.vatExclusive +
+                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
+                      vat
+                  : amounts.nonVatable +
+                      amounts.vatExclusive +
+                      amounts.vatInclusive / 1.12 +
+                      vat
               )}
             </Typography>
           </Box>
@@ -178,7 +225,13 @@ const BillingStatementHeader = ({
             }}
           >
             <Typography>Total Non-Vatable Sale:</Typography>
-            <Typography>{formatNumber(amounts.nonVatable)}</Typography>
+            <Typography>
+              {formatNumber(
+                isIndividualBillingToBill
+                  ? groupedTransactions?.totals?.amounts.nonVatable
+                  : amounts.nonVatable
+              )}
+            </Typography>
           </Box>
           <Box
             sx={{
@@ -188,7 +241,12 @@ const BillingStatementHeader = ({
           >
             <Typography>Total Vatable Sale:</Typography>
             <Typography>
-              {formatNumber(amounts.vatExclusive + amounts.vatInclusive / 1.12)}
+              {formatNumber(
+                isIndividualBillingToBill
+                  ? groupedTransactions?.totals?.amounts.vatExclusive +
+                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12
+                  : amounts.vatExclusive + amounts.vatInclusive / 1.12
+              )}
             </Typography>
           </Box>
           <Box
@@ -211,7 +269,11 @@ const BillingStatementHeader = ({
           >
             <Typography sx={{ fontWeight: "bold" }}>LESS:</Typography>
             <Typography sx={{ fontWeight: "bold" }}>
-              {formatNumber(credits.vatInclusive)}
+              {formatNumber(
+                isIndividualBillingToBill
+                  ? groupedTransactions?.totals?.credits.vatInclusive
+                  : credits.vatInclusive
+              )}
             </Typography>
           </Box>
           <Box
@@ -227,11 +289,17 @@ const BillingStatementHeader = ({
             </Typography>
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
               {formatNumber(
-                amounts.nonVatable +
-                  amounts.vatExclusive +
-                  amounts.vatInclusive / 1.12 +
-                  vat -
-                  credits.vatInclusive
+                isIndividualBillingToBill
+                  ? groupedTransactions?.totals?.amounts.nonVatable +
+                      groupedTransactions?.totals?.amounts.vatExclusive +
+                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
+                      vat -
+                      groupedTransactions?.totals?.credits.vatInclusive
+                  : amounts.nonVatable +
+                      amounts.vatExclusive +
+                      amounts.vatInclusive / 1.12 +
+                      vat -
+                      credits.vatInclusive
               )}
             </Typography>
           </Box>

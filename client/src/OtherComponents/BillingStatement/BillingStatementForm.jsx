@@ -428,11 +428,23 @@ const BillingStatementForm = ({
     }
   });
 
+  console.log(isIndividualBilling);
+
+  const isIndividualBillingToProcess = isIndividualBilling
+    ? isIndividualBilling
+    : isIndividualBillingToBill;
+
+  console.log(isIndividualBillingToProcess);
+
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {
       // Extract invoiceNumber from BilledTransaction
+
+      console.log(transaction);
       const invoiceNumber =
-        transaction.BilledTransaction?.[0]?.invoiceNumber || null;
+        transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
+
+      console.log(invoiceNumber);
 
       transaction.ScheduledTransaction.forEach((scheduled) => {
         const { scheduledDate, scheduledTime } = scheduled;
@@ -449,9 +461,16 @@ const BillingStatementForm = ({
                 acc[clientId] = {
                   transactions: [],
                   totals: {
-                    vatExclusive: 0,
-                    vatInclusive: 0,
-                    nonVatable: 0,
+                    amounts: {
+                      vatExclusive: 0,
+                      vatInclusive: 0,
+                      nonVatable: 0,
+                    },
+                    credits: {
+                      vatExclusive: 0,
+                      vatInclusive: 0,
+                      nonVatable: 0,
+                    },
                   },
                 };
               }
@@ -465,6 +484,8 @@ const BillingStatementForm = ({
                 typeOfWeight,
               };
 
+              console.log(groupedWaste);
+
               // Add the groupedWaste to the transactions array
               acc[clientId].transactions.push(groupedWaste);
 
@@ -473,17 +494,25 @@ const BillingStatementForm = ({
               if (QuotationWaste) {
                 const { vatCalculation } = QuotationWaste;
 
+                const target =
+                  QuotationWaste.mode === "CHARGE" ? "amounts" : "credits";
+
                 // Add the waste amount to the correct vatCalculation total
-                const amount = waste.amount || 0;
+                const amount =
+                  (QuotationWaste.unitPrice || 0) *
+                  (typeOfWeight === "CLIENT WEIGHT"
+                    ? waste.clientWeight || 0
+                    : waste.weight || 0);
+
                 switch (vatCalculation) {
                   case "VAT EXCLUSIVE":
-                    acc[clientId].totals.vatExclusive += amount;
+                    acc[clientId].totals[target].vatExclusive += amount;
                     break;
                   case "VAT INCLUSIVE":
-                    acc[clientId].totals.vatInclusive += amount;
+                    acc[clientId].totals[target].vatInclusive += amount;
                     break;
                   case "NON VATABLE":
-                    acc[clientId].totals.nonVatable += amount;
+                    acc[clientId].totals[target].nonVatable += amount;
                     break;
                   default:
                     break;
@@ -556,13 +585,13 @@ const BillingStatementForm = ({
         <Box>
           <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
             {/* Header */}
-            <Box ref={headerRef} sx={{ zIndex: 1 }}>
+            {/* <Box ref={headerRef} sx={{ zIndex: 1 }}>
               <BillingStatementHeader
                 row={row}
                 amounts={amounts}
                 credits={credits}
               />
-            </Box>
+            </Box> */}
 
             {/* Content */}
             <Box ref={contentRef} sx={{ zIndex: 1 }}>
@@ -793,25 +822,32 @@ const BillingStatementForm = ({
                       }}
                     >
                       {/* Render Header only on the first page */}
-                      {index === 0 && !isIndividualBillingToBill && (
+                      {index === 0 && !isIndividualBillingToProcess && (
                         <Box>
                           <BillingStatementHeader
                             row={row}
                             amounts={amounts}
                             credits={credits}
                             isIndividualBillingToBill={
-                              isIndividualBillingToBill
+                              isIndividualBillingToProcess
                             }
+                            groupedTransactions={groupedTransactions[index]}
+                            index={index}
                           />
                         </Box>
                       )}
 
-                      {isIndividualBillingToBill && (
+                      {isIndividualBillingToProcess && (
                         <Box>
                           <BillingStatementHeader
                             row={row}
                             amounts={amounts}
                             credits={credits}
+                            isIndividualBillingToBill={
+                              isIndividualBillingToProcess
+                            }
+                            groupedTransactions={groupedTransactions[index]}
+                            index={index}
                           />
                         </Box>
                       )}
@@ -844,7 +880,7 @@ const BillingStatementForm = ({
                       )}
 
                       {index === pagesContent.length - 1 &&
-                        !isIndividualBillingToBill && (
+                        !isIndividualBillingToProcess && (
                           <Box>
                             <BillingStatementFooter
                               row={row}
@@ -853,7 +889,7 @@ const BillingStatementForm = ({
                           </Box>
                         )}
 
-                      {isIndividualBillingToBill && (
+                      {isIndividualBillingToProcess && (
                         <Box>
                           <BillingStatementFooter
                             row={row}

@@ -43,7 +43,7 @@ const BillingContent = ({
     transactions.reduce((acc, transaction) => {
       // Extract invoiceNumber from BilledTransaction
       const invoiceNumber =
-        transaction.BilledTransaction?.[0]?.invoiceNumber || null;
+        transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
 
       transaction.ScheduledTransaction.forEach((scheduled) => {
         const { scheduledDate, scheduledTime } = scheduled; // Extract date and time
@@ -215,6 +215,8 @@ const BillingContent = ({
     fontFamily: "'Poppins', sans-serif",
     height: "20px",
   });
+
+  console.log(groupedTransactions);
 
   return (
     <Box>
@@ -1054,10 +1056,14 @@ const BillingContent = ({
             {groupedTransactions
               // Sort transactions by haulingDate from oldest to newest
               .map((transaction, index) => {
+                const remarks =
+                  transaction.BilledTransaction?.[0]?.remarks || null;
+
                 const wasteRows = transaction.transactions.map((waste, idx) => {
                   const fontColor =
                     waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
-
+                  console.log(waste);
+                  console.log(waste.invoiceNumber);
                   return (
                     <>
                       <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
@@ -1078,7 +1084,7 @@ const BillingContent = ({
                             ...bodyCellStyles({ width: 40, color: fontColor }),
                           }}
                         >
-                          {waste.invoiceNumber}
+                          {Number(waste.invoiceNumber) + index}
                         </TableCell>
                         <TableCell
                           sx={{ ...bodyCellStyles({ color: fontColor }) }}

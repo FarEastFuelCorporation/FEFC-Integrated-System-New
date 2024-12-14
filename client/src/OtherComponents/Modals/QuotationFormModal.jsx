@@ -34,6 +34,7 @@ const QuotationFormModal = ({
   const [clients, setClients] = useState([]);
   const [wasteTypes, setWasteTypes] = useState([]);
   const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [treatmentProcesses, setTreatmentProcesses] = useState([]);
   const modeOptions = ["BUYING", "CHARGE", "FREE OF CHARGE", "SELLING"];
   const unitOptions = ["PC", "KG", "L", "DRUM", "LOT", "CASE", "TRIP"];
   const vatCalculationOptions = [
@@ -47,16 +48,24 @@ const QuotationFormModal = ({
       const fetchData = async () => {
         try {
           const apiUrl = process.env.REACT_APP_API_URL;
-          const [clientsResponse, wasteTypesResponse, vehicleTypesResponse] =
-            await Promise.all([
-              axios.get(`${apiUrl}/api/client`),
-              axios.get(`${apiUrl}/api/typeOfWaste`),
-              axios.get(`${apiUrl}/api/vehicleType`),
-            ]);
+          const [
+            clientsResponse,
+            wasteTypesResponse,
+            vehicleTypesResponse,
+            treatmentProcessResponse,
+          ] = await Promise.all([
+            axios.get(`${apiUrl}/api/client`),
+            axios.get(`${apiUrl}/api/typeOfWaste`),
+            axios.get(`${apiUrl}/api/vehicleType`),
+            axios.get(`${apiUrl}/api/treatmentProcess`),
+          ]);
 
           setClients(clientsResponse.data.clients);
           setWasteTypes(wasteTypesResponse.data.typeOfWastes);
           setVehicleTypes(vehicleTypesResponse.data.vehicleTypes);
+          setTreatmentProcesses(
+            treatmentProcessResponse.data.treatmentProcesses
+          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -71,6 +80,7 @@ const QuotationFormModal = ({
       id: null,
       quotationId: null,
       wasteId: "",
+      treatmentProcessId: "",
       wasteName: "",
       mode: "",
       unit: "",
@@ -170,6 +180,20 @@ const QuotationFormModal = ({
     } else {
       console.warn(`No waste type found for id: ${value}`);
     }
+  };
+
+  const handleTreatmentProcessChange = (index, value) => {
+    const updatedWastes = formData.quotationWastes.map((waste, i) =>
+      i === index
+        ? {
+            ...waste,
+            treatmentProcessId: value,
+          }
+        : waste
+    );
+    handleInputChange({
+      target: { name: "quotationWastes", value: updatedWastes },
+    });
   };
 
   const handleVehicleTypeChange = (index, value) => {
@@ -507,7 +531,7 @@ const QuotationFormModal = ({
                   Waste Entry #{index + 1}
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={1.5}>
+                  <Grid item xs={0.75}>
                     <FormControl fullWidth required>
                       <InputLabel
                         id={`waste-type-select-label-${index}`}
@@ -561,6 +585,42 @@ const QuotationFormModal = ({
                       }}
                       autoComplete="off"
                     />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`treatment-process-select-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        Treatment Process
+                      </InputLabel>
+                      <Select
+                        labelId={`treatment-process-select-label-${index}`}
+                        name={`quotationWastes[${index}].treatmentProcessId`}
+                        value={waste.treatmentProcessId}
+                        onChange={(e) =>
+                          handleTreatmentProcessChange(index, e.target.value)
+                        }
+                        label="Treatment Process"
+                        fullWidth
+                        InputLabelProps={{
+                          style: {
+                            color: colors.grey[100],
+                          },
+                        }}
+                      >
+                        {treatmentProcesses.map((treatmentProcess) => (
+                          <MenuItem
+                            key={treatmentProcess.id}
+                            value={treatmentProcess.id}
+                          >
+                            {treatmentProcess.treatmentProcess}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item xs={1}>
                     <FormControl fullWidth required>
@@ -621,7 +681,7 @@ const QuotationFormModal = ({
                       />
                     </Grid>
                   )}
-                  <Grid item xs={1}>
+                  <Grid item xs={0.75}>
                     <FormControl fullWidth required>
                       <InputLabel
                         id={`unit-label-${index}`}

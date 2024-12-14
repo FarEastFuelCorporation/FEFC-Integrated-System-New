@@ -6,6 +6,7 @@ const IdInformation = require("../models/IdInformation");
 const Quotation = require("../models/Quotation");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
+const TreatmentProcess = require("../models/TreatmentProcess");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
 
@@ -54,6 +55,7 @@ async function createQuotationController(req, res) {
       quotationWastes.map(async (waste) => {
         let {
           wasteId,
+          treatmentProcessId,
           wasteName,
           mode,
           quantity,
@@ -72,6 +74,7 @@ async function createQuotationController(req, res) {
         return await QuotationWaste.create({
           quotationId: quotation.id,
           wasteId,
+          treatmentProcessId,
           wasteName,
           mode,
           quantity,
@@ -354,6 +357,11 @@ async function getQuotationFullController(req, res) {
               attributes: ["wasteCode"],
             },
             {
+              model: TreatmentProcess,
+              as: "TreatmentProcess",
+              attributes: ["treatmentProcess"],
+            },
+            {
               model: Quotation,
               as: "Quotation",
             },
@@ -463,6 +471,7 @@ async function updateQuotationController(req, res) {
           quotationWastes.map(async (waste) => {
             let {
               wasteId,
+              treatmentProcessId,
               wasteName,
               mode,
               quantity,
@@ -481,6 +490,7 @@ async function updateQuotationController(req, res) {
             return await QuotationWaste.create({
               quotationId: quotation.id,
               wasteId,
+              treatmentProcessId,
               wasteName,
               mode,
               quantity,
@@ -591,6 +601,7 @@ async function updateQuotationController(req, res) {
             const {
               id,
               wasteId,
+              treatmentProcessId,
               wasteName,
               mode,
               quantity,
@@ -609,6 +620,7 @@ async function updateQuotationController(req, res) {
             if (existingWaste) {
               // Update existing waste
               existingWaste.wasteId = wasteId;
+              existingWaste.treatmentProcessId = treatmentProcessId;
               existingWaste.wasteName = wasteName && wasteName.toUpperCase();
               existingWaste.mode = mode;
               existingWaste.quantity = quantity;
@@ -627,6 +639,7 @@ async function updateQuotationController(req, res) {
               await QuotationWaste.create({
                 quotationId: updatedQuotation.id,
                 wasteId,
+                treatmentProcessId,
                 wasteName: wasteName && wasteName.toUpperCase(),
                 mode,
                 quantity,

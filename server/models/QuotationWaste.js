@@ -19,6 +19,10 @@ const QuotationWaste = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    treatmentProcessId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
     wasteName: {
       type: DataTypes.STRING,
       allowNull: false,

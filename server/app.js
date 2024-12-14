@@ -87,13 +87,14 @@ const {
   handleAttendanceSync,
   syncSpecificEmployeeToLocal,
 } = require("./syncronize");
+const QuotationWaste = require("./models/QuotationWaste");
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    // await BilledTransaction.sync({ alter: true });
+    // await QuotationWaste.sync({ alter: true });
 
     // await handleAttendanceSync();
 

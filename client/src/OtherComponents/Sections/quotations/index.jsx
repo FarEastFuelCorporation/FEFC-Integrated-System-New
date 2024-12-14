@@ -79,6 +79,7 @@ const Quotations = ({ user }) => {
         id: null,
         quotationId: null,
         wasteId: "",
+        treatmentProcessId: "",
         wasteName: "",
         mode: "",
         quantity: 1,
@@ -315,12 +316,15 @@ const Quotations = ({ user }) => {
   }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (row) => {
+    console.log(row.validity);
+    console.log(row.QuotationWaste);
+    const formattedDate = new Date(row.validity).toISOString().split("T")[0];
     if (row) {
       setFormData({
         id: row.id,
         clientId: row.clientId,
         quotationCode: row.quotationCode,
-        validity: row.validity,
+        validity: formattedDate,
         termsCharge: row.termsCharge,
         termsChargeDays: row.termsChargeDays,
         termsBuying: row.termsBuying,
@@ -368,6 +372,7 @@ const Quotations = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(formData);
     try {
       setLoading(true);
       if (formData.id) {

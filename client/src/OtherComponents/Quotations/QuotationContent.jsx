@@ -173,8 +173,18 @@ const QuotationContent = ({
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {fixedWeight === 0
-                            ? waste.wasteName
-                            : `${waste.wasteName} FIRST ${fixedWeight} ${waste.unit}`}
+                            ? `${waste.wasteName}${
+                                waste.TreatmentProcess?.treatmentProcess
+                                  ? ` - ${waste.TreatmentProcess?.treatmentProcess}`
+                                  : ""
+                              }`
+                            : `${waste.wasteName} FIRST ${fixedWeight} ${
+                                waste.unit
+                              }${
+                                waste.TreatmentProcess?.treatmentProcess
+                                  ? ` - ${waste.TreatmentProcess?.treatmentProcess}`
+                                  : ""
+                              }`}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {waste.TypeOfWaste.wasteCode}
@@ -206,7 +216,10 @@ const QuotationContent = ({
                           {index + 1}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
-                          {waste.wasteName}
+                          {waste.wasteName}{" "}
+                          {waste.TreatmentProcess?.treatmentProcess
+                            ? ` - ${waste.TreatmentProcess?.treatmentProcess}`
+                            : ""}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {waste.TypeOfWaste.wasteCode}

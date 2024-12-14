@@ -641,6 +641,19 @@ TreatmentMachine.belongsTo(TreatmentProcess, {
   onDelete: "CASCADE",
 });
 
+TreatmentProcess.hasMany(QuotationWaste, {
+  as: "QuotationWaste",
+  foreignKey: "treatmentProcessId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+QuotationWaste.belongsTo(TreatmentProcess, {
+  as: "TreatmentProcess",
+  foreignKey: "treatmentProcessId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 Client.hasMany(Quotation, {
   as: "Quotation",
   foreignKey: "clientId",

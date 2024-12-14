@@ -431,43 +431,13 @@ const Quotations = ({ user }) => {
               if (loadingPicture) {
                 return <CircularProgress size={20} color="secondary" />; // Spinner while loading pictures
               }
-              if (params.value && params.value.data && params.value.type) {
-                try {
-                  // Convert Buffer to Uint8Array
-                  const uint8Array = new Uint8Array(params.value.data);
-                  // Create Blob from Uint8Array
-                  const blob = new Blob([uint8Array], {
-                    type: params.value.type,
-                  });
-                  // Create object URL from Blob
-                  const imageUrl = URL.createObjectURL(blob);
-
-                  return (
-                    <img
-                      src={imageUrl}
-                      alt="Logo"
-                      style={{ width: 40, height: 40, borderRadius: "50%" }}
-                    />
-                  );
-                } catch (error) {
-                  console.error("Error creating image URL:", error);
-                  return (
-                    <img
-                      src="/assets/unknown.png"
-                      alt="Logo"
-                      style={{ width: 40, height: 40, borderRadius: "50%" }}
-                    />
-                  );
-                }
-              } else {
-                return (
-                  <img
-                    src="/assets/unknown.png"
-                    alt="Logo"
-                    style={{ width: 40, height: 40, borderRadius: "50%" }}
-                  />
-                );
-              }
+              return (
+                <img
+                  src={params.value || "/assets/unknown.png"}
+                  alt="Logo"
+                  style={{ width: 40, height: 40, borderRadius: "50%" }}
+                />
+              );
             },
           },
         ]

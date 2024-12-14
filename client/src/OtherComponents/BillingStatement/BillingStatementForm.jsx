@@ -896,7 +896,9 @@ const BillingStatementForm = ({
                       }}
                     >
                       <Typography variant="h5" fontWeight="bold">
-                        Page {index + 1} / {pagesContent.length}
+                        {isIndividualBillingToProcess
+                          ? `Page 1 / 1`
+                          : `Page ${index + 1} / ${pagesContent.length}`}
                       </Typography>
                     </Box>
                   </Box>

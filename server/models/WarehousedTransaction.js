@@ -25,6 +25,14 @@ const WarehousedTransaction = sequelize.define(
       type: DataTypes.TIME,
       allowNull: false,
     },
+    totalWarehousedWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    discrepancyWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

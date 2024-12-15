@@ -83,8 +83,11 @@ const CertifiedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       sortedTransactionId:
-        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-          .id,
+        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.SortedTransaction?.[0]?.id,
+      warehousedTransactionId:
+        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.WarehousedTransaction?.[0]?.id,
       isBilled: row.BilledTransaction.length === 0 ? false : true,
       isBillingApproved: row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ? true

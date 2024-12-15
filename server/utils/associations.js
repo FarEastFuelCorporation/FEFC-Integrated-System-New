@@ -1107,6 +1107,19 @@ TreatedWasteTransaction.belongsTo(TreatmentMachine, {
   onDelete: "CASCADE",
 });
 
+WarehousedTransaction.hasMany(CertifiedTransaction, {
+  as: "CertifiedTransaction",
+  foreignKey: "warehousedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CertifiedTransaction.belongsTo(WarehousedTransaction, {
+  as: "WarehousedTransaction",
+  foreignKey: "warehousedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 SortedTransaction.hasMany(CertifiedTransaction, {
   as: "CertifiedTransaction",
   foreignKey: "sortedTransactionId",

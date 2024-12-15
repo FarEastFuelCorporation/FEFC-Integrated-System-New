@@ -210,16 +210,13 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
 
           <br />
           <Typography variant="h5">
-            Batch Weight: {formatWeight(receivedTransaction.netWeight)} Kg
-          </Typography>
-          <Typography variant="h5">
             Remarks:{" "}
             {warehousedOutTransaction?.remarks
               ? warehousedOutTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Sorted By:{" "}
+            Warehoused Out By:{" "}
             {`${warehousedOutTransaction?.Employee?.firstName || ""} ${
               warehousedOutTransaction?.Employee?.lastName || ""
             }`}
@@ -346,11 +343,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
                 </Box>
               );
             })}
-
           <br />
-          <Typography variant="h5">
-            Batch Weight: {formatWeight(receivedTransaction?.netWeight)} Kg
-          </Typography>
           <Typography variant="h5">
             Remarks:{" "}
             {warehousedOutTransaction?.remarks
@@ -358,7 +351,7 @@ const WarehousedOutTransaction = ({ row, user, handleDeleteClick }) => {
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Sorted By:{" "}
+            Warehoused Out By:{" "}
             {`${warehousedOutTransaction?.Employee?.firstName || ""} ${
               warehousedOutTransaction?.Employee?.lastName || ""
             }`}

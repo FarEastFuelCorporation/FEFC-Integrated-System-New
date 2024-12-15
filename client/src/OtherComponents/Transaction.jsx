@@ -720,14 +720,26 @@ const Transaction = ({
                         handleDeleteClick={handleDeleteClick}
                       />
                     )}
-                    {user.userType === 6 && (
-                      <TreatedTransaction
-                        row={row}
-                        handleOpenModal={handleOpenModal}
-                        handleDeleteClick={handleDeleteClick}
-                        user={user}
-                      />
-                    )}
+                    {user.userType === 6 &&
+                      row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                        ?.submitTo === "SORTING" && (
+                        <TreatedTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
+                    {user.userType === 6 &&
+                      row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                        ?.submitTo === "WAREHOUSE" && (
+                        <TreatedWarehouseTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                     {user.userType === 7 && (
                       <CertifiedTransaction
                         row={row}
@@ -818,7 +830,7 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 8 && certifiedTransaction && (
+                      {row.statusId >= 8 && (
                         <CertifiedTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}

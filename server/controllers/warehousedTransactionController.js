@@ -17,6 +17,8 @@ async function createWarehousedTransactionController(req, res) {
       receivedTransactionId,
       warehousedDate,
       warehousedTime,
+      totalWarehousedWeight,
+      discrepancyWeight,
       warehousedItems,
       remarks,
       statusId,
@@ -33,6 +35,8 @@ async function createWarehousedTransactionController(req, res) {
         receivedTransactionId,
         warehousedDate,
         warehousedTime,
+        totalWarehousedWeight,
+        discrepancyWeight,
         remarks,
         createdBy,
       },
@@ -48,6 +52,11 @@ async function createWarehousedTransactionController(req, res) {
           {
             warehousedTransactionId: newWarehousedTransaction.id,
             quotationWasteId: item.quotationWasteId,
+            description: item.description && item.description.toUpperCase(),
+            unit: item.unit,
+            quantity: item.quantity,
+            weight: item.weight,
+            clientWeight: item.clientWeight,
             gatePass: item.gatePass && item.gatePass.toUpperCase(),
             warehouse: item.warehouse,
             area: item.area,
@@ -55,9 +64,6 @@ async function createWarehousedTransactionController(req, res) {
             level: item.level,
             palletNumber: item.palletNumber && item.palletNumber.toUpperCase(),
             steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
-            quantity: item.quantity,
-            unit: item.unit,
-            description: item.description && item.description.toUpperCase(),
           },
           { transaction: transaction }
         );
@@ -131,6 +137,8 @@ async function updateWarehousedTransactionController(req, res) {
       receivedTransactionId,
       warehousedDate,
       warehousedTime,
+      totalWarehousedWeight,
+      discrepancyWeight,
       warehousedItems,
       remarks,
       statusId,
@@ -152,6 +160,9 @@ async function updateWarehousedTransactionController(req, res) {
         receivedTransactionId;
       updatedWarehousedTransaction.warehousedDate = warehousedDate;
       updatedWarehousedTransaction.warehousedTime = warehousedTime;
+      updatedWarehousedTransaction.totalWarehousedWeight =
+        totalWarehousedWeight;
+      updatedWarehousedTransaction.discrepancyWeight = discrepancyWeight;
       updatedWarehousedTransaction.remarks = remarks;
       updatedWarehousedTransaction.updatedBy = createdBy;
 
@@ -185,6 +196,11 @@ async function updateWarehousedTransactionController(req, res) {
           await WarehousedTransactionItem.update(
             {
               quotationWasteId: item.quotationWasteId,
+              description: item.description && item.description.toUpperCase(),
+              unit: item.unit,
+              quantity: item.quantity,
+              weight: item.weight,
+              clientWeight: item.clientWeight,
               gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,
@@ -193,9 +209,6 @@ async function updateWarehousedTransactionController(req, res) {
               palletNumber:
                 item.palletNumber && item.palletNumber.toUpperCase(),
               steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
-              quantity: item.quantity,
-              unit: item.unit,
-              description: item.description && item.description.toUpperCase(),
             },
             { where: { id: item.id }, transaction }
           );
@@ -205,6 +218,11 @@ async function updateWarehousedTransactionController(req, res) {
             {
               warehousedTransactionId: id,
               quotationWasteId: item.quotationWasteId,
+              description: item.description && item.description.toUpperCase(),
+              unit: item.unit,
+              quantity: item.quantity,
+              totalWarehousedWeight: item.totalWarehousedWeight,
+              discrepancyWeight: item.discrepancyWeight,
               gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,
@@ -213,9 +231,6 @@ async function updateWarehousedTransactionController(req, res) {
               palletNumber:
                 item.palletNumber && item.palletNumber.toUpperCase(),
               steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
-              quantity: item.quantity,
-              unit: item.unit,
-              description: item.description && item.description.toUpperCase(),
             },
             { transaction }
           );

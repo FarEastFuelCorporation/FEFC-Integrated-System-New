@@ -38,9 +38,14 @@ const TreatedWarehouseTransaction = ({
     row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]
       ?.WarehousedTransaction[0]?.WarehousedTransactionItem;
 
-  const sortedWarehousedTransactionItem = warehousedTransactionItem.sort(
-    (a, b) => a.description.localeCompare(b.description)
-  );
+  console.log(row);
+  console.log(warehousedTransactionItem);
+
+  const sortedWarehousedTransactionItem = warehousedTransactionItem
+    ? warehousedTransactionItem.sort((a, b) =>
+        a.description.localeCompare(b.description)
+      )
+    : [];
 
   // Get the bookedTransactionId from ScheduledTransaction
   const bookedTransactionId = row.ScheduledTransaction[0].bookedTransactionId;
@@ -79,6 +84,8 @@ const TreatedWarehouseTransaction = ({
     // Add the treatedWeight to the SortedWasteTransaction
     warehousedTransactionItem.treatedWeight = treatedWeight;
   });
+
+  console.log(sortedWarehousedTransactionItem);
 
   const totalSortedWeight = sortedWarehousedTransactionItem
     .map((transaction) => transaction.weight || 0)
@@ -474,7 +481,7 @@ const TreatedWarehouseTransaction = ({
             : "Pending"}
         </Typography>
         <Typography variant="h5">
-          Total Sorted Weight: {formatWeight(totalSortedWeight)} Kg
+          Total Warehoused Weight: {formatWeight(totalSortedWeight)} Kg
         </Typography>
         <Typography variant="h5">
           Total Treated Weight: {formatWeight(totalTreatedWeight)} Kg

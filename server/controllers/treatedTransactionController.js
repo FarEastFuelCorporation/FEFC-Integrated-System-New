@@ -17,7 +17,10 @@ async function createTreatedTransactionController(req, res) {
       isFinished,
       bookedTransactionId,
       sortedTransactionId,
+      warehousedTransactionId,
       sortedWasteTransactionId,
+      warehousedTransactionItemId,
+      submitTo,
       treatedWastes,
       remarks,
       statusId,
@@ -30,7 +33,10 @@ async function createTreatedTransactionController(req, res) {
     // Create TreatedTransaction entry
     const newTreatedTransaction = await TreatedTransaction.create(
       {
-        sortedTransactionId,
+        sortedTransactionId:
+          submitTo === "SORTING" ? sortedTransactionId : null,
+        warehousedTransactionId:
+          submitTo === "WAREHOUSE" ? warehousedTransactionId : null,
         remarks,
         createdBy,
       },
@@ -42,7 +48,10 @@ async function createTreatedTransactionController(req, res) {
         return TreatedWasteTransaction.create(
           {
             treatedTransactionId: newTreatedTransaction.id,
-            sortedWasteTransactionId,
+            sortedWasteTransactionId:
+              submitTo === "SORTING" ? sortedWasteTransactionId : null,
+            warehousedTransactionItemId:
+              submitTo === "WAREHOUSE" ? warehousedTransactionItemId : null,
             treatmentProcessId: waste.treatmentProcessId,
             treatmentMachineId: waste.treatmentMachineId,
             weight: waste.weight,

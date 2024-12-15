@@ -256,6 +256,8 @@ const Modal = forwardRef(
             setErrorMessage={setErrorMessage}
             showErrorMessage={showErrorMessage}
             setShowErrorMessage={setShowErrorMessage}
+            setIsDiscrepancy={setIsDiscrepancy}
+            isDiscrepancy={isDiscrepancy}
             refs={refs}
             ref={ref}
           />

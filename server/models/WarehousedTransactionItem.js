@@ -17,6 +17,30 @@ const WarehousedTransactionItem = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    quotationWasteId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    unit: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    weight: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    clientWeight: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
     gatePass: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -42,18 +66,6 @@ const WarehousedTransactionItem = sequelize.define(
       allowNull: false,
     },
     steamNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    unit: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
       type: DataTypes.STRING,
       allowNull: false,
     },

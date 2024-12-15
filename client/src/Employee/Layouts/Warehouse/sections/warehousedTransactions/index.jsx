@@ -27,6 +27,8 @@ const WarehousedTransactions = ({ user }) => {
       quotationWasteId: "",
       description: "",
       quantity: 0,
+      weight: 0,
+      clientWeight: 0,
       gatePass: "",
       warehouse: "",
       area: "",
@@ -44,22 +46,25 @@ const WarehousedTransactions = ({ user }) => {
     receivedTransactionId: "",
     warehousedDate: "",
     warehousedTime: "",
+    batchWeight: 0,
+    totalWarehousedWeight: 0,
+    discrepancyWeight: 0,
     warehousedItems: [
-      [
-        {
-          quotationWasteId: "",
-          description: "",
-          quantity: 0,
-          gatePass: "",
-          warehouse: "",
-          area: "",
-          section: "",
-          level: "",
-          palletNumber: "",
-          steamNumber: "",
-          unit: "",
-        },
-      ],
+      {
+        quotationWasteId: "",
+        description: "",
+        quantity: 0,
+        weight: 0,
+        clientWeight: 0,
+        gatePass: "",
+        warehouse: "",
+        area: "",
+        section: "",
+        level: "",
+        palletNumber: "",
+        steamNumber: "",
+        unit: "",
+      },
     ],
     remarks: "",
     statusId: 6,
@@ -75,6 +80,7 @@ const WarehousedTransactions = ({ user }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [isDiscrepancy, setIsDiscrepancy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialog, setDialog] = useState(false);
@@ -136,22 +142,25 @@ const WarehousedTransactions = ({ user }) => {
         row.ScheduledTransaction[0].ReceivedTransaction[0].id,
       warehousedDate: "",
       warehousedTime: "",
+      batchWeight: row.ScheduledTransaction[0].ReceivedTransaction[0].netWeight,
+      totalWarehousedWeight: 0,
+      discrepancyWeight: 0,
       warehousedItems: [
-        [
-          {
-            quotationWasteId: "",
-            description: "",
-            quantity: 0,
-            gatePass: "",
-            warehouse: "",
-            area: "",
-            section: "",
-            level: "",
-            palletNumber: "",
-            steamNumber: "",
-            unit: "",
-          },
-        ],
+        {
+          quotationWasteId: "",
+          description: "",
+          quantity: 0,
+          weight: 0,
+          clientWeight: 0,
+          gatePass: "",
+          warehouse: "",
+          area: "",
+          section: "",
+          level: "",
+          palletNumber: "",
+          steamNumber: "",
+          unit: "",
+        },
       ],
       remarks: "",
       statusId: 6,
@@ -162,26 +171,30 @@ const WarehousedTransactions = ({ user }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setErrorMessage("");
     setFormData({
       id: "",
       warehousedDate: "",
       warehousedTime: "",
+      batchWeight: 0,
+      totalWarehousedWeight: 0,
+      discrepancyWeight: 0,
       warehousedItems: [
-        [
-          {
-            quotationWasteId: "",
-            description: "",
-            quantity: 0,
-            gatePass: "",
-            warehouse: "",
-            area: "",
-            section: "",
-            level: "",
-            palletNumber: "",
-            steamNumber: "",
-            unit: "",
-          },
-        ],
+        {
+          quotationWasteId: "",
+          description: "",
+          quantity: 0,
+          weight: 0,
+          clientWeight: 0,
+          gatePass: "",
+          warehouse: "",
+          area: "",
+          section: "",
+          level: "",
+          palletNumber: "",
+          steamNumber: "",
+          unit: "",
+        },
       ],
       remarks: "",
       statusId: 6,
@@ -192,6 +205,8 @@ const WarehousedTransactions = ({ user }) => {
         quotationWasteId: "",
         description: "",
         quantity: 0,
+        weight: 0,
+        clientWeight: 0,
         gatePass: "",
         warehouse: "",
         area: "",
@@ -220,10 +235,20 @@ const WarehousedTransactions = ({ user }) => {
           typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0].id,
         warehousedDate: warehousedTransaction.warehousedDate,
         warehousedTime: warehousedTransaction.warehousedTime,
+        batchWeight:
+          typeToEdit.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
+            .netWeight,
+        totalWarehousedWeight: warehousedTransaction.totalWarehousedWeight,
+        discrepancyWeight: warehousedTransaction.discrepancyWeight,
         warehousedItems: warehousedTransaction.WarehousedTransactionItem
           ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
               warehousedTransactionId: item.warehousedTransactionId || "",
               quotationWasteId: item.quotationWasteId || "",
+              description: item.description || "",
+              unit: item.unit || "",
+              quantity: item.quantity || 0,
+              weight: item.weight || 0,
+              clientWeight: item.clientWeight || 0,
               gatePass: item.gatePass || "",
               warehouse: item.warehouse || "",
               area: item.area || "",
@@ -231,9 +256,6 @@ const WarehousedTransactions = ({ user }) => {
               level: item.level || "",
               palletNumber: item.palletNumber || "",
               steamNumber: item.steamNumber || "",
-              quantity: item.quantity || 0,
-              unit: item.unit || "",
-              description: item.description || "",
             }))
           : [],
         remarks: warehousedTransaction.remarks,
@@ -246,6 +268,11 @@ const WarehousedTransactions = ({ user }) => {
           ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
               warehousedTransactionId: item.warehousedTransactionId || "",
               quotationWasteId: item.quotationWasteId || "",
+              description: item.description || "",
+              unit: item.unit || "",
+              quantity: item.quantity || 0,
+              weight: item.weight || 0,
+              clientWeight: item.clientWeight || 0,
               gatePass: item.gatePass || "",
               warehouse: item.warehouse || "",
               area: item.area || "",
@@ -253,9 +280,6 @@ const WarehousedTransactions = ({ user }) => {
               level: item.level || "",
               palletNumber: item.palletNumber || "",
               steamNumber: item.steamNumber || "",
-              quantity: item.quantity || 0,
-              unit: item.unit || "",
-              description: item.description || "",
             }))
           : [];
 
@@ -301,13 +325,24 @@ const WarehousedTransactions = ({ user }) => {
     e.preventDefault();
 
     try {
-      setLoading(true);
-
       const items =
         warehousedItemsRefContent.current.querySelectorAll(`[id='item']`);
 
       // Collect warehoused items data
       const warehousedItemsData = [];
+      let validationErrors = [];
+
+      // Validate warehousedDate and warehousedTime
+      const warehousedDateValue = warehousedDateRef.current.value.trim();
+      const warehousedTimeValue = warehousedTimeRef.current.value.trim();
+
+      if (!warehousedDateValue) {
+        validationErrors.push("Warehoused Date is required.");
+      }
+      if (!warehousedTimeValue) {
+        validationErrors.push("Warehoused Time is required.");
+      }
+
       items.forEach((itemRef, index) => {
         if (!itemRef) return;
 
@@ -317,6 +352,9 @@ const WarehousedTransactions = ({ user }) => {
           unit: itemRef.querySelector(`[name='unit-${index}']`)?.value || "",
           quantity:
             itemRef.querySelector(`[name='quantity-${index}']`)?.value || 0,
+          weight: itemRef.querySelector(`[name='weight-${index}']`)?.value || 0,
+          clientWeight:
+            itemRef.querySelector(`[name='clientWeight-${index}']`)?.value || 0,
           quotationWasteId:
             itemRef.querySelector(`[name='quotationWasteId-${index}']`)
               ?.value || "",
@@ -335,22 +373,64 @@ const WarehousedTransactions = ({ user }) => {
             itemRef.querySelector(`[name='steamNumber-${index}']`)?.value || "",
         };
 
-        // Validate itemData
-        if (!itemData.description || itemData.quantity <= 0) {
-          throw new Error(`Invalid data for item ${index + 1}`);
-        }
+        // Collect errors
+        let fieldErrors = [];
+        if (!itemData.description) fieldErrors.push("Description is required.");
+        if (!itemData.unit) fieldErrors.push("Unit is required.");
+        if (itemData.quantity <= 0)
+          fieldErrors.push("Quantity must be greater than 0.");
+        if (itemData.weight <= 0)
+          fieldErrors.push("Weight must be greater than 0.");
+        if (!itemData.quotationWasteId)
+          fieldErrors.push("Quotation Waste ID is required.");
+        if (!itemData.gatePass) fieldErrors.push("Gate Pass is required.");
+        if (!itemData.warehouse) fieldErrors.push("Warehouse is required.");
+        if (!itemData.area) fieldErrors.push("Area is required.");
+        if (!itemData.section) fieldErrors.push("Section is required.");
+        if (!itemData.level) fieldErrors.push("Level is required.");
+        if (!itemData.palletNumber)
+          fieldErrors.push("Pallet Number is required.");
+        if (!itemData.steamNumber)
+          fieldErrors.push("Steam Number is required.");
 
-        warehousedItemsData.push(itemData);
+        if (fieldErrors.length > 0) {
+          validationErrors.push(`Item ${index + 1}: ${fieldErrors.join(", ")}`);
+        } else {
+          warehousedItemsData.push(itemData);
+        }
       });
+
+      // Remarks validation
+      if (
+        formData.discrepancyWeight !== 0 &&
+        !remarksRef.current?.value.trim()
+      ) {
+        validationErrors.push(
+          "Remarks: Remarks are required when Discrepancy Weight is not 0."
+        );
+      }
+
+      // Concatenate and display validation errors
+      if (validationErrors.length > 0) {
+        const errorMessage = validationErrors.join("\n");
+        setErrorMessage(errorMessage); // Pass the concatenated string to state
+        setShowErrorMessage(true);
+        return;
+      }
 
       // Set formData from refs before validation
       const updatedFormData = {
         ...formData,
-        warehousedDate: warehousedDateRef.current.value,
-        warehousedTime: warehousedTimeRef.current.value,
-        remarks: remarksRef.current.value,
+        warehousedDate: warehousedDateRef.current?.value,
+        warehousedTime: warehousedTimeRef.current?.value,
+        remarks: remarksRef.current?.value || "",
         warehousedItems: warehousedItemsData,
       };
+
+      // Simulate form submission (replace with your API call)
+      console.log("Form Data:", updatedFormData);
+
+      setLoading(true);
 
       if (updatedFormData.id) {
         await axios.put(
@@ -429,6 +509,8 @@ const WarehousedTransactions = ({ user }) => {
         setErrorMessage={setErrorMessage}
         showErrorMessage={showErrorMessage}
         setShowErrorMessage={setShowErrorMessage}
+        setIsDiscrepancy={setIsDiscrepancy}
+        isDiscrepancy={isDiscrepancy}
         refs={{
           warehousedDateRef,
           warehousedTimeRef,

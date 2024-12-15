@@ -294,19 +294,26 @@ const WarehousedTransaction = ({ row }) => {
                 }}
               />
             )}
-
           <br />
           <Typography variant="h5">
             Batch Weight: {formatWeight(receivedTransaction.netWeight)} Kg
           </Typography>
           <Typography variant="h5">
-            Remarks:{" "}
+            Total Warehoused Weight:{" "}
+            {formatWeight(warehousedTransaction.totalWarehousedWeight)} Kg
+          </Typography>
+          <Typography variant="h5">
+            Discrepancy Weight:{" "}
+            {formatWeight(warehousedTransaction.discrepancyWeight)} Kg
+          </Typography>
+          <Typography variant="h5">
+            Discrepancy Remarks:{" "}
             {warehousedTransaction.remarks
               ? warehousedTransaction.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Sorted By:{" "}
+            Warehoused In By:{" "}
             {`${warehousedTransaction.Employee.firstName || ""} ${
               warehousedTransaction.Employee.lastName || ""
             }`}

@@ -19,7 +19,11 @@ const CertifiedTransaction = sequelize.define(
     },
     sortedTransactionId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
+    },
+    warehousedTransactionId: {
+      type: DataTypes.UUID,
+      allowNull: true,
     },
     certificateNumber: {
       type: DataTypes.STRING,

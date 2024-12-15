@@ -28,6 +28,8 @@ const WarehouseModal = forwardRef(
       handleFormSubmit,
       errorMessage,
       showErrorMessage,
+      setIsDiscrepancy,
+      isDiscrepancy,
       refs,
     },
     ref
@@ -63,12 +65,73 @@ const WarehouseModal = forwardRef(
       }
     }, [open, formData.clientId]);
 
+    useEffect(() => {
+      const totalWarehousedWeight = calculateTotalWarehousedWeight(
+        formData.warehousedItems
+      );
+      const discrepancyWeight = calculateDiscrepancyWeight(
+        parseFloat(formData.batchWeight || 0),
+        totalWarehousedWeight
+      );
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        totalWarehousedWeight,
+        discrepancyWeight,
+      }));
+      if (discrepancyWeight === 0) {
+        setIsDiscrepancy(false);
+      } else {
+        setIsDiscrepancy(true);
+      }
+    }, [
+      formData.warehousedItems,
+      formData.batchWeight,
+      setFormData,
+      setIsDiscrepancy,
+    ]);
+
+    const calculateTotalWarehousedWeight = (warehousedItems) => {
+      const totalWarehousedWasteWeight = warehousedItems.reduce(
+        (total, waste) => {
+          return total + parseFloat(waste.weight || 0);
+        },
+        0
+      );
+
+      return totalWarehousedWasteWeight;
+    };
+
+    const calculateDiscrepancyWeight = (batchWeight, totalWarehousedWeight) => {
+      return batchWeight - totalWarehousedWeight;
+    };
+
+    const handleItemChange = useCallback(
+      (index, field, value) => {
+        const updatedWarehousedItems = formData.warehousedItems.map(
+          (item, i) => {
+            console.log(item);
+            return i === index ? { ...item, [field]: value } : item;
+          }
+        );
+        setFormData({
+          ...formData,
+          warehousedItems: updatedWarehousedItems,
+        });
+        console.log(formData.warehousedItems);
+        console.log(field);
+        console.log(updatedWarehousedItems);
+      },
+      [formData, setFormData]
+    );
+
     const handleAddItem = () => {
       // Accessing current warehoused items and adding a new one
       const newItem = {
         quotationWasteId: "",
         description: "",
         quantity: 0,
+        weight: 0,
+        clientWeight: 0,
         gatePass: "",
         warehouse: "",
         area: "",
@@ -98,37 +161,6 @@ const WarehouseModal = forwardRef(
         warehousedItems: prev.warehousedItems.filter((_, i) => i !== index),
       }));
     };
-
-    // const handleWasteCodeChange = useCallback(
-    //   (index, value) => {
-    //     let selectedWasteType = null;
-
-    //     for (let quotation of quotations) {
-    //       selectedWasteType = quotation.QuotationWaste.find(
-    //         (waste) => waste.id === value
-    //       );
-    //       if (selectedWasteType) break;
-    //     }
-
-    //     if (selectedWasteType) {
-    //       const updatedWastes = formData.sortedWastes.map((waste, i) =>
-    //         i === index
-    //           ? {
-    //               ...waste,
-    //               quotationWasteId: value,
-    //               wasteName: selectedWasteType.wasteName,
-    //             }
-    //           : waste
-    //       );
-    //       handleInputChange({
-    //         target: { name: "sortedWastes", value: updatedWastes },
-    //       });
-    //     } else {
-    //       console.warn(`No waste type found for id: ${value}`);
-    //     }
-    //   },
-    //   [quotations, formData, handleInputChange]
-    // );
 
     const handleCategoryChange = (index, value) => {
       // Access the specific element in the warehousedItemsRef using index
@@ -215,6 +247,56 @@ const WarehouseModal = forwardRef(
                 autoComplete="off"
               />
             </div>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <TextField
+                  label="Batch Weight"
+                  name={`batchWeight`}
+                  value={formData.batchWeight}
+                  type="number"
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Total Warehoused Weight"
+                  name={`totalWarehousedWeight`}
+                  value={formData.totalWarehousedWeight}
+                  type="number"
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Discrepancy Weight"
+                  name={`discrepancyWeight`}
+                  value={formData.discrepancyWeight}
+                  type="number"
+                  fullWidth
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+            </Grid>
 
             {/* Warehoused Items */}
             <Grid item xs={12} ref={ref}>
@@ -224,7 +306,7 @@ const WarehouseModal = forwardRef(
                   <Typography my={1}>Item {index + 1}</Typography>
                   <Box id={`warehoused-item-${index}`}>
                     <Grid container spacing={2}>
-                      <Grid item xs={3.5}>
+                      <Grid item xs={2.5}>
                         <FormControl fullWidth>
                           <InputLabel
                             id={`waste-type-select-label-${index}`}
@@ -260,7 +342,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={12} sm={6} md={6} lg={3.5}>
+                      <Grid item xs={12} sm={6} md={6} lg={2.5}>
                         <TextField
                           name={`description-${index}`}
                           id={`description-${index}`}
@@ -271,7 +353,7 @@ const WarehouseModal = forwardRef(
                           defaultValue={item.description}
                         />
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={2}>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <FormControl fullWidth required>
                           <InputLabel id={`unit-label-${index}`}>
                             Unit
@@ -293,7 +375,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={2}>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <TextField
                           name={`quantity-${index}`}
                           label="Quantity"
@@ -301,6 +383,29 @@ const WarehouseModal = forwardRef(
                           fullWidth
                           required
                           defaultValue={item.quantity}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                        <TextField
+                          name={`weight-${index}`}
+                          label="Weight"
+                          type="number"
+                          fullWidth
+                          required
+                          defaultValue={item.weight}
+                          onChange={(e) =>
+                            handleItemChange(index, `weight`, e.target.value)
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                        <TextField
+                          name={`clientWeight-${index}`}
+                          label="Client Weight"
+                          type="number"
+                          fullWidth
+                          required
+                          defaultValue={item.clientWeight}
                         />
                       </Grid>
                       <Grid item xs={6} sm={3} md={2} lg={0.5}>
@@ -488,18 +593,20 @@ const WarehouseModal = forwardRef(
               </Grid>
             </Grid>
 
-            <TextField
-              label="Remarks"
-              inputRef={remarksRef}
-              defaultValue={formData.remarksRef}
-              fullWidth
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-            />
+            {isDiscrepancy && (
+              <TextField
+                label="Remarks"
+                inputRef={remarksRef}
+                defaultValue={formData.remarksRef}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            )}
             <TextField
               label="Status Id"
               name="statusId"

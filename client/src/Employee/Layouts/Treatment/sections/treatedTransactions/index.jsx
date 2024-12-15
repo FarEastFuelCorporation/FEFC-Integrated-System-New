@@ -17,7 +17,10 @@ const TreatedTransactions = ({ user }) => {
     id: "",
     bookedTransactionId: "",
     sortedTransactionId: "",
+    warehousedTransactionId: "",
     sortedWasteTransactionId: "",
+    warehousedTransactionItemId: "",
+    submitTo: "",
     treatedWastes: [
       {
         treatedDate: "",
@@ -88,9 +91,15 @@ const TreatedTransactions = ({ user }) => {
       id: "",
       bookedTransactionId: row.id,
       sortedTransactionId:
-        row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-          .id,
+        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.SortedTransaction?.[0]?.id,
+      warehousedTransactionId:
+        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+          ?.WarehousedTransaction[0]?.id,
       sortedWasteTransactionId: waste.id,
+      warehousedTransactionItemId: waste.id,
+      submitTo:
+        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo,
       treatedWastes: [
         {
           treatedDate: "",
@@ -261,13 +270,14 @@ const TreatedTransactions = ({ user }) => {
     const receivedTransaction = scheduledTransaction?.ReceivedTransaction?.[0];
     if (!receivedTransaction) return;
 
-    const sortedTransaction = receivedTransaction?.SortedTransaction?.[0];
-    if (!sortedTransaction) return;
+    const warehousedTransaction =
+      receivedTransaction?.WarehousedTransaction?.[0];
+    if (!warehousedTransaction) return;
 
-    // Calculate the total weight from all SortedWasteTransaction objects
-    const sortedWasteTransactions =
-      sortedTransaction?.SortedWasteTransaction || [];
-    const totalSortedWeight = sortedWasteTransactions.reduce(
+    // Calculate the total weight from all WarehousedTransactionItem objects
+    const warehousedTransactionItem =
+      warehousedTransaction?.WarehousedTransactionItem || [];
+    const totalWarehousedWeight = warehousedTransactionItem.reduce(
       (total, wasteTransaction) => {
         // Convert weight to a number and sum it
         return (
@@ -278,8 +288,8 @@ const TreatedTransactions = ({ user }) => {
       0
     );
 
-    // Calculate the total treatedWeight from all SortedWasteTransaction objects
-    let totalTreatedWeight = sortedWasteTransactions.reduce(
+    // Calculate the total treatedWeight from all WarehousedTransactionItem objects
+    let totalTreatedWeight = warehousedTransactionItem.reduce(
       (total, wasteTransaction) => {
         return (
           total +
@@ -297,8 +307,8 @@ const TreatedTransactions = ({ user }) => {
       return total + (treatedWaste.weight ? Number(treatedWaste.weight) : 0);
     }, 0);
 
-    // Update isFinished if totalSortedWeight matches totalTreatedWeight
-    const isFinished = totalSortedWeight === totalTreatedWeight;
+    // Update isFinished if totalWarehousedWeight matches totalTreatedWeight
+    const isFinished = totalWarehousedWeight === totalTreatedWeight;
 
     // Return the updated formData with the isFinished flag
     return {
@@ -315,10 +325,12 @@ const TreatedTransactions = ({ user }) => {
     }
 
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const updatedFormData = updateIsFinished(formData);
 
+      console.log(formData);
+      console.log(updatedFormData);
       const { row, ...updatedDataWithoutRow } = updatedFormData;
 
       if (!formData.id) {

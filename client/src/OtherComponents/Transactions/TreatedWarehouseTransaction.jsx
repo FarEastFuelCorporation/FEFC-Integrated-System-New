@@ -38,9 +38,6 @@ const TreatedWarehouseTransaction = ({
     row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]
       ?.WarehousedTransaction[0]?.WarehousedTransactionItem;
 
-  console.log(row);
-  console.log(warehousedTransactionItem);
-
   const sortedWarehousedTransactionItem = warehousedTransactionItem
     ? warehousedTransactionItem.sort((a, b) =>
         a.description.localeCompare(b.description)
@@ -84,8 +81,6 @@ const TreatedWarehouseTransaction = ({
     // Add the treatedWeight to the SortedWasteTransaction
     warehousedTransactionItem.treatedWeight = treatedWeight;
   });
-
-  console.log(sortedWarehousedTransactionItem);
 
   const totalSortedWeight = sortedWarehousedTransactionItem
     .map((transaction) => transaction.weight || 0)

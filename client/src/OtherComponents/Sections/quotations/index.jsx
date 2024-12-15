@@ -316,8 +316,6 @@ const Quotations = ({ user }) => {
   }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (row) => {
-    console.log(row.validity);
-    console.log(row.QuotationWaste);
     const formattedDate = new Date(row.validity).toISOString().split("T")[0];
     if (row) {
       setFormData({
@@ -372,7 +370,6 @@ const Quotations = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(formData);
     try {
       setLoading(true);
       if (formData.id) {

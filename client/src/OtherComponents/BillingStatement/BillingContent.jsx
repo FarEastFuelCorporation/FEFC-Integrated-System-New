@@ -230,8 +230,6 @@ const BillingContent = ({
     height: "20px",
   });
 
-  console.log(groupedTransactions);
-
   return (
     <Box>
       <Box>

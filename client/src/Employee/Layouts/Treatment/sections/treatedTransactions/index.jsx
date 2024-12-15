@@ -329,8 +329,6 @@ const TreatedTransactions = ({ user }) => {
 
       const updatedFormData = updateIsFinished(formData);
 
-      console.log(formData);
-      console.log(updatedFormData);
       const { row, ...updatedDataWithoutRow } = updatedFormData;
 
       if (!formData.id) {

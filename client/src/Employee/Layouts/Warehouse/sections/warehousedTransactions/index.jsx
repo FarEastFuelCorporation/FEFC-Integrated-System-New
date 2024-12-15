@@ -427,9 +427,6 @@ const WarehousedTransactions = ({ user }) => {
         warehousedItems: warehousedItemsData,
       };
 
-      // Simulate form submission (replace with your API call)
-      console.log("Form Data:", updatedFormData);
-
       setLoading(true);
 
       if (updatedFormData.id) {

@@ -109,7 +109,6 @@ const WarehouseModal = forwardRef(
       (index, field, value) => {
         const updatedWarehousedItems = formData.warehousedItems.map(
           (item, i) => {
-            console.log(item);
             return i === index ? { ...item, [field]: value } : item;
           }
         );
@@ -117,9 +116,6 @@ const WarehouseModal = forwardRef(
           ...formData,
           warehousedItems: updatedWarehousedItems,
         });
-        console.log(formData.warehousedItems);
-        console.log(field);
-        console.log(updatedWarehousedItems);
       },
       [formData, setFormData]
     );

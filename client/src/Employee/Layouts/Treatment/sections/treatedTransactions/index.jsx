@@ -325,7 +325,7 @@ const TreatedTransactions = ({ user }) => {
     }
 
     try {
-      // setLoading(true);
+      setLoading(true);
 
       const updatedFormData = updateIsFinished(formData);
 

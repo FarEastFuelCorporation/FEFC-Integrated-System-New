@@ -74,7 +74,7 @@ async function createQuotationController(req, res) {
         return await QuotationWaste.create({
           quotationId: quotation.id,
           wasteId,
-          treatmentProcessId,
+          treatmentProcessId: treatmentProcessId ? treatmentProcessId : null,
           wasteName,
           mode,
           quantity,
@@ -490,7 +490,9 @@ async function updateQuotationController(req, res) {
             return await QuotationWaste.create({
               quotationId: quotation.id,
               wasteId,
-              treatmentProcessId,
+              treatmentProcessId: treatmentProcessId
+                ? treatmentProcessId
+                : null,
               wasteName,
               mode,
               quantity,
@@ -620,7 +622,9 @@ async function updateQuotationController(req, res) {
             if (existingWaste) {
               // Update existing waste
               existingWaste.wasteId = wasteId;
-              existingWaste.treatmentProcessId = treatmentProcessId;
+              existingWaste.treatmentProcessId = treatmentProcessId
+                ? treatmentProcessId
+                : null;
               existingWaste.wasteName = wasteName && wasteName.toUpperCase();
               existingWaste.mode = mode;
               existingWaste.quantity = quantity;
@@ -639,7 +643,9 @@ async function updateQuotationController(req, res) {
               await QuotationWaste.create({
                 quotationId: updatedQuotation.id,
                 wasteId,
-                treatmentProcessId,
+                treatmentProcessId: treatmentProcessId
+                  ? treatmentProcessId
+                  : null,
                 wasteName: wasteName && wasteName.toUpperCase(),
                 mode,
                 quantity,

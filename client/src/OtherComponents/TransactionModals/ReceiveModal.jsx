@@ -348,6 +348,7 @@ const ReceiveModal = ({
             <MenuItem value="SORTING">SORTING</MenuItem>
             <MenuItem value="WAREHOUSE">WAREHOUSE</MenuItem>
             <MenuItem value="ACCOUNTING">ACCOUNTING</MenuItem>
+            <MenuItem value="FOUL TRIP">FOUL TRIP</MenuItem>
           </Select>
         </FormControl>
         <TextField

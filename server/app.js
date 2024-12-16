@@ -87,14 +87,13 @@ const {
   handleAttendanceSync,
   syncSpecificEmployeeToLocal,
 } = require("./syncronize");
-const CertifiedTransaction = require("./models/CertifiedTransaction");
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    // await CertifiedTransaction.sync({ alter: true });
+    // await ReceivedTransaction.sync({ alter: true });
 
     // await handleAttendanceSync();
 

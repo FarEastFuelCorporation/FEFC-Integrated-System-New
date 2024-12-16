@@ -75,7 +75,7 @@ const ReceivedTransaction = sequelize.define(
     },
     submitTo: {
       type: DataTypes.ENUM,
-      values: ["SORTING", "WAREHOUSE", "ACCOUNTING"],
+      values: ["SORTING", "WAREHOUSE", "ACCOUNTING", "FOUL TRIP"],
       allowNull: true,
     },
     hasDemurrage: {

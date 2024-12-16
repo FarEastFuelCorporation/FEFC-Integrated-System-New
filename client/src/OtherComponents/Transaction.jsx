@@ -110,6 +110,7 @@ const Transaction = ({
       {params.value}
     </div>
   );
+  console.log(transactions);
 
   const columns = [
     {
@@ -212,6 +213,11 @@ const Transaction = ({
           status = "SCHEDULED";
         } else if (params.row.statusId === 3) {
           status = "DISPATCHED";
+        } else if (
+          params.row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.submitTo === "FOUL TRIP"
+        ) {
+          status = "FOUL TRIP";
         } else if (params.row.statusId === 4) {
           status = "RECEIVED";
         } else if (params.row.statusId === 5) {
@@ -246,6 +252,11 @@ const Transaction = ({
         ) {
           status = "BILLED";
         } else if (
+          params.row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.submitTo === "FOUL TRIP"
+        ) {
+          status = "FOUL TRIP";
+        } else if (
           params.row.BilledTransaction?.length > 0 &&
           params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ) {
@@ -269,8 +280,15 @@ const Transaction = ({
       align: "center",
       flex: 1,
       minWidth: 100,
-      valueGetter: (params) =>
-        params.row.BilledTransaction?.[0]?.billingNumber || "PENDING",
+      valueGetter: (params) => {
+        if (
+          params.row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.submitTo === "FOUL TRIP"
+        ) {
+          return "FOUL TRIP";
+        }
+        return params.row.BilledTransaction?.[0]?.billingNumber || "PENDING";
+      },
       renderCell: renderCellWithWrapText,
     },
     {
@@ -338,10 +356,6 @@ const Transaction = ({
     }
     return true; // Include the column
   });
-
-  const certifiedTransaction =
-    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-      ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0];
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 

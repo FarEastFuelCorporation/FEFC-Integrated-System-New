@@ -128,6 +128,7 @@ const ReceivedTransactions = ({ user }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setErrorMessage("");
     clearFormData();
   };
 
@@ -217,6 +218,7 @@ const ReceivedTransactions = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
+    // Perform client-side validation
     const {
       receivedDate,
       receivedTime,
@@ -229,28 +231,34 @@ const ReceivedTransactions = ({ user }) => {
       grossWeight,
       tareWeight,
       netWeight,
-      statusId,
       submitTo,
-      createdBy,
     } = formData;
 
-    if (
-      !receivedDate ||
-      !receivedTime ||
-      !pttNo ||
-      !manifestNo ||
-      !pullOutFormNo ||
-      !truckScaleNo ||
-      !manifestWeight ||
-      !clientWeight ||
-      !grossWeight ||
-      !tareWeight ||
-      !netWeight ||
-      !statusId ||
-      !submitTo ||
-      !createdBy
-    ) {
-      setErrorMessage("Please fill all required fields.");
+    // Collect validation errors
+    let validationErrors = [];
+
+    if (!receivedDate) validationErrors.push("Received Date is required.");
+    if (!receivedTime) validationErrors.push("Received Time is required.");
+    if (!formData.dispatchedTransactionId && !formData.vehicle)
+      validationErrors.push("Plate Number is required.");
+    if (!formData.dispatchedTransactionId && !formData.driver)
+      validationErrors.push("Driver is required.");
+    if (!pttNo) validationErrors.push("PTT No is required.");
+    if (!manifestNo) validationErrors.push("Manifest No is required.");
+    if (!pullOutFormNo) validationErrors.push("Pull-Out Form No is required.");
+    if (!truckScaleNo) validationErrors.push("Truck Scale No is required.");
+    if (manifestWeight == null)
+      validationErrors.push("Manifest Weight is required.");
+    if (clientWeight == null)
+      validationErrors.push("Client Weight is required.");
+    if (grossWeight == null) validationErrors.push("Gross Weight is required.");
+    if (tareWeight == null) validationErrors.push("Tare Weight is required.");
+    if (netWeight == null) validationErrors.push("Net Weight is required.");
+    if (!submitTo) validationErrors.push("Submit To is required.");
+
+    // If there are validation errors, show them and stop further processing
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(" "));
       setShowErrorMessage(true);
       return;
     }

@@ -214,26 +214,20 @@ const DispatchedTransactions = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const {
-      dispatchedDate,
-      dispatchedTime,
-      vehicleId,
-      driverId,
-      helperIds,
-      statusId,
-      createdBy,
-    } = formData;
+    const { dispatchedDate, dispatchedTime, vehicleId, driverId, helperIds } =
+      formData;
 
-    if (
-      !dispatchedDate ||
-      !dispatchedTime ||
-      !vehicleId ||
-      !driverId ||
-      helperIds.length === 0 ||
-      !statusId ||
-      !createdBy
-    ) {
-      setErrorMessage("Please fill all required fields.");
+    let validationErrors = [];
+
+    if (!dispatchedDate) validationErrors.push("Dispatched Date is required.");
+    if (!dispatchedTime) validationErrors.push("Dispatched Time is required.");
+    if (!vehicleId) validationErrors.push("Vehicle selection is required.");
+    if (!driverId) validationErrors.push("Driver selection is required.");
+    if (helperIds.length === 0)
+      validationErrors.push("At least one helper is required.");
+
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(" "));
       setShowErrorMessage(true);
       return;
     }

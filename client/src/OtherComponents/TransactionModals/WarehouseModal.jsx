@@ -329,9 +329,16 @@ const WarehouseModal = forwardRef(
                             disabled={formData.statusId === 4}
                           >
                             {quotations.map((quotation) =>
-                              quotation.QuotationWaste.map((waste) => (
+                              quotation.QuotationWaste.filter(
+                                (waste) =>
+                                  !["AHW", "ANHW", "AHNHW"].includes(
+                                    waste.TypeOfWaste.wasteCode
+                                  ) // Exclude these codes
+                              ).map((waste) => (
                                 <MenuItem key={waste.id} value={waste.id}>
-                                  {waste.wasteName} - {waste.unit}
+                                  {waste.wasteName} {"("}
+                                  {waste.TypeOfWaste.wasteCode}
+                                  {")"} - {waste.unit}
                                 </MenuItem>
                               ))
                             )}

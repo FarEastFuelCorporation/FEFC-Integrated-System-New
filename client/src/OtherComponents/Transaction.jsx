@@ -110,7 +110,6 @@ const Transaction = ({
       {params.value}
     </div>
   );
-  console.log(transactions);
 
   const columns = [
     {

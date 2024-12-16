@@ -233,7 +233,6 @@ const DispatchedTransactions = ({ user }) => {
     }
 
     try {
-      let newTransaction;
       setLoading(true);
       if (!formData.driverId) {
         setError("Driver selection is required.");
@@ -241,7 +240,7 @@ const DispatchedTransactions = ({ user }) => {
         setError("");
 
         if (formData.id) {
-          newTransaction = await axios.put(
+          await axios.put(
             `${apiUrl}/api/dispatchedTransaction/${formData.id}`,
             formData
           );
@@ -269,10 +268,7 @@ const DispatchedTransactions = ({ user }) => {
           // ]);
           setSuccessMessage("Update Dispatched Transaction successfully!");
         } else {
-          newTransaction = await axios.post(
-            `${apiUrl}/api/dispatchedTransaction`,
-            formData
-          );
+          await axios.post(`${apiUrl}/api/dispatchedTransaction`, formData);
           // Merging new data with previous state data
           // setPendingTransactions((prevPendingTransactions) => [
           //   ...prevPendingTransactions,

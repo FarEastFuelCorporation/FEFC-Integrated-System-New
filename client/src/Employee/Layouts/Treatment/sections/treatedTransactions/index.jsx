@@ -278,9 +278,6 @@ const TreatedTransactions = ({ user }) => {
         ? receivedTransaction?.SortedTransaction?.[0]
         : receivedTransaction?.WarehousedTransaction?.[0];
 
-    console.log(formData);
-    console.log(transaction);
-
     if (!transaction) return;
 
     // Calculate the total weight
@@ -288,8 +285,6 @@ const TreatedTransactions = ({ user }) => {
       submitTo === "SORTING"
         ? transaction?.SortedWasteTransaction || []
         : transaction?.WarehousedTransactionItem || [];
-
-    console.log(transactionItem);
 
     const totalWarehousedWeight = transactionItem.reduce(
       (total, wasteTransaction) => {

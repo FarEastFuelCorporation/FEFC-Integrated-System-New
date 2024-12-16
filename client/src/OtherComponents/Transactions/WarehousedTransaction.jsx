@@ -36,16 +36,6 @@ const WarehousedTransaction = ({ row }) => {
   const warehousedTransactionItemHeight =
     warehousedTransactionItem.length * rowHeight + headerHeight;
 
-  const formatTimeToHHMMSS = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    return `${hours}:${minutes}:00`;
-  };
-
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "2-digit" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
       {params.value}

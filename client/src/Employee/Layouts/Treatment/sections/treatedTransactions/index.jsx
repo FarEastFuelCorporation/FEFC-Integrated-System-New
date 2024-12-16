@@ -264,20 +264,34 @@ const TreatedTransactions = ({ user }) => {
 
   const updateIsFinished = (formData) => {
     // Extract relevant data from the formData object
+
     const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
     if (!scheduledTransaction) return;
 
     const receivedTransaction = scheduledTransaction?.ReceivedTransaction?.[0];
     if (!receivedTransaction) return;
 
-    const warehousedTransaction =
-      receivedTransaction?.WarehousedTransaction?.[0];
-    if (!warehousedTransaction) return;
+    const submitTo = receivedTransaction?.submitTo;
 
-    // Calculate the total weight from all WarehousedTransactionItem objects
-    const warehousedTransactionItem =
-      warehousedTransaction?.WarehousedTransactionItem || [];
-    const totalWarehousedWeight = warehousedTransactionItem.reduce(
+    const transaction =
+      submitTo === "SORTING"
+        ? receivedTransaction?.SortedTransaction?.[0]
+        : receivedTransaction?.WarehousedTransaction?.[0];
+
+    console.log(formData);
+    console.log(transaction);
+
+    if (!transaction) return;
+
+    // Calculate the total weight
+    const transactionItem =
+      submitTo === "SORTING"
+        ? transaction?.SortedWasteTransaction || []
+        : transaction?.WarehousedTransactionItem || [];
+
+    console.log(transactionItem);
+
+    const totalWarehousedWeight = transactionItem.reduce(
       (total, wasteTransaction) => {
         // Convert weight to a number and sum it
         return (
@@ -288,8 +302,8 @@ const TreatedTransactions = ({ user }) => {
       0
     );
 
-    // Calculate the total treatedWeight from all WarehousedTransactionItem objects
-    let totalTreatedWeight = warehousedTransactionItem.reduce(
+    // Calculate the total treatedWeight
+    let totalTreatedWeight = transactionItem.reduce(
       (total, wasteTransaction) => {
         return (
           total +

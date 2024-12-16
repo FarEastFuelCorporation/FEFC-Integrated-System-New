@@ -262,7 +262,7 @@ const BookModal = ({
         )}
         {filteredVehicleTypes.length > 0 && formData.quotationWasteId && (
           <>
-            <Typography variant="h6" sx={{ fontSize: "12px", color: "yellow" }}>
+            <Typography variant="h6" sx={{ fontSize: "12px", color: "red" }}>
               Leave the Vehicle Type field empty if using your own vehicle.
             </Typography>
             <TextField

@@ -16,6 +16,8 @@ const CertifiedTransactions = ({ user }) => {
     id: "",
     bookedTransactionId: "",
     sortedTransactionId: "",
+    warehousedTransactionId: "",
+    submitTo: "",
     isBilled: false,
     certificateNumber: "",
     certifiedDate: "",
@@ -88,6 +90,8 @@ const CertifiedTransactions = ({ user }) => {
       warehousedTransactionId:
         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
           ?.WarehousedTransaction?.[0]?.id,
+      submitTo:
+        row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo,
       isBilled: row.BilledTransaction.length === 0 ? false : true,
       isBillingApproved: row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ? true
@@ -124,10 +128,16 @@ const CertifiedTransactions = ({ user }) => {
   const handleEditClick = (row) => {
     const typeToEdit = row;
 
+    const submitTo =
+      row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo;
+
     if (typeToEdit) {
       const certifiedTransaction =
-        typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0] || {};
+        submitTo === "SORTING"
+          ? typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+              ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0] || {}
+          : typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+              ?.WarehousedTransaction?.[0]?.CertifiedTransaction?.[0] || {};
 
       const typeOfCertificateArray = certifiedTransaction.typeOfCertificate
         ? certifiedTransaction.typeOfCertificate.split(", ")
@@ -139,6 +149,12 @@ const CertifiedTransactions = ({ user }) => {
         sortedTransactionId:
           typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
             ?.SortedTransaction?.[0].id,
+        warehousedTransactionId:
+          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.WarehousedTransaction?.[0]?.id,
+        submitTo:
+          typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.submitTo,
         certificateNumber: certifiedTransaction.certificateNumber,
         certifiedDate: certifiedTransaction.certifiedDate,
         certifiedTime: certifiedTransaction.certifiedTime,
@@ -172,9 +188,16 @@ const CertifiedTransactions = ({ user }) => {
 
   const handleConfirmDelete = async (row) => {
     try {
+      console.log(row);
+      console.log(
+        row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo
+      );
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].id}`,
+        row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo ===
+          "SORTING"
+          ? `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].id}`
+          : `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].WarehousedTransaction?.[0].CertifiedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,
@@ -216,11 +239,6 @@ const CertifiedTransactions = ({ user }) => {
     // Validate bookedTransactionId
     if (!formData.bookedTransactionId) {
       validationErrors.push("Booked Transaction ID is required.");
-    }
-
-    // Validate sortedTransactionId
-    if (!formData.sortedTransactionId) {
-      validationErrors.push("Sorted Transaction ID is required.");
     }
 
     // Validate certifiedDate

@@ -27,6 +27,8 @@ async function createCertifiedTransactionController(req, res) {
     let {
       bookedTransactionId,
       sortedTransactionId,
+      warehousedTransactionId,
+      submitTo,
       isBilled,
       isBillingApproved,
       certifiedDate,
@@ -49,7 +51,10 @@ async function createCertifiedTransactionController(req, res) {
     const certifiedTransaction = await CertifiedTransaction.create(
       {
         bookedTransactionId,
-        sortedTransactionId,
+        sortedTransactionId:
+          submitTo === "SORTING" ? sortedTransactionId : null,
+        warehousedTransactionId:
+          submitTo === "WAREHOUSE" ? warehousedTransactionId : null,
         certificateNumber,
         certifiedDate,
         certifiedTime,
@@ -274,6 +279,8 @@ async function updateCertifiedTransactionController(req, res) {
       const {
         bookedTransactionId,
         sortedTransactionId,
+        warehousedTransactionId,
+        submitTo,
         certifiedDate,
         certifiedTime,
         typeOfCertificate,
@@ -296,7 +303,10 @@ async function updateCertifiedTransactionController(req, res) {
       if (certifiedTransaction) {
         // Update certified transaction attributes
         certifiedTransaction.bookedTransactionId = bookedTransactionId;
-        certifiedTransaction.sortedTransactionId = sortedTransactionId;
+        certifiedTransaction.sortedTransactionId =
+          submitTo === "SORTING" ? sortedTransactionId : null;
+        certifiedTransaction.warehousedTransactionId =
+          submitTo === "WAREHOUSE" ? warehousedTransactionId : null;
         certifiedTransaction.certificateNumber = certificateNumber;
         certifiedTransaction.certifiedDate = certifiedDate;
         certifiedTransaction.certifiedTime = certifiedTime;

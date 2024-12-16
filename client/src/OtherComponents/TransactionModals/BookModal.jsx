@@ -250,38 +250,46 @@ const BookModal = ({
               ) // Sort wasteName in ascending order
                 .map((waste, wasteIndex) => (
                   <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
-                    {waste.wasteName} {"("}
+                    {waste.wasteName}
                     {waste.TreatmentProcess?.treatmentProcess
-                      ? waste.TreatmentProcess?.treatmentProcess
-                      : ""}
-                    {")"} - {waste.unit}
+                      ? `(${waste.TreatmentProcess?.treatmentProcess})`
+                      : ""}{" "}
+                    - {waste.unit}
                   </MenuItem>
                 ))
             )}
           </TextField>
         )}
         {filteredVehicleTypes.length > 0 && formData.quotationWasteId && (
-          <TextField
-            label="Vehicle Type"
-            name="quotationTransportationId"
-            value={formData.quotationTransportationId}
-            onChange={handleInputChange}
-            select
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          >
-            {filteredVehicleTypes.map((transport, index) => (
-              <MenuItem key={index} value={transport.quotationTransportationId}>
-                {transport.typeOfVehicle}
-              </MenuItem>
-            ))}
-          </TextField>
+          <>
+            <Typography variant="h6" sx={{ fontSize: "12px", color: "yellow" }}>
+              Leave the Vehicle Type field empty if using your own vehicle.
+            </Typography>
+            <TextField
+              label="Vehicle Type"
+              name="quotationTransportationId"
+              value={formData.quotationTransportationId}
+              onChange={handleInputChange}
+              select
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            >
+              {filteredVehicleTypes.map((transport, index) => (
+                <MenuItem
+                  key={index}
+                  value={transport.quotationTransportationId}
+                >
+                  {transport.typeOfVehicle}
+                </MenuItem>
+              ))}
+            </TextField>
+          </>
         )}
         <TextField
           label="Remarks"

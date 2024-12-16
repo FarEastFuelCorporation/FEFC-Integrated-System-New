@@ -178,7 +178,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
+      minWidth: 250,
       valueGetter: (params) => {
         return params.row.Client.clientName;
       },

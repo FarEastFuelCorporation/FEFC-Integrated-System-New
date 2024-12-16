@@ -291,6 +291,11 @@ async function getQuotationController(req, res) {
               model: Quotation,
               as: "Quotation",
             },
+            {
+              model: TreatmentProcess,
+              as: "TreatmentProcess",
+              attributes: ["treatmentProcess"],
+            },
           ],
           order: [
             ["wasteName", "ASC"],

@@ -250,7 +250,8 @@ const BookModal = ({
               ) // Sort wasteName in ascending order
                 .map((waste, wasteIndex) => (
                   <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
-                    {waste.wasteName} - {waste.unit}
+                    {waste.wasteName} {waste.TreatmentProcess.treatmentProcess}{" "}
+                    - {waste.unit}
                   </MenuItem>
                 ))
             )}

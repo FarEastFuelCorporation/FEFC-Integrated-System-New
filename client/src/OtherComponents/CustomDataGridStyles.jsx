@@ -34,23 +34,22 @@ const CustomDataGridStyles = ({ children, height, margin = "40px 0 0 0" }) => {
           backgroundColor: colors.primary[400],
           overflowX: "auto",
           overflowY: "auto", // Ensure scrolling works
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE 10+
+          "&::-webkit-scrollbar": {
+            width: "8px",
+            height: "8px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: colors.grey[500],
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: colors.grey[700],
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: colors.grey[300],
+          },
         },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
-          width: "6px", // Horizontal scrollbar width
-          height: "6px", // Horizontal scrollbar height
-        },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb": {
-          backgroundColor: "rgba(0, 0, 0, 0.2)", // Horizontal scrollbar thumb color
-          borderRadius: "3px",
-        },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb:vertical": {
-          display: "none", // Hide vertical scrollbar
-        },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-track": {
-          backgroundColor: "transparent", // Horizontal scrollbar track color
-        },
+
         "& .MuiDataGrid-footerContainer": {
           borderTop: "none",
           backgroundColor: colors.blueAccent[700],

@@ -117,6 +117,7 @@ const Transaction = ({
       headerName: "Transaction ID",
       headerAlign: "center",
       align: "center",
+      flex: 1,
       minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
@@ -125,7 +126,8 @@ const Transaction = ({
       headerName: "Hauling Date",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1,
+      minWidth: 150,
       renderCell: (params) => {
         let haulingDate;
         if (params.row.ScheduledTransaction[0]) {
@@ -151,7 +153,8 @@ const Transaction = ({
       headerName: "Hauling Time",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1,
+      minWidth: 150,
       renderCell: (params) => {
         const scheduledTime = params.row.ScheduledTransaction[0]
           ? params.row.ScheduledTransaction[0].scheduledTime
@@ -175,7 +178,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 300,
+      minWidth: 200,
       valueGetter: (params) => {
         return params.row.Client.clientName;
       },
@@ -187,7 +190,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 300,
+      minWidth: 200,
       valueGetter: (params) => {
         return params.row.QuotationWaste.wasteName;
       },
@@ -198,7 +201,8 @@ const Transaction = ({
       headerName: "Transaction Status",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1,
+      minWidth: 150,
       valueGetter: (params) => {
         let status;
 
@@ -231,7 +235,8 @@ const Transaction = ({
       headerName: "Billing Status",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1,
+      minWidth: 150,
       valueGetter: (params) => {
         let status;
 
@@ -262,7 +267,8 @@ const Transaction = ({
       headerName: "Billing Number",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 1,
+      minWidth: 100,
       valueGetter: (params) =>
         params.row.BilledTransaction?.[0]?.billingNumber || "PENDING",
       renderCell: renderCellWithWrapText,
@@ -273,7 +279,8 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       sortable: false,
-      width: 200,
+      flex: 1,
+      minWidth: 200,
       renderCell: (params) => (
         <Button
           color="secondary"

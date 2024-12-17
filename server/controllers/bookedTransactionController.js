@@ -108,6 +108,7 @@ async function createBookedTransactionController(req, res) {
     const clientName = bookedTransaction?.Client?.clientName || "";
     const clientId = bookedTransaction?.createdBy || "";
     const clientType = clientId?.slice(0, 3) || "";
+    const clientEmail = bookedTransaction?.Client?.email || "";
 
     const emailBody = await BookedTransactionEmailFormat(
       clientType,
@@ -127,6 +128,7 @@ async function createBookedTransactionController(req, res) {
         `${transactionId} - Booked Transaction: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
         emailBody, // HTML content
+        [clientEmail],
         [
           "rmangaron@fareastfuelcorp.com",
           "edevera@fareastfuelcorp.com",

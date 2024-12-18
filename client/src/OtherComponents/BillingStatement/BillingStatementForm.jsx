@@ -263,11 +263,16 @@ const BillingStatementForm = ({
         target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
         hasFixedRateIndividual = QuotationWaste.hasFixedRate;
-        vatCalculation = QuotationWaste.vatCalculation;
-        fixedWeight = QuotationWaste.fixedWeight;
-        fixedPrice = QuotationWaste.fixedPrice;
-        unitPrice = QuotationWaste.unitPrice;
-        hasTransportation = QuotationWaste.hasTransportation;
+        if (hasFixedRateIndividual) {
+          vatCalculation = QuotationWaste.vatCalculation;
+          fixedWeight = QuotationWaste.fixedWeight;
+          fixedPrice = QuotationWaste.fixedPrice;
+          unitPrice = QuotationWaste.unitPrice;
+          hasTransportation = QuotationWaste.hasTransportation;
+        }
+
+        console.log(totalWeightPrice);
+        console.log(hasFixedRateIndividual);
 
         if (!hasFixedRateIndividual) {
           switch (QuotationWaste.vatCalculation) {
@@ -283,6 +288,31 @@ const BillingStatementForm = ({
             default:
               break;
           }
+        } else {
+          console.log(usedWeight.toNumber());
+          console.log(fixedWeight);
+
+          if (usedWeight.toNumber() > fixedWeight) {
+            const excessWeight = new Decimal(usedWeight)
+              .minus(new Decimal(fixedWeight))
+              .toNumber();
+
+            const excessPrice = excessWeight * unitPrice;
+
+            switch (vatCalculation) {
+              case "VAT EXCLUSIVE":
+                target.vatExclusive += excessPrice;
+                break;
+              case "VAT INCLUSIVE":
+                target.vatInclusive += excessPrice;
+                break;
+              case "NON VATABLE":
+                target.nonVatable += excessPrice;
+                break;
+              default:
+                break;
+            }
+          }
         }
       });
 
@@ -295,31 +325,10 @@ const BillingStatementForm = ({
           break;
         case "NON VATABLE":
           target.nonVatable += fixedPrice;
+          console.log(fixedPrice);
           break;
         default:
           break;
-      }
-
-      if (usedWeight > fixedWeight) {
-        const excessWeight = new Decimal(usedWeight)
-          .minus(new Decimal(fixedWeight))
-          .toNumber();
-
-        const excessPrice = excessWeight * unitPrice;
-
-        switch (vatCalculation) {
-          case "VAT EXCLUSIVE":
-            target.vatExclusive += excessPrice;
-            break;
-          case "VAT INCLUSIVE":
-            target.vatInclusive += excessPrice;
-            break;
-          case "NON VATABLE":
-            target.nonVatable += excessPrice;
-            break;
-          default:
-            break;
-        }
       }
     } else {
       // Calculate amounts and credits based on vatCalculation and mode
@@ -371,6 +380,9 @@ const BillingStatementForm = ({
     const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
       // Check if the mode is "CHARGE"
       if (transpoMode === "CHARGE") {
+        console.log(transpoFee);
+        console.log(transpoVatCalculation);
+        console.log(transpoMode);
         // Add the transportation fee based on VAT calculation
         switch (transpoVatCalculation) {
           case "VAT EXCLUSIVE":

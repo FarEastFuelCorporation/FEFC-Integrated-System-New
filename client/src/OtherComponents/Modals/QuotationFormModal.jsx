@@ -36,7 +36,17 @@ const QuotationFormModal = ({
   const [vehicleTypes, setVehicleTypes] = useState([]);
   const [treatmentProcesses, setTreatmentProcesses] = useState([]);
   const modeOptions = ["BUYING", "CHARGE", "FREE OF CHARGE", "SELLING"];
-  const unitOptions = ["PC", "KG", "L", "DRUM", "LOT", "CASE", "TRIP"];
+  const unitOptions = [
+    "PC",
+    "KG",
+    "L",
+    "DRUM",
+    "LOT",
+    "CASE",
+    "PALLET",
+    "CUBIC METER",
+    "TRIP",
+  ];
   const vatCalculationOptions = [
     "VAT EXCLUSIVE",
     "VAT INCLUSIVE",

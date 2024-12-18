@@ -277,6 +277,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                   </TableHead>
                   <TableBody>
                     {sortedWasteTransaction.map((waste, index) => {
+                      console.log(waste.TreatedWasteTransaction);
                       return (
                         <TableRow key={index} sx={{ border: "black" }}>
                           <TableCell sx={bodyCellStyles(false)}>
@@ -329,7 +330,7 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                                 }
                               </TableCell>
                               <TableCell sx={bodyCellStyles(true)}>
-                                {waste.TreatedWasteTransaction
+                                {waste.TreatedWasteTransaction.length !== 0
                                   ? waste.TreatedWasteTransaction.reduce(
                                       (latest, transaction) => {
                                         const treatedDate = new Date(

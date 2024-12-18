@@ -329,17 +329,19 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                                 }
                               </TableCell>
                               <TableCell sx={bodyCellStyles(true)}>
-                                {waste.TreatedWasteTransaction.reduce(
-                                  (latest, transaction) => {
-                                    const treatedDate = new Date(
-                                      transaction.treatedDate
-                                    );
-                                    return treatedDate > new Date(latest)
-                                      ? formatDate(transaction.treatedDate)
-                                      : formatDate(latest);
-                                  },
-                                  new Date(0)
-                                )}
+                                {waste.TreatedWasteTransaction
+                                  ? waste.TreatedWasteTransaction.reduce(
+                                      (latest, transaction) => {
+                                        const treatedDate = new Date(
+                                          transaction.treatedDate
+                                        );
+                                        return treatedDate > new Date(latest)
+                                          ? formatDate(transaction.treatedDate)
+                                          : formatDate(latest);
+                                      },
+                                      new Date(0)
+                                    )
+                                  : ""}
                               </TableCell>
                             </>
                           )}

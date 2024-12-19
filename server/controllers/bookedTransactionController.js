@@ -98,7 +98,7 @@ async function createBookedTransactionController(req, res) {
       include: {
         model: Client,
         as: "Client",
-        attributes: ["clientName"],
+        attributes: ["clientName", "email"],
       },
     });
 
@@ -128,7 +128,7 @@ async function createBookedTransactionController(req, res) {
         `${transactionId} - Booked Transaction: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
         emailBody, // HTML content
-        [clientEmail],
+        [clientEmail], //cc
         [
           "rmangaron@fareastfuelcorp.com",
           "edevera@fareastfuelcorp.com",
@@ -137,7 +137,7 @@ async function createBookedTransactionController(req, res) {
           "dcardinez@fareastfuelcorp.com",
           "dm.cardinez@fareastfuel.com",
           "je.soriano@fareastfuel.com",
-        ] // cc
+        ] // bcc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
       });

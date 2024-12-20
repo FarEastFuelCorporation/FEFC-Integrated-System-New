@@ -14,7 +14,7 @@ const BookedTransaction = sequelize.define(
       primaryKey: true,
     },
     transporterClientId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       defaultValue: null,
       allowNull: true,
     },

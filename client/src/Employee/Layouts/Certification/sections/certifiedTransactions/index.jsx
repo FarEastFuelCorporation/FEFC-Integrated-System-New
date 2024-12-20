@@ -188,10 +188,6 @@ const CertifiedTransactions = ({ user }) => {
 
   const handleConfirmDelete = async (row) => {
     try {
-      console.log(row);
-      console.log(
-        row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo
-      );
       setLoading(true);
       await axios.delete(
         row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo ===

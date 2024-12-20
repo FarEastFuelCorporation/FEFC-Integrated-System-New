@@ -15,8 +15,6 @@ const BillingStatementHeader = ({
   datePlusOneMonth.setMonth(today.getMonth() + 1);
   const clientData = row?.Client;
 
-  console.log(amounts);
-
   const vat = isIndividualBillingToBill
     ? groupedTransactions?.totals?.amounts.vatExclusive * 0.12 +
       groupedTransactions?.totals?.amounts.vatInclusive -

@@ -271,9 +271,6 @@ const BillingStatementForm = ({
           hasTransportation = QuotationWaste.hasTransportation;
         }
 
-        console.log(totalWeightPrice);
-        console.log(hasFixedRateIndividual);
-
         if (!hasFixedRateIndividual) {
           switch (QuotationWaste.vatCalculation) {
             case "VAT EXCLUSIVE":
@@ -289,9 +286,6 @@ const BillingStatementForm = ({
               break;
           }
         } else {
-          console.log(usedWeight.toNumber());
-          console.log(fixedWeight);
-
           if (usedWeight.toNumber() > fixedWeight) {
             const excessWeight = new Decimal(usedWeight)
               .minus(new Decimal(fixedWeight))
@@ -325,7 +319,6 @@ const BillingStatementForm = ({
           break;
         case "NON VATABLE":
           target.nonVatable += fixedPrice;
-          console.log(fixedPrice);
           break;
         default:
           break;
@@ -380,9 +373,6 @@ const BillingStatementForm = ({
     const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
       // Check if the mode is "CHARGE"
       if (transpoMode === "CHARGE") {
-        console.log(transpoFee);
-        console.log(transpoVatCalculation);
-        console.log(transpoMode);
         // Add the transportation fee based on VAT calculation
         switch (transpoVatCalculation) {
           case "VAT EXCLUSIVE":

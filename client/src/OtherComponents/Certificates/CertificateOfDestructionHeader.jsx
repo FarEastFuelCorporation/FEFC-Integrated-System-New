@@ -2,7 +2,6 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 
 const CertificateOfDestructionHeader = ({ row, certifiedTransaction }) => {
-  console.log(row);
   return (
     <Box>
       <Typography

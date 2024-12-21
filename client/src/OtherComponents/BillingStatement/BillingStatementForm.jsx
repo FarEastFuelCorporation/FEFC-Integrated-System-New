@@ -122,17 +122,28 @@ const BillingStatementForm = ({
     const hasFixedRate = transaction?.QuotationWaste?.hasFixedRate;
     const isMonthly = transaction?.QuotationWaste?.isMonthly;
 
+    const receivedTransaction =
+      transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0];
+
+    const submitTo = receivedTransaction?.submitTo;
+
     const certifiedTransaction =
-      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-        .SortedTransaction[0].CertifiedTransaction?.[0];
+      submitTo === "WAREHOUSE"
+        ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+            .WarehousedTransaction[0].CertifiedTransaction?.[0]
+        : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+            .SortedTransaction[0].CertifiedTransaction?.[0];
 
     const typeOfWeight = certifiedTransaction?.typeOfWeight
       ? certifiedTransaction.typeOfWeight
       : "SORTED WEIGHT";
 
     const sortedWasteTransaction =
-      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-        .SortedTransaction[0].SortedWasteTransaction;
+      submitTo === "WAREHOUSE"
+        ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+            .WarehousedTransaction[0].WarehousedTransactionItem
+        : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+            .SortedTransaction[0].SortedWasteTransaction;
 
     isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
     isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;

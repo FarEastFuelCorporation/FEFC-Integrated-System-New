@@ -268,11 +268,19 @@ const BillingContent = ({
                 const demurrageDays =
                   transaction?.ScheduledTransaction?.[0]
                     ?.ReceivedTransaction?.[0]?.demurrageDays || 0;
+                const submitTo =
+                  transaction?.ScheduledTransaction?.[0]
+                    ?.ReceivedTransaction?.[0]?.submitTo;
 
                 if (isPerClientToBill) {
                   aggregatedWasteTransactions =
-                    transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                      .SortedTransaction[0].SortedWasteTransaction;
+                    submitTo === "WAREHOUSE"
+                      ? transaction.ScheduledTransaction[0]
+                          .ReceivedTransaction[0].WarehousedTransaction[0]
+                          .WarehousedTransactionItem
+                      : transaction.ScheduledTransaction[0]
+                          .ReceivedTransaction[0].SortedTransaction[0]
+                          .SortedWasteTransaction;
 
                   aggregatedWasteTransactions.sort((a, b) => {
                     const clientNameA = a.TransporterClient?.clientName || "";
@@ -282,43 +290,76 @@ const BillingContent = ({
                   });
                 } else {
                   aggregatedWasteTransactions = Object.values(
-                    transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
-                      (acc, current) => {
-                        const { id } = current.QuotationWaste;
+                    submitTo === "WAREHOUSE"
+                      ? transaction.ScheduledTransaction[0].ReceivedTransaction[0].WarehousedTransaction[0].WarehousedTransactionItem.reduce(
+                          (acc, current) => {
+                            const { id } = current.QuotationWaste;
 
-                        const currentWeight = new Decimal(current.weight); // Use Decimal.js
-                        const currentClientWeight = new Decimal(
-                          current.clientWeight
-                        ); // Use Decimal.js
+                            const currentWeight = new Decimal(current.weight); // Use Decimal.js
+                            const currentClientWeight = new Decimal(
+                              current.clientWeight
+                            ); // Use Decimal.js
 
-                        if (acc[id]) {
-                          acc[id].weight = acc[id].weight.plus(currentWeight);
-                          acc[id].clientWeight =
-                            acc[id].clientWeight.plus(currentClientWeight);
-                        } else {
-                          acc[id] = {
-                            ...current,
-                            weight: currentWeight,
-                            clientWeight: currentClientWeight,
-                          };
-                        }
+                            if (acc[id]) {
+                              acc[id].weight =
+                                acc[id].weight.plus(currentWeight);
+                              acc[id].clientWeight =
+                                acc[id].clientWeight.plus(currentClientWeight);
+                            } else {
+                              acc[id] = {
+                                ...current,
+                                weight: currentWeight,
+                                clientWeight: currentClientWeight,
+                              };
+                            }
 
-                        return acc;
-                      },
-                      {}
-                    )
+                            return acc;
+                          },
+                          {}
+                        )
+                      : transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
+                          (acc, current) => {
+                            const { id } = current.QuotationWaste;
+
+                            const currentWeight = new Decimal(current.weight); // Use Decimal.js
+                            const currentClientWeight = new Decimal(
+                              current.clientWeight
+                            ); // Use Decimal.js
+
+                            if (acc[id]) {
+                              acc[id].weight =
+                                acc[id].weight.plus(currentWeight);
+                              acc[id].clientWeight =
+                                acc[id].clientWeight.plus(currentClientWeight);
+                            } else {
+                              acc[id] = {
+                                ...current,
+                                weight: currentWeight,
+                                clientWeight: currentClientWeight,
+                              };
+                            }
+
+                            return acc;
+                          },
+                          {}
+                        )
                   ).map((item) => ({
                     ...item,
                     weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+                    clientWeight: item.clientWeight.toNumber(), // Convert Decimal back to a standard number
                   }));
                 }
 
                 const invoiceNumber =
                   transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
                 const typeOfWeight =
-                  transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                    .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-                    ?.typeOfWeight || "SORTED WEIGHT";
+                  submitTo === "WAREHOUSE"
+                    ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                        .WarehousedTransaction?.[0]?.CertifiedTransaction?.[0]
+                        ?.typeOfWeight || "SORTED WEIGHT"
+                    : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+                        .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
+                        ?.typeOfWeight || "SORTED WEIGHT";
 
                 const scheduledTransaction =
                   transaction.ScheduledTransaction?.[0];
@@ -338,9 +379,13 @@ const BillingContent = ({
                   totalWeight = totalWeight.plus(usedWeight);
 
                   const wasteName =
-                    transaction.ScheduledTransaction?.[0]
-                      ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
-                      ?.SortedWasteTransaction?.[0]?.wasteName;
+                    submitTo === "WAREHOUSE"
+                      ? transaction.ScheduledTransaction?.[0]
+                          ?.ReceivedTransaction?.[0]?.WarehousedTransaction?.[0]
+                          ?.WarehousedTransactionItem?.[0]?.wasteName
+                      : transaction.ScheduledTransaction?.[0]
+                          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
+                          ?.SortedWasteTransaction?.[0]?.wasteName;
 
                   const isWasteName =
                     transaction.BilledTransaction?.[0]?.isWasteName;

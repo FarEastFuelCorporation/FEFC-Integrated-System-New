@@ -7,6 +7,7 @@ const BillingApprovalTransaction = require("../models/BillingApprovalTransaction
 const BilledTransaction = require("../models/BilledTransaction");
 const { BillingApprovedEmailFormat } = require("../utils/emailFormat");
 const sendEmail = require("../sendEmail");
+const Client = require("../models/Client");
 const transactionStatusId = 10;
 const additionalStatusId = [5, 6, 7, 8];
 
@@ -55,6 +56,7 @@ async function createBillingApprovalTransactionController(req, res) {
     }
 
     let clientName;
+    let clientEmail;
     let transactions = {};
 
     // Create BillingApprovalTransaction entries for all related billed transactions
@@ -73,17 +75,29 @@ async function createBillingApprovalTransactionController(req, res) {
       // Update the status of each related booked transaction
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         billedTransaction.bookedTransactionId,
-        { transaction }
+        {
+          include: {
+            model: Client,
+            as: "Client",
+            attributes: ["clientName", "email"],
+          },
+          transaction,
+        }
       );
 
-      if (updatedBookedTransaction) {
-        transactions[updatedBookedTransaction.transactionId].transactionId =
-          updatedBookedTransaction.transactionId;
-        transactions[updatedBookedTransaction.transactionId].haulingDate =
-          updatedBookedTransaction.haulingDate;
-        transactions[updatedBookedTransaction.transactionId].billingNumber =
-          billingNumber;
+      console.log(updatedBookedTransaction);
 
+      if (updatedBookedTransaction) {
+        const transactionId = updatedBookedTransaction.transactionId;
+        clientName = updatedBookedTransaction.Client.clientName;
+        clientEmail = updatedBookedTransaction.Client.email;
+        if (!transactions[transactionId]) {
+          transactions[transactionId] = {};
+        }
+        transactions[transactionId].transactionId = transactionId;
+        transactions[transactionId].haulingDate =
+          updatedBookedTransaction.haulingDate;
+        transactions[transactionId].billingNumber = billingNumber;
         updatedBookedTransaction.statusId = statusId;
         await updatedBookedTransaction.save({ transaction });
       }
@@ -107,18 +121,20 @@ async function createBillingApprovalTransactionController(req, res) {
 
     try {
       sendEmail(
-        "jmfalar@fareastfuelcorp.com", // Recipient
-        // "dcardinez@fareastfuelcorp.com", // Recipient
-        `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
+        // "jmfalar@fareastfuelcorp.com", // Recipient
+        clientEmail, // Recipient
+        `${billingNumber} - Billing Statement Notification`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody
-        // ["dm.cardinez@fareastfuel.com"], // HTML content // cc
-        // [
-        //   "rmangaron@fareastfuelcorp.com",
-        //   "edevera@fareastfuelcorp.com",
-        //   "eb.devera410@gmail.com",
-        //   "cc.duran@fareastfuel.com",
-        // ] // bcc
+        emailBody,
+        ["marketing@fareastfuelcorp.com", "accounting@fareastfuelcorp.com"], // HTML content // cc
+        [
+          "rmangaron@fareastfuelcorp.com",
+          "edevera@fareastfuelcorp.com",
+          "eb.devera410@gmail.com",
+          "cc.duran@fareastfuel.com",
+          "dm.cardinez@fareastfuel.com",
+          "dcardinez@fareastfuelcorp.com",
+        ] // bcc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
       });

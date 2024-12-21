@@ -752,7 +752,7 @@ async function BillingApprovedEmailFormat(clientName, transactions) {
               }
               .header {
                 text-align: center;
-                background-color: #007bff;
+                background-color: #28a745;
                 color: white;
                 padding: 10px 0;
                 border-radius: 8px 8px 0 0;
@@ -784,7 +784,7 @@ async function BillingApprovedEmailFormat(clientName, transactions) {
                 text-align: center;
               }
               th {
-                background-color: #007bff;
+                background-color: #28a745;
                 color: white;
               }
             </style>
@@ -792,7 +792,7 @@ async function BillingApprovedEmailFormat(clientName, transactions) {
           <body>
             <div class="container">
               <div class="header">
-                <h1>Billing Statement Completed</h1>
+                <h1>Billing Statement Notification</h1>
               </div>
               <div class="content">
                 <p>Dear ${clientName},</p>
@@ -805,9 +805,9 @@ async function BillingApprovedEmailFormat(clientName, transactions) {
                   </tr>
                   ${transactionRows}
                 </table>
-                <p>Please log in to the system to view and download your billing statement.</p>
-                <p>If you have any questions, feel free to contact our support team.</p>
-                <p>Thank you for your business.</p>
+                <p>To access and download the billing statement, please log in to your account on our system.</p>
+                <p>If you have any questions or need further assistance, feel free to contact us.</p>
+                <p>Thank you for trusting FAR EAST FUEL CORPORATION.</p>
               </div>
               <div class="footer">
                 <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>

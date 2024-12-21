@@ -5,6 +5,8 @@ const BookedTransaction = require("../models/BookedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
 const BillingApprovalTransaction = require("../models/BillingApprovalTransaction");
 const BilledTransaction = require("../models/BilledTransaction");
+const { BillingApprovedEmailFormat } = require("../utils/emailFormat");
+const sendEmail = require("../sendEmail");
 const transactionStatusId = 10;
 const additionalStatusId = [5, 6, 7, 8];
 
@@ -52,6 +54,9 @@ async function createBillingApprovalTransactionController(req, res) {
         .json({ message: "No related billed transactions found" });
     }
 
+    let clientName;
+    let transactions = {};
+
     // Create BillingApprovalTransaction entries for all related billed transactions
     for (const billedTransaction of billedTransactionIds) {
       await BillingApprovalTransaction.create(
@@ -72,6 +77,13 @@ async function createBillingApprovalTransactionController(req, res) {
       );
 
       if (updatedBookedTransaction) {
+        transactions[updatedBookedTransaction.transactionId].transactionId =
+          updatedBookedTransaction.transactionId;
+        transactions[updatedBookedTransaction.transactionId].haulingDate =
+          updatedBookedTransaction.haulingDate;
+        transactions[updatedBookedTransaction.transactionId].billingNumber =
+          billingNumber;
+
         updatedBookedTransaction.statusId = statusId;
         await updatedBookedTransaction.save({ transaction });
       }
@@ -79,6 +91,40 @@ async function createBillingApprovalTransactionController(req, res) {
 
     // Commit the transaction
     await transaction.commit();
+
+    // Sorting transactions by transactionId
+    const sortedTransactions = Object.values(transactions).sort((a, b) => {
+      if (a.transactionId < b.transactionId) return -1; // Ascending order
+      if (a.transactionId > b.transactionId) return 1;
+      return 0;
+    });
+
+    const emailBody = await BillingApprovedEmailFormat(
+      clientName,
+      sortedTransactions
+    );
+    console.log(emailBody);
+
+    try {
+      sendEmail(
+        "jmfalar@fareastfuelcorp.com", // Recipient
+        // "dcardinez@fareastfuelcorp.com", // Recipient
+        `${billingNumber} - For Billing Approval: ${clientName}`, // Subject
+        "Please view this email in HTML format.", // Plain-text fallback
+        emailBody
+        // ["dm.cardinez@fareastfuel.com"], // HTML content // cc
+        // [
+        //   "rmangaron@fareastfuelcorp.com",
+        //   "edevera@fareastfuelcorp.com",
+        //   "eb.devera410@gmail.com",
+        //   "cc.duran@fareastfuel.com",
+        // ] // bcc
+      ).catch((emailError) => {
+        console.error("Error sending email:", emailError);
+      });
+    } catch (error) {
+      console.error("Unexpected error when sending email:", error);
+    }
 
     // Fetch updated transaction data
     const data = await fetchData(statusId);

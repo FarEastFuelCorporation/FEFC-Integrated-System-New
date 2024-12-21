@@ -720,6 +720,110 @@ async function BillingApprovalEmailFormat(clientName, transactions) {
   }
 }
 
+async function BillingApprovedEmailFormat(clientName, transactions) {
+  try {
+    const transactionRows = Object.values(transactions)
+      .map(
+        (transaction) => `
+        <tr>
+          <td>${transaction.transactionId}</td>
+          <td>${formatDate(transaction.haulingDate)}</td>
+          <td>${transaction.billingNumber}</td>
+        </tr>`
+      )
+      .join("");
+
+    const emailTemplate = `
+          <html>
+          <head>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+              }
+              .container {
+                max-width: 600px;
+                margin: 0 auto;
+                border: 1px solid #ddd;
+                padding: 20px;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+              }
+              .header {
+                text-align: center;
+                background-color: #007bff;
+                color: white;
+                padding: 10px 0;
+                border-radius: 8px 8px 0 0;
+              }
+              .header h1 {
+                margin: 0;
+                font-size: 24px;
+              }
+              .content {
+                margin: 20px 0;
+              }
+              .content p {
+                margin: 10px 0;
+              }
+              .footer {
+                text-align: center;
+                font-size: 12px;
+                color: #777;
+                margin-top: 20px;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              th {
+                background-color: #007bff;
+                color: white;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Billing Statement Completed</h1>
+              </div>
+              <div class="content">
+                <p>Dear ${clientName},</p>
+                <p>We are pleased to inform you that your billing statement has been completed and is now available for download on our system.</p>
+                <table>
+                  <tr>
+                      <th>Transaction ID</th>
+                      <th>Hauling Date</th>
+                      <th>Billing Number</th>
+                  </tr>
+                  ${transactionRows}
+                </table>
+                <p>Please log in to the system to view and download your billing statement.</p>
+                <p>If you have any questions, feel free to contact our support team.</p>
+                <p>Thank you for your business.</p>
+              </div>
+              <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+    return emailTemplate;
+  } catch (error) {
+    console.error("Error generating billing completion email template:", error);
+    throw error;
+  }
+}
+
 async function sendOtpFormat(otp) {
   try {
     const emailTemplate = `
@@ -812,5 +916,6 @@ module.exports = {
   CertifiedTransactionEmailFormat,
   CertifiedTransactionEmailToAccountingFormat,
   BillingApprovalEmailFormat,
+  BillingApprovedEmailFormat,
   sendOtpFormat,
 };

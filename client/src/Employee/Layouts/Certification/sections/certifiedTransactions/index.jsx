@@ -128,16 +128,8 @@ const CertifiedTransactions = ({ user }) => {
   const handleEditClick = (row) => {
     const typeToEdit = row;
 
-    const submitTo =
-      row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo;
-
     if (typeToEdit) {
-      const certifiedTransaction =
-        submitTo === "SORTING"
-          ? typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-              ?.SortedTransaction?.[0]?.CertifiedTransaction?.[0] || {}
-          : typeToEdit.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-              ?.WarehousedTransaction?.[0]?.CertifiedTransaction?.[0] || {};
+      const certifiedTransaction = typeToEdit.CertifiedTransaction?.[0] || {};
 
       const typeOfCertificateArray = certifiedTransaction.typeOfCertificate
         ? certifiedTransaction.typeOfCertificate.split(", ")
@@ -190,10 +182,7 @@ const CertifiedTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo ===
-          "SORTING"
-          ? `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].SortedTransaction?.[0].CertifiedTransaction?.[0].id}`
-          : `${apiUrl}/api/certifiedTransaction/${row.ScheduledTransaction?.[0].ReceivedTransaction?.[0].WarehousedTransaction?.[0].CertifiedTransaction?.[0].id}`,
+        `${apiUrl}/api/certifiedTransaction/${row.CertifiedTransaction?.[0].id}`,
         {
           data: {
             deletedBy: user.id,

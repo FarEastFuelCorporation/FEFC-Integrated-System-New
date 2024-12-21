@@ -63,7 +63,7 @@ async function createBookedTransactionController(req, res) {
     }
 
     if (transporterClientId) {
-      const concatenatedString = transporterClientId.join(". ");
+      const concatenatedString = transporterClientId.join(", ");
 
       transactionData.transporterClientId = concatenatedString;
     }

@@ -11,15 +11,7 @@ const CertifiedTransaction = ({ row, user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const submitTo =
-    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo;
-
-  const certifiedTransaction =
-    submitTo === "SORTING"
-      ? row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
-          .SortedTransaction?.[0].CertifiedTransaction?.[0]
-      : row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
-          .WarehousedTransaction?.[0].CertifiedTransaction?.[0];
+  const certifiedTransaction = row.CertifiedTransaction?.[0];
 
   return (
     <Box>

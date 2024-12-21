@@ -35,17 +35,21 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
 
-  const certifiedTransaction =
-    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]
-      .SortedTransaction?.[0].CertifiedTransaction?.[0];
+  const certifiedTransaction = row.CertifiedTransaction?.[0];
 
   const typeOfCertificateArray = certifiedTransaction.typeOfCertificate
     ? certifiedTransaction.typeOfCertificate.split(", ")
     : [];
 
+  const submitTo =
+    row.ScheduledTransaction?.[0].ReceivedTransaction?.[0]?.submitTo;
+
   const sortedWasteTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .SortedWasteTransaction;
+    submitTo === "WAREHOUSE"
+      ? row.ScheduledTransaction[0].ReceivedTransaction[0]
+          .WarehousedTransaction[0].WarehousedTransactionItem
+      : row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
+          .SortedWasteTransaction;
 
   const typeOfWeight = certifiedTransaction?.typeOfWeight;
 
@@ -277,13 +281,17 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                   </TableHead>
                   <TableBody>
                     {sortedWasteTransaction.map((waste, index) => {
+                      const wasteName =
+                        submitTo === "WAREHOUSE"
+                          ? waste.description
+                          : waste.wasteName;
                       return (
                         <TableRow key={index} sx={{ border: "black" }}>
                           <TableCell sx={bodyCellStyles(false)}>
                             {formatDate(row.haulingDate)}
                           </TableCell>
                           <TableCell sx={bodyCellStyles(false)}>
-                            {waste.wasteName}
+                            {wasteName}
                           </TableCell>
 
                           {typeOfCertificate === "CERTIFICATE OF ACCEPTANCE" ? (

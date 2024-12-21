@@ -13,9 +13,7 @@ export const CertificateOfDestructionFooter1 = ({
   row,
   sortedWasteTransaction,
 }) => {
-  const certifiedTransaction =
-    row.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0]
-      .CertifiedTransaction[0];
+  const certifiedTransaction = row.CertifiedTransaction[0];
 
   const typeOfWeight = certifiedTransaction.typeOfWeight;
 

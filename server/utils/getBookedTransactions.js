@@ -202,18 +202,6 @@ const getIncludeOptions = () => [
                 paranoid: true,
               },
               {
-                model: CertifiedTransaction,
-                as: "CertifiedTransaction",
-                required: false,
-                include: [
-                  {
-                    model: Employee,
-                    as: "Employee",
-                    attributes: ["firstName", "lastName"],
-                  },
-                ],
-              },
-              {
                 model: Employee,
                 as: "Employee",
                 attributes: ["firstName", "lastName"],
@@ -373,6 +361,18 @@ const getIncludeOptions = () => [
           },
         ],
       },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CertifiedTransaction,
+    as: "CertifiedTransaction",
+    required: false,
+    include: [
       {
         model: Employee,
         as: "Employee",

@@ -551,7 +551,7 @@ const BillingContent = ({
                         <TableCell
                           sx={{ ...bodyCellStyles({ color: fontColor }) }}
                         >
-                          {hasFixedRateIndividual && !isMonthly
+                          {hasFixedRateIndividual && !isMonthly && fixedWeight
                             ? isWasteNameToBill
                               ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
                               : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
@@ -571,7 +571,9 @@ const BillingContent = ({
                           {hasFixedRateIndividual &&
                           !isMonthly &&
                           usedWeight > fixedWeight
-                            ? formatNumber2(fixedWeight)
+                            ? fixedWeight
+                              ? formatNumber2(fixedWeight)
+                              : formatNumber2(1)
                             : formatNumber2(new Decimal(usedWeight).toNumber())}
                         </TableCell>
                         <TableCell
@@ -579,7 +581,9 @@ const BillingContent = ({
                             ...bodyCellStyles({ width: 40, color: fontColor }),
                           }}
                         >
-                          {waste.QuotationWaste.unit}
+                          {hasFixedRateIndividual && !fixedWeight
+                            ? "LOT"
+                            : waste.QuotationWaste.unit}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -590,7 +594,9 @@ const BillingContent = ({
                             }),
                           }}
                         >
-                          {formatNumber2(waste.QuotationWaste.unitPrice)}
+                          {hasFixedRateIndividual && !fixedWeight
+                            ? formatNumber2(waste.QuotationWaste.fixedPrice)
+                            : formatNumber2(waste.QuotationWaste.unitPrice)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -660,6 +666,7 @@ const BillingContent = ({
                       </TableRow>
                       {hasFixedRateIndividual &&
                         !isMonthly &&
+                        fixedWeight &&
                         usedWeight > fixedWeight && (
                           <TableRow
                             key={`waste2-${idx}`}

@@ -323,7 +323,9 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                               >
                                 {typeOfWeight === "CLIENT WEIGHT"
                                   ? `${formatNumber(waste.clientWeight)} ${
-                                      waste.QuotationWaste.unit
+                                      waste.clientUnit
+                                        ? waste.clientUnit
+                                        : waste.QuotationWaste.unit
                                     }`
                                   : `${formatNumber(waste.weight)} ${
                                       waste.QuotationWaste.unit

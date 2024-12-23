@@ -70,6 +70,7 @@ async function createSortedTransactionController(req, res) {
             wasteName: wasteName,
             weight: waste.weight,
             clientWeight: waste.clientWeight,
+            clientUnit: waste.clientUnit,
             formNo: waste.formNo,
           },
           { transaction: transaction }
@@ -230,6 +231,7 @@ async function updateSortedTransactionController(req, res) {
               wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
+              clientUnit: waste.clientUnit,
               formNo: waste.formNo,
             },
             { where: { id: waste.id }, transaction }
@@ -247,6 +249,7 @@ async function updateSortedTransactionController(req, res) {
               wasteName: waste.wasteName && waste.wasteName.toUpperCase(),
               weight: waste.weight,
               clientWeight: waste.clientWeight,
+              clientUnit: waste.clientUnit,
               formNo: waste.formNo,
             },
             { transaction }

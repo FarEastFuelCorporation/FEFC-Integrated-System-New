@@ -405,6 +405,8 @@ const BillingContent = ({
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
 
+                  console.log(fixedWeight);
+
                   return (
                     <>
                       {newClient && isPerClientToBill && (
@@ -553,8 +555,12 @@ const BillingContent = ({
                         >
                           {hasFixedRateIndividual && !isMonthly
                             ? isWasteNameToBill
-                              ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
-                              : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                              ? `${waste.wasteName}``${
+                                  fixedWeight == 0
+                                    ? ""
+                                    : `(FIRST ${fixedWeight} ${unit})`
+                                }`
+                              : `${waste.QuotationWaste.wasteName}`
                             : isWasteNameToBill
                             ? waste.wasteName
                             : waste.QuotationWaste.wasteName}
@@ -568,18 +574,22 @@ const BillingContent = ({
                             }),
                           }}
                         >
-                          {hasFixedRateIndividual &&
-                          !isMonthly &&
-                          usedWeight > fixedWeight
-                            ? formatNumber2(fixedWeight)
-                            : formatNumber2(new Decimal(usedWeight).toNumber())}
+                          {fixedWeight
+                            ? hasFixedRateIndividual &&
+                              !isMonthly &&
+                              usedWeight > fixedWeight
+                              ? formatNumber2(fixedWeight)
+                              : formatNumber2(
+                                  new Decimal(usedWeight).toNumber()
+                                )
+                            : formatNumber2(1)}
                         </TableCell>
                         <TableCell
                           sx={{
                             ...bodyCellStyles({ width: 40, color: fontColor }),
                           }}
                         >
-                          {waste.QuotationWaste.unit}
+                          {fixedWeight ? waste.QuotationWaste.unit : "LOT"}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -590,7 +600,9 @@ const BillingContent = ({
                             }),
                           }}
                         >
-                          {formatNumber2(waste.QuotationWaste.unitPrice)}
+                          {fixedWeight
+                            ? formatNumber2(waste.QuotationWaste.unitPrice)
+                            : formatNumber2(waste.QuotationWaste.fixedPrice)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -659,6 +671,7 @@ const BillingContent = ({
                         )}
                       </TableRow>
                       {hasFixedRateIndividual &&
+                        fixedWeight &&
                         !isMonthly &&
                         usedWeight > fixedWeight && (
                           <TableRow

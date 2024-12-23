@@ -259,7 +259,7 @@ const BillingStatementForm = ({
 
       let target;
 
-      let usedWeight;
+      let usedWeight = 0;
 
       aggregatedWasteTransactions.forEach((item) => {
         const { weight, clientWeight, QuotationWaste } = item;
@@ -268,6 +268,7 @@ const BillingStatementForm = ({
           typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
         usedWeight = selectedWeight;
+        console.log(selectedWeight);
 
         const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 
@@ -297,7 +298,7 @@ const BillingStatementForm = ({
               break;
           }
         } else {
-          if (usedWeight.toNumber() > fixedWeight) {
+          if (usedWeight > fixedWeight) {
             const excessWeight = new Decimal(usedWeight)
               .minus(new Decimal(fixedWeight))
               .toNumber();

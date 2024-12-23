@@ -268,7 +268,6 @@ const BillingStatementForm = ({
           typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
         usedWeight = selectedWeight;
-        console.log(selectedWeight);
 
         const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 

@@ -125,9 +125,6 @@ const SortModal = ({
 
   const handleWasteChange = useCallback(
     (index, field, value) => {
-      console.log(index);
-      console.log(field);
-      console.log(value);
       const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
         i === index ? { ...waste, [field]: value } : waste
       );

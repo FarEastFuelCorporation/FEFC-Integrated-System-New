@@ -36,6 +36,17 @@ const SortModal = ({
   const [scrapTypes, setScrapTypes] = useState([]);
   const [treatmentProcesses, setTreatmentProcesses] = useState([]);
   const [transporterClients, setTransporterClients] = useState([]);
+  const unitOptions = [
+    "PC",
+    "KG",
+    "L",
+    "DRUM",
+    "LOT",
+    "CASE",
+    "PALLET",
+    "CUBIC METER",
+    "TRIP",
+  ];
 
   useEffect(() => {
     if (open) {
@@ -114,6 +125,9 @@ const SortModal = ({
 
   const handleWasteChange = useCallback(
     (index, field, value) => {
+      console.log(index);
+      console.log(field);
+      console.log(value);
       const updatedSortedWastes = formData.sortedWastes.map((waste, i) =>
         i === index ? { ...waste, [field]: value } : waste
       );
@@ -204,6 +218,7 @@ const SortModal = ({
           wasteName: "",
           weight: 0,
           clientWeight: 0,
+          clientUnit: "",
           formNo: "",
         },
       ],
@@ -491,7 +506,7 @@ const SortModal = ({
               </Grid>
               <Grid item xs={1}>
                 <TextField
-                  label="Weight"
+                  label="Weight (Kg)"
                   name="weight"
                   value={waste.weight}
                   onChange={(e) =>
@@ -528,6 +543,37 @@ const SortModal = ({
                   }}
                   autoComplete="off"
                 />
+              </Grid>
+              <Grid item xs={1}>
+                <FormControl fullWidth required>
+                  <InputLabel
+                    id={`unit-label-${index}`}
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Client Unit
+                  </InputLabel>
+                  <Select
+                    labelId={`unit-label-${index}`}
+                    name={`quotationWastes[${index}].unit`}
+                    value={waste.clientUnit || ""}
+                    onChange={(e) =>
+                      handleWasteChange(index, "clientUnit", e.target.value)
+                    }
+                    fullWidth
+                    inputProps={{
+                      name: `quotationWastes[${index}].unit`,
+                      id: `unit-select-${index}`,
+                    }}
+                  >
+                    {unitOptions.map((option, idx) => (
+                      <MenuItem key={idx} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={1}>
                 <TextField

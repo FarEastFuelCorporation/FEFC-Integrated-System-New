@@ -30,6 +30,7 @@ const SortedTransactions = ({ user }) => {
         wasteName: "",
         weight: 0,
         clientWeight: 0,
+        clientUnit: "",
         formNo: "",
       },
     ],
@@ -122,6 +123,7 @@ const SortedTransactions = ({ user }) => {
           wasteName: "",
           weight: 0,
           clientWeight: 0,
+          clientUnit: "",
           formNo: "",
         },
       ],
@@ -175,6 +177,7 @@ const SortedTransactions = ({ user }) => {
               wasteName: waste.wasteName || "",
               weight: waste.weight || 0,
               clientWeight: waste.clientWeight || 0,
+              clientUnit: waste.clientUnit || "",
               formNo: waste.formNo || "",
             }))
           : [
@@ -185,6 +188,7 @@ const SortedTransactions = ({ user }) => {
                 wasteName: "",
                 weight: 0,
                 clientWeight: 0,
+                clientUnit: "",
                 formNo: "",
               },
             ],

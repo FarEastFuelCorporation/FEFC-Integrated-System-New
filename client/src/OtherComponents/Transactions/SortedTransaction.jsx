@@ -138,6 +138,19 @@ const SortedTransaction = ({ row }) => {
         </div>
       ),
     },
+    {
+      field: "clientUnit",
+      headerName: "Client Unit",
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      minWidth: 150,
+      renderCell: (params) => (
+        <div className={"wrap-text"} style={{ textAlign: "center" }}>
+          {params.value}
+        </div>
+      ),
+    },
   ];
 
   const columns2 = [

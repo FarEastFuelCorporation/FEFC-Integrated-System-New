@@ -82,7 +82,7 @@ const EmployeeLogin = ({ onLogin }) => {
         console.error("Error response data:", error.response.data);
 
         if (error.response.status === 401) {
-          setError("Invalid employee ID or password");
+          setError("Invalid username or password");
         } else {
           setError("An error occurred. Please try again.");
         }

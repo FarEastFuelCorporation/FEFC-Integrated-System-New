@@ -354,11 +354,8 @@ const BillingContent = ({
                   transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
 
                 const typeOfWeight =
-                  submitTo === "WAREHOUSE"
-                    ? transaction.CertifiedTransaction?.[0]?.typeOfWeight ||
-                      "SORTED WEIGHT"
-                    : transaction.CertifiedTransaction?.[0]?.typeOfWeight ||
-                      "SORTED WEIGHT";
+                  transaction.CertifiedTransaction?.[0]?.typeOfWeight ||
+                  "SORTED WEIGHT";
 
                 const scheduledTransaction =
                   transaction.ScheduledTransaction?.[0];

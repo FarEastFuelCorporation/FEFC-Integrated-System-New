@@ -352,9 +352,7 @@ const BillingContent = ({
 
                 const invoiceNumber =
                   transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
-                console.log(
-                  transaction.CertifiedTransaction?.[0]?.typeOfWeight
-                );
+
                 const typeOfWeight =
                   submitTo === "WAREHOUSE"
                     ? transaction.CertifiedTransaction?.[0]?.typeOfWeight ||

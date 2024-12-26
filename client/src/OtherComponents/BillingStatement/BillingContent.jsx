@@ -58,14 +58,14 @@ const BillingContent = ({
         const invoiceNumber =
           transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
 
+        const typeOfWeight =
+          transaction.CertifiedTransaction?.[0]?.typeOfWeight;
+
         transaction.ScheduledTransaction.forEach((scheduled) => {
           const { scheduledDate, scheduledTime } = scheduled; // Extract date and time
 
           scheduled.ReceivedTransaction.forEach((received) => {
             received.SortedTransaction.forEach((sorted) => {
-              const typeOfWeight =
-                sorted.CertifiedTransaction?.[0]?.typeOfWeight;
-
               sorted.SortedWasteTransaction.forEach((waste) => {
                 const clientId = waste.transporterClientId;
 
@@ -352,14 +352,15 @@ const BillingContent = ({
 
                 const invoiceNumber =
                   transaction.BilledTransaction?.[0]?.serviceInvoiceNumber;
+                console.log(
+                  transaction.CertifiedTransaction?.[0]?.typeOfWeight
+                );
                 const typeOfWeight =
                   submitTo === "WAREHOUSE"
-                    ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                        .WarehousedTransaction?.[0]?.CertifiedTransaction?.[0]
-                        ?.typeOfWeight || "SORTED WEIGHT"
-                    : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-                        .SortedTransaction?.[0]?.CertifiedTransaction?.[0]
-                        ?.typeOfWeight || "SORTED WEIGHT";
+                    ? transaction.CertifiedTransaction?.[0]?.typeOfWeight ||
+                      "SORTED WEIGHT"
+                    : transaction.CertifiedTransaction?.[0]?.typeOfWeight ||
+                      "SORTED WEIGHT";
 
                 const scheduledTransaction =
                   transaction.ScheduledTransaction?.[0];

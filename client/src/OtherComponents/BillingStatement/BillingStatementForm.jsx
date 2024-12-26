@@ -127,12 +127,7 @@ const BillingStatementForm = ({
 
     const submitTo = receivedTransaction?.submitTo;
 
-    const certifiedTransaction =
-      submitTo === "WAREHOUSE"
-        ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-            .WarehousedTransaction[0].CertifiedTransaction?.[0]
-        : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-            .SortedTransaction[0].CertifiedTransaction?.[0];
+    const certifiedTransaction = transaction.CertifiedTransaction?.[0];
 
     const typeOfWeight = certifiedTransaction?.typeOfWeight
       ? certifiedTransaction.typeOfWeight
@@ -452,13 +447,13 @@ const BillingStatementForm = ({
       const invoiceNumber =
         transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
 
+      const typeOfWeight = transaction.CertifiedTransaction?.[0]?.typeOfWeight;
+
       transaction.ScheduledTransaction.forEach((scheduled) => {
         const { scheduledDate, scheduledTime } = scheduled;
 
         scheduled.ReceivedTransaction.forEach((received) => {
           received.SortedTransaction.forEach((sorted) => {
-            const typeOfWeight = sorted.CertifiedTransaction?.[0]?.typeOfWeight;
-
             sorted.SortedWasteTransaction.forEach((waste) => {
               const clientId = waste.transporterClientId;
 

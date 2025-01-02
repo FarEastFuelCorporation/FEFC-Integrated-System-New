@@ -189,9 +189,10 @@ const QuotationContent = ({
                                   ? ` - ${waste.TreatmentProcess?.treatmentProcess}`
                                   : ""
                               }`
-                            : `${waste.wasteName} FIRST ${fixedWeight} ${
+                            : `${waste.wasteName} (FIRST ${fixedWeight} ${
                                 waste.unit
-                              }${
+                              })
+                              ${
                                 waste.TreatmentProcess?.treatmentProcess
                                   ? ` - ${waste.TreatmentProcess?.treatmentProcess}`
                                   : ""
@@ -228,6 +229,9 @@ const QuotationContent = ({
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {waste.wasteName}{" "}
+                          {verify
+                            ? `(IN EXCESS EXCESS OF ${fixedWeight} ${waste.unit})`
+                            : ""}
                           {waste.TreatmentProcess?.treatmentProcess
                             ? ` - ${waste.TreatmentProcess?.treatmentProcess}`
                             : ""}

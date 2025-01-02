@@ -230,7 +230,7 @@ const QuotationContent = ({
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {waste.wasteName}{" "}
                           {verify
-                            ? `(IN EXCESS EXCESS OF ${fixedWeight} ${waste.unit})`
+                            ? `(IN EXCESS OF ${fixedWeight} ${waste.unit})`
                             : ""}
                           {waste.TreatmentProcess?.treatmentProcess
                             ? ` - ${waste.TreatmentProcess?.treatmentProcess}`

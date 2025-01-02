@@ -148,6 +148,8 @@ const QuotationContent = ({
     color: "black",
   });
 
+  let number = 0;
+
   return (
     <Box>
       {/* Waste Details */}
@@ -164,12 +166,21 @@ const QuotationContent = ({
                 const fixedWeight = waste.fixedWeight;
                 const fixedPrice = waste.fixedPrice;
 
+                const verify =
+                  (hasFixedRate && fixedWeight !== 0) ||
+                  (!hasFixedRate && fixedWeight === 0);
+
+                number++;
+
+                if (verify) {
+                  number++;
+                }
                 return (
                   <>
                     {hasFixedRate && (
                       <TableRow key={`${index}H`} sx={{ border: "black" }}>
                         <TableCell align="center" sx={getCellStyle(false)}>
-                          {index + 1}
+                          {verify ? number - 1 : number}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {fixedWeight === 0
@@ -193,7 +204,7 @@ const QuotationContent = ({
                           {formatNumber(waste.quantity ? waste.quantity : 1)}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
-                          {fixedWeight === 0 ? "LOT" : waste.unit}
+                          {verify ? "LOT" : waste.unit}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {fixedPrice}
@@ -213,7 +224,7 @@ const QuotationContent = ({
                     (!hasFixedRate && fixedWeight === 0) ? (
                       <TableRow key={index} sx={{ border: "black" }}>
                         <TableCell align="center" sx={getCellStyle(false)}>
-                          {index + 1}
+                          {number}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {waste.wasteName}{" "}

@@ -143,6 +143,7 @@ async function createBilledTransactionController(req, res) {
           "edevera@fareastfuelcorp.com",
           "eb.devera410@gmail.com",
           "cc.duran@fareastfuel.com",
+          "jmfalar@fareastfuelcorp.com",
         ] // bcc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);

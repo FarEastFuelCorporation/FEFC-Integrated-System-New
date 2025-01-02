@@ -1,15 +1,21 @@
 // utils/generateTransactionId
 
+const { Op } = require("sequelize");
 const BookedTransaction = require("../models/BookedTransaction");
 
-async function generateTransactionId() {
+async function generateTransactionId(haulingDate) {
   try {
-    // Get the current year
-    const currentYear = new Date().getFullYear().toString();
+    // Get the year from the haulingDate
+    const haulingYear = new Date(haulingDate).getFullYear().toString();
 
-    // Find the latest transaction ID with the specified prefix
+    // Find the latest transaction ID for the given year
     const latestTransaction = await BookedTransaction.findOne({
-      order: [["createdAt", "DESC"]],
+      where: {
+        transactionId: {
+          [Op.like]: `${haulingYear}%`, // Match IDs starting with the hauling year
+        },
+      },
+      order: [["transactionId", "DESC"]], // Order by transactionId in descending order
       paranoid: false, // Include soft-deleted records
     });
 
@@ -17,16 +23,13 @@ async function generateTransactionId() {
     let newIdNumber = 1;
     if (latestTransaction) {
       const latestTransactionId = latestTransaction.transactionId;
-      const latestYear = latestTransactionId.substring(0, 4);
-      if (latestYear === currentYear) {
-        const latestIdNumber = parseInt(latestTransactionId.substring(4), 10);
-        newIdNumber = latestIdNumber + 1;
-      }
+      const latestIdNumber = parseInt(latestTransactionId.substring(4), 10);
+      newIdNumber = latestIdNumber + 1;
     }
 
     // Pad the ID number with leading zeros
     const newIdString = newIdNumber.toString().padStart(4, "0");
-    const newTransactionId = `${currentYear}${newIdString}`;
+    const newTransactionId = `${haulingYear}${newIdString}`;
 
     return newTransactionId;
   } catch (error) {

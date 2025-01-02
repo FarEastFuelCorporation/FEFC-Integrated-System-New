@@ -73,11 +73,14 @@ const Leave = ({ user }) => {
 
       const leaves = response.data.leaves;
 
+      const currentYear = new Date().getFullYear();
+
       const sickLeaveCount = leaves
         .filter(
           (leave) =>
             leave.typeOfLeave === "SICK LEAVE" &&
-            leave.isApproved !== "DISAPPROVED"
+            leave.isApproved !== "DISAPPROVED" &&
+            new Date(leave.startDate).getFullYear() === currentYear
         )
         .reduce((total, leave) => total + (leave.duration || 0), 0);
 
@@ -85,7 +88,8 @@ const Leave = ({ user }) => {
         .filter(
           (leave) =>
             leave.typeOfLeave === "VACATION LEAVE" &&
-            leave.isApproved !== "DISAPPROVED"
+            leave.isApproved !== "DISAPPROVED" &&
+            new Date(leave.startDate).getFullYear() === currentYear
         )
         .reduce((total, leave) => total + (leave.duration || 0), 0);
 

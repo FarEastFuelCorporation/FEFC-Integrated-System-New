@@ -43,7 +43,7 @@ async function createBookedTransactionController(req, res) {
 
     remarks = remarks && remarks.toUpperCase();
 
-    const transactionId = await generateTransactionId();
+    const transactionId = await generateTransactionId(haulingDate);
 
     const transactionData = {
       transactionId,

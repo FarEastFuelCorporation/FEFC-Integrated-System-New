@@ -166,9 +166,7 @@ const QuotationContent = ({
                 const fixedWeight = waste.fixedWeight;
                 const fixedPrice = waste.fixedPrice;
 
-                const verify =
-                  (hasFixedRate && fixedWeight !== 0) ||
-                  (!hasFixedRate && fixedWeight === 0);
+                const verify = hasFixedRate && fixedWeight !== 0;
 
                 number++;
 

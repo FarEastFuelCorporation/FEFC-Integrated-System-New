@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { tokens } from "../../theme";
 
 import { timestampDate, parseTimeString, formatNumber } from "../Functions";
+import Decimal from "decimal.js";
 
 const CollectedTransaction = ({ row, user }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -140,43 +141,82 @@ const CollectedTransaction = ({ row, user }) => {
     nonVatable: 0,
   };
 
-  let totalWeight = 0;
+  let totalWeight = new Decimal(0);
+  let isWasteName = false;
+  let isPerClient = false;
+  let isIndividualBilling = false;
 
   transactions.forEach((transaction) => {
-    const certifiedTransaction =
-      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-        .SortedTransaction[0].CertifiedTransaction?.[0];
+    const hasFixedRate = transaction?.QuotationWaste?.hasFixedRate;
+    const isMonthly = transaction?.QuotationWaste?.isMonthly;
+
+    const receivedTransaction =
+      transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0];
+
+    const submitTo = receivedTransaction?.submitTo;
+
+    const certifiedTransaction = transaction.CertifiedTransaction?.[0];
 
     const typeOfWeight = certifiedTransaction?.typeOfWeight
       ? certifiedTransaction.typeOfWeight
       : "SORTED WEIGHT";
 
     const sortedWasteTransaction =
-      transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-        .SortedTransaction[0].SortedWasteTransaction;
+      submitTo === "WAREHOUSE"
+        ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+            .WarehousedTransaction[0].WarehousedTransactionItem
+        : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
+            .SortedTransaction[0].SortedWasteTransaction;
+
+    isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
+    isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;
+    isIndividualBilling =
+      transaction?.BilledTransaction?.[0]?.isIndividualBilling;
+
+    const hasDemurrage =
+      transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+        ?.hasDemurrage || false;
+    const demurrageDays =
+      transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+        ?.demurrageDays || 0;
 
     // Create a new array by aggregating the `weight` for duplicate `QuotationWaste.id`
     const aggregatedWasteTransactions = Object.values(
       sortedWasteTransaction.reduce((acc, current) => {
         const { id } = current.QuotationWaste;
 
+        const currentWeight = new Decimal(current.weight); // Use Decimal.js
+        const currentClientWeight = new Decimal(current.clientWeight); // Use Decimal.js
+
         // If the `QuotationWaste.id` is already in the accumulator, add the weight
         if (acc[id]) {
-          acc[id].weight += current.weight;
+          acc[id].weight = acc[id].weight.plus(currentWeight);
+          acc[id].clientWeight = acc[id].clientWeight.plus(currentClientWeight);
         } else {
           // Otherwise, set the initial object in the accumulator
-          acc[id] = { ...current, weight: current.weight };
+          acc[id] = {
+            ...current,
+            weight: currentWeight,
+            clientWeight: currentClientWeight,
+          };
         }
 
         return acc;
       }, {})
-    );
+    ).map((item) => ({
+      ...item,
+      weight: item.weight.toNumber(), // Convert Decimal back to a standard number
+    }));
 
-    if (hasFixedRate) {
+    let hasTransportation;
+
+    // SMB
+    if (hasFixedRate && isMonthly) {
       let vatCalculation;
       let fixedWeight;
       let fixedPrice;
       let unitPrice;
+
       let target;
 
       aggregatedWasteTransactions.forEach((item) => {
@@ -185,7 +225,7 @@ const CollectedTransaction = ({ row, user }) => {
         const selectedWeight =
           typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
-        totalWeight += selectedWeight; // Total weight multiplied by unit price
+        totalWeight = totalWeight.plus(selectedWeight); // Total weight multiplied by unit price
 
         target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
@@ -193,6 +233,7 @@ const CollectedTransaction = ({ row, user }) => {
         fixedWeight = QuotationWaste.fixedWeight;
         fixedPrice = QuotationWaste.fixedPrice;
         unitPrice = QuotationWaste.unitPrice;
+        hasTransportation = QuotationWaste.hasTransportation;
       });
 
       switch (vatCalculation) {
@@ -209,24 +250,112 @@ const CollectedTransaction = ({ row, user }) => {
           break;
       }
 
-      if (totalWeight > fixedWeight) {
-        const excessWeight = totalWeight - fixedWeight;
+      if (fixedWeight !== 0) {
+        if (totalWeight.toNumber() > fixedWeight) {
+          const excessWeight = totalWeight.minus(fixedWeight);
 
-        const excessPrice = excessWeight * unitPrice;
+          const excessPrice = excessWeight * unitPrice;
 
-        switch (vatCalculation) {
-          case "VAT EXCLUSIVE":
-            target.vatExclusive += excessPrice;
-            break;
-          case "VAT INCLUSIVE":
-            target.vatInclusive += excessPrice;
-            break;
-          case "NON VATABLE":
-            target.nonVatable += excessPrice;
-            break;
-          default:
-            break;
+          switch (vatCalculation) {
+            case "VAT EXCLUSIVE":
+              target.vatExclusive += excessPrice;
+              break;
+            case "VAT INCLUSIVE":
+              target.vatInclusive += excessPrice;
+              break;
+            case "NON VATABLE":
+              target.nonVatable += excessPrice;
+              break;
+            default:
+              break;
+          }
         }
+      }
+    }
+    // LOREAL, RED CROSS
+    else if (hasFixedRate && !isMonthly) {
+      let hasFixedRateIndividual;
+      let vatCalculation;
+      let fixedWeight;
+      let fixedPrice;
+      let unitPrice;
+
+      let target;
+
+      let usedWeight = 0;
+
+      aggregatedWasteTransactions.forEach((item) => {
+        const { weight, clientWeight, QuotationWaste } = item;
+
+        const selectedWeight =
+          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+
+        usedWeight = selectedWeight;
+
+        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+
+        target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        hasFixedRateIndividual = QuotationWaste.hasFixedRate;
+        if (hasFixedRateIndividual) {
+          vatCalculation = QuotationWaste.vatCalculation;
+          fixedWeight = QuotationWaste.fixedWeight;
+          fixedPrice = QuotationWaste.fixedPrice;
+          unitPrice = QuotationWaste.unitPrice;
+          hasTransportation = QuotationWaste.hasTransportation;
+        }
+
+        if (!hasFixedRateIndividual) {
+          switch (QuotationWaste.vatCalculation) {
+            case "VAT EXCLUSIVE":
+              target.vatExclusive += totalWeightPrice;
+              break;
+            case "VAT INCLUSIVE":
+              target.vatInclusive += totalWeightPrice;
+              break;
+            case "NON VATABLE":
+              target.nonVatable += totalWeightPrice;
+              break;
+            default:
+              break;
+          }
+        } else {
+          if (usedWeight > fixedWeight) {
+            const excessWeight = new Decimal(usedWeight)
+              .minus(new Decimal(fixedWeight))
+              .toNumber();
+
+            const excessPrice = excessWeight * unitPrice;
+
+            switch (vatCalculation) {
+              case "VAT EXCLUSIVE":
+                target.vatExclusive += excessPrice;
+                break;
+              case "VAT INCLUSIVE":
+                target.vatInclusive += excessPrice;
+                break;
+              case "NON VATABLE":
+                target.nonVatable += excessPrice;
+                break;
+              default:
+                break;
+            }
+          }
+        }
+      });
+
+      switch (vatCalculation) {
+        case "VAT EXCLUSIVE":
+          target.vatExclusive += fixedPrice;
+          break;
+        case "VAT INCLUSIVE":
+          target.vatInclusive += fixedPrice;
+          break;
+        case "NON VATABLE":
+          target.nonVatable += fixedPrice;
+          break;
+        default:
+          break;
       }
     } else {
       // Calculate amounts and credits based on vatCalculation and mode
@@ -239,6 +368,8 @@ const CollectedTransaction = ({ row, user }) => {
         const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        hasTransportation = QuotationWaste.hasTransportation;
 
         switch (QuotationWaste.vatCalculation) {
           case "VAT EXCLUSIVE":
@@ -260,10 +391,18 @@ const CollectedTransaction = ({ row, user }) => {
     const transpoVatCalculation =
       transaction.QuotationTransportation?.vatCalculation;
     const transpoMode = transaction.QuotationTransportation?.mode;
-    const isTransportation =
-      transaction.ScheduledTransaction?.[0].DispatchedTransaction.length === 0
+    let isTransportation =
+      transaction.ScheduledTransaction?.[0]?.DispatchedTransaction.length === 0
         ? false
         : true;
+
+    const logisticsId = transaction.ScheduledTransaction?.[0]?.logisticsId;
+
+    const clientVehicle = "dbbeee0a-a2ea-44c5-b17a-b21ac4bb2788";
+
+    if (!isTransportation) {
+      isTransportation = logisticsId !== clientVehicle ? true : false;
+    }
 
     const addTranspoFee = (transpoFee, transpoVatCalculation, transpoMode) => {
       // Check if the mode is "CHARGE"
@@ -285,17 +424,155 @@ const CollectedTransaction = ({ row, user }) => {
       }
     };
 
+    const addDemurrageFee = (
+      transpoFee,
+      demurrageDays,
+      transpoVatCalculation,
+      transpoMode
+    ) => {
+      // Check if the mode is "CHARGE"
+      if (transpoMode === "CHARGE") {
+        // Add the transportation fee based on VAT calculation
+        switch (transpoVatCalculation) {
+          case "VAT EXCLUSIVE":
+            amounts.vatExclusive += transpoFee * demurrageDays;
+            break;
+          case "VAT INCLUSIVE":
+            amounts.vatInclusive += transpoFee * demurrageDays;
+            break;
+          case "NON VATABLE":
+            amounts.nonVatable += transpoFee * demurrageDays;
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
     // Call the function to add transportation fee
-    if (isTransportation) {
+    if (isTransportation && hasTransportation) {
       addTranspoFee(transpoFee, transpoVatCalculation, transpoMode);
+    }
+
+    if (hasDemurrage) {
+      addDemurrageFee(
+        transpoFee,
+        demurrageDays,
+        transpoVatCalculation,
+        transpoMode
+      );
     }
   });
 
+  const isIndividualBillingToProcess = isIndividualBilling;
+
+  const groupedTransactions = Object.entries(
+    transactions.reduce((acc, transaction) => {
+      // Extract invoiceNumber from BilledTransaction
+
+      const invoiceNumber =
+        transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
+
+      const typeOfWeight = transaction.CertifiedTransaction?.[0]?.typeOfWeight;
+
+      transaction.ScheduledTransaction.forEach((scheduled) => {
+        const { scheduledDate, scheduledTime } = scheduled;
+
+        scheduled.ReceivedTransaction.forEach((received) => {
+          received.SortedTransaction.forEach((sorted) => {
+            sorted.SortedWasteTransaction.forEach((waste) => {
+              const clientId = waste.transporterClientId;
+
+              // Initialize client group if it doesn't exist
+              if (!acc[clientId]) {
+                acc[clientId] = {
+                  transactions: [],
+                  totals: {
+                    amounts: {
+                      vatExclusive: 0,
+                      vatInclusive: 0,
+                      nonVatable: 0,
+                    },
+                    credits: {
+                      vatExclusive: 0,
+                      vatInclusive: 0,
+                      nonVatable: 0,
+                    },
+                  },
+                };
+              }
+
+              // Create the groupedWaste object
+              const groupedWaste = {
+                ...waste,
+                scheduledDate,
+                scheduledTime,
+                invoiceNumber,
+                typeOfWeight,
+              };
+
+              // Add the groupedWaste to the transactions array
+              acc[clientId].transactions.push(groupedWaste);
+
+              // Process QuotationWaste.mode and vatCalculation
+              const { QuotationWaste } = waste;
+              if (QuotationWaste) {
+                const { vatCalculation } = QuotationWaste;
+
+                const target =
+                  QuotationWaste.mode === "CHARGE" ? "amounts" : "credits";
+
+                // Add the waste amount to the correct vatCalculation total
+                const amount =
+                  (QuotationWaste.unitPrice || 0) *
+                  (typeOfWeight === "CLIENT WEIGHT"
+                    ? waste.clientWeight || 0
+                    : waste.weight || 0);
+
+                switch (vatCalculation) {
+                  case "VAT EXCLUSIVE":
+                    acc[clientId].totals[target].vatExclusive += amount;
+                    break;
+                  case "VAT INCLUSIVE":
+                    acc[clientId].totals[target].vatInclusive += amount;
+                    break;
+                  case "NON VATABLE":
+                    acc[clientId].totals[target].nonVatable += amount;
+                    break;
+                  default:
+                    break;
+                }
+              }
+            });
+          });
+        });
+      });
+
+      return acc;
+    }, {})
+  ).map(([transporterClientId, data]) => ({
+    transporterClientId,
+    transactions: data.transactions,
+    totals: data.totals,
+  }));
+
+  const vat = isIndividualBillingToProcess
+    ? groupedTransactions?.totals?.amounts.vatExclusive * 0.12 +
+      groupedTransactions?.totals?.amounts.vatInclusive -
+      groupedTransactions?.totals?.amounts.vatInclusive / 1.12
+    : amounts.vatExclusive * 0.12 +
+      (amounts.vatInclusive - amounts.vatInclusive / 1.12);
+
   const totalAmountDue = formatNumber(
-    amounts.vatInclusive +
-      amounts.vatExclusive +
-      amounts.vatExclusive * 0.12 -
-      credits.vatInclusive
+    isIndividualBillingToProcess
+      ? groupedTransactions?.totals?.amounts.nonVatable +
+          groupedTransactions?.totals?.amounts.vatExclusive +
+          groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
+          vat
+      : amounts.nonVatable +
+          amounts.vatExclusive +
+          amounts.vatInclusive / 1.12 +
+          vat
   );
 
   return (

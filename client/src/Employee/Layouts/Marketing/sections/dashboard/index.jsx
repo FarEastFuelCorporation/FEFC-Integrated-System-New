@@ -781,7 +781,7 @@ const Dashboard = ({ user }) => {
                   height: isMobile ? "100px" : "auto",
                   display: "flex",
                   flexDirection: isMobile ? "column" : "row",
-                  alignItems: "center",
+                  alignItems: "initial",
                   justifyContent: isMobile ? "none" : "space-between",
                 }}
               >
@@ -860,7 +860,7 @@ const Dashboard = ({ user }) => {
                   </Tabs>
                 </Box>
               </Box>
-              <CustomDataGridStyles height={"372px"} margin={0}>
+              <CustomDataGridStyles height={"372px"} margin={"-20px 0 0 0"}>
                 <DataGrid
                   rows={updatedTransactions ? updatedTransactions : []}
                   columns={columns}
@@ -921,7 +921,7 @@ const Dashboard = ({ user }) => {
                   <Tab label="Vehicle Type" />
                 </Tabs> */}
               </Box>
-              <CustomDataGridStyles height={"372px"} margin={0}>
+              <CustomDataGridStyles height={"372px"} margin={"-20px 0 0 0"}>
                 <DataGrid
                   rows={summaryData ? summaryData : []}
                   columns={columnsSummary}

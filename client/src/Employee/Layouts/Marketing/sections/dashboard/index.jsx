@@ -32,7 +32,7 @@ import DayNavigator from "../../../../../OtherComponents/DayNavigator";
 import axios from "axios";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const Dashboard = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -864,6 +864,7 @@ const Dashboard = ({ user }) => {
                 <DataGrid
                   rows={updatedTransactions ? updatedTransactions : []}
                   columns={columns}
+                  components={{ Toolbar: GridToolbar }}
                   getRowId={(row) => row.id}
                   hideFooter
                   initialState={{
@@ -924,6 +925,7 @@ const Dashboard = ({ user }) => {
                 <DataGrid
                   rows={summaryData ? summaryData : []}
                   columns={columnsSummary}
+                  components={{ Toolbar: GridToolbar }}
                   getRowId={(row) => row.id}
                   hideFooter
                   initialState={{

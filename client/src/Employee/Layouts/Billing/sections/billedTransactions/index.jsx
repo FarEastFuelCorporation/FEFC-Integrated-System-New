@@ -152,6 +152,7 @@ const BilledTransactions = ({ user }) => {
     setIsWasteNameToBill(false);
     setIsPerClientToBill(false);
     setIsIndividualBillingToBill(false);
+    setIsIndividualWasteToBill(false);
     clearFormData();
   };
 

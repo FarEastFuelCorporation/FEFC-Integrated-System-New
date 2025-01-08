@@ -52,6 +52,11 @@ const BilledTransaction = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    isIndividualWaste: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

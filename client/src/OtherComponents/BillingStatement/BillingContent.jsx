@@ -22,6 +22,7 @@ const BillingContent = ({
   isWasteNameToBill = false,
   isPerClientToBill = false,
   isIndividualBillingToBill = false,
+  isIndividualWasteToProcess,
 }) => {
   const wasteTableRef = useRef(null);
 
@@ -211,6 +212,7 @@ const BillingContent = ({
     isWasteNameToBill,
     isPerClientToBill,
     isIndividualBillingToBill,
+    isIndividualWasteToProcess,
   ]);
 
   const bodyCellStyles = ({
@@ -300,7 +302,14 @@ const BillingContent = ({
                               current.clientWeight
                             ); // Use Decimal.js
 
-                            if (acc[id]) {
+                            if (isIndividualWasteToProcess) {
+                              // If isIndividualWasteToProcess is true, each entry is added separately
+                              acc[`${id}-${Math.random()}`] = {
+                                ...current,
+                                weight: currentWeight,
+                                clientWeight: currentClientWeight,
+                              };
+                            } else if (acc[id]) {
                               acc[id].weight =
                                 acc[id].weight.plus(currentWeight);
                               acc[id].clientWeight =
@@ -326,7 +335,14 @@ const BillingContent = ({
                               current.clientWeight
                             ); // Use Decimal.js
 
-                            if (acc[id]) {
+                            if (isIndividualWasteToProcess) {
+                              // If isIndividualWasteToProcess is true, each entry is added separately
+                              acc[`${id}-${Math.random()}`] = {
+                                ...current,
+                                weight: currentWeight,
+                                clientWeight: currentClientWeight,
+                              };
+                            } else if (acc[id]) {
                               acc[id].weight =
                                 acc[id].weight.plus(currentWeight);
                               acc[id].clientWeight =

@@ -35,6 +35,7 @@ const BilledTransactions = ({ user }) => {
     isWasteName: false,
     isPerClient: false,
     isIndividualBilling: false,
+    isIndividualWaste: false,
     billedAmount: 0,
     remarks: "",
     statusId: 10,
@@ -60,6 +61,7 @@ const BilledTransactions = ({ user }) => {
   const [isPerClientToBill, setIsPerClientToBill] = useState(false);
   const [isIndividualBillingToBill, setIsIndividualBillingToBill] =
     useState(false);
+  const [isIndividualWasteToBill, setIsIndividualWasteToBill] = useState(false);
 
   // Fetch data function
   const fetchData = useCallback(async () => {
@@ -135,6 +137,7 @@ const BilledTransactions = ({ user }) => {
       isWasteName: false,
       isPerClient: false,
       isIndividualBilling: false,
+      isIndividualWaste: false,
       billedAmount: 0,
       remarks: "",
       statusId: 10,
@@ -177,6 +180,7 @@ const BilledTransactions = ({ user }) => {
         isWasteName: billedTransaction.isWasteName,
         isPerClient: billedTransaction.isPerClient,
         isIndividualBilling: billedTransaction.isIndividualBilling,
+        isIndividualWaste: billedTransaction.isIndividualWaste,
         billedAmount: billedTransaction.billedAmount,
         remarks: billedTransaction.remarks,
         statusId: typeToEdit.statusId,
@@ -363,6 +367,8 @@ const BilledTransactions = ({ user }) => {
         setIsPerClientToBill={setIsPerClientToBill}
         isIndividualBillingToBill={isIndividualBillingToBill}
         setIsIndividualBillingToBill={setIsIndividualBillingToBill}
+        isIndividualWasteToBill={isIndividualWasteToBill}
+        setIsIndividualWasteToBill={setIsIndividualWasteToBill}
         refs={{
           billedDateRef,
           billedTimeRef,

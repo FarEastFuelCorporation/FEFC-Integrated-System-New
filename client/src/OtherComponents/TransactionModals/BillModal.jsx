@@ -27,6 +27,8 @@ const BillModal = ({
   setIsPerClientToBill,
   isIndividualBillingToBill,
   setIsIndividualBillingToBill,
+  isIndividualWasteToBill,
+  setIsIndividualWasteToBill,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -47,6 +49,12 @@ const BillModal = ({
     const isChecked = e.target.checked;
     setIsIndividualBillingToBill(isChecked); // Update the individual state
     setFormData({ ...formData, isIndividualBilling: isChecked }); // Update formData state
+  };
+
+  const handleCheckboxChange4 = (e) => {
+    const isChecked = e.target.checked;
+    setIsIndividualWasteToBill(isChecked); // Update the individual state
+    setFormData({ ...formData, isIndividualWaste: isChecked }); // Update formData state
   };
 
   return (
@@ -89,6 +97,16 @@ const BillModal = ({
                 />
               }
               label="By Waste Name"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isIndividualWaste}
+                  onChange={handleCheckboxChange4}
+                  color="secondary"
+                />
+              }
+              label="By Individual Waste"
             />
             {formData.clientType === "TRP" && (
               <>
@@ -220,6 +238,7 @@ const BillModal = ({
             isWasteNameToBill={isWasteNameToBill}
             isPerClientToBill={isPerClientToBill}
             isIndividualBillingToBill={isIndividualBillingToBill}
+            isIndividualWasteToBill={isIndividualWasteToBill}
           />
         </Box>
       </Modal>

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import { CircleLogo } from "../CustomAccordionStyles";
@@ -11,6 +11,7 @@ import jsPDF from "jspdf";
 
 const BilledTransaction = ({ row, user }) => {
   const certificateRef = useRef();
+  const [isRendering, setIsRendering] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -60,7 +61,22 @@ const BilledTransaction = ({ row, user }) => {
     processPage(0, pages); // Start processing pages from the first one
   };
 
-  const handleOpenPDFInNewTab = () => {
+  // Memoize waitForRender with useCallback
+  const waitForRender = useCallback(() => {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (certificateRef.current) {
+          clearInterval(interval); // Clear the interval once it's ready
+          resolve();
+        }
+      }, 100); // Check every 100ms
+    });
+  }, []);
+
+  const handleOpenPDFInNewTab = useCallback(async () => {
+    setIsRendering(true);
+    await waitForRender(); // Wait for the DOM to render
+
     const input = certificateRef.current;
 
     const pageHeight = 1056;
@@ -102,7 +118,8 @@ const BilledTransaction = ({ row, user }) => {
     // Break the content into multiple pages if needed
     const pages = Array.from(input.children); // Assuming each page is a child of input
     processPage(0, pages); // Start processing pages from the first one
-  };
+    setIsRendering(false);
+  }, [waitForRender]);
 
   const isBilled = row.BilledTransaction.length === 0 ? false : true;
 
@@ -229,8 +246,9 @@ const BilledTransaction = ({ row, user }) => {
                   variant="contained"
                   color="secondary"
                   onClick={handleOpenPDFInNewTab}
+                  disabled={isRendering}
                 >
-                  View Billing Statement
+                  {isRendering ? "Opening..." : "View Billing Statement"}
                 </Button>
               </Box>
             </>

@@ -93,6 +93,8 @@ const Transaction = ({
       ? inProgressTransactions
       : finishedTransactions;
 
+  console.log(transactions);
+
   const pendingCount = pendingTransactions.length;
   const inProgressCount = inProgressTransactions.length;
   const finishedCount = finishedTransactions.length;
@@ -256,6 +258,7 @@ const Transaction = ({
         ) {
           status = "FOUL TRIP";
         } else if (
+          params.row.statusId === 11 &&
           params.row.BilledTransaction?.length > 0 &&
           params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
         ) {

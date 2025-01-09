@@ -374,6 +374,12 @@ const Transaction = ({
     if (column.field === "clientName" && !Number.isInteger(user.userType)) {
       return false; // Exclude the column
     }
+    if (
+      column.field === "collectedAmount" &&
+      !Number.isInteger(user.userType)
+    ) {
+      return false; // Exclude the column
+    }
     return true; // Include the column
   });
 

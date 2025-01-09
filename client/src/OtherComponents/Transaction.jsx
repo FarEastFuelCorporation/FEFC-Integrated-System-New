@@ -38,7 +38,7 @@ import BillingDistributionTransaction from "./Transactions/BillingDistributionTr
 import WarehousedTransaction from "./Transactions/WarehousedTransaction";
 import CustomDataGridStyles from "./CustomDataGridStyles";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
-import { calculateRemainingDays } from "./Functions";
+import { calculateRemainingDays, formatNumber } from "./Functions";
 import axios from "axios";
 import WarehousedOutTransaction from "./Transactions/WarehousedOutTransaction";
 import TreatedWarehouseTransaction from "./Transactions/TreatedWarehouseTransaction";
@@ -288,6 +288,26 @@ const Transaction = ({
           return "FOUL TRIP";
         }
         return params.row.BilledTransaction?.[0]?.billingNumber || "PENDING";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "collectedAmount", // Same field name as in the original columns
+      headerName: "Collected Amount",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
+          ?.BillingDistributionTransaction?.CollectedTransaction
+          ?.collectedAmount
+          ? formatNumber(
+              params.row.BilledTransaction?.[0]?.BillingApprovalTransaction
+                ?.BillingDistributionTransaction?.CollectedTransaction
+                ?.collectedAmount
+            )
+          : "PENDING";
       },
       renderCell: renderCellWithWrapText,
     },

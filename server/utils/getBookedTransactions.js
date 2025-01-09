@@ -418,6 +418,22 @@ const getIncludeOptionsPartial = () => [
         as: "BillingApprovalTransaction",
         attributes: ["id"],
         required: false,
+        include: [
+          {
+            model: BillingDistributionTransaction,
+            as: "BillingDistributionTransaction",
+            attributes: ["id"],
+            required: false,
+            include: [
+              {
+                model: CollectedTransaction,
+                as: "CollectedTransaction",
+                attributes: ["id", "collectedAmount"],
+                required: false,
+              },
+            ],
+          },
+        ],
       },
     ],
   },

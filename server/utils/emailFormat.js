@@ -824,6 +824,119 @@ async function BillingApprovedEmailFormat(clientName, transactions) {
   }
 }
 
+async function CollectedTransactionEmailFormat(
+  clientName,
+  transactions,
+  totalAmountCollected,
+  collectionDate
+) {
+  try {
+    const transactionRows = Object.values(transactions)
+      .map(
+        (transaction) => ` 
+        <tr>
+          <td>${transaction.transactionId}</td>
+          <td>${formatDate(transaction.haulingDate)}</td>
+        </tr>`
+      )
+      .join("");
+
+    const emailTemplate = `
+      <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+          }
+          .header {
+            text-align: center;
+            background-color: #006400; /* Dark Green */
+            color: white;
+            padding: 10px 0;
+            border-radius: 8px 8px 0 0;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .content {
+            margin: 20px 0;
+          }
+          .content p {
+            margin: 10px 0;
+          }
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+          }
+          th {
+            background-color: #006400; /* Dark Green */
+            color: white;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Collected Transaction Notification</h1>
+          </div>
+          <div class="content">
+            <p>Dear ${clientName},</p>
+            <p>We are pleased to inform you that the following transactions have been successfully collected.</p>
+            <p><strong>Total Amount Collected: ₱${totalAmountCollected}</strong></p>
+            <p><strong>Collection Date: ${formatDate(
+              collectionDate
+            )}</strong></p>
+            <table>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Hauling Date</th>
+              </tr>
+              ${transactionRows}
+            </table>
+            <p>Thank you for your prompt payments. If you have any questions or require further assistance, please do not hesitate to contact us.</p>
+            <p>We appreciate your continued trust in FAR EAST FUEL CORPORATION.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return emailTemplate;
+  } catch (error) {
+    console.error(
+      "Error generating collected transaction email template:",
+      error
+    );
+    throw error;
+  }
+}
+
 async function sendOtpFormat(otp) {
   try {
     const emailTemplate = `

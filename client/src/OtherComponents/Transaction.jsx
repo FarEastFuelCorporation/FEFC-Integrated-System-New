@@ -93,8 +93,6 @@ const Transaction = ({
       ? inProgressTransactions
       : finishedTransactions;
 
-  console.log(transactions);
-
   const pendingCount = pendingTransactions.length;
   const inProgressCount = inProgressTransactions.length;
   const finishedCount = finishedTransactions.length;

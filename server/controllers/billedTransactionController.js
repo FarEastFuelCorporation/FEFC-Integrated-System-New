@@ -29,6 +29,7 @@ async function createBilledTransactionController(req, res) {
       isWasteName,
       isPerClient,
       isIndividualBilling,
+      isIndividualWaste,
       billedAmount,
       remarks,
       statusId,
@@ -61,6 +62,7 @@ async function createBilledTransactionController(req, res) {
           isWasteName,
           isPerClient,
           isIndividualBilling,
+          isIndividualWaste,
           billedAmount,
           remarks,
           createdBy,
@@ -264,6 +266,7 @@ async function updateBilledTransactionController(req, res) {
         isWasteName,
         isPerClient,
         isIndividualBilling,
+        isIndividualWaste,
         billedAmount,
         remarks,
         statusId,
@@ -294,6 +297,7 @@ async function updateBilledTransactionController(req, res) {
             transactionEntry.isWasteName = isWasteName;
             transactionEntry.isPerClient = isPerClient;
             transactionEntry.isIndividualBilling = isIndividualBilling;
+            transactionEntry.isIndividualWaste = isIndividualWaste;
             transactionEntry.billedAmount = billedAmount;
             transactionEntry.remarks = updatedRemarks;
             transactionEntry.updatedBy = updatedBy;

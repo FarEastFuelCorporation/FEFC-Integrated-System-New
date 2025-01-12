@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const Attendance = require("../models/Attendance");
 const IdInformation = require("../models/IdInformation");
 
@@ -25,8 +26,40 @@ function isToday(date) {
   );
 }
 
+// Helper function to get the start and end dates of a specific week in a given year
+function getWeekDateRange(year, weekNumber) {
+  const startDate = new Date(year, 0, 1 + (weekNumber - 1) * 7);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6); // Set to the last day of the week
+  return { startDate, endDate };
+}
+
+// Helper function to get the current week number of the year
+function getWeekNumber(date) {
+  const startDate = new Date(date.getFullYear(), 0, 1);
+  const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000));
+  return Math.ceil((days + 1) / 7);
+}
+
 async function getAttendanceRecordsController(req, res) {
   try {
+    // Extract year and weekNumber from query parameters
+    const { year, weekNumber } = req.query;
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // If year or weekNumber is not provided, use the current year and week
+    const targetYear = year || currentDate.getFullYear();
+    const targetWeekNumber = weekNumber || getWeekNumber(currentDate);
+
+    // Calculate the start and end dates of the target week
+    const { startDate, endDate } = getWeekDateRange(
+      targetYear,
+      targetWeekNumber
+    );
+
+    // Fetch attendance records within the target week
     const results = await Attendance.findAll({
       include: [
         {
@@ -43,9 +76,16 @@ async function getAttendanceRecordsController(req, res) {
           ],
         },
       ],
+      where: {
+        createdAt: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
+        },
+      },
       order: [["createdAt", "ASC"]], // Sort by date for proper pairing
     });
 
+    // Process the results as needed
     const attendanceMap = {};
 
     // First, group TIME-IN and TIME-OUT entries for each employee per day
@@ -232,8 +272,6 @@ async function getAttendanceRecordController(req, res) {
     res.status(500).send("Error fetching data from the database");
   }
 }
-
-const { Op } = require("sequelize");
 
 async function getAttendanceRecordSubordinatesController(req, res) {
   try {

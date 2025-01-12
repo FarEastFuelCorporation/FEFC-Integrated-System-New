@@ -1,6 +1,7 @@
 // controllers/scheduledTransactionController.js
 
-const { Op } = require("sequelize");
+const { Op, fn, col, literal } = require("sequelize");
+const moment = require("moment"); // Ensure you have moment.js installed
 const BookedTransaction = require("../models/BookedTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
@@ -18,6 +19,24 @@ const {
 const sendEmail = require("../sendEmail");
 const QuotationWaste = require("../models/QuotationWaste");
 const statusId = 1;
+
+// Function to get the start and end dates of the last 8 weeks
+function getLast8Weeks() {
+  const weeks = [];
+  const today = moment().startOf("day"); // Start of today
+  const startOfWeek = today.clone().startOf("isoWeek").add(4, "days"); // Get Saturday of the current week
+
+  for (let i = 0; i < 8; i++) {
+    const weekEnd = startOfWeek.clone().subtract(i * 7, "days");
+    const weekStart = weekEnd.clone().subtract(6, "days");
+    weeks.push({
+      weekStart: weekStart.format("YYYY-MM-DD"),
+      weekEnd: weekEnd.format("YYYY-MM-DD"),
+    });
+  }
+
+  return weeks.reverse(); // Return in ascending order
+}
 
 // Create Scheduled Transaction controller
 async function createScheduledTransactionController(req, res) {
@@ -358,6 +377,41 @@ async function getScheduledTransactionsDashboardController(req, res) {
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
 
+    // Get the last 8 weeks
+    const last8Weeks = getLast8Weeks();
+
+    // Initialize an array to hold the grouped transactions
+    const formattedScheduledCounts = [];
+
+    // Iterate over each week
+    for (const week of last8Weeks) {
+      // Convert weekStart and weekEnd to Date objects
+      const startDate = new Date(week.weekStart);
+      const endDate = new Date(week.weekEnd);
+
+      // Query the ScheduledTransaction model for transactions within the current week
+      const transactions = await ScheduledTransaction.count({
+        where: {
+          scheduledDate: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+      });
+
+      // Push the transactions into the groupedTransactions array
+      formattedScheduledCounts.push({
+        weekStart: week.weekStart,
+        weekEnd: week.weekEnd,
+        transactions: transactions,
+      });
+    }
+
+    // groupedTransactions now contains the transactions grouped by week
+    console.log(formattedScheduledCounts);
+
+    console.log("last8Weeks", last8Weeks);
+    console.log("formattedScheduledCounts", formattedScheduledCounts);
+
     const pendingCount = await BookedTransaction.count({
       where: { statusId: 1 },
     });
@@ -595,6 +649,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
       totalClients,
       clientCountByEmployeeData,
       result: filteredResultArray,
+      scheduledTransactionCounts: formattedScheduledCounts,
     });
   } catch (error) {
     console.error("Error:", error);

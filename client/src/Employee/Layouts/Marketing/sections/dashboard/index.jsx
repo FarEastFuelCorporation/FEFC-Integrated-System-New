@@ -30,9 +30,15 @@ import WeekNavigator from "../../../../../OtherComponents/WeekNavigator";
 import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
 import DayNavigator from "../../../../../OtherComponents/DayNavigator";
 import axios from "axios";
-import { formatNumber } from "../../../../../OtherComponents/Functions";
+import {
+  formatDate,
+  formatDate2,
+  formatDate3,
+  formatNumber,
+} from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { ResponsiveBar } from "@nivo/bar";
 
 const Dashboard = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -65,6 +71,8 @@ const Dashboard = ({ user }) => {
     { field: "clientName", sort: "asc" },
   ]);
 
+  const [latest8weeks, setLatest8weeks] = useState([]);
+
   // useCallback to memoize fetchData function
   const fetchData = useCallback(async () => {
     try {
@@ -94,6 +102,16 @@ const Dashboard = ({ user }) => {
       setVehicleTypeTrips(response.data.vehicleTypeTripsArray);
       setTransactions(response.data.result);
       setClientCountByEmployeeData(response.data.clientCountByEmployeeData);
+
+      const transformedData = response.data.scheduledTransactionCounts.map(
+        (item) => ({
+          id: `${formatDate2(item.weekStart)} - ${formatDate2(item.weekEnd)}`,
+          value: item.transactions,
+        })
+      );
+      setLatest8weeks(transformedData);
+
+      console.log(response.data.scheduledTransactionCounts);
 
       setLoading(false);
     } catch (error) {
@@ -364,6 +382,7 @@ const Dashboard = ({ user }) => {
           <Tab label="Daily" />
           <Tab label="Weekly" />
           <Tab label="Monthly" />
+          <Tab label="Comparison" />
         </Tabs>
         <Box mt={isMobile ? 0 : -3}>
           {selectedTab === 0 && (
@@ -384,190 +403,9 @@ const Dashboard = ({ user }) => {
         </Box>
       </Box>
       <hr />
-      <Grid container spacing={3} sx={{ marginTop: "20px" }}>
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 90 }}>
-            <CardContent>
-              {loading ? (
-                <CircularProgress size={20} color="secondary" />
-              ) : (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6" gutterBottom>
-                      On-Time Schedules
-                    </Typography>
-                    <Typography variant="h4" color="textSecondary">
-                      {onTimeSchedule}
-                    </Typography>
-                  </Box>
-                  <SentimentVerySatisfiedIcon
-                    sx={{ fontSize: 40, marginRight: 2 }}
-                    color="secondary"
-                  />
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-          {!isMobile && (
-            <Card sx={{ minHeight: 90, marginTop: "20px" }}>
-              <CardContent>
-                {loading ? (
-                  <CircularProgress size={20} color="secondary" />
-                ) : (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="h6" gutterBottom>
-                        Pending Schedules
-                      </Typography>
-                      <Typography variant="h4" color="textSecondary">
-                        {pendingDispatch}
-                      </Typography>
-                    </Box>
-                    <PendingActionsIcon
-                      sx={{ fontSize: 40, marginRight: 2 }}
-                      color="secondary"
-                    />
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </Grid>
-
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 90 }}>
-            <CardContent>
-              {loading ? (
-                <CircularProgress size={20} color="secondary" />
-              ) : (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6" gutterBottom>
-                      Late Schedules
-                    </Typography>
-                    <Typography variant="h4" color="textSecondary">
-                      {lateSchedule}
-                    </Typography>
-                  </Box>
-                  <SentimentVeryDissatisfiedIcon
-                    sx={{ fontSize: 40, marginRight: 2 }}
-                    color="secondary"
-                  />
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-          {!isMobile && (
-            <Card sx={{ minHeight: 90, marginTop: "20px" }}>
-              <CardContent>
-                {loading ? (
-                  <CircularProgress size={20} color="secondary" />
-                ) : (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="h6" gutterBottom>
-                        Client Satisfaction
-                      </Typography>
-                      <Typography variant="h4" color="textSecondary">
-                        {onTimePercentage}%
-                      </Typography>
-                    </Box>
-                    <StarBorderPurple500Icon
-                      sx={{ fontSize: 40, marginRight: 2 }}
-                      color="secondary"
-                    />
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </Grid>
-        <Grid item xs={12} sm={2.5}>
-          <Card sx={{ minHeight: 90 }}>
-            <CardContent>
-              {loading ? (
-                <CircularProgress size={20} color="secondary" />
-              ) : (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6" gutterBottom>
-                      Total Schedules
-                    </Typography>
-                    <Typography variant="h4" color="textSecondary">
-                      {totalSchedule}
-                    </Typography>
-                  </Box>
-                  <CalendarMonthIcon
-                    sx={{ fontSize: 40, marginRight: 2 }}
-                    color="secondary"
-                  />
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-          {!isMobile && (
-            <Card sx={{ minHeight: 90, marginTop: "20px" }}>
-              <CardContent>
-                {loading ? (
-                  <CircularProgress size={20} color="secondary" />
-                ) : (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="h6" gutterBottom>
-                        Total Clients
-                      </Typography>
-                      <Typography variant="h4" color="textSecondary">
-                        {totalClients}
-                      </Typography>
-                    </Box>
-                    <PeopleIcon
-                      sx={{ fontSize: 40, marginRight: 2 }}
-                      color="secondary"
-                    />
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </Grid>
-        {isMobile && (
-          <>
+      {selectedTab !== 3 && (
+        <>
+          <Grid container spacing={3} sx={{ marginTop: "20px" }}>
             <Grid item xs={12} sm={2.5}>
               <Card sx={{ minHeight: 90 }}>
                 <CardContent>
@@ -583,13 +421,13 @@ const Dashboard = ({ user }) => {
                     >
                       <Box>
                         <Typography variant="h6" gutterBottom>
-                          Pending Schedules
+                          On-Time Schedules
                         </Typography>
                         <Typography variant="h4" color="textSecondary">
-                          {pendingDispatch}
+                          {onTimeSchedule}
                         </Typography>
                       </Box>
-                      <PendingActionsIcon
+                      <SentimentVerySatisfiedIcon
                         sx={{ fontSize: 40, marginRight: 2 }}
                         color="secondary"
                       />
@@ -597,306 +435,489 @@ const Dashboard = ({ user }) => {
                   )}
                 </CardContent>
               </Card>
-            </Grid>
-            <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 90 }}>
-                <CardContent>
-                  {loading ? (
-                    <CircularProgress size={20} color="secondary" />
-                  ) : (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="h6" gutterBottom>
-                          Client Satisfaction
-                        </Typography>
-                        <Typography variant="h4" color="textSecondary">
-                          {onTimePercentage}%
-                        </Typography>
-                      </Box>
-                      <StarBorderPurple500Icon
-                        sx={{ fontSize: 40, marginRight: 2 }}
-                        color="secondary"
-                      />
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={2.5}>
-              <Card sx={{ minHeight: 90 }}>
-                <CardContent>
-                  {loading ? (
-                    <CircularProgress size={20} color="secondary" />
-                  ) : (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="h6" gutterBottom>
-                          Total Clients
-                        </Typography>
-                        <Typography variant="h4" color="textSecondary">
-                          {totalClients}
-                        </Typography>
-                      </Box>
-                      <PeopleIcon
-                        sx={{ fontSize: 40, marginRight: 2 }}
-                        color="secondary"
-                      />
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          </>
-        )}
-
-        {/* Fourth Column for Pie Chart */}
-        <Grid item xs={12} sm={4.5} sx={{ height: "200px" }}>
-          <Card sx={{ height: "inherit" }}>
-            <CardContent sx={{ height: "inherit" }}>
-              <ResponsivePie
-                data={data}
-                colorBy="id"
-                theme={{
-                  axis: {
-                    domain: {
-                      line: {
-                        stroke: colors.grey[100],
-                      },
-                    },
-                    legend: {
-                      text: {
-                        fill: colors.grey[100],
-                      },
-                    },
-                    ticks: {
-                      line: {
-                        stroke: colors.grey[100],
-                        strokeWidth: 1,
-                      },
-                      text: {
-                        fill: colors.grey[100],
-                      },
-                    },
-                  },
-                  legends: {
-                    text: {
-                      fill: colors.grey[100],
-                    },
-                  },
-                }}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  bottom: isMobile ? 60 : 20,
-                  left: 60,
-                }}
-                innerRadius={0.5}
-                padAngle={0.7}
-                cornerRadius={3}
-                activeOuterRadiusOffset={8}
-                borderWidth={1}
-                borderColor={{
-                  from: "color",
-                  modifiers: [["darker", 10]],
-                }}
-                arcLinkLabelsSkipAngle={10}
-                arcLinkLabelsTextColor={colors.grey[100]}
-                arcLinkLabelsThickness={2}
-                arcLinkLabelsColor={{ from: "color" }}
-                arcLabelsSkipAngle={10}
-                arcLabelsTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 10]],
-                }}
-                defs={[
-                  {
-                    id: "dots",
-                    type: "patternDots",
-                    background: "inherit",
-                    color: "rgba(255, 255, 255, 0.3)",
-                    size: 4,
-                    padding: 1,
-                    stagger: true,
-                  },
-                  {
-                    id: "lines",
-                    type: "patternLines",
-                    background: "inherit",
-                    color: "rgba(255, 255, 255, 0.3)",
-                    rotation: -45,
-                    lineWidth: 6,
-                    spacing: 10,
-                  },
-                ]}
-                legends={[
-                  {
-                    anchor: `${isMobile ? "bottom" : "top-left"}`,
-                    direction: `${isMobile ? "row" : "column"}`,
-                    justify: false,
-                    translateX: isMobile ? 0 : -50,
-                    translateY: isMobile ? 50 : 0,
-                    itemsSpacing: 10,
-                    itemWidth: 100,
-                    itemHeight: 18,
-                    itemTextColor: colors.grey[100],
-                    itemDirection: "left-to-right",
-                    itemOpacity: 1,
-                    symbolSize: 24,
-                    symbolShape: "circle",
-                    effects: [
-                      {
-                        on: "hover",
-                        style: {
-                          itemTextColor: "#999",
-                        },
-                      },
-                    ],
-                    legendOffset: 10,
-                  },
-                ]}
-              />
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-      <Grid container spacing={3} sx={{ marginTop: isMobile ? 3 : 0 }}>
-        <Grid item xs={12} sm={7.5}>
-          <Card sx={{ minHeight: 450 }}>
-            <CardContent>
-              <Box
-                sx={{
-                  width: "100%",
-                  height: isMobile ? "100px" : "auto",
-                  display: "flex",
-                  flexDirection: isMobile ? "column" : "row",
-                  alignItems: "initial",
-                  justifyContent: isMobile ? "none" : "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Details:
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", gap: 3 }}>
-                  <Box>
-                    {selectedDetailsTab === 0 && (
-                      <FormControl
-                        sx={{ width: "200px", height: "30px", padding: 0 }}
+              {!isMobile && (
+                <Card sx={{ minHeight: 90, marginTop: "20px" }}>
+                  <CardContent>
+                    {loading ? (
+                      <CircularProgress size={20} color="secondary" />
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
                       >
-                        <InputLabel
-                          id="employee-select-label"
-                          sx={{ padding: 0 }}
-                          style={{
-                            color: colors.grey[100],
-                          }}
-                          shrink={true}
-                        >
-                          Select Employee
-                        </InputLabel>
-                        <Select
-                          labelId="employee-select-label"
-                          id="employeeSelect"
-                          value={selectedEmployee}
-                          onChange={handleSelectChange}
-                          label="Select Employee"
+                        <Box>
+                          <Typography variant="h6" gutterBottom>
+                            Pending Schedules
+                          </Typography>
+                          <Typography variant="h4" color="textSecondary">
+                            {pendingDispatch}
+                          </Typography>
+                        </Box>
+                        <PendingActionsIcon
+                          sx={{ fontSize: 40, marginRight: 2 }}
+                          color="secondary"
+                        />
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </Grid>
+
+            <Grid item xs={12} sm={2.5}>
+              <Card sx={{ minHeight: 90 }}>
+                <CardContent>
+                  {loading ? (
+                    <CircularProgress size={20} color="secondary" />
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" gutterBottom>
+                          Late Schedules
+                        </Typography>
+                        <Typography variant="h4" color="textSecondary">
+                          {lateSchedule}
+                        </Typography>
+                      </Box>
+                      <SentimentVeryDissatisfiedIcon
+                        sx={{ fontSize: 40, marginRight: 2 }}
+                        color="secondary"
+                      />
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+              {!isMobile && (
+                <Card sx={{ minHeight: 90, marginTop: "20px" }}>
+                  <CardContent>
+                    {loading ? (
+                      <CircularProgress size={20} color="secondary" />
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="h6" gutterBottom>
+                            Client Satisfaction
+                          </Typography>
+                          <Typography variant="h4" color="textSecondary">
+                            {onTimePercentage}%
+                          </Typography>
+                        </Box>
+                        <StarBorderPurple500Icon
+                          sx={{ fontSize: 40, marginRight: 2 }}
+                          color="secondary"
+                        />
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={2.5}>
+              <Card sx={{ minHeight: 90 }}>
+                <CardContent>
+                  {loading ? (
+                    <CircularProgress size={20} color="secondary" />
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" gutterBottom>
+                          Total Schedules
+                        </Typography>
+                        <Typography variant="h4" color="textSecondary">
+                          {totalSchedule}
+                        </Typography>
+                      </Box>
+                      <CalendarMonthIcon
+                        sx={{ fontSize: 40, marginRight: 2 }}
+                        color="secondary"
+                      />
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+              {!isMobile && (
+                <Card sx={{ minHeight: 90, marginTop: "20px" }}>
+                  <CardContent>
+                    {loading ? (
+                      <CircularProgress size={20} color="secondary" />
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="h6" gutterBottom>
+                            Total Clients
+                          </Typography>
+                          <Typography variant="h4" color="textSecondary">
+                            {totalClients}
+                          </Typography>
+                        </Box>
+                        <PeopleIcon
+                          sx={{ fontSize: 40, marginRight: 2 }}
+                          color="secondary"
+                        />
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </Grid>
+            {isMobile && (
+              <>
+                <Grid item xs={12} sm={2.5}>
+                  <Card sx={{ minHeight: 90 }}>
+                    <CardContent>
+                      {loading ? (
+                        <CircularProgress size={20} color="secondary" />
+                      ) : (
+                        <Box
                           sx={{
-                            height: "30px",
-                            paddingTop: 0,
-                            paddingBottom: 0,
                             display: "flex",
                             alignItems: "center",
+                            justifyContent: "space-between",
                           }}
                         >
-                          <MenuItem value="">
-                            <em>None</em>
-                          </MenuItem>
-                          {clientCountByEmployeeData.map((employee) => (
-                            <MenuItem
-                              key={employee.employeeId}
-                              value={employee.employeeId}
-                            >
-                              {employee.employeeName}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                  </Box>
-                  <Tabs
-                    value={selectedDetailsTab}
-                    onChange={handleChangeDetailsTab}
+                          <Box>
+                            <Typography variant="h6" gutterBottom>
+                              Pending Schedules
+                            </Typography>
+                            <Typography variant="h4" color="textSecondary">
+                              {pendingDispatch}
+                            </Typography>
+                          </Box>
+                          <PendingActionsIcon
+                            sx={{ fontSize: 40, marginRight: 2 }}
+                            color="secondary"
+                          />
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} sm={2.5}>
+                  <Card sx={{ minHeight: 90 }}>
+                    <CardContent>
+                      {loading ? (
+                        <CircularProgress size={20} color="secondary" />
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="h6" gutterBottom>
+                              Client Satisfaction
+                            </Typography>
+                            <Typography variant="h4" color="textSecondary">
+                              {onTimePercentage}%
+                            </Typography>
+                          </Box>
+                          <StarBorderPurple500Icon
+                            sx={{ fontSize: 40, marginRight: 2 }}
+                            color="secondary"
+                          />
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} sm={2.5}>
+                  <Card sx={{ minHeight: 90 }}>
+                    <CardContent>
+                      {loading ? (
+                        <CircularProgress size={20} color="secondary" />
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="h6" gutterBottom>
+                              Total Clients
+                            </Typography>
+                            <Typography variant="h4" color="textSecondary">
+                              {totalClients}
+                            </Typography>
+                          </Box>
+                          <PeopleIcon
+                            sx={{ fontSize: 40, marginRight: 2 }}
+                            color="secondary"
+                          />
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </>
+            )}
+
+            {/* Fourth Column for Pie Chart */}
+            <Grid item xs={12} sm={4.5} sx={{ height: "200px" }}>
+              <Card sx={{ height: "inherit" }}>
+                <CardContent sx={{ height: "inherit" }}>
+                  <ResponsivePie
+                    data={data}
+                    colorBy="id"
+                    theme={{
+                      axis: {
+                        domain: {
+                          line: {
+                            stroke: colors.grey[100],
+                          },
+                        },
+                        legend: {
+                          text: {
+                            fill: colors.grey[100],
+                          },
+                        },
+                        ticks: {
+                          line: {
+                            stroke: colors.grey[100],
+                            strokeWidth: 1,
+                          },
+                          text: {
+                            fill: colors.grey[100],
+                          },
+                        },
+                      },
+                      legends: {
+                        text: {
+                          fill: colors.grey[100],
+                        },
+                      },
+                    }}
+                    margin={{
+                      top: 20,
+                      right: 20,
+                      bottom: isMobile ? 60 : 20,
+                      left: 60,
+                    }}
+                    innerRadius={0.5}
+                    padAngle={0.7}
+                    cornerRadius={3}
+                    activeOuterRadiusOffset={8}
+                    borderWidth={1}
+                    borderColor={{
+                      from: "color",
+                      modifiers: [["darker", 10]],
+                    }}
+                    arcLinkLabelsSkipAngle={10}
+                    arcLinkLabelsTextColor={colors.grey[100]}
+                    arcLinkLabelsThickness={2}
+                    arcLinkLabelsColor={{ from: "color" }}
+                    arcLabelsSkipAngle={10}
+                    arcLabelsTextColor={{
+                      from: "color",
+                      modifiers: [["darker", 10]],
+                    }}
+                    defs={[
+                      {
+                        id: "dots",
+                        type: "patternDots",
+                        background: "inherit",
+                        color: "rgba(255, 255, 255, 0.3)",
+                        size: 4,
+                        padding: 1,
+                        stagger: true,
+                      },
+                      {
+                        id: "lines",
+                        type: "patternLines",
+                        background: "inherit",
+                        color: "rgba(255, 255, 255, 0.3)",
+                        rotation: -45,
+                        lineWidth: 6,
+                        spacing: 10,
+                      },
+                    ]}
+                    legends={[
+                      {
+                        anchor: `${isMobile ? "bottom" : "top-left"}`,
+                        direction: `${isMobile ? "row" : "column"}`,
+                        justify: false,
+                        translateX: isMobile ? 0 : -50,
+                        translateY: isMobile ? 50 : 0,
+                        itemsSpacing: 10,
+                        itemWidth: 100,
+                        itemHeight: 18,
+                        itemTextColor: colors.grey[100],
+                        itemDirection: "left-to-right",
+                        itemOpacity: 1,
+                        symbolSize: 24,
+                        symbolShape: "circle",
+                        effects: [
+                          {
+                            on: "hover",
+                            style: {
+                              itemTextColor: "#999",
+                            },
+                          },
+                        ],
+                        legendOffset: 10,
+                      },
+                    ]}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+          <Grid container spacing={3} sx={{ marginTop: isMobile ? 3 : 0 }}>
+            <Grid item xs={12} sm={7.5}>
+              <Card sx={{ minHeight: 450 }}>
+                <CardContent>
+                  <Box
                     sx={{
-                      "& .MuiTab-root": {
-                        height: 30, // Set height for each Tab
-                        minHeight: 30, // Ensure minimum height of 20px for the Tab
-                        paddingY: 0, // Remove vertical padding
-                      },
-                      "& .Mui-selected": {
-                        backgroundColor: colors.greenAccent[400],
-                        boxShadow: "none",
-                        borderBottom: `1px solid ${colors.grey[100]}`,
-                      },
-                      "& .MuiTab-root > span": {
-                        paddingRight: "10px",
-                      },
-                      height: 20,
+                      width: "100%",
+                      height: isMobile ? "100px" : "auto",
+                      display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
+                      alignItems: "initial",
+                      justifyContent: isMobile ? "none" : "space-between",
                     }}
                   >
-                    <Tab label="Individual" />
-                    <Tab label="Team" />
-                  </Tabs>
-                </Box>
-              </Box>
-              <CustomDataGridStyles height={"372px"} margin={"-20px 0 0 0"}>
-                <DataGrid
-                  rows={updatedTransactions ? updatedTransactions : []}
-                  columns={columns}
-                  components={{ Toolbar: GridToolbar }}
-                  getRowId={(row) => row.id}
-                  hideFooter
-                  initialState={{
-                    sorting: {
-                      sortModel: [{ field: "total", sort: "asc" }],
-                    },
-                  }}
-                  onSortModelChange={handleSortModelChange}
-                />
-              </CustomDataGridStyles>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4.5}>
-          <Card sx={{ minHeight: 450 }}>
-            <CardContent>
-              <Box
-                sx={{
-                  width: "100%",
-                  height: isMobile ? "100px" : "auto",
-                  display: "flex",
-                  flexDirection: isMobile ? "column" : "row",
-                  alignItems: "center",
-                  justifyContent: isMobile ? "none" : "space-between",
-                }}
-              >
-                <Box mb={3}>
-                  <Typography variant="h6" gutterBottom>
-                    Summary:
-                  </Typography>
-                </Box>
-                {/* <Tabs
+                    <Box>
+                      <Typography variant="h6" gutterBottom>
+                        Details:
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 3 }}>
+                      <Box>
+                        {selectedDetailsTab === 0 && (
+                          <FormControl
+                            sx={{ width: "200px", height: "30px", padding: 0 }}
+                          >
+                            <InputLabel
+                              id="employee-select-label"
+                              sx={{ padding: 0 }}
+                              style={{
+                                color: colors.grey[100],
+                              }}
+                              shrink={true}
+                            >
+                              Select Employee
+                            </InputLabel>
+                            <Select
+                              labelId="employee-select-label"
+                              id="employeeSelect"
+                              value={selectedEmployee}
+                              onChange={handleSelectChange}
+                              label="Select Employee"
+                              sx={{
+                                height: "30px",
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <MenuItem value="">
+                                <em>None</em>
+                              </MenuItem>
+                              {clientCountByEmployeeData.map((employee) => (
+                                <MenuItem
+                                  key={employee.employeeId}
+                                  value={employee.employeeId}
+                                >
+                                  {employee.employeeName}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                      </Box>
+                      <Tabs
+                        value={selectedDetailsTab}
+                        onChange={handleChangeDetailsTab}
+                        sx={{
+                          "& .MuiTab-root": {
+                            height: 30, // Set height for each Tab
+                            minHeight: 30, // Ensure minimum height of 20px for the Tab
+                            paddingY: 0, // Remove vertical padding
+                          },
+                          "& .Mui-selected": {
+                            backgroundColor: colors.greenAccent[400],
+                            boxShadow: "none",
+                            borderBottom: `1px solid ${colors.grey[100]}`,
+                          },
+                          "& .MuiTab-root > span": {
+                            paddingRight: "10px",
+                          },
+                          height: 20,
+                        }}
+                      >
+                        <Tab label="Individual" />
+                        <Tab label="Team" />
+                      </Tabs>
+                    </Box>
+                  </Box>
+                  <CustomDataGridStyles height={"372px"} margin={"-20px 0 0 0"}>
+                    <DataGrid
+                      rows={updatedTransactions ? updatedTransactions : []}
+                      columns={columns}
+                      components={{ Toolbar: GridToolbar }}
+                      getRowId={(row) => row.id}
+                      hideFooter
+                      initialState={{
+                        sorting: {
+                          sortModel: [{ field: "total", sort: "asc" }],
+                        },
+                      }}
+                      onSortModelChange={handleSortModelChange}
+                    />
+                  </CustomDataGridStyles>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4.5}>
+              <Card sx={{ minHeight: 450 }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: isMobile ? "100px" : "auto",
+                      display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
+                      alignItems: "center",
+                      justifyContent: isMobile ? "none" : "space-between",
+                    }}
+                  >
+                    <Box mb={3}>
+                      <Typography variant="h6" gutterBottom>
+                        Summary:
+                      </Typography>
+                    </Box>
+                    {/* <Tabs
                   value={selectedSummaryTab}
                   onChange={handleChangeSummaryTab}
                   sx={{
@@ -920,25 +941,128 @@ const Dashboard = ({ user }) => {
                   <Tab label="Vehicle" />
                   <Tab label="Vehicle Type" />
                 </Tabs> */}
-              </Box>
-              <CustomDataGridStyles height={"372px"} margin={"-20px 0 0 0"}>
-                <DataGrid
-                  rows={summaryData ? summaryData : []}
-                  columns={columnsSummary}
-                  components={{ Toolbar: GridToolbar }}
-                  getRowId={(row) => row.id}
-                  hideFooter
-                  initialState={{
-                    sorting: {
-                      sortModel: [{ field: "clientName", sort: "asc" }],
+                  </Box>
+                  <CustomDataGridStyles height={"372px"} margin={"-20px 0 0 0"}>
+                    <DataGrid
+                      rows={summaryData ? summaryData : []}
+                      columns={columnsSummary}
+                      components={{ Toolbar: GridToolbar }}
+                      getRowId={(row) => row.id}
+                      hideFooter
+                      initialState={{
+                        sorting: {
+                          sortModel: [{ field: "clientName", sort: "asc" }],
+                        },
+                      }}
+                    />
+                  </CustomDataGridStyles>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </>
+      )}
+      {selectedTab === 3 && (
+        <div style={{ height: "400px" }}>
+          <ResponsiveBar
+            data={latest8weeks}
+            keys={["value"]}
+            indexBy="id"
+            margin={{ top: 20, right: 30, bottom: 40, left: 40 }}
+            padding={0.3}
+            layout="vertical"
+            colors={{ scheme: "nivo" }}
+            theme={{
+              axis: {
+                domain: {
+                  line: {
+                    stroke: colors.grey[100],
+                  },
+                },
+                legend: {
+                  text: {
+                    fill: colors.grey[100],
+                  },
+                },
+                ticks: {
+                  line: {
+                    stroke: colors.grey[100],
+                  },
+                  text: {
+                    fill: colors.grey[100],
+                  },
+                },
+              },
+              legends: {
+                text: {
+                  fill: colors.grey[100],
+                },
+              },
+            }}
+            axisBottom={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: "Week Coverage",
+              legendPosition: "middle",
+              legendOffset: 32,
+            }}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: "Transactions",
+              legendPosition: "middle",
+              legendOffset: -40,
+            }}
+            enableGridX={true}
+            enableGridY={true}
+            animate={true}
+            motionConfig="gentle"
+            borderColor={{
+              from: "color",
+              modifiers: [["darker", 1.6]],
+            }}
+            labelSkipWidth={12}
+            labelSkipHeight={12}
+            labelTextColor={(bar) => {
+              if (bar.id === "value") {
+                return "#FFFFFF"; // White text on bars
+              }
+              return colors.grey[900]; // Default text color
+            }}
+            legends={[
+              {
+                dataFrom: "keys",
+                anchor: "bottom-right",
+                direction: "column",
+                justify: false,
+                translateX: 120,
+                translateY: 0,
+                itemsSpacing: 2,
+                itemWidth: 100,
+                itemHeight: 20,
+                itemDirection: "left-to-right",
+                itemOpacity: 0.85,
+                symbolSize: 20,
+                effects: [
+                  {
+                    on: "hover",
+                    style: {
+                      itemOpacity: 1,
                     },
-                  }}
-                />
-              </CustomDataGridStyles>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                  },
+                ],
+              },
+            ]}
+            role="application"
+            ariaLabel="Nivo bar chart demo"
+            barAriaLabel={(e) =>
+              `${e.id}: ${e.formattedValue} in week: ${e.indexValue}`
+            }
+          />
+        </div>
+      )}
     </Box>
   );
 };

@@ -107,11 +107,11 @@ const IdInformation = sequelize.define(
     },
     profile_picture: {
       type: DataTypes.BLOB("long"),
-      allowNull: false,
+      allowNull: true,
     },
     signature: {
       type: DataTypes.BLOB("long"),
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

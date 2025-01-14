@@ -37,7 +37,7 @@ const QuotationTransportation = sequelize.define(
       allowNull: false,
     },
     unitPrice: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     vatCalculation: {

@@ -31,9 +31,7 @@ import MonthNavigator from "../../../../../OtherComponents/MonthNavigator";
 import DayNavigator from "../../../../../OtherComponents/DayNavigator";
 import axios from "axios";
 import {
-  formatDate,
   formatDate2,
-  formatDate3,
   formatNumber,
 } from "../../../../../OtherComponents/Functions";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";

@@ -70,7 +70,6 @@ const Dashboard = () => {
         setOnTimePercentage(response.data.onTimePercentage);
         setLateDispatch(response.data.lateDispatch);
         setIncome(response.data.income);
-        console.log(response.data.income);
         setTransactions(response.data.dispatchedTransactions);
         setClientTrips(response.data.clientTripsArray);
         setVehicleTrips(response.data.vehicleTripsArray);

@@ -209,12 +209,13 @@ async function getQuotationsController(req, res) {
     // Flatten and format the data
     const flattenedData = quotations.map((item) => {
       const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
+      const validityDate = new Date(quotation.validity);
       return {
         ...quotation,
         clientName: quotation.Client ? quotation.Client.clientName : null,
-        validity: quotation.validity
-          ? new Date(quotation.validity).toISOString().split("T")[0]
-          : null, // Convert timestamp to yyyy-mm-dd format
+        validity: !isNaN(validityDate.getTime())
+          ? validityDate.toISOString().split("T")[0]
+          : null, // Convert valid date to yyyy-mm-dd format or null if invalid
       };
     });
 

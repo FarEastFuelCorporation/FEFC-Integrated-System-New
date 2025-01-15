@@ -933,8 +933,9 @@ async function geBookedTransactionsDashboardFullController(req, res) {
           }
 
           const transpoFee =
-            transaction.BookedTransaction.QuotationTransportation?.unitPrice ||
-            0;
+            parseFloat(
+              transaction.BookedTransaction.QuotationTransportation?.unitPrice
+            ) || 0;
           console.log("transpoFee;", transpoFee);
           const transpoVatCalculation =
             transaction.BookedTransaction.QuotationTransportation

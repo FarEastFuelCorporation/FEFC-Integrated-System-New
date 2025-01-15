@@ -375,11 +375,8 @@ async function getDispatchedTransactionsDashboardController(req, res) {
           const quotationTransportation =
             bookedTransaction?.QuotationTransportation;
 
-          if (
-            quotationTransportation &&
-            typeof quotationTransportation.unitPrice === "number"
-          ) {
-            income += quotationTransportation.unitPrice || 0;
+          if (quotationTransportation) {
+            income += parseFloat(quotationTransportation.unitPrice || 0);
           }
         }
       }
@@ -389,9 +386,11 @@ async function getDispatchedTransactionsDashboardController(req, res) {
       const quotationTransportation =
         transaction.ScheduledTransaction?.BookedTransaction
           ?.QuotationTransportation;
+
       const unitPrice = quotationTransportation
-        ? quotationTransportation.unitPrice
+        ? parseFloat(quotationTransportation.unitPrice)
         : 0; // Default to 0 if unitPrice is not available
+
       const vehicleType = quotationTransportation?.VehicleType;
 
       if (client) {

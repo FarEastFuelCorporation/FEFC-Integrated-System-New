@@ -189,6 +189,13 @@ const BookModal = ({
         </div>
         {user.userType === "TRP" && transporterClient.length > 0 && (
           <>
+            <Typography
+              variant="h6"
+              sx={{ fontSize: "12px", color: "#70d8bd" }}
+            >
+              "Leave the Client Name field empty if there are assorted clients
+              in a transaction."
+            </Typography>
             <Autocomplete
               multiple
               options={transporterClient} // Options for the dropdown

@@ -131,15 +131,16 @@ const Transaction = ({
       renderCell: (params) => {
         let haulingDate;
         if (params.row.ScheduledTransaction[0]) {
-          haulingDate = format(
-            new Date(params.row.ScheduledTransaction[0].scheduledDate),
-            "MMMM dd, yyyy"
-          );
+          haulingDate = params.row.ScheduledTransaction[0].scheduledDate
+            ? format(
+                new Date(params.row.ScheduledTransaction[0].scheduledDate),
+                "MMMM dd, yyyy"
+              )
+            : "";
         } else {
-          haulingDate = format(
-            new Date(params.row.haulingDate),
-            "MMMM dd, yyyy"
-          );
+          haulingDate = params.row.haulingDate
+            ? format(new Date(params.row.haulingDate), "MMMM dd, yyyy")
+            : "";
         }
 
         let value = {};

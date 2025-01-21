@@ -130,22 +130,30 @@ const Transaction = ({
       minWidth: 150,
       renderCell: (params) => {
         let haulingDate;
+
+        // Check if ScheduledTransaction exists and has scheduledDate
         if (params.row.ScheduledTransaction[0]) {
-          haulingDate = params.row.ScheduledTransaction[0].scheduledDate
-            ? format(
-                new Date(params.row.ScheduledTransaction[0].scheduledDate),
-                "MMMM dd, yyyy"
-              )
-            : "";
+          const scheduledDate =
+            params.row.ScheduledTransaction[0].scheduledDate;
+          if (scheduledDate && !isNaN(new Date(scheduledDate))) {
+            haulingDate = format(new Date(scheduledDate), "MMMM dd, yyyy");
+          } else {
+            haulingDate = ""; // Invalid or missing date
+          }
         } else {
-          haulingDate = params.row.haulingDate
-            ? format(new Date(params.row.haulingDate), "MMMM dd, yyyy")
-            : "";
+          const haulingDateValue = params.row.haulingDate;
+          if (haulingDateValue && !isNaN(new Date(haulingDateValue))) {
+            haulingDate = format(new Date(haulingDateValue), "MMMM dd, yyyy");
+          } else {
+            haulingDate = ""; // Invalid or missing date
+          }
         }
 
+        // Create the value object
         let value = {};
         value.value = haulingDate;
 
+        // Render the cell with wrapped text
         return renderCellWithWrapText(value);
       },
     },

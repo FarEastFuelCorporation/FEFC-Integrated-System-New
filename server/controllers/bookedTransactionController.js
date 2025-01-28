@@ -51,6 +51,7 @@ async function createBookedTransactionController(req, res) {
       haulingDate,
       haulingTime,
       statusId,
+      remarks,
       createdBy,
     };
 

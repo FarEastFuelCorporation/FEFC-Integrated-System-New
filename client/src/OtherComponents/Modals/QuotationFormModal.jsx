@@ -462,7 +462,7 @@ const QuotationFormModal = ({
                     ON PICKUP
                   </MenuItem>
                   <MenuItem key={"ON DELIVERY"} value={"ON DELIVERY"}>
-                    ON DELIVERY
+                    OFFSET ON CHARGE WASTE
                   </MenuItem>
                   <MenuItem key={"N/A"} value={"N/A"}>
                     N/A

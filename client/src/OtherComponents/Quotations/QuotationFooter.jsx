@@ -92,7 +92,9 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                 textAlign="center"
               >
                 {quotationData?.termsBuying !== "N/A"
-                  ? quotationData?.termsBuyingDays === 0
+                  ? quotationData?.termsBuying === "OFFSET ON CHARGE WASTE"
+                    ? quotationData?.termsBuying
+                    : quotationData?.termsBuyingDays === 0
                     ? `CASH ${quotationData?.termsBuying}`
                     : quotationData?.termsBuyingDays === 1
                     ? `${quotationData?.termsBuyingDays} DAY ${quotationData?.termsBuying}`

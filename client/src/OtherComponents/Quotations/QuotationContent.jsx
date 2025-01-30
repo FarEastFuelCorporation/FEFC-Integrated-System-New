@@ -203,7 +203,7 @@ const QuotationContent = ({
                           {formatNumber(waste.quantity ? waste.quantity : 1)}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
-                          {verify ? "LOT" : waste.unit}
+                          {"LOT"}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {fixedPrice}

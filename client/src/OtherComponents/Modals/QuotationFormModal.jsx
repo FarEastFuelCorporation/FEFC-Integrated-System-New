@@ -723,6 +723,9 @@ const QuotationFormModal = ({
                             {option}
                           </MenuItem>
                         ))}
+                        <MenuItem key={"PAX"} value={"PAX"}>
+                          {"PAX"}
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>

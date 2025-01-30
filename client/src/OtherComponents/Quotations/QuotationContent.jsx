@@ -235,7 +235,9 @@ const QuotationContent = ({
                             : ""}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
-                          {waste.TypeOfWaste.wasteCode}
+                          {waste.unit === "PAX"
+                            ? ""
+                            : waste.TypeOfWaste.wasteCode}
                         </TableCell>
                         <TableCell align="center" sx={getCellStyle(false)}>
                           {formatNumber(waste.quantity ? waste.quantity : 1)}

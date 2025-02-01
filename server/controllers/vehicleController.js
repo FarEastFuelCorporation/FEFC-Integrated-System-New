@@ -165,6 +165,7 @@ async function getVehiclesByVehicleTypeIdController(req, res) {
     // Fetch all vehicles from the database
     const vehicles = await Vehicle.findAll({
       // where: { vehicleTypeId: id },
+      
       include: {
         model: VehicleType,
         as: "VehicleType",

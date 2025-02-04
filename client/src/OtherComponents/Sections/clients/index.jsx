@@ -36,6 +36,12 @@ const Clients = ({ user }) => {
     natureOfBusiness: "",
     contactNumber: "",
     clientType: "",
+    billerName: "",
+    billerAddress: "",
+    billerContactPerson: "",
+    billerContactNumber: "",
+    billerTinNumber: "",
+    email: "",
     clientPicture: "",
     createdBy: user.id,
   };
@@ -60,6 +66,7 @@ const Clients = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/client`);
 
+      console.log(response.data.clients);
       setClientData(response.data.clients);
 
       setLoading(false);
@@ -96,11 +103,17 @@ const Clients = ({ user }) => {
       setFormData({
         id: clientToEdit.id,
         clientId: clientToEdit.clientId,
-        clientName: clientToEdit.clientName,
-        address: clientToEdit.address,
-        natureOfBusiness: clientToEdit.natureOfBusiness,
-        contactNumber: clientToEdit.contactNumber,
-        clientType: clientToEdit.clientType,
+        clientName: clientToEdit.clientName || "",
+        address: clientToEdit.address || "",
+        natureOfBusiness: clientToEdit.natureOfBusiness || "",
+        contactNumber: clientToEdit.contactNumber || "",
+        clientType: clientToEdit.clientType || "",
+        billerName: clientToEdit.billerName || "",
+        billerAddress: clientToEdit.billerAddress || "",
+        billerContactPerson: clientToEdit.billerContactPerson || "",
+        billerContactNumber: clientToEdit.billerContactNumber || "",
+        billerTinNumber: clientToEdit.billerTinNumber || "",
+        email: clientToEdit.email || "",
         createdBy: user.id,
       });
       handleOpenModal();
@@ -144,17 +157,10 @@ const Clients = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { clientName, address, natureOfBusiness, contactNumber, clientType } =
-      formData;
+    const { clientName, address, contactNumber, clientType } = formData;
 
     // Check if all required fields are filled
-    if (
-      !clientName ||
-      !address ||
-      !natureOfBusiness ||
-      !contactNumber ||
-      !clientType
-    ) {
+    if (!clientName || !address || !contactNumber || !clientType) {
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;
@@ -168,6 +174,18 @@ const Clients = ({ user }) => {
       formDataToSend.append("natureOfBusiness", formData.natureOfBusiness);
       formDataToSend.append("contactNumber", formData.contactNumber);
       formDataToSend.append("clientType", formData.clientType);
+      formDataToSend.append("billerName", formData.billerName);
+      formDataToSend.append("billerAddress", formData.billerAddress);
+      formDataToSend.append(
+        "billerContactPerson",
+        formData.billerContactPerson
+      );
+      formDataToSend.append(
+        "billerContactNumber",
+        formData.billerContactNumber
+      );
+      formDataToSend.append("billerTinNumber", formData.billerTinNumber);
+      formDataToSend.append("email", formData.email);
       formDataToSend.append("createdBy", formData.createdBy);
 
       // Add clientPicture if it's selected
@@ -356,8 +374,6 @@ const Clients = ({ user }) => {
     );
   }
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   return (
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
@@ -407,12 +423,12 @@ const Clients = ({ user }) => {
             left: "50%",
             transform: "translate(-50%)",
             width: "80%",
+            maxHeight: "80%",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
-            display: "flex",
-            flexDirection: "column",
             gap: 2,
+            overflowY: "scroll",
           }}
         >
           <Typography variant="h6" component="h2">
@@ -421,15 +437,8 @@ const Clients = ({ user }) => {
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
-          <Grid
-            sx={{
-              flexDirection: "column",
-              gap: 2,
-              overflowY: "scroll",
-              height: "100%",
-            }}
-          >
-            <Grid>
+          <Grid container spacing={2} my={2}>
+            <Grid item xs={12} lg={6}>
               <TextField
                 label="Client Name"
                 name="clientName"
@@ -438,6 +447,11 @@ const Clients = ({ user }) => {
                 fullWidth
                 required
                 autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
               />
               <TextField
                 label="Address"
@@ -447,6 +461,11 @@ const Clients = ({ user }) => {
                 fullWidth
                 required
                 autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
               />
               <TextField
                 label="Nature of Business"
@@ -456,6 +475,11 @@ const Clients = ({ user }) => {
                 fullWidth
                 required
                 autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
               />
               <TextField
                 label="Contact Number"
@@ -465,6 +489,11 @@ const Clients = ({ user }) => {
                 fullWidth
                 required
                 autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
               />
               <TextField
                 label="Client Type"
@@ -476,6 +505,11 @@ const Clients = ({ user }) => {
                 disabled={!!formData.id}
                 fullWidth
                 autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
               >
                 <MenuItem value="GENERATOR">GENERATOR</MenuItem>
                 <MenuItem value="TRANSPORTER">TRANSPORTER</MenuItem>
@@ -484,86 +518,115 @@ const Clients = ({ user }) => {
                 </MenuItem>
                 <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
               </TextField>
+              <TextField
+                label="Email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
             </Grid>
-            <Grid>
-              <Box>
-                <TextField
-                  label="Client Name"
-                  name="clientName"
-                  value={formData.clientName}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  autoComplete="off"
-                />
-                <TextField
-                  label="Address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  autoComplete="off"
-                />
-                <TextField
-                  label="Nature of Business"
-                  name="natureOfBusiness"
-                  value={formData.natureOfBusiness}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  autoComplete="off"
-                />
-                <TextField
-                  label="Contact Number"
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  autoComplete="off"
-                />
-                <TextField
-                  label="Client Type"
-                  name="clientType"
-                  value={formData.clientType}
-                  onChange={handleInputChange}
-                  select
-                  required
-                  disabled={!!formData.id}
-                  fullWidth
-                  autoComplete="off"
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Biller Name"
+                name="billerName"
+                value={formData.billerName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
+              <TextField
+                label="BIller Address"
+                name="billerAddress"
+                value={formData.billerAddress}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
+              <TextField
+                label="Biller Contact Person"
+                name="billerContactPerson"
+                value={formData.billerContactPerson}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
+              <TextField
+                label="Biller Contact Number"
+                name="billerContactNumber"
+                value={formData.billerContactNumber}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
+              <TextField
+                label="Biller TIN Number"
+                name="billerTinNumber"
+                value={formData.billerTinNumber}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
+
+              <input
+                type="file"
+                className="form-control visually-hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+                id="clientPicture"
+                name="clientPicture"
+                style={{ display: "none" }}
+              />
+              <label htmlFor="clientPicture">
+                <Typography>File: {fileName}</Typography>
+                <Button
+                  variant="contained"
+                  component="span"
+                  sx={{ mt: 2, backgroundColor: colors.primary[500] }}
                 >
-                  <MenuItem value="GENERATOR">GENERATOR</MenuItem>
-                  <MenuItem value="TRANSPORTER">TRANSPORTER</MenuItem>
-                  <MenuItem value="INTEGRATED FACILITIES MANAGEMENT">
-                    INTEGRATED FACILITIES MANAGEMENT
-                  </MenuItem>
-                  <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
-                </TextField>
-              </Box>
+                  Upload Client Picture
+                </Button>
+              </label>
             </Grid>
           </Grid>
 
-          <input
-            type="file"
-            className="form-control visually-hidden"
-            accept="image/*"
-            onChange={handleFileChange}
-            id="clientPicture"
-            name="clientPicture"
-            style={{ display: "none" }}
-          />
-          <label htmlFor="clientPicture">
-            <Typography>File: {fileName}</Typography>
-            <Button
-              variant="contained"
-              component="span"
-              sx={{ mt: 2, backgroundColor: colors.primary[500] }}
-            >
-              Upload Client Picture
-            </Button>
-          </label>
           <TextField
             label="Created By"
             name="createdBy"
@@ -575,7 +638,7 @@ const Clients = ({ user }) => {
           />
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             onClick={handleFormSubmit}
           >
             {formData.id ? "Update Client" : "Add Client"}

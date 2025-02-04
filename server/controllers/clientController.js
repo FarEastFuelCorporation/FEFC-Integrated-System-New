@@ -19,6 +19,7 @@ async function createClientController(req, res) {
       billerContactPerson,
       billerContactNumber,
       billerTinNumber,
+      email,
       createdBy,
     } = req.body;
 
@@ -51,6 +52,7 @@ async function createClientController(req, res) {
       billerContactPerson,
       billerContactNumber,
       billerTinNumber,
+      email,
       clientPicture,
       createdBy,
     });
@@ -136,17 +138,17 @@ async function updateClientController(req, res) {
     const updatedClient = await Client.findByPk(id);
 
     if (updatedClient) {
+      updatedClient.clientName = clientName || "";
       // Update client attributes
-      updatedClient.clientName = clientName;
-      updatedClient.address = address;
-      updatedClient.natureOfBusiness = natureOfBusiness;
-      updatedClient.contactNumber = contactNumber;
-      updatedClient.clientType = clientType;
-      updatedClient.billerName = billerName;
-      updatedClient.billerAddress = billerAddress;
-      updatedClient.billerContactPerson = billerContactPerson;
-      updatedClient.billerContactNumber = billerContactNumber;
-      updatedClient.billerTinNumber = billerTinNumber;
+      updatedClient.address = address || "";
+      updatedClient.natureOfBusiness = natureOfBusiness || "";
+      updatedClient.contactNumber = contactNumber || "";
+      updatedClient.clientType = clientType || "";
+      updatedClient.billerName = billerName || "";
+      updatedClient.billerAddress = billerAddress || "";
+      updatedClient.billerContactPerson = billerContactPerson || "";
+      updatedClient.billerContactNumber = billerContactNumber || "";
+      updatedClient.billerTinNumber = billerTinNumber || "";
       updatedClient.updatedBy = createdBy;
       updatedClient.clientPicture = clientPicture;
 

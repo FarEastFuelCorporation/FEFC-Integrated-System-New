@@ -8,6 +8,8 @@ import {
   Button,
   useTheme,
   MenuItem,
+  useMediaQuery,
+  Grid,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -325,7 +327,7 @@ const Clients = ({ user }) => {
         sortable: false,
         width: 60,
         renderCell: (params) =>
-          params.row.createdBy === user.id ? (
+          params.row.createdBy === user.id || user.id === "23108" ? (
             <IconButton
               color="warning"
               onClick={() => handleEditClick(params.row.id)}
@@ -342,7 +344,7 @@ const Clients = ({ user }) => {
         sortable: false,
         width: 60,
         renderCell: (params) =>
-          params.row.createdBy === user.id ? (
+          params.row.createdBy === user.id || user.id === "23108" ? (
             <IconButton
               color="error"
               onClick={() => handleDeleteClick(params.row.id)}
@@ -353,6 +355,8 @@ const Clients = ({ user }) => {
       }
     );
   }
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Box p="20px" width="100% !important" position="relative">
@@ -399,10 +403,10 @@ const Clients = ({ user }) => {
           onSubmit={handleFormSubmit}
           sx={{
             position: "absolute",
-            top: "50%",
+            top: "10%",
             left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
+            transform: "translate(-50%)",
+            width: "80%",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
@@ -417,60 +421,130 @@ const Clients = ({ user }) => {
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
-          <TextField
-            label="Client Name"
-            name="clientName"
-            value={formData.clientName}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            autoComplete="off"
-          />
-          <TextField
-            label="Address"
-            name="address"
-            value={formData.address}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            autoComplete="off"
-          />
-          <TextField
-            label="Nature of Business"
-            name="natureOfBusiness"
-            value={formData.natureOfBusiness}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            autoComplete="off"
-          />
-          <TextField
-            label="Contact Number"
-            name="contactNumber"
-            value={formData.contactNumber}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            autoComplete="off"
-          />
-          <TextField
-            label="Client Type"
-            name="clientType"
-            value={formData.clientType}
-            onChange={handleInputChange}
-            select
-            required
-            disabled={!!formData.id}
-            fullWidth
-            autoComplete="off"
+          <Grid
+            sx={{
+              flexDirection: "column",
+              gap: 2,
+              overflowY: "scroll",
+              height: "100%",
+            }}
           >
-            <MenuItem value="GENERATOR">GENERATOR</MenuItem>
-            <MenuItem value="TRANSPORTER">TRANSPORTER</MenuItem>
-            <MenuItem value="INTEGRATED FACILITIES MANAGEMENT">
-              INTEGRATED FACILITIES MANAGEMENT
-            </MenuItem>
-            <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
-          </TextField>
+            <Grid>
+              <TextField
+                label="Client Name"
+                name="clientName"
+                value={formData.clientName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+              />
+              <TextField
+                label="Address"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+              />
+              <TextField
+                label="Nature of Business"
+                name="natureOfBusiness"
+                value={formData.natureOfBusiness}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+              />
+              <TextField
+                label="Contact Number"
+                name="contactNumber"
+                value={formData.contactNumber}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                autoComplete="off"
+              />
+              <TextField
+                label="Client Type"
+                name="clientType"
+                value={formData.clientType}
+                onChange={handleInputChange}
+                select
+                required
+                disabled={!!formData.id}
+                fullWidth
+                autoComplete="off"
+              >
+                <MenuItem value="GENERATOR">GENERATOR</MenuItem>
+                <MenuItem value="TRANSPORTER">TRANSPORTER</MenuItem>
+                <MenuItem value="INTEGRATED FACILITIES MANAGEMENT">
+                  INTEGRATED FACILITIES MANAGEMENT
+                </MenuItem>
+                <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid>
+              <Box>
+                <TextField
+                  label="Client Name"
+                  name="clientName"
+                  value={formData.clientName}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Nature of Business"
+                  name="natureOfBusiness"
+                  value={formData.natureOfBusiness}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Contact Number"
+                  name="contactNumber"
+                  value={formData.contactNumber}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Client Type"
+                  name="clientType"
+                  value={formData.clientType}
+                  onChange={handleInputChange}
+                  select
+                  required
+                  disabled={!!formData.id}
+                  fullWidth
+                  autoComplete="off"
+                >
+                  <MenuItem value="GENERATOR">GENERATOR</MenuItem>
+                  <MenuItem value="TRANSPORTER">TRANSPORTER</MenuItem>
+                  <MenuItem value="INTEGRATED FACILITIES MANAGEMENT">
+                    INTEGRATED FACILITIES MANAGEMENT
+                  </MenuItem>
+                  <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
+                </TextField>
+              </Box>
+            </Grid>
+          </Grid>
+
           <input
             type="file"
             className="form-control visually-hidden"

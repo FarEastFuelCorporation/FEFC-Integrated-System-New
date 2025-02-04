@@ -364,7 +364,6 @@ const BillingStatementForm = ({
 
     const transpoFee =
       parseFloat(transaction.QuotationTransportation?.unitPrice) || 0;
-    console.log(parseFloat(transpoFee));
     const transpoVatCalculation =
       transaction.QuotationTransportation?.vatCalculation;
     const transpoMode = transaction.QuotationTransportation?.mode;

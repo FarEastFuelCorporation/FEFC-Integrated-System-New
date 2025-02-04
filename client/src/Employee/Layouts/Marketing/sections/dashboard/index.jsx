@@ -109,8 +109,6 @@ const Dashboard = ({ user }) => {
       );
       setLatest8weeks(transformedData);
 
-      console.log(response.data.scheduledTransactionCounts);
-
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);

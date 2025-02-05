@@ -20,7 +20,8 @@ const sequelize = new Sequelize({
     idle: 5000, // Time in ms before releasing an idle connection
   },
   dialectOptions: {
-    connectTimeout: 60000, // Set MySQL connection timeout
+    connectTimeout: 60000,
+    requestTimeout: 60000, // Ensure request timeout is set
   },
 });
 

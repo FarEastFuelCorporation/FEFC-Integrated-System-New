@@ -2,7 +2,7 @@
 
 const BilledTransaction = require("../models/BilledTransaction");
 const BookedTransaction = require("../models/BookedTransaction");
-const { getIncludeOptions } = require("../utils/getBookedTransactions");
+const { getIncludeOptionsVerify } = require("../utils/getBookedTransactions");
 
 // Get Billing controller
 async function getBillingController(req, res) {
@@ -15,7 +15,7 @@ async function getBillingController(req, res) {
       include: {
         model: BookedTransaction,
         as: "BookedTransaction",
-        include: getIncludeOptions(),
+        include: getIncludeOptionsVerify(),
       },
     });
 

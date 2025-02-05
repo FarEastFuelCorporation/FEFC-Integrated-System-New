@@ -4,7 +4,7 @@ const BookedTransaction = require("../models/BookedTransaction");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const Client = require("../models/Client");
 const PlasticTransaction = require("../models/PlasticTransaction");
-const { getIncludeOptions } = require("../utils/getBookedTransactions");
+const { getIncludeOptionsVerify } = require("../utils/getBookedTransactions");
 
 // Get Certificate of Destruction controller
 async function getCertificateController(req, res) {
@@ -17,7 +17,7 @@ async function getCertificateController(req, res) {
       include: {
         model: BookedTransaction,
         as: "BookedTransaction",
-        include: getIncludeOptions(),
+        include: getIncludeOptionsVerify(),
       },
     });
 

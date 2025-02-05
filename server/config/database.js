@@ -16,12 +16,8 @@ const sequelize = new Sequelize({
   pool: {
     max: 100, // Maximum number of connections
     min: 0, // Minimum number of connections
-    acquire: 60000, // Maximum time in ms to acquire a connection
-    idle: 5000, // Time in ms before releasing an idle connection
-  },
-  dialectOptions: {
-    connectTimeout: 60000,
-    requestTimeout: 60000, // Ensure request timeout is set
+    acquire: 120000, // Maximum time in ms to acquire a connection
+    idle: 120000, // Time in ms before releasing an idle connection
   },
 });
 

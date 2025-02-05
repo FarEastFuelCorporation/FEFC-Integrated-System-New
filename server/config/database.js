@@ -19,6 +19,9 @@ const sequelize = new Sequelize({
     acquire: 60000, // Maximum time in ms to acquire a connection
     idle: 5000, // Time in ms before releasing an idle connection
   },
+  dialectOptions: {
+    connectTimeout: 60000, // Set MySQL connection timeout
+  },
 });
 
 module.exports = sequelize;

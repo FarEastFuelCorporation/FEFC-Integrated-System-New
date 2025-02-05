@@ -29,6 +29,8 @@ const BillModal = ({
   setIsIndividualBillingToBill,
   isIndividualWasteToBill,
   setIsIndividualWasteToBill,
+  discount,
+  setDiscount,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -183,6 +185,22 @@ const BillModal = ({
               label="Service Invoice Number"
               inputRef={refs.serviceInvoiceNumberRef}
               defaultValue={formData.serviceInvoiceNumber}
+              fullWidth
+              type="text"
+              required
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+            <TextField
+              label="Discount"
+              name="discountAmount"
+              value={discount}
+              onChange={setDiscount}
               fullWidth
               type="text"
               required

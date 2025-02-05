@@ -37,6 +37,11 @@ const BilledTransaction = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    discountAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: 0,
+    },
     isWasteName: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

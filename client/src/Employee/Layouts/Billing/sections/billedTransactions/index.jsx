@@ -62,7 +62,8 @@ const BilledTransactions = ({ user }) => {
   const [isIndividualBillingToBill, setIsIndividualBillingToBill] =
     useState(false);
   const [isIndividualWasteToBill, setIsIndividualWasteToBill] = useState(false);
-
+  const [discount, setDiscount] = useState(0);
+  console.log(discount);
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
@@ -370,6 +371,8 @@ const BilledTransactions = ({ user }) => {
         setIsIndividualBillingToBill={setIsIndividualBillingToBill}
         isIndividualWasteToBill={isIndividualWasteToBill}
         setIsIndividualWasteToBill={setIsIndividualWasteToBill}
+        discount={discount}
+        setDiscount={setDiscount}
         refs={{
           billedDateRef,
           billedTimeRef,

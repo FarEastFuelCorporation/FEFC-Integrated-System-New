@@ -22,6 +22,10 @@ const BillingStatementHeader = ({
     : amounts.vatExclusive * 0.12 +
       (amounts.vatInclusive - amounts.vatInclusive / 1.12);
 
+  console.log(row);
+  const discount = row.BilledTransaction?.[0]?.discountAmount || 0;
+  console.log(discount);
+
   const termsChargeDays = parseInt(
     row?.QuotationWaste?.Quotation?.termsChargeDays
   );
@@ -260,8 +264,8 @@ const BillingStatementHeader = ({
             <Typography sx={{ fontWeight: "bold" }}>
               {formatNumber(
                 isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.credits.vatInclusive
-                  : credits.vatInclusive
+                  ? groupedTransactions?.totals?.credits.vatInclusive - discount
+                  : credits.vatInclusive + discount
               )}
             </Typography>
           </Box>
@@ -283,12 +287,14 @@ const BillingStatementHeader = ({
                       groupedTransactions?.totals?.amounts.vatExclusive +
                       groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
                       vat -
-                      groupedTransactions?.totals?.credits.vatInclusive
+                      groupedTransactions?.totals?.credits.vatInclusive -
+                      discount
                   : amounts.nonVatable +
                       amounts.vatExclusive +
                       amounts.vatInclusive / 1.12 +
                       vat -
-                      credits.vatInclusive
+                      credits.vatInclusive -
+                      discount
               )}
             </Typography>
           </Box>

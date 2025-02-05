@@ -69,13 +69,19 @@ async function BookedTransactionEmailFormat(
             color: #777;
             margin-top: 20px;
           }
-          .track-link {
-            color: #007bff;
+          .track-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
             text-decoration: none;
             font-weight: bold;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
           }
-          .track-link:hover {
-            text-decoration: underline;
+          .track-button:hover {
+            background-color: #0056b3;
           }
         </style>
       </head>
@@ -123,7 +129,10 @@ async function BookedTransactionEmailFormat(
               </tr>
             </table>
             <p>Please ensure the necessary arrangements are made to facilitate this transaction smoothly.</p>
-            <p>You can <a href="https://system.fareastfuelcorp.com/client" target="_blank" class="track-link">Track Your Transaction</a> with your user credentials.</p>
+            <p>You can track your transaction with your user credentials on our system by clicking the button below:</p>
+            <p style="text-align: center;">
+              <a href="https://system.fareastfuelcorp.com/client" target="_blank" class="track-button">Track Your Transaction</a>
+            </p>
             <p>Thank you for your attention to this matter.</p>
           </div>
           <div class="footer">

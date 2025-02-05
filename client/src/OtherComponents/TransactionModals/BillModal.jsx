@@ -200,7 +200,7 @@ const BillModal = ({
               label="Discount"
               name="discountAmount"
               value={discount}
-              onChange={setDiscount}
+              onChange={(e) => setDiscount(Number(e.target.value) || 0)}
               fullWidth
               type="text"
               required
@@ -257,6 +257,7 @@ const BillModal = ({
             isPerClientToBill={isPerClientToBill}
             isIndividualBillingToBill={isIndividualBillingToBill}
             isIndividualWasteToBill={isIndividualWasteToBill}
+            discount={discount}
           />
         </Box>
       </Modal>

@@ -9,6 +9,7 @@ const BillingStatementHeader = ({
   isIndividualBillingToBill = false,
   groupedTransactions,
   index,
+  discount,
 }) => {
   const today = new Date();
   const datePlusOneMonth = new Date();
@@ -22,9 +23,9 @@ const BillingStatementHeader = ({
     : amounts.vatExclusive * 0.12 +
       (amounts.vatInclusive - amounts.vatInclusive / 1.12);
 
-  console.log(row);
-  const discount = row.BilledTransaction?.[0]?.discountAmount || 0;
-  console.log(discount);
+  const discountAmount = row?.BilledTransaction?.[0]?.discountAmount || 0;
+
+  const toBeDiscount = discountAmount ? discountAmount : discount;
 
   const termsChargeDays = parseInt(
     row?.QuotationWaste?.Quotation?.termsChargeDays
@@ -264,8 +265,9 @@ const BillingStatementHeader = ({
             <Typography sx={{ fontWeight: "bold" }}>
               {formatNumber(
                 isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.credits.vatInclusive - discount
-                  : credits.vatInclusive + discount
+                  ? groupedTransactions?.totals?.credits.vatInclusive -
+                      toBeDiscount
+                  : credits.vatInclusive + toBeDiscount
               )}
             </Typography>
           </Box>
@@ -288,13 +290,13 @@ const BillingStatementHeader = ({
                       groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
                       vat -
                       groupedTransactions?.totals?.credits.vatInclusive -
-                      discount
+                      toBeDiscount
                   : amounts.nonVatable +
                       amounts.vatExclusive +
                       amounts.vatInclusive / 1.12 +
                       vat -
                       credits.vatInclusive -
-                      discount
+                      toBeDiscount
               )}
             </Typography>
           </Box>

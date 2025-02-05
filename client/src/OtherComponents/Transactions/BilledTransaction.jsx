@@ -9,7 +9,7 @@ import { timestampDate, parseTimeString } from "../Functions";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-const BilledTransaction = ({ row, user }) => {
+const BilledTransaction = ({ row, user, discount }) => {
   const certificateRef = useRef();
   const [isRendering, setIsRendering] = useState(false);
   const theme = useTheme();
@@ -232,7 +232,11 @@ const BilledTransaction = ({ row, user }) => {
           {isBilled && row.statusId < 11 && (
             <>
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
-                <BillingStatementForm statementRef={certificateRef} row={row} />
+                <BillingStatementForm
+                  statementRef={certificateRef}
+                  row={row}
+                  discount={discount}
+                />
               </Box>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <Button

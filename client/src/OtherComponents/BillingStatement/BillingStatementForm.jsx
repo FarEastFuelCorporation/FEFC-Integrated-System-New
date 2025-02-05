@@ -35,6 +35,7 @@ const BillingStatementForm = ({
   isPerClientToBill = false,
   isIndividualBillingToBill = false,
   isIndividualWasteToBill = false,
+  discount,
 }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
@@ -595,6 +596,7 @@ const BillingStatementForm = ({
                 row={row}
                 amounts={amounts}
                 credits={credits}
+                discount={discount}
               />
             </Box>
 
@@ -839,6 +841,7 @@ const BillingStatementForm = ({
                             }
                             groupedTransactions={groupedTransactions[index]}
                             index={index}
+                            discount={discount}
                           />
                         </Box>
                       )}
@@ -854,6 +857,7 @@ const BillingStatementForm = ({
                             }
                             groupedTransactions={groupedTransactions[index]}
                             index={index}
+                            discount={discount}
                           />
                         </Box>
                       )}

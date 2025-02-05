@@ -63,7 +63,7 @@ const BilledTransactions = ({ user }) => {
     useState(false);
   const [isIndividualWasteToBill, setIsIndividualWasteToBill] = useState(false);
   const [discount, setDiscount] = useState(0);
-  console.log(discount);
+
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
@@ -145,6 +145,8 @@ const BilledTransactions = ({ user }) => {
       createdBy: user.id,
     });
 
+    setDiscount(newRow.BilledTransaction?.[0]?.discountAmount || 0);
+
     setOpenModal(true);
   };
 
@@ -188,6 +190,8 @@ const BilledTransactions = ({ user }) => {
         statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
+
+      setDiscount(billedTransaction?.[0]?.discountAmount || discount);
 
       setOpenModal(true);
     } else {
@@ -275,6 +279,7 @@ const BilledTransactions = ({ user }) => {
       billingNumber: billingNumberRef.current.value,
       serviceInvoiceNumber: serviceInvoiceNumberRef.current.value,
       remarks: remarksRef.current.value,
+      discount: discount,
     };
 
     // Perform client-side validation
@@ -351,6 +356,7 @@ const BilledTransactions = ({ user }) => {
         setOpenTransactionModal={setOpenTransactionModal}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
+        discount={discount}
       />
       <Modal
         user={user}

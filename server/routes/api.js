@@ -6,7 +6,7 @@ const router = express.Router();
 // Include your routes
 const authRoutes = require("./auth");
 const othersRoutes = require("./others");
-const attendanceRoutes = require("./attendanceRoutes");
+// const attendanceRoutes = require("./attendanceRoutes");
 const travelOrderRoutes = require("./travelOrderRoutes");
 const travelOrderVerifyRoutes = require("./travelOrderVerifyRoutes");
 const leaveRoutes = require("./leaveRoutes");
@@ -60,7 +60,7 @@ const { error404Controller } = require("../controllers/othersController");
 
 router.use(authRoutes);
 router.use(othersRoutes);
-router.use("/attendance", attendanceRoutes);
+// router.use("/attendance", attendanceRoutes);
 router.use("/certificate", certificateRoutes);
 router.use("/billing", billingRoutes);
 router.use("/quotationForm", quotationFormRoutes);

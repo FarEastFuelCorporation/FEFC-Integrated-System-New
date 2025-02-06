@@ -89,13 +89,14 @@ const {
 } = require("./syncronize");
 const SortedWasteTransaction = require("./models/SortedWasteTransaction");
 const BilledTransaction = require("./models/BilledTransaction");
+const ReceivedTransaction = require("./models/ReceivedTransaction");
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    // await BilledTransaction.sync({ alter: true });
+    await ReceivedTransaction.sync({ alter: true });
 
     // await handleAttendanceSync();
 

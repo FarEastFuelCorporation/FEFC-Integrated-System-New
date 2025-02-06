@@ -27,6 +27,15 @@ const BillingStatementHeader = ({
 
   const toBeDiscount = discountAmount ? discountAmount : discount;
 
+  const hasDemurrage =
+    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.hasDemurrage;
+  const demurrageDays =
+    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.demurrageDays;
+
+  const demurrageFee = parseFloat(row?.QuotationTransportation?.unitPrice);
+  const vatCalculation = row?.QuotationTransportation?.vatCalculation;
+  // const vatCalculation = "VAT INCLUSIVE";
+
   const termsChargeDays = parseInt(
     row?.QuotationWaste?.Quotation?.termsChargeDays
   );
@@ -199,17 +208,25 @@ const BillingStatementHeader = ({
               Total Amount Payable:
             </Typography>
             <Typography sx={{ fontWeight: "bold" }}>
-              {formatNumber(
-                isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.amounts.nonVatable +
-                      groupedTransactions?.totals?.amounts.vatExclusive +
-                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
-                      vat
-                  : amounts.nonVatable +
-                      amounts.vatExclusive +
-                      amounts.vatInclusive / 1.12 +
-                      vat
-              )}
+              {hasDemurrage
+                ? vatCalculation === "VAT EXCLUSIVE"
+                  ? formatNumber(
+                      demurrageDays * demurrageFee +
+                        demurrageDays * demurrageFee * 0.12
+                    )
+                  : formatNumber(demurrageDays * demurrageFee)
+                : formatNumber(
+                    isIndividualBillingToBill
+                      ? groupedTransactions?.totals?.amounts.nonVatable +
+                          groupedTransactions?.totals?.amounts.vatExclusive +
+                          groupedTransactions?.totals?.amounts.vatInclusive /
+                            1.12 +
+                          vat
+                      : amounts.nonVatable +
+                          amounts.vatExclusive +
+                          amounts.vatInclusive / 1.12 +
+                          vat
+                  )}
             </Typography>
           </Box>
           <Box
@@ -220,11 +237,15 @@ const BillingStatementHeader = ({
           >
             <Typography>Total Non-Vatable Sale:</Typography>
             <Typography>
-              {formatNumber(
-                isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.amounts.nonVatable
-                  : amounts.nonVatable
-              )}
+              {hasDemurrage
+                ? vatCalculation === "NON VATABLE"
+                  ? formatNumber(demurrageDays * demurrageFee)
+                  : 0
+                : formatNumber(
+                    isIndividualBillingToBill
+                      ? groupedTransactions?.totals?.amounts.nonVatable
+                      : amounts.nonVatable
+                  )}
             </Typography>
           </Box>
           <Box
@@ -235,12 +256,19 @@ const BillingStatementHeader = ({
           >
             <Typography>Total Vatable Sale:</Typography>
             <Typography>
-              {formatNumber(
-                isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.amounts.vatExclusive +
-                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12
-                  : amounts.vatExclusive + amounts.vatInclusive / 1.12
-              )}
+              {hasDemurrage
+                ? vatCalculation === "VAT EXCLUSIVE"
+                  ? formatNumber(demurrageDays * demurrageFee)
+                  : vatCalculation === "VAT INCLUSIVE"
+                  ? formatNumber((demurrageDays * demurrageFee) / 1.12)
+                  : 0
+                : formatNumber(
+                    isIndividualBillingToBill
+                      ? groupedTransactions?.totals?.amounts.vatExclusive +
+                          groupedTransactions?.totals?.amounts.vatInclusive /
+                            1.12
+                      : amounts.vatExclusive + amounts.vatInclusive / 1.12
+                  )}
             </Typography>
           </Box>
           <Box
@@ -250,7 +278,18 @@ const BillingStatementHeader = ({
             }}
           >
             <Typography>VAT (12%):</Typography>
-            <Typography>{formatNumber(vat)}</Typography>
+            <Typography>
+              {hasDemurrage
+                ? vatCalculation === "VAT EXCLUSIVE"
+                  ? formatNumber(demurrageDays * demurrageFee * 0.12)
+                  : vatCalculation === "VAT INCLUSIVE"
+                  ? formatNumber(
+                      demurrageDays * demurrageFee -
+                        (demurrageDays * demurrageFee) / 1.12
+                    )
+                  : 0
+                : formatNumber(vat)}
+            </Typography>
           </Box>
           <Box
             sx={{
@@ -283,21 +322,30 @@ const BillingStatementHeader = ({
               Total Amount Due:
             </Typography>
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-              {formatNumber(
-                isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.amounts.nonVatable +
-                      groupedTransactions?.totals?.amounts.vatExclusive +
-                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
-                      vat -
-                      groupedTransactions?.totals?.credits.vatInclusive -
-                      toBeDiscount
-                  : amounts.nonVatable +
-                      amounts.vatExclusive +
-                      amounts.vatInclusive / 1.12 +
-                      vat -
-                      credits.vatInclusive -
-                      toBeDiscount
-              )}
+              {hasDemurrage
+                ? vatCalculation === "VAT EXCLUSIVE"
+                  ? formatNumber(
+                      demurrageDays * demurrageFee +
+                        demurrageDays * demurrageFee * 0.12 -
+                        toBeDiscount
+                    )
+                  : formatNumber(demurrageDays * demurrageFee + toBeDiscount)
+                : formatNumber(
+                    isIndividualBillingToBill
+                      ? groupedTransactions?.totals?.amounts.nonVatable +
+                          groupedTransactions?.totals?.amounts.vatExclusive +
+                          groupedTransactions?.totals?.amounts.vatInclusive /
+                            1.12 +
+                          vat -
+                          groupedTransactions?.totals?.credits.vatInclusive -
+                          toBeDiscount
+                      : amounts.nonVatable +
+                          amounts.vatExclusive +
+                          amounts.vatInclusive / 1.12 +
+                          vat -
+                          credits.vatInclusive -
+                          toBeDiscount
+                  )}
             </Typography>
           </Box>
           <Box

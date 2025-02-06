@@ -120,6 +120,7 @@ const BillingStatementForm = ({
   let isPerClient = false;
   let isIndividualBilling = false;
   let isIndividualWaste = false;
+  let hasDemurrage = false;
 
   transactions.forEach((transaction) => {
     const hasFixedRate = transaction?.QuotationWaste?.hasFixedRate;
@@ -149,7 +150,7 @@ const BillingStatementForm = ({
       transaction?.BilledTransaction?.[0]?.isIndividualBilling;
     isIndividualWaste = transaction?.BilledTransaction?.[0]?.isIndividualWaste;
 
-    const hasDemurrage =
+    hasDemurrage =
       transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
         ?.hasDemurrage || false;
     const demurrageDays =
@@ -756,7 +757,10 @@ const BillingStatementForm = ({
                               waste[9] === "BUYING" ? "red" : "black"
                             )}
                           >
-                            {hasFixedRate && isMonthly && waste[0] !== ""
+                            {!hasDemurrage &&
+                            hasFixedRate &&
+                            isMonthly &&
+                            waste[0] !== ""
                               ? ""
                               : waste[6]}
                           </TableCell>
@@ -769,7 +773,10 @@ const BillingStatementForm = ({
                               waste[9] === "BUYING" ? "red" : "black"
                             )}
                           >
-                            {hasFixedRate && isMonthly && waste[0] !== ""
+                            {!hasDemurrage &&
+                            hasFixedRate &&
+                            isMonthly &&
+                            waste[0] !== ""
                               ? ""
                               : waste[7]}
                           </TableCell>
@@ -782,7 +789,10 @@ const BillingStatementForm = ({
                               waste[9] === "BUYING" ? "red" : "black"
                             )}
                           >
-                            {hasFixedRate && isMonthly && waste[0] !== ""
+                            {!hasDemurrage &&
+                            hasFixedRate &&
+                            isMonthly &&
+                            waste[0] !== ""
                               ? ""
                               : waste[8]}
                           </TableCell>

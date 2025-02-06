@@ -34,6 +34,7 @@ const BillingContent = ({
   const vatCalculation = transactions?.[0]?.QuotationWaste?.vatCalculation;
   const isMonthly = transactions?.[0]?.QuotationWaste?.isMonthly;
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
+  let hasDemurrage = false;
 
   let totalWeight = new Decimal(0);
 
@@ -264,7 +265,7 @@ const BillingContent = ({
                 let clientNames = [];
                 let aggregatedWasteTransactions;
 
-                const hasDemurrage =
+                hasDemurrage =
                   transaction?.ScheduledTransaction?.[0]
                     ?.ReceivedTransaction?.[0]?.hasDemurrage || false;
                 const demurrageDays =
@@ -418,7 +419,7 @@ const BillingContent = ({
                     waste.QuotationWaste?.hasFixedRate;
 
                   return (
-                    <>
+                    <Box>
                       {newClient && isPerClientToBill && (
                         <TableRow
                           key={`wasteH-${idx}`}
@@ -823,7 +824,7 @@ const BillingContent = ({
                             )}
                           </TableRow>
                         )}
-                    </>
+                    </Box>
                   );
                 });
 
@@ -908,67 +909,61 @@ const BillingContent = ({
                   ];
 
                 // Add the transportation row if applicable
-                const demurrageRows = transaction?.QuotationTransportation
-                  ?.mode === "CHARGE" &&
-                  isTransportation &&
-                  hasTransportation &&
-                  hasDemurrage && [
-                    <TableRow
-                      key={`demurrage-${index}`}
-                      sx={{ border: "black" }}
+
+                const demurrageRows = [
+                  <TableRow key={`demurrage-${index}`} sx={{ border: "black" }}>
+                    <TableCell sx={bodyCellStyles({ width: 60 })}>
+                      {formatDate2(scheduledTransaction.scheduledDate)}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {invoiceNumber}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles()}>
+                      {`DEMURRAGE FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 60,
+                        notCenter: true,
+                      })}
                     >
-                      <TableCell sx={bodyCellStyles({ width: 60 })}>
-                        {formatDate2(scheduledTransaction.scheduledDate)}
-                      </TableCell>
-                      <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
-                      <TableCell sx={bodyCellStyles({ width: 40 })}>
-                        {invoiceNumber}
-                      </TableCell>
-                      <TableCell sx={bodyCellStyles()}>
-                        {`DEMURRAGE FEE ${transaction.QuotationTransportation?.VehicleType.typeOfVehicle}`}
-                      </TableCell>
-                      <TableCell
-                        sx={bodyCellStyles({
-                          width: 60,
-                          notCenter: true,
-                        })}
-                      >
-                        {`${formatNumber2(demurrageDays)}`}
-                      </TableCell>
-                      <TableCell sx={bodyCellStyles({ width: 40 })}>
-                        {transaction.QuotationTransportation?.unit}
-                      </TableCell>
-                      <TableCell
-                        sx={bodyCellStyles({
-                          width: 80,
-                          notCenter: true,
-                        })}
-                      >
-                        {formatNumber2(
+                      {`${formatNumber2(demurrageDays)}`}
+                    </TableCell>
+                    <TableCell sx={bodyCellStyles({ width: 40 })}>
+                      {transaction.QuotationTransportation?.unit}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 80,
+                        notCenter: true,
+                      })}
+                    >
+                      {formatNumber2(
+                        transaction.QuotationTransportation?.unitPrice
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 80,
+                        notCenter: true,
+                      })}
+                    >
+                      {formatNumber(
+                        demurrageDays *
                           transaction.QuotationTransportation?.unitPrice
-                        )}
-                      </TableCell>
-                      <TableCell
-                        sx={bodyCellStyles({
-                          width: 80,
-                          notCenter: true,
-                        })}
-                      >
-                        {formatNumber(
-                          demurrageDays *
-                            transaction.QuotationTransportation?.unitPrice
-                        )}
-                      </TableCell>
-                      <TableCell
-                        sx={bodyCellStyles({
-                          width: 85,
-                          isLastCell: true,
-                        })}
-                      >
-                        {transaction.QuotationTransportation?.vatCalculation}
-                      </TableCell>
-                    </TableRow>,
-                  ];
+                      )}
+                    </TableCell>
+                    <TableCell
+                      sx={bodyCellStyles({
+                        width: 85,
+                        isLastCell: true,
+                      })}
+                    >
+                      {transaction.QuotationTransportation?.vatCalculation}
+                    </TableCell>
+                  </TableRow>,
+                ];
 
                 // Combine waste and transportation rows for alternating display
                 const combinedRows = [];
@@ -983,6 +978,10 @@ const BillingContent = ({
                   if (hasDemurrage) {
                     combinedRows.push(demurrageRows[0]); // Only one transpo row per transaction
                   }
+                }
+
+                if (hasDemurrage) {
+                  combinedRows.push(demurrageRows[0]); // Only one transpo row per transaction
                 }
 
                 if (index !== transactions.length - 1) {
@@ -1005,7 +1004,7 @@ const BillingContent = ({
 
                 return combinedRows;
               })}
-            {hasFixedRate && isMonthly && (
+            {!hasDemurrage && hasFixedRate && isMonthly && (
               <TableRow key={`add-${1}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -1020,7 +1019,7 @@ const BillingContent = ({
                 ></TableCell>
               </TableRow>
             )}
-            {hasFixedRate && isMonthly && (
+            {!hasDemurrage && hasFixedRate && isMonthly && (
               <TableRow key={`add-${2}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -1038,7 +1037,7 @@ const BillingContent = ({
               </TableRow>
             )}
 
-            {hasFixedRate && isMonthly && (
+            {!hasDemurrage && hasFixedRate && isMonthly && (
               <TableRow key={`add-${3}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -1065,7 +1064,8 @@ const BillingContent = ({
                 </TableCell>
               </TableRow>
             )}
-            {hasFixedRate &&
+            {!hasDemurrage &&
+              hasFixedRate &&
               isMonthly &&
               fixedWeight !== 0 &&
               totalWeight.toNumber() > fixedWeight && (

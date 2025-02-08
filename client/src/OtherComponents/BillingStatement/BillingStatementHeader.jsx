@@ -304,7 +304,7 @@ const BillingStatementHeader = ({
             <Typography sx={{ fontWeight: "bold" }}>LESS:</Typography>
             <Typography sx={{ fontWeight: "bold" }}>
               {isChargeToProcess
-                ? 0
+                ? formatNumber(0)
                 : formatNumber(
                     isIndividualBillingToBill
                       ? groupedTransactions?.totals?.credits.vatInclusive -

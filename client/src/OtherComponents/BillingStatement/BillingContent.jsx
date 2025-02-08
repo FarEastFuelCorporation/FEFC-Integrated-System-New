@@ -37,6 +37,8 @@ const BillingContent = ({
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
   let hasDemurrage = false;
 
+  console.log(isChargeToProcess);
+
   let totalWeight = new Decimal(0);
 
   const firstPageHeight = pageHeight - headerHeight;
@@ -390,6 +392,8 @@ const BillingContent = ({
                   const excludeBuying =
                     isChargeToProcess && mode === "BUYING" ? true : false;
 
+                  console.log(isChargeToProcess);
+                  console.log(mode);
                   console.log(excludeBuying);
 
                   const usedWeight =

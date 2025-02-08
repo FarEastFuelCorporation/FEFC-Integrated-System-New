@@ -452,7 +452,9 @@ const BillingStatementForm = ({
     ? isIndividualWaste
     : isIndividualWasteToBill;
 
-  const isChargeToToProcess = isChargeOnly ? isChargeOnly : isChargeToBill;
+  const isChargeToProcess = isChargeOnly ? isChargeOnly : isChargeToBill;
+
+  console.log(isChargeToProcess);
 
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {
@@ -602,6 +604,7 @@ const BillingStatementForm = ({
                 amounts={amounts}
                 credits={credits}
                 discount={discount}
+                isChargeToProcess={isChargeToProcess}
               />
             </Box>
 
@@ -627,7 +630,7 @@ const BillingStatementForm = ({
                     : isIndividualBillingToBill
                 }
                 isIndividualWasteToProcess={isIndividualWasteToProcess}
-                isChargeToToProcess={isChargeToToProcess}
+                isChargeToProcess={isChargeToProcess}
               />
             </Box>
 
@@ -857,6 +860,7 @@ const BillingStatementForm = ({
                             groupedTransactions={groupedTransactions[index]}
                             index={index}
                             discount={discount}
+                            isChargeToProcess={isChargeToProcess}
                           />
                         </Box>
                       )}
@@ -873,6 +877,7 @@ const BillingStatementForm = ({
                             groupedTransactions={groupedTransactions[index]}
                             index={index}
                             discount={discount}
+                            isChargeToProcess={isChargeToProcess}
                           />
                         </Box>
                       )}

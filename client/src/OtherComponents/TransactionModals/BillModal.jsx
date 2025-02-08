@@ -127,7 +127,7 @@ const BillModal = ({
                   color="secondary"
                 />
               }
-              label="Charge Only"
+              label="Exclude Buying"
             />
             {formData.clientType === "TRP" && (
               <>

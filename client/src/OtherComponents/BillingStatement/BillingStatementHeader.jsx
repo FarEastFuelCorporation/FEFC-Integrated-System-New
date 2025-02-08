@@ -10,6 +10,7 @@ const BillingStatementHeader = ({
   groupedTransactions,
   index,
   discount,
+  isChargeToProcess,
 }) => {
   const today = new Date();
   const datePlusOneMonth = new Date();
@@ -302,12 +303,14 @@ const BillingStatementHeader = ({
           >
             <Typography sx={{ fontWeight: "bold" }}>LESS:</Typography>
             <Typography sx={{ fontWeight: "bold" }}>
-              {formatNumber(
-                isIndividualBillingToBill
-                  ? groupedTransactions?.totals?.credits.vatInclusive -
-                      toBeDiscount
-                  : credits.vatInclusive + toBeDiscount
-              )}
+              {isChargeToProcess
+                ? 0
+                : formatNumber(
+                    isIndividualBillingToBill
+                      ? groupedTransactions?.totals?.credits.vatInclusive -
+                          toBeDiscount
+                      : credits.vatInclusive + toBeDiscount
+                  )}
             </Typography>
           </Box>
           <Box
@@ -337,13 +340,16 @@ const BillingStatementHeader = ({
                           groupedTransactions?.totals?.amounts.vatInclusive /
                             1.12 +
                           vat -
-                          groupedTransactions?.totals?.credits.vatInclusive -
+                          (isChargeToProcess
+                            ? 0
+                            : groupedTransactions?.totals?.credits
+                                .vatInclusive) -
                           toBeDiscount
                       : amounts.nonVatable +
                           amounts.vatExclusive +
                           amounts.vatInclusive / 1.12 +
                           vat -
-                          credits.vatInclusive -
+                          (isChargeToProcess ? 0 : credits.vatInclusive) -
                           toBeDiscount
                   )}
             </Typography>

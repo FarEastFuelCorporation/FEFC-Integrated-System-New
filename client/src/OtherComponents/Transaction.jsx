@@ -202,7 +202,7 @@ const Transaction = ({
       flex: 1,
       minWidth: 200,
       valueGetter: (params) => {
-        return params.row.QuotationWaste.wasteName;
+        return params.row.QuotationWaste?.wasteName;
       },
       renderCell: renderCellWithWrapText,
     },

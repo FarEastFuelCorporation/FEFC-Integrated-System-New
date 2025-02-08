@@ -23,7 +23,7 @@ const BillingContent = ({
   isPerClientToBill = false,
   isIndividualBillingToBill = false,
   isIndividualWasteToProcess,
-  isChargeToToProcess,
+  isChargeToProcess,
 }) => {
   const wasteTableRef = useRef(null);
 
@@ -385,6 +385,13 @@ const BillingContent = ({
                   const fontColor =
                     waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
 
+                  const mode = waste.QuotationWaste.mode;
+
+                  const excludeBuying =
+                    isChargeToProcess && mode === "BUYING" ? true : false;
+
+                  console.log(excludeBuying);
+
                   const usedWeight =
                     typeOfWeight === "CLIENT WEIGHT"
                       ? waste.clientWeight
@@ -421,7 +428,7 @@ const BillingContent = ({
 
                   return (
                     <Box>
-                      {newClient && isPerClientToBill && (
+                      {!excludeBuying && newClient && isPerClientToBill && (
                         <TableRow
                           key={`wasteH-${idx}`}
                           sx={{ border: "black" }}
@@ -542,115 +549,107 @@ const BillingContent = ({
                           )}
                         </TableRow>
                       )}
-                      <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 60, color: fontColor }),
-                          }}
-                        >
-                          {formatDate2(scheduledTransaction.scheduledDate)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
-                          }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
-                          }}
-                        >
-                          {invoiceNumber}
-                        </TableCell>
-                        <TableCell
-                          sx={{ ...bodyCellStyles({ color: fontColor }) }}
-                        >
-                          {hasFixedRateIndividual && !isMonthly && fixedWeight
-                            ? isWasteNameToBill
-                              ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
-                              : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
-                            : isWasteNameToBill
-                            ? waste.wasteName
-                            : waste.QuotationWaste.wasteName}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 60,
-                              notCenter: true,
-                              color: fontColor,
-                            }),
-                          }}
-                        >
-                          {hasFixedRateIndividual &&
-                          !isMonthly &&
-                          usedWeight > fixedWeight
-                            ? fixedWeight
-                              ? formatNumber2(fixedWeight)
-                              : formatNumber2(1)
-                            : formatNumber2(new Decimal(usedWeight).toNumber())}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
-                          }}
-                        >
-                          {hasFixedRateIndividual && !fixedWeight
-                            ? "LOT"
-                            : waste.QuotationWaste.unit}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 80,
-                              notCenter: true,
-                              color: fontColor,
-                            }),
-                          }}
-                        >
-                          {hasFixedRateIndividual && !fixedWeight
-                            ? formatNumber2(waste.QuotationWaste.fixedPrice)
-                            : formatNumber2(waste.QuotationWaste.unitPrice)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 80,
-                              notCenter: true,
-                              color: fontColor,
-                            }),
-                          }}
-                        >
-                          {hasFixedRateIndividual && !isMonthly
-                            ? formatNumber2(fixedPrice)
-                            : formatNumber(
-                                new Decimal(usedWeight).toNumber() *
-                                  waste.QuotationWaste.unitPrice
-                              )}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 85,
-                              isLastCell: true,
-                              color: fontColor,
-                            }),
-                          }}
-                        >
-                          {waste.QuotationWaste.vatCalculation}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            ...bodyCellStyles({
-                              width: 85,
-                              isLastCell: true,
-                              color: fontColor,
-                            }),
-                          }}
-                        >
-                          {waste.QuotationWaste.mode}
-                        </TableCell>
-                        {isWasteName && (
+                      {!excludeBuying && (
+                        <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 60,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {formatDate2(scheduledTransaction.scheduledDate)}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {invoiceNumber}
+                          </TableCell>
+                          <TableCell
+                            sx={{ ...bodyCellStyles({ color: fontColor }) }}
+                          >
+                            {hasFixedRateIndividual && !isMonthly && fixedWeight
+                              ? isWasteNameToBill
+                                ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                                : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                              : isWasteNameToBill
+                              ? waste.wasteName
+                              : waste.QuotationWaste.wasteName}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 60,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {hasFixedRateIndividual &&
+                            !isMonthly &&
+                            usedWeight > fixedWeight
+                              ? fixedWeight
+                                ? formatNumber2(fixedWeight)
+                                : formatNumber2(1)
+                              : formatNumber2(
+                                  new Decimal(usedWeight).toNumber()
+                                )}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 40,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {hasFixedRateIndividual && !fixedWeight
+                              ? "LOT"
+                              : waste.QuotationWaste.unit}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {hasFixedRateIndividual && !fixedWeight
+                              ? formatNumber2(waste.QuotationWaste.fixedPrice)
+                              : formatNumber2(waste.QuotationWaste.unitPrice)}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {hasFixedRateIndividual && !isMonthly
+                              ? formatNumber2(fixedPrice)
+                              : formatNumber(
+                                  new Decimal(usedWeight).toNumber() *
+                                    waste.QuotationWaste.unitPrice
+                                )}
+                          </TableCell>
                           <TableCell
                             sx={{
                               ...bodyCellStyles({
@@ -660,24 +659,48 @@ const BillingContent = ({
                               }),
                             }}
                           >
-                            {wasteName}
+                            {waste.QuotationWaste.vatCalculation}
                           </TableCell>
-                        )}
+                          <TableCell
+                            sx={{
+                              ...bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                                color: fontColor,
+                              }),
+                            }}
+                          >
+                            {waste.QuotationWaste.mode}
+                          </TableCell>
+                          {isWasteName && (
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {wasteName}
+                            </TableCell>
+                          )}
 
-                        {isWasteName && (
-                          <TableCell
-                            sx={{
-                              ...bodyCellStyles({
-                                width: 85,
-                                isLastCell: true,
-                                color: fontColor,
-                              }),
-                            }}
-                          >
-                            {isWasteName ? "true" : "false"}
-                          </TableCell>
-                        )}
-                      </TableRow>
+                          {isWasteName && (
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {isWasteName ? "true" : "false"}
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      )}
                       {hasFixedRateIndividual &&
                         !isMonthly &&
                         fixedWeight &&

@@ -36,6 +36,7 @@ const BilledTransactions = ({ user }) => {
     isPerClient: false,
     isIndividualBilling: false,
     isIndividualWaste: false,
+    isChargeOnly: false,
     billedAmount: 0,
     remarks: "",
     statusId: 10,
@@ -62,6 +63,7 @@ const BilledTransactions = ({ user }) => {
   const [isIndividualBillingToBill, setIsIndividualBillingToBill] =
     useState(false);
   const [isIndividualWasteToBill, setIsIndividualWasteToBill] = useState(false);
+  const [isChargeToBill, setIsChargeToBill] = useState(false);
   const [discount, setDiscount] = useState(0);
 
   // Fetch data function
@@ -139,13 +141,14 @@ const BilledTransactions = ({ user }) => {
       isPerClient: false,
       isIndividualBilling: false,
       isIndividualWaste: false,
+      isChargeOnly: false,
       billedAmount: 0,
       remarks: "",
       statusId: 10,
       createdBy: user.id,
     });
 
-    setDiscount(newRow.BilledTransaction?.[0]?.discountAmount || 0);
+    setDiscount(newRow?.BilledTransaction?.[0]?.discountAmount || 0);
 
     setOpenModal(true);
   };
@@ -185,6 +188,7 @@ const BilledTransactions = ({ user }) => {
         isPerClient: billedTransaction.isPerClient,
         isIndividualBilling: billedTransaction.isIndividualBilling,
         isIndividualWaste: billedTransaction.isIndividualWaste,
+        isChargeOnly: billedTransaction.isChargeOnly,
         billedAmount: billedTransaction.billedAmount,
         remarks: billedTransaction.remarks,
         statusId: typeToEdit.statusId,
@@ -377,6 +381,8 @@ const BilledTransactions = ({ user }) => {
         setIsIndividualBillingToBill={setIsIndividualBillingToBill}
         isIndividualWasteToBill={isIndividualWasteToBill}
         setIsIndividualWasteToBill={setIsIndividualWasteToBill}
+        isChargeToBill={isChargeToBill}
+        setIsChargeToBill={setIsChargeToBill}
         discount={discount}
         setDiscount={setDiscount}
         refs={{

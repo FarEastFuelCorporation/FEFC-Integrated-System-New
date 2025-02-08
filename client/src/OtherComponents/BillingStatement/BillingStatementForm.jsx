@@ -35,6 +35,7 @@ const BillingStatementForm = ({
   isPerClientToBill = false,
   isIndividualBillingToBill = false,
   isIndividualWasteToBill = false,
+  isChargeToBill = false,
   discount,
 }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -120,6 +121,7 @@ const BillingStatementForm = ({
   let isPerClient = false;
   let isIndividualBilling = false;
   let isIndividualWaste = false;
+  let isChargeOnly = false;
   let hasDemurrage = false;
 
   transactions.forEach((transaction) => {
@@ -450,6 +452,8 @@ const BillingStatementForm = ({
     ? isIndividualWaste
     : isIndividualWasteToBill;
 
+  const isChargeToToProcess = isChargeOnly ? isChargeOnly : isChargeToBill;
+
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {
       // Extract invoiceNumber from BilledTransaction
@@ -623,6 +627,7 @@ const BillingStatementForm = ({
                     : isIndividualBillingToBill
                 }
                 isIndividualWasteToProcess={isIndividualWasteToProcess}
+                isChargeToToProcess={isChargeToToProcess}
               />
             </Box>
 

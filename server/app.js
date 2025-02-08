@@ -96,7 +96,7 @@ async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    await ReceivedTransaction.sync({ alter: true });
+    // await BilledTransaction.sync({ alter: true });
 
     // await handleAttendanceSync();
 

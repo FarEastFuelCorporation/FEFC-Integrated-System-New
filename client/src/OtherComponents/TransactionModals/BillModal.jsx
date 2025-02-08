@@ -29,6 +29,8 @@ const BillModal = ({
   setIsIndividualBillingToBill,
   isIndividualWasteToBill,
   setIsIndividualWasteToBill,
+  isChargeToBill,
+  setIsChargeToBill,
   discount,
   setDiscount,
 }) => {
@@ -57,6 +59,13 @@ const BillModal = ({
     const isChecked = e.target.checked;
     setIsIndividualWasteToBill(isChecked); // Update the individual state
     setFormData({ ...formData, isIndividualWaste: isChecked }); // Update formData state
+  };
+
+  const handleCheckboxChange5 = (e) => {
+    const isChecked = e.target.checked;
+    console.log(isChecked);
+    setIsChargeToBill(isChecked); // Update the individual state
+    setFormData({ ...formData, isChargeOnly: isChecked }); // Update formData state
   };
 
   return (
@@ -109,6 +118,16 @@ const BillModal = ({
                 />
               }
               label="By Individual Waste"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isChargeOnly}
+                  onChange={handleCheckboxChange5}
+                  color="secondary"
+                />
+              }
+              label="Charge Only"
             />
             {formData.clientType === "TRP" && (
               <>
@@ -257,6 +276,7 @@ const BillModal = ({
             isPerClientToBill={isPerClientToBill}
             isIndividualBillingToBill={isIndividualBillingToBill}
             isIndividualWasteToBill={isIndividualWasteToBill}
+            isChargeToBill={isChargeToBill}
             discount={discount}
           />
         </Box>

@@ -23,6 +23,7 @@ const BillingContent = ({
   isPerClientToBill = false,
   isIndividualBillingToBill = false,
   isIndividualWasteToProcess,
+  isChargeToToProcess,
 }) => {
   const wasteTableRef = useRef(null);
 

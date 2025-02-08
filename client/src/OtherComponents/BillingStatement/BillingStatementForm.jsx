@@ -454,8 +454,6 @@ const BillingStatementForm = ({
 
   const isChargeToProcess = isChargeOnly ? isChargeOnly : isChargeToBill;
 
-  console.log(isChargeToProcess);
-
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {
       // Extract invoiceNumber from BilledTransaction
@@ -630,7 +628,6 @@ const BillingStatementForm = ({
                     : isIndividualBillingToBill
                 }
                 isIndividualWasteToProcess={isIndividualWasteToProcess}
-                isChargeToProcess={isChargeToProcess}
               />
             </Box>
 
@@ -664,147 +661,155 @@ const BillingStatementForm = ({
 
                   const waste = item; // Assuming item contains waste details
 
+                  // Check if we should include this row
+                  const shouldIncludeRow =
+                    !isChargeToProcess || waste[9] !== "BUYING";
+
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
-                      {waste[9] === "CLIENT NAME" ? (
-                        <TableRow key={index} sx={{ border: "black" }}>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              true,
-                              columnWidths.waste[3],
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black",
-                              waste[9] === "CLIENT NAME" ? "bold" : "normal"
-                            )}
-                            colSpan={9}
-                          >
-                            {waste[11] === "true" ? waste[10] : waste[3]}
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        <TableRow key={index} sx={{ border: "black" }}>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[0],
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {waste[0]}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[1],
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {waste[1]}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[2],
+                      {shouldIncludeRow && (
+                        <>
+                          {waste[9] === "CLIENT NAME" ? (
+                            <TableRow key={index} sx={{ border: "black" }}>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  true,
+                                  columnWidths.waste[3],
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black",
+                                  waste[9] === "CLIENT NAME" ? "bold" : "normal"
+                                )}
+                                colSpan={9}
+                              >
+                                {waste[11] === "true" ? waste[10] : waste[3]}
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            <TableRow key={index} sx={{ border: "black" }}>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[0],
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {waste[0]}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[1],
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {waste[1]}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[2],
 
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {waste[2]}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[3],
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black",
-                              waste[9] === "CLIENT NAME" ? "bold" : "normal"
-                            )}
-                          >
-                            {waste[3]}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[4],
-                              true,
-                              waste[4]
-                                ? waste[9] === "BUYING"
-                                  ? "red"
-                                  : "black"
-                                : "white"
-                            )}
-                          >
-                            {waste[4] ? waste[4] : 0}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[5],
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {waste[5] ? waste[5] : ""}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[6],
-                              true,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {!hasDemurrage &&
-                            hasFixedRate &&
-                            isMonthly &&
-                            waste[0] !== ""
-                              ? ""
-                              : waste[6]}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              false,
-                              columnWidths.waste[7],
-                              true,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {!hasDemurrage &&
-                            hasFixedRate &&
-                            isMonthly &&
-                            waste[0] !== ""
-                              ? ""
-                              : waste[7]}
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={getCellStyle(
-                              true,
-                              columnWidths.waste[8],
-                              false,
-                              waste[9] === "BUYING" ? "red" : "black"
-                            )}
-                          >
-                            {!hasDemurrage &&
-                            hasFixedRate &&
-                            isMonthly &&
-                            waste[0] !== ""
-                              ? ""
-                              : waste[8]}
-                          </TableCell>
-                        </TableRow>
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {waste[2]}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[3],
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black",
+                                  waste[9] === "CLIENT NAME" ? "bold" : "normal"
+                                )}
+                              >
+                                {waste[3]}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[4],
+                                  true,
+                                  waste[4]
+                                    ? waste[9] === "BUYING"
+                                      ? "red"
+                                      : "black"
+                                    : "white"
+                                )}
+                              >
+                                {waste[4] ? waste[4] : 0}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[5],
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {waste[5] ? waste[5] : ""}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[6],
+                                  true,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {!hasDemurrage &&
+                                hasFixedRate &&
+                                isMonthly &&
+                                waste[0] !== ""
+                                  ? ""
+                                  : waste[6]}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  false,
+                                  columnWidths.waste[7],
+                                  true,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {!hasDemurrage &&
+                                hasFixedRate &&
+                                isMonthly &&
+                                waste[0] !== ""
+                                  ? ""
+                                  : waste[7]}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={getCellStyle(
+                                  true,
+                                  columnWidths.waste[8],
+                                  false,
+                                  waste[9] === "BUYING" ? "red" : "black"
+                                )}
+                              >
+                                {!hasDemurrage &&
+                                hasFixedRate &&
+                                isMonthly &&
+                                waste[0] !== ""
+                                  ? ""
+                                  : waste[8]}
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </>
                       )}
                     </TableBody>
                   );

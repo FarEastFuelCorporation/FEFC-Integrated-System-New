@@ -23,7 +23,6 @@ const BillingContent = ({
   isPerClientToBill = false,
   isIndividualBillingToBill = false,
   isIndividualWasteToProcess,
-  isChargeToProcess,
 }) => {
   const wasteTableRef = useRef(null);
 
@@ -36,8 +35,6 @@ const BillingContent = ({
   const isMonthly = transactions?.[0]?.QuotationWaste?.isMonthly;
   const remarks = transactions?.[0]?.BilledTransaction?.[0]?.remarks;
   let hasDemurrage = false;
-
-  console.log(isChargeToProcess);
 
   let totalWeight = new Decimal(0);
 
@@ -387,15 +384,6 @@ const BillingContent = ({
                   const fontColor =
                     waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
 
-                  const mode = waste.QuotationWaste.mode;
-
-                  const excludeBuying =
-                    isChargeToProcess && mode === "BUYING" ? true : false;
-
-                  console.log(isChargeToProcess);
-                  console.log(mode);
-                  console.log(excludeBuying);
-
                   const usedWeight =
                     typeOfWeight === "CLIENT WEIGHT"
                       ? waste.clientWeight
@@ -432,7 +420,7 @@ const BillingContent = ({
 
                   return (
                     <Box>
-                      {!excludeBuying && newClient && isPerClientToBill && (
+                      {newClient && isPerClientToBill && (
                         <TableRow
                           key={`wasteH-${idx}`}
                           sx={{ border: "black" }}
@@ -553,7 +541,7 @@ const BillingContent = ({
                           )}
                         </TableRow>
                       )}
-                      {!excludeBuying && (
+                      {
                         <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                           <TableCell
                             sx={{
@@ -704,7 +692,7 @@ const BillingContent = ({
                             </TableCell>
                           )}
                         </TableRow>
-                      )}
+                      }
                       {hasFixedRateIndividual &&
                         !isMonthly &&
                         fixedWeight &&

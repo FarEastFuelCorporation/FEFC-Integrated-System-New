@@ -63,7 +63,6 @@ const BillModal = ({
 
   const handleCheckboxChange5 = (e) => {
     const isChecked = e.target.checked;
-    console.log(isChecked);
     setIsChargeToBill(isChecked); // Update the individual state
     setFormData({ ...formData, isChargeOnly: isChecked }); // Update formData state
   };

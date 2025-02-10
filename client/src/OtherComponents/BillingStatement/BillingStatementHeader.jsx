@@ -26,7 +26,7 @@ const BillingStatementHeader = ({
 
   const discountAmount = row?.BilledTransaction?.[0]?.discountAmount || 0;
 
-  const toBeDiscount = discountAmount ? discountAmount : discount;
+  const toBeDiscount = discountAmount ? discountAmount : discount || 0;
 
   const hasDemurrage =
     row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.hasDemurrage;

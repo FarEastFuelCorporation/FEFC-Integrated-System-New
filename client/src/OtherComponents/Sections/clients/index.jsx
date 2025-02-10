@@ -155,7 +155,7 @@ const Clients = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { clientName, address, contactNumber, clientType } = formData;
+    const { clientName, address, clientType } = formData;
 
     // Check if all required fields are filled
     if (!clientName || !address || !contactNumber || !clientType) {

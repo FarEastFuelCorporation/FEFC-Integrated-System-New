@@ -151,6 +151,7 @@ const BillingStatementForm = ({
     isIndividualBilling =
       transaction?.BilledTransaction?.[0]?.isIndividualBilling;
     isIndividualWaste = transaction?.BilledTransaction?.[0]?.isIndividualWaste;
+    isChargeOnly = transaction?.BilledTransaction?.[0]?.isChargeOnly;
 
     hasDemurrage =
       transaction?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
@@ -453,6 +454,9 @@ const BillingStatementForm = ({
     : isIndividualWasteToBill;
 
   const isChargeToProcess = isChargeOnly ? isChargeOnly : isChargeToBill;
+
+  console.log(isChargeOnly);
+  console.log(isChargeToProcess);
 
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {

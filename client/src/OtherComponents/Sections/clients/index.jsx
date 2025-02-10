@@ -618,6 +618,7 @@ const Clients = ({ user }) => {
               />
               <TextField
                 label="Biller TIN Number"
+                name="billerTinNumber"
                 value={formData.billerTinNumber}
                 onChange={handleInputChange}
                 fullWidth

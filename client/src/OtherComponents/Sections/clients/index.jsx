@@ -475,19 +475,7 @@ const Clients = ({ user }) => {
                   },
                 }}
               />
-              <TextField
-                label="Nature of Business"
-                name="natureOfBusiness"
-                value={formData.natureOfBusiness}
-                onChange={handleInputChange}
-                fullWidth
-                autoComplete="off"
-                InputLabelProps={{
-                  style: {
-                    color: colors.grey[100],
-                  },
-                }}
-              />
+
               <TextField
                 label="Contact Number"
                 name="contactNumber"
@@ -537,6 +525,25 @@ const Clients = ({ user }) => {
                   },
                 }}
               />
+              <input
+                type="file"
+                className="form-control visually-hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+                id="clientPicture"
+                name="clientPicture"
+                style={{ display: "none" }}
+              />
+              <label htmlFor="clientPicture">
+                <Typography>File: {fileName}</Typography>
+                <Button
+                  variant="contained"
+                  component="span"
+                  sx={{ mt: 2, backgroundColor: colors.primary[500] }}
+                >
+                  Upload Client Picture
+                </Button>
+              </label>
             </Grid>
             <Grid item xs={12} lg={6}>
               <Typography variant="subtitle2" gutterBottom>
@@ -596,6 +603,19 @@ const Clients = ({ user }) => {
                 }}
               />
               <TextField
+                label="Nature of Business"
+                name="natureOfBusiness"
+                value={formData.natureOfBusiness}
+                onChange={handleInputChange}
+                fullWidth
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              />
+              <TextField
                 label="Biller TIN Number"
                 value={formData.billerTinNumber}
                 onChange={handleInputChange}
@@ -607,26 +627,6 @@ const Clients = ({ user }) => {
                   },
                 }}
               />
-
-              <input
-                type="file"
-                className="form-control visually-hidden"
-                accept="image/*"
-                onChange={handleFileChange}
-                id="clientPicture"
-                name="clientPicture"
-                style={{ display: "none" }}
-              />
-              <label htmlFor="clientPicture">
-                <Typography>File: {fileName}</Typography>
-                <Button
-                  variant="contained"
-                  component="span"
-                  sx={{ mt: 2, backgroundColor: colors.primary[500] }}
-                >
-                  Upload Client Picture
-                </Button>
-              </label>
             </Grid>
           </Grid>
 

@@ -155,10 +155,17 @@ const Clients = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { clientName, address, clientType } = formData;
+    const { clientName, address, billerName, billerAddress, clientType } =
+      formData;
 
     // Check if all required fields are filled
-    if (!clientName || !address || !clientType) {
+    if (
+      !clientName ||
+      !address ||
+      !billerName ||
+      !billerAddress ||
+      !clientType
+    ) {
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;
@@ -471,7 +478,6 @@ const Clients = ({ user }) => {
                 value={formData.natureOfBusiness}
                 onChange={handleInputChange}
                 fullWidth
-                required
                 autoComplete="off"
                 InputLabelProps={{
                   style: {
@@ -485,7 +491,6 @@ const Clients = ({ user }) => {
                 value={formData.contactNumber}
                 onChange={handleInputChange}
                 fullWidth
-                required
                 autoComplete="off"
                 InputLabelProps={{
                   style: {
@@ -522,7 +527,6 @@ const Clients = ({ user }) => {
                 value={formData.email}
                 onChange={handleInputChange}
                 fullWidth
-                required
                 autoComplete="off"
                 InputLabelProps={{
                   style: {
@@ -566,7 +570,6 @@ const Clients = ({ user }) => {
                 value={formData.billerContactPerson}
                 onChange={handleInputChange}
                 fullWidth
-                required
                 autoComplete="off"
                 InputLabelProps={{
                   style: {
@@ -576,11 +579,9 @@ const Clients = ({ user }) => {
               />
               <TextField
                 label="Biller Contact Number"
-                name="billerContactNumber"
                 value={formData.billerContactNumber}
                 onChange={handleInputChange}
                 fullWidth
-                required
                 autoComplete="off"
                 InputLabelProps={{
                   style: {
@@ -590,11 +591,9 @@ const Clients = ({ user }) => {
               />
               <TextField
                 label="Biller TIN Number"
-                name="billerTinNumber"
                 value={formData.billerTinNumber}
                 onChange={handleInputChange}
                 fullWidth
-                required
                 autoComplete="off"
                 InputLabelProps={{
                   style: {

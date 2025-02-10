@@ -444,6 +444,9 @@ const Clients = ({ user }) => {
           </Typography>
           <Grid container spacing={2} my={2}>
             <Grid item xs={12} lg={6}>
+              <Typography variant="subtitle2" gutterBottom>
+                For Certification Details
+              </Typography>
               <TextField
                 label="Client Name"
                 name="clientName"
@@ -536,6 +539,9 @@ const Clients = ({ user }) => {
               />
             </Grid>
             <Grid item xs={12} lg={6}>
+              <Typography variant="subtitle2" gutterBottom>
+                For Billing Details
+              </Typography>
               <TextField
                 label="Biller Name"
                 name="billerName"

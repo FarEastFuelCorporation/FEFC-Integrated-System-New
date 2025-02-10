@@ -158,7 +158,7 @@ const Clients = ({ user }) => {
     const { clientName, address, clientType } = formData;
 
     // Check if all required fields are filled
-    if (!clientName || !address || !contactNumber || !clientType) {
+    if (!clientName || !address || !clientType) {
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;

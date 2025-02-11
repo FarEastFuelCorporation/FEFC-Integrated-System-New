@@ -93,7 +93,7 @@ const DispatchedTransactions = ({ user }) => {
 
   const handleOpenModal = (row) => {
     setFormData({
-      vehicleTypeId: row.QuotationTransportation.vehicleTypeId,
+      vehicleTypeId: row.QuotationTransportation?.vehicleTypeId,
       id: "",
       bookedTransactionId: row.id,
       scheduledTransactionId: row.ScheduledTransaction[0].id,

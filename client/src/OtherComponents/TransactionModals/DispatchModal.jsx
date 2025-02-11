@@ -34,7 +34,9 @@ const DispatchModal = ({
         const [employeeResponse, vehicleResponse] = await Promise.all([
           axios.get(`${apiUrl}/api/employee`),
           axios.get(
-            `${apiUrl}/api/vehicle/vehicleType/${formData.vehicleTypeId}`
+            `${apiUrl}/api/vehicle/vehicleType/${
+              formData.vehicleTypeId || null
+            }`
           ),
         ]);
 

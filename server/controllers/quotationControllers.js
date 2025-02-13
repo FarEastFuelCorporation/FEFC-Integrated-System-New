@@ -561,6 +561,8 @@ async function updateQuotationController(req, res) {
         updatedQuotation.scopeOfWork = scopeOfWork;
         updatedQuotation.contactPerson = contactPerson;
         updatedQuotation.remarks = remarks;
+        updatedQuotation.isOneTime = isOneTime;
+        updatedQuotation.updatedBy = createdBy;
 
         // Save the updated quotation
         await updatedQuotation.save();

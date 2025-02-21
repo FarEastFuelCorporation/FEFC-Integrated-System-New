@@ -62,9 +62,10 @@ const DispatchedTransactions = () => {
 
   // Default to fallback coordinates if latitude or longitude are not valid
   const { latitude, longitude, plateNumber } = gpsData;
-  const validLatitude = Number.isFinite(latitude) ? latitude : 15.1004537; // Fallback value for latitude
-  const validLongitude = Number.isFinite(longitude) ? longitude : 120.948715; // Fallback value for longitude
-
+  const validLatitude = parseFloat(latitude); // Fallback value for latitude
+  const validLongitude = parseFloat(longitude); // Fallback value for longitude
+  console.log(validLatitude);
+  console.log(validLongitude);
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
       <Box display="flex" justifyContent="space-between">

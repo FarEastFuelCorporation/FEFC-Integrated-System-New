@@ -60,7 +60,10 @@ const DispatchedTransactions = () => {
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
 
+  // Default to fallback coordinates if latitude or longitude are not valid
   const { latitude, longitude, plateNumber } = gpsData;
+  const validLatitude = Number.isFinite(latitude) ? latitude : 15.1004537; // Fallback value for latitude
+  const validLongitude = Number.isFinite(longitude) ? longitude : 120.948715; // Fallback value for longitude
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
@@ -70,11 +73,11 @@ const DispatchedTransactions = () => {
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={15}
-        center={{ lat: latitude || 15.1004537, lng: longitude || 120.948715 }}
+        center={{ lat: validLatitude, lng: validLongitude }}
       >
-        {latitude && longitude && (
+        {validLatitude && validLongitude && (
           <Marker
-            position={{ lat: latitude, lng: longitude }}
+            position={{ lat: validLatitude, lng: validLongitude }}
             onClick={() => setShowInfoWindow(!showInfoWindow)} // Toggle InfoWindow
           >
             {showInfoWindow && (

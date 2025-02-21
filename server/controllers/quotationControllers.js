@@ -20,6 +20,8 @@ async function createQuotationController(req, res) {
     termsCharge,
     termsBuyingDays,
     termsBuying,
+    isPDC,
+    termsPDCDays,
     scopeOfWork,
     contactPerson,
     remarks,
@@ -43,6 +45,8 @@ async function createQuotationController(req, res) {
       termsCharge,
       termsBuyingDays,
       termsBuying,
+      isPDC,
+      termsPDCDays,
       scopeOfWork,
       contactPerson,
       remarks,
@@ -427,6 +431,8 @@ async function updateQuotationController(req, res) {
       termsCharge,
       termsBuyingDays,
       termsBuying,
+      isPDC,
+      termsPDCDays,
       scopeOfWork,
       contactPerson,
       remarks,
@@ -465,6 +471,8 @@ async function updateQuotationController(req, res) {
           termsCharge,
           termsBuyingDays,
           termsBuying,
+          isPDC,
+          termsPDCDays,
           scopeOfWork,
           contactPerson,
           remarks,
@@ -558,6 +566,8 @@ async function updateQuotationController(req, res) {
         updatedQuotation.termsCharge = termsCharge;
         updatedQuotation.termsBuyingDays = termsBuyingDays;
         updatedQuotation.termsBuying = termsBuying;
+        updatedQuotation.isPDC = isPDC;
+        updatedQuotation.termsPDCDays = termsPDCDays;
         updatedQuotation.scopeOfWork = scopeOfWork;
         updatedQuotation.contactPerson = contactPerson;
         updatedQuotation.remarks = remarks;

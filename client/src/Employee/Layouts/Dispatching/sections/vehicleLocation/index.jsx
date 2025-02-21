@@ -17,32 +17,6 @@ const DispatchedTransactions = () => {
     libraries,
   });
 
-  useEffect(() => {
-    // const socket = new WebSocket("ws://192.168.1.244:3001");
-    const socket = new WebSocket("ws://192.168.137.1:3001");
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setGpsData(data);
-    };
-
-    socket.onopen = () => {
-      console.log("WebSocket connection established");
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    return () => {
-      socket.close();
-    };
-  }, []);
-
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
 

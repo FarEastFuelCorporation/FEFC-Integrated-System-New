@@ -41,6 +41,13 @@ const Quotation = sequelize.define(
     termsBuying: {
       type: DataTypes.STRING,
     },
+    isPDC: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    termsPDCDays: {
+      type: DataTypes.INTEGER,
+    },
     scopeOfWork: {
       type: DataTypes.STRING,
     },

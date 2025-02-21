@@ -76,6 +76,13 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                     ? `${quotationData?.termsChargeDays} DAY ${quotationData?.termsCharge}`
                     : `${quotationData?.termsChargeDays} DAYS ${quotationData?.termsCharge}`
                   : "N/A"}
+                {console.log(quotationData?.termsCharge)}
+                {console.log(quotationData?.isPDC)}
+                {quotationData?.termsCharge !== "N/A" && quotationData?.isPDC
+                  ? ` (${quotationData?.termsPDCDays} ${
+                      quotationData?.termsPDCDays === 1 ? "DAY PDC" : "DAYS PDC"
+                    })`
+                  : ""}
               </Typography>
             </Box>
             <Box
@@ -100,6 +107,12 @@ const QuotationFooter = ({ quotationData, qrCodeURL }) => {
                     ? `${quotationData?.termsBuyingDays} DAY ${quotationData?.termsBuying}`
                     : `${quotationData?.termsBuyingDays} DAYS ${quotationData?.termsBuying}`
                   : "N/A"}
+
+                {quotationData?.termsBuying !== "N/A" && quotationData?.isPDC
+                  ? ` (${quotationData?.termsPDCDays} ${
+                      quotationData?.termsPDCDays === 1 ? "DAY PDC" : "DAYS PDC"
+                    })`
+                  : ""}
               </Typography>
             </Box>
           </Box>

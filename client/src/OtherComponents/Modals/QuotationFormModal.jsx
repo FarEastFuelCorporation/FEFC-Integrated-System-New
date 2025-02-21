@@ -370,7 +370,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1.75}>
               <FormControl fullWidth required>
                 <InputLabel
                   id={`termsCharge-label`}
@@ -428,7 +428,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1.75}>
               <FormControl fullWidth required>
                 <InputLabel
                   id={`termsBuying-label`}
@@ -470,6 +470,51 @@ const QuotationFormModal = ({
                 </Select>
               </FormControl>
             </Grid>
+            <Grid
+              item
+              xs={0.5}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name="isPDC"
+                    checked={!!formData.isPDC}
+                    color="secondary"
+                    onChange={(e) =>
+                      handleInputChange({
+                        target: {
+                          name: e.target.name,
+                          value: e.target.checked,
+                        },
+                      })
+                    }
+                  />
+                }
+                label="PDC"
+              />
+            </Grid>
+            {formData.isPDC && (
+              <Grid item xs={1}>
+                <TextField
+                  label="Terms PDC Days"
+                  name="termsPDCDays"
+                  value={formData.termsPDCDays}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+            )}
             <Grid item xs={4}>
               <TextField
                 label="Scope of Work"
@@ -501,7 +546,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={6}>
               <TextField
                 label="Remarks"
                 name="remarks"

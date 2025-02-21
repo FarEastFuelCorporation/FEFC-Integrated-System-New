@@ -3,10 +3,12 @@
 const express = require("express");
 const router = express.Router();
 const {
-  createDispatchedTransactionController,
+  postVehicleLocation,
+  getLatestLocation,
 } = require("../controllers/vehicleLocationController");
 
-// Create Dispatched Transaction route
-router.post("/", createDispatchedTransactionController);
+router.get("/", getLatestLocation);
+
+router.post("/", postVehicleLocation);
 
 module.exports = router;

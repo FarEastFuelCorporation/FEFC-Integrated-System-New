@@ -28,7 +28,7 @@ const DispatchedTransactions = () => {
     plateNumber: "NBZ7675",
   });
   const [showInfoWindow, setShowInfoWindow] = useState(false); // Control info window visibility
-
+  console.log(process.env.REACT_APP_GOOGLE_API_KEY);
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY, // Use your environment variable
     libraries,

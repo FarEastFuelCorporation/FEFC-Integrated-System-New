@@ -73,7 +73,7 @@ const DispatchedTransactions = () => {
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={15}
-        center={{ lat: 15.1004537, lng: 120.948715 }}
+        center={{ lat: validLatitude, lng: validLongitude }}
       >
         {validLatitude && validLongitude && (
           <Marker

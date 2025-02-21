@@ -126,6 +126,8 @@ async function updateClientController(req, res) {
       clientPicture = req.file.buffer;
     }
 
+    console.log(clientPicture);
+
     clientName = clientName && clientName.toUpperCase();
     address = address && address.toUpperCase();
     natureOfBusiness = natureOfBusiness && natureOfBusiness.toUpperCase();
@@ -150,7 +152,9 @@ async function updateClientController(req, res) {
       updatedClient.billerContactNumber = billerContactNumber || "";
       updatedClient.billerTinNumber = billerTinNumber || "";
       updatedClient.updatedBy = createdBy;
-      updatedClient.clientPicture = clientPicture;
+      if (clientPicture !== null) {
+        updatedClient.clientPicture = clientPicture;
+      }
 
       // Save the updated client
       await updatedClient.save();

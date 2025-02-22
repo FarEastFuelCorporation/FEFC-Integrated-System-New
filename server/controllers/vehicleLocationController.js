@@ -7,14 +7,16 @@ async function postVehicleLocation(req, res) {
     console.log("Connecting ...");
 
     // Extract latitude and longitude from request body
-    const { latitude, longitude, rawGPS } = req.body;
+    const { latitude, longitude, gpsData } = req.body;
+
+    console.log(req.body);
 
     // Store latest location
     latestLocation = { latitude, longitude };
 
     // Log the received location
     console.log(
-      `📍 Received Location: Latitude=${latitude}, Longitude=${longitude}. rawGPS=${rawGPS}`
+      `📍 Received Location: Latitude=${latitude}, Longitude=${longitude}. rawGPS=${gpsData}`
     );
 
     res.status(201).json({ message: "Submitted" });

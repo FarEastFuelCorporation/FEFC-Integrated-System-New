@@ -6,10 +6,19 @@ async function postVehicleLocation(req, res) {
   try {
     console.log("Connecting ...");
 
-    // Extract latitude and longitude from request body
-    const { latitude, longitude, gpsData } = req.body;
+    // Extract latitude, longitude, and gpsData from request body
+    let { latitude, longitude, gpsData } = req.body;
 
     console.log(req.body);
+
+    // Extract latitude and longitude from gpsData if not already provided
+    if (gpsData) {
+      const match = gpsData.match(/(\d+\.\d+),(\d+\.\d+)/);
+      if (match) {
+        latitude = parseFloat(match[1]);
+        longitude = parseFloat(match[2]);
+      }
+    }
 
     // Store latest location
     latestLocation = { latitude, longitude };
@@ -19,7 +28,7 @@ async function postVehicleLocation(req, res) {
       `📍 Received Location: Latitude=${latitude}, Longitude=${longitude}. rawGPS=${gpsData}`
     );
 
-    res.status(201).json({ message: "Submitted" });
+    res.status(201).json({ message: "Submitted", latitude, longitude });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });

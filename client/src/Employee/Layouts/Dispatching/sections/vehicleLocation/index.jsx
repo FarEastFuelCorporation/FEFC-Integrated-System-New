@@ -27,10 +27,10 @@ const DispatchedTransactions = () => {
     longitude: null,
     plateNumber: "NBZ7675",
   });
-  const [showInfoWindow, setShowInfoWindow] = useState(false); // Control info window visibility
-  console.log(process.env.REACT_APP_GOOGLE_API_KEY);
+  const [showInfoWindow, setShowInfoWindow] = useState(true); // Default to true
+
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY, // Use your environment variable
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY,
     libraries,
   });
 
@@ -38,13 +38,10 @@ const DispatchedTransactions = () => {
     const fetchLocation = async () => {
       try {
         const response = await axios.get(`${apiUrl}/api/vehicleLocation`);
-        console.log(`${apiUrl}/api/vehicleLocation`);
-        console.log(response.data.latestLocation);
-
         setGpsData({
           latitude: response.data.latestLocation.latitude,
           longitude: response.data.latestLocation.longitude,
-          plateNumber: "NBZ7675", // Static for now, but can be fetched dynamically
+          plateNumber: "NBZ7675",
         });
       } catch (error) {
         console.error("Error fetching location:", error);
@@ -52,7 +49,7 @@ const DispatchedTransactions = () => {
     };
 
     fetchLocation();
-    const interval = setInterval(fetchLocation, 5000); // Fetch every 5 seconds
+    const interval = setInterval(fetchLocation, 5000);
 
     return () => clearInterval(interval);
   }, [apiUrl]);
@@ -60,13 +57,15 @@ const DispatchedTransactions = () => {
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading Maps...</div>;
 
-  // Default to fallback coordinates if latitude or longitude are not valid
-  // 15.100583182992573, 120.95124801411367
   const { latitude, longitude, plateNumber } = gpsData;
+
+  console.log(latitude);
+  console.log(longitude);
+  console.log(plateNumber);
   const validLatitude =
-    parseFloat(latitude) === 0 ? 15.100583182992573 : parseFloat(latitude); // Fallback value for latitude
+    parseFloat(latitude) === 0 ? 15.100583182992573 : parseFloat(latitude);
   const validLongitude =
-    parseFloat(longitude) === 0 ? 120.95124801411367 : parseFloat(longitude); // Fallback value for longitude
+    parseFloat(longitude) === 0 ? 120.95124801411367 : parseFloat(longitude);
 
   return (
     <Box p="20px" width="100% !important" sx={{ position: "relative" }}>
@@ -84,7 +83,11 @@ const DispatchedTransactions = () => {
             onClick={() => setShowInfoWindow(!showInfoWindow)} // Toggle InfoWindow
           >
             {showInfoWindow && (
-              <InfoWindow onCloseClick={() => setShowInfoWindow(false)}>
+              <InfoWindow
+                position={{ lat: validLatitude, lng: validLongitude }}
+                onCloseClick={() => setShowInfoWindow(false)}
+                options={{ pixelOffset: new window.google.maps.Size(0, -35) }} // Offset the InfoWindow
+              >
                 <Box>
                   <Typography
                     variant="h6"

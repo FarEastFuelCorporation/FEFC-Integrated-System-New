@@ -1,5 +1,7 @@
 // controllers/vehicleLocationController.js
 
+const { broadcastMessage } = require("../websocketManager");
+
 let latestLocation = { latitude: 0, longitude: 0 }; // Store last known location
 
 async function postVehicleLocation(req, res) {
@@ -27,6 +29,13 @@ async function postVehicleLocation(req, res) {
     console.log(
       `📍 Received Location: Latitude=${latitude}, Longitude=${longitude}. rawGPS=${gpsData}`
     );
+
+    const formattedEntry = { latitude, longitude };
+
+    broadcastMessage({
+      type: "NEW_LOCATION",
+      data: formattedEntry,
+    });
 
     res.status(201).json({ message: "Submitted", latitude, longitude });
   } catch (error) {

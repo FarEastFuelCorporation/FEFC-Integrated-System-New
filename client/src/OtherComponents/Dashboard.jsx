@@ -22,7 +22,7 @@ import TransporterRoutes from "../Client/Routes/TransporterRoutes";
 import CustomerRoutes from "../Client/Routes/CustomerRoutes";
 import WarehouseOutRoutes from "../Employee/Routes/WarehouseOutRoutes";
 
-const Dashboard = ({ user, onUpdateUser }) => {
+const Dashboard = ({ user, onUpdateUser, socket }) => {
   switch (user.userType) {
     case "GEN":
       return (
@@ -69,7 +69,11 @@ const Dashboard = ({ user, onUpdateUser }) => {
     case 3:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[3]}>
-          <DispatchingRoutes user={user} onUpdateUser={onUpdateUser} />
+          <DispatchingRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 4:

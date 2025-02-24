@@ -28,7 +28,11 @@ import Employee from "./Auth/Employee";
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
 
+  // Convert API URL to WebSocket URL
+  const wsUrl = apiUrl.replace(/^http/, "ws");
+
   const [user, setUser] = useState(null); // State to hold user information
+  const [socketInstance, setSocketInstance] = useState(null);
   const [loading, setLoading] = useState(false); // State to indicate loading
   const [theme, colorMode] = useMode();
   const navigate = useNavigate();
@@ -39,6 +43,34 @@ const App = () => {
     setUser(userData);
     navigate("/dashboard");
     setLoading(false); // Set loading to false after user data is set and navigation is done
+
+    // Create WebSocket connection after login
+    const socket = new WebSocket(
+      `${wsUrl}?employeeId=${userData.id}&employeeName=${userData.employeeDetails.firstName} ${userData.employeeDetails.lastName}`
+    );
+    setSocketInstance(socket);
+
+    // Listen for messages from the WebSocket server
+    socketInstance.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Received:", data);
+      // You can handle incoming messages here (e.g., updating UI)
+    };
+
+    // Handle WebSocket connection close
+    socketInstance.onclose = () => {
+      console.log("WebSocket closed");
+    };
+
+    // Handle WebSocket errors
+    socketInstance.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    // Clean up WebSocket connection when user logs out or component unmounts
+    return () => {
+      socketInstance.close();
+    };
   };
 
   const handleUpdateUser = (updatedUser) => {
@@ -101,7 +133,11 @@ const App = () => {
             <Route
               path="/dashboard/*"
               element={
-                <Dashboard user={user} onUpdateUser={handleUpdateUser} />
+                <Dashboard
+                  user={user}
+                  onUpdateUser={handleUpdateUser}
+                  socket={socketInstance}
+                />
               }
             />
           ) : (

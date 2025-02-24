@@ -11,7 +11,7 @@ import Calendar from "../../Employee/Layouts/Dispatching/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
 
-const DispatchingRoutes = ({ user, onUpdateUser }) => (
+const DispatchingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
@@ -19,7 +19,10 @@ const DispatchingRoutes = ({ user, onUpdateUser }) => (
         path="transactions"
         element={<DispatchedTransactions user={user} />}
       />
-      <Route path="vehicleLocation" element={<VehicleLocation user={user} />} />
+      <Route
+        path="vehicleLocation"
+        element={<VehicleLocation user={user} socket={socket} />}
+      />
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />
       <Route

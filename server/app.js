@@ -107,7 +107,7 @@ async function initializeApp() {
     // await handleAttendanceSync();
 
     // await syncIdInformationToLocal();
-    await syncSpecificEmployeeToLocal(25011);
+    // await syncSpecificEmployeeToLocal(25011);
     console.log("Models synced successfully.");
   } catch (error) {
     console.error("Error syncing models:", error);

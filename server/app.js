@@ -17,6 +17,14 @@ require("./utils/associations");
 
 const app = express();
 
+// Allow HTTP traffic (bypass Heroku's forced HTTPS)
+app.use((req, res, next) => {
+  if (req.headers["x-forwarded-proto"] !== "https") {
+    console.log("Allowing HTTP traffic...");
+  }
+  next();
+});
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL, // your frontend URL

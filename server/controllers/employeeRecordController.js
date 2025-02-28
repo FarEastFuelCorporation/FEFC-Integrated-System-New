@@ -1,6 +1,8 @@
 // controllers/employeeRecordController.js
 
 const EmployeeAttachment = require("../models/EmployeeAttachment");
+const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
+const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const Vehicle = require("../models/Vehicle");
 
@@ -171,6 +173,16 @@ async function createEmployeeRecordController(req, res) {
           as: "EmployeeAttachment",
           attributes: ["fileName", "createdBy"], // Include only necessary fields
         },
+        {
+          model: EmployeeAttachmentLegal,
+          as: "EmployeeAttachmentLegal",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+        {
+          model: EmployeeAttachmentMemo,
+          as: "EmployeeAttachmentMemo",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
       ],
     });
 
@@ -196,6 +208,16 @@ async function getEmployeeRecordsController(req, res) {
           as: "EmployeeAttachment",
           attributes: ["fileName", "createdBy"], // Include only necessary fields
         },
+        {
+          model: EmployeeAttachmentLegal,
+          as: "EmployeeAttachmentLegal",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+        {
+          model: EmployeeAttachmentMemo,
+          as: "EmployeeAttachmentMemo",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
       ],
     });
 
@@ -217,6 +239,16 @@ async function getEmployeeRecordsFullController(req, res) {
         {
           model: EmployeeAttachment,
           as: "EmployeeAttachment",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+        {
+          model: EmployeeAttachmentLegal,
+          as: "EmployeeAttachmentLegal",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+        {
+          model: EmployeeAttachmentMemo,
+          as: "EmployeeAttachmentMemo",
           attributes: ["fileName", "createdBy"], // Include only necessary fields
         },
       ],
@@ -398,6 +430,16 @@ async function updateEmployeeRecordController(req, res) {
           {
             model: EmployeeAttachment,
             as: "EmployeeAttachment",
+            attributes: ["fileName", "createdBy"], // Include only necessary fields
+          },
+          {
+            model: EmployeeAttachmentLegal,
+            as: "EmployeeAttachmentLegal",
+            attributes: ["fileName", "createdBy"], // Include only necessary fields
+          },
+          {
+            model: EmployeeAttachmentMemo,
+            as: "EmployeeAttachmentMemo",
             attributes: ["fileName", "createdBy"], // Include only necessary fields
           },
         ],

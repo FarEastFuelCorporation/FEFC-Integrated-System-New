@@ -44,7 +44,9 @@ const EmployeeProfileModal = ({
   const [departments, setDepartments] = useState([]);
   const [fileName, setFileName] = useState("");
   const [fileNameToSubmit, setFileNameToSubmit] = useState("");
-  const [attachmentData, setAttachmentData] = useState([]);
+  const [attachmentMedicalData, setAttachmentMedicalData] = useState([]);
+  const [attachmentLegalData, setAttachmentLegalData] = useState([]);
+  const [attachmentMemoData, setAttachmentMemoData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -55,27 +57,57 @@ const EmployeeProfileModal = ({
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
 
-  const attachmentTableHeight =
-    attachmentData.length === 0
+  const attachmentMedicalTableHeight =
+    attachmentMedicalData.length === 0
       ? rowHeight + headerHeight
-      : attachmentData.length * rowHeight + headerHeight;
+      : attachmentMedicalData.length * rowHeight + headerHeight;
+
+  const attachmentLegalTableHeight =
+    attachmentLegalData.length === 0
+      ? rowHeight + headerHeight
+      : attachmentLegalData.length * rowHeight + headerHeight;
+
+  const attachmentMemoTableHeight =
+    attachmentMemoData.length === 0
+      ? rowHeight + headerHeight
+      : attachmentMemoData.length * rowHeight + headerHeight;
 
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.employeeId) {
       return;
     }
     try {
-      const [employeeResponse, departmentResponse, employeeAttachmentResponse] =
-        await Promise.all([
-          axios.get(`${apiUrl}/api/employee`),
-          axios.get(`${apiUrl}/api/department`),
-          axios.get(
-            `${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`
-          ),
-        ]);
+      const [
+        employeeResponse,
+        departmentResponse,
+        employeeAttachmentResponse,
+        employeeAttachmentLegalResponse,
+        employeeAttachmentMemoResponse,
+      ] = await Promise.all([
+        axios.get(`${apiUrl}/api/employee`),
+        axios.get(`${apiUrl}/api/department`),
+        axios.get(`${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`),
+        axios.get(
+          `${apiUrl}/api/employeeAttachmentLegal/${selectedRow.employeeId}`
+        ),
+        axios.get(
+          `${apiUrl}/api/employeeAttachmentMemo/${selectedRow.employeeId}`
+        ),
+      ]);
       setEmployeesData(employeeResponse.data.employees);
       setDepartments(departmentResponse.data.departments);
-      setAttachmentData(employeeAttachmentResponse.data.employeeAttachments);
+      setAttachmentMedicalData(
+        employeeAttachmentResponse.data.employeeAttachments
+      );
+      setAttachmentLegalData(
+        employeeAttachmentLegalResponse.data.employeeAttachmentLegals
+      );
+      console.log(
+        employeeAttachmentLegalResponse.data.employeeAttachmentLegals
+      );
+      setAttachmentMemoData(
+        employeeAttachmentMemoResponse.data.employeeAttachmentMemos
+      );
     } catch (error) {
       console.error("Error fetching provinces:", error);
     }
@@ -162,20 +194,39 @@ const EmployeeProfileModal = ({
       formData.append("fileName", fileNameToSubmit);
       formData.append("createdBy", user.id);
 
+      const url =
+        selectedTab === 5
+          ? "employeeAttachment"
+          : selectedTab === 6
+          ? "employeeAttachmentLegal"
+          : "employeeAttachmentMemo";
+
       // Submit the form data with file upload
-      const uploadResponse = await axios.post(
-        `${apiUrl}/api/employeeAttachment`,
-        formData
-      );
+      const uploadResponse = await axios.post(`${apiUrl}/api/${url}`, formData);
 
       setSuccessMessage("File uploaded successfully!");
       setShowSuccessMessage(true);
 
       // Assuming the response contains the uploaded attachment data:
-      const newAttachmentData = uploadResponse.data.newAttachment;
+
+      const newAttachmentData =
+        selectedTab === 5
+          ? uploadResponse.data.newAttachment
+          : selectedTab === 6
+          ? uploadResponse.data.newAttachmentLegal
+          : uploadResponse.data.newAttachmentMemo;
 
       // Append the new attachment data to the existing data (if any)
-      setAttachmentData((prevData) => [...prevData, newAttachmentData]);
+      if (selectedTab === 5) {
+        setAttachmentMedicalData((prevData) => [
+          ...prevData,
+          newAttachmentData,
+        ]);
+      } else if (selectedTab === 6) {
+        setAttachmentLegalData((prevData) => [...prevData, newAttachmentData]);
+      } else {
+        setAttachmentMemoData((prevData) => [...prevData, newAttachmentData]);
+      }
 
       setFileName("");
       setFileNameToSubmit("");
@@ -195,17 +246,38 @@ const EmployeeProfileModal = ({
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/employeeAttachment/${id}`, {
+
+      const url =
+        selectedTab === 5
+          ? "employeeAttachment"
+          : selectedTab === 6
+          ? "employeeAttachmentLegal"
+          : "employeeAttachmentMemo";
+
+      await axios.delete(`${apiUrl}/api/${url}/${id}`, {
         data: { deletedBy: user.id },
       });
 
-      fetchData();
-      setSuccessMessage("Attachment Deleted Successfully!");
+      // Update state by filtering out the deleted attachment
+      if (selectedTab === 5) {
+        setAttachmentMedicalData((prevData) =>
+          prevData.filter((attachment) => attachment.id !== id)
+        );
+      } else if (selectedTab === 6) {
+        setAttachmentLegalData((prevData) =>
+          prevData.filter((attachment) => attachment.id !== id)
+        );
+      } else {
+        setAttachmentMemoData((prevData) =>
+          prevData.filter((attachment) => attachment.id !== id)
+        );
+      }
 
-      setLoading(false);
+      setSuccessMessage("Attachment Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
     } finally {
+      setLoading(false);
       setOpenDialog(false); // Close the dialog
     }
   };
@@ -274,11 +346,18 @@ const EmployeeProfileModal = ({
           sx={{ color: colors.greenAccent[400], fontSize: "large" }}
           onClick={async () => {
             try {
+              const url =
+                selectedTab === 5
+                  ? "employeeAttachment"
+                  : selectedTab === 6
+                  ? "employeeAttachmentLegal"
+                  : "employeeAttachmentMemo";
+
               const documentId = params.row.id; // Get the document ID
 
               // Fetch the binary data from the API
               const response = await axios.get(
-                `${apiUrl}/api/employeeAttachment/full/${documentId}`,
+                `${apiUrl}/api/${url}/full/${documentId}`,
                 { responseType: "arraybuffer" } // Get binary data
               );
 
@@ -288,10 +367,10 @@ const EmployeeProfileModal = ({
               });
 
               // Create an object URL for the Blob
-              const url = URL.createObjectURL(blob);
+              const urlFile = URL.createObjectURL(blob);
 
               // Open the file in a new tab
-              window.open(url, "_blank");
+              window.open(urlFile, "_blank");
             } catch (error) {
               console.error("Error fetching document file:", error);
             }
@@ -313,13 +392,20 @@ const EmployeeProfileModal = ({
           sx={{ color: colors.blueAccent[400], fontSize: "large" }}
           onClick={async () => {
             try {
+              const url =
+                selectedTab === 5
+                  ? "employeeAttachment"
+                  : selectedTab === 6
+                  ? "employeeAttachmentLegal"
+                  : "employeeAttachmentMemo";
+
               const documentId = params.row.id; // Get the document ID
               const fileName =
                 params.row.fileName || `attachment_${documentId}`; // Fallback to a default name if no file name is provided
 
               // Fetch the attachment from the API using the document ID
               const response = await axios.get(
-                `${apiUrl}/api/employeeAttachment/full/${documentId}`,
+                `${apiUrl}/api/${url}/full/${documentId}`,
                 { responseType: "arraybuffer" } // Fetch binary data
               );
 
@@ -331,11 +417,11 @@ const EmployeeProfileModal = ({
               });
 
               // Generate a URL for the Blob
-              const url = URL.createObjectURL(blob);
+              const urlFile = URL.createObjectURL(blob);
 
               // Create an anchor element for downloading
               const link = document.createElement("a");
-              link.href = url;
+              link.href = urlFile;
               link.download = fileName; // Set the file name
               document.body.appendChild(link);
               link.click(); // Trigger the download
@@ -388,7 +474,7 @@ const EmployeeProfileModal = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 1200,
+            width: 1400,
             height: "90%",
             overflowY: "scroll",
             bgcolor: "background.paper",
@@ -583,7 +669,8 @@ const EmployeeProfileModal = ({
                   <Tab label="Family Background" />
                   <Tab label="Educational Background" />
                   <Tab label="References" />
-                  <Tab label="Attachments" />
+                  <Tab label="Medical Documents" />
+                  <Tab label="Legal Documents" />
                   <Tab label="Memo" />
                 </Tabs>
                 {selectedTab === 0 && (
@@ -1244,13 +1331,13 @@ const EmployeeProfileModal = ({
                       />
                     )}
                     <Typography variant="h3" gutterBottom mt={5}>
-                      Attachments
+                      Medical Documents
                     </Typography>
                     <DataGrid
                       sx={{
                         "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
                           {
-                            height: attachmentTableHeight,
+                            height: attachmentMedicalTableHeight,
                           },
                         "& .MuiDataGrid-root": {
                           border: "none",
@@ -1282,7 +1369,215 @@ const EmployeeProfileModal = ({
                           display: "none",
                         },
                       }}
-                      rows={attachmentData || []}
+                      rows={attachmentMedicalData || []}
+                      columns={columns}
+                      components={{ Toolbar: GridToolbar }}
+                      getRowId={(row) => row.id}
+                      localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      initialState={{
+                        sortModel: [{ field: "createdAt", sort: "asc" }],
+                      }}
+                    />
+                  </Box>
+                )}
+                {selectedTab === 6 && (
+                  <Box position="relative">
+                    <Typography variant="h3" gutterBottom mt={2}>
+                      Upload Attachment
+                    </Typography>
+                    <Grid item xs={12} md={6} lg={4} mb={2}>
+                      <input
+                        type="file"
+                        className="form-control visually-hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        id="attachment"
+                        name="attachment"
+                        style={{ display: "none" }}
+                      />
+                      <label htmlFor="attachment">
+                        <Typography>File: {fileName}</Typography>
+                        <Button
+                          variant="contained"
+                          component="span"
+                          sx={{ mt: 2, backgroundColor: colors.primary[500] }}
+                        >
+                          Upload Employee Attachment
+                        </Button>
+                      </label>
+                      <TextField
+                        label="File Name"
+                        variant="outlined"
+                        value={fileNameToSubmit}
+                        onChange={handleFileNameChange}
+                        fullWidth
+                        required
+                        autoComplete="off"
+                        sx={{ mt: 2 }}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={handleFormSubmit}
+                        sx={{
+                          mt: 2,
+                          backgroundColor: colors.greenAccent[500],
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? "Uploading..." : "Submit Attachment"}
+                      </Button>
+                    </Grid>
+                    <hr />
+                    {showSuccessMessage && (
+                      <SuccessMessage
+                        message={successMessage}
+                        onClose={() => setShowSuccessMessage(false)}
+                      />
+                    )}
+                    <Typography variant="h3" gutterBottom mt={5}>
+                      Legal Documents
+                    </Typography>
+                    <DataGrid
+                      sx={{
+                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
+                          {
+                            height: attachmentLegalTableHeight,
+                          },
+                        "& .MuiDataGrid-root": {
+                          border: "none",
+                          width: "100%",
+                          color: colors.grey[100],
+                        },
+                        "& .MuiDataGrid-overlayWrapper": {
+                          minHeight: "52px",
+                        },
+                        "& .name-column--cell": {
+                          color: colors.greenAccent[300],
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                          backgroundColor: colors.blueAccent[700],
+                          borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                          whiteSpace: "normal !important",
+                          wordWrap: "break-word !important",
+                          lineHeight: "1.2 !important",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                          backgroundColor: colors.primary[400],
+                        },
+                        "& .MuiDataGrid-toolbarContainer": {
+                          display: "none",
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                          display: "none",
+                        },
+                      }}
+                      rows={attachmentLegalData || []}
+                      columns={columns}
+                      components={{ Toolbar: GridToolbar }}
+                      getRowId={(row) => row.id}
+                      localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      initialState={{
+                        sortModel: [{ field: "createdAt", sort: "asc" }],
+                      }}
+                    />
+                  </Box>
+                )}
+                {selectedTab === 7 && (
+                  <Box position="relative">
+                    <Typography variant="h3" gutterBottom mt={2}>
+                      Upload Attachment
+                    </Typography>
+                    <Grid item xs={12} md={6} lg={4} mb={2}>
+                      <input
+                        type="file"
+                        className="form-control visually-hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        id="attachment"
+                        name="attachment"
+                        style={{ display: "none" }}
+                      />
+                      <label htmlFor="attachment">
+                        <Typography>File: {fileName}</Typography>
+                        <Button
+                          variant="contained"
+                          component="span"
+                          sx={{ mt: 2, backgroundColor: colors.primary[500] }}
+                        >
+                          Upload Employee Attachment
+                        </Button>
+                      </label>
+                      <TextField
+                        label="File Name"
+                        variant="outlined"
+                        value={fileNameToSubmit}
+                        onChange={handleFileNameChange}
+                        fullWidth
+                        required
+                        autoComplete="off"
+                        sx={{ mt: 2 }}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={handleFormSubmit}
+                        sx={{
+                          mt: 2,
+                          backgroundColor: colors.greenAccent[500],
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? "Uploading..." : "Submit Attachment"}
+                      </Button>
+                    </Grid>
+                    <hr />
+                    {showSuccessMessage && (
+                      <SuccessMessage
+                        message={successMessage}
+                        onClose={() => setShowSuccessMessage(false)}
+                      />
+                    )}
+                    <Typography variant="h3" gutterBottom mt={5}>
+                      Memo
+                    </Typography>
+                    <DataGrid
+                      sx={{
+                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
+                          {
+                            height: attachmentMemoTableHeight,
+                          },
+                        "& .MuiDataGrid-root": {
+                          border: "none",
+                          width: "100%",
+                          color: colors.grey[100],
+                        },
+                        "& .MuiDataGrid-overlayWrapper": {
+                          minHeight: "52px",
+                        },
+                        "& .name-column--cell": {
+                          color: colors.greenAccent[300],
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                          backgroundColor: colors.blueAccent[700],
+                          borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                          whiteSpace: "normal !important",
+                          wordWrap: "break-word !important",
+                          lineHeight: "1.2 !important",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                          backgroundColor: colors.primary[400],
+                        },
+                        "& .MuiDataGrid-toolbarContainer": {
+                          display: "none",
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                          display: "none",
+                        },
+                      }}
+                      rows={attachmentMemoData || []}
                       columns={columns}
                       components={{ Toolbar: GridToolbar }}
                       getRowId={(row) => row.id}

@@ -59,6 +59,8 @@ const Medicine = require("../models/Medicine");
 const MedicineLog = require("../models/MedicineLog");
 const WarehousedOutTransaction = require("../models/WarehousedOutTransaction");
 const WarehousedOutTransactionItem = require("../models/WarehousedOutTransactionItem");
+const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
+const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -109,6 +111,32 @@ EmployeeAttachment.belongsTo(EmployeeRecord, {
   onDelete: "CASCADE",
 });
 
+EmployeeRecord.hasMany(EmployeeAttachmentLegal, {
+  as: "EmployeeAttachmentLegal",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeAttachmentLegal.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(EmployeeAttachmentMemo, {
+  as: "EmployeeAttachmentMemo",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeAttachmentMemo.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
 Employee.hasMany(EmployeeAttachment, {
   as: "EmployeeAttachment",
   foreignKey: "createdBy",
@@ -116,6 +144,32 @@ Employee.hasMany(EmployeeAttachment, {
   onDelete: "CASCADE",
 });
 EmployeeAttachment.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(EmployeeAttachmentLegal, {
+  as: "EmployeeAttachmentLegal",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeAttachmentLegal.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(EmployeeAttachmentMemo, {
+  as: "EmployeeAttachmentMemo",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeAttachmentMemo.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",

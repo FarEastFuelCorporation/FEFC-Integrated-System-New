@@ -102,9 +102,6 @@ const EmployeeProfileModal = ({
       setAttachmentLegalData(
         employeeAttachmentLegalResponse.data.employeeAttachmentLegals
       );
-      console.log(
-        employeeAttachmentLegalResponse.data.employeeAttachmentLegals
-      );
       setAttachmentMemoData(
         employeeAttachmentMemoResponse.data.employeeAttachmentMemos
       );

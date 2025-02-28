@@ -183,8 +183,6 @@ const Quotations = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name);
-    console.log(value);
     setFormData({ ...formData, [name]: value });
   };
 
@@ -320,8 +318,6 @@ const Quotations = ({ user }) => {
   }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (row) => {
-    console.log(row.isOneTime);
-
     const formattedDate = new Date(row.validity).toISOString().split("T")[0];
     if (row) {
       setFormData({

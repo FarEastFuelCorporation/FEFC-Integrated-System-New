@@ -455,9 +455,6 @@ const BillingStatementForm = ({
 
   const isChargeToProcess = isChargeOnly ? isChargeOnly : isChargeToBill;
 
-  console.log(isChargeOnly);
-  console.log(isChargeToProcess);
-
   const groupedTransactions = Object.entries(
     transactions.reduce((acc, transaction) => {
       // Extract invoiceNumber from BilledTransaction

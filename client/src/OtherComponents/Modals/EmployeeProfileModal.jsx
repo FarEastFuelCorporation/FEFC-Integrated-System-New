@@ -305,8 +305,9 @@ const EmployeeProfileModal = ({
       renderCell: (params) => {
         let value = {};
         value.value =
-          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
-          "";
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${
+            params.row.Employee.affix ? params.row.Employee.affix : ""
+          }` || "";
 
         return renderCellWithWrapText(value);
       },

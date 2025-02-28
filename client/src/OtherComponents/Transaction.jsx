@@ -417,6 +417,7 @@ const Transaction = ({
               <Badge
                 badgeContent={pendingCount}
                 color="error"
+                max={9999}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -432,6 +433,7 @@ const Transaction = ({
                 <Badge
                   badgeContent={inProgressCount}
                   color="warning"
+                  max={9999}
                   anchorOrigin={{
                     vertical: "top",
                     horizontal: "right",
@@ -447,6 +449,7 @@ const Transaction = ({
               <Badge
                 badgeContent={finishedCount}
                 color="success"
+                max={9999}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",

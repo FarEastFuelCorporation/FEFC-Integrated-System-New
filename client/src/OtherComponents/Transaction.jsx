@@ -128,7 +128,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: (params) => {
         let haulingDate;
 
@@ -164,7 +164,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: (params) => {
         const scheduledTime = params.row.ScheduledTransaction[0]
           ? params.row.ScheduledTransaction[0].scheduledTime
@@ -200,7 +200,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
       valueGetter: (params) => {
         return params.row.QuotationWaste?.wasteName;
       },
@@ -212,7 +212,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 200,
+      minWidth: 150,
       valueGetter: (params) => {
         return params.row.QuotationTransportation?.VehicleType?.typeOfVehicle;
       },
@@ -224,7 +224,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       valueGetter: (params) => {
         let status;
 
@@ -263,7 +263,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       valueGetter: (params) => {
         let status;
 

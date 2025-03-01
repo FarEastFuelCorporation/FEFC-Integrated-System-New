@@ -207,6 +207,18 @@ const Transaction = ({
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "typeOfVehicle",
+      headerName: "Type Of Vehicle",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 200,
+      valueGetter: (params) => {
+        return params.row.QuotationTransportation?.VehicleType?.typeOfVehicle;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "status",
       headerName: "Transaction Status",
       headerAlign: "center",

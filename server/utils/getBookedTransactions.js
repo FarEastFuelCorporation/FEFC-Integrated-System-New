@@ -716,13 +716,25 @@ const getIncludeOptionsVerify = () => [
       },
     ],
   },
-];  
+];
 
 const getIncludeOptionsPartial = () => [
   {
     model: QuotationWaste,
     as: "QuotationWaste",
     attributes: ["wasteName"],
+  },
+  {
+    model: QuotationTransportation,
+    as: "QuotationTransportation",
+    required: false,
+    include: [
+      {
+        model: VehicleType,
+        as: "VehicleType",
+        attributes: ["typeOfVehicle"],
+      },
+    ],
   },
   {
     model: Client,

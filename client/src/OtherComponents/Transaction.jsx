@@ -206,7 +206,10 @@ const Transaction = ({
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        return params.row.QuotationTransportation?.VehicleType?.typeOfVehicle;
+        return (
+          params.row.QuotationTransportation?.VehicleType?.typeOfVehicle ||
+          "CLIENT VEHICLE"
+        );
       },
       renderCell: renderCellWithWrapText,
     },

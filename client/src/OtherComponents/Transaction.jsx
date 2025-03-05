@@ -214,6 +214,35 @@ const Transaction = ({
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "plateNumber",
+      headerName: "Plate Number",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        if (!params.row.QuotationTransportation) {
+          return "CLIENT VEHICLE";
+        } else if (
+          params.row?.ScheduledTransaction?.[0]?.DispatchedTransaction &&
+          params.row?.ScheduledTransaction?.[0]?.DispatchedTransaction.length >
+            0
+        ) {
+          return params.row?.ScheduledTransaction?.[0]
+            ?.DispatchedTransaction?.[0]?.Vehicle?.plateNumber;
+        } else if (
+          params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction &&
+          params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction.length > 0
+        ) {
+          return params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.vehicle;
+        } else {
+          return "PENDING";
+        }
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "status",
       headerName: "Transaction Status",
       headerAlign: "center",

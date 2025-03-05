@@ -748,10 +748,27 @@ const getIncludeOptionsPartial = () => [
     attributes: ["logisticsId", "scheduledDate", "scheduledTime"],
     include: [
       {
+        model: DispatchedTransaction,
+        as: "DispatchedTransaction",
+        required: false,
+        include: [
+          {
+            model: Vehicle,
+            as: "Vehicle",
+            attributes: ["plateNumber"],
+            include: {
+              model: VehicleType,
+              as: "VehicleType",
+              attributes: ["typeOfVehicle"],
+            },
+          },
+        ],
+      },
+      {
         model: ReceivedTransaction,
         as: "ReceivedTransaction",
         required: false,
-        attributes: ["submitTo"],
+        attributes: ["submitTo", "vehicle"],
       },
     ],
   },

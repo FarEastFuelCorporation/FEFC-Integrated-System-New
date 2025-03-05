@@ -50,11 +50,13 @@ const ScheduledTransactions = ({ user }) => {
       setPendingTransactions(
         scheduledTransactionResponse.data.pendingTransactions
       );
+      console.log(scheduledTransactionResponse.data.pendingTransactions);
 
       // For in progress transactions
       setInProgressTransactions(
         scheduledTransactionResponse.data.inProgressTransactions
       );
+      console.log(scheduledTransactionResponse.data.inProgressTransactions);
 
       // For finished transactions
       setFinishedTransactions(

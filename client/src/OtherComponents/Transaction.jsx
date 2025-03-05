@@ -221,9 +221,7 @@ const Transaction = ({
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        if (!params.row.QuotationTransportation) {
-          return "CLIENT VEHICLE";
-        } else if (
+        if (
           params.row?.ScheduledTransaction?.[0]?.DispatchedTransaction &&
           params.row?.ScheduledTransaction?.[0]?.DispatchedTransaction.length >
             0
@@ -234,8 +232,7 @@ const Transaction = ({
           params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction &&
           params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction.length > 0
         ) {
-          return params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-            ?.vehicle;
+          return params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.vehicle.toUpperCase();
         } else {
           return "PENDING";
         }

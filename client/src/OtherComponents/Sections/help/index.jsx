@@ -23,6 +23,16 @@ const guides = [
       "A comprehensive overview of the system's transaction processes.",
     pdfUrl: "/guides/SYSTEM_TRANSACTION_FLOW.pdf", // Public folder path
   },
+  {
+    title: "View/Download Certificates",
+    description: "Guide on accessing and downloading Certificates Destruction.",
+    pdfUrl: "/guides/VIEW_OR_DOWNLOAD_CERTIFICATES_GUIDE.pdf", // Public folder path
+  },
+  {
+    title: "View/Download Billing Statement",
+    description: "Guide on accessing and downloading Billing Statement.",
+    pdfUrl: "/guides/VIEW_OR_DOWNLOAD_CERTIFICATES_GUIDE.pdf", // Public folder path
+  },
   // {
   //   title: "FAQ",
   //   description: "Answers to frequently asked questions.",
@@ -47,7 +57,7 @@ const Help = () => {
       </Box>
       <Grid container spacing={3}>
         {guides.map((guide, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid item xs={12} sm={6} md={12 / 5} key={index}>
             <Card
               variant="outlined"
               onClick={() => handleCardClick(guide.pdfUrl)}

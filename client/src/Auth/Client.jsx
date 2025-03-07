@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LandingPage from "../OtherComponents/LandingPage";
 import ClientLogin from "./Client/ClientLogin";
 import ClientSignup from "./Client/ClientSignup";
-import { Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
 const Client = ({ onLogin }) => {
@@ -38,6 +38,15 @@ const Client = ({ onLogin }) => {
             : "Switch to Client Login"}
         </Typography>
       </div>
+      {/* Footer Section */}
+      <Box textAlign="center" mt="auto" mb={2} p={2}>
+        <Typography variant="h5" color={colors.grey[100]}>
+          Powered by <strong>JIM'S INTEGRATION</strong>
+        </Typography>
+        <Typography variant="h5" color={colors.grey[100]}>
+          <i>jimsintegration@gmail.com</i>
+        </Typography>
+      </Box>
     </div>
   );
 };

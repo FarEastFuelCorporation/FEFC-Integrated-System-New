@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LandingPage from "../OtherComponents/LandingPage";
 import EmployeeSignup from "./Employee/EmployeeSignup";
 import EmployeeLogin from "./Employee/EmployeeLogin";
-import { Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
 const Employee = ({ onLogin }) => {
@@ -38,6 +38,14 @@ const Employee = ({ onLogin }) => {
             : "Switch to Employee Login"}
         </Typography>
       </div>
+      <Box textAlign="center" mt="auto" mb={2} p={2}>
+        <Typography variant="h5" color={colors.grey[100]}>
+          Powered by <strong>JIM'S INTEGRATION</strong>
+        </Typography>
+        <Typography variant="h5" color={colors.grey[100]}>
+          <i>jimsintegration@gmail.com</i>
+        </Typography>
+      </Box>
     </div>
   );
 };

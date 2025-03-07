@@ -324,141 +324,152 @@ const GeneratorSidebar = ({ user }) => {
         />
       )}
       <ProSidebar collapsed={isCollapsed}>
-        <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
-          <MenuItem
-            onClick={handleCollapse}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
-            style={{
-              margin: "0 0 20px 0",
-              color: colors.grey[100],
-            }}
-          >
-            {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                ml="15px"
-              >
-                <Typography variant="h4" color={colors.grey[100]}>
-                  GENERATOR
-                </Typography>
-                <IconButton onClick={handleCollapse}>
-                  <MenuOutlinedIcon />
-                </IconButton>
+        <Box display="flex" flexDirection="column" height="calc(100vh - 64px)">
+          <Menu iconShape="square" style={{ height: "calc(100vh - 64px)" }}>
+            <MenuItem
+              onClick={handleCollapse}
+              icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+              style={{
+                margin: "0 0 20px 0",
+                color: colors.grey[100],
+              }}
+            >
+              {!isCollapsed && (
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  ml="15px"
+                >
+                  <Typography variant="h4" color={colors.grey[100]}>
+                    GENERATOR
+                  </Typography>
+                  <IconButton onClick={handleCollapse}>
+                    <MenuOutlinedIcon />
+                  </IconButton>
+                </Box>
+              )}
+            </MenuItem>
+
+            {!isCollapsed && user && profilePictureSrc && (
+              <Box mb="25px">
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  onClick={handleOpenModal}
+                  style={{ cursor: "pointer" }}
+                >
+                  <img
+                    alt="profile-user"
+                    width="100px"
+                    height="100px"
+                    src={profilePictureSrc}
+                    style={{ borderRadius: "50%" }}
+                  />
+                </Box>
+
+                <Box textAlign="center">
+                  <Typography
+                    variant="h3"
+                    color={colors.grey[100]}
+                    fontWeight="bold"
+                    sx={{ m: "10px 0 0 0" }}
+                  >
+                    {clientDetails.clientName}
+                  </Typography>
+                </Box>
               </Box>
             )}
-          </MenuItem>
 
-          {!isCollapsed && user && profilePictureSrc && (
-            <Box mb="25px">
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                onClick={handleOpenModal}
-                style={{ cursor: "pointer" }}
-              >
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={profilePictureSrc}
-                  style={{ borderRadius: "50%" }}
-                />
-              </Box>
-
-              <Box textAlign="center">
-                <Typography
-                  variant="h3"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
+            {isCollapsed && user && profilePictureSrc && (
+              <Box mb="25px">
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  onClick={handleOpenModal}
+                  style={{ cursor: "pointer" }}
                 >
-                  {clientDetails.clientName}
-                </Typography>
+                  <img
+                    alt="profile-user"
+                    width="50px"
+                    height="50px"
+                    src={profilePictureSrc}
+                    style={{ borderRadius: "50%" }}
+                  />
+                </Box>
               </Box>
-            </Box>
-          )}
+            )}
 
-          {isCollapsed && user && profilePictureSrc && (
-            <Box mb="25px">
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                onClick={handleOpenModal}
-                style={{ cursor: "pointer" }}
+            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+              <Item
+                title="Dashboard"
+                to=""
+                icon={<HomeOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
+
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 20px" }}
               >
-                <img
-                  alt="profile-user"
-                  width="50px"
-                  height="50px"
-                  src={profilePictureSrc}
-                  style={{ borderRadius: "50%" }}
-                />
-              </Box>
+                Data
+              </Typography>
+              <Item
+                title="Transactions"
+                to="transactions"
+                icon={<ContactsOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
+              <Item
+                title="Quotations"
+                to="quotations"
+                icon={<FormatListBulletedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 20px" }}
+              >
+                Pages
+              </Typography>
+              <Item
+                title="Calendar"
+                to="calendar"
+                icon={<CalendarTodayOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
+              <Item
+                title="Help"
+                to="help"
+                icon={<HelpIcon />}
+                selected={selected}
+                setSelected={setSelected}
+                collapsed={isCollapsed}
+              />
             </Box>
-          )}
-
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
-              title="Dashboard"
-              to=""
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
+          </Menu>
+          {/* Footer Section */}
+          <Box textAlign="center" mt="auto" mb={2} p={2}>
+            <Typography variant="h5" color={colors.grey[100]}>
+              Powered by <strong>JIM'S INTEGRATION</strong>
             </Typography>
-            <Item
-              title="Transactions"
-              to="transactions"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Quotations"
-              to="quotations"
-              icon={<FormatListBulletedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
+            <Typography variant="h5" color={colors.grey[100]}>
+              <i>jimsintegration@gmail.com</i>
             </Typography>
-            <Item
-              title="Calendar"
-              to="calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Help"
-              to="help"
-              icon={<HelpIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
           </Box>
-        </Menu>
+        </Box>
       </ProSidebar>
 
       <Modal

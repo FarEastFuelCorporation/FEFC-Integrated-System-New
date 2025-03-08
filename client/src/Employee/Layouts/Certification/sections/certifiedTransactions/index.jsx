@@ -55,20 +55,45 @@ const CertifiedTransactions = ({ user }) => {
         `${apiUrl}/api/certifiedTransaction`
       );
 
+      // // For pending transactions
+      // setPendingTransactions(
+      //   certifiedTransactionResponse.data.pendingTransactions
+      // );
+
+      // // For in progress transactions
+      // setInProgressTransactions(
+      //   certifiedTransactionResponse.data.inProgressTransactions
+      // );
+
+      // // For finished transactions
+      // setFinishedTransactions(
+      //   certifiedTransactionResponse.data.finishedTransactions
+      // );
+
+      // Define excluded createdBy values
+      const excludedCreators = ["GEN-142", "GEN-143"];
+
       // For pending transactions
       setPendingTransactions(
-        certifiedTransactionResponse.data.pendingTransactions
+        certifiedTransactionResponse.data.pendingTransactions.filter(
+          (transaction) => !excludedCreators.includes(transaction.createdBy)
+        )
       );
 
-      // For in progress transactions
+      // For in-progress transactions
       setInProgressTransactions(
-        certifiedTransactionResponse.data.inProgressTransactions
+        certifiedTransactionResponse.data.inProgressTransactions.filter(
+          (transaction) => !excludedCreators.includes(transaction.createdBy)
+        )
       );
 
       // For finished transactions
       setFinishedTransactions(
-        certifiedTransactionResponse.data.finishedTransactions
+        certifiedTransactionResponse.data.finishedTransactions.filter(
+          (transaction) => !excludedCreators.includes(transaction.createdBy)
+        )
       );
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);

@@ -27,7 +27,7 @@ const Quotation = sequelize.define(
     },
     clientId: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     termsChargeDays: {
       type: DataTypes.INTEGER,

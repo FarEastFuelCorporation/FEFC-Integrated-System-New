@@ -245,13 +245,14 @@ Client.hasMany(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "createdBy",
   sourceKey: "clientId",
-  onDelete: "CASCADE",
+  onDelete: "SET NULL", // Change from CASCADE to SET NULL
 });
+
 BookedTransaction.belongsTo(Client, {
   as: "Client",
   foreignKey: "createdBy",
   targetKey: "clientId",
-  onDelete: "CASCADE",
+  onDelete: "SET NULL", // Change from CASCADE to SET NULL
 });
 
 TransporterClient.hasMany(BookedTransaction, {
@@ -725,13 +726,13 @@ Client.hasMany(Quotation, {
   as: "Quotation",
   foreignKey: "clientId",
   sourceKey: "clientId",
-  onDelete: "CASCADE",
+  onDelete: "SET NULL",
 });
 Quotation.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
   targetKey: "clientId",
-  onDelete: "CASCADE",
+  onDelete: "SET NULL",
 });
 
 Quotation.hasMany(QuotationWaste, {

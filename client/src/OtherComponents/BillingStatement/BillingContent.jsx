@@ -39,7 +39,7 @@ const BillingContent = ({
   let totalWeight = new Decimal(0);
 
   const firstPageHeight = pageHeight - headerHeight;
-  const nextPageHeight = pageHeight - 50;
+  const nextPageHeight = pageHeight;
 
   const groupedTransactions = Object.entries(
     // First, sort the transactions by the earliest scheduledDate
@@ -135,8 +135,9 @@ const BillingContent = ({
         if (element !== null) {
           currentPage.push(element); // Push the element only if it's not null
         }
-        currentPageHeight += elementHeight;
-        availableHeight -= elementHeight;
+
+        currentPageHeight += cellContent.length > 35 ? elementHeight : 22;
+        availableHeight -= cellContent.length > 35 ? elementHeight : 22;
       } else {
         addPage(); // Save current page and start a new one
         if (element !== null) {

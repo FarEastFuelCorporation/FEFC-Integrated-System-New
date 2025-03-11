@@ -98,13 +98,15 @@ const {
 const Quotation = require("./models/Quotation");
 const EmployeeAttachmentLegal = require("./models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("./models/EmployeeAttachmentMemo");
+const { Client } = require("mqtt");
+const BookedTransaction = require("./models/BookedTransaction");
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    // await EmployeeAttachmentMemo.sync({ alter: true });
+    // await Quotation.sync({ alter: true });
 
     // await handleAttendanceSync();
 

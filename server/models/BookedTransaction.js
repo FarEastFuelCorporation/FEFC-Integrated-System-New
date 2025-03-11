@@ -53,7 +53,7 @@ const BookedTransaction = sequelize.define(
     },
     createdBy: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     updatedAt: {
       type: DataTypes.DATE,

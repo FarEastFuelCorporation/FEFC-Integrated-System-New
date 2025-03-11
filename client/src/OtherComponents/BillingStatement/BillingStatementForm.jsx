@@ -21,7 +21,7 @@ const modifyApiUrlPort = (url) => {
   return url.replace(portPattern, ":3000");
 };
 
-const pageHeight = 795; // Full page height (A4 paper size in pixels)
+const pageHeight = 800; // Full page height (A4 paper size in pixels)
 const defaultHeaderHeight = 350; // Default approximate height for header
 const defaultFooterHeight = 120; // Default approximate height for footer
 

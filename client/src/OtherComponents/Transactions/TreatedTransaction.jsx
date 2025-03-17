@@ -37,9 +37,9 @@ const TreatedTransaction = ({
     row.ScheduledTransaction[0]?.ReceivedTransaction?.[0]?.SortedTransaction[0]
       ?.SortedWasteTransaction;
 
-  const sortedWasteTransactionSorted = sortedWasteTransaction.sort((a, b) =>
-    a.wasteName.localeCompare(b.wasteName)
-  );
+  const sortedWasteTransactionSorted = sortedWasteTransaction
+    .filter((item) => item.weight > 0) // Remove items with weight 0
+    .sort((a, b) => a.wasteName.localeCompare(b.wasteName));
 
   // Get the bookedTransactionId from ScheduledTransaction
   const bookedTransactionId = row.ScheduledTransaction[0].bookedTransactionId;
@@ -77,11 +77,11 @@ const TreatedTransaction = ({
     sortedTransaction.treatedWeight = treatedWeight;
   });
 
-  const totalSortedWeight = sortedWasteTransaction
+  const totalSortedWeight = sortedWasteTransactionSorted
     .map((transaction) => transaction.weight || 0)
     .reduce((total, weight) => total + weight, 0); // Sum the weights using reduce
 
-  const totalTreatedWeight = sortedWasteTransaction
+  const totalTreatedWeight = sortedWasteTransactionSorted
     .map((transaction) => transaction.treatedWeight || 0)
     .reduce((total, treatedWeight) => total + treatedWeight, 0); // Sum the weights using reduce
 
@@ -170,7 +170,7 @@ const TreatedTransaction = ({
   }
 
   const { latestTreatedDate, latestTreatedTime } = getLatestTreatedDateAndTime(
-    sortedWasteTransaction
+    sortedWasteTransactionSorted
   );
 
   const { latestTreatedDateTime } =
@@ -335,8 +335,9 @@ const TreatedTransaction = ({
           </Grid>
         )}
       </Box>
-      {sortedWasteTransaction && sortedWasteTransaction.length > 0 ? (
-        sortedWasteTransaction.map((waste, index) => {
+      {sortedWasteTransactionSorted &&
+      sortedWasteTransactionSorted.length > 0 ? (
+        sortedWasteTransactionSorted.map((waste, index) => {
           const treatedWasteTransactionHeight =
             waste.TreatedWasteTransaction.length === 0
               ? rowHeight + headerHeight
@@ -355,7 +356,7 @@ const TreatedTransaction = ({
                   Waste Name: {waste.wasteName}
                 </Typography>
                 <Box sx={{ display: "flex", gap: 2 }}>
-                  {sortedWasteTransaction[index].treatedWeight !==
+                  {sortedWasteTransactionSorted[index].treatedWeight !==
                     waste.weight &&
                     user.userType === 6 && (
                       <Button
@@ -373,7 +374,7 @@ const TreatedTransaction = ({
                       padding: "5px",
                       borderRadius: "5px",
                       backgroundColor:
-                        sortedWasteTransaction[index].treatedWeight ===
+                        sortedWasteTransactionSorted[index].treatedWeight ===
                         waste.weight
                           ? colors.greenAccent[700]
                           : "red",
@@ -382,7 +383,7 @@ const TreatedTransaction = ({
                   >
                     <Typography variant="h6">
                       {formatWeight2(
-                        sortedWasteTransaction[index].treatedWeight
+                        sortedWasteTransactionSorted[index].treatedWeight
                       )}{" "}
                       Kg Treated /{formatWeight2(waste.weight)} Kg
                     </Typography>

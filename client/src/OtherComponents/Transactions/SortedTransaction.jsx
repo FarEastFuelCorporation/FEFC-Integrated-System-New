@@ -24,7 +24,9 @@ const SortedTransaction = ({ row }) => {
         ...item,
         sortedDate: sortedTransaction.sortedDate,
         sortedTime: sortedTransaction.sortedTime,
-      })).sort((a, b) => a.wasteName.localeCompare(b.wasteName))
+      }))
+        .filter((item) => item.weight > 0) // Remove items with weight 0
+        .sort((a, b) => a.wasteName.localeCompare(b.wasteName))
     : [];
 
   const sortedScrapTransaction = sortedTransaction.SortedScrapTransaction

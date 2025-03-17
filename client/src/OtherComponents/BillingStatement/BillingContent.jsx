@@ -750,9 +750,11 @@ const BillingContent = ({
                                 }),
                               }}
                             >
-                              {new Decimal(usedWeight)
-                                .minus(new Decimal(fixedWeight))
-                                .toNumber()}
+                              {formatNumber2(
+                                new Decimal(usedWeight)
+                                  .minus(new Decimal(fixedWeight))
+                                  .toNumber()
+                              )}
                             </TableCell>
                             <TableCell
                               sx={{

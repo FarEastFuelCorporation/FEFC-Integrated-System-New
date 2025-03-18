@@ -30,10 +30,11 @@ export const formatWeight2 = (weight) => {
 };
 
 export const formatNumber = (weight) => {
+  const roundedWeight = Math.round(weight * 100) / 100;
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(weight);
+  }).format(roundedWeight);
 };
 
 export const formatNumber2 = (weight) => {

@@ -97,6 +97,7 @@ const BookModal = ({
             id: transport.vehicleTypeId,
             quotationTransportationId: transport.id,
             typeOfVehicle: transport.VehicleType.typeOfVehicle,
+            haulingArea: transport.haulingArea,
           })
         );
 
@@ -276,7 +277,7 @@ const BookModal = ({
               Leave the Vehicle Type field empty if using your own vehicle.
             </Typography>
             <TextField
-              label="Vehicle Type"
+              label="Vehicle Type / Hauling Area"
               name="quotationTransportationId"
               value={formData.quotationTransportationId}
               onChange={handleInputChange}
@@ -295,7 +296,7 @@ const BookModal = ({
                   key={index}
                   value={transport.quotationTransportationId}
                 >
-                  {transport.typeOfVehicle}
+                  {transport.typeOfVehicle} - {transport.haulingArea}
                 </MenuItem>
               ))}
             </TextField>

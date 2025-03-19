@@ -107,7 +107,7 @@ const QuotationHeader = ({ quotationData }) => {
             <Box display="flex" fontSize="10px">
               <Typography>
                 {clientData?.billerContactNumber
-                  ? "Contact #: " + clientData?.billerContactPerson
+                  ? "Contact #: " + clientData?.billerContactNumber
                   : ""}
               </Typography>
             </Box>

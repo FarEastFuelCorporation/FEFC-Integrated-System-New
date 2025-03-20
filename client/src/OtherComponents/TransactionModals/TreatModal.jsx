@@ -53,11 +53,6 @@ const TreatModal = ({
           setTreatmentMachines(
             treatmentMachinesResponse.data.treatmentMachines
           );
-          setTotalWeight(formData.waste.weight);
-          setTotalTreatedWeight(
-            formData.waste.treatedWeight +
-              calculateTotalWeight(formData.treatedWastes)
-          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -69,15 +64,33 @@ const TreatModal = ({
       setErrorMessage("");
       setShowErrorMessage(false);
     }
-  }, [
-    open,
-    formData.clientId,
-    formData.waste.weight,
-    formData.treatedWastes,
-    setErrorMessage,
-    setShowErrorMessage,
-    formData.waste.treatedWeight,
-  ]);
+  }, [open, setErrorMessage, setShowErrorMessage]);
+
+  useEffect(() => {
+    if (open) {
+      const fetchData = async () => {
+        try {
+          setTotalWeight(
+            formData.waste.reduce((acc, w) => acc + (w.weight || 0), 0)
+          );
+
+          setTotalTreatedWeight(
+            formData.waste.reduce(
+              (acc, w) =>
+                acc +
+                (w.treatedWeight || 0) +
+                calculateTotalWeight(w.treatedWastes || []),
+              0
+            )
+          );
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [open, formData.waste, formData.waste.treatedWeight]);
 
   const formatWeight = (weight) => {
     // Check if weight is NaN
@@ -93,77 +106,112 @@ const TreatModal = ({
   };
 
   // Function to calculate the total weight
-  const calculateTotalWeight = (treatedWastes) => {
+  const calculateTotalWeight = (treatedWastes = []) => {
     return treatedWastes.reduce(
-      (total, waste) => total + parseFloat(waste.weight || 0),
+      (total, waste) =>
+        total +
+        (isNaN(parseFloat(waste.weight)) ? 0 : parseFloat(waste.weight)),
       0
     );
   };
 
-  const handleInputChange = (e, index, name) => {
+  const handleInputChange = (e, i, index, name) => {
     const { value } = e.target;
-    const updatedTreatedWastes = [...formData.treatedWastes];
-    updatedTreatedWastes[index] = {
-      ...updatedTreatedWastes[index],
-      [name]: value,
-    };
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      treatedWastes: updatedTreatedWastes,
-    }));
+
+    setFormData((prevFormData) => {
+      const updatedWaste = [...prevFormData.waste]; // Copy waste array
+      updatedWaste[i] = {
+        ...updatedWaste[i],
+        treatedWastes: updatedWaste[i].treatedWastes.map((w, idx) =>
+          idx === index ? { ...w, [name]: value } : w
+        ),
+      };
+
+      return {
+        ...prevFormData,
+        waste: updatedWaste, // Update the waste array
+      };
+    });
   };
 
-  const handleTreatmentProcessChange = (index, value) => {
+  const handleTreatmentProcessChange = (i, index, value) => {
     // Filter the treatment machines based on the selected treatment process
     const filteredMachines = treatmentMachines.filter(
       (machine) => machine.TreatmentProcess.id === value
     );
+
     setFormData((prevFormData) => {
-      const updatedTreatedWastes = [...prevFormData.treatedWastes];
-      updatedTreatedWastes[index].treatmentProcessId = value;
-      updatedTreatedWastes[index].filteredMachines = filteredMachines; // Store the filtered machines in formData for later use
+      const updatedWaste = [...prevFormData.waste]; // Copy waste array
+      updatedWaste[i] = {
+        ...updatedWaste[i],
+        treatedWastes: updatedWaste[i].treatedWastes.map((w, idx) =>
+          idx === index
+            ? { ...w, treatmentProcessId: value, filteredMachines }
+            : w
+        ),
+      };
 
       return {
         ...prevFormData,
-        treatedWastes: updatedTreatedWastes,
+        waste: updatedWaste, // Update the waste array
       };
     });
   };
 
-  const handleTreatmentMachineChange = (index, value) => {
+  const handleTreatmentMachineChange = (i, index, value) => {
     setFormData((prevFormData) => {
-      const updatedTreatedWastes = [...prevFormData.treatedWastes];
-      updatedTreatedWastes[index].treatmentMachineId = value;
+      const updatedWaste = [...prevFormData.waste]; // Copy waste array
+      updatedWaste[i] = {
+        ...updatedWaste[i],
+        treatedWastes: updatedWaste[i].treatedWastes.map((w, idx) =>
+          idx === index ? { ...w, treatmentMachineId: value } : w
+        ),
+      };
+
       return {
         ...prevFormData,
-        treatedWastes: updatedTreatedWastes,
+        waste: updatedWaste, // Update the waste array
       };
     });
   };
 
-  const handleWeightChange = (index, field, value) => {
+  const handleWeightChange = (i, index, field, value) => {
     setFormData((prevFormData) => {
-      const updatedTreatedWastes = [...prevFormData.treatedWastes];
-      const currentWeight = parseFloat(updatedTreatedWastes[index][field] || 0);
-      const newValue = parseFloat(value);
+      const updatedWaste = [...prevFormData.waste];
 
-      // Update the weight of the specified waste
+      if (!updatedWaste[i] || !updatedWaste[i].treatedWastes) {
+        return prevFormData; // Ensure waste and treatedWastes exist before modifying
+      }
+
+      const updatedTreatedWastes = [...updatedWaste[i].treatedWastes];
+
+      // Parse weight safely
+      const currentWeight = parseFloat(updatedTreatedWastes[index][field]) || 0;
+      const newValue = isNaN(parseFloat(value)) ? 0 : parseFloat(value);
+
+      // Update the weight of the specified treated waste
       updatedTreatedWastes[index][field] = value;
 
-      // Calculate the total weight including the current and new value
-      const newTotalWeight = totalTreatedWeight - currentWeight + newValue;
+      // Recalculate the total treated weight for this waste
+      updatedWaste[i].treatedWastes = updatedTreatedWastes;
 
-      // Update the total treated weight state
-      setTotalTreatedWeight(newTotalWeight);
+      // Recalculate total treated weight across all wastes
+      const newTotalTreatedWeight = updatedWaste.reduce(
+        (total, w) => total + calculateTotalWeight(w.treatedWastes || []),
+        0
+      );
+
+      // Update state
+      setTotalTreatedWeight(newTotalTreatedWeight);
 
       return {
         ...prevFormData,
-        treatedWastes: updatedTreatedWastes,
+        waste: updatedWaste,
       };
     });
   };
 
-  const addWasteField = () => {
+  const addWasteField = (index) => {
     const newWasteField = {
       treatedDate: null,
       treatedTime: null,
@@ -172,31 +220,37 @@ const TreatModal = ({
       weight: 0,
     };
 
-    const newTreatedWastes = [...formData.treatedWastes, newWasteField];
+    const updatedWaste = [...formData.waste]; // Clone waste array
+    if (!updatedWaste[index].treatedWastes) {
+      updatedWaste[index].treatedWastes = []; // Ensure treatedWastes exists
+    }
+    updatedWaste[index].treatedWastes.push(newWasteField);
 
     setFormData({
       ...formData,
-      treatedWastes: newTreatedWastes,
+      waste: updatedWaste,
     });
 
     // Recalculate the total weight
-    setTotalTreatedWeight(calculateTotalWeight(newTreatedWastes));
+    setTotalTreatedWeight(calculateTotalWeight(updatedWaste));
   };
 
-  const removeWasteField = (index) => {
-    const newTreatedWastes = formData.treatedWastes.filter(
+  const removeWasteField = (idx, index) => {
+    const updatedWaste = [...formData.waste]; // Clone waste array
+    updatedWaste[idx].treatedWastes = updatedWaste[idx].treatedWastes.filter(
       (_, i) => i !== index
     );
 
     setFormData({
       ...formData,
-      treatedWastes: newTreatedWastes,
+      waste: updatedWaste, // Update the waste array properly
     });
 
     // Recalculate the total weight
-    setTotalTreatedWeight(calculateTotalWeight(newTreatedWastes));
+    setTotalTreatedWeight(
+      calculateTotalWeight(updatedWaste.flatMap((w) => w.treatedWastes || []))
+    );
   };
-
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -226,171 +280,228 @@ const TreatModal = ({
         <Typography variant="h6" component="h2" color="error">
           {showErrorMessage && errorMessage}
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "end",
-          }}
-        >
-          <Typography variant="h5">
-            {formData.waste ? formData.waste.wasteName : ""}
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2 }}>
+        {!formData.isWaste && (
+          <Box>
             <Box
               sx={{
-                padding: "5px",
-                borderRadius: "5px",
-                backgroundColor:
-                  totalTreatedWeight === totalWeight
-                    ? colors.greenAccent[700]
-                    : "red",
-                color: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "end",
               }}
             >
-              <Typography variant="h6">
-                {formatWeight(totalTreatedWeight)} Kg Treated /
-                {formatWeight(totalWeight)} Kg
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-        {formData.treatedWastes.map((waste, index) => (
-          <Box key={index}>
-            <Typography variant="subtitle2" gutterBottom>
-              Waste Entry #{index + 1}
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <FormControl fullWidth>
-                  <InputLabel
-                    id={`treatmentProcess-type-select-label-${index}`}
-                    style={{
-                      color: colors.grey[100],
-                    }}
-                  >
-                    Treatment Process
-                  </InputLabel>
-                  <Select
-                    labelId={`treatmentProcess-type-select-label-${index}`}
-                    name={`treatedWastes[${index}].treatmentProcessId`}
-                    value={waste.treatmentProcessId}
-                    onChange={(e) =>
-                      handleTreatmentProcessChange(index, e.target.value)
-                    }
-                    label="treatmentProcess"
-                    fullWidth
-                    required
-                  >
-                    {treatmentProcesses.map((process) => (
-                      <MenuItem key={process.id} value={process.id}>
-                        {process.treatmentProcess}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={3}>
-                <FormControl fullWidth>
-                  <InputLabel
-                    id={`treatmentMachine-type-select-label-${index}`}
-                    style={{
-                      color: colors.grey[100],
-                    }}
-                  >
-                    Treatment Machine
-                  </InputLabel>
-                  <Select
-                    labelId={`treatmentMachine-type-select-label-${index}`}
-                    name={`treatedWastes[${index}].treatmentMachineId`}
-                    value={waste.treatmentMachineId}
-                    onChange={(e) =>
-                      handleTreatmentMachineChange(index, e.target.value)
-                    }
-                    label="treatmentMachine"
-                    fullWidth
-                    required
-                  >
-                    {waste.filteredMachines &&
-                      waste.filteredMachines.map((machine) => (
-                        <MenuItem key={machine.id} value={machine.id}>
-                          {machine.machineName}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={1.5}>
-                <TextField
-                  label="Weight"
-                  name={`treatedWastes[${index}].weight`}
-                  value={waste.weight}
-                  onChange={(e) =>
-                    handleWeightChange(index, "weight", e.target.value)
-                  }
-                  type="number"
-                  fullWidth
-                  required
-                  InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
+              <Typography variant="h5">TOTAL</Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Box
+                  sx={{
+                    padding: "5px",
+                    borderRadius: "5px",
+                    backgroundColor:
+                      totalTreatedWeight === totalWeight
+                        ? colors.greenAccent[700]
+                        : "red",
+                    color: "white",
                   }}
-                  autoComplete="off"
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <TextField
-                  label="Treated Date"
-                  name={`treatedWastes[${index}].treatedDate`}
-                  value={waste.treatedDate}
-                  onChange={(e) => handleInputChange(e, index, "treatedDate")}
-                  fullWidth
-                  type="date"
-                  required
-                  InputLabelProps={{
-                    shrink: true,
-                    style: {
-                      color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
-              </Grid>
-              <Grid item xs={1.5}>
-                <TextField
-                  label="Treated Time"
-                  name={`treatedWastes[${index}].treatedTime`}
-                  value={waste.treatedTime}
-                  onChange={(e) => handleInputChange(e, index, "treatedTime")}
-                  fullWidth
-                  type="time"
-                  required
-                  InputLabelProps={{
-                    shrink: true,
-                    style: {
-                      color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <IconButton
-                  color="error"
-                  onClick={() => removeWasteField(index)}
                 >
-                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                  <Typography variant="h6">
+                    {formatWeight(totalTreatedWeight)} Kg Treated /
+                    {formatWeight(totalWeight)} Kg
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <hr />
+          </Box>
+        )}
+
+        {formData.waste.map((item, i) => (
+          <Box key={i}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "end",
+              }}
+            >
+              <Typography variant="h5">
+                {formData.waste ? formData.waste[i].wasteName : ""}
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Box
+                  sx={{
+                    padding: "5px",
+                    borderRadius: "5px",
+                    backgroundColor:
+                      formData.waste[i].treatedWastes.reduce(
+                        (total, waste) =>
+                          total + (parseFloat(waste.weight) || 0),
+                        0
+                      ) === formData.waste[i].weight
+                        ? colors.greenAccent[700]
+                        : "red",
+                    color: "white",
+                  }}
+                >
+                  <Typography variant="h6">
+                    {formatWeight(
+                      formData.waste[i].treatedWastes.reduce(
+                        (total, waste) =>
+                          total + (parseFloat(waste.weight) || 0),
+                        0
+                      )
+                    )}{" "}
+                    Kg Treated /{formatWeight(formData.waste[i].weight)} Kg
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            {item.treatedWastes.map((waste, index) => (
+              <Box key={index}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Waste Entry #{index + 1}
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={3}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`treatmentProcess-type-select-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        Treatment Process
+                      </InputLabel>
+                      <Select
+                        labelId={`treatmentProcess-type-select-label-${index}`}
+                        name={`treatedWastes[${index}].treatmentProcessId`}
+                        value={waste.treatmentProcessId}
+                        onChange={(e) =>
+                          handleTreatmentProcessChange(i, index, e.target.value)
+                        }
+                        label="treatmentProcess"
+                        fullWidth
+                        required
+                      >
+                        {treatmentProcesses.map((process) => (
+                          <MenuItem key={process.id} value={process.id}>
+                            {process.treatmentProcess}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id={`treatmentMachine-type-select-label-${index}`}
+                        style={{
+                          color: colors.grey[100],
+                        }}
+                      >
+                        Treatment Machine
+                      </InputLabel>
+                      <Select
+                        labelId={`treatmentMachine-type-select-label-${index}`}
+                        name={`treatedWastes[${index}].treatmentMachineId`}
+                        value={waste.treatmentMachineId}
+                        onChange={(e) =>
+                          handleTreatmentMachineChange(i, index, e.target.value)
+                        }
+                        label="treatmentMachine"
+                        fullWidth
+                        required
+                      >
+                        {waste.filteredMachines &&
+                          waste.filteredMachines.map((machine) => (
+                            <MenuItem key={machine.id} value={machine.id}>
+                              {machine.machineName}
+                            </MenuItem>
+                          ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <TextField
+                      label="Weight"
+                      name={`treatedWastes[${index}].weight`}
+                      value={waste.weight}
+                      onChange={(e) =>
+                        handleWeightChange(i, index, "weight", e.target.value)
+                      }
+                      type="number"
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                      autoComplete="off"
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <TextField
+                      label="Treated Date"
+                      name={`treatedWastes[${index}].treatedDate`}
+                      value={waste.treatedDate}
+                      onChange={(e) =>
+                        handleInputChange(e, i, index, "treatedDate")
+                      }
+                      fullWidth
+                      type="date"
+                      required
+                      InputLabelProps={{
+                        shrink: true,
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                      autoComplete="off"
+                    />
+                  </Grid>
+                  <Grid item xs={1.5}>
+                    <TextField
+                      label="Treated Time"
+                      name={`treatedWastes[${index}].treatedTime`}
+                      value={waste.treatedTime}
+                      onChange={(e) =>
+                        handleInputChange(e, i, index, "treatedTime")
+                      }
+                      fullWidth
+                      type="time"
+                      required
+                      InputLabelProps={{
+                        shrink: true,
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                      autoComplete="off"
+                    />
+                  </Grid>
+                  <Grid item xs={1}>
+                    <IconButton
+                      color="error"
+                      onClick={() => removeWasteField(i, index)}
+                    >
+                      <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
+            {formData.waste[i].treatedWastes.reduce(
+              (total, waste) => total + (parseFloat(waste.weight) || 0),
+              0
+            ) < formData.waste[i].weight && (
+              <Box display="flex" justifyContent="center" mt={2}>
+                <IconButton color="success" onClick={() => addWasteField(i)}>
+                  <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
                 </IconButton>
-              </Grid>
-            </Grid>
+              </Box>
+            )}
+            <hr />
           </Box>
         ))}
-        <Box display="flex" justifyContent="center" mt={2}>
-          <IconButton color="success" onClick={addWasteField}>
-            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
-          </IconButton>
-        </Box>
         <TextField
           label="Remarks"
           name="remarks"

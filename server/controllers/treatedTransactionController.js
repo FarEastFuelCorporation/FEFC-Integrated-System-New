@@ -18,17 +18,15 @@ async function createTreatedTransactionController(req, res) {
       bookedTransactionId,
       sortedTransactionId,
       warehousedTransactionId,
-      sortedWasteTransactionId,
-      warehousedTransactionItemId,
       submitTo,
-      treatedWastes,
+      waste, // Now an array of waste objects
       remarks,
       statusId,
       createdBy,
     } = req.body;
-    console.log("logger:" + req.body);
+    console.log("Logger:", req.body);
 
-    remarks = remarks && remarks.toUpperCase();
+    remarks = remarks?.toUpperCase();
 
     // Create TreatedTransaction entry
     const newTreatedTransaction = await TreatedTransaction.create(
@@ -40,62 +38,67 @@ async function createTreatedTransactionController(req, res) {
         remarks,
         createdBy,
       },
-      { transaction: transaction }
+      { transaction }
     );
-    // Adding treated wastes to TreatedWasteTransaction table
-    if (treatedWastes && treatedWastes.length > 0) {
-      const treatedWastePromises = treatedWastes.map((waste) => {
-        return TreatedWasteTransaction.create(
-          {
-            treatedTransactionId: newTreatedTransaction.id,
-            sortedWasteTransactionId:
-              submitTo === "SORTING" ? sortedWasteTransactionId : null,
-            warehousedTransactionItemId:
-              submitTo === "WAREHOUSE" ? warehousedTransactionItemId : null,
-            treatmentProcessId: waste.treatmentProcessId,
-            treatmentMachineId: waste.treatmentMachineId,
-            weight: waste.weight,
-            treatedDate: waste.treatedDate,
-            treatedTime: waste.treatedTime,
-          },
-          { transaction: transaction }
-        );
-      });
+
+    // Iterate over the waste array and process treatedWastes
+    if (waste && waste.length > 0) {
+      const treatedWastePromises = waste.flatMap((w) =>
+        (w.treatedWastes || []).map((treatedWaste) =>
+          TreatedWasteTransaction.create(
+            {
+              treatedTransactionId: newTreatedTransaction.id,
+              sortedWasteTransactionId:
+                submitTo === "SORTING" ? w.sortedWasteTransactionId : null,
+              warehousedTransactionItemId:
+                submitTo === "WAREHOUSE" ? w.warehousedTransactionItemId : null,
+              treatmentProcessId: treatedWaste.treatmentProcessId,
+              treatmentMachineId: treatedWaste.treatmentMachineId,
+              weight: treatedWaste.weight,
+              treatedDate: treatedWaste.treatedDate,
+              treatedTime: treatedWaste.treatedTime,
+            },
+            { transaction }
+          )
+        )
+      );
+
       await Promise.all(treatedWastePromises);
     }
 
+    // Fetch and update booked transaction
     const updatedBookedTransaction = await BookedTransaction.findByPk(
       bookedTransactionId,
       { transaction }
     );
 
     if (updatedBookedTransaction) {
-      // Update booked transaction attributes if isFinished is true
+      // Update status if isFinished is true
       if (isFinished) {
         updatedBookedTransaction.statusId = statusId;
         await updatedBookedTransaction.save({ transaction });
       }
+
       // Commit the transaction
       await transaction.commit();
 
-      // fetch transactions
-      const data = await fetchData(transactionStatusId);
+      // Fetch transactions
+      const data = await fetchData(statusId);
 
-      // Respond with the updated data
+      // Respond with updated data
       res.status(200).json({
         pendingTransactions: data.pending,
         inProgressTransactions: data.inProgress,
         finishedTransactions: data.finished,
       });
     } else {
-      // If booked transaction with the specified ID was not found
+      // If booked transaction is not found, rollback
       await transaction.rollback();
       res.status(404).json({
         message: `Booked Transaction with ID ${bookedTransactionId} not found`,
       });
     }
   } catch (error) {
-    // Handling errors
     console.error("Error:", error);
     await transaction.rollback();
     res.status(500).json({ message: "Internal server error" });

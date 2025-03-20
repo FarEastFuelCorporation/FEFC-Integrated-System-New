@@ -111,7 +111,37 @@ const TreatedTransactions = ({ user }) => {
   const handleOpenModal = (row, waste) => {
     setFormData({
       row: row,
-      waste: waste,
+      waste: waste
+        ? [
+            {
+              ...waste,
+              treatedWastes: waste.treatedWastes || [
+                {
+                  treatedDate: "",
+                  treatedTime: "",
+                  treatmentProcessId: "",
+                  treatmentMachineId: "",
+                  weight: 0,
+                },
+              ],
+              sortedWasteTransactionId: waste?.id,
+            },
+          ]
+        : row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]?.SortedWasteTransaction.map(
+            (w) => ({
+              ...w,
+              treatedWastes: w.treatedWastes || [
+                {
+                  treatedDate: "",
+                  treatedTime: "",
+                  treatmentProcessId: "",
+                  treatmentMachineId: "",
+                  weight: 0,
+                },
+              ],
+              sortedWasteTransactionId: w?.id,
+            })
+          ),
       isFinished: false,
       id: "",
       bookedTransactionId: row.id,
@@ -120,26 +150,20 @@ const TreatedTransactions = ({ user }) => {
           ?.SortedTransaction?.[0]?.id,
       warehousedTransactionId:
         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
-          ?.WarehousedTransaction[0]?.id,
-      sortedWasteTransactionId: waste.id,
-      warehousedTransactionItemId: waste.id,
+          ?.WarehousedTransaction?.[0]?.id,
+      sortedWasteTransactionId: waste?.id,
+      warehousedTransactionItemId: waste?.id,
+      isWaste: waste ? true : false,
       submitTo:
         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo,
-      treatedWastes: [
-        {
-          treatedDate: "",
-          treatedTime: "",
-          treatmentProcessId: "",
-          treatmentMachineId: "",
-          weight: 0,
-        },
-      ],
       remarks: "",
       statusId: 8,
       createdBy: user.id,
     });
     setOpenModal(true);
   };
+
+  console.log(formData);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -195,40 +219,63 @@ const TreatedTransactions = ({ user }) => {
       validationErrors.push("Booked Transaction ID is required.");
     }
 
-    // Validate sortedWasteTransactionId
-    if (!formData.sortedWasteTransactionId) {
-      validationErrors.push("Sorted Waste Transaction ID is required.");
-    }
-
-    // Validate treatedWastes
-    if (!formData.treatedWastes || formData.treatedWastes.length === 0) {
-      validationErrors.push("At least one treated waste entry is required.");
+    // Validate waste and treatedWastes
+    if (!formData.waste || formData.waste.length === 0) {
+      validationErrors.push("At least one waste entry is required.");
     } else {
-      formData.treatedWastes.forEach((waste, index) => {
-        if (!waste.treatmentProcessId) {
+      formData.waste.forEach((waste, wasteIndex) => {
+        if (!waste.sortedWasteTransactionId) {
           validationErrors.push(
-            `Treatment Process is required for waste entry #${index + 1}.`
+            `Sorted Waste Transaction ID is required for waste #${
+              wasteIndex + 1
+            }.`
           );
         }
-        if (!waste.treatmentMachineId) {
+
+        if (!waste.treatedWastes || waste.treatedWastes.length === 0) {
           validationErrors.push(
-            `Treatment Machine is required for waste entry #${index + 1}.`
+            `At least one treated waste entry is required for waste #${
+              wasteIndex + 1
+            }.`
           );
-        }
-        if (!waste.treatedDate) {
-          validationErrors.push(
-            `Treated Date is required for waste entry #${index + 1}.`
-          );
-        }
-        if (!waste.treatedTime) {
-          validationErrors.push(
-            `Treated Time is required for waste entry #${index + 1}.`
-          );
-        }
-        if (waste.weight <= 0) {
-          validationErrors.push(
-            `Weight must be greater than zero for waste entry #${index + 1}.`
-          );
+        } else {
+          waste.treatedWastes.forEach((treatedWaste, treatedIndex) => {
+            if (!treatedWaste.treatmentProcessId) {
+              validationErrors.push(
+                `Treatment Process is required for treated waste entry #${
+                  treatedIndex + 1
+                } in waste #${wasteIndex + 1}.`
+              );
+            }
+            if (!treatedWaste.treatmentMachineId) {
+              validationErrors.push(
+                `Treatment Machine is required for treated waste entry #${
+                  treatedIndex + 1
+                } in waste #${wasteIndex + 1}.`
+              );
+            }
+            if (!treatedWaste.treatedDate) {
+              validationErrors.push(
+                `Treated Date is required for treated waste entry #${
+                  treatedIndex + 1
+                } in waste #${wasteIndex + 1}.`
+              );
+            }
+            if (!treatedWaste.treatedTime) {
+              validationErrors.push(
+                `Treated Time is required for treated waste entry #${
+                  treatedIndex + 1
+                } in waste #${wasteIndex + 1}.`
+              );
+            }
+            if (treatedWaste.weight <= 0) {
+              validationErrors.push(
+                `Weight must be greater than zero for treated waste entry #${
+                  treatedIndex + 1
+                } in waste #${wasteIndex + 1}.`
+              );
+            }
+          });
         }
       });
     }
@@ -251,7 +298,7 @@ const TreatedTransactions = ({ user }) => {
             0
           );
 
-          // Total treated weight
+          // Total treated weight (including treatedWastes within waste)
           let totalTreatedWeight = sortedWasteTransactions.reduce(
             (total, wasteTransaction) =>
               total +
@@ -260,11 +307,18 @@ const TreatedTransactions = ({ user }) => {
                 : 0),
             0
           );
-          totalTreatedWeight += formData.treatedWastes.reduce(
-            (total, treatedWaste) =>
-              total + (treatedWaste.weight ? Number(treatedWaste.weight) : 0),
-            0
-          );
+
+          totalTreatedWeight += formData.waste.reduce((total, waste) => {
+            return (
+              total +
+              (waste.treatedWastes || []).reduce(
+                (subTotal, treatedWaste) =>
+                  subTotal +
+                  (treatedWaste.weight ? Number(treatedWaste.weight) : 0),
+                0
+              )
+            );
+          }, 0);
 
           // Compare treated weight to sorted weight
           if (totalTreatedWeight > totalSortedWeight) {
@@ -289,12 +343,11 @@ const TreatedTransactions = ({ user }) => {
 
   const updateIsFinished = (formData) => {
     // Extract relevant data from the formData object
-
     const scheduledTransaction = formData.row?.ScheduledTransaction?.[0];
-    if (!scheduledTransaction) return;
+    if (!scheduledTransaction) return formData;
 
     const receivedTransaction = scheduledTransaction?.ReceivedTransaction?.[0];
-    if (!receivedTransaction) return;
+    if (!receivedTransaction) return formData;
 
     const submitTo = receivedTransaction?.submitTo;
 
@@ -303,42 +356,42 @@ const TreatedTransactions = ({ user }) => {
         ? receivedTransaction?.SortedTransaction?.[0]
         : receivedTransaction?.WarehousedTransaction?.[0];
 
-    if (!transaction) return;
+    if (!transaction) return formData;
 
-    // Calculate the total weight
-    const transactionItem =
+    // Get transaction items based on submitTo type
+    const transactionItems =
       submitTo === "SORTING"
         ? transaction?.SortedWasteTransaction || []
         : transaction?.WarehousedTransactionItem || [];
 
-    const totalWarehousedWeight = transactionItem.reduce(
-      (total, wasteTransaction) => {
-        // Convert weight to a number and sum it
-        return (
-          total +
-          (wasteTransaction.weight ? Number(wasteTransaction.weight) : 0)
-        );
-      },
+    // Calculate the total weight
+    const totalWarehousedWeight = transactionItems.reduce(
+      (total, wasteTransaction) =>
+        total + (wasteTransaction.weight ? Number(wasteTransaction.weight) : 0),
       0
     );
 
-    // Calculate the total treatedWeight
-    let totalTreatedWeight = transactionItem.reduce(
-      (total, wasteTransaction) => {
-        return (
-          total +
-          (wasteTransaction.treatedWeight
-            ? Number(wasteTransaction.treatedWeight)
-            : 0)
-        );
-      },
+    // Calculate the total treated weight from transactionItems
+    let totalTreatedWeight = transactionItems.reduce(
+      (total, wasteTransaction) =>
+        total +
+        (wasteTransaction.treatedWeight
+          ? Number(wasteTransaction.treatedWeight)
+          : 0),
       0
     );
 
-    // Also add the weight from treatedWastes array in formData
-    const treatedWastes = formData.treatedWastes || [];
-    totalTreatedWeight += treatedWastes.reduce((total, treatedWaste) => {
-      return total + (treatedWaste.weight ? Number(treatedWaste.weight) : 0);
+    // Add the treated weight from the waste array in formData
+    const waste = formData.waste || [];
+    totalTreatedWeight += waste.reduce((total, w) => {
+      return (
+        total +
+        (w.treatedWastes || []).reduce(
+          (subTotal, treatedWaste) =>
+            subTotal + (treatedWaste.weight ? Number(treatedWaste.weight) : 0),
+          0
+        )
+      );
     }, 0);
 
     // Update isFinished if totalWarehousedWeight matches totalTreatedWeight

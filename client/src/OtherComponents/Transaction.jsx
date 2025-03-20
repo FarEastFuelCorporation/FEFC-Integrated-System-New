@@ -669,18 +669,17 @@ const Transaction = ({
                             justifyContent: "end",
                           }}
                         >
-                          {Number.isInteger(user.userType) &&
-                            user.userType !== 6 && (
-                              <Button
-                                onClick={() => handleOpenModal(row)}
-                                sx={{
-                                  backgroundColor: `${colors.greenAccent[700]}`,
-                                  color: `${colors.grey[100]}`,
-                                }}
-                              >
-                                {buttonText}
-                              </Button>
-                            )}
+                          {Number.isInteger(user.userType) && (
+                            <Button
+                              onClick={() => handleOpenModal(row)}
+                              sx={{
+                                backgroundColor: `${colors.greenAccent[700]}`,
+                                color: `${colors.grey[100]}`,
+                              }}
+                            >
+                              {buttonText}
+                            </Button>
+                          )}
                           {!Number.isInteger(user.userType) && (
                             <div style={{ display: "flex" }}>
                               <IconButton onClick={() => handleEditClick(row)}>

@@ -163,8 +163,6 @@ const TreatedTransactions = ({ user }) => {
     setOpenModal(true);
   };
 
-  console.log(formData);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();

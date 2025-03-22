@@ -14,6 +14,7 @@ const sequelize = require("./config/database");
 
 // Import utility functions and models
 require("./utils/associations");
+require("./jd/utils/associations");
 
 const app = express();
 
@@ -86,10 +87,13 @@ app.use("/hr_Dashboard/*", isAuthenticated);
 
 // Import API routes
 const apiRoutes = require("./routes/api");
+const apiJdRoutes = require("./jd/routes/api");
 const syncronize = require("./syncronize");
 
 // Use the /api prefix for all API routes
 app.use("/api", apiRoutes);
+app.use("/apiJD", apiJdRoutes);
+
 const {
   syncIdInformationToLocal,
   handleAttendanceSync,
@@ -98,15 +102,20 @@ const {
 const Quotation = require("./models/Quotation");
 const EmployeeAttachmentLegal = require("./models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("./models/EmployeeAttachmentMemo");
-const { Client } = require("mqtt");
 const BookedTransaction = require("./models/BookedTransaction");
+const EmployeeRolesEmployeeJD = require("./jd/models/EmployeeRolesEmployee");
+const EmployeeJD = require("./jd/models/Employee");
+const UserJD = require("./jd/models/User");
+const EmployeeRoleJD = require("./jd/models/EmployeeRole");
+const sequelizeJD = require("./jd/config/database");
 
 // Function to initialize the application
 async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    // await Quotation.sync({ alter: true });
+    // await sequelizeJD.sync({ alter: true });
+    // await EmployeeRoleJD.sync({ alter: false });
 
     // await handleAttendanceSync();
 

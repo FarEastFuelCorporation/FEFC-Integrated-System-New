@@ -24,6 +24,10 @@ import Attendance from "./OtherComponents/Sections/attendance";
 import VerifyTravelOrder from "./Employee/Layouts/Employee/screens/travelOrder/VerifyTravelOrder";
 import Client from "./Auth/Client";
 import Employee from "./Auth/Employee";
+import LandingPageJD from "./JD/OtherComponents/LandingPage";
+import NavbarJD from "./JD/OtherComponents/Navbar";
+import EmployeeJD from "./JD/Auth/Employee";
+import DashboardJD from "./JD/OtherComponents/Dashboard";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,6 +41,9 @@ const App = () => {
   const [theme, colorMode] = useMode();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Boolean to check if the URL starts with "/JD"
+  const isJDRoute = location.pathname.startsWith("/JD");
 
   // Function to update user information after successful login
   const handleLogin = (userData) => {
@@ -105,7 +112,7 @@ const App = () => {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Navbar />
+        {isJDRoute ? <NavbarJD /> : <Navbar />}
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
@@ -134,6 +141,27 @@ const App = () => {
               path="/dashboard/*"
               element={
                 <Dashboard
+                  user={user}
+                  onUpdateUser={handleUpdateUser}
+                  socket={socketInstance}
+                />
+              }
+            />
+          ) : (
+            <Route path="" element={<Navigate to="/login" />} />
+          )}
+
+          {/* JD */}
+          <Route path="/JD" element={<LandingPageJD />} />
+          <Route
+            path="/JD/employee"
+            element={<EmployeeJD onLogin={handleLogin} />}
+          />
+          {user ? (
+            <Route
+              path="/JD/dashboard/*"
+              element={
+                <DashboardJD
                   user={user}
                   onUpdateUser={handleUpdateUser}
                   socket={socketInstance}

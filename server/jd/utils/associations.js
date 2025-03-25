@@ -3,6 +3,8 @@
 const EmployeeJD = require("../models/Employee");
 const EmployeeRoleJD = require("../models/EmployeeRole");
 const EmployeeRolesEmployeeJD = require("../models/EmployeeRolesEmployee");
+const EquipmentsJD = require("../models/Equipments");
+const ProductCategoryJD = require("../models/ProductCategory");
 const UserJD = require("../models/User");
 
 // Define associations
@@ -32,7 +34,27 @@ EmployeeJD.belongsToMany(EmployeeRoleJD, {
   as: "EmployeeRolesJD",
 });
 
-console.log("pass");
+EmployeeJD.hasMany(ProductCategoryJD, {
+  as: "ProductCategoryJD",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+ProductCategoryJD.belongsTo(EmployeeJD, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+EmployeeJD.hasMany(EquipmentsJD, {
+  as: "EquipmentsJD",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+EquipmentsJD.belongsTo(EmployeeJD, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
 
 // Export the associations
 module.exports = {
@@ -40,4 +62,6 @@ module.exports = {
   EmployeeRoleJD,
   EmployeeRolesEmployeeJD,
   UserJD,
+  ProductCategoryJD,
+  EquipmentsJD,
 };

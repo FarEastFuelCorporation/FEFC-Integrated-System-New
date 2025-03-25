@@ -48,7 +48,12 @@ const App = () => {
   // Function to update user information after successful login
   const handleLogin = (userData) => {
     setUser(userData);
-    navigate("/dashboard");
+    if (isJDRoute) {
+      navigate("/JD/dashboard"); // Redirect to JD dashboard
+    } else {
+      navigate("/dashboard"); // Redirect to the default dashboard
+    }
+
     setLoading(false); // Set loading to false after user data is set and navigation is done
 
     // Create WebSocket connection after login
@@ -169,7 +174,7 @@ const App = () => {
               }
             />
           ) : (
-            <Route path="" element={<Navigate to="/login" />} />
+            <Route path="" element={<Navigate to="/JD/employee" />} />
           )}
         </Routes>
       </ThemeProvider>

@@ -114,8 +114,8 @@ async function initializeApp() {
   try {
     console.log("Syncing models to the database...");
     // await sequelize.sync({ alter: false });
-    // await sequelizeJD.sync({ alter: true });
-    // await EmployeeRoleJD.sync({ alter: false });
+    await sequelizeJD.sync({ alter: false });
+    // await EmployeeRoleJD.sync({ alter: true });
 
     // await handleAttendanceSync();
 

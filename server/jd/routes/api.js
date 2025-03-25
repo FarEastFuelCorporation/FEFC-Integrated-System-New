@@ -6,9 +6,9 @@ const router = express.Router();
 // Include your routes
 
 const authRoutes = require("./auth");
-// const travelOrderRoutes = require("./travelOrderRoutes");
+const productCategoryRoutes = require("./productCategoryRoutes");
 
 router.use(authRoutes);
-// router.use("/travelOrder", travelOrderRoutes);
+router.use("/productCategory", productCategoryRoutes);
 
 module.exports = router;

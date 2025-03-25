@@ -10,13 +10,12 @@ import {
 import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import RecyclingIcon from "@mui/icons-material/Recycling";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import PaidIcon from "@mui/icons-material/Paid";
-import TopicIcon from "@mui/icons-material/Topic";
+import FactoryIcon from "@mui/icons-material/Factory";
+import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import NoteAltIcon from "@mui/icons-material/NoteAlt";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import CategoryIcon from "@mui/icons-material/Category";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
@@ -32,15 +31,13 @@ const AdminSidebarJD = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
-      "/dashboard/clients": "Clients",
-      "/dashboard/typeOfWastes": "Type Of Wastes",
-      "/dashboard/logistics": "Logistics",
-      "/dashboard/quotations": "Quotations",
-      "/dashboard/transactions": "Transactions",
-      "/dashboard/commissions": "Commissions",
-      "/dashboard/documents": "Documents",
-      "/dashboard/calendar": "Calendar",
-      "/dashboard/switchUser": "Switch User",
+      "/JD/dashboard/productCategory": "Product Category",
+      "/JD/dashboard/operations": "Operations",
+      "/JD/dashboard/stocks": "Stocks",
+      "/JD/dashboard/equipments": "Equipments",
+      "/JD/dashboard/inventory": "Inventory",
+      "/JD/dashboard/ledger": "Ledger",
+      "/JD/dashboard/switchUser": "Switch User",
     }),
     []
   );
@@ -56,17 +53,13 @@ const AdminSidebarJD = ({ user }) => {
 
   useEffect(() => {
     const convertUint8ArrayToBlob = () => {
-      if (
-        !user ||
-        !user.employeePicture ||
-        !user.employeePicture.profile_picture
-      ) {
+      if (!user || !user.employeePicture) {
+        // Set default profile picture when there is no profile picture
+        setProfilePictureSrc("/assets/unknown.png");
         return;
       }
 
-      const uint8Array = new Uint8Array(
-        user.employeePicture.profile_picture.data
-      );
+      const uint8Array = new Uint8Array(user.employeePicture.data);
       const blob = new Blob([uint8Array], { type: "image/jpeg" });
 
       const reader = new FileReader();
@@ -121,68 +114,52 @@ const AdminSidebarJD = ({ user }) => {
           navigate={""}
         />
         <BottomNavItem
-          label="Transactions"
-          value="Transactions"
-          icon={PointOfSaleIcon}
+          label="Product Category"
+          value="Product Category"
+          icon={HomeOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"transactions"}
+          navigate={"productCategory"}
         />
         <BottomNavItem
-          label="Clients"
-          value="Clients"
-          icon={PeopleOutlinedIcon}
+          label="Operations"
+          value="Operations"
+          icon={FactoryIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"clients"}
+          navigate={"operations"}
         />
         <BottomNavItem
-          label="Type Of Wastes"
-          value="Type Of Wastes"
-          icon={RecyclingIcon}
+          label="Stocks"
+          value="Stocks"
+          icon={InventoryIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"typeOfWastes"}
+          navigate={"stocks"}
         />
         <BottomNavItem
-          label="Logistics"
-          value="Logistics"
-          icon={LocalShippingIcon}
+          label="Equipments"
+          value="Equipments"
+          icon={SettingsSuggestIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"logistics"}
+          navigate={"equipments"}
         />
         <BottomNavItem
-          label="Quotations"
-          value="Quotations"
-          icon={FormatListBulletedIcon}
+          label="Inventory"
+          value="Inventory"
+          icon={AssignmentIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"quotations"}
+          navigate={"inventory"}
         />
         <BottomNavItem
-          label="Commissions"
-          value="Commissions"
-          icon={PaidIcon}
+          label="Ledger"
+          value="Ledger"
+          icon={NoteAltIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"commissions"}
-        />
-        <BottomNavItem
-          label="Documents"
-          value="Documents"
-          icon={TopicIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"documents"}
-        />
-        <BottomNavItem
-          label="Calendar"
-          value="Calendar"
-          icon={CalendarTodayOutlinedIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"calendar"}
+          navigate={"ledger"}
         />
         <BottomNavItem
           label="Switch User"
@@ -232,7 +209,7 @@ const AdminSidebarJD = ({ user }) => {
                 ml="15px"
               >
                 <Typography variant="h4" color={colors.grey[100]}>
-                  MARKETING
+                  ADMIN
                 </Typography>
                 <IconButton onClick={handleCollapse}>
                   <MenuOutlinedIcon />
@@ -293,14 +270,15 @@ const AdminSidebarJD = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-            <Item
+            {/* <Item
               title="Transactions"
               to="transactions"
               icon={<PointOfSaleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            />
+            /> */}
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -309,49 +287,49 @@ const AdminSidebarJD = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Clients"
-              to="clients"
-              icon={<PeopleOutlinedIcon />}
+              title="Product Category"
+              to="productCategory"
+              icon={<CategoryIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
             <Item
-              title="Type Of Wastes"
-              to="typeOfWastes"
-              icon={<RecyclingIcon />}
+              title="Operations"
+              to="operations"
+              icon={<FactoryIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
             <Item
-              title="Logistics"
-              to="logistics"
-              icon={<LocalShippingIcon />}
+              title="Stocks"
+              to="stocks"
+              icon={<InventoryIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
             <Item
-              title="Quotations"
-              to="quotations"
-              icon={<FormatListBulletedIcon />}
+              title="Equipments"
+              to="equipments"
+              icon={<SettingsSuggestIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
             <Item
-              title="Commissions"
-              to="commissions"
-              icon={<PaidIcon />}
+              title="Inventory"
+              to="inventory"
+              icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
             <Item
-              title="Documents"
-              to="documents"
-              icon={<TopicIcon />}
+              title="Ledger"
+              to="ledger"
+              icon={<NoteAltIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
@@ -361,7 +339,7 @@ const AdminSidebarJD = ({ user }) => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Pages
+              Others
             </Typography>
 
             <Item

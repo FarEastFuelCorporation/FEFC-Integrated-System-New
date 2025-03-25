@@ -265,19 +265,22 @@ async function createClientSignupController(req, res) {
       return res.status(400).json({ error: "Invalid Client ID" });
     }
 
-    existingClient.email = email;
+    // Concatenate if email exists, otherwise assign the new email
+    existingClient.email = existingClient.email
+      ? `${existingClient.email}, ${email}`
+      : email;
 
     await existingClient.save();
 
-    // Check if the employeeId is already registered in the User table
-    const existingClientUser = await ClientUser.findOne({
-      where: { clientId },
-    });
+    // // Check if the employeeId is already registered in the User table
+    // const existingClientUser = await ClientUser.findOne({
+    //   where: { clientId },
+    // });
 
-    if (existingClientUser) {
-      // Employee is already registered, send an error response
-      return res.status(400).json({ error: "Client is already registered" });
-    }
+    // if (existingClientUser) {
+    //   // Employee is already registered, send an error response
+    //   return res.status(400).json({ error: "Client is already registered" });
+    // }
 
     // Hash the password before storing it in the database
     const hashedPassword = await bcrypt.hash(password, 10);

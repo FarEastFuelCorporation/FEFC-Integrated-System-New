@@ -15,7 +15,6 @@ const ClientUser = sequelize.define(
     clientId: {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true,
     },
     clientUsername: {
       type: DataTypes.STRING,

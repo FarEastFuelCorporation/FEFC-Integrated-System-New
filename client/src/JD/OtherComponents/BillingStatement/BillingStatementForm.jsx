@@ -276,6 +276,7 @@ const BillingStatementForm = ({
 
         target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
+        console.log(target);
         hasFixedRateIndividual = QuotationWaste.hasFixedRate;
         if (hasFixedRateIndividual) {
           vatCalculation = QuotationWaste.vatCalculation;
@@ -348,6 +349,8 @@ const BillingStatementForm = ({
         const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+
+        console.log(target);
 
         hasTransportation = QuotationWaste.hasTransportation;
 

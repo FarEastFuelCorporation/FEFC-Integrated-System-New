@@ -15,7 +15,7 @@ const AdminRoutesJD = ({ user, onUpdateUser }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebarJD user={user} />}>
-      <Route path="" element={<Dashboard user={user} />} />
+      {/* <Route path="" element={<Dashboard user={user} />} /> */}
       <Route
         path="productCategory"
         element={<ProductCategoryJD user={user} />}

@@ -441,7 +441,7 @@ const Transaction = ({
     ) {
       return false; // Exclude the column
     }
-    if (column.field === "createdAt" && user.userType !== 7) {
+    if (user.userType !== 7 && column.field === "createdAt") {
       return false; // Exclude the column
     }
     return true; // Include the column

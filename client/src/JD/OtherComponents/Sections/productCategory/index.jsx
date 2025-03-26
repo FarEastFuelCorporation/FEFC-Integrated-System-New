@@ -19,23 +19,24 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
-import ProductCategoryModalJD from "./productCategoryModal";
+import ModalJD from "./Modal";
+import { Validation } from "./Validation";
 
-const ProductCategoryJD = ({ user }) => {
+const ProductCategoryJD = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const initialFormData = {
     id: "",
-    category: "",
+    productCategory: "",
     createdBy: user.id,
   };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [productCategories, setProductCategories] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -50,7 +51,7 @@ const ProductCategoryJD = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/apiJD/productCategory`);
 
-      setVehicleTypes(response.data.categories);
+      setProductCategories(response.data.productCategory);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -60,6 +61,42 @@ const ProductCategoryJD = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === "NEW_PRODUCT_CATEGORY_JD") {
+          setProductCategories((prevData) => [...prevData, message.data]);
+        } else if (message.type === "UPDATED_PRODUCT_CATEGORY_JD") {
+          setProductCategories((prevData) => {
+            // Find the index of the data to be updated
+            const index = prevData.findIndex(
+              (prev) => prev.id === message.data.id
+            );
+
+            if (index !== -1) {
+              // Replace the updated data data
+              const updatedData = [...prevData];
+              updatedData[index] = message.data; // Update the data at the found index
+              return updatedData;
+            } else {
+              // If the data is not found, just return the previous state
+              return prevData;
+            }
+          });
+        } else if (message.type === "DELETED_PRODUCT_CATEGORY_JD") {
+          setProductCategories((prevData) => {
+            const updatedData = prevData.filter(
+              (prev) => prev.id !== message.data // Remove the data with matching ID
+            );
+            return updatedData;
+          });
+        }
+      };
+    }
+  }, [socket]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -77,6 +114,7 @@ const ProductCategoryJD = ({ user }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setErrorMessage("");
     clearFormData();
   };
 
@@ -89,35 +127,35 @@ const ProductCategoryJD = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleEditClick = (id) => {
-    const typeToEdit = vehicleTypes.find((type) => type.id === id);
-    if (typeToEdit) {
+  const handleEditClick = (row) => {
+    if (row) {
       setFormData({
-        id: typeToEdit.id,
-        typeOfVehicle: typeToEdit.typeOfVehicle,
+        id: row.id,
+        productCategory: row.productCategory,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Vehicle type with ID ${id} not found for editing.`);
+      console.error(
+        `Product Category with ID ${row.id} not found for editing.`
+      );
     }
   };
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Vehicle Type?");
+    setDialog("Are you sure you want to Delete this Product Category?");
     setDialogAction(() => () => handleConfirmDelete(id));
   };
 
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/vehicleType/${id}`, {
+      await axios.delete(`${apiUrl}/apiJD/productCategory/${id}`, {
         data: { deletedBy: user.id },
       });
 
-      fetchData();
-      setSuccessMessage("Vehicle Type Deleted Successfully!");
+      setSuccessMessage("Product Category Deleted Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {
@@ -130,12 +168,10 @@ const ProductCategoryJD = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Perform client-side validation
-    const { typeOfVehicle } = formData;
+    const validationErrors = Validation(formData);
 
-    // Check if all required fields are filled
-    if (!typeOfVehicle) {
-      setErrorMessage("Please fill all required fields.");
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
       setShowErrorMessage(true);
       return;
     }
@@ -143,18 +179,20 @@ const ProductCategoryJD = ({ user }) => {
     try {
       setLoading(true);
       if (formData.id) {
-        // Update existing vehicle type
-        await axios.put(`${apiUrl}/api/vehicleType/${formData.id}`, formData);
+        // Update existing Product Category
+        await axios.put(
+          `${apiUrl}/apiJD/productCategory/${formData.id}`,
+          formData
+        );
 
-        setSuccessMessage("Vehicle Type Updated Successfully!");
+        setSuccessMessage("Product Category Updated Successfully!");
       } else {
-        // Add new vehicle type
-        await axios.post(`${apiUrl}/api/vehicleType`, formData);
+        // Add new Product Category
+        await axios.post(`${apiUrl}/apiJD/productCategory`, formData);
 
-        setSuccessMessage("Vehicle Type Added Successfully!");
+        setSuccessMessage("Product Category Added Successfully!");
       }
 
-      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
       setLoading(false);
@@ -171,7 +209,7 @@ const ProductCategoryJD = ({ user }) => {
 
   const columns = [
     {
-      field: "category",
+      field: "productCategory",
       headerName: "Product Category",
       headerAlign: "center",
       align: "center",
@@ -193,7 +231,7 @@ const ProductCategoryJD = ({ user }) => {
         renderCell: (params) => (
           <IconButton
             color="warning"
-            onClick={() => handleEditClick(params.row.id)}
+            onClick={() => handleEditClick(params.row)}
           >
             <EditIcon />
           </IconButton>
@@ -247,18 +285,18 @@ const ProductCategoryJD = ({ user }) => {
       />
       <CustomDataGridStyles>
         <DataGrid
-          rows={vehicleTypes}
+          rows={productCategories}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
+              sortModel: [{ field: "productCategory", sort: "asc" }],
             },
           }}
         />
       </CustomDataGridStyles>
-      <ProductCategoryModalJD
+      <ModalJD
         user={user}
         open={openModal}
         onClose={handleCloseModal}

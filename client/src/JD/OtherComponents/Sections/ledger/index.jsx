@@ -19,23 +19,31 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
-import ProductCategoryModalJD from "./productCategoryModal";
+import ModalJD from "./Modal";
+import { Validation } from "./Validation";
+import { formatDate3, formatNumber } from "../../Functions";
 
-const LedgerJD = ({ user }) => {
+const ProductCategoryJD = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const initialFormData = {
     id: "",
-    category: "",
+    transactionDate: "",
+    transactionDetails: "",
+    transactionCategory: "",
+    fundSource: "",
+    fundAllocation: "",
+    amount: 0,
+    remarks: "",
     createdBy: user.id,
   };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -48,9 +56,10 @@ const LedgerJD = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/apiJD/productCategory`);
+      const response = await axios.get(`${apiUrl}/apiJD/ledger`);
 
-      setVehicleTypes(response.data.categories);
+      console.log(response.data.ledger);
+      setTransactions(response.data.ledger);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -60,6 +69,42 @@ const LedgerJD = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === "NEW_LEDGER_JD") {
+          setTransactions((prevData) => [...prevData, message.data]);
+        } else if (message.type === "UPDATED_PRODUCT_CATEGORY_JD") {
+          setTransactions((prevData) => {
+            // Find the index of the data to be updated
+            const index = prevData.findIndex(
+              (prev) => prev.id === message.data.id
+            );
+
+            if (index !== -1) {
+              // Replace the updated data data
+              const updatedData = [...prevData];
+              updatedData[index] = message.data; // Update the data at the found index
+              return updatedData;
+            } else {
+              // If the data is not found, just return the previous state
+              return prevData;
+            }
+          });
+        } else if (message.type === "DELETED_PRODUCT_CATEGORY_JD") {
+          setTransactions((prevData) => {
+            const updatedData = prevData.filter(
+              (prev) => prev.id !== message.data // Remove the data with matching ID
+            );
+            return updatedData;
+          });
+        }
+      };
+    }
+  }, [socket]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -77,6 +122,7 @@ const LedgerJD = ({ user }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setErrorMessage("");
     clearFormData();
   };
 
@@ -89,35 +135,33 @@ const LedgerJD = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleEditClick = (id) => {
-    const typeToEdit = vehicleTypes.find((type) => type.id === id);
-    if (typeToEdit) {
+  const handleEditClick = (row) => {
+    if (row) {
       setFormData({
-        id: typeToEdit.id,
-        typeOfVehicle: typeToEdit.typeOfVehicle,
+        id: row.id,
+        productCategory: row.productCategory,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Vehicle type with ID ${id} not found for editing.`);
+      console.error(`Transaction with ID ${row.id} not found for editing.`);
     }
   };
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Vehicle Type?");
+    setDialog("Are you sure you want to Delete this Transaction?");
     setDialogAction(() => () => handleConfirmDelete(id));
   };
 
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/vehicleType/${id}`, {
+      await axios.delete(`${apiUrl}/apiJD/ledger/${id}`, {
         data: { deletedBy: user.id },
       });
 
-      fetchData();
-      setSuccessMessage("Vehicle Type Deleted Successfully!");
+      setSuccessMessage("Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {
@@ -130,12 +174,10 @@ const LedgerJD = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Perform client-side validation
-    const { typeOfVehicle } = formData;
+    const validationErrors = Validation(formData);
 
-    // Check if all required fields are filled
-    if (!typeOfVehicle) {
-      setErrorMessage("Please fill all required fields.");
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
       setShowErrorMessage(true);
       return;
     }
@@ -143,18 +185,17 @@ const LedgerJD = ({ user }) => {
     try {
       setLoading(true);
       if (formData.id) {
-        // Update existing vehicle type
-        await axios.put(`${apiUrl}/api/vehicleType/${formData.id}`, formData);
+        // Update existing Transaction
+        await axios.put(`${apiUrl}/apiJD/ledger/${formData.id}`, formData);
 
-        setSuccessMessage("Vehicle Type Updated Successfully!");
+        setSuccessMessage("Transaction Updated Successfully!");
       } else {
-        // Add new vehicle type
-        await axios.post(`${apiUrl}/api/vehicleType`, formData);
+        // Add new Transaction
+        await axios.post(`${apiUrl}/apiJD/ledger`, formData);
 
-        setSuccessMessage("Vehicle Type Added Successfully!");
+        setSuccessMessage("Transaction Added Successfully!");
       }
 
-      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
       setLoading(false);
@@ -169,7 +210,77 @@ const LedgerJD = ({ user }) => {
     </div>
   );
 
-  const columns = [];
+  const columns = [
+    {
+      field: "transactionDate",
+      headerName: "Transaction Date",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return formatDate3(params.row.transactionDate);
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transactionDetails",
+      headerName: "Transaction Details",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transactionCategory",
+      headerName: "Transaction Category",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "fundSource",
+      headerName: "Fund Source",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "fundAllocation",
+      headerName: "Fund Allocation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return formatNumber(params.row.amount);
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "remarks",
+      headerName: "Remarks",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+  ];
 
   if (user.userType === 1) {
     columns.push(
@@ -183,7 +294,7 @@ const LedgerJD = ({ user }) => {
         renderCell: (params) => (
           <IconButton
             color="warning"
-            onClick={() => handleEditClick(params.row.id)}
+            onClick={() => handleEditClick(params.row)}
           >
             <EditIcon />
           </IconButton>
@@ -234,18 +345,18 @@ const LedgerJD = ({ user }) => {
       />
       <CustomDataGridStyles>
         <DataGrid
-          rows={vehicleTypes}
+          rows={transactions}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "typeOfVehicle", sort: "asc" }],
+              sortModel: [{ field: "productCategory", sort: "asc" }],
             },
           }}
         />
       </CustomDataGridStyles>
-      <ProductCategoryModalJD
+      <ModalJD
         user={user}
         open={openModal}
         onClose={handleCloseModal}
@@ -259,4 +370,4 @@ const LedgerJD = ({ user }) => {
   );
 };
 
-export default LedgerJD;
+export default ProductCategoryJD;

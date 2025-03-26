@@ -1,4 +1,4 @@
-// models/EmployeeRole.js
+// models/ProductCategory.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
@@ -12,7 +12,7 @@ const ProductCategoryJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
-    category: {
+    productCategory: {
       type: DataTypes.STRING,
       allowNull: false,
     },

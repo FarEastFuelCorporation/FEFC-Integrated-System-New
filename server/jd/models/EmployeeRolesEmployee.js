@@ -1,3 +1,5 @@
+// models/EmployeeRolesEmployee.js
+
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const EmployeeRoleJD = require("./EmployeeRole");

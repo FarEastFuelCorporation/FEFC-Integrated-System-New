@@ -94,7 +94,7 @@ function handleMessage(message, uuid) {
 
 // Broadcast message to all connected clients
 function broadcastMessage(message) {
-  console.log("Broadcasting message...");
+  console.log(`Broadcasting message... ${message.type}`);
   for (const [uuid, connection] of connections.entries()) {
     if (connection.readyState === connection.OPEN) {
       try {

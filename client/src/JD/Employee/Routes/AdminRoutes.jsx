@@ -11,20 +11,29 @@ import EquipmentsJD from "../../OtherComponents/Sections/equipments";
 import InventoryJD from "../../OtherComponents/Sections/inventory";
 import LedgerJD from "../../OtherComponents/Sections/ledger";
 
-const AdminRoutesJD = ({ user, onUpdateUser }) => (
+const AdminRoutesJD = ({ user, onUpdateUser, socket }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebarJD user={user} />}>
       {/* <Route path="" element={<Dashboard user={user} />} /> */}
       <Route
         path="productCategory"
-        element={<ProductCategoryJD user={user} />}
+        element={<ProductCategoryJD user={user} socket={socket} />}
       />
-      <Route path="operations" element={<OperationsJD user={user} />} />
-      <Route path="stocks" element={<StocksJD user={user} />} />
-      <Route path="equipments" element={<EquipmentsJD user={user} />} />
-      <Route path="inventory" element={<InventoryJD user={user} />} />
-      <Route path="ledger" element={<LedgerJD user={user} />} />
+      <Route
+        path="operations"
+        element={<OperationsJD user={user} socket={socket} />}
+      />
+      <Route path="stocks" element={<StocksJD user={user} socket={socket} />} />
+      <Route
+        path="equipments"
+        element={<EquipmentsJD user={user} socket={socket} />}
+      />
+      <Route
+        path="inventory"
+        element={<InventoryJD user={user} socket={socket} />}
+      />
+      <Route path="ledger" element={<LedgerJD user={user} socket={socket} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route
         path="switchUser"

@@ -9,16 +9,16 @@ const {
   deleteProductCategoryJDController,
 } = require("../controllers/productCategoryController");
 
-// Create Vehicle Type route
+// Create Product Category route
 router.post("/", createProductCategoryJDController);
 
-// Get Vehicle Types route
+// Get Product Categories route
 router.get("/", getProductCategoryJDsController);
 
-// Update Vehicle Type route
+// Update Product Category route
 router.put("/:id", updateProductCategoryJDController);
 
-// Delete Vehicle Type route
+// Delete Product Category route
 router.delete("/:id", deleteProductCategoryJDController);
 
 module.exports = router;

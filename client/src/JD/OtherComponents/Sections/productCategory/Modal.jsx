@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { tokens } from "../../../theme";
 
-const ProductCategoryModalJD = ({
+const ModalJD = ({
   open,
   onClose,
   formData,
@@ -42,15 +42,15 @@ const ProductCategoryModalJD = ({
         }}
       >
         <Typography variant="h6" component="h2">
-          {formData.id ? "Update Vehicle Type" : "Add New Vehicle Type"}
+          {formData.id ? "Update Product Category" : "Add New Product Category"}
         </Typography>
         <Typography variant="h6" component="h2" color="error">
           {showErrorMessage && errorMessage}
         </Typography>
         <TextField
-          label="Type of Vehicle"
-          name="typeOfVehicle"
-          value={formData.typeOfVehicle}
+          label="Product Category"
+          name="productCategory"
+          value={formData.productCategory}
           onChange={handleInputChange}
           fullWidth
           required
@@ -71,11 +71,11 @@ const ProductCategoryModalJD = ({
           style={{ display: "none" }}
         />
         <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-          {formData.id ? "Update Vehicle Type" : "Add Vehicle Type"}
+          {formData.id ? "Update Product Category" : "Add Product Category"}
         </Button>
       </Box>
     </Modal>
   );
 };
 
-export default ProductCategoryModalJD;
+export default ModalJD;

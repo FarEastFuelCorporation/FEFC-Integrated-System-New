@@ -8,14 +8,22 @@ const DashboardJD = ({ user, onUpdateUser, socket }) => {
     case 1:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[1]}>
-          <MarketingRoutesJD user={user} onUpdateUser={onUpdateUser} />
+          <MarketingRoutesJD
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
 
     default:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[1]}>
-          <MarketingRoutesJD user={user} onUpdateUser={onUpdateUser} />
+          <MarketingRoutesJD
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
   }

@@ -1,25 +1,32 @@
 // controllers/productCategoryController.js.js
 
+const { broadcastMessage } = require("../../websocketManager");
 const ProductCategoryJD = require("../models/ProductCategory");
 
 // Create Product Category controller
 async function createProductCategoryJDController(req, res) {
   try {
     // Extracting data from the request body
-    let { typeOfVehicle, createdBy } = req.body;
+    let { productCategory, createdBy } = req.body;
 
-    typeOfVehicle = typeOfVehicle && typeOfVehicle.toUpperCase();
+    productCategory = productCategory && productCategory.toUpperCase();
 
-    // Creating a new vehicle type
-    await ProductCategoryJD.create({
-      typeOfVehicle,
+    // Creating a new Product Category
+    const newEntry = await ProductCategoryJD.create({
+      productCategory,
       createdBy,
     });
 
-    const vehicleTypes = await ProductCategoryJD.findAll();
+    const newCategory = await ProductCategoryJD.findByPk(newEntry.id);
 
-    // Respond with the updated vehicle type data
-    res.status(201).json({ vehicleTypes });
+    broadcastMessage({
+      type: "NEW_PRODUCT_CATEGORY_JD",
+      data: newCategory,
+    });
+
+    res.status(201).json({
+      message: "submitted successfully!",
+    });
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -30,12 +37,12 @@ async function createProductCategoryJDController(req, res) {
 // Get Product Categories controller
 async function getProductCategoryJDsController(req, res) {
   try {
-    // Fetch all categories from the database
-    const categories = await ProductCategoryJD.findAll({
-      order: [["category", "ASC"]],
+    // Fetch all productCategory from the database
+    const productCategory = await ProductCategoryJD.findAll({
+      order: [["productCategory", "ASC"]],
     });
 
-    res.json({ categories });
+    res.json({ productCategory });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -46,38 +53,42 @@ async function getProductCategoryJDsController(req, res) {
 async function updateProductCategoryJDController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating vehicle type with ID:", id);
+    console.log("Updating Product Category with ID:", id);
 
-    let { typeOfVehicle, createdBy } = req.body;
-    console.log("Request body:", req.body);
+    let { productCategory, createdBy } = req.body;
 
-    typeOfVehicle = typeOfVehicle && typeOfVehicle.toUpperCase();
+    productCategory = productCategory && productCategory.toUpperCase();
 
-    // Find the vehicle type by ID and update it
+    // Find the Product Category by ID and update it
     const updatedProductCategoryJD = await ProductCategoryJD.findByPk(id);
 
     if (updatedProductCategoryJD) {
-      // Update vehicle type attributes
-      updatedProductCategoryJD.typeOfVehicle = typeOfVehicle;
+      // Update Product Category attributes
+      updatedProductCategoryJD.productCategory = productCategory;
       updatedProductCategoryJD.updatedBy = createdBy;
 
-      // Save the updated vehicle type
+      // Save the updated Product Category
       await updatedProductCategoryJD.save();
 
-      const vehicleTypes = await ProductCategoryJD.findAll();
+      const updatedEntry = await ProductCategoryJD.findByPk(id);
 
-      // Respond with the updated vehicle type data
-      res.json({
-        vehicleType: updatedProductCategoryJD,
-        vehicleTypes,
+      broadcastMessage({
+        type: "UPDATED_PRODUCT_CATEGORY_JD",
+        data: updatedEntry,
+      });
+
+      res.status(201).json({
+        message: "updated successfully!",
       });
     } else {
-      // If vehicle type with the specified ID was not found
-      res.status(404).json({ message: `Vehicle type with ID ${id} not found` });
+      // If Product Category with the specified ID was not found
+      res
+        .status(404)
+        .json({ message: `Product Category with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating vehicle type:", error);
+    console.error("Error updating Product Category:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -91,20 +102,25 @@ async function deleteProductCategoryJDController(req, res) {
     console.log("Soft deleting ProductCategoryJD with ID:", id);
 
     // Find the ProductCategoryJD by ID
-    const vehicleTypeToDelete = await ProductCategoryJD.findByPk(id);
+    const productCategoryToDelete = await ProductCategoryJD.findByPk(id);
 
-    if (vehicleTypeToDelete) {
+    if (productCategoryToDelete) {
       // Update the deletedBy field
-      vehicleTypeToDelete.updatedBy = deletedBy;
-      vehicleTypeToDelete.deletedBy = deletedBy;
-      await vehicleTypeToDelete.save();
+      productCategoryToDelete.updatedBy = deletedBy;
+      productCategoryToDelete.deletedBy = deletedBy;
+      await productCategoryToDelete.save();
 
       // Soft delete the ProductCategoryJD (sets deletedAt timestamp)
-      await vehicleTypeToDelete.destroy();
+      await productCategoryToDelete.destroy();
+
+      broadcastMessage({
+        type: "DELETED_PRODUCT_CATEGORY_JD",
+        data: productCategoryToDelete.id,
+      });
 
       // Respond with a success message
-      res.json({
-        message: `ProductCategoryJD with ID ${id} soft-deleted successfully`,
+      res.status(201).json({
+        message: "deleted successfully!",
       });
     } else {
       // If ProductCategoryJD with the specified ID was not found

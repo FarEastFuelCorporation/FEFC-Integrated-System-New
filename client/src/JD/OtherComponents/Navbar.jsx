@@ -33,7 +33,7 @@ const NavbarJD = () => {
 
   // Check if the current route is either "/signup" or "/login"
   const isAuthPage =
-    location.pathname === "/JD/employee" || location.pathname === "/JD/";
+    location.pathname === "/JD/employee" || location.pathname === "/JD";
 
   const handleLogout = async () => {
     try {
@@ -120,7 +120,7 @@ const NavbarJD = () => {
             )}
           </IconButton>
         </Box>
-        {!isAuthPage && location.pathname !== "/attendance" && (
+        {!isAuthPage && location.pathname !== "/JD/attendance" && (
           <Box display="flex" gap={2}>
             <Button onClick={handleLogout} color="inherit">
               <Typography variant="h5" style={{ marginLeft: "10px" }}>
@@ -155,7 +155,7 @@ const NavbarJD = () => {
                 <ListItem
                   button
                   component={Link}
-                  to="/"
+                  to="/JD"
                   onClick={() => setDrawerOpen(false)}
                 >
                   <ListItemText primary="Home" />
@@ -163,7 +163,7 @@ const NavbarJD = () => {
                 <ListItem
                   button
                   component={Link}
-                  to="/employee"
+                  to="/JD/employee"
                   onClick={() => setDrawerOpen(false)}
                 >
                   <ListItemText primary="Employee" />

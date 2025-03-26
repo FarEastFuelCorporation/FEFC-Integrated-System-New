@@ -802,6 +802,12 @@ const getIncludeOptionsPartial = () => [
       },
     ],
   },
+  {
+    model: CertifiedTransaction,
+    as: "CertifiedTransaction",
+    attributes: ["createdAt"],
+    required: false,
+  },
 ];
 
 // Get Pending Transactions (where statusId equals given value)

@@ -38,7 +38,11 @@ import BillingDistributionTransaction from "./Transactions/BillingDistributionTr
 import WarehousedTransaction from "./Transactions/WarehousedTransaction";
 import CustomDataGridStyles from "./CustomDataGridStyles";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
-import { calculateRemainingDays, formatNumber } from "./Functions";
+import {
+  calculateRemainingDays,
+  formatNumber,
+  formatTimestamp,
+} from "./Functions";
 import axios from "axios";
 import WarehousedOutTransaction from "./Transactions/WarehousedOutTransaction";
 import TreatedWarehouseTransaction from "./Transactions/TreatedWarehouseTransaction";
@@ -355,6 +359,20 @@ const Transaction = ({
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "createdAt", // Same field name as in the original columns
+      headerName: "Created At",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return params.row.CertifiedTransaction?.[0]?.createdAt
+          ? formatTimestamp(params.row.CertifiedTransaction?.[0]?.createdAt)
+          : "";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "view",
       headerName: "View",
       headerAlign: "center",
@@ -421,6 +439,9 @@ const Transaction = ({
       column.field === "collectedAmount" &&
       !Number.isInteger(user.userType)
     ) {
+      return false; // Exclude the column
+    }
+    if (column.field === "createdAt" && user.userType !== 7) {
       return false; // Exclude the column
     }
     return true; // Include the column
@@ -560,6 +581,15 @@ const Transaction = ({
               }
               return ""; // Default class if no blinking is needed
             }}
+            initialState={
+              user.userType === 7
+                ? {
+                    sorting: {
+                      sortModel: [{ field: "createdAt", sort: "desc" }],
+                    },
+                  }
+                : undefined
+            }
           />
         </CustomDataGridStyles>
         <Modal

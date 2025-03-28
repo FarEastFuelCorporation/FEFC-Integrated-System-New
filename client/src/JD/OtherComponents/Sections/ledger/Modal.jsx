@@ -11,7 +11,11 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Grid,
+  IconButton,
 } from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { tokens } from "../../../theme";
 
 const ModalJD = ({
@@ -62,7 +66,7 @@ const ModalJD = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: "90%",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
@@ -77,145 +81,171 @@ const ModalJD = ({
         <Typography variant="h6" component="h2" color="error">
           {showErrorMessage && errorMessage}
         </Typography>
-        <TextField
-          label="Transaction Date"
-          name="transactionDate"
-          value={formData.transactionDate}
-          onChange={handleInputChange}
-          type="Date"
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-            shrink: true,
-          }}
-          autoComplete="off"
-        />
-        <TextField
-          label="Transaction Details"
-          name="transactionDetails"
-          value={formData.transactionDetails}
-          onChange={handleInputChange}
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
-        <FormControl fullWidth required>
-          <InputLabel
-            style={{
-              color: colors.grey[100],
-            }}
-          >
-            Transaction Category
-          </InputLabel>
-          <Select
-            labelId={`transactionCategory`}
-            name={`transactionCategory`}
-            value={formData.transactionCategory || ""}
-            onChange={handleInputChange}
-            fullWidth
-            inputProps={{
-              name: `transactionCategory`,
-              id: `transactionCategory`,
-            }}
-          >
-            {category1.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth required>
-          <InputLabel
-            style={{
-              color: colors.grey[100],
-            }}
-          >
-            Fund Source
-          </InputLabel>
-          <Select
-            labelId={`fundSource`}
-            name={`fundSource`}
-            value={formData.fundSource || ""}
-            onChange={handleInputChange}
-            fullWidth
-            inputProps={{
-              name: `fundSource`,
-              id: `fundSource`,
-            }}
-          >
-            {category2.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth required>
-          <InputLabel
-            style={{
-              color: colors.grey[100],
-            }}
-          >
-            Fund Allocation
-          </InputLabel>
-          <Select
-            labelId={`fundAllocation`}
-            name={`fundAllocation`}
-            value={formData.fundAllocation || ""}
-            onChange={handleInputChange}
-            fullWidth
-            sx={{ mb: 2 }}
-            inputProps={{
-              name: `fundAllocation`,
-              id: `fundAllocation`,
-            }}
-          >
-            {category2.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          label="Amount"
-          name="amount"
-          value={formData.amount}
-          onChange={handleInputChange}
-          type="Number"
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-            shrink: true,
-          }}
-          autoComplete="off"
-        />
-        <TextField
-          label="Remarks"
-          name="remarks"
-          value={formData.remarks}
-          onChange={handleInputChange}
-          fullWidth
-          required
-          InputLabelProps={{
-            style: {
-              color: colors.grey[100],
-            },
-          }}
-          autoComplete="off"
-        />
+        <Grid container spacing={2}>
+          <Grid item xs={1} xl={2}>
+            <TextField
+              label="Transaction Date"
+              name="transactionDate"
+              value={formData.transactionDate}
+              onChange={handleInputChange}
+              type="Date"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+                shrink: true,
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={1} xl={2}>
+            <TextField
+              label="Transaction Details"
+              name="transactionDetails"
+              value={formData.transactionDetails}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={1} xl={2}>
+            <FormControl fullWidth required>
+              <InputLabel
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Transaction Category
+              </InputLabel>
+              <Select
+                labelId={`transactionCategory`}
+                name={`transactionCategory`}
+                value={formData.transactionCategory || ""}
+                onChange={handleInputChange}
+                fullWidth
+                inputProps={{
+                  name: `transactionCategory`,
+                  id: `transactionCategory`,
+                }}
+              >
+                {category1.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={1} xl={2}>
+            <FormControl fullWidth required>
+              <InputLabel
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Fund Source
+              </InputLabel>
+              <Select
+                labelId={`fundSource`}
+                name={`fundSource`}
+                value={formData.fundSource || ""}
+                onChange={handleInputChange}
+                fullWidth
+                inputProps={{
+                  name: `fundSource`,
+                  id: `fundSource`,
+                }}
+              >
+                {category2.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={1} xl={2}>
+            <FormControl fullWidth required>
+              <InputLabel
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Fund Allocation
+              </InputLabel>
+              <Select
+                labelId={`fundAllocation`}
+                name={`fundAllocation`}
+                value={formData.fundAllocation || ""}
+                onChange={handleInputChange}
+                fullWidth
+                sx={{ mb: 2 }}
+                inputProps={{
+                  name: `fundAllocation`,
+                  id: `fundAllocation`,
+                }}
+              >
+                {category2.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={1} xl={2}>
+            {" "}
+            <TextField
+              label="Amount"
+              name="amount"
+              value={formData.amount}
+              onChange={handleInputChange}
+              type="Number"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+                shrink: true,
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={1} xl={2}>
+            {" "}
+            <TextField
+              label="Remarks"
+              name="remarks"
+              value={formData.remarks}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          {/* <Grid item xs={0.5} textAlign="right">
+            <IconButton color="error" onClick={() => handleRemoveWaste(index)}>
+              <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+            </IconButton>
+          </Grid> */}
+        </Grid>
+
         <TextField
           label="Created By"
           name="createdBy"

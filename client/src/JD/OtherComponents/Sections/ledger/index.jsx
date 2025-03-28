@@ -31,12 +31,16 @@ const ProductCategoryJD = ({ user, socket }) => {
   const initialFormData = {
     id: "",
     transactionDate: "",
-    transactionDetails: "",
-    transactionCategory: "",
-    fundSource: "",
-    fundAllocation: "",
-    amount: 0,
-    remarks: "",
+    transactions: [
+      {
+        transactionDetails: "",
+        transactionCategory: "",
+        fundSource: "",
+        fundAllocation: "",
+        amount: 0,
+        remarks: "",
+      },
+    ],
     createdBy: user.id,
   };
 

@@ -1,12 +1,10 @@
-// controllers/ledgerController.js.js
+// controllers/inventoryController.js.js
 
 const { broadcastMessage } = require("../../websocketManager");
-const EquipmentsJD = require("../models/Equipment");
 const InventoryJD = require("../models/Inventory");
-const LedgerJD = require("../models/Ledger");
 
-// Create Ledger controller
-async function createLedgerJDController(req, res) {
+// Create Inventory controller
+async function createInventoryJDController(req, res) {
   try {
     // Extracting data from the request body
     let { transactionDate, transactions, createdBy } = req.body;
@@ -30,7 +28,7 @@ async function createLedgerJDController(req, res) {
         remarks,
       } = transaction;
 
-      const newEntry = await LedgerJD.create({
+      const newEntry = await InventoryJD.create({
         transactionDate,
         transactionDetails: transactionDetails?.toUpperCase(),
         transactionCategory: transactionCategory,
@@ -63,21 +61,6 @@ async function createLedgerJDController(req, res) {
           type: "NEW_INVENTORY_JD",
           data: newInventoryEntry,
         });
-      } else if (transactionCategory === "EQUIPMENTS") {
-        const newEquipmentEntry = await EquipmentsJD.create({
-          transactionId: newEntry.id,
-          transactionDate,
-          equipmentName: transactionDetails?.toUpperCase(),
-          transaction: "IN",
-          amount: amount,
-          remarks: remarks,
-          createdBy,
-        });
-
-        broadcastMessage({
-          type: "NEW_EQUIPMENT_JD",
-          data: newEquipmentEntry,
-        });
       }
 
       broadcastMessage({
@@ -88,6 +71,7 @@ async function createLedgerJDController(req, res) {
 
     res.status(201).json({
       message: "Submitted successfully!",
+      entries: createdEntries,
     });
   } catch (error) {
     // Handling errors
@@ -96,43 +80,43 @@ async function createLedgerJDController(req, res) {
   }
 }
 
-// Get Ledgers controller
-async function getLedgerJDsController(req, res) {
+// Get Inventories controller
+async function getInventoryJDsController(req, res) {
   try {
-    // Fetch all ledger from the database
-    const ledger = await LedgerJD.findAll({
+    // Fetch all inventory from the database
+    const inventory = await InventoryJD.findAll({
       order: [["transactionDate", "ASC"]],
     });
 
-    res.json({ ledger });
+    res.json({ inventory });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
 
-// Update Ledger controller
-async function updateLedgerJDController(req, res) {
+// Update Inventory controller
+async function updateInventoryJDController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating Ledger with ID:", id);
+    console.log("Updating Inventory with ID:", id);
 
     let { transactionDetails, createdBy } = req.body;
 
     transactionDetails = transactionDetails && transactionDetails.toUpperCase();
 
-    // Find the Ledger by ID and update it
-    const updatedLedgerJD = await LedgerJD.findByPk(id);
+    // Find the Inventory by ID and update it
+    const updatedInventoryJD = await InventoryJD.findByPk(id);
 
-    if (updatedLedgerJD) {
-      // Update Ledger attributes
-      updatedLedgerJD.transactionDetails = transactionDetails;
-      updatedLedgerJD.updatedBy = createdBy;
+    if (updatedInventoryJD) {
+      // Update Inventory attributes
+      updatedInventoryJD.transactionDetails = transactionDetails;
+      updatedInventoryJD.updatedBy = createdBy;
 
-      // Save the updated Ledger
-      await updatedLedgerJD.save();
+      // Save the updated Inventory
+      await updatedInventoryJD.save();
 
-      const updatedEntry = await LedgerJD.findByPk(id);
+      const updatedEntry = await InventoryJD.findByPk(id);
 
       broadcastMessage({
         type: "UPDATED_PRODUCT_CATEGORY_JD",
@@ -143,39 +127,39 @@ async function updateLedgerJDController(req, res) {
         message: "updated successfully!",
       });
     } else {
-      // If Ledger with the specified ID was not found
-      res.status(404).json({ message: `Ledger with ID ${id} not found` });
+      // If Inventory with the specified ID was not found
+      res.status(404).json({ message: `Inventory with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating Ledger:", error);
+    console.error("Error updating Inventory:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Delete Ledger controller
-async function deleteLedgerJDController(req, res) {
+// Delete Inventory controller
+async function deleteInventoryJDController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
 
-    console.log("Soft deleting LedgerJD with ID:", id);
+    console.log("Soft deleting InventoryJD with ID:", id);
 
-    // Find the LedgerJD by ID
-    const ledgerToDelete = await LedgerJD.findByPk(id);
+    // Find the InventoryJD by ID
+    const inventoryToDelete = await InventoryJD.findByPk(id);
 
-    if (ledgerToDelete) {
+    if (inventoryToDelete) {
       // Update the deletedBy field
-      ledgerToDelete.updatedBy = deletedBy;
-      ledgerToDelete.deletedBy = deletedBy;
-      await ledgerToDelete.save();
+      inventoryToDelete.updatedBy = deletedBy;
+      inventoryToDelete.deletedBy = deletedBy;
+      await inventoryToDelete.save();
 
-      // Soft delete the LedgerJD (sets deletedAt timestamp)
-      await ledgerToDelete.destroy();
+      // Soft delete the InventoryJD (sets deletedAt timestamp)
+      await inventoryToDelete.destroy();
 
       broadcastMessage({
         type: "DELETED_PRODUCT_CATEGORY_JD",
-        data: ledgerToDelete.id,
+        data: inventoryToDelete.id,
       });
 
       // Respond with a success message
@@ -183,19 +167,19 @@ async function deleteLedgerJDController(req, res) {
         message: "deleted successfully!",
       });
     } else {
-      // If LedgerJD with the specified ID was not found
-      res.status(404).json({ message: `LedgerJD with ID ${id} not found` });
+      // If InventoryJD with the specified ID was not found
+      res.status(404).json({ message: `InventoryJD with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error soft-deleting LedgerJD:", error);
+    console.error("Error soft-deleting InventoryJD:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
 module.exports = {
-  getLedgerJDsController,
-  createLedgerJDController,
-  updateLedgerJDController,
-  deleteLedgerJDController,
+  getInventoryJDsController,
+  createInventoryJDController,
+  updateInventoryJDController,
+  deleteInventoryJDController,
 };

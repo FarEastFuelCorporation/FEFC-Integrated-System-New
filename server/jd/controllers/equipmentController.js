@@ -1,12 +1,10 @@
-// controllers/ledgerController.js.js
+// controllers/equipmentController.js.js
 
 const { broadcastMessage } = require("../../websocketManager");
-const EquipmentsJD = require("../models/Equipment");
-const InventoryJD = require("../models/Inventory");
-const LedgerJD = require("../models/Ledger");
+const EquipmentJD = require("../models/Equipment");
 
-// Create Ledger controller
-async function createLedgerJDController(req, res) {
+// Create Equipment controller
+async function createEquipmentJDController(req, res) {
   try {
     // Extracting data from the request body
     let { transactionDate, transactions, createdBy } = req.body;
@@ -30,7 +28,7 @@ async function createLedgerJDController(req, res) {
         remarks,
       } = transaction;
 
-      const newEntry = await LedgerJD.create({
+      const newEntry = await EquipmentJD.create({
         transactionDate,
         transactionDetails: transactionDetails?.toUpperCase(),
         transactionCategory: transactionCategory,
@@ -45,7 +43,7 @@ async function createLedgerJDController(req, res) {
         transactionCategory === "INGREDIENTS" ||
         transactionCategory === "PACKAGING AND LABELING"
       ) {
-        const newInventoryEntry = await InventoryJD.create({
+        const newEquipmentEntry = await EquipmentJD.create({
           transactionId: newEntry.id,
           transactionDate,
           item: transactionDetails?.toUpperCase(),
@@ -61,21 +59,6 @@ async function createLedgerJDController(req, res) {
 
         broadcastMessage({
           type: "NEW_INVENTORY_JD",
-          data: newInventoryEntry,
-        });
-      } else if (transactionCategory === "EQUIPMENTS") {
-        const newEquipmentEntry = await EquipmentsJD.create({
-          transactionId: newEntry.id,
-          transactionDate,
-          equipmentName: transactionDetails?.toUpperCase(),
-          transaction: "IN",
-          amount: amount,
-          remarks: remarks,
-          createdBy,
-        });
-
-        broadcastMessage({
-          type: "NEW_EQUIPMENT_JD",
           data: newEquipmentEntry,
         });
       }
@@ -88,6 +71,7 @@ async function createLedgerJDController(req, res) {
 
     res.status(201).json({
       message: "Submitted successfully!",
+      entries: createdEntries,
     });
   } catch (error) {
     // Handling errors
@@ -96,43 +80,43 @@ async function createLedgerJDController(req, res) {
   }
 }
 
-// Get Ledgers controller
-async function getLedgerJDsController(req, res) {
+// Get Equipments controller
+async function getEquipmentJDsController(req, res) {
   try {
-    // Fetch all ledger from the database
-    const ledger = await LedgerJD.findAll({
+    // Fetch all equipment from the database
+    const equipment = await EquipmentJD.findAll({
       order: [["transactionDate", "ASC"]],
     });
 
-    res.json({ ledger });
+    res.json({ equipment });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
 
-// Update Ledger controller
-async function updateLedgerJDController(req, res) {
+// Update Equipment controller
+async function updateEquipmentJDController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating Ledger with ID:", id);
+    console.log("Updating Equipment with ID:", id);
 
     let { transactionDetails, createdBy } = req.body;
 
     transactionDetails = transactionDetails && transactionDetails.toUpperCase();
 
-    // Find the Ledger by ID and update it
-    const updatedLedgerJD = await LedgerJD.findByPk(id);
+    // Find the Equipment by ID and update it
+    const updatedEquipmentJD = await EquipmentJD.findByPk(id);
 
-    if (updatedLedgerJD) {
-      // Update Ledger attributes
-      updatedLedgerJD.transactionDetails = transactionDetails;
-      updatedLedgerJD.updatedBy = createdBy;
+    if (updatedEquipmentJD) {
+      // Update Equipment attributes
+      updatedEquipmentJD.transactionDetails = transactionDetails;
+      updatedEquipmentJD.updatedBy = createdBy;
 
-      // Save the updated Ledger
-      await updatedLedgerJD.save();
+      // Save the updated Equipment
+      await updatedEquipmentJD.save();
 
-      const updatedEntry = await LedgerJD.findByPk(id);
+      const updatedEntry = await EquipmentJD.findByPk(id);
 
       broadcastMessage({
         type: "UPDATED_PRODUCT_CATEGORY_JD",
@@ -143,39 +127,39 @@ async function updateLedgerJDController(req, res) {
         message: "updated successfully!",
       });
     } else {
-      // If Ledger with the specified ID was not found
-      res.status(404).json({ message: `Ledger with ID ${id} not found` });
+      // If Equipment with the specified ID was not found
+      res.status(404).json({ message: `Equipment with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error updating Ledger:", error);
+    console.error("Error updating Equipment:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Delete Ledger controller
-async function deleteLedgerJDController(req, res) {
+// Delete Equipment controller
+async function deleteEquipmentJDController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
 
-    console.log("Soft deleting LedgerJD with ID:", id);
+    console.log("Soft deleting EquipmentJD with ID:", id);
 
-    // Find the LedgerJD by ID
-    const ledgerToDelete = await LedgerJD.findByPk(id);
+    // Find the EquipmentJD by ID
+    const equipmentToDelete = await EquipmentJD.findByPk(id);
 
-    if (ledgerToDelete) {
+    if (equipmentToDelete) {
       // Update the deletedBy field
-      ledgerToDelete.updatedBy = deletedBy;
-      ledgerToDelete.deletedBy = deletedBy;
-      await ledgerToDelete.save();
+      equipmentToDelete.updatedBy = deletedBy;
+      equipmentToDelete.deletedBy = deletedBy;
+      await equipmentToDelete.save();
 
-      // Soft delete the LedgerJD (sets deletedAt timestamp)
-      await ledgerToDelete.destroy();
+      // Soft delete the EquipmentJD (sets deletedAt timestamp)
+      await equipmentToDelete.destroy();
 
       broadcastMessage({
         type: "DELETED_PRODUCT_CATEGORY_JD",
-        data: ledgerToDelete.id,
+        data: equipmentToDelete.id,
       });
 
       // Respond with a success message
@@ -183,19 +167,19 @@ async function deleteLedgerJDController(req, res) {
         message: "deleted successfully!",
       });
     } else {
-      // If LedgerJD with the specified ID was not found
-      res.status(404).json({ message: `LedgerJD with ID ${id} not found` });
+      // If EquipmentJD with the specified ID was not found
+      res.status(404).json({ message: `EquipmentJD with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
-    console.error("Error soft-deleting LedgerJD:", error);
+    console.error("Error soft-deleting EquipmentJD:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
 module.exports = {
-  getLedgerJDsController,
-  createLedgerJDController,
-  updateLedgerJDController,
-  deleteLedgerJDController,
+  getEquipmentJDsController,
+  createEquipmentJDController,
+  updateEquipmentJDController,
+  deleteEquipmentJDController,
 };

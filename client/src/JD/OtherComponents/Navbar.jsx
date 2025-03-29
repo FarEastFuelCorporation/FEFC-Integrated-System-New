@@ -33,7 +33,7 @@ const NavbarJD = () => {
 
   // Check if the current route is either "/signup" or "/login"
   const isAuthPage =
-    location.pathname === "/JD/employee" || location.pathname === "/JD";
+    location.pathname === "/JD/employee" || location.pathname === "/JD/";
 
   const handleLogout = async () => {
     try {

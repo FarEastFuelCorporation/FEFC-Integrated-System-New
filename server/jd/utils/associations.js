@@ -3,7 +3,9 @@
 const EmployeeJD = require("../models/Employee");
 const EmployeeRoleJD = require("../models/EmployeeRole");
 const EmployeeRolesEmployeeJD = require("../models/EmployeeRolesEmployee");
-const EquipmentsJD = require("../models/Equipments");
+const EquipmentJD = require("../models/Equipment");
+const InventoryJD = require("../models/Inventory");
+const LedgerJD = require("../models/Ledger");
 const ProductCategoryJD = require("../models/ProductCategory");
 const UserJD = require("../models/User");
 
@@ -40,20 +42,53 @@ EmployeeJD.hasMany(ProductCategoryJD, {
   sourceKey: "employeeId",
 });
 ProductCategoryJD.belongsTo(EmployeeJD, {
-  as: "Employee",
+  as: "EmployeeJD",
   foreignKey: "createdBy",
   targetKey: "employeeId",
 });
 
-EmployeeJD.hasMany(EquipmentsJD, {
-  as: "EquipmentsJD",
+EmployeeJD.hasMany(EquipmentJD, {
+  as: "EquipmentJD",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
 });
-EquipmentsJD.belongsTo(EmployeeJD, {
-  as: "Employee",
+EquipmentJD.belongsTo(EmployeeJD, {
+  as: "EmployeeJD",
   foreignKey: "createdBy",
   targetKey: "employeeId",
+});
+
+EmployeeJD.hasMany(LedgerJD, {
+  as: "LedgerJD",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+LedgerJD.belongsTo(EmployeeJD, {
+  as: "EmployeeJD",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+LedgerJD.hasMany(InventoryJD, {
+  as: "InventoryJD",
+  foreignKey: "transactionId",
+  sourceKey: "id",
+});
+InventoryJD.belongsTo(LedgerJD, {
+  as: "LedgerJD",
+  foreignKey: "transactionId",
+  targetKey: "id",
+});
+
+LedgerJD.hasMany(EquipmentJD, {
+  as: "EquipmentJD",
+  foreignKey: "transactionId",
+  sourceKey: "id",
+});
+EquipmentJD.belongsTo(LedgerJD, {
+  as: "LedgerJD",
+  foreignKey: "transactionId",
+  targetKey: "id",
 });
 
 // Export the associations
@@ -63,5 +98,5 @@ module.exports = {
   EmployeeRolesEmployeeJD,
   UserJD,
   ProductCategoryJD,
-  EquipmentsJD,
+  EquipmentJD,
 };

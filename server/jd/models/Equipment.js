@@ -1,10 +1,10 @@
-// models/Equipments.js
+// models/Equipment.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const EquipmentsJD = sequelize.define(
-  "EquipmentsJD",
+const EquipmentJD = sequelize.define(
+  "EquipmentJD",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,15 +12,29 @@ const EquipmentsJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
+    transactionId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    batchId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    transactionDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
     equipmentName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    quantity: {
-      type: DataTypes.INTEGER,
+    transaction: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    unitPrice: {
+    amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -42,4 +56,4 @@ const EquipmentsJD = sequelize.define(
   }
 );
 
-module.exports = EquipmentsJD;
+module.exports = EquipmentJD;

@@ -22,8 +22,9 @@ import ConfirmationDialog from "../../ConfirmationDialog";
 import ModalJD from "./Modal";
 import { Validation } from "./Validation";
 import { formatDate3, formatNumber } from "../../Functions";
+import { columns } from "./Column";
 
-const ProductCategoryJD = ({ user, socket }) => {
+const LedgerJD = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -37,6 +38,9 @@ const ProductCategoryJD = ({ user, socket }) => {
         transactionCategory: "",
         fundSource: "",
         fundAllocation: "",
+        quantity: "",
+        unit: "",
+        unitPrice: "",
         amount: 0,
         remarks: "",
       },
@@ -81,7 +85,7 @@ const ProductCategoryJD = ({ user, socket }) => {
 
         if (message.type === "NEW_LEDGER_JD") {
           setTransactions((prevData) => [...prevData, message.data]);
-        } else if (message.type === "UPDATED_PRODUCT_CATEGORY_JD") {
+        } else if (message.type === "UPDATED_LEDGER_JD") {
           setTransactions((prevData) => {
             // Find the index of the data to be updated
             const index = prevData.findIndex(
@@ -98,7 +102,7 @@ const ProductCategoryJD = ({ user, socket }) => {
               return prevData;
             }
           });
-        } else if (message.type === "DELETED_PRODUCT_CATEGORY_JD") {
+        } else if (message.type === "DELETED_LEDGER_JD") {
           setTransactions((prevData) => {
             const updatedData = prevData.filter(
               (prev) => prev.id !== message.data // Remove the data with matching ID
@@ -208,84 +212,6 @@ const ProductCategoryJD = ({ user, socket }) => {
     }
   };
 
-  const renderCellWithWrapText = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {params.value}
-    </div>
-  );
-
-  const columns = [
-    {
-      field: "transactionDate",
-      headerName: "Transaction Date",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 100,
-      valueGetter: (params) => {
-        return formatDate3(params.row.transactionDate);
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "transactionDetails",
-      headerName: "Transaction Details",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "transactionCategory",
-      headerName: "Transaction Category",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fundSource",
-      headerName: "Fund Source",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fundAllocation",
-      headerName: "Fund Allocation",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "amount",
-      headerName: "Amount",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      valueGetter: (params) => {
-        return formatNumber(params.row.amount);
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "remarks",
-      headerName: "Remarks",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-  ];
-
   if (user.userType === 1) {
     columns.push(
       {
@@ -341,6 +267,7 @@ const ProductCategoryJD = ({ user, socket }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+
       <ConfirmationDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
@@ -374,4 +301,4 @@ const ProductCategoryJD = ({ user, socket }) => {
   );
 };
 
-export default ProductCategoryJD;
+export default LedgerJD;

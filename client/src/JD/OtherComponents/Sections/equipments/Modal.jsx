@@ -178,6 +178,7 @@ const ModalJD = ({
         </Grid>
         {formData.transactions.map((transaction, index) => {
           const hasQuantity =
+            transaction.transactionCategory === "EQUIPMENTS" ||
             transaction.transactionCategory === "INGREDIENTS" ||
             transaction.transactionCategory === "PACKAGING AND LABELING";
 
@@ -189,6 +190,28 @@ const ModalJD = ({
                 Transaction Entry #{index + 1}
               </Typography>
               <Grid container spacing={2}>
+                <Grid item xs={1} lg={2}>
+                  <TextField
+                    label="Transaction Details"
+                    name={`transactions[${index}].transactionDetails`}
+                    value={transaction.transactionDetails || ""}
+                    onChange={(e) =>
+                      handleTransactionChange(
+                        index,
+                        "transactionDetails",
+                        e.target.value
+                      )
+                    }
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                </Grid>
                 <Grid item xs={1} lg={2}>
                   <FormControl fullWidth required>
                     <InputLabel
@@ -223,30 +246,6 @@ const ModalJD = ({
                     </Select>
                   </FormControl>
                 </Grid>
-                {hasCategory && (
-                  <Grid item xs={1} lg={2}>
-                    <TextField
-                      label="Transaction Details"
-                      name={`transactions[${index}].transactionDetails`}
-                      value={transaction.transactionDetails || ""}
-                      onChange={(e) =>
-                        handleTransactionChange(
-                          index,
-                          "transactionDetails",
-                          e.target.value
-                        )
-                      }
-                      fullWidth
-                      required
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                      autoComplete="off"
-                    />
-                  </Grid>
-                )}
                 {hasCategory && (
                   <Grid item xs={1} lg={2}>
                     <FormControl fullWidth required>
@@ -397,7 +396,7 @@ const ModalJD = ({
                           id: `unit`,
                         }}
                       >
-                        {unitCategory.map((item) => (
+                        {category1.map((item) => (
                           <MenuItem key={item} value={item}>
                             {item}
                           </MenuItem>

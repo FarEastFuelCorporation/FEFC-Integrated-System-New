@@ -1,5 +1,11 @@
 import moment from "moment-timezone";
 
+export const renderCellWithWrapText = (params) => (
+  <div className={"wrap-text"} style={{ textAlign: "center" }}>
+    {params.value}
+  </div>
+);
+
 export const timestampDate = (timestamp) => {
   return moment(timestamp).tz("Asia/Manila").format("YYYY-MM-DD HH:mm:ss");
 };

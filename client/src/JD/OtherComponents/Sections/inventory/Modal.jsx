@@ -191,28 +191,6 @@ const ModalJD = ({
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={1} lg={2}>
-                  <TextField
-                    label="Transaction Details"
-                    name={`transactions[${index}].transactionDetails`}
-                    value={transaction.transactionDetails || ""}
-                    onChange={(e) =>
-                      handleTransactionChange(
-                        index,
-                        "transactionDetails",
-                        e.target.value
-                      )
-                    }
-                    fullWidth
-                    required
-                    InputLabelProps={{
-                      style: {
-                        color: colors.grey[100],
-                      },
-                    }}
-                    autoComplete="off"
-                  />
-                </Grid>
-                <Grid item xs={1} lg={2}>
                   <FormControl fullWidth required>
                     <InputLabel
                       style={{
@@ -246,6 +224,30 @@ const ModalJD = ({
                     </Select>
                   </FormControl>
                 </Grid>
+                {hasCategory && (
+                  <Grid item xs={1} lg={2}>
+                    <TextField
+                      label="Transaction Details"
+                      name={`transactions[${index}].transactionDetails`}
+                      value={transaction.transactionDetails || ""}
+                      onChange={(e) =>
+                        handleTransactionChange(
+                          index,
+                          "transactionDetails",
+                          e.target.value
+                        )
+                      }
+                      fullWidth
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                      }}
+                      autoComplete="off"
+                    />
+                  </Grid>
+                )}
                 {hasCategory && (
                   <Grid item xs={1} lg={2}>
                     <FormControl fullWidth required>
@@ -396,7 +398,7 @@ const ModalJD = ({
                           id: `unit`,
                         }}
                       >
-                        {category1.map((item) => (
+                        {unitCategory.map((item) => (
                           <MenuItem key={item} value={item}>
                             {item}
                           </MenuItem>

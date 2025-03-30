@@ -1,10 +1,10 @@
-// models/Inventory.js
+// models/InventoryLedger.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const InventoryJD = sequelize.define(
-  "InventoryJD",
+const InventoryLedgerJD = sequelize.define(
+  "InventoryLedgerJD",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,7 +12,12 @@ const InventoryJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
-    transactionId: {
+    inventoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    batchId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null,
@@ -21,31 +26,11 @@ const InventoryJD = sequelize.define(
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    item: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     transaction: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    transactionCategory: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     quantity: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    unit: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    unitPrice: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -71,4 +56,4 @@ const InventoryJD = sequelize.define(
   }
 );
 
-module.exports = InventoryJD;
+module.exports = InventoryLedgerJD;

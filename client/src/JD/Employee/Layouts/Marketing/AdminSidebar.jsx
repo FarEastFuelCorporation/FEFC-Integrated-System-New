@@ -31,8 +31,8 @@ const AdminSidebarJD = ({ user }) => {
   const pathToTitleMap = useMemo(
     () => ({
       "/dashboard/dashboard": "Dashboard",
-      "/JD/dashboard/productCategory": "Product Category",
-      "/JD/dashboard/operations": "Operations",
+      "/JD/dashboard/productCategory": "Products",
+      "/JD/dashboard/production": "Productions",
       "/JD/dashboard/stocks": "Stocks",
       "/JD/dashboard/equipments": "Equipments",
       "/JD/dashboard/inventory": "Inventory",
@@ -114,20 +114,20 @@ const AdminSidebarJD = ({ user }) => {
           navigate={""}
         />
         <BottomNavItem
-          label="Product Category"
-          value="Product Category"
+          label="Products"
+          value="Products"
           icon={HomeOutlinedIcon}
           selected={selected}
           setSelected={setSelected}
           navigate={"productCategory"}
         />
         <BottomNavItem
-          label="Operations"
-          value="Operations"
+          label="Productions"
+          value="Productions"
           icon={FactoryIcon}
           selected={selected}
           setSelected={setSelected}
-          navigate={"operations"}
+          navigate={"production"}
         />
         <BottomNavItem
           label="Stocks"
@@ -287,7 +287,7 @@ const AdminSidebarJD = ({ user }) => {
               Data
             </Typography>
             <Item
-              title="Product Category"
+              title="Products"
               to="productCategory"
               icon={<CategoryIcon />}
               selected={selected}
@@ -295,8 +295,8 @@ const AdminSidebarJD = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
-              title="Operations"
-              to="operations"
+              title="Productions"
+              to="production"
               icon={<FactoryIcon />}
               selected={selected}
               setSelected={setSelected}

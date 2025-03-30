@@ -1,10 +1,10 @@
-// models/Inventory.js
+// models/Production.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const InventoryJD = sequelize.define(
-  "InventoryJD",
+const ProductionJD = sequelize.define(
+  "ProductionJD",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,28 +12,19 @@ const InventoryJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
-    transactionId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: null,
-    },
     transactionDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    item: {
+    batch: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    transaction: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    productId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
-    transactionCategory: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    quantity: {
+    yield: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -45,7 +36,23 @@ const InventoryJD = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    amount: {
+    ingredientCost: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    packagingCost: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    equipmentCost: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    utilitiesCost: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    laborCost: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -71,4 +78,4 @@ const InventoryJD = sequelize.define(
   }
 );
 
-module.exports = InventoryJD;
+module.exports = ProductionJD;

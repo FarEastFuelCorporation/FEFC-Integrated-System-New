@@ -21,7 +21,11 @@ import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import ModalJD from "./Modal";
 import { Validation } from "./Validation";
-import { formatDate3, formatNumber } from "../../Functions";
+import {
+  formatDate3,
+  formatNumber,
+  renderCellWithWrapText,
+} from "../../Functions";
 import { columns } from "./Column";
 
 const LedgerJD = ({ user, socket }) => {
@@ -118,16 +122,6 @@ const LedgerJD = ({ user, socket }) => {
     setOpenModal(true);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     setErrorMessage("");
@@ -144,12 +138,28 @@ const LedgerJD = ({ user, socket }) => {
   };
 
   const handleEditClick = (row) => {
+    console.log(row);
+    console.log(row.amount);
     if (row) {
       setFormData({
         id: row.id,
-        productCategory: row.productCategory,
+        transactionDate: row.transactionDate,
+        transactions: [
+          {
+            transactionDetails: row.transactionDetails,
+            transactionCategory: row.transactionCategory,
+            fundSource: row.fundSource,
+            fundAllocation: row.fundAllocation,
+            quantity: row.InventoryJD?.[0]?.quantity,
+            unit: row.InventoryJD?.[0]?.unit,
+            unitPrice: row.InventoryJD?.[0]?.unitPrice,
+            amount: row.amount,
+            remarks: row.remarks,
+          },
+        ],
         createdBy: user.id,
       });
+
       handleOpenModal();
     } else {
       console.error(`Transaction with ID ${row.id} not found for editing.`);
@@ -212,42 +222,106 @@ const LedgerJD = ({ user, socket }) => {
     }
   };
 
-  if (user.userType === 1) {
-    columns.push(
-      {
-        field: "edit",
-        headerName: "Edit",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
+  const columns = [
+    {
+      field: "transactionDate",
+      headerName: "Transaction Date",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return formatDate3(params.row.transactionDate);
       },
-      {
-        field: "delete",
-        headerName: "Delete",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
-      }
-    );
-  }
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transactionDetails",
+      headerName: "Transaction Details",
+      headerAlign: "center",
+      align: "center",
+      flex: 2,
+      minWidth: 250,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transactionCategory",
+      headerName: "Transaction Category",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "fundSource",
+      headerName: "Fund Source",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "fundAllocation",
+      headerName: "Fund Allocation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return formatNumber(params.row.amount);
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "remarks",
+      headerName: "Remarks",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteClick(params.row.id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
+  ];
 
   return (
     <Box p="20px" width="100% !important" position="relative">

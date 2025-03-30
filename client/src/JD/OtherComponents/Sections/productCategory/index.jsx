@@ -7,6 +7,10 @@ import {
   TextField,
   Button,
   useTheme,
+  Card,
+  Tabs,
+  Tab,
+  Badge,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -19,8 +23,9 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
-import ModalJD from "./Modal";
-import { Validation } from "./Validation";
+import { ModalJD, ModalJD2 } from "./Modal";
+import { Validation, Validation2 } from "./Validation";
+import { renderCellWithWrapText } from "../../Functions";
 
 const ProductCategoryJD = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -33,10 +38,19 @@ const ProductCategoryJD = ({ user, socket }) => {
     createdBy: user.id,
   };
 
+  const initialFormData2 = {
+    id: "",
+    productCategoryId: "",
+    productName: "",
+    createdBy: user.id,
+  };
+
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
+  const [formData2, setFormData2] = useState(initialFormData2);
 
   const [productCategories, setProductCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -46,12 +60,22 @@ const ProductCategoryJD = ({ user, socket }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
 
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/apiJD/productCategory`);
+      const responseProductCategory = await axios.get(
+        `${apiUrl}/apiJD/productCategory`
+      );
 
-      setProductCategories(response.data.productCategory);
+      const responseProduct = await axios.get(`${apiUrl}/apiJD/product`);
+
+      setProductCategories(responseProductCategory.data.productCategory);
+
+      console.log(responseProduct.data.product);
+      setProducts(responseProduct.data.product);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -86,8 +110,47 @@ const ProductCategoryJD = ({ user, socket }) => {
               return prevData;
             }
           });
+          setProducts((prevData) =>
+            prevData.map((product) =>
+              product.productCategoryId === message.data.id
+                ? {
+                    ...product,
+                    ProductCategoryJD: {
+                      ...product.ProductCategoryJD,
+                      productCategory: message.data.productCategory,
+                    },
+                  }
+                : product
+            )
+          );
         } else if (message.type === "DELETED_PRODUCT_CATEGORY_JD") {
           setProductCategories((prevData) => {
+            const updatedData = prevData.filter(
+              (prev) => prev.id !== message.data // Remove the data with matching ID
+            );
+            return updatedData;
+          });
+        } else if (message.type === "NEW_PRODUCT_JD") {
+          setProducts((prevData) => [...prevData, message.data]);
+        } else if (message.type === "UPDATED_PRODUCT_JD") {
+          setProducts((prevData) => {
+            // Find the index of the data to be updated
+            const index = prevData.findIndex(
+              (prev) => prev.id === message.data.id
+            );
+
+            if (index !== -1) {
+              // Replace the updated data data
+              const updatedData = [...prevData];
+              updatedData[index] = message.data; // Update the data at the found index
+              return updatedData;
+            } else {
+              // If the data is not found, just return the previous state
+              return prevData;
+            }
+          });
+        } else if (message.type === "DELETED_PRODUCT_JD") {
+          setProducts((prevData) => {
             const updatedData = prevData.filter(
               (prev) => prev.id !== message.data // Remove the data with matching ID
             );
@@ -102,15 +165,9 @@ const ProductCategoryJD = ({ user, socket }) => {
     setOpenModal(true);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
+  const handleChangeTab = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -120,11 +177,17 @@ const ProductCategoryJD = ({ user, socket }) => {
 
   const clearFormData = () => {
     setFormData(initialFormData);
+    setFormData2(initialFormData2);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleInputChange2 = (e) => {
+    const { name, value } = e.target;
+    setFormData2({ ...formData2, [name]: value });
   };
 
   const handleEditClick = (row) => {
@@ -134,6 +197,14 @@ const ProductCategoryJD = ({ user, socket }) => {
         productCategory: row.productCategory,
         createdBy: user.id,
       });
+
+      setFormData2({
+        id: row.id,
+        productCategoryId: row.productCategoryId,
+        productName: row.productName,
+        createdBy: user.id,
+      });
+
       handleOpenModal();
     } else {
       console.error(
@@ -143,19 +214,30 @@ const ProductCategoryJD = ({ user, socket }) => {
   };
 
   const handleDeleteClick = (id) => {
+    const message =
+      selectedTab === 1
+        ? `Are you sure you want to Delete this Product Category?`
+        : `Are you sure you want to Delete this Product?`;
+    console.log(selectedTab);
     setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Product Category?");
+    setDialog(message);
     setDialogAction(() => () => handleConfirmDelete(id));
   };
 
   const handleConfirmDelete = async (id) => {
+    const url = selectedTab === 1 ? "productCategory" : "product";
+    const message =
+      selectedTab === 1
+        ? "Product Category Deleted Successfully!"
+        : "Product Deleted Successfully!";
+
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/apiJD/productCategory/${id}`, {
+      await axios.delete(`${apiUrl}/apiJD/${url}/${id}`, {
         data: { deletedBy: user.id },
       });
 
-      setSuccessMessage("Product Category Deleted Successfully!");
+      setSuccessMessage(message);
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {
@@ -201,11 +283,38 @@ const ProductCategoryJD = ({ user, socket }) => {
     }
   };
 
-  const renderCellWithWrapText = (params) => (
-    <div className={"wrap-text"} style={{ textAlign: "center" }}>
-      {params.value}
-    </div>
-  );
+  const handleFormSubmit2 = async (e) => {
+    e.preventDefault();
+
+    const validationErrors = Validation2(formData2);
+
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
+      setShowErrorMessage(true);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      if (formData2.id) {
+        // Update existing Product
+        await axios.put(`${apiUrl}/apiJD/product/${formData2.id}`, formData2);
+
+        setSuccessMessage("Product Updated Successfully!");
+      } else {
+        // Add new Product
+        await axios.post(`${apiUrl}/apiJD/product`, formData2);
+
+        setSuccessMessage("Product Added Successfully!");
+      }
+
+      setShowSuccessMessage(true);
+      handleCloseModal();
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const columns = [
     {
@@ -215,54 +324,102 @@ const ProductCategoryJD = ({ user, socket }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      valueGetter: (params) => {
+        return params.row.productCategory;
+      },
       renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteClick(params.row.id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
     },
   ];
 
-  if (user.userType === 1) {
-    columns.push(
-      {
-        field: "edit",
-        headerName: "Edit",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
+  const columns2 = [
+    {
+      field: "productName",
+      headerName: "Product Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "productCategory",
+      headerName: "Product Category",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return params.row.ProductCategoryJD?.productCategory;
       },
-      {
-        field: "delete",
-        headerName: "Delete",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
-      }
-    );
-  }
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteClick(params.row.id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
+  ];
 
   return (
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header
-          title="Product Category"
-          subtitle="List of Product Categories"
+          title="Products"
+          subtitle="List of Products and Product Categories"
         />
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>
@@ -283,29 +440,94 @@ const ProductCategoryJD = ({ user, socket }) => {
         onConfirm={dialogAction}
         text={dialog}
       />
-      <CustomDataGridStyles>
+      <Card>
+        <Tabs
+          value={selectedTab}
+          onChange={handleChangeTab}
+          sx={{
+            "& .Mui-selected": {
+              backgroundColor: colors.greenAccent[400],
+              boxShadow: "none",
+              borderBottom: `1px solid ${colors.grey[100]}`,
+            },
+            "& .MuiTab-root > span": {
+              paddingRight: "10px",
+            },
+          }}
+        >
+          <Tab
+            label={
+              <Badge
+                // badgeContent={pendingCount}
+                color="error"
+                max={9999}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                Products
+              </Badge>
+            }
+          />
+          <Tab
+            label={
+              <Badge
+                // badgeContent={pendingCount}
+                color="error"
+                max={9999}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                Product Categories
+              </Badge>
+            }
+          />
+        </Tabs>
+      </Card>
+
+      <CustomDataGridStyles margin={0}>
         <DataGrid
-          rows={productCategories}
-          columns={columns}
+          rows={selectedTab === 1 ? productCategories : products}
+          columns={selectedTab === 1 ? columns : columns2}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "productCategory", sort: "asc" }],
+              sortModel:
+                selectedTab === 1
+                  ? [{ field: "productCategory", sort: "asc" }]
+                  : [{ field: "productName", sort: "asc" }],
             },
           }}
         />
       </CustomDataGridStyles>
-      <ModalJD
-        user={user}
-        open={openModal}
-        onClose={handleCloseModal}
-        formData={formData}
-        handleInputChange={handleInputChange}
-        handleFormSubmit={handleFormSubmit}
-        errorMessage={errorMessage}
-        showErrorMessage={showErrorMessage}
-      />
+      {selectedTab === 1 ? (
+        <ModalJD
+          user={user}
+          open={openModal}
+          onClose={handleCloseModal}
+          formData={formData}
+          handleInputChange={handleInputChange}
+          handleFormSubmit={handleFormSubmit}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
+        />
+      ) : (
+        <ModalJD2
+          user={user}
+          open={openModal}
+          onClose={handleCloseModal}
+          formData={formData2}
+          handleInputChange={handleInputChange2}
+          handleFormSubmit={handleFormSubmit2}
+          errorMessage={errorMessage}
+          showErrorMessage={showErrorMessage}
+          productCategories={productCategories}
+        />
+      )}
     </Box>
   );
 };

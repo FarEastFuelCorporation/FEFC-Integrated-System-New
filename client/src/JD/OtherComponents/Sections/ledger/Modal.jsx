@@ -176,7 +176,7 @@ const ModalJD = ({
             />
           </Grid>
         </Grid>
-        {formData.transactions.map((transaction, index) => {
+        {formData.transactions?.map((transaction, index) => {
           const hasQuantity =
             transaction.transactionCategory === "INGREDIENTS" ||
             transaction.transactionCategory === "PACKAGING AND LABELING";
@@ -366,14 +366,16 @@ const ModalJD = ({
                     />
                   </Grid>
                 )}
-                <Grid item xs={0.5} textAlign="right">
-                  <IconButton
-                    color="error"
-                    onClick={() => handleRemoveTransaction(index)}
-                  >
-                    <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
-                  </IconButton>
-                </Grid>
+                {!formData.id && (
+                  <Grid item xs={0.5} textAlign="right">
+                    <IconButton
+                      color="error"
+                      onClick={() => handleRemoveTransaction(index)}
+                    >
+                      <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                    </IconButton>
+                  </Grid>
+                )}
                 {hasCategory && hasQuantity && (
                   <Grid item xs={1} lg={2}>
                     <FormControl fullWidth required>
@@ -484,11 +486,13 @@ const ModalJD = ({
             </Box>
           );
         })}
-        <Box display="flex" justifyContent="center">
-          <IconButton color="success" onClick={handleAddTransaction}>
-            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
-          </IconButton>
-        </Box>
+        {!formData.id && (
+          <Box display="flex" justifyContent="center">
+            <IconButton color="success" onClick={handleAddTransaction}>
+              <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+            </IconButton>
+          </Box>
+        )}
         <TextField
           label="Created By"
           name="createdBy"

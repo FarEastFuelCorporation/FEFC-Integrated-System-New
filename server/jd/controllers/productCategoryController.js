@@ -7,13 +7,11 @@ const ProductCategoryJD = require("../models/ProductCategory");
 async function createProductCategoryJDController(req, res) {
   try {
     // Extracting data from the request body
-    let { productCategory, createdBy } = req.body;
-
-    productCategory = productCategory && productCategory.toUpperCase();
+    const { productCategory, createdBy } = req.body;
 
     // Creating a new Product Category
     const newEntry = await ProductCategoryJD.create({
-      productCategory,
+      productCategory: productCategory?.toUpperCase(),
       createdBy,
     });
 
@@ -55,16 +53,14 @@ async function updateProductCategoryJDController(req, res) {
     const id = req.params.id;
     console.log("Updating Product Category with ID:", id);
 
-    let { productCategory, createdBy } = req.body;
-
-    productCategory = productCategory && productCategory.toUpperCase();
+    const { productCategory, createdBy } = req.body;
 
     // Find the Product Category by ID and update it
     const updatedProductCategoryJD = await ProductCategoryJD.findByPk(id);
 
     if (updatedProductCategoryJD) {
       // Update Product Category attributes
-      updatedProductCategoryJD.productCategory = productCategory;
+      updatedProductCategoryJD.productCategory = productCategory?.toUpperCase();
       updatedProductCategoryJD.updatedBy = createdBy;
 
       // Save the updated Product Category

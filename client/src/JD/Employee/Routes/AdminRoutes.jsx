@@ -5,9 +5,9 @@ import Dashboard from "../Layouts/Marketing/sections/dashboard";
 import Calendar from "../Layouts/Marketing/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import ProductCategoryJD from "../../OtherComponents/Sections/productCategory";
-import OperationsJD from "../../OtherComponents/Sections/operations";
+import ProductionJD from "../../OtherComponents/Sections/production";
 import StocksJD from "../../OtherComponents/Sections/stocks";
-import EquipmentsJD from "../../OtherComponents/Sections/equipments";
+import EquipmentJD from "../../OtherComponents/Sections/equipments";
 import InventoryJD from "../../OtherComponents/Sections/inventory";
 import LedgerJD from "../../OtherComponents/Sections/ledger";
 
@@ -21,13 +21,13 @@ const AdminRoutesJD = ({ user, onUpdateUser, socket }) => (
         element={<ProductCategoryJD user={user} socket={socket} />}
       />
       <Route
-        path="operations"
-        element={<OperationsJD user={user} socket={socket} />}
+        path="production"
+        element={<ProductionJD user={user} socket={socket} />}
       />
       <Route path="stocks" element={<StocksJD user={user} socket={socket} />} />
       <Route
         path="equipments"
-        element={<EquipmentsJD user={user} socket={socket} />}
+        element={<EquipmentJD user={user} socket={socket} />}
       />
       <Route
         path="inventory"

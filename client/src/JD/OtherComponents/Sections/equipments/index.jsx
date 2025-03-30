@@ -89,9 +89,9 @@ const EquipmentJD = ({ user, socket }) => {
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
 
-        if (message.type === "NEW_INVENTORY_JD") {
+        if (message.type === "NEW_EQUIPMENT_JD") {
           setTransactions((prevData) => [...prevData, message.data]);
-        } else if (message.type === "UPDATED_INVENTORY_JD") {
+        } else if (message.type === "UPDATED_EQUIPMENT_JD") {
           setTransactions((prevData) => {
             // Find the index of the data to be updated
             const index = prevData.findIndex(
@@ -108,7 +108,7 @@ const EquipmentJD = ({ user, socket }) => {
               return prevData;
             }
           });
-        } else if (message.type === "DELETED_INVENTORY_JD") {
+        } else if (message.type === "DELETED_EQUIPMENT_JD") {
           setTransactions((prevData) => {
             const updatedData = prevData.filter(
               (prev) => prev.id !== message.data // Remove the data with matching ID
@@ -123,16 +123,6 @@ const EquipmentJD = ({ user, socket }) => {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
@@ -222,42 +212,47 @@ const EquipmentJD = ({ user, socket }) => {
     }
   };
 
-  if (user.userType === 1) {
-    columns.push(
-      {
-        field: "edit",
-        headerName: "Edit",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
-      },
-      {
-        field: "delete",
-        headerName: "Delete",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
-      }
-    );
-  }
+  // if (user.userType === 1) {
+  //   const existingFields = columns.map((col) => col.field);
+
+  //   if (!existingFields.includes("edit")) {
+  //     columns.push({
+  //       field: "edit",
+  //       headerName: "Edit",
+  //       headerAlign: "center",
+  //       align: "center",
+  //       sortable: false,
+  //       width: 60,
+  //       renderCell: (params) => (
+  //         <IconButton
+  //           color="warning"
+  //           onClick={() => handleEditClick(params.row)}
+  //         >
+  //           <EditIcon />
+  //         </IconButton>
+  //       ),
+  //     });
+  //   }
+
+  //   if (!existingFields.includes("delete")) {
+  //     columns.push({
+  //       field: "delete",
+  //       headerName: "Delete",
+  //       headerAlign: "center",
+  //       align: "center",
+  //       sortable: false,
+  //       width: 60,
+  //       renderCell: (params) => (
+  //         <IconButton
+  //           color="error"
+  //           onClick={() => handleDeleteClick(params.row.id)}
+  //         >
+  //           <DeleteIcon />
+  //         </IconButton>
+  //       ),
+  //     });
+  //   }
+  // }
 
   return (
     <Box p="20px" width="100% !important" position="relative">

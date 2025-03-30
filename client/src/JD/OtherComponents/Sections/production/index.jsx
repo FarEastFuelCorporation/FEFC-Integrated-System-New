@@ -7,10 +7,6 @@ import {
   TextField,
   Button,
   useTheme,
-  Tabs,
-  Card,
-  Tab,
-  Badge,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -25,10 +21,14 @@ import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import ModalJD from "./Modal";
 import { Validation } from "./Validation";
-import { formatDate3, formatNumber } from "../../Functions";
+import {
+  formatDate3,
+  formatNumber,
+  renderCellWithWrapText,
+} from "../../Functions";
 import { columns } from "./Column";
 
-const InventoryJD = ({ user, socket }) => {
+const ProductionJD = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -36,6 +36,23 @@ const InventoryJD = ({ user, socket }) => {
   const initialFormData = {
     id: "",
     transactionDate: "",
+    ingredientCost: 0,
+    packagingCost: 0,
+    equipmentCost: 0,
+    utilitiesCost: 0,
+    laborCost: 0,
+    totalCost: 0,
+    ingredients: [
+      {
+        id: "",
+        unit: "",
+        remaining: "",
+        unitPrice: "",
+        quantity: "",
+        amount: 0,
+        remarks: "",
+      },
+    ],
     transactions: [
       {
         transactionDetails: "",
@@ -56,6 +73,10 @@ const InventoryJD = ({ user, socket }) => {
   const [formData, setFormData] = useState(initialFormData);
 
   const [transactions, setTransactions] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const [packaging, setPackaging] = useState([]);
+  const [equipments, setEquipments] = useState([]);
+  const [products, setProducts] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -65,15 +86,44 @@ const InventoryJD = ({ user, socket }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
 
-  const [selectedTab, setSelectedTab] = useState(0);
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/apiJD/inventory`);
+      const response = await axios.get(`${apiUrl}/apiJD/production`);
+      const responseInventory = await axios.get(`${apiUrl}/apiJD/inventory`);
+      const responseEquipment = await axios.get(`${apiUrl}/apiJD/equipment`);
+      const responseProductCategory = await axios.get(
+        `${apiUrl}/apiJD/productCategory`
+      );
 
-      console.log(response.data.inventory);
-      setTransactions(response.data.inventory);
+      const responseProduct = await axios.get(`${apiUrl}/apiJD/product`);
+
+      const inventoryData = responseInventory.data.inventory;
+      const equipmentData = responseEquipment.data.equipment;
+
+      // Filter for "PACKAGING AND LABELING"
+      const packagingItems = inventoryData.filter(
+        (item) => item.transactionCategory === "PACKAGING AND LABELING"
+      );
+
+      // Filter for "INGREDIENTS"
+      const ingredientItems = inventoryData.filter(
+        (item) => item.transactionCategory === "INGREDIENTS"
+      );
+
+      console.log(response.data.production);
+      console.log(packagingItems);
+      console.log(ingredientItems);
+      console.log(equipmentData);
+      console.log(responseProductCategory.data.productCategory);
+      console.log(responseProduct.data.product);
+
+      // Update state
+      setTransactions(response.data.production);
+      setPackaging(packagingItems);
+      setIngredients(ingredientItems);
+      setEquipments(equipmentData);
+      setProducts(responseProduct.data.product);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -89,9 +139,9 @@ const InventoryJD = ({ user, socket }) => {
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
 
-        if (message.type === "NEW_INVENTORY_JD") {
+        if (message.type === "NEW_PRODUCTION_JD") {
           setTransactions((prevData) => [...prevData, message.data]);
-        } else if (message.type === "UPDATED_INVENTORY_JD") {
+        } else if (message.type === "UPDATED_PRODUCTION_JD") {
           setTransactions((prevData) => {
             // Find the index of the data to be updated
             const index = prevData.findIndex(
@@ -108,7 +158,7 @@ const InventoryJD = ({ user, socket }) => {
               return prevData;
             }
           });
-        } else if (message.type === "DELETED_INVENTORY_JD") {
+        } else if (message.type === "DELETED_PRODUCTION_JD") {
           setTransactions((prevData) => {
             const updatedData = prevData.filter(
               (prev) => prev.id !== message.data // Remove the data with matching ID
@@ -122,10 +172,6 @@ const InventoryJD = ({ user, socket }) => {
 
   const handleOpenModal = () => {
     setOpenModal(true);
-  };
-
-  const handleChangeTab = (event, newValue) => {
-    setSelectedTab(newValue);
   };
 
   const handleCloseModal = () => {
@@ -144,12 +190,28 @@ const InventoryJD = ({ user, socket }) => {
   };
 
   const handleEditClick = (row) => {
+    console.log(row);
+    console.log(row.amount);
     if (row) {
       setFormData({
         id: row.id,
-        productCategory: row.productCategory,
+        transactionDate: row.transactionDate,
+        transactions: [
+          {
+            transactionDetails: row.transactionDetails,
+            transactionCategory: row.transactionCategory,
+            fundSource: row.fundSource,
+            fundAllocation: row.fundAllocation,
+            quantity: row.InventoryJD?.[0]?.quantity,
+            unit: row.InventoryJD?.[0]?.unit,
+            unitPrice: row.InventoryJD?.[0]?.unitPrice,
+            amount: row.amount,
+            remarks: row.remarks,
+          },
+        ],
         createdBy: user.id,
       });
+
       handleOpenModal();
     } else {
       console.error(`Transaction with ID ${row.id} not found for editing.`);
@@ -212,56 +274,112 @@ const InventoryJD = ({ user, socket }) => {
     }
   };
 
-  // if (user.userType === 1) {
-  //   const existingFields = columns.map((col) => col.field);
-
-  //   if (!existingFields.includes("edit")) {
-  //     columns.push({
-  //       field: "edit",
-  //       headerName: "Edit",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       sortable: false,
-  //       width: 60,
-  //       renderCell: (params) => (
-  //         <IconButton
-  //           color="warning"
-  //           onClick={() => handleEditClick(params.row)}
-  //         >
-  //           <EditIcon />
-  //         </IconButton>
-  //       ),
-  //     });
-  //   }
-
-  //   if (!existingFields.includes("delete")) {
-  //     columns.push({
-  //       field: "delete",
-  //       headerName: "Delete",
-  //       headerAlign: "center",
-  //       align: "center",
-  //       sortable: false,
-  //       width: 60,
-  //       renderCell: (params) => (
-  //         <IconButton
-  //           color="error"
-  //           onClick={() => handleDeleteClick(params.row.id)}
-  //         >
-  //           <DeleteIcon />
-  //         </IconButton>
-  //       ),
-  //     });
-  //   }
-  // }
+  const columns = [
+    {
+      field: "transactionDate",
+      headerName: "Transaction Date",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return formatDate3(params.row.transactionDate);
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transactionDetails",
+      headerName: "Transaction Details",
+      headerAlign: "center",
+      align: "center",
+      flex: 2,
+      minWidth: 250,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "transactionCategory",
+      headerName: "Transaction Category",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "fundSource",
+      headerName: "Fund Source",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "fundAllocation",
+      headerName: "Fund Allocation",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return formatNumber(params.row.amount);
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "remarks",
+      headerName: "Remarks",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteClick(params.row.id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
+  ];
 
   return (
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
-        <Header
-          title="Inventory"
-          subtitle="List of Inventories  and Transaction Log"
-        />
+        <Header title="Productions" subtitle="List of Productions" />
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />
@@ -275,60 +393,14 @@ const InventoryJD = ({ user, socket }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
+
       <ConfirmationDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         onConfirm={dialogAction}
         text={dialog}
       />
-      <Card>
-        <Tabs
-          value={selectedTab}
-          onChange={handleChangeTab}
-          sx={{
-            "& .Mui-selected": {
-              backgroundColor: colors.greenAccent[400],
-              boxShadow: "none",
-              borderBottom: `1px solid ${colors.grey[100]}`,
-            },
-            "& .MuiTab-root > span": {
-              paddingRight: "10px",
-            },
-          }}
-        >
-          <Tab
-            label={
-              <Badge
-                // badgeContent={pendingCount}
-                color="error"
-                max={9999}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                Transaction
-              </Badge>
-            }
-          />
-          <Tab
-            label={
-              <Badge
-                // badgeContent={pendingCount}
-                color="error"
-                max={9999}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                Inventories
-              </Badge>
-            }
-          />
-        </Tabs>
-      </Card>
-      <CustomDataGridStyles margin={0}>
+      <CustomDataGridStyles>
         <DataGrid
           rows={transactions}
           columns={columns}
@@ -350,9 +422,13 @@ const InventoryJD = ({ user, socket }) => {
         handleFormSubmit={handleFormSubmit}
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
+        ingredients={ingredients}
+        packaging={packaging}
+        equipments={equipments}
+        products={products}
       />
     </Box>
   );
 };
 
-export default InventoryJD;
+export default ProductionJD;

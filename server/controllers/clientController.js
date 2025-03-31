@@ -116,6 +116,7 @@ async function updateClientController(req, res) {
       billerContactPerson,
       billerContactNumber,
       billerTinNumber,
+      email,
       createdBy,
     } = req.body;
 
@@ -151,6 +152,7 @@ async function updateClientController(req, res) {
       updatedClient.billerContactPerson = billerContactPerson || "";
       updatedClient.billerContactNumber = billerContactNumber || "";
       updatedClient.billerTinNumber = billerTinNumber || "";
+      updatedClient.email = email || "";
       updatedClient.updatedBy = createdBy;
       if (clientPicture !== null) {
         updatedClient.clientPicture = clientPicture;

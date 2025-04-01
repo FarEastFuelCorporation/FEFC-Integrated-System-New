@@ -343,13 +343,27 @@ async function geBookedTransactionsDashboardController(req, res) {
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
 
+    // Convert the cutoff date to a comparable format
+    const cutoffDate = new Date("2025-03-31");
+
+    // Define the date condition
+    let dateCondition = {
+      [Op.between]: [startDate, endDate],
+    };
+
+    // If the client ID is GEN-142 or GEN-143, exclude transactions before March 31, 2025
+    if (clientId === "GEN-142" || clientId === "GEN-143") {
+      dateCondition = {
+        [Op.gt]: cutoffDate, // Only include transactions after March 31, 2025
+        [Op.between]: [startDate, endDate],
+      };
+    }
+
     const pendingCount = await BookedTransaction.count({
       where: {
         statusId: 1,
         createdBy: clientId,
-        haulingDate: {
-          [Op.between]: [startDate, endDate],
-        },
+        haulingDate: dateCondition,
       },
     });
 
@@ -357,42 +371,30 @@ async function geBookedTransactionsDashboardController(req, res) {
       where: {
         statusId: { [Op.between]: [2, 8] },
         createdBy: clientId,
-        haulingDate: {
-          [Op.between]: [startDate, endDate],
-        },
+        haulingDate: dateCondition,
       },
     });
 
     const certifiedCount = await BookedTransaction.count({
       where: {
-        statusId: {
-          [Op.gte]: 9, // Change to greater than or equal to 9
-        },
+        statusId: { [Op.gte]: 9 },
         createdBy: clientId,
-        haulingDate: {
-          [Op.between]: [startDate, endDate],
-        },
+        haulingDate: dateCondition,
       },
     });
 
     const billedCount = await BookedTransaction.count({
       where: {
-        statusId: {
-          [Op.gte]: 10, // Change to greater than or equal to 9
-        },
+        statusId: { [Op.gte]: 10 },
         createdBy: clientId,
-        haulingDate: {
-          [Op.between]: [startDate, endDate],
-        },
+        haulingDate: dateCondition,
       },
     });
 
     const allCount = await BookedTransaction.count({
       where: {
         createdBy: clientId,
-        haulingDate: {
-          [Op.between]: [startDate, endDate],
-        },
+        haulingDate: dateCondition,
       },
     });
 
@@ -410,6 +412,7 @@ async function geBookedTransactionsDashboardController(req, res) {
           as: "BookedTransaction",
           where: {
             createdBy: clientId,
+            haulingDate: dateCondition,
           },
         },
         {
@@ -432,15 +435,13 @@ async function geBookedTransactionsDashboardController(req, res) {
           ],
         },
       ],
-      group: ["billingNumber"], // Group by billingNumber to get unique values
+      group: ["billingNumber"],
     });
 
     const bookedTransactions = await BookedTransaction.findAll({
       where: {
         createdBy: clientId,
-        haulingDate: {
-          [Op.between]: [startDate, endDate],
-        },
+        haulingDate: dateCondition,
       },
       include: {
         model: QuotationWaste,

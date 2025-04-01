@@ -826,13 +826,21 @@ const getPendingTransactions = async (
         additionalStatusId ? { statusId: additionalStatusId } : null, // Optionally matches an additional statusId
       ].filter(Boolean), // Filter out nulls if additionalStatusId is not provided
     };
+
     // If user is provided, add user-specific condition (e.g., createdBy)
     if (user) {
       whereConditions.createdBy = user;
+
+      // Exclude transactions before March 31, 2025, for GEN-142 or GEN-143
+      if (user === "GEN-142" || user === "GEN-143") {
+        whereConditions.haulingDate = { [Op.gt]: "2025-03-31" }; // Dates after March 31, 2025
+      }
     }
+
     if (transactionId) {
       whereConditions.transactionId = transactionId;
     }
+
     console.log(whereConditions);
 
     const queryOptions = {
@@ -874,13 +882,24 @@ const getInProgressTransactions = async (
       },
     };
 
-    // If user is provided, add the condition for createdBy (or whatever the user field is)
+    // If user is provided, add the condition for createdBy
     if (user) {
       whereConditions.createdBy = user;
     }
     if (transactionId) {
       whereConditions.transactionId = transactionId;
     }
+
+    // Exclude transactions before March 31, 2025, for specific clients
+    whereConditions[Op.and] = [
+      {
+        [Op.or]: [
+          { clientId: { [Op.ne]: "GEN-142" } },
+          { clientId: { [Op.ne]: "GEN-143" } },
+          { transactionDate: { [Op.gt]: "2025-03-31" } },
+        ],
+      },
+    ];
 
     const queryOptions = {
       where: whereConditions,
@@ -896,7 +915,7 @@ const getInProgressTransactions = async (
     const bookedTransactions = await BookedTransaction.findAll(queryOptions);
     return bookedTransactions;
   } catch (error) {
-    console.error("Error fetching in progress transactions:", error);
+    console.error("Error fetching in-progress transactions:", error);
     throw error; // Re-throw error to handle it in the calling function
   }
 };
@@ -913,13 +932,26 @@ const getFinishedTransactions = async (
     // Build the base where conditions
     const whereConditions = { statusId: 13 };
 
-    // If user is provided, add the condition for createdBy (or whatever the user field is)
+    // If user is provided, add the condition for createdBy
     if (user) {
       whereConditions.createdBy = user;
     }
     if (transactionId) {
       whereConditions.transactionId = transactionId;
     }
+
+    // Exclude transactions before March 31, 2025, for specific clients
+    whereConditions[Op.and] = [
+      {
+        [Op.or]: [
+          { clientId: { [Op.ne]: "GEN-142" } },
+          { clientId: { [Op.ne]: "GEN-143" } },
+        ],
+      },
+      {
+        transactionDate: { [Op.gt]: "2025-03-31" },
+      },
+    ];
 
     const queryOptions = {
       where: whereConditions,
@@ -936,7 +968,7 @@ const getFinishedTransactions = async (
 
     return bookedTransactions;
   } catch (error) {
-    console.error("Error fetching in progress transactions:", error);
+    console.error("Error fetching finished transactions:", error);
     throw error; // Re-throw error to handle it in the calling function
   }
 };

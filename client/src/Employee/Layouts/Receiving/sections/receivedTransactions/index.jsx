@@ -61,64 +61,30 @@ const ReceivedTransactions = ({ user }) => {
         `${apiUrl}/api/receivedTransaction`
       );
 
-      // // Define the logisticsId to match
-      // const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
-
-      // // For pending transactions
-      // const filteredPendingTransactions =
-      //   receivedTransactionResponse.data.pendingTransactions.filter(
-      //     (transaction) =>
-      //       (transaction.statusId === 2 &&
-      //         transaction.ScheduledTransaction &&
-      //         transaction.ScheduledTransaction[0].logisticsId !==
-      //           matchingLogisticsId) ||
-      //       transaction.statusId === 3
-      //   );
-      // setPendingTransactions(filteredPendingTransactions);
-
-      // // For in-progress transactions
-      // setInProgressTransactions(
-      //   receivedTransactionResponse.data.inProgressTransactions
-      // );
-
-      // // For finished transactions
-      // setFinishedTransactions(
-      //   receivedTransactionResponse.data.finishedTransactions
-      // );
-
       // Define the logisticsId to match
       const matchingLogisticsId = "0577d985-8f6f-47c7-be3c-20ca86021154";
-
-      // Define excluded createdBy values
-      const excludedCreators = ["GEN-142", "GEN-143"];
 
       // For pending transactions
       const filteredPendingTransactions =
         receivedTransactionResponse.data.pendingTransactions.filter(
           (transaction) =>
-            !excludedCreators.includes(transaction.createdBy) && // Exclude specific createdBy values
-            ((transaction.statusId === 2 &&
+            (transaction.statusId === 2 &&
               transaction.ScheduledTransaction &&
               transaction.ScheduledTransaction[0].logisticsId !==
                 matchingLogisticsId) ||
-              transaction.statusId === 3)
+            transaction.statusId === 3
         );
-
       setPendingTransactions(filteredPendingTransactions);
 
       // For in-progress transactions
-      const filteredInProgressTransactions =
-        receivedTransactionResponse.data.inProgressTransactions.filter(
-          (transaction) => !excludedCreators.includes(transaction.createdBy)
-        );
-      setInProgressTransactions(filteredInProgressTransactions);
+      setInProgressTransactions(
+        receivedTransactionResponse.data.inProgressTransactions
+      );
 
       // For finished transactions
-      const filteredFinishedTransactions =
-        receivedTransactionResponse.data.finishedTransactions.filter(
-          (transaction) => !excludedCreators.includes(transaction.createdBy)
-        );
-      setFinishedTransactions(filteredFinishedTransactions);
+      setFinishedTransactions(
+        receivedTransactionResponse.data.finishedTransactions
+      );
 
       setLoading(false);
     } catch (error) {

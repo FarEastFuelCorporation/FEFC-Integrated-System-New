@@ -55,43 +55,19 @@ const CertifiedTransactions = ({ user }) => {
         `${apiUrl}/api/certifiedTransaction`
       );
 
-      // // For pending transactions
-      // setPendingTransactions(
-      //   certifiedTransactionResponse.data.pendingTransactions
-      // );
-
-      // // For in progress transactions
-      // setInProgressTransactions(
-      //   certifiedTransactionResponse.data.inProgressTransactions
-      // );
-
-      // // For finished transactions
-      // setFinishedTransactions(
-      //   certifiedTransactionResponse.data.finishedTransactions
-      // );
-
-      // Define excluded createdBy values
-      const excludedCreators = ["GEN-142", "GEN-143"];
-
       // For pending transactions
       setPendingTransactions(
-        certifiedTransactionResponse.data.pendingTransactions.filter(
-          (transaction) => !excludedCreators.includes(transaction.createdBy)
-        )
+        certifiedTransactionResponse.data.pendingTransactions
       );
 
-      // For in-progress transactions
+      // For in progress transactions
       setInProgressTransactions(
-        certifiedTransactionResponse.data.inProgressTransactions.filter(
-          (transaction) => !excludedCreators.includes(transaction.createdBy)
-        )
+        certifiedTransactionResponse.data.inProgressTransactions
       );
 
       // For finished transactions
       setFinishedTransactions(
-        certifiedTransactionResponse.data.finishedTransactions.filter(
-          (transaction) => !excludedCreators.includes(transaction.createdBy)
-        )
+        certifiedTransactionResponse.data.finishedTransactions
       );
 
       setLoading(false);

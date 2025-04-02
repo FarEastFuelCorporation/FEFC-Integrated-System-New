@@ -62,48 +62,13 @@ const SortedTransactions = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/sortedTransaction`);
 
-      // // Helper function to filter by submitTo "SORTING"
-      // const filterBySubmitToSorting = (transactions) => {
-      //   return transactions.filter((transaction) => {
-      //     const scheduledTransaction = transaction.ScheduledTransaction?.[0];
-      //     const receivedTransaction =
-      //       scheduledTransaction?.ReceivedTransaction?.[0];
-      //     return receivedTransaction?.submitTo === "SORTING";
-      //   });
-      // };
-
-      // // For pending transactions
-      // const filteredPendingTransactions = filterBySubmitToSorting(
-      //   response.data.pendingTransactions
-      // );
-      // setPendingTransactions(filteredPendingTransactions);
-
-      // // For in progress transactions
-      // const filteredInProgressTransactions = filterBySubmitToSorting(
-      //   response.data.inProgressTransactions
-      // );
-      // setInProgressTransactions(filteredInProgressTransactions);
-
-      // // For finished transactions
-      // const filteredFinishedTransactions = filterBySubmitToSorting(
-      //   response.data.finishedTransactions
-      // );
-      // setFinishedTransactions(filteredFinishedTransactions);
-
-      // Define excluded createdBy values
-      const excludedCreators = ["GEN-142", "GEN-143"];
-
-      // Helper function to filter by submitTo "SORTING" and exclude specific createdBy values
+      // Helper function to filter by submitTo "SORTING"
       const filterBySubmitToSorting = (transactions) => {
         return transactions.filter((transaction) => {
           const scheduledTransaction = transaction.ScheduledTransaction?.[0];
           const receivedTransaction =
             scheduledTransaction?.ReceivedTransaction?.[0];
-
-          return (
-            receivedTransaction?.submitTo === "SORTING" &&
-            !excludedCreators.includes(transaction.createdBy) // Exclude specific createdBy values
-          );
+          return receivedTransaction?.submitTo === "SORTING";
         });
       };
 
@@ -113,7 +78,7 @@ const SortedTransactions = ({ user }) => {
       );
       setPendingTransactions(filteredPendingTransactions);
 
-      // For in-progress transactions
+      // For in progress transactions
       const filteredInProgressTransactions = filterBySubmitToSorting(
         response.data.inProgressTransactions
       );

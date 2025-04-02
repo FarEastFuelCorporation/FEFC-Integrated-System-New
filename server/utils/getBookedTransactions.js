@@ -822,26 +822,31 @@ const getPendingTransactions = async (
     // Build the where clause dynamically
     const whereConditions = {
       [Op.or]: [
-        { statusId }, // Matches the main statusId
-        additionalStatusId ? { statusId: additionalStatusId } : null, // Optionally matches an additional statusId
-      ].filter(Boolean), // Filter out nulls if additionalStatusId is not provided
+        { statusId },
+        additionalStatusId ? { statusId: additionalStatusId } : null,
+      ].filter(Boolean),
     };
 
-    // If user is provided, add user-specific condition (e.g., createdBy)
-    if (user) {
-      whereConditions.createdBy = user;
+    console.log("user:", user);
 
-      // Exclude transactions before March 31, 2025, for GEN-142 or GEN-143
-      if (user === "GEN-142" || user === "GEN-143") {
-        whereConditions.haulingDate = { [Op.gt]: "2025-03-31" }; // Dates after March 31, 2025
-      }
-    }
+    // Apply a condition to exclude transactions on or before March 31, 2025, for GEN-142 and GEN-143
+    whereConditions[Op.and] = [
+      {
+        [Op.or]: [
+          { createdBy: { [Op.notIn]: ["GEN-142", "GEN-143"] } }, // Allow all other users' transactions
+          { haulingDate: { [Op.gt]: "2025-03-31" } }, // Only allow GEN-142 & GEN-143 transactions if after March 31, 2025
+        ],
+      },
+    ];
 
     if (transactionId) {
       whereConditions.transactionId = transactionId;
     }
 
-    console.log(whereConditions);
+    console.log(
+      "Final Where Conditions:",
+      JSON.stringify(whereConditions, null, 2)
+    );
 
     const queryOptions = {
       where: whereConditions,
@@ -854,14 +859,14 @@ const getPendingTransactions = async (
       queryOptions.include = getIncludeOptions();
     }
 
-    console.log(queryOptions);
+    console.log("Query Options:", JSON.stringify(queryOptions, null, 2));
 
     const bookedTransactions = await BookedTransaction.findAll(queryOptions);
 
     return bookedTransactions;
   } catch (error) {
     console.error("Error fetching pending transactions:", error);
-    throw error; // Re-throw error to handle it in the calling function
+    throw error;
   }
 };
 
@@ -894,9 +899,8 @@ const getInProgressTransactions = async (
     whereConditions[Op.and] = [
       {
         [Op.or]: [
-          { createdBy: { [Op.ne]: "GEN-142" } },
-          { createdBy: { [Op.ne]: "GEN-143" } },
-          { haulingDate: { [Op.gt]: "2025-03-31" } },
+          { createdBy: { [Op.notIn]: ["GEN-142", "GEN-143"] } }, // Allow all other users' transactions
+          { haulingDate: { [Op.gt]: "2025-03-31" } }, // Only allow GEN-142 & GEN-143 transactions if after March 31, 2025
         ],
       },
     ];
@@ -944,12 +948,9 @@ const getFinishedTransactions = async (
     whereConditions[Op.and] = [
       {
         [Op.or]: [
-          { createdBy: { [Op.ne]: "GEN-142" } },
-          { createdBy: { [Op.ne]: "GEN-143" } },
+          { createdBy: { [Op.notIn]: ["GEN-142", "GEN-143"] } }, // Allow all other users' transactions
+          { haulingDate: { [Op.gt]: "2025-03-31" } }, // Only allow GEN-142 & GEN-143 transactions if after March 31, 2025
         ],
-      },
-      {
-        haulingDate: { [Op.gt]: "2025-03-31" },
       },
     ];
 

@@ -894,9 +894,9 @@ const getInProgressTransactions = async (
     whereConditions[Op.and] = [
       {
         [Op.or]: [
-          { clientId: { [Op.ne]: "GEN-142" } },
-          { clientId: { [Op.ne]: "GEN-143" } },
-          { transactionDate: { [Op.gt]: "2025-03-31" } },
+          { createdBy: { [Op.ne]: "GEN-142" } },
+          { createdBy: { [Op.ne]: "GEN-143" } },
+          { haulingDate: { [Op.gt]: "2025-03-31" } },
         ],
       },
     ];
@@ -944,12 +944,12 @@ const getFinishedTransactions = async (
     whereConditions[Op.and] = [
       {
         [Op.or]: [
-          { clientId: { [Op.ne]: "GEN-142" } },
-          { clientId: { [Op.ne]: "GEN-143" } },
+          { createdBy: { [Op.ne]: "GEN-142" } },
+          { createdBy: { [Op.ne]: "GEN-143" } },
         ],
       },
       {
-        transactionDate: { [Op.gt]: "2025-03-31" },
+        haulingDate: { [Op.gt]: "2025-03-31" },
       },
     ];
 

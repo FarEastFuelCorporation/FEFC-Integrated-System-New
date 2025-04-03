@@ -829,6 +829,14 @@ const getPendingTransactions = async (
 
     console.log("user:", user);
 
+    // If user is provided, add the condition for createdBy
+    if (user) {
+      whereConditions.createdBy = user;
+    }
+    if (transactionId) {
+      whereConditions.transactionId = transactionId;
+    }
+
     // Apply a condition to exclude transactions on or before March 31, 2025, for GEN-142 and GEN-143
     whereConditions[Op.and] = [
       {

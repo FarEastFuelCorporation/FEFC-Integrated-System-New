@@ -41,7 +41,7 @@ const QuotationHeader = ({ quotationData }) => {
               Date
             </Typography>
             <Typography variant="h6" fontWeight="bold" textAlign="center">
-              {formatDateFull(today)}
+              {formatDateFull(quotationData.createdAt)}
             </Typography>
           </Box>
           <Box>
@@ -55,7 +55,7 @@ const QuotationHeader = ({ quotationData }) => {
               Valid Until
             </Typography>
             <Typography variant="h6" fontWeight="bold" textAlign="center">
-              {formatDateFull(datePlusOneMonth)}
+              {formatDateFull(quotationData.validity)}
             </Typography>
           </Box>
         </Box>

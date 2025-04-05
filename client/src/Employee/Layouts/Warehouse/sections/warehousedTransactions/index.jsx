@@ -37,7 +37,7 @@ const WarehousedTransactions = ({ user }) => {
       level: "",
       palletNumber: "",
       steamNumber: "",
-      duration: "",
+      duration: 0,
     },
   ]);
 
@@ -65,7 +65,7 @@ const WarehousedTransactions = ({ user }) => {
         level: "",
         palletNumber: "",
         steamNumber: "",
-        duration: "",
+        duration: 0,
       },
     ],
     remarks: "",
@@ -162,7 +162,7 @@ const WarehousedTransactions = ({ user }) => {
           level: "",
           palletNumber: "",
           steamNumber: "",
-          duration: "",
+          duration: 0,
         },
       ],
       remarks: "",
@@ -197,7 +197,7 @@ const WarehousedTransactions = ({ user }) => {
           level: "",
           palletNumber: "",
           steamNumber: "",
-          duration: "",
+          duration: 0,
         },
       ],
       remarks: "",
@@ -219,7 +219,7 @@ const WarehousedTransactions = ({ user }) => {
         level: "",
         palletNumber: "",
         steamNumber: "",
-        duration: "",
+        duration: 0,
       },
     ];
   };
@@ -261,7 +261,7 @@ const WarehousedTransactions = ({ user }) => {
               level: item.level || "",
               palletNumber: item.palletNumber || "",
               steamNumber: item.steamNumber || "",
-              duration: item.duration || "",
+              duration: item.duration || 0,
             }))
           : [],
         remarks: warehousedTransaction.remarks,
@@ -286,7 +286,7 @@ const WarehousedTransactions = ({ user }) => {
               level: item.level || "",
               palletNumber: item.palletNumber || "",
               steamNumber: item.steamNumber || "",
-              duration: item.duration || "",
+              duration: item.duration || 0,
             }))
           : [];
 
@@ -379,7 +379,7 @@ const WarehousedTransactions = ({ user }) => {
           steamNumber:
             itemRef.querySelector(`[name='steamNumber-${index}']`)?.value || "",
           duration:
-            itemRef.querySelector(`[name='duration-${index}']`)?.value || "",
+            itemRef.querySelector(`[name='duration-${index}']`)?.value || 0,
         };
 
         // Collect errors
@@ -388,8 +388,6 @@ const WarehousedTransactions = ({ user }) => {
         if (!itemData.unit) fieldErrors.push("Unit is required.");
         if (itemData.quantity <= 0)
           fieldErrors.push("Quantity must be greater than 0.");
-        if (itemData.weight <= 0)
-          fieldErrors.push("Weight must be greater than 0.");
         if (!itemData.quotationWasteId)
           fieldErrors.push("Quotation Waste ID is required.");
         if (!itemData.gatePass) fieldErrors.push("Gate Pass is required.");
@@ -401,7 +399,13 @@ const WarehousedTransactions = ({ user }) => {
           fieldErrors.push("Pallet Number is required.");
         if (!itemData.steamNumber)
           fieldErrors.push("Steam Number is required.");
-        if (!itemData.duration) fieldErrors.push("Duration is required.");
+        if (
+          itemData.duration === undefined ||
+          itemData.duration === null ||
+          itemData.duration === ""
+        ) {
+          fieldErrors.push("Duration is required.");
+        }
 
         if (fieldErrors.length > 0) {
           validationErrors.push(`Item ${index + 1}: ${fieldErrors.join(", ")}`);

@@ -653,6 +653,7 @@ const WarehouseModal = forwardRef(
                         <TextField
                           name={`duration-${index}`}
                           label="Duration (Days)"
+                          type="number"
                           fullWidth
                           required
                           InputLabelProps={{

@@ -209,6 +209,7 @@ async function updateWarehousedTransactionController(req, res) {
               palletNumber:
                 item.palletNumber && item.palletNumber.toUpperCase(),
               steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
+              duration: item.duration && item.duration.toUpperCase(),
             },
             { where: { id: item.id }, transaction }
           );
@@ -221,8 +222,8 @@ async function updateWarehousedTransactionController(req, res) {
               description: item.description && item.description.toUpperCase(),
               unit: item.unit,
               quantity: item.quantity,
-              totalWarehousedWeight: item.totalWarehousedWeight,
-              discrepancyWeight: item.discrepancyWeight,
+              weight: item.weight,
+              clientWeight: item.clientWeight,
               gatePass: item.gatePass && item.gatePass.toUpperCase(),
               warehouse: item.warehouse,
               area: item.area,
@@ -231,6 +232,7 @@ async function updateWarehousedTransactionController(req, res) {
               palletNumber:
                 item.palletNumber && item.palletNumber.toUpperCase(),
               steamNumber: item.steamNumber && item.steamNumber.toUpperCase(),
+              duration: item.duration && item.duration.toUpperCase(),
             },
             { transaction }
           );

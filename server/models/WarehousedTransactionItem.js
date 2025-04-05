@@ -72,6 +72,7 @@ const WarehousedTransactionItem = sequelize.define(
     duration: {
       type: DataTypes.FLOAT,
       allowNull: false,
+      defaultValue: 0,
     },
   },
   {

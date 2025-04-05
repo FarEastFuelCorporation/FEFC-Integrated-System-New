@@ -43,25 +43,23 @@ function getWeekNumber(date) {
 
 async function getAttendanceRecordsController(req, res) {
   try {
+    // Extract year and weekNumber from query parameters
     const { year, weekNumber } = req.query;
 
+    // Get the current date
     const currentDate = new Date();
+
+    // If year or weekNumber is not provided, use the current year and week
     const targetYear = year || currentDate.getFullYear();
+    const targetWeekNumber = weekNumber || getWeekNumber(currentDate);
 
-    let whereClause = {};
-    let startDate = null;
-    let endDate = null;
+    // Calculate the start and end dates of the target week
+    const { startDate, endDate } = getWeekDateRange(
+      targetYear,
+      targetWeekNumber
+    );
 
-    // If weekNumber is defined, filter by that week's date range
-    if (weekNumber) {
-      ({ startDate, endDate } = getWeekDateRange(targetYear, weekNumber));
-      whereClause.createdAt = {
-        [Op.gte]: startDate,
-        [Op.lte]: endDate,
-      };
-    }
-
-    // Fetch attendance records (filtered or all)
+    // Fetch attendance records within the target week
     const results = await Attendance.findAll({
       include: [
         {
@@ -78,17 +76,24 @@ async function getAttendanceRecordsController(req, res) {
           ],
         },
       ],
-      where: whereClause,
-      order: [["createdAt", "ASC"]],
+      where: {
+        createdAt: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
+        },
+      },
+      order: [["createdAt", "ASC"]], // Sort by date for proper pairing
     });
 
-    // Rest of your logic stays the same
+    // Process the results as needed
     const attendanceMap = {};
 
+    // First, group TIME-IN and TIME-OUT entries for each employee per day
     results.forEach((row) => {
       const employeeId = row.employee_id;
       const date = new Date(row.createdAt);
 
+      // Format the dayKey using Asia/Manila timezone
       const dayKey = date.toLocaleDateString("en-US", {
         timeZone: "Asia/Manila",
         year: "numeric",
@@ -103,6 +108,7 @@ async function getAttendanceRecordsController(req, res) {
         timeZone: "Asia/Manila",
       });
 
+      // Format the time in the same timezone
       const timeFormatted = date.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "numeric",
@@ -126,7 +132,9 @@ async function getAttendanceRecordsController(req, res) {
         });
       } else if (row.status === "TIME-OUT") {
         let paired = false;
-        const allDays = Object.keys(attendanceMap[employeeId]).sort().reverse();
+
+        // Check the current day and all previous days for unpaired TIME-IN
+        const allDays = Object.keys(attendanceMap[employeeId]).sort().reverse(); // Get all days sorted in reverse (most recent first)
 
         for (const previousDayKey of allDays) {
           const currentEntries = attendanceMap[employeeId][previousDayKey];
@@ -135,12 +143,14 @@ async function getAttendanceRecordsController(req, res) {
           );
 
           if (lastEntry) {
+            // Pair the TIME-OUT with the unpaired TIME-IN
             lastEntry.timeOut = `${dateFormatted} ${timeFormatted}`;
             paired = true;
-            break;
+            break; // Exit the loop once paired
           }
         }
 
+        // If for some reason no unpaired TIME-IN was found, log an error or handle it
         if (!paired) {
           console.warn(`No unpaired TIME-IN found for employee ${employeeId}`);
         }
@@ -150,24 +160,26 @@ async function getAttendanceRecordsController(req, res) {
     const weeklyData = {};
     let index = 0;
 
+    // Now group by week and organize by day
     Object.keys(attendanceMap).forEach((employeeId) => {
       Object.keys(attendanceMap[employeeId]).forEach((dayKey) => {
         const date = new Date(dayKey);
-        const recordWeekNumber = getWeekNumber(date);
+        const weekNumber = getWeekNumber(date);
         const dayOfWeek = getDayOfWeek(date);
         const employeeRecords = attendanceMap[employeeId][dayKey];
 
-        if (!weeklyData[recordWeekNumber]) {
-          weeklyData[recordWeekNumber] = {};
+        // Initialize week and employee structure if it doesn't exist
+        if (!weeklyData[weekNumber]) {
+          weeklyData[weekNumber] = {};
         }
 
-        if (!weeklyData[recordWeekNumber][employeeId]) {
+        if (!weeklyData[weekNumber][employeeId]) {
           const employeeDetails = results.find(
             (row) => row.employee_id === employeeId
           ).IdInformation;
-          weeklyData[recordWeekNumber][employeeId] = {
+          weeklyData[weekNumber][employeeId] = {
             id: ++index,
-            weekNumber: recordWeekNumber,
+            weekNumber,
             employee_id: employeeDetails.employee_id,
             employee_name: `${employeeDetails.last_name}, ${employeeDetails.first_name} ${employeeDetails.affix} ${employeeDetails.middle_name}`,
             designation: employeeDetails.designation,
@@ -194,7 +206,7 @@ async function getAttendanceRecordsController(req, res) {
         const dayLabel = dayLabels[dayOfWeek];
 
         employeeRecords.forEach(({ timeIn, timeOut }) => {
-          weeklyData[recordWeekNumber][employeeId][dayLabel].push({
+          weeklyData[weekNumber][employeeId][dayLabel].push({
             timeIn,
             timeOut,
           });
@@ -202,6 +214,7 @@ async function getAttendanceRecordsController(req, res) {
       });
     });
 
+    // Format the final output
     const formattedData = Object.keys(weeklyData)
       .sort((a, b) => b - a)
       .flatMap((weekNumber) =>
@@ -226,9 +239,9 @@ async function getAttendanceRecordsController(req, res) {
                   }
                   return `${timeIn} - ${timeOut}`;
                 })
-                .join("; ");
+                .join("; "); // Multiple pairs are joined with a semicolon
             } else {
-              employeeData[dayLabel] = null;
+              employeeData[dayLabel] = null; // No entries for this day
             }
           });
           return employeeData;

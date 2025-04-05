@@ -26,6 +26,7 @@ const WarehousedTransactions = ({ user }) => {
     {
       quotationWasteId: "",
       description: "",
+      unit: "",
       quantity: 0,
       weight: 0,
       clientWeight: 0,
@@ -36,7 +37,7 @@ const WarehousedTransactions = ({ user }) => {
       level: "",
       palletNumber: "",
       steamNumber: "",
-      unit: "",
+      duration: "",
     },
   ]);
 
@@ -53,6 +54,7 @@ const WarehousedTransactions = ({ user }) => {
       {
         quotationWasteId: "",
         description: "",
+        unit: "",
         quantity: 0,
         weight: 0,
         clientWeight: 0,
@@ -63,7 +65,7 @@ const WarehousedTransactions = ({ user }) => {
         level: "",
         palletNumber: "",
         steamNumber: "",
-        unit: "",
+        duration: "",
       },
     ],
     remarks: "",
@@ -149,6 +151,7 @@ const WarehousedTransactions = ({ user }) => {
         {
           quotationWasteId: "",
           description: "",
+          unit: "",
           quantity: 0,
           weight: 0,
           clientWeight: 0,
@@ -159,7 +162,7 @@ const WarehousedTransactions = ({ user }) => {
           level: "",
           palletNumber: "",
           steamNumber: "",
-          unit: "",
+          duration: "",
         },
       ],
       remarks: "",
@@ -183,6 +186,7 @@ const WarehousedTransactions = ({ user }) => {
         {
           quotationWasteId: "",
           description: "",
+          unit: "",
           quantity: 0,
           weight: 0,
           clientWeight: 0,
@@ -193,7 +197,7 @@ const WarehousedTransactions = ({ user }) => {
           level: "",
           palletNumber: "",
           steamNumber: "",
-          unit: "",
+          duration: "",
         },
       ],
       remarks: "",
@@ -204,6 +208,7 @@ const WarehousedTransactions = ({ user }) => {
       {
         quotationWasteId: "",
         description: "",
+        unit: "",
         quantity: 0,
         weight: 0,
         clientWeight: 0,
@@ -214,7 +219,7 @@ const WarehousedTransactions = ({ user }) => {
         level: "",
         palletNumber: "",
         steamNumber: "",
-        unit: "",
+        duration: "",
       },
     ];
   };
@@ -256,6 +261,7 @@ const WarehousedTransactions = ({ user }) => {
               level: item.level || "",
               palletNumber: item.palletNumber || "",
               steamNumber: item.steamNumber || "",
+              duration: item.duration || "",
             }))
           : [],
         remarks: warehousedTransaction.remarks,
@@ -280,6 +286,7 @@ const WarehousedTransactions = ({ user }) => {
               level: item.level || "",
               palletNumber: item.palletNumber || "",
               steamNumber: item.steamNumber || "",
+              duration: item.duration || "",
             }))
           : [];
 
@@ -371,6 +378,8 @@ const WarehousedTransactions = ({ user }) => {
             "",
           steamNumber:
             itemRef.querySelector(`[name='steamNumber-${index}']`)?.value || "",
+          duration:
+            itemRef.querySelector(`[name='duration-${index}']`)?.value || "",
         };
 
         // Collect errors
@@ -392,6 +401,7 @@ const WarehousedTransactions = ({ user }) => {
           fieldErrors.push("Pallet Number is required.");
         if (!itemData.steamNumber)
           fieldErrors.push("Steam Number is required.");
+        if (!itemData.duration) fieldErrors.push("Duration is required.");
 
         if (fieldErrors.length > 0) {
           validationErrors.push(`Item ${index + 1}: ${fieldErrors.join(", ")}`);

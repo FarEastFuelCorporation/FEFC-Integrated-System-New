@@ -302,7 +302,7 @@ const WarehouseModal = forwardRef(
                   <Typography my={1}>Item {index + 1}</Typography>
                   <Box id={`warehoused-item-${index}`}>
                     <Grid container spacing={2}>
-                      <Grid item xs={2.5}>
+                      <Grid item xs={2.75}>
                         <FormControl fullWidth>
                           <InputLabel
                             id={`waste-type-select-label-${index}`}
@@ -345,7 +345,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={12} sm={6} md={6} lg={2.5}>
+                      <Grid item xs={12} sm={6} md={6} lg={2.75}>
                         <TextField
                           name={`description-${index}`}
                           id={`description-${index}`}
@@ -420,7 +420,7 @@ const WarehouseModal = forwardRef(
                           <RemoveCircleOutlineIcon />
                         </IconButton>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <TextField
                           name={`gatePass-${index}`}
                           label="Gate Pass"
@@ -430,7 +430,7 @@ const WarehouseModal = forwardRef(
                           defaultValue={item.gatePass}
                         />
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
                           <InputLabel id={`warehouse-label-${index}`}>
                             Warehouse
@@ -453,7 +453,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
                           <InputLabel id={`area-label-${index}`}>
                             Area
@@ -503,7 +503,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
                           <InputLabel id={`section-label-${index}`}>
                             Section
@@ -533,7 +533,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
                           <InputLabel id={`level-label-${index}`}>
                             Level
@@ -556,7 +556,7 @@ const WarehouseModal = forwardRef(
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={1.5}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <TextField
                           name={`palletNumber-${index}`}
                           label="Pallet #"
@@ -566,7 +566,7 @@ const WarehouseModal = forwardRef(
                           defaultValue={item.palletNumber}
                         />
                       </Grid>
-                      <Grid item xs={6} sm={3} md={2} lg={2}>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <TextField
                           name={`steamNumber-${index}`}
                           label="Steam Number"
@@ -574,6 +574,16 @@ const WarehouseModal = forwardRef(
                           required
                           autoComplete="off"
                           defaultValue={item.steamNumber}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
+                        <TextField
+                          name={`duration-${index}`}
+                          label="Duration (Days)"
+                          fullWidth
+                          required
+                          autoComplete="off"
+                          defaultValue={item.duration}
                         />
                       </Grid>
                     </Grid>

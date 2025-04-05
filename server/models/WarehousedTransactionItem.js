@@ -69,6 +69,10 @@ const WarehousedTransactionItem = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    duration: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
   },
   {
     // Enable soft deletion (paranoid mode)

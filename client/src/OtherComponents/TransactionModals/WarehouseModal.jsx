@@ -375,6 +375,7 @@ const WarehouseModal = forwardRef(
                             <MenuItem value="CASE">CASE</MenuItem>
                             <MenuItem value="JUMBO">JUMBO</MenuItem>
                             <MenuItem value="POLYSACK">POLYSACK</MenuItem>
+                            <MenuItem value="DAY">DAY</MenuItem>
                           </Select>
                         </FormControl>
                       </Grid>

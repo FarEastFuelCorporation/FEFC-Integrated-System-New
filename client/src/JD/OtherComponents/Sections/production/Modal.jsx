@@ -105,12 +105,12 @@ const ModalJD = ({
         (ingredient) => ingredient.id === value
       );
 
-      console.log(ingredientItem);
+      // console.log(ingredientItem);
 
-      console.log(ingredient);
-      console.log(index);
-      console.log(field);
-      console.log(value);
+      // console.log(ingredient);
+      // console.log(index);
+      // console.log(field);
+      // console.log(value);
 
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {

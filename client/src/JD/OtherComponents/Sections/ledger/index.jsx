@@ -70,7 +70,6 @@ const LedgerJD = ({ user, socket }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/apiJD/ledger`);
 
-      console.log(response.data.ledger);
       setTransactions(response.data.ledger);
       setLoading(false);
     } catch (error) {
@@ -138,8 +137,6 @@ const LedgerJD = ({ user, socket }) => {
   };
 
   const handleEditClick = (row) => {
-    console.log(row);
-    console.log(row.amount);
     if (row) {
       setFormData({
         id: row.id,

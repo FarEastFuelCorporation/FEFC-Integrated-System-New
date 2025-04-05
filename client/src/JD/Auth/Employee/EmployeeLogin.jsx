@@ -74,7 +74,7 @@ const EmployeeLoginJD = ({ onLogin }) => {
       );
 
       const { user } = response.data;
-      console.log(user);
+
       onLogin(user); // Update user state in App component
       // navigate("/JD/dashboard"); // Redirect user to the specified URL
       navigate("/JD/dashboard", { replace: true });

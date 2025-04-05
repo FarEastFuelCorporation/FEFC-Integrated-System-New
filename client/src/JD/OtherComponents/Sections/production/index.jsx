@@ -111,12 +111,12 @@ const ProductionJD = ({ user, socket }) => {
         (item) => item.transactionCategory === "INGREDIENTS"
       );
 
-      console.log(response.data.production);
-      console.log(packagingItems);
-      console.log(ingredientItems);
-      console.log(equipmentData);
-      console.log(responseProductCategory.data.productCategory);
-      console.log(responseProduct.data.product);
+      // console.log(response.data.production);
+      // console.log(packagingItems);
+      // console.log(ingredientItems);
+      // console.log(equipmentData);
+      // console.log(responseProductCategory.data.productCategory);
+      // console.log(responseProduct.data.product);
 
       // Update state
       setTransactions(response.data.production);
@@ -190,8 +190,6 @@ const ProductionJD = ({ user, socket }) => {
   };
 
   const handleEditClick = (row) => {
-    console.log(row);
-    console.log(row.amount);
     if (row) {
       setFormData({
         id: row.id,

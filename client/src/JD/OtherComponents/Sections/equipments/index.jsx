@@ -72,7 +72,6 @@ const EquipmentJD = ({ user, socket }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/apiJD/equipment`);
 
-      console.log(response.data.equipment);
       setTransactions(response.data.equipment);
       setLoading(false);
     } catch (error) {

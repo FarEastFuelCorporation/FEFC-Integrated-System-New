@@ -72,7 +72,6 @@ const InventoryJD = ({ user, socket }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/apiJD/inventory`);
 
-      console.log(response.data.inventory);
       setTransactions(response.data.inventory);
       setLoading(false);
     } catch (error) {

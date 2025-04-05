@@ -418,7 +418,6 @@ const BillingContent = ({
 
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
-                  console.log(waste);
 
                   return (
                     <Box>

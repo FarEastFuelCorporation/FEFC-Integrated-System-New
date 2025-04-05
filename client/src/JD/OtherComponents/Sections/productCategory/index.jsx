@@ -73,7 +73,6 @@ const ProductCategoryJD = ({ user, socket }) => {
 
       setProductCategories(responseProductCategory.data.productCategory);
 
-      console.log(responseProduct.data.product);
       setProducts(responseProduct.data.product);
 
       setLoading(false);
@@ -218,7 +217,7 @@ const ProductCategoryJD = ({ user, socket }) => {
       selectedTab === 1
         ? `Are you sure you want to Delete this Product Category?`
         : `Are you sure you want to Delete this Product?`;
-    console.log(selectedTab);
+
     setOpenDialog(true);
     setDialog(message);
     setDialogAction(() => () => handleConfirmDelete(id));

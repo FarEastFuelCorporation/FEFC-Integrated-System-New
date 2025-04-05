@@ -306,8 +306,10 @@ const WarehouseModal = forwardRef(
                         <FormControl fullWidth>
                           <InputLabel
                             id={`waste-type-select-label-${index}`}
-                            style={{
-                              color: colors.grey[100],
+                            sx={{
+                              "&.MuiInputLabel-shrink": {
+                                color: colors.grey[100], // color when shrunk
+                              },
                             }}
                           >
                             Category
@@ -352,19 +354,32 @@ const WarehouseModal = forwardRef(
                           label="Description"
                           fullWidth
                           required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           autoComplete="off"
                           defaultValue={item.description}
                         />
                       </Grid>
                       <Grid item xs={6} sm={3} md={2} lg={1.5}>
                         <FormControl fullWidth required>
-                          <InputLabel id={`unit-label-${index}`}>
+                          <InputLabel
+                            id={`unit-label-${index}`}
+                            sx={{
+                              "&.MuiInputLabel-shrink": {
+                                color: colors.grey[100], // color when shrunk
+                              },
+                            }}
+                          >
                             Unit
                           </InputLabel>
                           <Select
                             name={`unit-${index}`}
                             defaultValue={item.unit}
                             labelId={`unit-label-${index}`}
+                            shrink
                             fullWidth
                           >
                             <MenuItem value="">
@@ -384,6 +399,11 @@ const WarehouseModal = forwardRef(
                           name={`quantity-${index}`}
                           label="Quantity"
                           type="number"
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           fullWidth
                           required
                           defaultValue={item.quantity}
@@ -394,6 +414,11 @@ const WarehouseModal = forwardRef(
                           name={`weight-${index}`}
                           label="Weight"
                           type="number"
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           fullWidth
                           required
                           defaultValue={item.weight}
@@ -407,6 +432,11 @@ const WarehouseModal = forwardRef(
                           name={`clientWeight-${index}`}
                           label="Client Weight"
                           type="number"
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           fullWidth
                           required
                           defaultValue={item.clientWeight}
@@ -426,13 +456,25 @@ const WarehouseModal = forwardRef(
                           label="Gate Pass"
                           fullWidth
                           required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           autoComplete="off"
                           defaultValue={item.gatePass}
                         />
                       </Grid>
                       <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
-                          <InputLabel id={`warehouse-label-${index}`}>
+                          <InputLabel
+                            id={`warehouse-label-${index}`}
+                            sx={{
+                              "&.MuiInputLabel-shrink": {
+                                color: colors.grey[100], // color when shrunk
+                              },
+                            }}
+                          >
                             Warehouse
                           </InputLabel>
                           <Select
@@ -455,7 +497,14 @@ const WarehouseModal = forwardRef(
                       </Grid>
                       <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
-                          <InputLabel id={`area-label-${index}`}>
+                          <InputLabel
+                            id={`area-label-${index}`}
+                            sx={{
+                              "&.MuiInputLabel-shrink": {
+                                color: colors.grey[100], // color when shrunk
+                              },
+                            }}
+                          >
                             Area
                           </InputLabel>
                           <Select
@@ -505,7 +554,14 @@ const WarehouseModal = forwardRef(
                       </Grid>
                       <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
-                          <InputLabel id={`section-label-${index}`}>
+                          <InputLabel
+                            id={`section-label-${index}`}
+                            sx={{
+                              "&.MuiInputLabel-shrink": {
+                                color: colors.grey[100], // color when shrunk
+                              },
+                            }}
+                          >
                             Section
                           </InputLabel>
                           <Select
@@ -535,7 +591,14 @@ const WarehouseModal = forwardRef(
                       </Grid>
                       <Grid item xs={6} sm={3} md={2} lg={12 / 8}>
                         <FormControl fullWidth required>
-                          <InputLabel id={`level-label-${index}`}>
+                          <InputLabel
+                            id={`level-label-${index}`}
+                            sx={{
+                              "&.MuiInputLabel-shrink": {
+                                color: colors.grey[100], // color when shrunk
+                              },
+                            }}
+                          >
                             Level
                           </InputLabel>
                           <Select
@@ -562,6 +625,11 @@ const WarehouseModal = forwardRef(
                           label="Pallet #"
                           fullWidth
                           required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           autoComplete="off"
                           defaultValue={item.palletNumber}
                         />
@@ -572,6 +640,11 @@ const WarehouseModal = forwardRef(
                           label="Steam Number"
                           fullWidth
                           required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           autoComplete="off"
                           defaultValue={item.steamNumber}
                         />
@@ -582,6 +655,11 @@ const WarehouseModal = forwardRef(
                           label="Duration (Days)"
                           fullWidth
                           required
+                          InputLabelProps={{
+                            style: {
+                              color: colors.grey[100],
+                            },
+                          }}
                           autoComplete="off"
                           defaultValue={item.duration}
                         />

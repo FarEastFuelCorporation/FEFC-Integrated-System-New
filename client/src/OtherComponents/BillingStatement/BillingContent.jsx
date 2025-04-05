@@ -396,7 +396,7 @@ const BillingContent = ({
                     submitTo === "WAREHOUSE"
                       ? transaction.ScheduledTransaction?.[0]
                           ?.ReceivedTransaction?.[0]?.WarehousedTransaction?.[0]
-                          ?.WarehousedTransactionItem?.[0]?.wasteName
+                          ?.WarehousedTransactionItem?.[0]?.description
                       : transaction.ScheduledTransaction?.[0]
                           ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
                           ?.SortedWasteTransaction?.[0]?.wasteName;
@@ -418,6 +418,7 @@ const BillingContent = ({
 
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
+                  console.log(waste);
 
                   return (
                     <Box>
@@ -577,10 +578,12 @@ const BillingContent = ({
                           >
                             {hasFixedRateIndividual && !isMonthly && fixedWeight
                               ? isWasteNameToBill
-                                ? `${waste.wasteName} (FIRST ${fixedWeight} ${unit})`
+                                ? `${
+                                    waste.wasteName || waste.description
+                                  } (FIRST ${fixedWeight} ${unit})`
                                 : `${waste.QuotationWaste.wasteName} (FIRST ${fixedWeight} ${unit})`
                               : isWasteNameToBill
-                              ? waste.wasteName
+                              ? waste.wasteName || waste.description
                               : waste.QuotationWaste.wasteName}
                           </TableCell>
                           <TableCell
@@ -639,8 +642,12 @@ const BillingContent = ({
                             {hasFixedRateIndividual && !isMonthly
                               ? formatNumber2(fixedPrice)
                               : formatNumber(
-                                  new Decimal(usedWeight).toNumber() *
-                                    waste.QuotationWaste.unitPrice
+                                  waste.duration
+                                    ? waste.duration *
+                                        new Decimal(usedWeight).toNumber() *
+                                        waste.QuotationWaste.unitPrice
+                                    : new Decimal(usedWeight).toNumber() *
+                                        waste.QuotationWaste.unitPrice
                                 )}
                           </TableCell>
                           <TableCell
@@ -735,10 +742,12 @@ const BillingContent = ({
                             >
                               {hasFixedRateIndividual && !isMonthly
                                 ? isWasteNameToBill
-                                  ? `${waste.wasteName} (EXCESS)`
+                                  ? `${
+                                      waste.wasteName || waste.description
+                                    } (EXCESS)`
                                   : `${waste.QuotationWaste.wasteName} (EXCESS)`
                                 : isWasteNameToBill
-                                ? waste.wasteName
+                                ? waste.wasteName || waste.description
                                 : waste.QuotationWaste.wasteName}
                             </TableCell>
                             <TableCell
@@ -787,9 +796,16 @@ const BillingContent = ({
                               }}
                             >
                               {formatNumber(
-                                new Decimal(usedWeight)
-                                  .minus(new Decimal(fixedWeight))
-                                  .toNumber() * waste.QuotationWaste.unitPrice
+                                waste.duration
+                                  ? waste.duration *
+                                      new Decimal(usedWeight)
+                                        .minus(new Decimal(fixedWeight))
+                                        .toNumber() *
+                                      waste.QuotationWaste.unitPrice
+                                  : new Decimal(usedWeight)
+                                      .minus(new Decimal(fixedWeight))
+                                      .toNumber() *
+                                      waste.QuotationWaste.unitPrice
                               )}
                             </TableCell>
                             <TableCell
@@ -1185,7 +1201,7 @@ const BillingContent = ({
                           sx={{ ...bodyCellStyles({ color: fontColor }) }}
                         >
                           {isWasteNameToBill
-                            ? waste.wasteName
+                            ? waste.wasteName || waste.description
                             : waste.QuotationWaste.wasteName}
                         </TableCell>
                         <TableCell

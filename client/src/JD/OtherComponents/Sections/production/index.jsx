@@ -208,8 +208,6 @@ const ProductionJD = ({ user, socket }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  console.log(formData);
-
   const handleEditClick = (row) => {
     if (row) {
       setFormData({

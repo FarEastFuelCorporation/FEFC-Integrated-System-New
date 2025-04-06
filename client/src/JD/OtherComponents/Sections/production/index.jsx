@@ -42,6 +42,12 @@ const ProductionJD = ({ user, socket }) => {
     utilitiesCost: 0,
     laborCost: 0,
     totalCost: 0,
+    outputType: "",
+    outputTypeId: "",
+    yield: 0,
+    unit: "",
+    unitPrice: 0,
+    grossIncome: 0,
     ingredients: [
       {
         id: "",
@@ -53,15 +59,13 @@ const ProductionJD = ({ user, socket }) => {
         remarks: "",
       },
     ],
-    transactions: [
+    packagings: [
       {
-        transactionDetails: "",
-        transactionCategory: "",
-        fundSource: "",
-        fundAllocation: "",
-        quantity: "",
+        id: "",
         unit: "",
+        remaining: "",
         unitPrice: "",
+        quantity: "",
         amount: 0,
         remarks: "",
       },
@@ -74,7 +78,7 @@ const ProductionJD = ({ user, socket }) => {
 
   const [transactions, setTransactions] = useState([]);
   const [ingredients, setIngredients] = useState([]);
-  const [packaging, setPackaging] = useState([]);
+  const [packagings, setPackagings] = useState([]);
   const [equipments, setEquipments] = useState([]);
   const [products, setProducts] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
@@ -120,7 +124,7 @@ const ProductionJD = ({ user, socket }) => {
 
       // Update state
       setTransactions(response.data.production);
-      setPackaging(packagingItems);
+      setPackagings(packagingItems);
       setIngredients(ingredientItems);
       setEquipments(equipmentData);
       setProducts(responseProduct.data.product);
@@ -186,8 +190,25 @@ const ProductionJD = ({ user, socket }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "utilitiesCost") {
+      formData.totalCost -= formData.utilitiesCost;
+      formData.totalCost += parseFloat(value);
+    } else if (name === "laborCost") {
+      formData.totalCost -= formData.laborCost;
+      formData.totalCost += parseFloat(value);
+    } else if (name === "outputType") {
+      formData.outputTypeId = "";
+    } else if (name === "yield") {
+      formData.grossIncome = parseFloat(value) * formData.unitPrice;
+    } else if (name === "unitPrice") {
+      formData.grossIncome = parseFloat(value) * formData.yield;
+    }
+
     setFormData({ ...formData, [name]: value });
   };
+
+  console.log(formData);
 
   const handleEditClick = (row) => {
     if (row) {
@@ -421,7 +442,7 @@ const ProductionJD = ({ user, socket }) => {
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
         ingredients={ingredients}
-        packaging={packaging}
+        packagings={packagings}
         equipments={equipments}
         products={products}
       />

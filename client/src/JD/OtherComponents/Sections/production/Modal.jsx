@@ -27,7 +27,7 @@ const ModalJD = ({
   errorMessage,
   showErrorMessage,
   ingredients,
-  packaging,
+  packagings,
   equipments,
   products,
 }) => {
@@ -97,20 +97,13 @@ const ModalJD = ({
     });
   };
 
-  const handleIngredientsChange = (index, field, value) => {
+  const handleIngredientChange = (index, field, value) => {
     const updatedIngredients = formData.ingredients.map((ingredient, i) => {
       if (i !== index) return ingredient;
 
       const ingredientItem = ingredients.filter(
         (ingredient) => ingredient.id === value
       );
-
-      // console.log(ingredientItem);
-
-      // console.log(ingredient);
-      // console.log(index);
-      // console.log(field);
-      // console.log(value);
 
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {
@@ -126,9 +119,13 @@ const ModalJD = ({
       };
 
       if (field === "quantity" || field === "unitPrice") {
+        formData.ingredientCost -= updatedTransaction.amount;
+        formData.totalCost -= updatedTransaction.amount;
         const quantity = parseFloat(updatedTransaction.quantity) || 0;
         const unitPrice = parseFloat(updatedTransaction.unitPrice) || 0;
         updatedTransaction.amount = quantity * unitPrice;
+        formData.ingredientCost += quantity * unitPrice;
+        formData.totalCost += quantity * unitPrice;
       }
 
       return updatedTransaction;
@@ -136,6 +133,70 @@ const ModalJD = ({
 
     handleInputChange({
       target: { name: "ingredients", value: updatedIngredients },
+    });
+  };
+
+  const handleAddPackaging = () => {
+    const newPackagings = {
+      id: "",
+      unit: "",
+      remaining: "",
+      unitPrice: "",
+      quantity: "",
+      amount: 0,
+      remarks: "",
+    };
+    const updatedPackagings = [...formData.packagings, newPackagings];
+    handleInputChange({
+      target: { name: "packagings", value: updatedPackagings },
+    });
+  };
+
+  const handleRemovePackaging = (index) => {
+    const updatedPackagings = formData.packagings.filter(
+      (waste, i) => i !== index
+    );
+    handleInputChange({
+      target: { name: "packagings", value: updatedPackagings },
+    });
+  };
+
+  const handlePackagingChange = (index, field, value) => {
+    const updatedPackagings = formData.packagings.map((packaging, i) => {
+      if (i !== index) return packaging;
+
+      const packagingItem = packagings.filter(
+        (packaging) => packaging.id === value
+      );
+
+      // Calculate amount if quantity or unitPrice is updated
+      const updatedTransaction = {
+        ...packaging,
+        [field]: value,
+        ...(field === "id" && packagingItem.length > 0
+          ? {
+              unit: packagingItem[0].unit,
+              remaining: packagingItem[0].updatedQuantity,
+              unitPrice: packagingItem[0].unitPrice,
+            }
+          : {}),
+      };
+
+      if (field === "quantity" || field === "unitPrice") {
+        formData.packagingCost -= updatedTransaction.amount;
+        formData.totalCost -= updatedTransaction.amount;
+        const quantity = parseFloat(updatedTransaction.quantity) || 0;
+        const unitPrice = parseFloat(updatedTransaction.unitPrice) || 0;
+        updatedTransaction.amount = quantity * unitPrice;
+        formData.packagingCost += quantity * unitPrice;
+        formData.totalCost += quantity * unitPrice;
+      }
+
+      return updatedTransaction;
+    });
+
+    handleInputChange({
+      target: { name: "packagings", value: updatedPackagings },
     });
   };
 
@@ -167,7 +228,7 @@ const ModalJD = ({
           {showErrorMessage && errorMessage}
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={3}>
             <TextField
               label="Transaction Date"
               name="transactionDate"
@@ -185,34 +246,6 @@ const ModalJD = ({
               autoComplete="off"
             />
           </Grid>
-          <Grid item xs={1} lg={3}>
-            <FormControl fullWidth required>
-              <InputLabel
-                style={{
-                  color: colors.grey[100],
-                }}
-              >
-                Product
-              </InputLabel>
-              <Select
-                labelId={`productId`}
-                name={`productId`}
-                value={formData.productId || ""}
-                onChange={handleInputChange}
-                fullWidth
-                inputProps={{
-                  name: `productId`,
-                  id: `productId`,
-                }}
-              >
-                {products.map((item) => (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.productName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
         </Grid>
         <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
           Ingredients
@@ -223,7 +256,7 @@ const ModalJD = ({
               Ingredient #{index + 1}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={1} lg={3}>
+              <Grid item xs={12} lg={3}>
                 <FormControl fullWidth required>
                   <InputLabel
                     style={{
@@ -237,7 +270,7 @@ const ModalJD = ({
                     name={`ingredients[${index}].id`}
                     value={ingredient.id || ""}
                     onChange={(e) =>
-                      handleIngredientsChange(index, "id", e.target.value)
+                      handleIngredientChange(index, "id", e.target.value)
                     }
                     fullWidth
                     inputProps={{
@@ -253,13 +286,13 @@ const ModalJD = ({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={1} lg={1}>
+              <Grid item xs={12} lg={1}>
                 <TextField
                   label="Unit"
                   name={`ingredients[${index}].unit`}
                   value={ingredient.unit || ""}
                   onChange={(e) =>
-                    handleIngredientsChange(index, "unit", e.target.value)
+                    handleIngredientChange(index, "unit", e.target.value)
                   }
                   fullWidth
                   required
@@ -273,13 +306,13 @@ const ModalJD = ({
                   disabled
                 />
               </Grid>
-              <Grid item xs={1} lg={2}>
+              <Grid item xs={12} lg={2}>
                 <TextField
                   label="Available Stock"
                   name={`ingredients[${index}].remaining`}
                   value={ingredient.remaining || ""}
                   onChange={(e) =>
-                    handleIngredientsChange(index, "remaining", e.target.value)
+                    handleIngredientChange(index, "remaining", e.target.value)
                   }
                   fullWidth
                   required
@@ -293,13 +326,13 @@ const ModalJD = ({
                   disabled
                 />
               </Grid>
-              <Grid item xs={1} lg={2}>
+              <Grid item xs={12} lg={2}>
                 <TextField
                   label="Unit Price"
                   name={`ingredients[${index}].unitPrice`}
                   value={ingredient.unitPrice || ""}
                   onChange={(e) =>
-                    handleIngredientsChange(index, "unitPrice", e.target.value)
+                    handleIngredientChange(index, "unitPrice", e.target.value)
                   }
                   fullWidth
                   required
@@ -313,13 +346,13 @@ const ModalJD = ({
                   disabled
                 />
               </Grid>
-              <Grid item xs={1} lg={1.5}>
+              <Grid item xs={12} lg={1.5}>
                 <TextField
                   label="Quantity"
                   name={`ingredients[${index}].quantity`}
                   value={ingredient.quantity || ""}
                   onChange={(e) =>
-                    handleIngredientsChange(index, "quantity", e.target.value)
+                    handleIngredientChange(index, "quantity", e.target.value)
                   }
                   fullWidth
                   required
@@ -332,13 +365,13 @@ const ModalJD = ({
                   autoComplete="off"
                 />
               </Grid>
-              <Grid item xs={1} lg={2}>
+              <Grid item xs={12} lg={2}>
                 <TextField
                   label="Amount"
                   name={`ingredients[${index}].amount`}
                   value={ingredient.amount || ""}
                   onChange={(e) =>
-                    handleIngredientsChange(index, "amount", e.target.value)
+                    handleIngredientChange(index, "amount", e.target.value)
                   }
                   fullWidth
                   required
@@ -352,7 +385,7 @@ const ModalJD = ({
                   disabled
                 />
               </Grid>
-              <Grid item xs={1} lg={0.5} textAlign="right">
+              <Grid item xs={12} lg={0.5} textAlign="right">
                 <IconButton
                   color="error"
                   onClick={() => handleRemoveIngredient(index)}
@@ -370,10 +403,165 @@ const ModalJD = ({
         </Box>
 
         <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
+          Packaging and Labeling
+        </Typography>
+        {formData.packagings?.map((packaging, index) => (
+          <Box key={index}>
+            <Typography variant="subtitle2" gutterBottom>
+              Packaging and Labeling #{index + 1}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} lg={3}>
+                <FormControl fullWidth required>
+                  <InputLabel
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Product
+                  </InputLabel>
+                  <Select
+                    labelId={`id`}
+                    name={`packagings[${index}].id`}
+                    value={packaging.id || ""}
+                    onChange={(e) =>
+                      handlePackagingChange(index, "id", e.target.value)
+                    }
+                    fullWidth
+                    inputProps={{
+                      name: `id`,
+                      id: `id`,
+                    }}
+                  >
+                    {packagings.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.item}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} lg={1}>
+                <TextField
+                  label="Unit"
+                  name={`packagings[${index}].unit`}
+                  value={packaging.unit || ""}
+                  onChange={(e) =>
+                    handlePackagingChange(index, "unit", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} lg={2}>
+                <TextField
+                  label="Available Stock"
+                  name={`packagings[${index}].remaining`}
+                  value={packaging.remaining || ""}
+                  onChange={(e) =>
+                    handlePackagingChange(index, "remaining", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} lg={2}>
+                <TextField
+                  label="Unit Price"
+                  name={`packagings[${index}].unitPrice`}
+                  value={packaging.unitPrice || ""}
+                  onChange={(e) =>
+                    handlePackagingChange(index, "unitPrice", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} lg={1.5}>
+                <TextField
+                  label="Quantity"
+                  name={`packagings[${index}].quantity`}
+                  value={packaging.quantity || ""}
+                  onChange={(e) =>
+                    handlePackagingChange(index, "quantity", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} lg={2}>
+                <TextField
+                  label="Amount"
+                  name={`packagings[${index}].amount`}
+                  value={packaging.amount || ""}
+                  onChange={(e) =>
+                    handlePackagingChange(index, "amount", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} lg={0.5} textAlign="right">
+                <IconButton
+                  color="error"
+                  onClick={() => handleRemovePackaging(index)}
+                >
+                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+        <Box display="flex" justifyContent="center">
+          <IconButton color="success" onClick={handleAddPackaging}>
+            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+          </IconButton>
+        </Box>
+
+        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
           Summary
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={2}>
             <TextField
               label="Ingredient Cost"
               name="ingredientCost"
@@ -391,7 +579,7 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={2}>
             <TextField
               label="Packaging Cost"
               name="packagingCost"
@@ -409,7 +597,7 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={2}>
             <TextField
               label="Equipment Cost"
               name="equipmentCost"
@@ -427,12 +615,13 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={2}>
             <TextField
               label="Utilities Cost"
               name="utilitiesCost"
               value={formData.utilitiesCost}
               onChange={handleInputChange}
+              type="number"
               fullWidth
               required
               InputLabelProps={{
@@ -444,12 +633,13 @@ const ModalJD = ({
               autoComplete="off"
             />
           </Grid>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={2}>
             <TextField
               label="Labor Cost"
               name="laborCost"
               value={formData.laborCost}
               onChange={handleInputChange}
+              type="number"
               fullWidth
               required
               InputLabelProps={{
@@ -461,7 +651,7 @@ const ModalJD = ({
               autoComplete="off"
             />
           </Grid>
-          <Grid item xs={1} lg={2}>
+          <Grid item xs={12} lg={2}>
             <TextField
               label="Total Cost"
               name="totalCost"
@@ -477,6 +667,181 @@ const ModalJD = ({
               }}
               autoComplete="off"
               disabled
+            />
+          </Grid>
+        </Grid>
+        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
+          Output
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} lg={2}>
+            <FormControl fullWidth required>
+              <InputLabel
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Output Type
+              </InputLabel>
+              <Select
+                labelId={`outputType`}
+                name={`outputType`}
+                value={formData.outputType || ""}
+                onChange={handleInputChange}
+                fullWidth
+                inputProps={{
+                  name: `outputType`,
+                  id: `outputType`,
+                }}
+              >
+                <MenuItem key={"INGREDIENT"} value={"INGREDIENT"}>
+                  {"INGREDIENT"}
+                </MenuItem>
+                <MenuItem key={"PRODUCT"} value={"PRODUCT"}>
+                  {"PRODUCT"}
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          {formData.outputType === "PRODUCT" && (
+            <Grid item xs={12} lg={4}>
+              <FormControl fullWidth required>
+                <InputLabel
+                  style={{
+                    color: colors.grey[100],
+                  }}
+                >
+                  Product
+                </InputLabel>
+                <Select
+                  labelId={`outputTypeId`}
+                  name={`outputTypeId`}
+                  value={formData.outputTypeId || ""}
+                  onChange={handleInputChange}
+                  fullWidth
+                  inputProps={{
+                    name: `outputTypeId`,
+                    id: `outputTypeId`,
+                  }}
+                >
+                  {products.map((item) => (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.productName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+          {formData.outputType === "INGREDIENT" && (
+            <Grid item xs={12} lg={4}>
+              <FormControl fullWidth required>
+                <InputLabel
+                  style={{
+                    color: colors.grey[100],
+                  }}
+                >
+                  Ingredient
+                </InputLabel>
+                <Select
+                  labelId={`outputTypeId`}
+                  name={`outputTypeId`}
+                  value={formData.outputTypeId || ""}
+                  onChange={handleInputChange}
+                  fullWidth
+                  inputProps={{
+                    name: `outputTypeId`,
+                    id: `outputTypeId`,
+                  }}
+                >
+                  {ingredients.map((item) => (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.item}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+          <Grid item xs={12} lg={1}>
+            <TextField
+              label="Yield"
+              name="yield"
+              value={formData.yield}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+                shrink: true,
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={12} lg={1}>
+            <FormControl fullWidth required>
+              <InputLabel
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Unit
+              </InputLabel>
+              <Select
+                labelId={`unit`}
+                name={`unit`}
+                value={formData.unit || ""}
+                onChange={handleInputChange}
+                fullWidth
+                inputProps={{
+                  name: `unit`,
+                  id: `unit`,
+                }}
+              >
+                {unitCategory.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} lg={2}>
+            <TextField
+              label="Unit Price"
+              name="unitPrice"
+              value={formData.unitPrice}
+              onChange={handleInputChange}
+              type="number"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+                shrink: true,
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={12} lg={2}>
+            <TextField
+              label="Gross Income"
+              name="grossIncome"
+              value={formData.grossIncome}
+              onChange={handleInputChange}
+              type="number"
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+                shrink: true,
+              }}
+              autoComplete="off"
             />
           </Grid>
         </Grid>

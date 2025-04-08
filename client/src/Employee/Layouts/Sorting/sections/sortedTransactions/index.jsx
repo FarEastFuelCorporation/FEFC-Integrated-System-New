@@ -105,7 +105,6 @@ const SortedTransactions = ({ user }) => {
   const handleOpenModal = (row) => {
     setFormData({
       id: "",
-      statusId: row.statusId,
       clientId: row.Client.clientId,
       bookedTransactionId: row.id,
       receivedTransactionId:
@@ -117,6 +116,7 @@ const SortedTransactions = ({ user }) => {
       discrepancyWeight: 0,
       sortedWastes: [
         {
+          id: "",
           quotationWasteId: "",
           transporterClientId: "",
           treatmentProcessId: "",
@@ -171,6 +171,7 @@ const SortedTransactions = ({ user }) => {
         discrepancyWeight: sortedTransaction.discrepancyWeight,
         sortedWastes: sortedTransaction.SortedWasteTransaction
           ? sortedTransaction.SortedWasteTransaction.map((waste) => ({
+              id: waste.id || "",
               quotationWasteId: waste.quotationWasteId || "",
               transporterClientId: waste.transporterClientId || "",
               treatmentProcessId: waste.treatmentProcessId || "",
@@ -182,6 +183,7 @@ const SortedTransactions = ({ user }) => {
             }))
           : [
               {
+                id: "",
                 quotationWasteId: "",
                 transporterClientId: "",
                 treatmentProcessId: "",

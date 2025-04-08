@@ -2,6 +2,7 @@
 
 const { broadcastMessage } = require("../../websocketManager");
 const EquipmentJD = require("../models/Equipment");
+const EquipmentLedgerJD = require("../models/EquipmentLedger");
 
 // Create Equipment controller
 async function createEquipmentJDController(req, res) {
@@ -85,10 +86,37 @@ async function getEquipmentJDsController(req, res) {
   try {
     // Fetch all equipment from the database
     const equipment = await EquipmentJD.findAll({
+      include: {
+        model: EquipmentLedgerJD,
+        as: "EquipmentLedgerJD",
+        attributes: ["id", "transaction", "amount"],
+      },
       order: [["transactionDate", "ASC"]],
     });
 
-    res.json({ equipment });
+    // Compute updatedAmount for each equipment item
+    const inventoryWithUpdatedAmount = equipment.map((item) => {
+      let updatedAmount = 0;
+
+      // Loop through associated EquipmentLedgerJD transactions
+      item.EquipmentLedgerJD.forEach((ledger) => {
+        if (ledger.transaction === "IN") {
+          updatedAmount += ledger.amount;
+        } else if (
+          ledger.transaction === "OUT" ||
+          ledger.transaction === "USED"
+        ) {
+          updatedAmount -= ledger.amount;
+        }
+      });
+
+      return {
+        ...item.toJSON(),
+        updatedAmount, // Add computed updatedAmount to each inventory item
+      };
+    });
+
+    res.json({ equipment: inventoryWithUpdatedAmount });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

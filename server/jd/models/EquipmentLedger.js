@@ -1,10 +1,10 @@
-// models/Equipment.js
+// models/EquipmentLedger.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const EquipmentJD = sequelize.define(
-  "EquipmentJD",
+const EquipmentLedgerJD = sequelize.define(
+  "EquipmentLedgerJD",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,17 +12,18 @@ const EquipmentJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
-    transactionId: {
+    equipmentId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    batchId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null,
     },
     transactionDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    equipmentName: {
-      type: DataTypes.STRING,
       allowNull: false,
     },
     transaction: {
@@ -51,4 +52,4 @@ const EquipmentJD = sequelize.define(
   }
 );
 
-module.exports = EquipmentJD;
+module.exports = EquipmentLedgerJD;

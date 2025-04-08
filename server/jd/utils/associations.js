@@ -4,6 +4,7 @@ const EmployeeJD = require("../models/Employee");
 const EmployeeRoleJD = require("../models/EmployeeRole");
 const EmployeeRolesEmployeeJD = require("../models/EmployeeRolesEmployee");
 const EquipmentJD = require("../models/Equipment");
+const EquipmentLedgerJD = require("../models/EquipmentLedger");
 const InventoryJD = require("../models/Inventory");
 const InventoryLedgerJD = require("../models/InventoryLedger");
 const LedgerJD = require("../models/Ledger");
@@ -143,6 +144,19 @@ EquipmentJD.belongsTo(LedgerJD, {
   onDelete: "SET NULL",
 });
 
+EquipmentJD.hasMany(EquipmentLedgerJD, {
+  as: "EquipmentLedgerJD",
+  foreignKey: "equipmentId",
+  sourceKey: "id",
+  onDelete: "SET NULL",
+});
+EquipmentLedgerJD.belongsTo(EquipmentJD, {
+  as: "EquipmentJD",
+  foreignKey: "equipmentId",
+  targetKey: "id",
+  onDelete: "SET NULL",
+});
+
 ProductionJD.hasMany(InventoryLedgerJD, {
   as: "InventoryLedgerJD",
   foreignKey: "batchId",
@@ -156,13 +170,13 @@ InventoryLedgerJD.belongsTo(ProductionJD, {
   onDelete: "SET NULL",
 });
 
-ProductionJD.hasMany(EquipmentJD, {
-  as: "EquipmentJD",
+ProductionJD.hasMany(EquipmentLedgerJD, {
+  as: "EquipmentLedgerJD",
   foreignKey: "batchId",
   sourceKey: "id",
   onDelete: "SET NULL",
 });
-EquipmentJD.belongsTo(ProductionJD, {
+EquipmentLedgerJD.belongsTo(ProductionJD, {
   as: "ProductionJD",
   foreignKey: "batchId",
   targetKey: "id",

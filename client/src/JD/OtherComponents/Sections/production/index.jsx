@@ -107,9 +107,6 @@ const ProductionJD = ({ user, socket }) => {
       const response = await axios.get(`${apiUrl}/apiJD/production`);
       const responseInventory = await axios.get(`${apiUrl}/apiJD/inventory`);
       const responseEquipment = await axios.get(`${apiUrl}/apiJD/equipment`);
-      const responseProductCategory = await axios.get(
-        `${apiUrl}/apiJD/productCategory`
-      );
 
       const responseProduct = await axios.get(`${apiUrl}/apiJD/product`);
 
@@ -125,6 +122,8 @@ const ProductionJD = ({ user, socket }) => {
       const ingredientItems = inventoryData.filter(
         (item) => item.transactionCategory === "INGREDIENTS"
       );
+
+      console.log(equipmentData);
 
       // console.log(response.data.production);
       // console.log(packagingItems);
@@ -203,17 +202,21 @@ const ProductionJD = ({ user, socket }) => {
     const { name, value } = e.target;
 
     if (name === "utilitiesCost") {
+      const amountValue = value ? value : 0;
       formData.totalCost -= formData.utilitiesCost;
-      formData.totalCost += parseFloat(value);
+      formData.totalCost += parseFloat(amountValue);
     } else if (name === "laborCost") {
+      const amountValue = value ? value : 0;
       formData.totalCost -= formData.laborCost;
-      formData.totalCost += parseFloat(value);
+      formData.totalCost += parseFloat(amountValue);
     } else if (name === "outputType") {
       formData.outputTypeId = "";
     } else if (name === "yield") {
-      formData.grossIncome = parseFloat(value) * formData.unitPrice;
+      const amountValue = value ? value : 0;
+      formData.grossIncome = parseFloat(amountValue) * formData.unitPrice;
     } else if (name === "unitPrice") {
-      formData.grossIncome = parseFloat(value) * formData.yield;
+      const amountValue = value ? value : 0;
+      formData.grossIncome = parseFloat(amountValue) * formData.yield;
     }
 
     setFormData({ ...formData, [name]: value });

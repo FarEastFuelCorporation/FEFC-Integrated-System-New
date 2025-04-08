@@ -200,6 +200,78 @@ const ModalJD = ({
     });
   };
 
+  const handleAddEquipment = () => {
+    const newEquipments = {
+      id: "",
+      unit: "",
+      remaining: "",
+      unitPrice: "",
+      quantity: "",
+      amount: 0,
+      remarks: "",
+    };
+    const updatedEquipments = [...formData.equipments, newEquipments];
+    handleInputChange({
+      target: { name: "equipments", value: updatedEquipments },
+    });
+  };
+
+  const handleRemoveEquipment = (index) => {
+    const updatedEquipments = formData.equipments.filter(
+      (waste, i) => i !== index
+    );
+    handleInputChange({
+      target: { name: "equipments", value: updatedEquipments },
+    });
+  };
+
+  const handleEquipmentChange = (index, field, value) => {
+    const updatedEquipments = formData.equipments.map((equipment, i) => {
+      if (i !== index) return equipment;
+
+      const equipmentItem = equipments.filter(
+        (equipment) => equipment.id === value
+      );
+
+      // Calculate amount if quantity or unitPrice is updated
+      const updatedTransaction = {
+        ...equipment,
+        [field]: value,
+        ...(field === "id" && equipmentItem.length > 0
+          ? {
+              remaining: equipmentItem[0].updatedAmount,
+              unitPrice: equipmentItem[0].amount,
+              amount: 0,
+            }
+          : {}),
+      };
+
+      if (field === "amount") {
+        const oldAmount = isNaN(updatedTransaction.amount2)
+          ? 0
+          : updatedTransaction.amount2;
+
+        const amountValue = value ? value : 0;
+
+        formData.equipmentCost -= parseFloat(isNaN(oldAmount) ? 0 : oldAmount);
+        formData.totalCost -= parseFloat(isNaN(oldAmount) ? 0 : oldAmount);
+
+        formData.equipmentCost += parseFloat(
+          isNaN(amountValue) ? 0 : amountValue
+        );
+        formData.totalCost += parseFloat(isNaN(amountValue) ? 0 : amountValue);
+
+        updatedTransaction.amount2 = parseFloat(amountValue);
+      }
+
+      return updatedTransaction;
+    });
+
+    handleInputChange({
+      target: { name: "equipments", value: updatedEquipments },
+    });
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -354,6 +426,7 @@ const ModalJD = ({
                   onChange={(e) =>
                     handleIngredientChange(index, "quantity", e.target.value)
                   }
+                  type="number"
                   fullWidth
                   required
                   InputLabelProps={{
@@ -362,6 +435,7 @@ const ModalJD = ({
                     },
                     shrink: true,
                   }}
+                  disabled={!ingredient.id}
                   autoComplete="off"
                 />
               </Grid>
@@ -517,6 +591,7 @@ const ModalJD = ({
                     },
                     shrink: true,
                   }}
+                  disabled={!packaging.id}
                   autoComplete="off"
                 />
               </Grid>
@@ -557,6 +632,120 @@ const ModalJD = ({
           </IconButton>
         </Box>
 
+        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
+          Equipments
+        </Typography>
+        {formData.equipments?.map((equipment, index) => (
+          <Box key={index}>
+            <Typography variant="subtitle2" gutterBottom>
+              Equipment #{index + 1}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} lg={3}>
+                <FormControl fullWidth required>
+                  <InputLabel
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Equipment
+                  </InputLabel>
+                  <Select
+                    labelId={`id`}
+                    name={`equipments[${index}].id`}
+                    value={equipment.id || ""}
+                    onChange={(e) =>
+                      handleEquipmentChange(index, "id", e.target.value)
+                    }
+                    fullWidth
+                    inputProps={{
+                      name: `id`,
+                      id: `id`,
+                    }}
+                  >
+                    {equipments.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.equipmentName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} lg={3}>
+                <TextField
+                  label="Available Amount"
+                  name={`equipments[${index}].remaining`}
+                  value={equipment.remaining || ""}
+                  onChange={(e) =>
+                    handleEquipmentChange(index, "remaining", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} lg={2}>
+                <TextField
+                  label="Unit Price"
+                  name={`equipments[${index}].unitPrice`}
+                  value={equipment.unitPrice || ""}
+                  onChange={(e) =>
+                    handleEquipmentChange(index, "unitPrice", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} lg={3.5}>
+                <TextField
+                  label="Amount"
+                  name={`equipments[${index}].amount`}
+                  value={equipment.amount || 0}
+                  onChange={(e) =>
+                    handleEquipmentChange(index, "amount", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} lg={0.5} textAlign="right">
+                <IconButton
+                  color="error"
+                  onClick={() => handleRemoveEquipment(index)}
+                >
+                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+        <Box display="flex" justifyContent="center">
+          <IconButton color="success" onClick={handleAddEquipment}>
+            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+          </IconButton>
+        </Box>
         <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
           Summary
         </Typography>
@@ -621,7 +810,6 @@ const ModalJD = ({
               name="utilitiesCost"
               value={formData.utilitiesCost}
               onChange={handleInputChange}
-              type="number"
               fullWidth
               required
               InputLabelProps={{
@@ -639,7 +827,6 @@ const ModalJD = ({
               name="laborCost"
               value={formData.laborCost}
               onChange={handleInputChange}
-              type="number"
               fullWidth
               required
               InputLabelProps={{
@@ -814,7 +1001,6 @@ const ModalJD = ({
               name="unitPrice"
               value={formData.unitPrice}
               onChange={handleInputChange}
-              type="number"
               fullWidth
               required
               InputLabelProps={{
@@ -832,7 +1018,6 @@ const ModalJD = ({
               name="grossIncome"
               value={formData.grossIncome}
               onChange={handleInputChange}
-              type="number"
               fullWidth
               required
               InputLabelProps={{

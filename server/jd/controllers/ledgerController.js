@@ -2,6 +2,7 @@
 
 const { broadcastMessage } = require("../../websocketManager");
 const EquipmentJD = require("../models/Equipment");
+const EquipmentLedgerJD = require("../models/EquipmentLedger");
 const InventoryJD = require("../models/Inventory");
 const InventoryLedgerJD = require("../models/InventoryLedger");
 const LedgerJD = require("../models/Ledger");
@@ -78,6 +79,15 @@ async function createLedgerJDController(req, res) {
           transactionId: newEntry.id,
           transactionDate,
           equipmentName: transactionDetails?.toUpperCase(),
+          transaction: "IN",
+          amount: amount,
+          remarks: remarks,
+          createdBy,
+        });
+
+        await EquipmentLedgerJD.create({
+          equipmentId: newEquipmentEntry.id,
+          transactionDate,
           transaction: "IN",
           amount: amount,
           remarks: remarks,

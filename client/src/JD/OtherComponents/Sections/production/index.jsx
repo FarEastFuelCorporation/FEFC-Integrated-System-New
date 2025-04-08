@@ -70,6 +70,17 @@ const ProductionJD = ({ user, socket }) => {
         remarks: "",
       },
     ],
+    equipments: [
+      {
+        id: "",
+        unit: "",
+        remaining: "",
+        unitPrice: "",
+        quantity: "",
+        amount: 0,
+        remarks: "",
+      },
+    ],
     createdBy: user.id,
   };
 

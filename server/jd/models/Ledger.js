@@ -12,6 +12,11 @@ const LedgerJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
+    batchId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
     transactionDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,

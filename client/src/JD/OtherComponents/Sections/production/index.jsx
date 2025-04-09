@@ -105,6 +105,7 @@ const ProductionJD = ({ user, socket }) => {
 
     // Only calculate amount for these:
     const updatedIngredients = calculateItemAmounts(formData.ingredients);
+
     const updatedPackagings = calculateItemAmounts(formData.packagings);
 
     // Don't touch amount for equipments, just use as is
@@ -196,7 +197,7 @@ const ProductionJD = ({ user, socket }) => {
         (item) => item.transactionCategory === "INGREDIENTS"
       );
 
-      console.log(equipmentData);
+      console.log(response.data.production);
 
       // console.log(response.data.production);
       // console.log(packagingItems);
@@ -373,12 +374,12 @@ const ProductionJD = ({ user, socket }) => {
       setLoading(true);
       if (formData.id) {
         // Update existing Transaction
-        await axios.put(`${apiUrl}/apiJD/ledger/${formData.id}`, formData);
+        await axios.put(`${apiUrl}/apiJD/production/${formData.id}`, formData);
 
         setSuccessMessage("Transaction Updated Successfully!");
       } else {
         // Add new Transaction
-        await axios.post(`${apiUrl}/apiJD/ledger`, formData);
+        await axios.post(`${apiUrl}/apiJD/production`, formData);
 
         setSuccessMessage("Transaction Added Successfully!");
       }
@@ -405,91 +406,197 @@ const ProductionJD = ({ user, socket }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "transactionDetails",
-      headerName: "Transaction Details",
+      field: "batch",
+      headerName: "Batch",
       headerAlign: "center",
       align: "center",
       flex: 2,
-      minWidth: 250,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "transactionCategory",
-      headerName: "Transaction Category",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fundSource",
-      headerName: "Fund Source",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "fundAllocation",
-      headerName: "Fund Allocation",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "amount",
-      headerName: "Amount",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
       minWidth: 100,
-      valueGetter: (params) => {
-        return formatNumber(params.row.amount);
-      },
       renderCell: renderCellWithWrapText,
     },
+    {
+      field: "ingredientCost",
+      headerName: "Ingredient Cost",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.ingredientCost || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "packagingCost",
+      headerName: "Packaging Cost",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.packagingCost || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "equipmentCost",
+      headerName: "Equipment Cost",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.equipmentCost || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "utilitiesCost",
+      headerName: "Utilities Cost",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.utilitiesCost || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "laborCost",
+      headerName: "Labor Cost",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.laborCost || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "totalCost",
+      headerName: "Total Cost",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.totalCost || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "grossIncome",
+      headerName: "Gross Income",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.grossIncome || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "netIncome",
+      headerName: "Net Income",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.netIncome || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount); // Apply formatting for display purposes
+      },
+    },
+    {
+      field: "profitMargin",
+      headerName: "Profit Margin",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      renderCell: (params) => {
+        const amount = params.row.profitMargin || 0;
+        // Format the number with a thousands separator and 2 decimal places
+        return `${new Intl.NumberFormat("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount)}%`;
+      },
+    },
+
     {
       field: "remarks",
       headerName: "Remarks",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
-    {
-      field: "edit",
-      headerName: "Edit",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) => (
-        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
-          <EditIcon />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 60,
-      renderCell: (params) => (
-        <IconButton
-          color="error"
-          onClick={() => handleDeleteClick(params.row.id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      ),
-    },
+    // {
+    //   field: "edit",
+    //   headerName: "Edit",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 60,
+    //   renderCell: (params) => (
+    //     <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+    //       <EditIcon />
+    //     </IconButton>
+    //   ),
+    // },
+    // {
+    //   field: "delete",
+    //   headerName: "Delete",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 60,
+    //   renderCell: (params) => (
+    //     <IconButton
+    //       color="error"
+    //       onClick={() => handleDeleteClick(params.row.id)}
+    //     >
+    //       <DeleteIcon />
+    //     </IconButton>
+    //   ),
+    // },
   ];
 
   return (

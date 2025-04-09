@@ -116,7 +116,17 @@ async function getInventoryJDsController(req, res) {
       };
     });
 
-    res.json({ inventory: inventoryWithUpdatedQuantity });
+    // Fetch all InventoryLedger from the database
+    const inventoryLedger = await InventoryLedgerJD.findAll({
+      include: {
+        model: InventoryJD,
+        as: "InventoryJD",
+        attributes: ["id", "item", "transactionCategory", "unit", "unitPrice"],
+      },
+      order: [["transactionDate", "DESC"]],
+    });
+
+    res.json({ inventory: inventoryWithUpdatedQuantity, inventoryLedger });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

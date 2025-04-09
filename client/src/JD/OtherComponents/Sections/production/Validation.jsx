@@ -8,61 +8,96 @@ export const Validation = (formData) => {
     validationErrors.push("Transaction Date is required.");
   }
 
-  // Validate transactions array
+  // Validate ingredients array
   if (
-    !Array.isArray(formData.transactions) ||
-    formData.transactions.length === 0
+    !Array.isArray(formData.ingredients) ||
+    formData.ingredients.length === 0
   ) {
-    validationErrors.push("At least one transaction is required.");
+    validationErrors.push("At least one ingredient is required.");
   } else {
-    formData.transactions.forEach((transaction, index) => {
+    formData.ingredients.forEach((ingredient, index) => {
+      if (!ingredient.id) {
+        validationErrors.push(`Ingredients ${index + 1}: Product is required.`);
+      }
       if (
-        !transaction.transactionCategory ||
-        transaction.transactionCategory.trim() === ""
+        ingredient.quantity === undefined ||
+        ingredient.quantity === null ||
+        isNaN(ingredient.quantity) ||
+        Number(ingredient.quantity) < 0
       ) {
         validationErrors.push(
-          `Transaction ${index + 1}: Transaction Category is required.`
+          `Ingredients ${index + 1}: Quantity is required.`
+        );
+      }
+    });
+  }
+
+  // Validate packagings array
+  if (!Array.isArray(formData.packagings) || formData.packagings.length === 0) {
+    validationErrors.push("At least one Packaging and Labeling is required.");
+  } else {
+    formData.packagings.forEach((packaging, index) => {
+      if (!packaging.id) {
+        validationErrors.push(
+          `Packaging and Labeling ${index + 1}: Product is required.`
         );
       }
       if (
-        !transaction.transactionDetails ||
-        transaction.transactionDetails.trim() === ""
+        packaging.quantity === undefined ||
+        packaging.quantity === null ||
+        isNaN(packaging.quantity) ||
+        Number(packaging.quantity) < 0
       ) {
         validationErrors.push(
-          `Transaction ${index + 1}: Transaction Details are required.`
+          `Packaging and Labeling ${index + 1}: Quantity is required.`
         );
       }
-      if (!transaction.fundSource || transaction.fundSource.trim() === "") {
+    });
+  }
+
+  // Validate equipments
+  formData.equipments.forEach((equipment, index) => {
+    if (!equipment.id) {
+      validationErrors.push(`Equipments ${index + 1}: Equipment is required.`);
+    }
+    if (
+      equipment.amount === undefined ||
+      equipment.amount === null ||
+      isNaN(equipment.amount) ||
+      Number(equipment.amount) < 0
+    ) {
+      validationErrors.push(`Equipments ${index + 1}: Amount is required.`);
+    }
+  });
+
+  // Validate outputs array
+  if (!Array.isArray(formData.outputs) || formData.outputs.length === 0) {
+    validationErrors.push("At least one Output is required.");
+  } else {
+    formData.outputs.forEach((output, index) => {
+      if (!output.outputType || output.outputType.trim() === "") {
+        validationErrors.push(`Outputs ${index + 1}: Output Type is required.`);
+      }
+      if (!output.id) {
         validationErrors.push(
-          `Transaction ${index + 1}: Fund Source is required.`
+          `Outputs ${index + 1}: Product / Ingredient Type is required.`
         );
       }
       if (
-        !transaction.fundAllocation ||
-        transaction.fundAllocation.trim() === ""
+        output.quantity === undefined ||
+        output.quantity === null ||
+        isNaN(output.quantity) ||
+        Number(output.quantity) < 0
       ) {
-        validationErrors.push(
-          `Transaction ${index + 1}: Fund Allocation is required.`
-        );
+        validationErrors.push(`Outputs ${index + 1}: Quantity is required.`);
       }
       if (
-        !transaction.amount ||
-        isNaN(transaction.amount) ||
-        Number(transaction.amount) <= 0
+        output.unitPrice === undefined ||
+        output.unitPrice === null ||
+        isNaN(output.unitPrice) ||
+        Number(output.unitPrice) < 0
       ) {
-        validationErrors.push(
-          `Transaction ${index + 1}: Amount must be greater than zero.`
-        );
-      }
-      if (
-        (transaction.quantity && isNaN(transaction.quantity)) ||
-        (transaction.unitPrice && isNaN(transaction.unitPrice))
-      ) {
-        validationErrors.push(
-          `Transaction ${
-            index + 1
-          }: Quantity and Unit Price must be valid numbers.`
-        );
+        validationErrors.push(`Outputs ${index + 1}: Unit Price is required.`);
       }
     });
   }

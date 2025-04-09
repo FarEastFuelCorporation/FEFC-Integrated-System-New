@@ -56,6 +56,7 @@ const LedgerJD = ({ user, socket }) => {
   const [formData, setFormData] = useState(initialFormData);
 
   const [transactions, setTransactions] = useState([]);
+  const [products, setProducts] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -70,7 +71,12 @@ const LedgerJD = ({ user, socket }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/apiJD/ledger`);
 
+      const responseProduct = await axios.get(`${apiUrl}/apiJD/product`);
+
       setTransactions(response.data.ledger);
+
+      console.log(responseProduct.data.product);
+      setProducts(responseProduct.data.product);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -367,6 +373,7 @@ const LedgerJD = ({ user, socket }) => {
         handleFormSubmit={handleFormSubmit}
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
+        products={products}
       />
     </Box>
   );

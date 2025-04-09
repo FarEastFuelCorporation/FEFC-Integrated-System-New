@@ -329,6 +329,18 @@ const ProductCategoryJD = ({ user, socket }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "productCount",
+      headerName: "Product Count",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return params.row.productCount;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "edit",
       headerName: "Edit",
       headerAlign: "center",
@@ -379,6 +391,15 @@ const ProductCategoryJD = ({ user, socket }) => {
       valueGetter: (params) => {
         return params.row.ProductCategoryJD?.productCategory;
       },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "updatedQuantity",
+      headerName: "Stocks",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
       renderCell: renderCellWithWrapText,
     },
     {

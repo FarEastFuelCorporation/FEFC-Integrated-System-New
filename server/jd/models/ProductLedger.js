@@ -48,7 +48,7 @@ const ProductLedgerJD = sequelize.define(
     },
     remarks: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     createdBy: {
       type: DataTypes.STRING,

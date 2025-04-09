@@ -43,6 +43,11 @@ async function createLedgerJDController(req, res) {
         createdBy,
       });
 
+      broadcastMessage({
+        type: "NEW_LEDGER_JD",
+        data: newEntry,
+      });
+
       if (
         transactionCategory === "INGREDIENTS" ||
         transactionCategory === "PACKAGING AND LABELING"
@@ -98,12 +103,23 @@ async function createLedgerJDController(req, res) {
           type: "NEW_EQUIPMENT_JD",
           data: newEquipmentEntry,
         });
-      }
 
-      broadcastMessage({
-        type: "NEW_LEDGER_JD",
-        data: newEntry,
-      });
+        const newEntry2 = await LedgerJD.create({
+          transactionDate,
+          transactionDetails: transactionDetails?.toUpperCase(),
+          transactionCategory: transactionCategory,
+          fundSource: "CASH IN",
+          fundAllocation: "EQUIPMENTS",
+          amount: amount,
+          remarks: remarks,
+          createdBy,
+        });
+
+        broadcastMessage({
+          type: "NEW_LEDGER_JD",
+          data: newEntry2,
+        });
+      }
     }
 
     res.status(201).json({
@@ -126,10 +142,61 @@ async function getLedgerJDsController(req, res) {
         as: "InventoryJD",
         attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
       },
-      order: [["transactionDate", "DESC"]],
+      order: [
+        ["createdAt", "DESC"], // Primary sort
+        ["transactionDate", "DESC"], // Secondary sort
+      ],
     });
 
     res.json({ ledger });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get Ledgers Summary controller
+async function getLedgerSummaryJDsController(req, res) {
+  try {
+    const ledger = await LedgerJD.findAll();
+
+    const categories = [
+      "CASH ON HAND",
+      "UNSOLD GOODS",
+      "UNUSED INVENTORIES",
+      "EQUIPMENTS",
+      "EQUIPMENT FUNDS",
+      "UTILITIES",
+      "LABOR",
+      "TRANSPORTATION",
+    ];
+
+    const summary = {};
+
+    // Initialize all categories to 0
+    categories.forEach((category) => {
+      summary[category] = 0;
+    });
+
+    ledger.forEach((entry) => {
+      const amount = Number(entry.amount || 0);
+
+      // Deduct from fundSource
+      if (summary.hasOwnProperty(entry.fundSource)) {
+        summary[entry.fundSource] -= amount;
+      }
+
+      // Add to fundAllocation
+      if (summary.hasOwnProperty(entry.fundAllocation)) {
+        summary[entry.fundAllocation] += amount;
+      }
+    });
+
+    // Calculate TOTAL (sum of all categories)
+    const total = Object.values(summary).reduce((sum, val) => sum + val, 0);
+    summary.TOTAL = total;
+
+    res.json({ summary });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
@@ -313,6 +380,7 @@ async function deleteLedgerJDController(req, res) {
 
 module.exports = {
   getLedgerJDsController,
+  getLedgerSummaryJDsController,
   createLedgerJDController,
   updateLedgerJDController,
   deleteLedgerJDController,

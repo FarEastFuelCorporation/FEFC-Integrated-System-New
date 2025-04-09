@@ -1,6 +1,7 @@
 // controllers/productCategoryController.js.js
 
 const { broadcastMessage } = require("../../websocketManager");
+const ProductJD = require("../models/Product");
 const ProductCategoryJD = require("../models/ProductCategory");
 
 // Create Product Category controller
@@ -37,10 +38,25 @@ async function getProductCategoryJDsController(req, res) {
   try {
     // Fetch all productCategory from the database
     const productCategory = await ProductCategoryJD.findAll({
+      include: [
+        {
+          model: ProductJD,
+          as: "ProductJD",
+          attributes: ["id"],
+        },
+      ],
       order: [["productCategory", "ASC"]],
     });
 
-    res.json({ productCategory });
+    // Compute updatedQuantity for each inventory item
+    const productCategoryWithUpdatedQuantity = productCategory.map((item) => {
+      return {
+        ...item.toJSON(),
+        productCount: item.ProductJD.length,
+      };
+    });
+
+    res.json({ productCategory: productCategoryWithUpdatedQuantity });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

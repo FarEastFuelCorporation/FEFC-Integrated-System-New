@@ -33,7 +33,6 @@ const AdminSidebarJD = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/JD/dashboard/productCategory": "Products",
       "/JD/dashboard/production": "Productions",
-      "/JD/dashboard/stocks": "Stocks",
       "/JD/dashboard/equipments": "Equipments",
       "/JD/dashboard/inventory": "Inventory",
       "/JD/dashboard/ledger": "Ledger",
@@ -128,14 +127,6 @@ const AdminSidebarJD = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"production"}
-        />
-        <BottomNavItem
-          label="Stocks"
-          value="Stocks"
-          icon={InventoryIcon}
-          selected={selected}
-          setSelected={setSelected}
-          navigate={"stocks"}
         />
         <BottomNavItem
           label="Equipments"
@@ -298,14 +289,6 @@ const AdminSidebarJD = ({ user }) => {
               title="Productions"
               to="production"
               icon={<FactoryIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              collapsed={isCollapsed}
-            />
-            <Item
-              title="Stocks"
-              to="stocks"
-              icon={<InventoryIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

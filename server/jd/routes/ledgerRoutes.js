@@ -7,6 +7,7 @@ const {
   getLedgerJDsController,
   updateLedgerJDController,
   deleteLedgerJDController,
+  getLedgerSummaryJDsController,
 } = require("../controllers/ledgerController");
 
 // Create Ledger route
@@ -14,6 +15,9 @@ router.post("/", createLedgerJDController);
 
 // Get Ledgers route
 router.get("/", getLedgerJDsController);
+
+// Get Ledgers Summary route
+router.get("/summary", getLedgerSummaryJDsController);
 
 // Update Ledger route
 router.put("/:id", updateLedgerJDController);

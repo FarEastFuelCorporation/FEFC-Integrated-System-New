@@ -40,9 +40,25 @@ const ProductionJD = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    totalCost: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    grossIncome: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    netIncome: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    profitMargin: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
     remarks: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     createdBy: {
       type: DataTypes.STRING,

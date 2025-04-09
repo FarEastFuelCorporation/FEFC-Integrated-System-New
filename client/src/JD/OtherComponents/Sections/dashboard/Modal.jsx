@@ -26,7 +26,6 @@ const ModalJD = ({
   handleFormSubmit,
   errorMessage,
   showErrorMessage,
-  products,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -39,9 +38,8 @@ const ModalJD = ({
     "TRANSPORTATION",
     "UNSOLD GOODS",
     "UTILITIES",
-    "PRODUCTION",
+    "OPERATIONS",
     "SALES",
-    "CAPITAL",
   ];
 
   const category2 = [
@@ -178,11 +176,11 @@ const ModalJD = ({
             />
           </Grid>
         </Grid>
-        {formData.transactions?.map((transaction, index) => {
+        {formData.transactions.map((transaction, index) => {
           const hasQuantity =
+            transaction.transactionCategory === "EQUIPMENTS" ||
             transaction.transactionCategory === "INGREDIENTS" ||
             transaction.transactionCategory === "PACKAGING AND LABELING";
-          const sales = transaction.transactionCategory === "SALES";
 
           const hasCategory = transaction.transactionCategory ? true : false;
 
@@ -192,6 +190,28 @@ const ModalJD = ({
                 Transaction Entry #{index + 1}
               </Typography>
               <Grid container spacing={2}>
+                <Grid item xs={1} lg={2}>
+                  <TextField
+                    label="Transaction Details"
+                    name={`transactions[${index}].transactionDetails`}
+                    value={transaction.transactionDetails || ""}
+                    onChange={(e) =>
+                      handleTransactionChange(
+                        index,
+                        "transactionDetails",
+                        e.target.value
+                      )
+                    }
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                </Grid>
                 <Grid item xs={1} lg={2}>
                   <FormControl fullWidth required>
                     <InputLabel
@@ -226,66 +246,6 @@ const ModalJD = ({
                     </Select>
                   </FormControl>
                 </Grid>
-                {hasCategory && !sales && (
-                  <Grid item xs={1} lg={2}>
-                    <TextField
-                      label="Transaction Details"
-                      name={`transactions[${index}].transactionDetails`}
-                      value={transaction.transactionDetails || ""}
-                      onChange={(e) =>
-                        handleTransactionChange(
-                          index,
-                          "transactionDetails",
-                          e.target.value
-                        )
-                      }
-                      fullWidth
-                      required
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
-                      autoComplete="off"
-                    />
-                  </Grid>
-                )}
-                {hasCategory && sales && (
-                  <Grid item xs={1} lg={2}>
-                    <FormControl fullWidth required>
-                      <InputLabel
-                        style={{
-                          color: colors.grey[100],
-                        }}
-                      >
-                        Transaction Details
-                      </InputLabel>
-                      <Select
-                        labelId={`transactionDetails`}
-                        name={`transactions[${index}].transactionDetails`}
-                        value={transaction.transactionDetails || ""}
-                        onChange={(e) =>
-                          handleTransactionChange(
-                            index,
-                            "transactionDetails",
-                            e.target.value
-                          )
-                        }
-                        fullWidth
-                        inputProps={{
-                          name: `transactionDetails`,
-                          id: `transactionDetails`,
-                        }}
-                      >
-                        {products.map((item) => (
-                          <MenuItem key={item.id} value={item.id}>
-                            {item.productName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                )}
                 {hasCategory && (
                   <Grid item xs={1} lg={2}>
                     <FormControl fullWidth required>
@@ -405,16 +365,14 @@ const ModalJD = ({
                     />
                   </Grid>
                 )}
-                {!formData.id && (
-                  <Grid item xs={0.5} textAlign="right">
-                    <IconButton
-                      color="error"
-                      onClick={() => handleRemoveTransaction(index)}
-                    >
-                      <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
-                    </IconButton>
-                  </Grid>
-                )}
+                <Grid item xs={0.5} textAlign="right">
+                  <IconButton
+                    color="error"
+                    onClick={() => handleRemoveTransaction(index)}
+                  >
+                    <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                  </IconButton>
+                </Grid>
                 {hasCategory && hasQuantity && (
                   <Grid item xs={1} lg={2}>
                     <FormControl fullWidth required>
@@ -438,7 +396,7 @@ const ModalJD = ({
                           id: `unit`,
                         }}
                       >
-                        {unitCategory.map((item) => (
+                        {category1.map((item) => (
                           <MenuItem key={item} value={item}>
                             {item}
                           </MenuItem>
@@ -525,13 +483,11 @@ const ModalJD = ({
             </Box>
           );
         })}
-        {!formData.id && (
-          <Box display="flex" justifyContent="center">
-            <IconButton color="success" onClick={handleAddTransaction}>
-              <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
-            </IconButton>
-          </Box>
-        )}
+        <Box display="flex" justifyContent="center">
+          <IconButton color="success" onClick={handleAddTransaction}>
+            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+          </IconButton>
+        </Box>
         <TextField
           label="Created By"
           name="createdBy"

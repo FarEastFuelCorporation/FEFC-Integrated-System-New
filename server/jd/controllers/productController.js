@@ -3,6 +3,7 @@
 const { broadcastMessage } = require("../../websocketManager");
 const ProductJD = require("../models/Product");
 const ProductCategoryJD = require("../models/ProductCategory");
+const ProductLedgerJD = require("../models/ProductLedger");
 
 // Create Product controller
 async function createProductJDController(req, res) {
@@ -45,15 +46,44 @@ async function getProductJDsController(req, res) {
   try {
     // Fetch all product from the database
     const product = await ProductJD.findAll({
-      include: {
-        model: ProductCategoryJD,
-        as: "ProductCategoryJD",
-        attributes: ["id", "productCategory"],
-      },
+      include: [
+        {
+          model: ProductCategoryJD,
+          as: "ProductCategoryJD",
+          attributes: ["id", "productCategory"],
+        },
+        {
+          model: ProductLedgerJD,
+          as: "ProductLedgerJD",
+          attributes: ["id", "transaction", "quantity"],
+        },
+      ],
       order: [["productName", "ASC"]],
     });
 
-    res.json({ product });
+    // Compute updatedQuantity for each inventory item
+    const productWithUpdatedQuantity = product.map((item) => {
+      let updatedQuantity = 0;
+
+      // Loop through associated ProductLedgerJD transactions
+      item.ProductLedgerJD.forEach((ledger) => {
+        if (ledger.transaction === "IN") {
+          updatedQuantity += ledger.quantity;
+        } else if (
+          ledger.transaction === "OUT" ||
+          ledger.transaction === "USED"
+        ) {
+          updatedQuantity -= ledger.quantity;
+        }
+      });
+
+      return {
+        ...item.toJSON(),
+        updatedQuantity, // Add computed updatedQuantity to each inventory item
+      };
+    });
+
+    res.json({ product: productWithUpdatedQuantity });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

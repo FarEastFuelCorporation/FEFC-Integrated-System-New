@@ -1035,6 +1035,7 @@ const ModalJD = ({
                     handleOutputChange(index, "amount", e.target.value)
                   }
                   fullWidth
+                  disabled
                   required
                   InputLabelProps={{
                     style: {

@@ -26,7 +26,7 @@ import ConfirmationDialog from "../../ConfirmationDialog";
 import ModalJD from "./Modal";
 import { Validation } from "./Validation";
 import { formatDate3, formatNumber } from "../../Functions";
-import { columns } from "./Column";
+import { columns, columns2 } from "./Column";
 
 const EquipmentJD = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -56,6 +56,7 @@ const EquipmentJD = ({ user, socket }) => {
   const [formData, setFormData] = useState(initialFormData);
 
   const [transactions, setTransactions] = useState([]);
+  const [transactions2, setTransactions2] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -73,6 +74,7 @@ const EquipmentJD = ({ user, socket }) => {
       const response = await axios.get(`${apiUrl}/apiJD/equipment`);
 
       setTransactions(response.data.equipment);
+      setTransactions2(response.data.equipmentLedgerLedger);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -306,7 +308,7 @@ const EquipmentJD = ({ user, socket }) => {
                   horizontal: "right",
                 }}
               >
-                Transaction
+                Equipments
               </Badge>
             }
           />
@@ -321,7 +323,7 @@ const EquipmentJD = ({ user, socket }) => {
                   horizontal: "right",
                 }}
               >
-                Equipments
+                Transaction
               </Badge>
             }
           />
@@ -329,8 +331,8 @@ const EquipmentJD = ({ user, socket }) => {
       </Card>
       <CustomDataGridStyles margin={0}>
         <DataGrid
-          rows={transactions}
-          columns={columns}
+          rows={selectedTab === 0 ? transactions : transactions2}
+          columns={selectedTab === 0 ? columns : columns2}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
           initialState={{

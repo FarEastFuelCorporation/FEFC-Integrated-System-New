@@ -37,19 +37,19 @@ const DayNavigator = ({ setStartDate, setEndDate }) => {
 
   return (
     <Grid container alignItems="center" mb={-5}>
-      <Grid item>
+      {/* <Grid item>
         <IconButton onClick={handlePreviousDay}>
           <ArrowLeftIcon sx={{ fontSize: 50 }} />
         </IconButton>
-      </Grid>
+      </Grid> */}
       <Grid item>
         <Typography variant="h6">{formatDate(currentDate)}</Typography>
       </Grid>
-      <Grid item>
+      {/* <Grid item>
         <IconButton onClick={handleNextDay}>
           <ArrowRightIcon sx={{ fontSize: 50 }} />
         </IconButton>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };

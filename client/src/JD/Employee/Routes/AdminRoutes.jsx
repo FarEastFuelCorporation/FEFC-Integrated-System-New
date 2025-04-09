@@ -10,12 +10,13 @@ import StocksJD from "../../OtherComponents/Sections/stocks";
 import EquipmentJD from "../../OtherComponents/Sections/equipments";
 import InventoryJD from "../../OtherComponents/Sections/inventory";
 import LedgerJD from "../../OtherComponents/Sections/ledger";
+import DashboardJD from "../../OtherComponents/Sections/dashboard";
 
 const AdminRoutesJD = ({ user, onUpdateUser, socket }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebarJD user={user} />}>
-      {/* <Route path="" element={<Dashboard user={user} />} /> */}
+      <Route path="" element={<DashboardJD user={user} />} />
       <Route
         path="productCategory"
         element={<ProductCategoryJD user={user} socket={socket} />}

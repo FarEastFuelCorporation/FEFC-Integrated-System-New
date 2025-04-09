@@ -108,6 +108,8 @@ const EmployeeJD = require("./jd/models/Employee");
 const UserJD = require("./jd/models/User");
 const EmployeeRoleJD = require("./jd/models/EmployeeRole");
 const sequelizeJD = require("./jd/config/database");
+const ProductionJD = require("./jd/models/Production");
+const LedgerJD = require("./jd/models/Ledger");
 
 // Function to initialize the application
 async function initializeApp() {
@@ -115,7 +117,7 @@ async function initializeApp() {
     console.log("Syncing models to the database...");
 
     // await sequelizeJD.sync({ alter: true });
-    // await EmployeeRoleJD.sync({ alter: true });
+    // await LedgerJD.sync({ alter: true });
 
     // await handleAttendanceSync();
 

@@ -116,7 +116,17 @@ async function getEquipmentJDsController(req, res) {
       };
     });
 
-    res.json({ equipment: inventoryWithUpdatedAmount });
+    // Fetch all EquipmentLedger from the database
+    const equipmentLedgerLedger = await EquipmentLedgerJD.findAll({
+      include: {
+        model: EquipmentJD,
+        as: "EquipmentJD",
+        attributes: ["id", "transactionDate", "equipmentName"],
+      },
+      order: [["transactionDate", "DESC"]],
+    });
+
+    res.json({ equipment: inventoryWithUpdatedAmount, equipmentLedgerLedger });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

@@ -126,7 +126,7 @@ async function getLedgerJDsController(req, res) {
         as: "InventoryJD",
         attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
       },
-      order: [["transactionDate", "ASC"]],
+      order: [["transactionDate", "DESC"]],
     });
 
     res.json({ ledger });

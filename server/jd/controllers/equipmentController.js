@@ -91,7 +91,7 @@ async function getEquipmentJDsController(req, res) {
         as: "EquipmentLedgerJD",
         attributes: ["id", "transaction", "amount"],
       },
-      order: [["transactionDate", "ASC"]],
+      order: [["transactionDate", "DESC"]],
     });
 
     // Compute updatedAmount for each equipment item

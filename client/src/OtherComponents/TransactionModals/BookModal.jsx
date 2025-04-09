@@ -252,20 +252,18 @@ const BookModal = ({
             }}
             autoComplete="off"
           >
-            {quotationsData.map((q, index) =>
-              q.QuotationWaste.sort((a, b) =>
-                a.wasteName.localeCompare(b.wasteName)
-              ) // Sort wasteName in ascending order
-                .map((waste, wasteIndex) => (
-                  <MenuItem key={`${index}-${wasteIndex}`} value={waste.id}>
-                    {waste.wasteName}
-                    {waste.TreatmentProcess?.treatmentProcess
-                      ? `(${waste.TreatmentProcess?.treatmentProcess})`
-                      : ""}{" "}
-                    - {waste.unit}
-                  </MenuItem>
-                ))
-            )}
+            {quotationsData
+              .flatMap((q) => q.QuotationWaste) // Flatten all QuotationWaste arrays
+              .sort((a, b) => a.wasteName.localeCompare(b.wasteName)) // Sort by wasteName in ascending order
+              .map((waste, wasteIndex) => (
+                <MenuItem key={waste.id} value={waste.id}>
+                  {waste.wasteName}
+                  {waste.TreatmentProcess?.treatmentProcess
+                    ? ` (${waste.TreatmentProcess?.treatmentProcess})`
+                    : ""}{" "}
+                  - {waste.unit}
+                </MenuItem>
+              ))}
           </TextField>
         )}
         {filteredVehicleTypes.length > 0 && formData.quotationWasteId && (

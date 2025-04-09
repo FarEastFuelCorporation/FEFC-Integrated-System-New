@@ -46,9 +46,10 @@ export const Validation = (formData) => {
         );
       }
       if (
-        !transaction.amount ||
+        transaction.amount === undefined ||
+        transaction.amount === null ||
         isNaN(transaction.amount) ||
-        Number(transaction.amount) <= 0
+        Number(transaction.amount) < 0
       ) {
         validationErrors.push(
           `Transaction ${index + 1}: Amount must be greater than zero.`

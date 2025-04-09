@@ -42,12 +42,9 @@ const ProductionJD = ({ user, socket }) => {
     utilitiesCost: 0,
     laborCost: 0,
     totalCost: 0,
-    outputType: "",
-    outputTypeId: "",
-    yield: 0,
-    unit: "",
-    unitPrice: 0,
     grossIncome: 0,
+    netIncome: 0,
+    profitMargin: 0,
     ingredients: [
       {
         id: "",
@@ -81,8 +78,84 @@ const ProductionJD = ({ user, socket }) => {
         remarks: "",
       },
     ],
+    outputs: [
+      {
+        outputType: "",
+        id: "",
+        unit: "",
+        quantity: 0,
+        unitPrice: 0,
+        amount: 0,
+        remarks: "",
+      },
+    ],
     createdBy: user.id,
   };
+
+  function calculateCosts(formData) {
+    const calculateItemAmounts = (items) =>
+      items.map((item) => {
+        const quantity = Number(item.quantity || 0);
+        const unitPrice = Number(item.unitPrice || 0);
+        return {
+          ...item,
+          amount: quantity * unitPrice,
+        };
+      });
+
+    // Only calculate amount for these:
+    const updatedIngredients = calculateItemAmounts(formData.ingredients);
+    const updatedPackagings = calculateItemAmounts(formData.packagings);
+
+    // Don't touch amount for equipments, just use as is
+    const updatedEquipments = formData.equipments.map((item) => ({
+      ...item,
+      amount: Number(item.amount || 0),
+    }));
+
+    // Outputs still need amount calculated
+    const updatedOutputs = calculateItemAmounts(formData.outputs);
+
+    const sumAmount = (items) =>
+      items.reduce((total, item) => total + Number(item.amount || 0), 0);
+
+    const ingredientCost = sumAmount(updatedIngredients);
+    const packagingCost = sumAmount(updatedPackagings);
+    const equipmentCost = sumAmount(updatedEquipments);
+    const utilitiesCost = Number(formData.utilitiesCost || 0);
+    const laborCost = Number(formData.laborCost || 0);
+
+    const totalCost =
+      ingredientCost +
+      packagingCost +
+      equipmentCost +
+      utilitiesCost +
+      laborCost;
+
+    const grossIncome = updatedOutputs.reduce(
+      (total, output) => total + Number(output.amount || 0),
+      0
+    );
+
+    const netIncome = grossIncome - totalCost;
+    const profitMargin =
+      grossIncome > 0 ? Math.round((netIncome / grossIncome) * 10000) / 100 : 0;
+
+    return {
+      ...formData,
+      ingredients: updatedIngredients,
+      packagings: updatedPackagings,
+      equipments: updatedEquipments,
+      outputs: updatedOutputs,
+      ingredientCost,
+      packagingCost,
+      equipmentCost,
+      totalCost,
+      grossIncome,
+      netIncome,
+      profitMargin,
+    };
+  }
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
@@ -184,6 +257,33 @@ const ProductionJD = ({ user, socket }) => {
     }
   }, [socket]);
 
+  const ingredientDeps = formData.ingredients
+    .map((i) => `${i.quantity}-${i.unitPrice}-${i.amount}`)
+    .join();
+
+  const packagingDeps = formData.packagings
+    .map((p) => `${p.quantity}-${p.unitPrice}-${p.amount}`)
+    .join();
+
+  const equipmentDeps = formData.equipments
+    .map((e) => `${e.quantity}-${e.unitPrice}-${e.amount}`)
+    .join();
+
+  const outputDeps = formData.outputs
+    .map((o) => `${o.quantity}-${o.unitPrice}`)
+    .join();
+
+  useEffect(() => {
+    setFormData((prev) => calculateCosts(prev));
+  }, [
+    ingredientDeps,
+    packagingDeps,
+    equipmentDeps,
+    formData.utilitiesCost,
+    formData.laborCost,
+    outputDeps,
+  ]);
+
   const handleOpenModal = () => {
     setOpenModal(true);
   };
@@ -201,22 +301,8 @@ const ProductionJD = ({ user, socket }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "utilitiesCost") {
-      const amountValue = value ? value : 0;
-      formData.totalCost -= formData.utilitiesCost;
-      formData.totalCost += parseFloat(amountValue);
-    } else if (name === "laborCost") {
-      const amountValue = value ? value : 0;
-      formData.totalCost -= formData.laborCost;
-      formData.totalCost += parseFloat(amountValue);
-    } else if (name === "outputType") {
+    if (name === "outputType") {
       formData.outputTypeId = "";
-    } else if (name === "yield") {
-      const amountValue = value ? value : 0;
-      formData.grossIncome = parseFloat(amountValue) * formData.unitPrice;
-    } else if (name === "unitPrice") {
-      const amountValue = value ? value : 0;
-      formData.grossIncome = parseFloat(amountValue) * formData.yield;
     }
 
     setFormData({ ...formData, [name]: value });

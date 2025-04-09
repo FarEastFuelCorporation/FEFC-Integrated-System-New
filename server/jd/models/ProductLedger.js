@@ -1,10 +1,10 @@
-// models/Production.js
+// models/ProductLedger.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const ProductionJD = sequelize.define(
-  "ProductionJD",
+const ProductLedgerJD = sequelize.define(
+  "ProductLedgerJD",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,31 +12,37 @@ const ProductionJD = sequelize.define(
       allowNull: false,
       autoIncrement: true,
     },
+    productId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    batchId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
     transactionDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    batch: {
+    transaction: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    ingredientCost: {
+    quantity: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    packagingCost: {
+    unit: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    unitPrice: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    equipmentCost: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    utilitiesCost: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    laborCost: {
+    amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -62,4 +68,4 @@ const ProductionJD = sequelize.define(
   }
 );
 
-module.exports = ProductionJD;
+module.exports = ProductLedgerJD;

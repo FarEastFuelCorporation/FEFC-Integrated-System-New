@@ -87,21 +87,26 @@ const LedgerJD = ({ user, socket }) => {
         const message = JSON.parse(event.data);
 
         if (message.type === "NEW_LEDGER_JD") {
-          setTransactions((prevData) => [...prevData, message.data]);
+          setTransactions((prevData) =>
+            [...prevData, message.data].sort(
+              (a, b) => new Date(b.date) - new Date(a.date)
+            )
+          );
         } else if (message.type === "UPDATED_LEDGER_JD") {
           setTransactions((prevData) => {
-            // Find the index of the data to be updated
             const index = prevData.findIndex(
               (prev) => prev.id === message.data.id
             );
 
             if (index !== -1) {
-              // Replace the updated data data
               const updatedData = [...prevData];
-              updatedData[index] = message.data; // Update the data at the found index
-              return updatedData;
+              updatedData[index] = message.data;
+
+              // Sort by date in descending order after update
+              return updatedData.sort(
+                (a, b) => new Date(b.date) - new Date(a.date)
+              );
             } else {
-              // If the data is not found, just return the previous state
               return prevData;
             }
           });
@@ -351,11 +356,6 @@ const LedgerJD = ({ user, socket }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "productCategory", sort: "asc" }],
-            },
-          }}
         />
       </CustomDataGridStyles>
       <ModalJD

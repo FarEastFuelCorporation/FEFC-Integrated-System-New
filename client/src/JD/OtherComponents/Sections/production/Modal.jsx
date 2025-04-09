@@ -118,16 +118,6 @@ const ModalJD = ({
           : {}),
       };
 
-      if (field === "quantity" || field === "unitPrice") {
-        formData.ingredientCost -= updatedTransaction.amount;
-        formData.totalCost -= updatedTransaction.amount;
-        const quantity = parseFloat(updatedTransaction.quantity) || 0;
-        const unitPrice = parseFloat(updatedTransaction.unitPrice) || 0;
-        updatedTransaction.amount = quantity * unitPrice;
-        formData.ingredientCost += quantity * unitPrice;
-        formData.totalCost += quantity * unitPrice;
-      }
-
       return updatedTransaction;
     });
 
@@ -181,16 +171,6 @@ const ModalJD = ({
             }
           : {}),
       };
-
-      if (field === "quantity" || field === "unitPrice") {
-        formData.packagingCost -= updatedTransaction.amount;
-        formData.totalCost -= updatedTransaction.amount;
-        const quantity = parseFloat(updatedTransaction.quantity) || 0;
-        const unitPrice = parseFloat(updatedTransaction.unitPrice) || 0;
-        updatedTransaction.amount = quantity * unitPrice;
-        formData.packagingCost += quantity * unitPrice;
-        formData.totalCost += quantity * unitPrice;
-      }
 
       return updatedTransaction;
     });
@@ -246,29 +226,63 @@ const ModalJD = ({
           : {}),
       };
 
-      if (field === "amount") {
-        const oldAmount = isNaN(updatedTransaction.amount2)
-          ? 0
-          : updatedTransaction.amount2;
+      return updatedTransaction;
+    });
 
-        const amountValue = value ? value : 0;
+    handleInputChange({
+      target: { name: "equipments", value: updatedEquipments },
+    });
+  };
 
-        formData.equipmentCost -= parseFloat(isNaN(oldAmount) ? 0 : oldAmount);
-        formData.totalCost -= parseFloat(isNaN(oldAmount) ? 0 : oldAmount);
+  const handleAddOutput = () => {
+    const newOutputs = {
+      id: "",
+      unit: "",
+      remaining: "",
+      unitPrice: "",
+      quantity: "",
+      amount: 0,
+      remarks: "",
+    };
+    const updatedOutputs = [...formData.outputs, newOutputs];
+    handleInputChange({
+      target: { name: "outputs", value: updatedOutputs },
+    });
+  };
 
-        formData.equipmentCost += parseFloat(
-          isNaN(amountValue) ? 0 : amountValue
-        );
-        formData.totalCost += parseFloat(isNaN(amountValue) ? 0 : amountValue);
+  const handleRemoveOutput = (index) => {
+    const updatedOutputs = formData.outputs.filter((waste, i) => i !== index);
+    handleInputChange({
+      target: { name: "outputs", value: updatedOutputs },
+    });
+  };
 
-        updatedTransaction.amount2 = parseFloat(amountValue);
+  const handleOutputChange = (index, field, value) => {
+    const updatedOutputs = formData.outputs.map((output, i) => {
+      if (i !== index) return output;
+
+      const item = ingredients.filter((item) => item.id === value);
+
+      // Calculate amount if quantity or unitPrice is updated
+      const updatedTransaction = {
+        ...output,
+        [field]: value,
+        ...(field === "id" && item.length > 0
+          ? {
+              unit: item[0].unit,
+            }
+          : {}),
+      };
+
+      if (output.outputType === "PRODUCT") {
+        updatedTransaction.unit = "PC";
       }
 
       return updatedTransaction;
     });
 
     handleInputChange({
-      target: { name: "equipments", value: updatedEquipments },
+      target: { name: "outputs", value: updatedOutputs },
     });
   };
 
@@ -426,7 +440,6 @@ const ModalJD = ({
                   onChange={(e) =>
                     handleIngredientChange(index, "quantity", e.target.value)
                   }
-                  type="number"
                   fullWidth
                   required
                   InputLabelProps={{
@@ -750,7 +763,7 @@ const ModalJD = ({
           Summary
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} lg={2}>
+          <Grid item xs={12} lg={11.5 / 5}>
             <TextField
               label="Ingredient Cost"
               name="ingredientCost"
@@ -768,7 +781,7 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-          <Grid item xs={12} lg={2}>
+          <Grid item xs={12} lg={11.5 / 5}>
             <TextField
               label="Packaging Cost"
               name="packagingCost"
@@ -786,7 +799,7 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-          <Grid item xs={12} lg={2}>
+          <Grid item xs={12} lg={11.5 / 5}>
             <TextField
               label="Equipment Cost"
               name="equipmentCost"
@@ -804,7 +817,7 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-          <Grid item xs={12} lg={2}>
+          <Grid item xs={12} lg={11.5 / 5}>
             <TextField
               label="Utilities Cost"
               name="utilitiesCost"
@@ -821,11 +834,240 @@ const ModalJD = ({
               autoComplete="off"
             />
           </Grid>
-          <Grid item xs={12} lg={2}>
+          <Grid item xs={12} lg={11.5 / 5}>
             <TextField
               label="Labor Cost"
               name="laborCost"
               value={formData.laborCost}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{
+                style: {
+                  color: colors.grey[100],
+                },
+                shrink: true,
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+        </Grid>
+        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
+          Output
+        </Typography>
+        {formData.outputs?.map((output, index) => (
+          <Box key={index}>
+            <Typography variant="subtitle2" gutterBottom>
+              Output #{index + 1}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} lg={2}>
+                <FormControl fullWidth required>
+                  <InputLabel
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Output Type
+                  </InputLabel>
+                  <Select
+                    labelId={`outputType`}
+                    name={`outputs[${index}].outputType`}
+                    value={output.outputType || ""}
+                    onChange={(e) =>
+                      handleOutputChange(index, "outputType", e.target.value)
+                    }
+                    fullWidth
+                    inputProps={{
+                      name: `outputType`,
+                      id: `outputType`,
+                    }}
+                  >
+                    <MenuItem key={"INGREDIENT"} value={"INGREDIENT"}>
+                      {"INGREDIENT"}
+                    </MenuItem>
+                    <MenuItem key={"PRODUCT"} value={"PRODUCT"}>
+                      {"PRODUCT"}
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              {output.outputType === "PRODUCT" && (
+                <Grid item xs={12} lg={4}>
+                  <FormControl fullWidth required>
+                    <InputLabel
+                      style={{
+                        color: colors.grey[100],
+                      }}
+                    >
+                      Product
+                    </InputLabel>
+                    <Select
+                      labelId={`id`}
+                      name={`outputs[${index}].id`}
+                      value={output.id || ""}
+                      onChange={(e) =>
+                        handleOutputChange(index, "id", e.target.value)
+                      }
+                      fullWidth
+                      inputProps={{
+                        name: `id`,
+                        id: `id`,
+                      }}
+                    >
+                      {products.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.productName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
+              {output.outputType === "INGREDIENT" && (
+                <Grid item xs={12} lg={4}>
+                  <FormControl fullWidth required>
+                    <InputLabel
+                      style={{
+                        color: colors.grey[100],
+                      }}
+                    >
+                      Ingredient
+                    </InputLabel>
+                    <Select
+                      labelId={`id`}
+                      name={`outputs[${index}].id`}
+                      value={output.id || ""}
+                      onChange={(e) =>
+                        handleOutputChange(index, "id", e.target.value)
+                      }
+                      fullWidth
+                      inputProps={{
+                        name: `id`,
+                        id: `id`,
+                      }}
+                    >
+                      {ingredients.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
+              <Grid item xs={12} lg={1}>
+                <FormControl fullWidth required>
+                  <InputLabel
+                    style={{
+                      color: colors.grey[100],
+                    }}
+                  >
+                    Unit
+                  </InputLabel>
+                  <Select
+                    labelId={`unit`}
+                    name={`outputs[${index}].unit`}
+                    value={output.unit || ""}
+                    onChange={(e) =>
+                      handleOutputChange(index, "unit", e.target.value)
+                    }
+                    fullWidth
+                    disabled
+                    inputProps={{
+                      name: `unit`,
+                      id: `unit`,
+                    }}
+                  >
+                    {unitCategory.map((item) => (
+                      <MenuItem key={item} value={item}>
+                        {item}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} lg={1}>
+                <TextField
+                  label="Quantity"
+                  name={`outputs[${index}].quantity`}
+                  value={output.quantity || ""}
+                  onChange={(e) =>
+                    handleOutputChange(index, "quantity", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+
+              <Grid item xs={12} lg={2}>
+                <TextField
+                  label="Unit Price"
+                  name={`outputs[${index}].unitPrice`}
+                  value={output.unitPrice || ""}
+                  onChange={(e) =>
+                    handleOutputChange(index, "unitPrice", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} lg={1.5}>
+                <TextField
+                  label="Amount"
+                  name={`outputs[${index}].amount`}
+                  value={output.amount || 0}
+                  onChange={(e) =>
+                    handleOutputChange(index, "amount", e.target.value)
+                  }
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    style: {
+                      color: colors.grey[100],
+                    },
+                    shrink: true,
+                  }}
+                  autoComplete="off"
+                />
+              </Grid>
+              <Grid item xs={12} lg={0.5} textAlign="right">
+                <IconButton
+                  color="error"
+                  onClick={() => handleRemoveOutput(index)}
+                >
+                  <RemoveCircleOutlineIcon sx={{ fontSize: 32 }} />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+        <Box display="flex" justifyContent="center">
+          <IconButton color="success" onClick={handleAddOutput}>
+            <AddCircleOutlineIcon sx={{ fontSize: 32 }} />
+          </IconButton>
+        </Box>
+        <Grid container spacing={2}></Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} lg={2}>
+            <TextField
+              label="Gross Income"
+              name="grossIncome"
+              value={formData.grossIncome}
               onChange={handleInputChange}
               fullWidth
               required
@@ -856,105 +1098,11 @@ const ModalJD = ({
               disabled
             />
           </Grid>
-        </Grid>
-        <Typography variant="subtitle1" gutterBottom sx={{ marginTop: "10px" }}>
-          Output
-        </Typography>
-        <Grid container spacing={2}>
           <Grid item xs={12} lg={2}>
-            <FormControl fullWidth required>
-              <InputLabel
-                style={{
-                  color: colors.grey[100],
-                }}
-              >
-                Output Type
-              </InputLabel>
-              <Select
-                labelId={`outputType`}
-                name={`outputType`}
-                value={formData.outputType || ""}
-                onChange={handleInputChange}
-                fullWidth
-                inputProps={{
-                  name: `outputType`,
-                  id: `outputType`,
-                }}
-              >
-                <MenuItem key={"INGREDIENT"} value={"INGREDIENT"}>
-                  {"INGREDIENT"}
-                </MenuItem>
-                <MenuItem key={"PRODUCT"} value={"PRODUCT"}>
-                  {"PRODUCT"}
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          {formData.outputType === "PRODUCT" && (
-            <Grid item xs={12} lg={4}>
-              <FormControl fullWidth required>
-                <InputLabel
-                  style={{
-                    color: colors.grey[100],
-                  }}
-                >
-                  Product
-                </InputLabel>
-                <Select
-                  labelId={`outputTypeId`}
-                  name={`outputTypeId`}
-                  value={formData.outputTypeId || ""}
-                  onChange={handleInputChange}
-                  fullWidth
-                  inputProps={{
-                    name: `outputTypeId`,
-                    id: `outputTypeId`,
-                  }}
-                >
-                  {products.map((item) => (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.productName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          {formData.outputType === "INGREDIENT" && (
-            <Grid item xs={12} lg={4}>
-              <FormControl fullWidth required>
-                <InputLabel
-                  style={{
-                    color: colors.grey[100],
-                  }}
-                >
-                  Ingredient
-                </InputLabel>
-                <Select
-                  labelId={`outputTypeId`}
-                  name={`outputTypeId`}
-                  value={formData.outputTypeId || ""}
-                  onChange={handleInputChange}
-                  fullWidth
-                  inputProps={{
-                    name: `outputTypeId`,
-                    id: `outputTypeId`,
-                  }}
-                >
-                  {ingredients.map((item) => (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.item}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          <Grid item xs={12} lg={1}>
             <TextField
-              label="Yield"
-              name="yield"
-              value={formData.yield}
+              label="Net Income"
+              name="netIncome"
+              value={formData.netIncome}
               onChange={handleInputChange}
               fullWidth
               required
@@ -965,58 +1113,14 @@ const ModalJD = ({
                 shrink: true,
               }}
               autoComplete="off"
-            />
-          </Grid>
-          <Grid item xs={12} lg={1}>
-            <FormControl fullWidth required>
-              <InputLabel
-                style={{
-                  color: colors.grey[100],
-                }}
-              >
-                Unit
-              </InputLabel>
-              <Select
-                labelId={`unit`}
-                name={`unit`}
-                value={formData.unit || ""}
-                onChange={handleInputChange}
-                fullWidth
-                inputProps={{
-                  name: `unit`,
-                  id: `unit`,
-                }}
-              >
-                {unitCategory.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} lg={2}>
-            <TextField
-              label="Unit Price"
-              name="unitPrice"
-              value={formData.unitPrice}
-              onChange={handleInputChange}
-              fullWidth
-              required
-              InputLabelProps={{
-                style: {
-                  color: colors.grey[100],
-                },
-                shrink: true,
-              }}
-              autoComplete="off"
+              disabled
             />
           </Grid>
           <Grid item xs={12} lg={2}>
             <TextField
-              label="Gross Income"
-              name="grossIncome"
-              value={formData.grossIncome}
+              label="Profit Margin (%)"
+              name="profitMargin"
+              value={formData.profitMargin}
               onChange={handleInputChange}
               fullWidth
               required
@@ -1027,6 +1131,7 @@ const ModalJD = ({
                 shrink: true,
               }}
               autoComplete="off"
+              disabled
             />
           </Grid>
         </Grid>

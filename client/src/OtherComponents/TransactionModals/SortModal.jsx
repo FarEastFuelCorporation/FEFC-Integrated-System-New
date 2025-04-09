@@ -389,20 +389,23 @@ const SortModal = ({
                     required
                     disabled={formData.statusId === 4}
                   >
-                    {quotations.map((quotation) =>
-                      quotation.QuotationWaste.filter(
-                        (waste) =>
-                          !["AHW", "ANHW", "AHNHW"].includes(
-                            waste.TypeOfWaste.wasteCode
-                          ) // Exclude these codes
-                      ).map((waste) => (
+                    {quotations
+                      .flatMap((quotation) =>
+                        quotation.QuotationWaste.filter(
+                          (waste) =>
+                            !["AHW", "ANHW", "AHNHW"].includes(
+                              waste.TypeOfWaste.wasteCode
+                            ) // Exclude these waste codes
+                        )
+                      ) // Flatten all filtered wastes from quotations
+                      .sort((a, b) => a.wasteName.localeCompare(b.wasteName)) // Sort by wasteName in ascending order
+                      .map((waste) => (
                         <MenuItem key={waste.id} value={waste.id}>
                           {waste.wasteName} {"("}
                           {waste.TypeOfWaste.wasteCode}
                           {")"} - {waste.unit}
                         </MenuItem>
-                      ))
-                    )}
+                      ))}
                   </Select>
                 </FormControl>
               </Grid>

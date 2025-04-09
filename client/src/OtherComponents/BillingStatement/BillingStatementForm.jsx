@@ -345,7 +345,9 @@ const BillingStatementForm = ({
         const selectedWeight =
           typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
-        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+        const totalWeightPrice = item.duration
+          ? item.duration * selectedWeight * QuotationWaste.unitPrice
+          : selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
 
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 

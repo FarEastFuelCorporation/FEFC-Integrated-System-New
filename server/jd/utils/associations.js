@@ -11,6 +11,7 @@ const LedgerJD = require("../models/Ledger");
 const ProductJD = require("../models/Product");
 const ProductCategoryJD = require("../models/ProductCategory");
 const ProductionJD = require("../models/Production");
+const ProductLedgerJD = require("../models/ProductLedger");
 const UserJD = require("../models/User");
 
 // Define associations
@@ -92,13 +93,13 @@ ProductJD.belongsTo(ProductCategoryJD, {
   onDelete: "SET NULL",
 });
 
-ProductJD.hasMany(ProductionJD, {
-  as: "ProductionJD",
+ProductJD.hasMany(ProductLedgerJD, {
+  as: "ProductLedgerJD",
   foreignKey: "productId",
   sourceKey: "id",
   onDelete: "SET NULL",
 });
-ProductionJD.belongsTo(ProductJD, {
+ProductLedgerJD.belongsTo(ProductJD, {
   as: "ProductJD",
   foreignKey: "productId",
   targetKey: "id",
@@ -177,6 +178,19 @@ ProductionJD.hasMany(EquipmentLedgerJD, {
   onDelete: "SET NULL",
 });
 EquipmentLedgerJD.belongsTo(ProductionJD, {
+  as: "ProductionJD",
+  foreignKey: "batchId",
+  targetKey: "id",
+  onDelete: "SET NULL",
+});
+
+ProductionJD.hasMany(ProductLedgerJD, {
+  as: "ProductLedgerJD",
+  foreignKey: "batchId",
+  sourceKey: "id",
+  onDelete: "SET NULL",
+});
+ProductLedgerJD.belongsTo(ProductionJD, {
   as: "ProductionJD",
   foreignKey: "batchId",
   targetKey: "id",

@@ -5,12 +5,40 @@ const EquipmentJD = require("../models/Equipment");
 const InventoryJD = require("../models/Inventory");
 const InventoryLedgerJD = require("../models/InventoryLedger");
 const ProductionJD = require("../models/Production");
+const generateBatchId = require("../utils/generateBatchId");
 
 // Create Production controller
 async function createProductionJDController(req, res) {
   try {
     // Extracting data from the request body
-    const { transactionDate, transactions, createdBy } = req.body;
+    const {
+      transactionDate,
+      ingredientCost,
+      packagingCost,
+      equipmentCost,
+      utilitiesCost,
+      laborCost,
+      totalCost,
+      grossIncome,
+      netIncome,
+      profitMargin,
+      ingredients,
+      packagings,
+      equipments,
+      outputs,
+      createdBy,
+    } = req.body;
+
+    const newEntry = await ProductionJD.create({
+      transactionDate,
+      transactionDetails: transactionDetails?.toUpperCase(),
+      transactionCategory: transactionCategory,
+      fundSource: fundSource,
+      fundAllocation: fundAllocation,
+      amount: amount,
+      remarks: remarks,
+      createdBy,
+    });
 
     if (!Array.isArray(transactions) || transactions.length === 0) {
       return res
@@ -30,6 +58,8 @@ async function createProductionJDController(req, res) {
         amount,
         remarks,
       } = transaction;
+
+      const batchId = await generateBatchId();
 
       const newEntry = await ProductionJD.create({
         transactionDate,
@@ -112,7 +142,7 @@ async function getProductionJDsController(req, res) {
           attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
         },
       },
-      order: [["transactionDate", "ASC"]],
+      order: [["transactionDate", "DESC"]],
     });
 
     res.json({ production });

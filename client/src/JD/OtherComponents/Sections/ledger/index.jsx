@@ -75,7 +75,6 @@ const LedgerJD = ({ user, socket }) => {
 
       setTransactions(response.data.ledger);
 
-      console.log(responseProduct.data.product);
       setProducts(responseProduct.data.product);
       setLoading(false);
     } catch (error) {

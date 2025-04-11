@@ -71,7 +71,7 @@ async function getProductJDsController(req, res) {
           updatedQuantity += ledger.quantity;
         } else if (
           ledger.transaction === "OUT" ||
-          ledger.transaction === "USED"
+          ledger.transaction === "SOLD"
         ) {
           updatedQuantity -= ledger.quantity;
         }

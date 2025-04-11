@@ -24,23 +24,17 @@ export const Validation = (formData) => {
           `Transaction ${index + 1}: Transaction Category is required.`
         );
       }
-      if (
-        !transaction.transactionDetails ||
-        transaction.transactionDetails.trim() === ""
-      ) {
+      if (!transaction.transactionDetails) {
         validationErrors.push(
           `Transaction ${index + 1}: Transaction Details are required.`
         );
       }
-      if (!transaction.fundSource || transaction.fundSource.trim() === "") {
+      if (!transaction.fundSource) {
         validationErrors.push(
           `Transaction ${index + 1}: Fund Source is required.`
         );
       }
-      if (
-        !transaction.fundAllocation ||
-        transaction.fundAllocation.trim() === ""
-      ) {
+      if (!transaction.fundAllocation) {
         validationErrors.push(
           `Transaction ${index + 1}: Fund Allocation is required.`
         );

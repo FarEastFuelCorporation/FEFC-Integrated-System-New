@@ -122,6 +122,11 @@ const ModalJD = ({
         const unitPrice = parseFloat(updatedTransaction.unitPrice) || 0;
         updatedTransaction.amount = quantity * unitPrice;
       }
+      if (field === "transactionCategory" || value === "SALES") {
+        updatedTransaction.unit = "PC";
+        updatedTransaction.fundSource = "UNSOLD GOODS";
+        updatedTransaction.fundAllocation = "CASH ON HAND";
+      }
 
       return updatedTransaction;
     });
@@ -278,7 +283,10 @@ const ModalJD = ({
                         }}
                       >
                         {products.map((item) => (
-                          <MenuItem key={item.id} value={item.id}>
+                          <MenuItem
+                            key={item.productName}
+                            value={item.productName}
+                          >
                             {item.productName}
                           </MenuItem>
                         ))}
@@ -308,6 +316,7 @@ const ModalJD = ({
                           )
                         }
                         fullWidth
+                        disabled={sales}
                         inputProps={{
                           name: `fundSource`,
                           id: `fundSource`,
@@ -344,6 +353,7 @@ const ModalJD = ({
                           )
                         }
                         fullWidth
+                        disabled={sales}
                         sx={{ mb: 2 }}
                         inputProps={{
                           name: `fundAllocation`,
@@ -359,7 +369,7 @@ const ModalJD = ({
                     </FormControl>
                   </Grid>
                 )}
-                {hasCategory && !hasQuantity && (
+                {hasCategory && !hasQuantity && !sales && (
                   <Grid item xs={1} lg={1.5}>
                     <TextField
                       label="Amount"
@@ -382,7 +392,7 @@ const ModalJD = ({
                   </Grid>
                 )}
                 {hasCategory && (
-                  <Grid item xs={1} lg={!hasQuantity ? 2 : 3.5}>
+                  <Grid item xs={1} lg={!hasQuantity && !sales ? 2 : 3.5}>
                     <TextField
                       label="Remarks"
                       name={`transactions[${index}].remarks`}
@@ -415,7 +425,7 @@ const ModalJD = ({
                     </IconButton>
                   </Grid>
                 )}
-                {hasCategory && hasQuantity && (
+                {hasCategory && (hasQuantity || sales) && (
                   <Grid item xs={1} lg={2}>
                     <FormControl fullWidth required>
                       <InputLabel
@@ -433,6 +443,7 @@ const ModalJD = ({
                           handleTransactionChange(index, "unit", e.target.value)
                         }
                         fullWidth
+                        disabled={sales}
                         inputProps={{
                           name: `unit`,
                           id: `unit`,
@@ -447,7 +458,7 @@ const ModalJD = ({
                     </FormControl>
                   </Grid>
                 )}
-                {hasCategory && hasQuantity && (
+                {hasCategory && (hasQuantity || sales) && (
                   <Grid item xs={1} lg={2}>
                     <TextField
                       label="Quantity"
@@ -472,7 +483,7 @@ const ModalJD = ({
                     />
                   </Grid>
                 )}
-                {hasCategory && hasQuantity && (
+                {hasCategory && (hasQuantity || sales) && (
                   <Grid item xs={1} lg={2}>
                     <TextField
                       label="Unit Price"
@@ -498,7 +509,7 @@ const ModalJD = ({
                     />
                   </Grid>
                 )}
-                {hasCategory && hasQuantity && (
+                {hasCategory && (hasQuantity || sales) && (
                   <Grid item xs={1} lg={2}>
                     <TextField
                       label="Amount"

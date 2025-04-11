@@ -22,6 +22,11 @@ const ProductLedgerJD = sequelize.define(
       allowNull: true,
       defaultValue: null,
     },
+    transactionId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
     transactionDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,

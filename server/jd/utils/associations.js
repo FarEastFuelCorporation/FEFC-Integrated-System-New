@@ -45,156 +45,169 @@ EmployeeJD.hasMany(ProductCategoryJD, {
   as: "ProductCategoryJD",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 ProductCategoryJD.belongsTo(EmployeeJD, {
   as: "EmployeeJD",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 EmployeeJD.hasMany(EquipmentJD, {
   as: "EquipmentJD",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 EquipmentJD.belongsTo(EmployeeJD, {
   as: "EmployeeJD",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 EmployeeJD.hasMany(LedgerJD, {
   as: "LedgerJD",
   foreignKey: "createdBy",
   sourceKey: "employeeId",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 LedgerJD.belongsTo(EmployeeJD, {
   as: "EmployeeJD",
   foreignKey: "createdBy",
   targetKey: "employeeId",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 ProductCategoryJD.hasMany(ProductJD, {
   as: "ProductJD",
   foreignKey: "productCategoryId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 ProductJD.belongsTo(ProductCategoryJD, {
   as: "ProductCategoryJD",
   foreignKey: "productCategoryId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 ProductJD.hasMany(ProductLedgerJD, {
   as: "ProductLedgerJD",
   foreignKey: "productId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 ProductLedgerJD.belongsTo(ProductJD, {
   as: "ProductJD",
   foreignKey: "productId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
+});
+
+LedgerJD.hasMany(ProductLedgerJD, {
+  as: "ProductLedgerJD",
+  foreignKey: "transactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+ProductLedgerJD.belongsTo(LedgerJD, {
+  as: "LedgerJD",
+  foreignKey: "transactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 LedgerJD.hasMany(InventoryJD, {
   as: "InventoryJD",
   foreignKey: "transactionId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 InventoryJD.belongsTo(LedgerJD, {
   as: "LedgerJD",
   foreignKey: "transactionId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 InventoryJD.hasMany(InventoryLedgerJD, {
   as: "InventoryLedgerJD",
   foreignKey: "inventoryId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 InventoryLedgerJD.belongsTo(InventoryJD, {
   as: "InventoryJD",
   foreignKey: "inventoryId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 LedgerJD.hasMany(EquipmentJD, {
   as: "EquipmentJD",
   foreignKey: "transactionId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 EquipmentJD.belongsTo(LedgerJD, {
   as: "LedgerJD",
   foreignKey: "transactionId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 EquipmentJD.hasMany(EquipmentLedgerJD, {
   as: "EquipmentLedgerJD",
   foreignKey: "equipmentId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 EquipmentLedgerJD.belongsTo(EquipmentJD, {
   as: "EquipmentJD",
   foreignKey: "equipmentId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 ProductionJD.hasMany(InventoryLedgerJD, {
   as: "InventoryLedgerJD",
   foreignKey: "batchId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 InventoryLedgerJD.belongsTo(ProductionJD, {
   as: "ProductionJD",
   foreignKey: "batchId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 ProductionJD.hasMany(EquipmentLedgerJD, {
   as: "EquipmentLedgerJD",
   foreignKey: "batchId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 EquipmentLedgerJD.belongsTo(ProductionJD, {
   as: "ProductionJD",
   foreignKey: "batchId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 ProductionJD.hasMany(ProductLedgerJD, {
   as: "ProductLedgerJD",
   foreignKey: "batchId",
   sourceKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 ProductLedgerJD.belongsTo(ProductionJD, {
   as: "ProductionJD",
   foreignKey: "batchId",
   targetKey: "id",
-  onDelete: "SET NULL",
+  onDelete: "CASCADE",
 });
 
 // Export the associations

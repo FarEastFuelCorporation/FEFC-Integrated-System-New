@@ -62,7 +62,6 @@ const DashboardJD = ({ user, socket }) => {
 
       const response = await axios.get(`${apiUrl}/apiJD/ledger/summary`);
 
-      console.log(response.data.summary);
       setSummary(response.data.summary);
 
       setLoading(false);

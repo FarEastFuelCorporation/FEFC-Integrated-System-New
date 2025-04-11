@@ -210,11 +210,6 @@ async function createProductionJDController(req, res) {
       }
     }
 
-    broadcastMessage({
-      type: "NEW_PRODUCTION_JD",
-      data: newProductionEntry,
-    });
-
     res.status(201).json({
       message: "Submitted successfully!",
     });

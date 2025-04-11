@@ -6,6 +6,8 @@ const EquipmentLedgerJD = require("../models/EquipmentLedger");
 const InventoryJD = require("../models/Inventory");
 const InventoryLedgerJD = require("../models/InventoryLedger");
 const LedgerJD = require("../models/Ledger");
+const ProductJD = require("../models/Product");
+const ProductLedgerJD = require("../models/ProductLedger");
 
 // Create Ledger controller
 async function createLedgerJDController(req, res) {
@@ -118,6 +120,28 @@ async function createLedgerJDController(req, res) {
         broadcastMessage({
           type: "NEW_LEDGER_JD",
           data: newEntry2,
+        });
+      } else if (transactionCategory === "SALES") {
+        const product = await ProductJD.findOne({
+          where: { productName: transactionDetails },
+        });
+
+        const newProductLedgerEntry = await ProductLedgerJD.create({
+          productId: product.id,
+          transactionId: newEntry.id,
+          transactionDate,
+          transaction: "SOLD",
+          quantity: quantity,
+          unit: unit,
+          unitPrice: unitPrice,
+          amount: amount,
+          remarks: remarks,
+          createdBy,
+        });
+
+        broadcastMessage({
+          type: "NEW_PRODUCT_LEDGER_JD",
+          data: newProductLedgerEntry,
         });
       }
     }

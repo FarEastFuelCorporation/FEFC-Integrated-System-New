@@ -14,6 +14,7 @@ const VehicleType = require("../models/VehicleType");
 async function createQuotationController(req, res) {
   let {
     quotationCode,
+    dateCreated,
     validity,
     clientId,
     termsChargeDays,
@@ -39,6 +40,7 @@ async function createQuotationController(req, res) {
     // Create the quotation record
     const quotation = await Quotation.create({
       quotationCode,
+      dateCreated,
       validity,
       clientId,
       termsChargeDays,
@@ -213,10 +215,14 @@ async function getQuotationsController(req, res) {
     // Flatten and format the data
     const flattenedData = quotations.map((item) => {
       const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
+      const createdDate = new Date(quotation.dateCreated);
       const validityDate = new Date(quotation.validity);
       return {
         ...quotation,
         clientName: quotation.Client ? quotation.Client.clientName : null,
+        dateCreated: !isNaN(createdDate.getTime())
+          ? createdDate.toISOString().split("T")[0]
+          : null, // Convert valid date to yyyy-mm-dd format or null if invalid
         validity: !isNaN(validityDate.getTime())
           ? validityDate.toISOString().split("T")[0]
           : null, // Convert valid date to yyyy-mm-dd format or null if invalid
@@ -263,6 +269,9 @@ async function getQuotationsFullController(req, res) {
         ...quotation,
         clientPicture,
         clientName: quotation.Client ? quotation.Client.clientName : null,
+        dateCreated: quotation.dateCreated
+          ? new Date(quotation.dateCreated).toISOString().split("T")[0]
+          : null, // Convert timestamp to yyyy-mm-dd format
         validity: quotation.validity
           ? new Date(quotation.validity).toISOString().split("T")[0]
           : null, // Convert timestamp to yyyy-mm-dd format
@@ -425,6 +434,7 @@ async function updateQuotationController(req, res) {
 
     let {
       quotationCode,
+      dateCreated,
       validity,
       clientId,
       termsChargeDays,
@@ -465,6 +475,7 @@ async function updateQuotationController(req, res) {
         const quotation = await Quotation.create({
           quotationCode,
           revisionNumber,
+          dateCreated,
           validity,
           clientId,
           termsChargeDays,
@@ -561,6 +572,7 @@ async function updateQuotationController(req, res) {
         );
       } else {
         // Update quotation details
+        updatedQuotation.dateCreated = dateCreated;
         updatedQuotation.validity = validity;
         updatedQuotation.termsChargeDays = termsChargeDays;
         updatedQuotation.termsCharge = termsCharge;

@@ -41,7 +41,11 @@ const QuotationHeader = ({ quotationData }) => {
               Date
             </Typography>
             <Typography variant="h6" fontWeight="bold" textAlign="center">
-              {formatDateFull(quotationData.createdAt)}
+              {formatDateFull(
+                quotationData.dateCreated
+                  ? quotationData.dateCreated
+                  : quotationData.createdAt
+              )}
             </Typography>
           </Box>
           <Box>

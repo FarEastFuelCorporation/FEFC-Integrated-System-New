@@ -21,6 +21,10 @@ const Quotation = sequelize.define(
       type: DataTypes.STRING,
       defaultValue: "00",
     },
+    dateCreated: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     validity: {
       type: DataTypes.DATE,
       allowNull: true,

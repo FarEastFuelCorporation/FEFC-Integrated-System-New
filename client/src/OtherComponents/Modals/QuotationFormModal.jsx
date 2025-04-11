@@ -308,7 +308,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <FormControl fullWidth required>
                 <InputLabel
                   id="client-select-label"
@@ -335,7 +335,24 @@ const QuotationFormModal = ({
                 </Select>
               </FormControl>
             </Grid>
-
+            <Grid item xs={1}>
+              <TextField
+                label="Date Created"
+                name="dateCreated"
+                type="date"
+                value={formData.dateCreated}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
             <Grid item xs={1}>
               <TextField
                 label="Validity"
@@ -370,7 +387,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={1.75}>
+            <Grid item xs={1.5}>
               <FormControl fullWidth required>
                 <InputLabel
                   id={`termsCharge-label`}
@@ -428,7 +445,7 @@ const QuotationFormModal = ({
                 autoComplete="off"
               />
             </Grid>
-            <Grid item xs={1.75}>
+            <Grid item xs={1.5}>
               <FormControl fullWidth required>
                 <InputLabel
                   id={`termsBuying-label`}

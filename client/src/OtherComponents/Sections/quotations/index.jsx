@@ -63,6 +63,7 @@ const Quotations = ({ user }) => {
     id: "",
     clientId: "",
     quotationCode: "",
+    dateCreated: "",
     validity: "",
     termsChargeDays: 0,
     termsCharge: "",
@@ -318,12 +319,16 @@ const Quotations = ({ user }) => {
   }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (row) => {
+    const formattedDateCreated = new Date(row.dateCreated)
+      .toISOString()
+      .split("T")[0];
     const formattedDate = new Date(row.validity).toISOString().split("T")[0];
     if (row) {
       setFormData({
         id: row.id,
         clientId: row.clientId,
         quotationCode: row.quotationCode,
+        dateCreated: formattedDateCreated,
         validity: formattedDate,
         termsCharge: row.termsCharge,
         termsChargeDays: row.termsChargeDays,

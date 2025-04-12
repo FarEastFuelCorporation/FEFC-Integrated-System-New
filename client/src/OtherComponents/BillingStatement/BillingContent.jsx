@@ -57,6 +57,20 @@ const BillingContent = ({
       })
       .reduce((acc, transaction) => {
         // Extract invoiceNumber from BilledTransaction
+        const transpoFee =
+          parseFloat(transaction.QuotationTransportation?.unitPrice) || 0;
+        const transpoVatCalculation =
+          transaction.QuotationTransportation?.vatCalculation;
+        const transpoMode = transaction.QuotationTransportation?.mode;
+        let isTransportation =
+          transaction.ScheduledTransaction?.[0]?.DispatchedTransaction
+            .length === 0
+            ? false
+            : true;
+
+        const typeOfVehicle =
+          transaction.QuotationTransportation?.VehicleType.typeOfVehicle;
+
         const invoiceNumber =
           transaction.BilledTransaction?.[0]?.serviceInvoiceNumber || null;
 
@@ -82,6 +96,10 @@ const BillingContent = ({
                   scheduledTime,
                   invoiceNumber,
                   typeOfWeight,
+                  transpoFee,
+                  transpoVatCalculation,
+                  isTransportation,
+                  typeOfVehicle,
                 });
               });
             });
@@ -1165,31 +1183,58 @@ const BillingContent = ({
           <TableBody>
             {groupedTransactions
               // Sort transactions by haulingDate from oldest to newest
-              .map((transaction, index) => {
+              .flatMap((transaction, index) => {
                 // const remarks =
                 //   transaction.BilledTransaction?.[0]?.remarks || null;
 
-                const wasteRows = transaction.transactions.map((waste, idx) => {
-                  const fontColor =
-                    waste.QuotationWaste.mode === "BUYING" ? "red" : "inherit";
-                  return (
-                    <>
+                const wasteRows = transaction.transactions.flatMap(
+                  (waste, idx, wasteArray) => {
+                    const fontColor =
+                      waste.QuotationWaste.mode === "BUYING"
+                        ? "red"
+                        : "inherit";
+
+                    const transpoFee = parseFloat(waste.transpoFee) || 0;
+                    const transpoVatCalculation = waste?.transpoVatCalculation;
+                    const transpoMode =
+                      transaction.QuotationTransportation?.mode;
+                    let isTransportation =
+                      transaction.ScheduledTransaction?.[0]
+                        ?.DispatchedTransaction.length === 0
+                        ? false
+                        : true;
+
+                    console.log(isTransportation);
+
+                    const isLastWaste = idx === wasteArray.length - 1;
+
+                    console.log("isLastWaste", isLastWaste);
+                    return [
                       <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                         <TableCell
                           sx={{
-                            ...bodyCellStyles({ width: 60, color: fontColor }),
+                            ...bodyCellStyles({
+                              width: 60,
+                              color: fontColor,
+                            }),
                           }}
                         >
                           {formatDate2(waste.scheduledDate)}
                         </TableCell>
                         <TableCell
                           sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                            ...bodyCellStyles({
+                              width: 40,
+                              color: fontColor,
+                            }),
                           }}
                         ></TableCell>
                         <TableCell
                           sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                            ...bodyCellStyles({
+                              width: 40,
+                              color: fontColor,
+                            }),
                           }}
                         >
                           {waste.invoiceNumber
@@ -1218,7 +1263,10 @@ const BillingContent = ({
                         </TableCell>
                         <TableCell
                           sx={{
-                            ...bodyCellStyles({ width: 40, color: fontColor }),
+                            ...bodyCellStyles({
+                              width: 40,
+                              color: fontColor,
+                            }),
                           }}
                         >
                           {waste.QuotationWaste.unit}
@@ -1274,10 +1322,82 @@ const BillingContent = ({
                         >
                           {waste.QuotationWaste.mode}
                         </TableCell>
-                      </TableRow>
-                    </>
-                  );
-                });
+                        {isLastWaste && (
+                          <>
+                            <TableCell sx={bodyCellStyles({ width: 60 })}>
+                              {formatDate2(waste.scheduledDate)}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({ width: 40 })}
+                            ></TableCell>
+                            <TableCell sx={bodyCellStyles({ width: 40 })}>
+                              {waste.invoiceNumber
+                                ? Number(waste.invoiceNumber) + index
+                                : ""}
+                            </TableCell>
+                            <TableCell sx={bodyCellStyles()}>
+                              {`TRANS FEE ${waste.typeOfVehicle}`}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 60,
+                                notCenter: true,
+                              })}
+                            >
+                              {`${formatNumber2(1)}`}
+                            </TableCell>
+                            <TableCell sx={bodyCellStyles({ width: 40 })}>
+                              {"TRIP"}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                              })}
+                            >
+                              {formatNumber2(transpoFee)}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 80,
+                                notCenter: true,
+                              })}
+                            >
+                              {formatNumber(transpoFee)}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                              })}
+                            >
+                              {transpoVatCalculation}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...bodyCellStyles({
+                                  width: 85,
+                                  isLastCell: true,
+                                  color: fontColor,
+                                }),
+                              }}
+                            >
+                              {waste.QuotationWaste.mode}
+                            </TableCell>
+                            <TableCell
+                              sx={bodyCellStyles({
+                                width: 85,
+                                isLastCell: true,
+                              })}
+                            >
+                              {isTransportation}
+                            </TableCell>
+                          </>
+                        )}
+                      </TableRow>,
+                    ];
+                  }
+                );
 
                 // Combine waste and transportation rows for alternating display
                 const combinedRows = [];

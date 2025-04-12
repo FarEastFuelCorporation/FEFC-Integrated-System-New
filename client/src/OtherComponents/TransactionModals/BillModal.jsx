@@ -128,30 +128,30 @@ const BillModal = ({
               }
               label="Exclude Buying"
             />
-            {formData.clientType === "TRP" && (
-              <>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={formData.isPerClient}
-                      onChange={handleCheckboxChange2}
-                      color="secondary"
-                    />
-                  }
-                  label="By Transporter's Client"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={formData.isIndividualBilling}
-                      onChange={handleCheckboxChange3}
-                      color="secondary"
-                    />
-                  }
-                  label="By Individual Billing"
-                />
-              </>
-            )}
+            <>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.isPerClient}
+                    onChange={handleCheckboxChange2}
+                    color="secondary"
+                  />
+                }
+                label="By Transporter's Client"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.isIndividualBilling}
+                    onChange={handleCheckboxChange3}
+                    color="secondary"
+                  />
+                }
+                label="By Individual Billing"
+              />
+            </>
+            {/* {formData.clientType === "TRP" && (
+            )} */}
           </Box>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField

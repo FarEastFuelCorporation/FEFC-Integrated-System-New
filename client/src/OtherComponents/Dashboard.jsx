@@ -79,7 +79,11 @@ const Dashboard = ({ user, onUpdateUser, socket }) => {
     case 4:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[4]}>
-          <ReceivingRoutes user={user} onUpdateUser={onUpdateUser} />
+          <ReceivingRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 5:

@@ -54,6 +54,9 @@ export const columns = [
     align: "center",
     flex: 1,
     minWidth: 80,
+    valueGetter: (params) => {
+      return params.row.updatedQuantity.toFixed(2);
+    },
     renderCell: renderCellWithWrapText,
   },
   {
@@ -100,11 +103,7 @@ export const columns2 = [
     flex: 1,
     minWidth: 100,
     valueGetter: (params) => {
-      if (params.row.transaction === "IN") {
-        return formatDate3(params.row.InventoryJD?.transactionDate);
-      } else {
-        return formatDate3(params.row.transactionDate);
-      }
+      return formatDate3(params.row.transactionDate);
     },
     renderCell: renderCellWithWrapText,
   },

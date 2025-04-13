@@ -34,6 +34,24 @@ const ModalJD = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  // Filter and sort packaging items
+  const packagingItems = packagings
+    .filter(
+      (item) =>
+        item.transactionCategory === "PACKAGING AND LABELING" &&
+        (formData.id || item.updatedQuantity !== 0)
+    )
+    .sort((a, b) => a.item.localeCompare(b.item));
+
+  // Filter and sort ingredient items
+  const ingredientItems = ingredients
+    .filter(
+      (item) =>
+        item.transactionCategory === "INGREDIENTS" &&
+        (formData.id || item.updatedQuantity !== 0)
+    )
+    .sort((a, b) => a.item.localeCompare(b.item));
+
   const category1 = [
     "EQUIPMENTS",
     "INGREDIENTS",
@@ -261,21 +279,19 @@ const ModalJD = ({
     const updatedOutputs = formData.outputs.map((output, i) => {
       if (i !== index) return output;
 
-      const item = ingredients.filter((item) => item.id === value);
-
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {
         ...output,
+        id: "",
+        unit: "",
         [field]: value,
-        ...(field === "id" && item.length > 0
-          ? {
-              unit: item[0].unit,
-            }
-          : {}),
       };
 
-      if (output.outputType === "PRODUCT") {
+      if (updatedTransaction.outputType === "PRODUCT") {
         updatedTransaction.unit = "PC";
+      }
+      if (updatedTransaction.outputType === "INGREDIENT") {
+        updatedTransaction.unit = "";
       }
 
       return updatedTransaction;
@@ -364,7 +380,7 @@ const ModalJD = ({
                       id: `id`,
                     }}
                   >
-                    {ingredients.map((item) => (
+                    {ingredientItems.map((item) => (
                       <MenuItem key={item.id} value={item.id}>
                         {item.item}
                       </MenuItem>
@@ -520,7 +536,7 @@ const ModalJD = ({
                       id: `id`,
                     }}
                   >
-                    {packagings.map((item) => (
+                    {packagingItems.map((item) => (
                       <MenuItem key={item.id} value={item.id}>
                         {item.item}
                       </MenuItem>
@@ -926,34 +942,22 @@ const ModalJD = ({
               )}
               {output.outputType === "INGREDIENT" && (
                 <Grid item xs={12} lg={4}>
-                  <FormControl fullWidth required>
-                    <InputLabel
-                      style={{
+                  <TextField
+                    label="Ingredient"
+                    name={`outputs[${index}].id`}
+                    value={output.id || ""}
+                    onChange={(e) =>
+                      handleOutputChange(index, "id", e.target.value)
+                    }
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      style: {
                         color: colors.grey[100],
-                      }}
-                    >
-                      Ingredient
-                    </InputLabel>
-                    <Select
-                      labelId={`id`}
-                      name={`outputs[${index}].id`}
-                      value={output.id || ""}
-                      onChange={(e) =>
-                        handleOutputChange(index, "id", e.target.value)
-                      }
-                      fullWidth
-                      inputProps={{
-                        name: `id`,
-                        id: `id`,
-                      }}
-                    >
-                      {ingredients.map((item) => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                      },
+                    }}
+                    autoComplete="off"
+                  />
                 </Grid>
               )}
               <Grid item xs={12} lg={1}>
@@ -973,7 +977,7 @@ const ModalJD = ({
                       handleOutputChange(index, "unit", e.target.value)
                     }
                     fullWidth
-                    disabled
+                    disabled={output.outputType === "PRODUCT"}
                     inputProps={{
                       name: `unit`,
                       id: `unit`,
@@ -1006,7 +1010,6 @@ const ModalJD = ({
                   autoComplete="off"
                 />
               </Grid>
-
               <Grid item xs={12} lg={2}>
                 <TextField
                   label="Unit Price"

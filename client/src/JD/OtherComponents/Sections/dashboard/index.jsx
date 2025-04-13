@@ -64,8 +64,6 @@ const DashboardJD = ({ user, socket }) => {
 
       const responseInventory = await axios.get(`${apiUrl}/apiJD/inventory`);
 
-      console.log("Response Inventory:", responseInventory.data.inventory);
-
       const unusedInventories = responseInventory.data.inventory.reduce(
         (sum, item) => {
           return (
@@ -75,13 +73,10 @@ const DashboardJD = ({ user, socket }) => {
         0
       );
 
-      console.log("Unused Inventories:", unusedInventories);
-
       setSummary({
         ...response.data.summary,
         "UNUSED INVENTORIES": unusedInventories,
       });
-      console.log(response.data.summary);
 
       setLoading(false);
     } catch (error) {
@@ -382,7 +377,9 @@ const DashboardJD = ({ user, socket }) => {
                   ) : (
                     <StatCard
                       title={"Total"}
-                      value={formatNumber(summary["TOTAL"])}
+                      value={formatNumber(
+                        summary["TOTAL"] + summary["UNUSED INVENTORIES"]
+                      )}
                       Icon={PaidIcon}
                     />
                   )}

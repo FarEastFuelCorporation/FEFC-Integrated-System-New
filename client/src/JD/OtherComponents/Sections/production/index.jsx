@@ -187,15 +187,15 @@ const ProductionJD = ({ user, socket }) => {
       const inventoryData = responseInventory.data.inventory;
       const equipmentData = responseEquipment.data.equipment;
 
-      // Filter for "PACKAGING AND LABELING"
-      const packagingItems = inventoryData.filter(
-        (item) => item.transactionCategory === "PACKAGING AND LABELING"
-      );
+      // Filter and sort packaging items
+      const packagingItems = inventoryData
+        .filter((item) => item.transactionCategory === "PACKAGING AND LABELING")
+        .sort((a, b) => a.item.localeCompare(b.item));
 
-      // Filter for "INGREDIENTS"
-      const ingredientItems = inventoryData.filter(
-        (item) => item.transactionCategory === "INGREDIENTS"
-      );
+      // Filter and sort ingredient items
+      const ingredientItems = inventoryData
+        .filter((item) => item.transactionCategory === "INGREDIENTS")
+        .sort((a, b) => a.item.localeCompare(b.item));
 
       // Update state
       setTransactions(response.data.production);
@@ -305,18 +305,77 @@ const ProductionJD = ({ user, socket }) => {
       setFormData({
         id: row.id,
         transactionDate: row.transactionDate,
-        transactions: [
-          {
-            transactionDetails: row.transactionDetails,
-            transactionCategory: row.transactionCategory,
-            fundSource: row.fundSource,
-            fundAllocation: row.fundAllocation,
-            quantity: row.InventoryJD?.[0]?.quantity,
-            unit: row.InventoryJD?.[0]?.unit,
-            unitPrice: row.InventoryJD?.[0]?.unitPrice,
-            amount: row.amount,
-            remarks: row.remarks,
-          },
+        ingredientCost: 0,
+        packagingCost: 0,
+        equipmentCost: 0,
+        utilitiesCost: row.utilitiesCost,
+        laborCost: row.laborCost,
+        totalCost: 0,
+        grossIncome: 0,
+        netIncome: 0,
+        profitMargin: 0,
+        ingredients: row.InventoryLedgerJD.filter(
+          (item) =>
+            item.InventoryJD?.transactionCategory === "INGREDIENTS" &&
+            item.transaction === "USED"
+        ).map((item) => ({
+          id: item.InventoryJD?.id,
+          unit: item.InventoryJD?.unit,
+          remaining: item.remaining,
+          unitPrice: item.InventoryJD?.unitPrice,
+          quantity: item.quantity,
+          amount: item.quantity * item.InventoryJD?.unitPrice,
+          remarks: item.remarks,
+        })),
+        packagings: row.InventoryLedgerJD.filter(
+          (item) =>
+            item.InventoryJD?.transactionCategory ===
+              "PACKAGING AND LABELING" && item.transaction === "USED"
+        ).map((item) => ({
+          id: item.InventoryJD?.id,
+          unit: item.InventoryJD?.unit,
+          remaining: item.remaining,
+          unitPrice: item.InventoryJD?.unitPrice,
+          quantity: item.quantity,
+          amount: item.quantity * item.InventoryJD?.unitPrice,
+          remarks: item.remarks,
+        })),
+
+        equipments: row.EquipmentLedgerJD.map((item) => ({
+          id: item.EquipmentJD?.id,
+          unit: item.EquipmentJD?.unit,
+          remaining: item.remaining,
+          unitPrice: item.EquipmentJD?.amount,
+          amount: item.amount,
+        })),
+        outputs: [
+          // Add PRODUCT outputs
+          ...row.ProductLedgerJD.map((item) => ({
+            outputType: "PRODUCT",
+            id: item.productId,
+            unit: item.unit,
+            remaining: item.remaining,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            amount: item.amount,
+            remarks: item.remarks,
+          })),
+
+          // Add INGREDIENTS with transaction === "IN"
+          ...row.InventoryLedgerJD.filter(
+            (item) =>
+              item.InventoryJD?.transactionCategory === "INGREDIENTS" &&
+              item.transaction === "IN"
+          ).map((item) => ({
+            outputType: "INGREDIENT",
+            id: item.InventoryJD?.id,
+            unit: item.InventoryJD?.unit,
+            remaining: item.remaining,
+            quantity: item.quantity,
+            unitPrice: item.InventoryJD?.unitPrice,
+            amount: item.quantity * item.InventoryJD?.unitPrice,
+            remarks: item.remarks,
+          })),
         ],
         createdBy: user.id,
       });
@@ -559,19 +618,19 @@ const ProductionJD = ({ user, socket }) => {
       minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
-    // {
-    //   field: "edit",
-    //   headerName: "Edit",
-    //   headerAlign: "center",
-    //   align: "center",
-    //   sortable: false,
-    //   width: 60,
-    //   renderCell: (params) => (
-    //     <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
-    //       <EditIcon />
-    //     </IconButton>
-    //   ),
-    // },
+    {
+      field: "edit",
+      headerName: "Edit",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
+          <EditIcon />
+        </IconButton>
+      ),
+    },
     // {
     //   field: "delete",
     //   headerName: "Delete",

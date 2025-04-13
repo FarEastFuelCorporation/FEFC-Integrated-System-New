@@ -15,9 +15,11 @@ export const columns = [
     flex: 1,
     minWidth: 100,
     valueGetter: (params) => {
-      return formatDate3(params.row.transactionDate);
+      return params.row.transactionDate; // Keep the raw date value for sorting
     },
-    renderCell: renderCellWithWrapText,
+    renderCell: (params) => {
+      return formatDate3(params.row.transactionDate); // Format the date for display
+    },
   },
   {
     field: "transactionDetails",

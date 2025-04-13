@@ -1204,11 +1204,8 @@ const BillingContent = ({
                         ? false
                         : true;
 
-                    console.log(isTransportation);
-
                     const isLastWaste = idx === wasteArray.length - 1;
 
-                    console.log("isLastWaste", isLastWaste);
                     return [
                       <TableRow key={`waste-${idx}`} sx={{ border: "black" }}>
                         <TableCell

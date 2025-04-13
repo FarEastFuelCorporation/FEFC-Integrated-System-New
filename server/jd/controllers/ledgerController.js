@@ -161,11 +161,18 @@ async function getLedgerJDsController(req, res) {
   try {
     // Fetch all ledger from the database
     const ledger = await LedgerJD.findAll({
-      include: {
-        model: InventoryJD,
-        as: "InventoryJD",
-        attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
-      },
+      include: [
+        {
+          model: InventoryJD,
+          as: "InventoryJD",
+          attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+        },
+        {
+          model: ProductLedgerJD,
+          as: "ProductLedgerJD",
+          attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+        },
+      ],
       order: [
         ["createdAt", "DESC"], // Primary sort
         ["transactionDate", "DESC"], // Secondary sort
@@ -220,6 +227,8 @@ async function getLedgerSummaryJDsController(req, res) {
     const total = Object.values(summary).reduce((sum, val) => sum + val, 0);
     summary.TOTAL = total;
 
+    console.log("Ledger Summary:", summary);
+
     res.json({ summary });
   } catch (error) {
     console.error("Error:", error);
@@ -265,6 +274,30 @@ async function updateLedgerJDController(req, res) {
 
         // Save the updated Ledger
         await updatedLedgerJD.save();
+
+        const ledger = await LedgerJD.findByPk(id, {
+          include: [
+            {
+              model: InventoryJD,
+              as: "InventoryJD",
+              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+            },
+            {
+              model: ProductLedgerJD,
+              as: "ProductLedgerJD",
+              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+            },
+          ],
+          order: [
+            ["createdAt", "DESC"], // Primary sort
+            ["transactionDate", "DESC"], // Secondary sort
+          ],
+        });
+
+        broadcastMessage({
+          type: "UPDATED_LEDGER_JD",
+          data: ledger,
+        });
         if (
           transactionCategory === "INGREDIENTS" ||
           transactionCategory === "PACKAGING AND LABELING"
@@ -308,12 +341,32 @@ async function updateLedgerJDController(req, res) {
             type: "UPDATED_EQUIPMENT_JD",
             data: updatedEquipmentJD,
           });
-        }
+        } else if (transactionCategory === "SALES") {
+          const product = await ProductJD.findOne({
+            where: { productName: transactionDetails },
+          });
 
-        broadcastMessage({
-          type: "UPDATED_LEDGER_JD",
-          data: updatedLedgerJD,
-        });
+          const updatedProductLedgerJD = await ProductLedgerJD.findOne({
+            where: { transactionId: updatedLedgerJD.id },
+          });
+
+          updatedProductLedgerJD.transactionDate = transactionDate;
+          updatedProductLedgerJD.productId = product.id;
+          updatedProductLedgerJD.quantity = quantity;
+          updatedProductLedgerJD.unit = unit;
+          updatedProductLedgerJD.unitPrice = unitPrice;
+          updatedProductLedgerJD.amount = amount;
+          updatedProductLedgerJD.remarks = remarks;
+          updatedProductLedgerJD.updatedBy = createdBy;
+
+          // Save the updated ProductLedger
+          await updatedProductLedgerJD.save();
+
+          broadcastMessage({
+            type: "UPDATED_PRODUCT_LEDGER_JD",
+            data: updatedProductLedgerJD,
+          });
+        }
 
         res.status(201).json({
           message: "updated successfully!",

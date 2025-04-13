@@ -68,6 +68,7 @@ const ModalJD = ({
     "BOTTLE",
     "BOX",
     "ROLL",
+    "METER",
   ];
 
   const handleAddTransaction = () => {
@@ -109,6 +110,7 @@ const ModalJD = ({
           transactionDetails: "",
           fundSource: "",
           fundAllocation: "",
+          remaining: "",
           quantity: "",
           unit: "",
           unitPrice: "",
@@ -120,12 +122,29 @@ const ModalJD = ({
       if (field === "quantity" || field === "unitPrice") {
         const quantity = parseFloat(updatedTransaction.quantity) || 0;
         const unitPrice = parseFloat(updatedTransaction.unitPrice) || 0;
-        updatedTransaction.amount = quantity * unitPrice;
+        updatedTransaction.amount = (quantity * unitPrice).toFixed(2);
       }
-      if (field === "transactionCategory" || value === "SALES") {
+      if (field === "transactionCategory" && value === "SALES") {
         updatedTransaction.unit = "PC";
         updatedTransaction.fundSource = "UNSOLD GOODS";
         updatedTransaction.fundAllocation = "CASH ON HAND";
+      }
+      if (
+        field === "transactionDetails" &&
+        updatedTransaction.transactionCategory === "SALES"
+      ) {
+        products.filter((product) => {
+          if (product.productName === value) {
+            updatedTransaction.remaining = product.updatedQuantity;
+          }
+        });
+      }
+      if (
+        field === "transactionCategory" &&
+        (value === "INGREDIENTS" || value === "PACKAGING AND LABELING")
+      ) {
+        updatedTransaction.fundSource = "CASH ON HAND";
+        updatedTransaction.fundAllocation = "CASH OUT";
       }
 
       return updatedTransaction;
@@ -456,6 +475,32 @@ const ModalJD = ({
                         ))}
                       </Select>
                     </FormControl>
+                  </Grid>
+                )}
+                {sales && (
+                  <Grid item xs={1} lg={2}>
+                    <TextField
+                      label="Remaining"
+                      name={`transactions[${index}].remaining`}
+                      value={transaction.remaining || ""}
+                      onChange={(e) =>
+                        handleTransactionChange(
+                          index,
+                          "remaining",
+                          e.target.value
+                        )
+                      }
+                      fullWidth
+                      disabled
+                      required
+                      InputLabelProps={{
+                        style: {
+                          color: colors.grey[100],
+                        },
+                        shrink: true,
+                      }}
+                      autoComplete="off"
+                    />
                   </Grid>
                 )}
                 {hasCategory && (hasQuantity || sales) && (

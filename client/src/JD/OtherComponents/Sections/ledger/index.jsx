@@ -157,9 +157,18 @@ const LedgerJD = ({ user, socket }) => {
             transactionCategory: row.transactionCategory,
             fundSource: row.fundSource,
             fundAllocation: row.fundAllocation,
-            quantity: row.InventoryJD?.[0]?.quantity,
-            unit: row.InventoryJD?.[0]?.unit,
-            unitPrice: row.InventoryJD?.[0]?.unitPrice,
+            quantity:
+              row.transactionCategory === "SALES"
+                ? row.ProductLedgerJD?.[0]?.quantity
+                : row.InventoryJD?.[0]?.quantity,
+            unit:
+              row.transactionCategory === "SALES"
+                ? row.ProductLedgerJD?.[0]?.unit
+                : row.InventoryJD?.[0]?.unit,
+            unitPrice:
+              row.transactionCategory === "SALES"
+                ? row.ProductLedgerJD?.[0]?.unitPrice
+                : row.InventoryJD?.[0]?.unitPrice,
             amount: row.amount,
             remarks: row.remarks,
           },
@@ -238,9 +247,11 @@ const LedgerJD = ({ user, socket }) => {
       flex: 1,
       minWidth: 100,
       valueGetter: (params) => {
-        return formatDate3(params.row.transactionDate);
+        return params.row.transactionDate; // Keep the raw date value for sorting
       },
-      renderCell: renderCellWithWrapText,
+      renderCell: (params) => {
+        return formatDate3(params.row.transactionDate); // Format the date for display
+      },
     },
     {
       field: "transactionDetails",
@@ -361,6 +372,12 @@ const LedgerJD = ({ user, socket }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          sortModel={[
+            {
+              field: "transactionDate",
+              sort: "desc",
+            },
+          ]}
         />
       </CustomDataGridStyles>
       <ModalJD

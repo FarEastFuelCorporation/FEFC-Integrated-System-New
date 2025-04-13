@@ -6,6 +6,7 @@ const EquipmentLedgerJD = require("../models/EquipmentLedger");
 const InventoryJD = require("../models/Inventory");
 const InventoryLedgerJD = require("../models/InventoryLedger");
 const LedgerJD = require("../models/Ledger");
+const ProductJD = require("../models/Product");
 const ProductionJD = require("../models/Production");
 const ProductLedgerJD = require("../models/ProductLedger");
 const generateBatchId = require("../utils/generateBatchId");
@@ -49,68 +50,6 @@ async function createProductionJDController(req, res) {
       netIncome: netIncome,
       profitMargin: profitMargin,
       createdBy,
-    });
-
-    const ledgerEntry = [
-      {
-        transactionDate,
-        transactionDetails: batchId,
-        transactionCategory: "PRODUCTION",
-        fundSource: "CASH IN",
-        fundAllocation: "UNSOLD GOODS",
-        amount: grossIncome,
-        remarks: "",
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "EQUIPMENT DEPRECIATION",
-        transactionCategory: "EQUIPMENTS",
-        fundSource: "EQUIPMENTS",
-        fundAllocation: "CASH OUT",
-        amount: equipmentCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "EQUIPMENT FEE",
-        transactionCategory: "EQUIPMENTS",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "EQUIPMENT FUNDS",
-        amount: equipmentCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "UTILITIES FEE",
-        transactionCategory: "UTILITIES",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "UTILITIES",
-        amount: utilitiesCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "LABOR FEE",
-        transactionCategory: "LABOR",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "LABOR",
-        amount: laborCost,
-        remarks: batchId,
-        createdBy,
-      },
-    ];
-
-    const newLedgerEntry = await LedgerJD.bulkCreate(ledgerEntry, {
-      validate: true,
-    });
-
-    broadcastMessage({
-      type: "NEW_LEDGER_JD",
-      data: newLedgerEntry,
     });
 
     for (const ingredient of ingredients) {
@@ -174,7 +113,30 @@ async function createProductionJDController(req, res) {
       const { outputType, id, unit, quantity, unitPrice, amount, remarks } =
         output;
 
+      const newProductEntry = await ProductJD.findByPk(id, {
+        attributes: ["id", "productName"],
+      });
+
       if (outputType === "PRODUCT") {
+        const newLedgerEntry = await LedgerJD.create(
+          {
+            transactionDate,
+            transactionDetails: newProductEntry.productName,
+            transactionCategory: "PRODUCTION",
+            fundSource: "CASH IN",
+            fundAllocation: "UNSOLD GOODS",
+            amount,
+            remarks: batchId,
+            createdBy,
+          },
+          { validate: true }
+        );
+
+        broadcastMessage({
+          type: "NEW_LEDGER_JD",
+          data: newLedgerEntry,
+        });
+
         const newProductLedgerEntry = await ProductLedgerJD.create({
           productId: id,
           batchId: newProductionEntry.id,
@@ -193,8 +155,43 @@ async function createProductionJDController(req, res) {
           data: newProductLedgerEntry,
         });
       } else if (outputType === "INGREDIENT") {
+        const newEntry = await LedgerJD.create({
+          transactionDate,
+          transactionDetails: id?.toUpperCase(),
+          transactionCategory: "INGREDIENTS",
+          fundSource: "CASH IN",
+          fundAllocation: "INGREDIENTS",
+          amount: amount,
+          remarks: remarks,
+          createdBy,
+        });
+
+        broadcastMessage({
+          type: "NEW_LEDGER_JD",
+          data: newEntry,
+        });
+
+        const newInventoryEntry = await InventoryJD.create({
+          transactionId: newEntry.id,
+          transactionDate,
+          item: id?.toUpperCase(),
+          transaction: "IN",
+          transactionCategory: "INGREDIENTS",
+          quantity: quantity,
+          unit: unit,
+          unitPrice: unitPrice,
+          amount: amount,
+          remarks: remarks,
+          createdBy,
+        });
+
+        broadcastMessage({
+          type: "NEW_INVENTORY_JD",
+          data: newInventoryEntry,
+        });
+
         const newInventoryLedgerEntry = await InventoryLedgerJD.create({
-          productId: id,
+          inventoryId: id,
           batchId: newProductionEntry.id,
           transactionDate,
           transaction: "IN",
@@ -209,6 +206,58 @@ async function createProductionJDController(req, res) {
         });
       }
     }
+
+    const ledgerEntry = [
+      {
+        transactionDate,
+        transactionDetails: "EQUIPMENT DEPRECIATION",
+        transactionCategory: "EQUIPMENTS",
+        fundSource: "EQUIPMENTS",
+        fundAllocation: "CASH OUT",
+        amount: equipmentCost,
+        remarks: batchId,
+        createdBy,
+      },
+      {
+        transactionDate,
+        transactionDetails: "EQUIPMENT FEE",
+        transactionCategory: "EQUIPMENTS",
+        fundSource: "CASH ON HAND",
+        fundAllocation: "EQUIPMENT FUNDS",
+        amount: equipmentCost,
+        remarks: batchId,
+        createdBy,
+      },
+      {
+        transactionDate,
+        transactionDetails: "UTILITIES FEE",
+        transactionCategory: "UTILITIES",
+        fundSource: "CASH ON HAND",
+        fundAllocation: "UTILITIES",
+        amount: utilitiesCost,
+        remarks: batchId,
+        createdBy,
+      },
+      {
+        transactionDate,
+        transactionDetails: "LABOR FEE",
+        transactionCategory: "LABOR",
+        fundSource: "CASH ON HAND",
+        fundAllocation: "LABOR",
+        amount: laborCost,
+        remarks: batchId,
+        createdBy,
+      },
+    ];
+
+    const newLedgerEntry = await LedgerJD.bulkCreate(ledgerEntry, {
+      validate: true,
+    });
+
+    broadcastMessage({
+      type: "NEW_LEDGER_JD",
+      data: newLedgerEntry,
+    });
 
     res.status(201).json({
       message: "Submitted successfully!",
@@ -225,16 +274,48 @@ async function getProductionJDsController(req, res) {
   try {
     // Fetch all production from the database
     const production = await ProductionJD.findAll({
-      include: {
-        model: InventoryLedgerJD,
-        as: "InventoryLedgerJD",
-        attributes: ["id", "quantity"],
-        include: {
-          model: InventoryJD,
-          as: "InventoryJD",
-          attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+      include: [
+        {
+          model: InventoryLedgerJD,
+          as: "InventoryLedgerJD",
+          attributes: ["id", "quantity", "transaction", "remarks"],
+          include: {
+            model: InventoryJD,
+            as: "InventoryJD",
+            attributes: [
+              "id",
+              "item",
+              "transactionCategory",
+              "quantity",
+              "unit",
+              "unitPrice",
+              "amount",
+            ],
+          },
         },
-      },
+        {
+          model: EquipmentLedgerJD,
+          as: "EquipmentLedgerJD",
+          attributes: ["id", "amount"],
+          include: {
+            model: EquipmentJD,
+            as: "EquipmentJD",
+            attributes: ["id", "equipmentName", "amount"],
+          },
+        },
+        {
+          model: ProductLedgerJD,
+          as: "ProductLedgerJD",
+          attributes: [
+            "id",
+            "productId",
+            "quantity",
+            "unit",
+            "unitPrice",
+            "amount",
+          ],
+        },
+      ],
       order: [["transactionDate", "DESC"]],
     });
 
@@ -249,102 +330,299 @@ async function getProductionJDsController(req, res) {
 async function updateProductionJDController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating Production with ID:", id);
+    const {
+      transactionDate,
+      ingredientCost,
+      packagingCost,
+      equipmentCost,
+      utilitiesCost,
+      laborCost,
+      totalCost,
+      grossIncome,
+      netIncome,
+      profitMargin,
+      ingredients,
+      packagings,
+      equipments,
+      outputs,
+      createdBy,
+    } = req.body;
 
-    const { transactionDate, transactions, createdBy } = req.body;
+    const production = await ProductionJD.findByPk(id);
+    if (!production) {
+      return res.status(404).json({ message: "Production not found" });
+    }
 
-    for (const transaction of transactions) {
+    // Update main Production record
+    await production.update({
+      transactionDate,
+      ingredientCost,
+      packagingCost,
+      equipmentCost,
+      utilitiesCost,
+      laborCost,
+      totalCost,
+      grossIncome,
+      netIncome,
+      profitMargin,
+      updatedBy: createdBy,
+    });
+
+    const batchId = production.batch;
+
+    // === INVENTORY LEDGER - INGREDIENTS & PACKAGINGS ===
+    const currentInventoryLedger = await InventoryLedgerJD.findAll({
+      where: { batchId: id },
+    });
+
+    const updatedInventory = [...ingredients, ...packagings];
+
+    // Smart sync: delete missing, update existing, create new
+    await Promise.all(
+      currentInventoryLedger.map(async (entry) => {
+        const match = updatedInventory.find(
+          (i) => i.id === entry.inventoryId && entry.transaction === "USED"
+        );
+        if (!match) {
+          await entry.destroy();
+        }
+      })
+    );
+
+    for (const item of updatedInventory) {
+      const existing = currentInventoryLedger.find(
+        (i) => i.inventoryId === item.id && i.transaction === "USED"
+      );
+      if (existing) {
+        await existing.update({
+          transactionDate,
+          quantity: item.quantity,
+          remarks: item.remarks,
+          updatedBy: createdBy,
+        });
+        broadcastMessage({
+          type: "UPDATED_INVENTORY_LEDGER_JD",
+          data: existing,
+        });
+      } else {
+        const newEntry = await InventoryLedgerJD.create({
+          inventoryId: item.id,
+          batchId: id,
+          transactionDate,
+          transaction: "USED",
+          quantity: item.quantity,
+          remarks: item.remarks,
+          createdBy,
+        });
+        broadcastMessage({ type: "USED_INVENTORY_LEDGER_JD", data: newEntry });
+      }
+    }
+
+    // === EQUIPMENT LEDGER ===
+    const currentEquipment = await EquipmentLedgerJD.findAll({
+      where: { batchId: id },
+    });
+
+    // Smart sync for Equipment Ledger: delete missing, update existing, create new
+    await Promise.all(
+      currentEquipment.map(async (entry) => {
+        const match = equipments.find((e) => e.id === entry.equipmentId);
+        if (!match) {
+          await entry.destroy();
+        }
+      })
+    );
+
+    for (const equipment of equipments) {
+      const existing = currentEquipment.find(
+        (e) => e.equipmentId === equipment.id
+      );
+      if (existing) {
+        await existing.update({
+          transactionDate,
+          amount: equipment.amount,
+          remarks: equipment.remarks,
+          updatedBy: createdBy,
+        });
+        broadcastMessage({ type: "UPDATED_EQUIPMENT_JD", data: existing });
+      } else {
+        const newEntry = await EquipmentLedgerJD.create({
+          equipmentId: equipment.id,
+          batchId: id,
+          transactionDate,
+          transaction: "USED",
+          amount: equipment.amount,
+          remarks: equipment.remarks,
+          createdBy,
+        });
+        broadcastMessage({ type: "USED_EQUIPMENT_JD", data: newEntry });
+      }
+    }
+
+    // === PRODUCT & INGREDIENT OUTPUTS ===
+    const currentProductLedgers = await ProductLedgerJD.findAll({
+      where: { batchId: id },
+    });
+    const currentInventoryLedgers = await InventoryLedgerJD.findAll({
+      where: { batchId: id, transaction: "IN" },
+    });
+    const currentInventoryEntries = await InventoryJD.findAll({
+      where: { transactionDate, remarks: batchId },
+    });
+    const currentOutputLedgers = await LedgerJD.findAll({
+      where: { remarks: batchId },
+    });
+
+    await Promise.all([
+      // Deleting all existing entries before adding new ones
+      ...currentProductLedgers.map((e) => e.destroy()),
+      ...currentInventoryLedgers.map((e) => e.destroy()),
+      ...currentInventoryEntries.map((e) => e.destroy()),
+      ...currentOutputLedgers.map((e) => e.destroy()),
+    ]);
+
+    for (const output of outputs) {
       const {
-        transactionDetails,
-        transactionCategory,
-        fundSource,
-        fundAllocation,
-        quantity,
+        outputType,
+        id: outputId,
         unit,
+        quantity,
         unitPrice,
         amount,
         remarks,
-      } = transaction;
+      } = output;
 
-      // Find the Production by ID and update it
-      const updatedProductionJD = await ProductionJD.findByPk(id);
+      if (outputType === "PRODUCT") {
+        const product = await ProductJD.findByPk(outputId, {
+          attributes: ["productName"],
+        });
 
-      if (updatedProductionJD) {
-        // Update Production attributes
+        const ledgerEntry = await LedgerJD.create({
+          transactionDate,
+          transactionDetails: product?.productName,
+          transactionCategory: "PRODUCTION",
+          fundSource: "CASH IN",
+          fundAllocation: "UNSOLD GOODS",
+          amount,
+          remarks: batchId,
+          createdBy,
+        });
 
-        updatedProductionJD.transactionDate = transactionDate;
-        updatedProductionJD.transactionDetails =
-          transactionDetails?.toUpperCase();
-        updatedProductionJD.transactionCategory = transactionCategory;
-        updatedProductionJD.fundSource = fundSource;
-        updatedProductionJD.fundAllocation = fundAllocation;
-        updatedProductionJD.amount = amount;
-        updatedProductionJD.remarks = remarks;
-        updatedProductionJD.updatedBy = createdBy;
+        broadcastMessage({ type: "NEW_LEDGER_JD", data: ledgerEntry });
 
-        // Save the updated Production
-        await updatedProductionJD.save();
-        if (
-          transactionCategory === "INGREDIENTS" ||
-          transactionCategory === "PACKAGING AND LABELING"
-        ) {
-          const updatedInventoryJD = await InventoryJD.findOne({
-            where: { transactionId: updatedProductionJD.id },
-          });
+        const productEntry = await ProductLedgerJD.create({
+          productId: outputId,
+          batchId: id,
+          transactionDate,
+          transaction: "IN",
+          quantity,
+          unit,
+          unitPrice,
+          amount,
+          remarks,
+          createdBy,
+        });
 
-          updatedInventoryJD.transactionDate = transactionDate;
-          updatedInventoryJD.item = transactionDetails?.toUpperCase();
-          updatedInventoryJD.transactionCategory = transactionCategory;
-          updatedInventoryJD.quantity = quantity;
-          updatedInventoryJD.unit = unit;
-          updatedInventoryJD.unitPrice = unitPrice;
-          updatedInventoryJD.amount = amount;
-          updatedInventoryJD.remarks = remarks;
-          updatedInventoryJD.updatedBy = createdBy;
+        broadcastMessage({ type: "NEW_PRODUCT_LEDGER_JD", data: productEntry });
+      } else if (outputType === "INGREDIENT") {
+        const ledgerEntry = await LedgerJD.create({
+          transactionDate,
+          transactionDetails: outputId?.toUpperCase(),
+          transactionCategory: "INGREDIENTS",
+          fundSource: "CASH IN",
+          fundAllocation: "INGREDIENTS",
+          amount,
+          remarks,
+          createdBy,
+        });
 
-          // Save the updated Inventory
-          await updatedInventoryJD.save();
+        broadcastMessage({ type: "NEW_LEDGER_JD", data: ledgerEntry });
 
-          broadcastMessage({
-            type: "UPDATED_INVENTORY_JD",
-            data: updatedInventoryJD,
-          });
-        } else if (transactionCategory === "EQUIPMENTS") {
-          const updatedEquipmentJD = await EquipmentJD.findOne({
-            where: { transactionId: updatedProductionJD.id },
-          });
+        const inventoryEntry = await InventoryJD.create({
+          transactionId: ledgerEntry.id,
+          transactionDate,
+          item: outputId?.toUpperCase(),
+          transaction: "IN",
+          transactionCategory: "INGREDIENTS",
+          quantity,
+          unit,
+          unitPrice,
+          amount,
+          remarks,
+          createdBy,
+        });
 
-          updatedEquipmentJD.transactionDate = transactionDate;
-          updatedEquipmentJD.equipmentName = transactionDetails?.toUpperCase();
-          updatedEquipmentJD.amount = amount;
-          updatedEquipmentJD.remarks = remarks;
-          updatedEquipmentJD.updatedBy = createdBy;
+        broadcastMessage({ type: "NEW_INVENTORY_JD", data: inventoryEntry });
 
-          // Save the updated Equipment
-          await updatedEquipmentJD.save();
-
-          broadcastMessage({
-            type: "UPDATED_EQUIPMENT_JD",
-            data: updatedEquipmentJD,
-          });
-        }
+        const inventoryLedgerEntry = await InventoryLedgerJD.create({
+          inventoryId: outputId,
+          batchId: id,
+          transactionDate,
+          transaction: "IN",
+          quantity,
+          remarks,
+          createdBy,
+        });
 
         broadcastMessage({
-          type: "UPDATED_PRODUCTION_JD",
-          data: updatedProductionJD,
+          type: "NEW_INVENTORY_LEDGER_JD",
+          data: inventoryLedgerEntry,
         });
-
-        res.status(201).json({
-          message: "updated successfully!",
-        });
-      } else {
-        // If Production with the specified ID was not found
-        res.status(404).json({ message: `Production with ID ${id} not found` });
       }
     }
+
+    // === LEDGER ENTRIES for costs ===
+    await LedgerJD.bulkCreate(
+      [
+        {
+          transactionDate,
+          transactionDetails: "EQUIPMENT DEPRECIATION",
+          transactionCategory: "EQUIPMENTS",
+          fundSource: "EQUIPMENTS",
+          fundAllocation: "CASH OUT",
+          amount: equipmentCost,
+          remarks: batchId,
+          createdBy,
+        },
+        {
+          transactionDate,
+          transactionDetails: "EQUIPMENT FEE",
+          transactionCategory: "EQUIPMENTS",
+          fundSource: "CASH ON HAND",
+          fundAllocation: "EQUIPMENT FUNDS",
+          amount: equipmentCost,
+          remarks: batchId,
+          createdBy,
+        },
+        {
+          transactionDate,
+          transactionDetails: "UTILITIES FEE",
+          transactionCategory: "UTILITIES",
+          fundSource: "CASH ON HAND",
+          fundAllocation: "UTILITIES",
+          amount: utilitiesCost,
+          remarks: batchId,
+          createdBy,
+        },
+        {
+          transactionDate,
+          transactionDetails: "LABOR FEE",
+          transactionCategory: "LABOR",
+          fundSource: "CASH ON HAND",
+          fundAllocation: "LABOR",
+          amount: laborCost,
+          remarks: batchId,
+          createdBy,
+        },
+      ],
+      { validate: true }
+    ).then((entries) =>
+      broadcastMessage({ type: "NEW_LEDGER_JD", data: entries })
+    );
+
+    res.status(200).json({ message: "Updated successfully!" });
   } catch (error) {
-    // Handle errors
-    console.error("Error updating Production:", error);
+    console.error("Error updating production:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

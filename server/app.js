@@ -10,6 +10,7 @@ const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
 const bodyParser = require("body-parser");
+require("./scale-reader");
 const sequelize = require("./config/database");
 
 // Import utility functions and models

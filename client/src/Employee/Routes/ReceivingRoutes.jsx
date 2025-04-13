@@ -9,13 +9,13 @@ import Calendar from "../../Employee/Layouts/Receiving/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
 
-const ReceivingRoutes = ({ user, onUpdateUser }) => (
+const ReceivingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route
         path="transactions"
-        element={<ReceivedTransactions user={user} />}
+        element={<ReceivedTransactions user={user} socket={socket} />}
       />
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />

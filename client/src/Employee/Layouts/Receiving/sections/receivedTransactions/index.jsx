@@ -9,7 +9,7 @@ import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
-const ReceivedTransactions = ({ user }) => {
+const ReceivedTransactions = ({ user, socket }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
@@ -96,6 +96,18 @@ const ReceivedTransactions = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === "LIVE_WEIGHT") {
+          console.log("Received weight:", message.data.value);
+        }
+      };
+    }
+  }, [socket]);
 
   const handleOpenModal = (row) => {
     setFormData({

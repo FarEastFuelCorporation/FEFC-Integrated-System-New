@@ -62,7 +62,26 @@ const DashboardJD = ({ user, socket }) => {
 
       const response = await axios.get(`${apiUrl}/apiJD/ledger/summary`);
 
-      setSummary(response.data.summary);
+      const responseInventory = await axios.get(`${apiUrl}/apiJD/inventory`);
+
+      console.log("Response Inventory:", responseInventory.data.inventory);
+
+      const unusedInventories = responseInventory.data.inventory.reduce(
+        (sum, item) => {
+          return (
+            sum + item.updatedQuantity.toFixed(2) * item.unitPrice.toFixed(2)
+          );
+        },
+        0
+      );
+
+      console.log("Unused Inventories:", unusedInventories);
+
+      setSummary({
+        ...response.data.summary,
+        "UNUSED INVENTORIES": unusedInventories,
+      });
+      console.log(response.data.summary);
 
       setLoading(false);
     } catch (error) {

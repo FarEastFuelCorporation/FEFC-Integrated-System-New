@@ -282,7 +282,6 @@ const ModalJD = ({
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {
         ...output,
-        id: "",
         unit: "",
         [field]: value,
       };
@@ -292,6 +291,11 @@ const ModalJD = ({
       }
       if (updatedTransaction.outputType === "INGREDIENT") {
         updatedTransaction.unit = "";
+      }
+      if (field === "outputType") {
+        updatedTransaction.id = "";
+        updatedTransaction.quantity = "";
+        updatedTransaction.unitPrice = "";
       }
 
       return updatedTransaction;
@@ -382,7 +386,7 @@ const ModalJD = ({
                   >
                     {ingredientItems.map((item) => (
                       <MenuItem key={item.id} value={item.id}>
-                        {item.item}
+                        ({item.id}) {item.item}
                       </MenuItem>
                     ))}
                   </Select>
@@ -412,7 +416,7 @@ const ModalJD = ({
                 <TextField
                   label="Available Stock"
                   name={`ingredients[${index}].remaining`}
-                  value={ingredient.remaining || ""}
+                  value={(ingredient.remaining || 0).toFixed(2)}
                   onChange={(e) =>
                     handleIngredientChange(index, "remaining", e.target.value)
                   }
@@ -538,7 +542,7 @@ const ModalJD = ({
                   >
                     {packagingItems.map((item) => (
                       <MenuItem key={item.id} value={item.id}>
-                        {item.item}
+                        ({item.id}) {item.item}
                       </MenuItem>
                     ))}
                   </Select>
@@ -568,7 +572,7 @@ const ModalJD = ({
                 <TextField
                   label="Available Stock"
                   name={`packagings[${index}].remaining`}
-                  value={packaging.remaining || ""}
+                  value={(packaging.remaining || 0).toFixed(2)}
                   onChange={(e) =>
                     handlePackagingChange(index, "remaining", e.target.value)
                   }

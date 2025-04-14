@@ -112,10 +112,10 @@ const ReceivedTransactions = ({ user, socket }) => {
   const handleOpenModal = (row) => {
     setFormData({
       id: "",
-      bookedTransactionId: row.id,
-      scheduledTransactionId: row.ScheduledTransaction[0].id,
+      bookedTransactionId: row?.id,
+      scheduledTransactionId: row?.ScheduledTransaction?.[0]?.id,
       dispatchedTransactionId:
-        row.ScheduledTransaction[0].DispatchedTransaction?.[0]?.id,
+        row?.ScheduledTransaction?.[0]?.DispatchedTransaction?.[0]?.id,
       receivedDate: "",
       receivedTime: "",
       vehicle: "",
@@ -307,13 +307,11 @@ const ReceivedTransactions = ({ user, socket }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
-        {user.userType === "GEN" && (
-          <Box display="flex">
-            <IconButton onClick={handleOpenModal}>
-              <PostAddIcon sx={{ fontSize: "40px" }} />
-            </IconButton>
-          </Box>
-        )}
+        {/* <Box display="flex">
+          <IconButton onClick={handleOpenModal}>
+            <PostAddIcon sx={{ fontSize: "40px" }} />
+          </IconButton>
+        </Box> */}
       </Box>
 
       {showSuccessMessage && (

@@ -259,6 +259,57 @@ async function createProductionJDController(req, res) {
       data: newLedgerEntry,
     });
 
+    const production = await ProductionJD.findByPk(newProductionEntry.id, {
+      include: [
+        {
+          model: InventoryLedgerJD,
+          as: "InventoryLedgerJD",
+          attributes: ["id", "quantity", "transaction", "remarks"],
+          include: {
+            model: InventoryJD,
+            as: "InventoryJD",
+            attributes: [
+              "id",
+              "item",
+              "transactionCategory",
+              "quantity",
+              "unit",
+              "unitPrice",
+              "amount",
+            ],
+          },
+        },
+        {
+          model: EquipmentLedgerJD,
+          as: "EquipmentLedgerJD",
+          attributes: ["id", "amount"],
+          include: {
+            model: EquipmentJD,
+            as: "EquipmentJD",
+            attributes: ["id", "equipmentName", "amount"],
+          },
+        },
+        {
+          model: ProductLedgerJD,
+          as: "ProductLedgerJD",
+          attributes: [
+            "id",
+            "productId",
+            "quantity",
+            "unit",
+            "unitPrice",
+            "amount",
+          ],
+        },
+      ],
+      order: [["transactionDate", "DESC"]],
+    });
+
+    broadcastMessage({
+      type: "NEW_PRODUCTION_JD",
+      data: production,
+    });
+
     res.status(201).json({
       message: "Submitted successfully!",
     });

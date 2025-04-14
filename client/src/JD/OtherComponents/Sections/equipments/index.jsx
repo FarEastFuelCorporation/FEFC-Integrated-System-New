@@ -335,11 +335,12 @@ const EquipmentJD = ({ user, socket }) => {
           columns={selectedTab === 0 ? columns : columns2}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "productCategory", sort: "asc" }],
+          sortModel={[
+            {
+              field: "transactionDate",
+              sort: "desc",
             },
-          }}
+          ]}
         />
       </CustomDataGridStyles>
       <ModalJD

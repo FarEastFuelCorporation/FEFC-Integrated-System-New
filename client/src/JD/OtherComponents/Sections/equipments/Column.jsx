@@ -15,9 +15,11 @@ export const columns = [
     flex: 1,
     minWidth: 100,
     valueGetter: (params) => {
-      return formatDate3(params.row.transactionDate);
+      return params.row.transactionDate; // Keep the raw date value for sorting
     },
-    renderCell: renderCellWithWrapText,
+    renderCell: (params) => {
+      return formatDate3(params.row.transactionDate); // Format the date for display
+    },
   },
   {
     field: "equipmentName",
@@ -71,14 +73,21 @@ export const columns2 = [
     align: "center",
     flex: 1,
     minWidth: 100,
+
     valueGetter: (params) => {
+      if (params.row.transaction === "IN") {
+        return params.row.EquipmentJD?.transactionDate;
+      } else {
+        return params.row.transactionDate;
+      }
+    },
+    renderCell: (params) => {
       if (params.row.transaction === "IN") {
         return formatDate3(params.row.EquipmentJD?.transactionDate);
       } else {
         return formatDate3(params.row.transactionDate);
       }
     },
-    renderCell: renderCellWithWrapText,
   },
   {
     field: "equipmentName2",

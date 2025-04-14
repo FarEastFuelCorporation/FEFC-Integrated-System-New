@@ -130,7 +130,24 @@ const ProductCategoryJD = ({ user, socket }) => {
             return updatedData;
           });
         } else if (message.type === "NEW_PRODUCT_JD") {
-          setProducts((prevData) => [...prevData, message.data]);
+          const newProduct = message.data;
+          const newCategory = newProduct.ProductCategoryJD?.productCategory;
+
+          // 1. Add new product
+          setProducts((prevData) => [...prevData, newProduct]);
+
+          // 2. Update category count if it exists
+          setProductCategories((prevCategories) =>
+            prevCategories.map((category) => {
+              if (category.productCategory === newCategory) {
+                return {
+                  ...category,
+                  productCount: (category.productCount || 0) + 1,
+                };
+              }
+              return category;
+            })
+          );
         } else if (message.type === "UPDATED_PRODUCT_JD") {
           setProducts((prevData) => {
             // Find the index of the data to be updated
@@ -150,10 +167,29 @@ const ProductCategoryJD = ({ user, socket }) => {
           });
         } else if (message.type === "DELETED_PRODUCT_JD") {
           setProducts((prevData) => {
-            const updatedData = prevData.filter(
-              (prev) => prev.id !== message.data // Remove the data with matching ID
+            const deletedProduct = prevData.find((p) => p.id === message.data); // message.data is ID
+            const deletedCategory =
+              deletedProduct?.ProductCategoryJD?.productCategory;
+
+            // 1. Update product list (remove the deleted product)
+            const updatedProducts = prevData.filter(
+              (p) => p.id !== message.data
             );
-            return updatedData;
+
+            // 2. Update product category count
+            setProductCategories((prevCategories) =>
+              prevCategories.map((category) => {
+                if (category.productCategory === deletedCategory) {
+                  return {
+                    ...category,
+                    productCount: Math.max((category.productCount || 0) - 1, 0),
+                  };
+                }
+                return category;
+              })
+            );
+
+            return updatedProducts;
           });
         }
       };
@@ -336,7 +372,7 @@ const ProductCategoryJD = ({ user, socket }) => {
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        return params.row.productCount;
+        return params.row.productCount || 0;
       },
       renderCell: renderCellWithWrapText,
     },
@@ -400,6 +436,9 @@ const ProductCategoryJD = ({ user, socket }) => {
       align: "center",
       flex: 1,
       minWidth: 80,
+      valueGetter: (params) => {
+        return params.row.updatedQuantity || 0;
+      },
       renderCell: renderCellWithWrapText,
     },
     {

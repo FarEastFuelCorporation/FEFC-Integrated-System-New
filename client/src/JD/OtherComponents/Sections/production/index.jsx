@@ -99,7 +99,7 @@ const ProductionJD = ({ user, socket }) => {
         const unitPrice = Number(item.unitPrice || 0);
         return {
           ...item,
-          amount: quantity * unitPrice,
+          amount: (quantity * unitPrice).toFixed(2), // Calculate amount based on quantity and unit price
         };
       });
 
@@ -120,18 +120,18 @@ const ProductionJD = ({ user, socket }) => {
     const sumAmount = (items) =>
       items.reduce((total, item) => total + Number(item.amount || 0), 0);
 
-    const ingredientCost = sumAmount(updatedIngredients);
-    const packagingCost = sumAmount(updatedPackagings);
-    const equipmentCost = sumAmount(updatedEquipments);
-    const utilitiesCost = Number(formData.utilitiesCost || 0);
-    const laborCost = Number(formData.laborCost || 0);
+    const ingredientCost = sumAmount(updatedIngredients).toFixed(2);
+    const packagingCost = sumAmount(updatedPackagings).toFixed(2);
+    const equipmentCost = sumAmount(updatedEquipments).toFixed(2);
+    const utilitiesCost = Number(formData.utilitiesCost || 0).toFixed(2);
+    const laborCost = Number(formData.laborCost || 0).toFixed(2);
 
     const totalCost =
-      ingredientCost +
-      packagingCost +
-      equipmentCost +
-      utilitiesCost +
-      laborCost;
+      parseFloat(ingredientCost) +
+      parseFloat(packagingCost) +
+      parseFloat(equipmentCost) +
+      parseFloat(utilitiesCost) +
+      parseFloat(laborCost);
 
     const grossIncome = updatedOutputs.reduce(
       (total, output) => total + Number(output.amount || 0),

@@ -91,7 +91,10 @@ async function getInventoryJDsController(req, res) {
         as: "InventoryLedgerJD",
         attributes: ["id", "transaction", "quantity"],
       },
-      order: [["transactionDate", "DESC"]],
+      order: [
+        ["createdAt", "DESC"], // Primary sort
+        ["transactionDate", "DESC"], // Secondary sort
+      ],
     });
 
     // Compute updatedQuantity for each inventory item

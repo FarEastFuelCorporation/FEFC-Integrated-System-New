@@ -94,46 +94,49 @@ const DashboardJD = ({ user, socket }) => {
     setSelectedTab(newValue);
   };
 
+  console.log(summary["UNUSED INVENTORIES"]);
+  console.log(formatNumber(summary["UNUSED INVENTORIES"]));
+
   const data = [
     {
       id: "CASH ON HAND",
       label: "CASH ON HAND",
-      value: summary["CASH ON HAND"],
+      value: (summary["CASH ON HAND"] || 0).toFixed(2), // Fallback to 0 if undefined or null
     },
     {
       id: "UNSOLD GOODS",
       label: "UNSOLD GOODS",
-      value: summary["UNSOLD GOODS"],
+      value: (summary["UNSOLD GOODS"] || 0).toFixed(2),
     },
     {
       id: "UNUSED INVENTORIES",
       label: "UNUSED INVENTORIES",
-      value: summary["UNUSED INVENTORIES"],
+      value: (summary["UNUSED INVENTORIES"] || 0).toFixed(2),
     },
     {
       id: "EQUIPMENTS",
       label: "EQUIPMENTS",
-      value: summary["EQUIPMENTS"],
+      value: (summary["EQUIPMENTS"] || 0).toFixed(2),
     },
     {
       id: "EQUIPMENT FUNDS",
       label: "EQUIPMENT FUNDS",
-      value: summary["EQUIPMENT FUNDS"],
+      value: (summary["EQUIPMENT FUNDS"] || 0).toFixed(2),
     },
     {
       id: "UTILITIES",
       label: "UTILITIES",
-      value: summary["UTILITIES"],
+      value: (summary["UTILITIES"] || 0).toFixed(2),
     },
     {
       id: "LABOR",
       label: "LABOR",
-      value: summary["LABOR"],
+      value: (summary["LABOR"] || 0).toFixed(2),
     },
     {
       id: "TRANSPORTATION",
       label: "TRANSPORTATION",
-      value: summary["TRANSPORTATION"],
+      value: (summary["TRANSPORTATION"] || 0).toFixed(2),
     },
   ];
 
@@ -490,6 +493,21 @@ const DashboardJD = ({ user, socket }) => {
               <ResponsivePie
                 data={data}
                 colorBy="id"
+                tooltip={({ datum }) => (
+                  <div
+                    style={{
+                      background: "#333",
+                      color: "#fff",
+                      padding: "6px 10px",
+                      borderRadius: "4px",
+                      fontSize: "13px",
+                    }}
+                  >
+                    <strong>{datum.id}</strong>
+                    <br />
+                    Value: {formatNumber(datum.value)}
+                  </div>
+                )}
                 theme={{
                   axis: {
                     domain: {

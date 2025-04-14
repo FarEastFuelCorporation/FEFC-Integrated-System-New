@@ -15,7 +15,7 @@ const ReceivedTransaction = sequelize.define(
     },
     scheduledTransactionId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     dispatchedTransactionId: {
       type: DataTypes.UUID,

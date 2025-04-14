@@ -372,12 +372,6 @@ const LedgerJD = ({ user, socket }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
-          sortModel={[
-            {
-              field: "transactionDate",
-              sort: "desc",
-            },
-          ]}
         />
       </CustomDataGridStyles>
       <ModalJD

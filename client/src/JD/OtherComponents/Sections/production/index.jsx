@@ -126,19 +126,20 @@ const ProductionJD = ({ user, socket }) => {
     const utilitiesCost = Number(formData.utilitiesCost || 0).toFixed(2);
     const laborCost = Number(formData.laborCost || 0).toFixed(2);
 
-    const totalCost =
+    const totalCost = (
       parseFloat(ingredientCost) +
       parseFloat(packagingCost) +
       parseFloat(equipmentCost) +
       parseFloat(utilitiesCost) +
-      parseFloat(laborCost);
+      parseFloat(laborCost)
+    ).toFixed(2);
 
     const grossIncome = updatedOutputs.reduce(
       (total, output) => total + Number(output.amount || 0),
       0
     );
 
-    const netIncome = grossIncome - totalCost;
+    const netIncome = (grossIncome - totalCost).toFixed(2);
     const profitMargin =
       grossIncome > 0 ? Math.round((netIncome / grossIncome) * 10000) / 100 : 0;
 

@@ -1,6 +1,7 @@
 // controllers/ledgerController.js.js
 
 const { broadcastMessage } = require("../../websocketManager");
+const EmployeeJD = require("../models/Employee");
 const EquipmentJD = require("../models/Equipment");
 const EquipmentLedgerJD = require("../models/EquipmentLedger");
 const InventoryJD = require("../models/Inventory");
@@ -139,9 +140,33 @@ async function createLedgerJDController(req, res) {
           createdBy,
         });
 
+        const ledger = await LedgerJD.findByPk(newProductLedgerEntry.id, {
+          include: [
+            {
+              model: InventoryJD,
+              as: "InventoryJD",
+              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+            },
+            {
+              model: ProductLedgerJD,
+              as: "ProductLedgerJD",
+              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+            },
+            {
+              model: EmployeeJD,
+              as: "EmployeeJD",
+              attributes: ["firstName", "lastName"],
+            },
+          ],
+          order: [
+            ["createdAt", "DESC"], // Primary sort
+            ["transactionDate", "DESC"], // Secondary sort
+          ],
+        });
+
         broadcastMessage({
           type: "NEW_PRODUCT_LEDGER_JD",
-          data: newProductLedgerEntry,
+          data: ledger,
         });
       }
     }
@@ -171,6 +196,11 @@ async function getLedgerJDsController(req, res) {
           model: ProductLedgerJD,
           as: "ProductLedgerJD",
           attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+        },
+        {
+          model: EmployeeJD,
+          as: "EmployeeJD",
+          attributes: ["firstName", "lastName"],
         },
       ],
       order: [
@@ -287,6 +317,11 @@ async function updateLedgerJDController(req, res) {
               as: "ProductLedgerJD",
               attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
             },
+            {
+              model: EmployeeJD,
+              as: "EmployeeJD",
+              attributes: ["firstName", "lastName"],
+            },
           ],
           order: [
             ["createdAt", "DESC"], // Primary sort
@@ -323,6 +358,18 @@ async function updateLedgerJDController(req, res) {
             type: "UPDATED_INVENTORY_JD",
             data: updatedInventoryJD,
           });
+
+          const updatedInventoryLedgerJD = await InventoryLedgerJD.findOne({
+            where: { inventoryId: updatedInventoryJD.id },
+          });
+
+          updatedInventoryLedgerJD.transactionDate = transactionDate;
+          updatedInventoryLedgerJD.quantity = quantity;
+          updatedInventoryLedgerJD.remarks = remarks;
+          updatedInventoryLedgerJD.updatedBy = createdBy;
+
+          // Save the updated Inventory
+          await updatedInventoryLedgerJD.save();
         } else if (transactionCategory === "EQUIPMENTS") {
           const updatedEquipmentJD = await EquipmentJD.findOne({
             where: { transactionId: updatedLedgerJD.id },
@@ -400,13 +447,13 @@ async function deleteLedgerJDController(req, res) {
       ledgerToDelete.deletedBy = deletedBy;
       await ledgerToDelete.save();
 
-      // Find related InventoryJD and EquipmentJD by transactionId (LedgerJD.id)
-      const inventoriesToDelete = await InventoryJD.findAll({
-        where: { transactionId: id },
-      });
-      const equipmentToDelete = await EquipmentJD.findAll({
-        where: { transactionId: id },
-      });
+      // Find related InventoryJD, EquipmentJD, and ProductLedgerJD by transactionId
+      const [inventoriesToDelete, equipmentToDelete, productLedgersToDelete] =
+        await Promise.all([
+          InventoryJD.findAll({ where: { transactionId: id } }),
+          EquipmentJD.findAll({ where: { transactionId: id } }),
+          ProductLedgerJD.findAll({ where: { transactionId: id } }),
+        ]);
 
       // Soft delete InventoryJD records
       for (const inventory of inventoriesToDelete) {
@@ -429,6 +476,18 @@ async function deleteLedgerJDController(req, res) {
         broadcastMessage({
           type: "DELETED_EQUIPMENT_JD",
           data: equipment.id,
+        });
+      }
+
+      // Soft delete ProductLedgerJD records
+      for (const productLedger of productLedgersToDelete) {
+        productLedger.updatedBy = deletedBy;
+        productLedger.deletedBy = deletedBy;
+        await productLedger.save();
+        await productLedger.destroy();
+        broadcastMessage({
+          type: "DELETED_PRODUCT_LEDGER_JD",
+          data: productLedger.id,
         });
       }
 

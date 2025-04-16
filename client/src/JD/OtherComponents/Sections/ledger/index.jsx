@@ -94,7 +94,8 @@ const LedgerJD = ({ user, socket }) => {
         if (message.type === "NEW_LEDGER_JD") {
           setTransactions((prevData) =>
             [...prevData, message.data].sort(
-              (a, b) => new Date(b.date) - new Date(a.date)
+              (a, b) =>
+                new Date(b.transactionDate) - new Date(a.transactionDate)
             )
           );
         } else if (message.type === "UPDATED_LEDGER_JD") {
@@ -109,7 +110,8 @@ const LedgerJD = ({ user, socket }) => {
 
               // Sort by date in descending order after update
               return updatedData.sort(
-                (a, b) => new Date(b.date) - new Date(a.date)
+                (a, b) =>
+                  new Date(b.transactionDate) - new Date(a.transactionDate)
               );
             } else {
               return prevData;
@@ -311,6 +313,18 @@ const LedgerJD = ({ user, socket }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "createdBy",
+      headerName: "Created By",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return `${params.row.EmployeeJD?.firstName} ${params.row.EmployeeJD?.lastName}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "edit",
       headerName: "Edit",
       headerAlign: "center",
@@ -372,6 +386,7 @@ const LedgerJD = ({ user, socket }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          sortModel={[{ field: "transactionDate", sort: "desc" }]}
         />
       </CustomDataGridStyles>
       <ModalJD

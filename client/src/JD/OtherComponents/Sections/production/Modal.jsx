@@ -52,31 +52,7 @@ const ModalJD = ({
     )
     .sort((a, b) => a.item.localeCompare(b.item));
 
-  const category1 = [
-    "EQUIPMENTS",
-    "INGREDIENTS",
-    "LABOR",
-    "PACKAGING AND LABELING",
-    "TRANSPORTATION",
-    "UNSOLD GOODS",
-    "UTILITIES",
-    "OPERATIONS",
-    "SALES",
-  ];
-
-  const category2 = [
-    "CASH IN",
-    "CASH ON HAND",
-    "CASH OUT",
-    "EQUIPMENT FUNDS",
-    "EQUIPMENTS",
-    "INGREDIENTS",
-    "LABOR",
-    "PACKAGING AND LABELING",
-    "TRANSPORTATION",
-    "UNSOLD GOODS",
-    "UTILITIES",
-  ];
+  console.log(equipments);
 
   const unitCategory = [
     "PC",
@@ -282,16 +258,13 @@ const ModalJD = ({
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {
         ...output,
-        unit: "",
         [field]: value,
       };
 
       if (updatedTransaction.outputType === "PRODUCT") {
         updatedTransaction.unit = "PC";
       }
-      if (updatedTransaction.outputType === "INGREDIENT") {
-        updatedTransaction.unit = "";
-      }
+
       if (field === "outputType") {
         updatedTransaction.id = "";
         updatedTransaction.quantity = "";
@@ -696,11 +669,15 @@ const ModalJD = ({
                       id: `id`,
                     }}
                   >
-                    {equipments.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.equipmentName}
-                      </MenuItem>
-                    ))}
+                    {equipments
+                      .sort((a, b) =>
+                        a.equipmentName.localeCompare(b.equipmentName)
+                      )
+                      .map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.equipmentName}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -909,6 +886,12 @@ const ModalJD = ({
                     <MenuItem key={"PRODUCT"} value={"PRODUCT"}>
                       {"PRODUCT"}
                     </MenuItem>
+                    <MenuItem
+                      key={"PACKAGING AND LABELING"}
+                      value={"PACKAGING AND LABELING"}
+                    >
+                      {"PACKAGING AND LABELING"}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -948,6 +931,26 @@ const ModalJD = ({
                 <Grid item xs={12} lg={4}>
                   <TextField
                     label="Ingredient"
+                    name={`outputs[${index}].id`}
+                    value={output.id || ""}
+                    onChange={(e) =>
+                      handleOutputChange(index, "id", e.target.value)
+                    }
+                    fullWidth
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                </Grid>
+              )}
+              {output.outputType === "PACKAGING AND LABELING" && (
+                <Grid item xs={12} lg={4}>
+                  <TextField
+                    label="Packaging and Labeling"
                     name={`outputs[${index}].id`}
                     value={output.id || ""}
                     onChange={(e) =>

@@ -140,6 +140,7 @@ const ProductionJD = ({ user, socket }) => {
     );
 
     const netIncome = (grossIncome - totalCost).toFixed(2);
+
     const profitMargin =
       grossIncome > 0 ? Math.round((netIncome / grossIncome) * 10000) / 100 : 0;
 
@@ -220,7 +221,12 @@ const ProductionJD = ({ user, socket }) => {
         const message = JSON.parse(event.data);
 
         if (message.type === "NEW_PRODUCTION_JD") {
-          setTransactions((prevData) => [...prevData, message.data]);
+          setTransactions((prevData) =>
+            [...prevData, message.data].sort(
+              (a, b) =>
+                new Date(b.transactionDate) - new Date(a.transactionDate)
+            )
+          );
         } else if (message.type === "UPDATED_PRODUCTION_JD") {
           setTransactions((prevData) => {
             // Find the index of the data to be updated
@@ -232,7 +238,10 @@ const ProductionJD = ({ user, socket }) => {
               // Replace the updated data data
               const updatedData = [...prevData];
               updatedData[index] = message.data; // Update the data at the found index
-              return updatedData;
+              return updatedData.sort(
+                (a, b) =>
+                  new Date(b.transactionDate) - new Date(a.transactionDate)
+              );
             } else {
               // If the data is not found, just return the previous state
               return prevData;
@@ -365,11 +374,13 @@ const ProductionJD = ({ user, socket }) => {
           // Add INGREDIENTS with transaction === "IN"
           ...row.InventoryLedgerJD.filter(
             (item) =>
-              item.InventoryJD?.transactionCategory === "INGREDIENTS" &&
+              (item.InventoryJD?.transactionCategory === "INGREDIENTS" ||
+                item.InventoryJD?.transactionCategory ===
+                  "PACKAGING AND LABELING") &&
               item.transaction === "IN"
           ).map((item) => ({
-            outputType: "INGREDIENT",
-            id: item.InventoryJD?.id,
+            outputType: "PACKAGING AND LABELING",
+            id: item.InventoryJD?.item,
             unit: item.InventoryJD?.unit,
             remaining: item.remaining,
             quantity: item.quantity,
@@ -683,7 +694,7 @@ const ProductionJD = ({ user, socket }) => {
           getRowId={(row) => row.id}
           initialState={{
             sorting: {
-              sortModel: [{ field: "productCategory", sort: "asc" }],
+              sortModel: [{ field: "createdAt", sort: "desc" }],
             },
           }}
         />

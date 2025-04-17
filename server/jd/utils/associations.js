@@ -171,6 +171,19 @@ EquipmentLedgerJD.belongsTo(EquipmentJD, {
   onDelete: "CASCADE",
 });
 
+ProductionJD.hasMany(LedgerJD, {
+  as: "LedgerJD",
+  foreignKey: "batchId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+LedgerJD.belongsTo(ProductionJD, {
+  as: "ProductionJD",
+  foreignKey: "batchId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
 ProductionJD.hasMany(InventoryLedgerJD, {
   as: "InventoryLedgerJD",
   foreignKey: "batchId",

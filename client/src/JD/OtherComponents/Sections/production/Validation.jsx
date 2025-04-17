@@ -13,7 +13,7 @@ export const Validation = (formData) => {
     !Array.isArray(formData.ingredients) ||
     formData.ingredients.length === 0
   ) {
-    validationErrors.push("At least one ingredient is required.");
+    // validationErrors.push("At least one ingredient is required.");
   } else {
     formData.ingredients.forEach((ingredient, index) => {
       if (!ingredient.id) {
@@ -34,7 +34,7 @@ export const Validation = (formData) => {
 
   // Validate packagings array
   if (!Array.isArray(formData.packagings) || formData.packagings.length === 0) {
-    validationErrors.push("At least one Packaging and Labeling is required.");
+    // validationErrors.push("At least one Packaging and Labeling is required.");
   } else {
     formData.packagings.forEach((packaging, index) => {
       if (!packaging.id) {
@@ -58,7 +58,7 @@ export const Validation = (formData) => {
   // Validate equipments
   formData.equipments.forEach((equipment, index) => {
     if (!equipment.id) {
-      validationErrors.push(`Equipments ${index + 1}: Equipment is required.`);
+      // validationErrors.push(`Equipments ${index + 1}: Equipment is required.`);
     }
     if (
       equipment.amount === undefined ||

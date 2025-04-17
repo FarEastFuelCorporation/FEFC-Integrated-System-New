@@ -33,13 +33,26 @@ async function createProductionJDController(req, res) {
       createdBy,
     } = req.body;
 
-    const batchId = await generateBatchId();
+    let batch;
 
-    console.log("batchId", batchId);
+    for (const output of outputs) {
+      if (output.outputType === "PRODUCT") {
+        batch = await generateBatchId("BATCH");
+        break;
+      } else if (output.outputType === "INGREDIENT") {
+        batch = await generateBatchId("INGREDIENT");
+        break;
+      } else if (output.outputType === "PACKAGING AND LABELING") {
+        batch = await generateBatchId("PACKAGING AND LABELING");
+        break;
+      }
+    }
+
+    console.log("batch", batch);
 
     const newProductionEntry = await ProductionJD.create({
       transactionDate,
-      batch: batchId,
+      batch: batch,
       ingredientCost: ingredientCost,
       packagingCost: packagingCost,
       equipmentCost: equipmentCost,
@@ -120,13 +133,14 @@ async function createProductionJDController(req, res) {
       if (outputType === "PRODUCT") {
         const newLedgerEntry = await LedgerJD.create(
           {
+            batchId: newProductionEntry.id,
             transactionDate,
             transactionDetails: newProductEntry.productName,
             transactionCategory: "PRODUCTION",
             fundSource: "CASH IN",
             fundAllocation: "UNSOLD GOODS",
             amount,
-            remarks: batchId,
+            remarks: batch,
             createdBy,
           },
           { validate: true }
@@ -154,15 +168,25 @@ async function createProductionJDController(req, res) {
           type: "NEW_PRODUCT_LEDGER_JD",
           data: newProductLedgerEntry,
         });
-      } else if (outputType === "INGREDIENT") {
+      } else if (
+        outputType === "INGREDIENT" ||
+        outputType === "PACKAGING AND LABELING"
+      ) {
         const newEntry = await LedgerJD.create({
+          batchId: newProductionEntry.id,
           transactionDate,
           transactionDetails: id?.toUpperCase(),
-          transactionCategory: "INGREDIENTS",
+          transactionCategory:
+            outputType === "INGREDIENT"
+              ? "INGREDIENTS"
+              : "PACKAGING AND LABELING",
           fundSource: "CASH IN",
-          fundAllocation: "INGREDIENTS",
+          fundAllocation:
+            outputType === "INGREDIENT"
+              ? "INGREDIENTS"
+              : "PACKAGING AND LABELING",
           amount: amount,
-          remarks: remarks,
+          remarks: batch,
           createdBy,
         });
 
@@ -191,7 +215,7 @@ async function createProductionJDController(req, res) {
         });
 
         const newInventoryLedgerEntry = await InventoryLedgerJD.create({
-          inventoryId: id,
+          inventoryId: newInventoryEntry.id,
           batchId: newProductionEntry.id,
           transactionDate,
           transaction: "IN",
@@ -207,48 +231,65 @@ async function createProductionJDController(req, res) {
       }
     }
 
-    const ledgerEntry = [
-      {
-        transactionDate,
-        transactionDetails: "EQUIPMENT DEPRECIATION",
-        transactionCategory: "EQUIPMENTS",
-        fundSource: "EQUIPMENTS",
-        fundAllocation: "CASH OUT",
-        amount: equipmentCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "EQUIPMENT FEE",
-        transactionCategory: "EQUIPMENTS",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "EQUIPMENT FUNDS",
-        amount: equipmentCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
+    const ledgerEntry = [];
+
+    // Only include equipment-related entries if there are equipments
+    if (equipments && equipments.length > 0) {
+      ledgerEntry.push(
+        {
+          batchId: newProductionEntry.id,
+          transactionDate,
+          transactionDetails: "EQUIPMENT DEPRECIATION",
+          transactionCategory: "EQUIPMENTS",
+          fundSource: "EQUIPMENTS",
+          fundAllocation: "CASH OUT",
+          amount: equipmentCost,
+          remarks: batch,
+          createdBy,
+        },
+        {
+          batchId: newProductionEntry.id,
+          transactionDate,
+          transactionDetails: "EQUIPMENT FEE",
+          transactionCategory: "EQUIPMENTS",
+          fundSource: "CASH ON HAND",
+          fundAllocation: "EQUIPMENT FUNDS",
+          amount: equipmentCost,
+          remarks: batch,
+          createdBy,
+        }
+      );
+    }
+
+    // Only include UTILITIES if cost is greater than 0
+    if (utilitiesCost && utilitiesCost > 0) {
+      ledgerEntry.push({
+        batchId: newProductionEntry.id,
         transactionDate,
         transactionDetails: "UTILITIES FEE",
         transactionCategory: "UTILITIES",
         fundSource: "CASH ON HAND",
         fundAllocation: "UTILITIES",
         amount: utilitiesCost,
-        remarks: batchId,
+        remarks: batch,
         createdBy,
-      },
-      {
+      });
+    }
+
+    // Only include LABOR if cost is greater than 0
+    if (laborCost && laborCost > 0) {
+      ledgerEntry.push({
+        batchId: newProductionEntry.id,
         transactionDate,
         transactionDetails: "LABOR FEE",
         transactionCategory: "LABOR",
         fundSource: "CASH ON HAND",
         fundAllocation: "LABOR",
         amount: laborCost,
-        remarks: batchId,
+        remarks: batch,
         createdBy,
-      },
-    ];
+      });
+    }
 
     const newLedgerEntry = await LedgerJD.bulkCreate(ledgerEntry, {
       validate: true,
@@ -367,7 +408,10 @@ async function getProductionJDsController(req, res) {
           ],
         },
       ],
-      order: [["transactionDate", "DESC"]],
+      order: [
+        ["createdAt", "DESC"], // Primary sort
+        ["transactionDate", "DESC"], // Secondary sort
+      ],
     });
 
     res.json({ production });
@@ -419,7 +463,7 @@ async function updateProductionJDController(req, res) {
       updatedBy: createdBy,
     });
 
-    const batchId = production.batch;
+    const batch = production.batch;
 
     // === INVENTORY LEDGER - INGREDIENTS & PACKAGINGS ===
     const currentInventoryLedger = await InventoryLedgerJD.findAll({
@@ -518,10 +562,10 @@ async function updateProductionJDController(req, res) {
       where: { batchId: id, transaction: "IN" },
     });
     const currentInventoryEntries = await InventoryJD.findAll({
-      where: { transactionDate, remarks: batchId },
+      where: { transactionDate, remarks: batch },
     });
     const currentOutputLedgers = await LedgerJD.findAll({
-      where: { remarks: batchId },
+      where: { remarks: batch },
     });
 
     await Promise.all([
@@ -549,13 +593,14 @@ async function updateProductionJDController(req, res) {
         });
 
         const ledgerEntry = await LedgerJD.create({
+          batchId: id,
           transactionDate,
           transactionDetails: product?.productName,
           transactionCategory: "PRODUCTION",
           fundSource: "CASH IN",
           fundAllocation: "UNSOLD GOODS",
           amount,
-          remarks: batchId,
+          remarks: batch,
           createdBy,
         });
 
@@ -575,13 +620,22 @@ async function updateProductionJDController(req, res) {
         });
 
         broadcastMessage({ type: "NEW_PRODUCT_LEDGER_JD", data: productEntry });
-      } else if (outputType === "INGREDIENT") {
+      } else if (
+        outputType === "INGREDIENT" ||
+        outputType === "PACKAGING AND LABELING"
+      ) {
         const ledgerEntry = await LedgerJD.create({
           transactionDate,
           transactionDetails: outputId?.toUpperCase(),
-          transactionCategory: "INGREDIENTS",
+          transactionCategory:
+            outputType === "INGREDIENT"
+              ? "INGREDIENTS"
+              : "PACKAGING AND LABELING",
           fundSource: "CASH IN",
-          fundAllocation: "INGREDIENTS",
+          fundAllocation:
+            outputType === "INGREDIENT"
+              ? "INGREDIENTS"
+              : "PACKAGING AND LABELING",
           amount,
           remarks,
           createdBy,
@@ -622,52 +676,70 @@ async function updateProductionJDController(req, res) {
       }
     }
 
-    // === LEDGER ENTRIES for costs ===
-    await LedgerJD.bulkCreate(
-      [
+    const ledgerEntry = [];
+
+    // Only include equipment-related entries if there are equipments
+    if (equipments && equipments.length > 0) {
+      ledgerEntry.push(
         {
+          batchId: id,
           transactionDate,
           transactionDetails: "EQUIPMENT DEPRECIATION",
           transactionCategory: "EQUIPMENTS",
           fundSource: "EQUIPMENTS",
           fundAllocation: "CASH OUT",
           amount: equipmentCost,
-          remarks: batchId,
+          remarks: batch,
           createdBy,
         },
         {
+          batchId: id,
           transactionDate,
           transactionDetails: "EQUIPMENT FEE",
           transactionCategory: "EQUIPMENTS",
           fundSource: "CASH ON HAND",
           fundAllocation: "EQUIPMENT FUNDS",
           amount: equipmentCost,
-          remarks: batchId,
+          remarks: batch,
           createdBy,
-        },
-        {
-          transactionDate,
-          transactionDetails: "UTILITIES FEE",
-          transactionCategory: "UTILITIES",
-          fundSource: "CASH ON HAND",
-          fundAllocation: "UTILITIES",
-          amount: utilitiesCost,
-          remarks: batchId,
-          createdBy,
-        },
-        {
-          transactionDate,
-          transactionDetails: "LABOR FEE",
-          transactionCategory: "LABOR",
-          fundSource: "CASH ON HAND",
-          fundAllocation: "LABOR",
-          amount: laborCost,
-          remarks: batchId,
-          createdBy,
-        },
-      ],
-      { validate: true }
-    ).then((entries) =>
+        }
+      );
+    }
+
+    // Only include UTILITIES if cost is greater than 0
+    if (utilitiesCost && utilitiesCost > 0) {
+      ledgerEntry.push({
+        batchId: id,
+        transactionDate,
+        transactionDetails: "UTILITIES FEE",
+        transactionCategory: "UTILITIES",
+        fundSource: "CASH ON HAND",
+        fundAllocation: "UTILITIES",
+        amount: utilitiesCost,
+        remarks: batch,
+        createdBy,
+      });
+    }
+
+    // Only include LABOR if cost is greater than 0
+    if (laborCost && laborCost > 0) {
+      ledgerEntry.push({
+        batchId: id,
+        transactionDate,
+        transactionDetails: "LABOR FEE",
+        transactionCategory: "LABOR",
+        fundSource: "CASH ON HAND",
+        fundAllocation: "LABOR",
+        amount: laborCost,
+        remarks: batch,
+        createdBy,
+      });
+    }
+
+    // === LEDGER ENTRIES for costs ===
+    await LedgerJD.bulkCreate(ledgerEntry, {
+      validate: true,
+    }).then((entries) =>
       broadcastMessage({ type: "NEW_LEDGER_JD", data: entries })
     );
 
@@ -747,87 +819,6 @@ async function deleteProductionJDController(req, res) {
     // Handle errors
     console.error("Error soft-deleting ProductionJD:", error);
     res.status(500).json({ message: "Internal server error" });
-  }
-}
-
-async function createProductionLedgerEntries() {
-  const transactionDate = "2025-03-16";
-  const batchId = "BATCH 1";
-  const grossIncome = 900;
-  const equipmentCost = 20;
-  const utilitiesCost = 90;
-  const laborCost = 90;
-  const createdBy = "00001";
-  try {
-    const ledgerEntry = [
-      {
-        transactionDate,
-        transactionDetails: batchId,
-        transactionCategory: "PRODUCTION",
-        fundSource: "CASH IN",
-        fundAllocation: "UNSOLD GOODS",
-        amount: grossIncome,
-        remarks: "",
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "EQUIPMENT DEPRECIATION",
-        transactionCategory: "EQUIPMENTS",
-        fundSource: "EQUIPMENTS",
-        fundAllocation: "CASH OUT",
-        amount: equipmentCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "EQUIPMENT FEE",
-        transactionCategory: "EQUIPMENTS",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "EQUIPMENT FUNDS",
-        amount: equipmentCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "UTILITIES FEE",
-        transactionCategory: "UTILITIES",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "UTILITIES",
-        amount: utilitiesCost,
-        remarks: batchId,
-        createdBy,
-      },
-      {
-        transactionDate,
-        transactionDetails: "LABOR FEE",
-        transactionCategory: "LABOR",
-        fundSource: "CASH ON HAND",
-        fundAllocation: "LABOR",
-        amount: laborCost,
-        remarks: batchId,
-        createdBy,
-      },
-    ];
-
-    const newLedgerEntries = await LedgerJD.bulkCreate(ledgerEntry, {
-      validate: true,
-    });
-
-    // Broadcast new entries
-    if (broadcastMessage) {
-      broadcastMessage({
-        type: "NEW_LEDGER_JD",
-        data: newLedgerEntries,
-      });
-    }
-
-    return newLedgerEntries;
-  } catch (error) {
-    console.error("Error creating production ledger entries:", error);
-    throw error;
   }
 }
 

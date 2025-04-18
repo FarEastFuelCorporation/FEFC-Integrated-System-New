@@ -10,6 +10,39 @@ const LedgerJD = require("../models/Ledger");
 const ProductJD = require("../models/Product");
 const ProductLedgerJD = require("../models/ProductLedger");
 
+async function getLedgerById(productId) {
+  try {
+    const ledger = await LedgerJD.findByPk(productId, {
+      include: [
+        {
+          model: InventoryJD,
+          as: "InventoryJD",
+          attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+        },
+        {
+          model: ProductLedgerJD,
+          as: "ProductLedgerJD",
+          attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
+        },
+        {
+          model: EmployeeJD,
+          as: "EmployeeJD",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
+      order: [
+        ["createdAt", "DESC"],
+        ["transactionDate", "DESC"],
+      ],
+    });
+
+    return ledger;
+  } catch (error) {
+    console.error("Error fetching ledger:", error);
+    throw error;
+  }
+}
+
 // Create Ledger controller
 async function createLedgerJDController(req, res) {
   try {
@@ -46,9 +79,11 @@ async function createLedgerJDController(req, res) {
         createdBy,
       });
 
+      const ledger = await getLedgerById(newEntry.id);
+
       broadcastMessage({
         type: "NEW_LEDGER_JD",
-        data: newEntry,
+        data: ledger,
       });
 
       if (
@@ -79,7 +114,7 @@ async function createLedgerJDController(req, res) {
         });
 
         broadcastMessage({
-          type: "NEW_INVENTORY_JD",
+          type: "NEW_INVENTORY_LEDGER_JD",
           data: newInventoryEntry,
         });
       } else if (transactionCategory === "EQUIPMENTS") {
@@ -118,9 +153,11 @@ async function createLedgerJDController(req, res) {
           createdBy,
         });
 
+        const ledger2 = await getLedgerById(newEntry2.id);
+
         broadcastMessage({
           type: "NEW_LEDGER_JD",
-          data: newEntry2,
+          data: ledger2,
         });
       } else if (transactionCategory === "SALES") {
         const product = await ProductJD.findOne({
@@ -140,33 +177,9 @@ async function createLedgerJDController(req, res) {
           createdBy,
         });
 
-        const ledger = await LedgerJD.findByPk(newProductLedgerEntry.id, {
-          include: [
-            {
-              model: InventoryJD,
-              as: "InventoryJD",
-              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
-            },
-            {
-              model: ProductLedgerJD,
-              as: "ProductLedgerJD",
-              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
-            },
-            {
-              model: EmployeeJD,
-              as: "EmployeeJD",
-              attributes: ["firstName", "lastName"],
-            },
-          ],
-          order: [
-            ["createdAt", "DESC"], // Primary sort
-            ["transactionDate", "DESC"], // Secondary sort
-          ],
-        });
-
         broadcastMessage({
           type: "NEW_PRODUCT_LEDGER_JD",
-          data: ledger,
+          data: newProductLedgerEntry,
         });
       }
     }
@@ -305,29 +318,7 @@ async function updateLedgerJDController(req, res) {
         // Save the updated Ledger
         await updatedLedgerJD.save();
 
-        const ledger = await LedgerJD.findByPk(id, {
-          include: [
-            {
-              model: InventoryJD,
-              as: "InventoryJD",
-              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
-            },
-            {
-              model: ProductLedgerJD,
-              as: "ProductLedgerJD",
-              attributes: ["id", "quantity", "unit", "unitPrice", "amount"],
-            },
-            {
-              model: EmployeeJD,
-              as: "EmployeeJD",
-              attributes: ["firstName", "lastName"],
-            },
-          ],
-          order: [
-            ["createdAt", "DESC"], // Primary sort
-            ["transactionDate", "DESC"], // Secondary sort
-          ],
-        });
+        const ledger = await getLedgerById(id);
 
         broadcastMessage({
           type: "UPDATED_LEDGER_JD",
@@ -414,14 +405,13 @@ async function updateLedgerJDController(req, res) {
             data: updatedProductLedgerJD,
           });
         }
-
-        res.status(201).json({
-          message: "updated successfully!",
-        });
       } else {
         // If Ledger with the specified ID was not found
         res.status(404).json({ message: `Ledger with ID ${id} not found` });
       }
+      res.status(201).json({
+        message: "updated successfully!",
+      });
     }
   } catch (error) {
     // Handle errors

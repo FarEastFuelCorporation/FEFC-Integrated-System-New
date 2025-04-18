@@ -11,6 +11,7 @@ import {
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
+import Decimal from "decimal.js";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import Header from "../../Header";
@@ -92,57 +93,68 @@ const ProductionJD = ({ user, socket }) => {
     createdBy: user.id,
   };
 
+  function safeDecimal(value) {
+    try {
+      return new Decimal(value);
+    } catch (error) {
+      return new Decimal(0);
+    }
+  }
+
   function calculateCosts(formData) {
     const calculateItemAmounts = (items) =>
       items.map((item) => {
-        const quantity = Number(item.quantity || 0);
-        const unitPrice = Number(item.unitPrice || 0);
+        const quantity = safeDecimal(item.quantity);
+        const unitPrice = safeDecimal(item.unitPrice);
+        const amount = quantity.mul(unitPrice);
         return {
           ...item,
-          amount: (quantity * unitPrice).toFixed(2), // Calculate amount based on quantity and unit price
+          amount: amount.toFixed(2),
         };
       });
 
-    // Only calculate amount for these:
-    const updatedIngredients = calculateItemAmounts(formData.ingredients);
-
-    const updatedPackagings = calculateItemAmounts(formData.packagings);
-
-    // Don't touch amount for equipments, just use as is
-    const updatedEquipments = formData.equipments.map((item) => ({
+    const updatedIngredients = calculateItemAmounts(formData.ingredients || []);
+    const updatedPackagings = calculateItemAmounts(formData.packagings || []);
+    const updatedEquipments = (formData.equipments || []).map((item) => ({
       ...item,
-      amount: Number(item.amount || 0),
+      amount: safeDecimal(item.amount).toFixed(2),
     }));
-
-    // Outputs still need amount calculated
-    const updatedOutputs = calculateItemAmounts(formData.outputs);
+    const updatedOutputs = calculateItemAmounts(formData.outputs || []);
 
     const sumAmount = (items) =>
-      items.reduce((total, item) => total + Number(item.amount || 0), 0);
+      items.reduce(
+        (total, item) => total.plus(safeDecimal(item.amount)),
+        new Decimal(0)
+      );
 
     const ingredientCost = sumAmount(updatedIngredients).toFixed(2);
     const packagingCost = sumAmount(updatedPackagings).toFixed(2);
     const equipmentCost = sumAmount(updatedEquipments).toFixed(2);
-    const utilitiesCost = Number(formData.utilitiesCost || 0).toFixed(2);
-    const laborCost = Number(formData.laborCost || 0).toFixed(2);
+    const utilitiesCost = safeDecimal(formData.utilitiesCost).toFixed(2);
+    const laborCost = safeDecimal(formData.laborCost).toFixed(2);
 
-    const totalCost = (
-      parseFloat(ingredientCost) +
-      parseFloat(packagingCost) +
-      parseFloat(equipmentCost) +
-      parseFloat(utilitiesCost) +
-      parseFloat(laborCost)
-    ).toFixed(2);
+    const totalCost = new Decimal(ingredientCost)
+      .plus(packagingCost)
+      .plus(equipmentCost)
+      .plus(utilitiesCost)
+      .plus(laborCost)
+      .toFixed(2);
 
     const grossIncome = updatedOutputs.reduce(
-      (total, output) => total + Number(output.amount || 0),
-      0
+      (total, output) => total.plus(safeDecimal(output.amount)),
+      new Decimal(0)
     );
 
-    const netIncome = (grossIncome - totalCost).toFixed(2);
+    const netIncome = grossIncome.minus(totalCost).toFixed(2);
 
-    const profitMargin =
-      grossIncome > 0 ? Math.round((netIncome / grossIncome) * 10000) / 100 : 0;
+    const profitMargin = grossIncome.gt(0)
+      ? grossIncome
+          .minus(totalCost)
+          .dividedBy(grossIncome)
+          .mul(100)
+          .toDecimalPlaces(2)
+          .toNumber()
+      : 0;
 
     return {
       ...formData,
@@ -153,8 +165,10 @@ const ProductionJD = ({ user, socket }) => {
       ingredientCost,
       packagingCost,
       equipmentCost,
+      utilitiesCost,
+      laborCost,
       totalCost,
-      grossIncome,
+      grossIncome: grossIncome.toFixed(2),
       netIncome,
       profitMargin,
     };
@@ -311,6 +325,7 @@ const ProductionJD = ({ user, socket }) => {
   };
 
   const handleEditClick = (row) => {
+    console.log(row);
     if (row) {
       setFormData({
         id: row.id,
@@ -379,7 +394,10 @@ const ProductionJD = ({ user, socket }) => {
                   "PACKAGING AND LABELING") &&
               item.transaction === "IN"
           ).map((item) => ({
-            outputType: "PACKAGING AND LABELING",
+            outputType:
+              item.InventoryJD?.transactionCategory === "INGREDIENTS"
+                ? "INGREDIENT"
+                : "PACKAGING AND LABELING",
             id: item.InventoryJD?.item,
             unit: item.InventoryJD?.unit,
             remaining: item.remaining,

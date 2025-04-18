@@ -1,7 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import UserSidebarJD from "../../OtherComponents/UserSidebar";
-import Dashboard from "../Layouts/Marketing/sections/dashboard";
 import Calendar from "../Layouts/Marketing/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import ProductCategoryJD from "../../OtherComponents/Sections/productCategory";

@@ -625,6 +625,7 @@ async function updateProductionJDController(req, res) {
         outputType === "PACKAGING AND LABELING"
       ) {
         const ledgerEntry = await LedgerJD.create({
+          batchId: id,
           transactionDate,
           transactionDetails: outputId?.toUpperCase(),
           transactionCategory:
@@ -637,7 +638,7 @@ async function updateProductionJDController(req, res) {
               ? "INGREDIENTS"
               : "PACKAGING AND LABELING",
           amount,
-          remarks,
+          remarks: batch,
           createdBy,
         });
 
@@ -660,7 +661,7 @@ async function updateProductionJDController(req, res) {
         broadcastMessage({ type: "NEW_INVENTORY_JD", data: inventoryEntry });
 
         const inventoryLedgerEntry = await InventoryLedgerJD.create({
-          inventoryId: outputId,
+          inventoryId: inventoryEntry.id,
           batchId: id,
           transactionDate,
           transaction: "IN",

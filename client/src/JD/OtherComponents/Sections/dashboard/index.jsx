@@ -487,11 +487,17 @@ const DashboardJD = ({ user, socket }) => {
         )}
 
         {/* Fourth Column for Pie Chart */}
-        <Grid item xs={12} sm={4.5} sx={{ height: "320px" }}>
+        <Grid
+          item
+          xs={12}
+          sm={4.5}
+          sx={{ height: isMobile ? "550px" : "320px" }}
+        >
           <Card sx={{ height: "inherit" }}>
             <CardContent sx={{ height: "inherit" }}>
               <ResponsivePie
                 data={data}
+                colors={{ scheme: "set3" }} // Add this to apply 'set3' color scheme
                 colorBy="id"
                 tooltip={({ datum }) => (
                   <div
@@ -537,10 +543,10 @@ const DashboardJD = ({ user, socket }) => {
                   },
                 }}
                 margin={{
-                  top: 20,
+                  top: isMobile ? -100 : 50,
                   right: 50,
-                  bottom: isMobile ? 60 : 20,
-                  left: 300,
+                  bottom: isMobile ? 170 : 20,
+                  left: 50,
                 }}
                 innerRadius={0.5}
                 padAngle={0.7}
@@ -551,6 +557,7 @@ const DashboardJD = ({ user, socket }) => {
                   from: "color",
                   modifiers: [["darker", 10]],
                 }}
+                enableArcLinkLabels={isMobile ? false : true}
                 arcLinkLabelsSkipAngle={10}
                 arcLinkLabelsTextColor={colors.grey[100]}
                 arcLinkLabelsThickness={2}
@@ -580,34 +587,35 @@ const DashboardJD = ({ user, socket }) => {
                     spacing: 10,
                   },
                 ]}
-                legends={[
-                  {
-                    anchor: `${isMobile ? "bottom" : "top-left"}`,
-                    direction: `${isMobile ? "row" : "column"}`,
-                    justify: false,
-                    translateX: isMobile ? 0 : -300,
-                    translateY: isMobile ? 50 : 0,
-                    itemsSpacing: 10,
-                    itemWidth: 100,
-                    itemHeight: 18,
-                    itemTextColor: colors.grey[100],
-                    itemDirection: "left-to-right",
-                    itemOpacity: 1,
-                    symbolSize: 24,
-                    symbolShape: "circle",
-                    effects: [
-                      {
-                        on: "hover",
-                        style: {
-                          itemTextColor: "#999",
+                legends={
+                  isMobile
+                    ? [
+                        {
+                          anchor: isMobile ? "bottom" : "top-left",
+                          direction: "column",
+                          justify: false,
+                          translateX: isMobile ? 0 : -300,
+                          translateY: isMobile ? 150 : 0,
+                          itemsSpacing: 10,
+                          itemWidth: 100,
+                          itemHeight: 18,
+                          itemTextColor: colors.grey[100],
+                          itemDirection: "left-to-right",
+                          itemOpacity: 1,
+                          symbolSize: 24,
+                          symbolShape: "circle",
+                          effects: [
+                            {
+                              on: "hover",
+                              style: {
+                                itemTextColor: "#999",
+                              },
+                            },
+                          ],
                         },
-                      },
-                    ],
-                    legendOffset: 10,
-                  },
-                ]}
-                // width={isMobile ? 280 : 350} // Control the width for smaller devices
-                // height={isMobile ? 250 : 300} // Control the height for smaller devices
+                      ]
+                    : []
+                }
               />
             </CardContent>
           </Card>
@@ -620,7 +628,6 @@ const DashboardJD = ({ user, socket }) => {
               <Box
                 sx={{
                   width: "100%",
-                  height: isMobile ? "100px" : "auto",
                   display: "flex",
                   flexDirection: isMobile ? "column" : "row",
                   alignItems: "center",
@@ -655,7 +662,6 @@ const DashboardJD = ({ user, socket }) => {
               <Box
                 sx={{
                   width: "100%",
-                  height: isMobile ? "100px" : "auto",
                   display: "flex",
                   flexDirection: isMobile ? "column" : "row",
                   alignItems: "center",

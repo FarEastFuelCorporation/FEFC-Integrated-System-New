@@ -52,8 +52,6 @@ const ModalJD = ({
     )
     .sort((a, b) => a.item.localeCompare(b.item));
 
-  console.log(equipments);
-
   const unitCategory = [
     "PC",
     "PACK",

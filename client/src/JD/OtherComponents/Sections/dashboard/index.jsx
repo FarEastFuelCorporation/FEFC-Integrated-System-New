@@ -94,9 +94,6 @@ const DashboardJD = ({ user, socket }) => {
     setSelectedTab(newValue);
   };
 
-  console.log(summary["UNUSED INVENTORIES"]);
-  console.log(formatNumber(summary["UNUSED INVENTORIES"]));
-
   const data = [
     {
       id: "CASH ON HAND",

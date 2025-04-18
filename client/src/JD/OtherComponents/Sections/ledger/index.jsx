@@ -90,8 +90,6 @@ const LedgerJD = ({ user, socket }) => {
     if (socket) {
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log(message.data);
-
         if (message.type === "NEW_LEDGER_JD") {
           setTransactions((prevData) =>
             [...prevData, message.data].sort(

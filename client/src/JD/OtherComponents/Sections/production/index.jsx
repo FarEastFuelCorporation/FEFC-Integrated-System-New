@@ -130,14 +130,14 @@ const ProductionJD = ({ user, socket }) => {
     const ingredientCost = sumAmount(updatedIngredients).toFixed(2);
     const packagingCost = sumAmount(updatedPackagings).toFixed(2);
     const equipmentCost = sumAmount(updatedEquipments).toFixed(2);
-    const utilitiesCost = safeDecimal(formData.utilitiesCost).toFixed(2);
-    const laborCost = safeDecimal(formData.laborCost).toFixed(2);
+    const utilitiesCost = safeDecimal(formData.utilitiesCost);
+    const laborCost = safeDecimal(formData.laborCost);
 
     const totalCost = new Decimal(ingredientCost)
       .plus(packagingCost)
       .plus(equipmentCost)
-      .plus(utilitiesCost)
-      .plus(laborCost)
+      .plus(utilitiesCost.toFixed(2))
+      .plus(laborCost.toFixed(2))
       .toFixed(2);
 
     const grossIncome = updatedOutputs.reduce(

@@ -97,6 +97,8 @@ const ModalJD = ({
         (ingredient) => ingredient.id === value
       );
 
+      console.log(ingredientItem);
+
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {
         ...ingredient,
@@ -387,7 +389,7 @@ const ModalJD = ({
                 <TextField
                   label="Available Stock"
                   name={`ingredients[${index}].remaining`}
-                  value={(ingredient.remaining || 0).toFixed(2)}
+                  value={(ingredient.remaining || 0).toFixed(5)}
                   onChange={(e) =>
                     handleIngredientChange(index, "remaining", e.target.value)
                   }
@@ -543,7 +545,7 @@ const ModalJD = ({
                 <TextField
                   label="Available Stock"
                   name={`packagings[${index}].remaining`}
-                  value={(packaging.remaining || 0).toFixed(2)}
+                  value={(packaging.remaining || 0).toFixed(5)}
                   onChange={(e) =>
                     handlePackagingChange(index, "remaining", e.target.value)
                   }

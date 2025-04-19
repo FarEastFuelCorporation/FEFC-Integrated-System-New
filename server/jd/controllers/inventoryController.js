@@ -115,7 +115,7 @@ async function getInventoryJDsController(req, res) {
 
       return {
         ...item.toJSON(),
-        updatedQuantity, // Add computed updatedQuantity to each inventory item
+        updatedQuantity: parseFloat(updatedQuantity.toFixed(4)), // Fix floating point issue
       };
     });
 

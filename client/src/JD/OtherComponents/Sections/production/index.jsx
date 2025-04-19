@@ -109,7 +109,7 @@ const ProductionJD = ({ user, socket }) => {
         const amount = quantity.mul(unitPrice);
         return {
           ...item,
-          amount: amount.toFixed(2),
+          amount: amount.toFixed(5),
         };
       });
 
@@ -117,7 +117,7 @@ const ProductionJD = ({ user, socket }) => {
     const updatedPackagings = calculateItemAmounts(formData.packagings || []);
     const updatedEquipments = (formData.equipments || []).map((item) => ({
       ...item,
-      amount: safeDecimal(item.amount).toFixed(2),
+      amount: safeDecimal(item.amount).toFixed(5),
     }));
     const updatedOutputs = calculateItemAmounts(formData.outputs || []);
 

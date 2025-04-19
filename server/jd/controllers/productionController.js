@@ -566,10 +566,46 @@ async function updateProductionJDController(req, res) {
     });
     const currentOutputLedgers = await LedgerJD.findAll({
       where: { remarks: batch },
+      include: {
+        model: InventoryJD,
+        as: "InventoryJD",
+        include: {
+          model: InventoryLedgerJD,
+          as: "InventoryLedgerJD",
+        },
+      },
     });
 
+    // Step 1: Collect all associated InventoryJD entries from output ledgers
+    const associatedInventoryJDsFromOutput = currentOutputLedgers
+      .flatMap((output) => output.InventoryJD || []) // since it's a hasMany
+      .filter(
+        (inv, index, self) =>
+          inv &&
+          typeof inv.destroy === "function" &&
+          self.findIndex((i) => i.id === inv.id) === index
+      );
+
+    // Step 2: Collect associated InventoryLedgerJD from those InventoryJD entries
+    const associatedInventoryLedgersFromOutput =
+      associatedInventoryJDsFromOutput
+        .flatMap((inv) => inv.InventoryLedgerJD || [])
+        .filter(
+          (ledger, index, self) =>
+            ledger &&
+            typeof ledger.destroy === "function" &&
+            self.findIndex((l) => l.id === ledger.id) === index
+        );
+
+    // Step 3: Destroy them all
     await Promise.all([
-      // Deleting all existing entries before adding new ones
+      // Delete associated InventoryLedgerJD entries first
+      ...associatedInventoryLedgersFromOutput.map((e) => e.destroy()),
+
+      // Then delete associated InventoryJD entries
+      ...associatedInventoryJDsFromOutput.map((e) => e.destroy()),
+
+      // Then delete main entries
       ...currentProductLedgers.map((e) => e.destroy()),
       ...currentInventoryLedgers.map((e) => e.destroy()),
       ...currentInventoryEntries.map((e) => e.destroy()),

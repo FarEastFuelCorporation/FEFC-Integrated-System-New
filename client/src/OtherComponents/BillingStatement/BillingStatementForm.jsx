@@ -188,7 +188,8 @@ const BillingStatementForm = ({
       weight: item.weight.toNumber(), // Convert Decimal back to a standard number
     }));
 
-    let hasTransportation;
+    let hasTransportation = false;
+    let transportation = [];
 
     // SMB
     if (hasFixedRate && isMonthly) {
@@ -353,6 +354,9 @@ const BillingStatementForm = ({
 
         hasTransportation = QuotationWaste.hasTransportation;
 
+        // Collect transportation flags
+        transportation.push(QuotationWaste.hasTransportation);
+
         switch (QuotationWaste.vatCalculation) {
           case "VAT EXCLUSIVE":
             target.vatExclusive += totalWeightPrice;
@@ -368,6 +372,9 @@ const BillingStatementForm = ({
         }
       });
     }
+
+    // Check if any entry in transportation is false
+    hasTransportation = transportation.every(Boolean);
 
     const transpoFee =
       parseFloat(transaction.QuotationTransportation?.unitPrice) || 0;

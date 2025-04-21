@@ -75,13 +75,14 @@ const TreatModal = ({
           );
 
           setTotalTreatedWeight(
-            formData.waste.reduce(
-              (acc, w) =>
+            (formData?.waste || []).reduce((acc, w) => {
+              if (!w) return acc;
+              return (
                 acc +
-                (w.treatedWeight || 0) +
-                calculateTotalWeight(w.treatedWastes || []),
-              0
-            )
+                (w?.treatedWeight || 0) +
+                calculateTotalWeight(w?.treatedWastes || [])
+              );
+            }, 0)
           );
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -90,7 +91,7 @@ const TreatModal = ({
 
       fetchData();
     }
-  }, [open, formData.waste, formData.waste.treatedWeight]);
+  }, [open, formData.waste, formData.waste?.treatedWeight]);
 
   const formatWeight = (weight) => {
     // Check if weight is NaN

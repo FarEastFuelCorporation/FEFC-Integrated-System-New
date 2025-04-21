@@ -85,6 +85,9 @@ const TreatedTransactions = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = (row, waste) => {
+    const submitTo =
+      row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo;
+
     setFormData({
       row: row,
       waste: waste
@@ -103,6 +106,22 @@ const TreatedTransactions = ({ user }) => {
               sortedWasteTransactionId: waste?.id,
             },
           ]
+        : submitTo === "WAREHOUSE"
+        ? row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.WarehousedTransaction?.[0]?.WarehousedTransactionItem.map(
+            (w) => ({
+              ...w,
+              treatedWastes: w.treatedWastes || [
+                {
+                  treatedDate: "",
+                  treatedTime: "",
+                  treatmentProcessId: "",
+                  treatmentMachineId: "",
+                  weight: 0,
+                },
+              ],
+              warehousedTransactionItemId: w?.id,
+            })
+          )
         : row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]?.SortedWasteTransaction.map(
             (w) => ({
               ...w,

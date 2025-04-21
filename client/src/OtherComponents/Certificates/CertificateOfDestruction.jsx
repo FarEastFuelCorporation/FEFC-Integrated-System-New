@@ -285,6 +285,14 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                         submitTo === "WAREHOUSE"
                           ? waste.description
                           : waste.wasteName;
+
+                      const hasTreatedTransactions =
+                        Array.isArray(waste.TreatedWasteTransaction) &&
+                        waste.TreatedWasteTransaction.length > 0;
+
+                      // 🛑 Skip if false
+                      if (!hasTreatedTransactions) return null;
+
                       return (
                         <TableRow key={index} sx={{ border: "black" }}>
                           <TableCell sx={bodyCellStyles(false)}>

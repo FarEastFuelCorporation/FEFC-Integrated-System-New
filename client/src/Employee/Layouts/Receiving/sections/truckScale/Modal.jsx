@@ -114,114 +114,151 @@ const SectionModal = ({
         </Grid>
         <Grid container spacing={2}>
           <Grid item xs={12} lg={6}>
-            <Autocomplete
-              freeSolo
-              fullWidth
-              options={clients}
-              getOptionLabel={(option) => {
-                if (typeof option === "string") return option;
-                return option.clientName || "";
-              }}
-              filterOptions={(options, state) =>
-                options.filter((option) =>
-                  option.clientName
-                    .toLowerCase()
-                    .includes(state.inputValue.toLowerCase())
-                )
-              }
-              inputValue={formData.clientName}
-              onInputChange={(event, newInputValue) => {
-                handleInputChange({
-                  target: {
-                    name: "clientName",
-                    value: newInputValue || "",
-                  },
-                });
-              }}
-              onChange={(event, newValue) => {
-                if (typeof newValue === "object" && newValue !== null) {
-                  // Selected from the list
+            {!formData.id && (
+              <Autocomplete
+                freeSolo
+                fullWidth
+                options={clients}
+                getOptionLabel={(option) => {
+                  if (typeof option === "string") return option;
+                  return option.clientName || "";
+                }}
+                filterOptions={(options, state) =>
+                  options.filter((option) =>
+                    option.clientName
+                      .toLowerCase()
+                      .includes(state.inputValue.toLowerCase())
+                  )
+                }
+                inputValue={formData.clientName}
+                onInputChange={(event, newInputValue) => {
                   handleInputChange({
                     target: {
                       name: "clientName",
-                      value: newValue.clientName,
+                      value: newInputValue || "",
                     },
                   });
+                }}
+                onChange={(event, newValue) => {
+                  if (typeof newValue === "object" && newValue !== null) {
+                    // Selected from the list
+                    handleInputChange({
+                      target: {
+                        name: "clientName",
+                        value: newValue.clientName,
+                      },
+                    });
+                    handleInputChange({
+                      target: {
+                        name: "clientId",
+                        value: newValue.clientId,
+                      },
+                    });
+                  } else {
+                    // Manually typed
+                    handleInputChange({
+                      target: {
+                        name: "clientId",
+                        value: "",
+                      },
+                    });
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Client Name"
+                    name="clientName"
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                )}
+              />
+            )}
+            {!formData.id && (
+              <Autocomplete
+                value={formData.commodity}
+                onChange={(event, newValue) => {
                   handleInputChange({
                     target: {
-                      name: "clientId",
-                      value: newValue.clientId,
+                      name: "commodity",
+                      value:
+                        typeof newValue === "string"
+                          ? newValue
+                          : newValue?.label || "",
                     },
                   });
-                } else {
-                  // Manually typed
+                }}
+                inputValue={formData.commodity}
+                onInputChange={(event, newInputValue) => {
                   handleInputChange({
                     target: {
-                      name: "clientId",
-                      value: "",
+                      name: "commodity",
+                      value: newInputValue,
                     },
                   });
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Client Name"
-                  name="clientName"
-                  required
-                  InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
-              )}
-            />
-
-            <Autocomplete
-              value={formData.commodity}
-              onChange={(event, newValue) => {
-                handleInputChange({
-                  target: {
-                    name: "commodity",
-                    value:
-                      typeof newValue === "string"
-                        ? newValue
-                        : newValue?.label || "",
+                }}
+                options={clientWasteNames.map((waste) => ({ label: waste }))}
+                getOptionLabel={(option) => {
+                  return typeof option === "string" ? option : option.label;
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Commodity"
+                    name="commodity"
+                    required
+                    InputLabelProps={{
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                    autoComplete="off"
+                  />
+                )}
+                fullWidth
+                freeSolo
+              />
+            )}
+            {formData.id && (
+              <TextField
+                label="Client Name"
+                name="clientName"
+                value={formData.clientName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
                   },
-                });
-              }}
-              inputValue={formData.commodity}
-              onInputChange={(event, newInputValue) => {
-                handleInputChange({
-                  target: {
-                    name: "commodity",
-                    value: newInputValue,
+                }}
+                disabled={formData.id}
+                autoComplete="off"
+              />
+            )}
+            {formData.id && (
+              <TextField
+                label="Commodity"
+                name="commodity"
+                value={formData.commodity}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
                   },
-                });
-              }}
-              options={clientWasteNames.map((waste) => ({ label: waste }))}
-              getOptionLabel={(option) => {
-                return typeof option === "string" ? option : option.label;
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Commodity"
-                  name="commodity"
-                  required
-                  InputLabelProps={{
-                    style: {
-                      color: colors.grey[100],
-                    },
-                  }}
-                  autoComplete="off"
-                />
-              )}
-              fullWidth
-              freeSolo
-            />
+                }}
+                disabled={formData.id}
+                autoComplete="off"
+              />
+            )}
           </Grid>
           <Grid item xs={12} lg={6}>
             <TextField
@@ -236,6 +273,7 @@ const SectionModal = ({
                   color: colors.grey[100],
                 },
               }}
+              disabled={formData.id}
               autoComplete="off"
             />
             <TextField
@@ -250,6 +288,7 @@ const SectionModal = ({
                   color: colors.grey[100],
                 },
               }}
+              disabled={formData.id}
               autoComplete="off"
             />
           </Grid>

@@ -110,7 +110,9 @@ const TruckScale = ({ user }) => {
     if (!formData.clientId) {
       setClientWasteNames([]);
       // Reset commodity when clientId is cleared
-      setFormData((prev) => ({ ...prev, commodity: "" }));
+      if (!formData.id) {
+        setFormData((prev) => ({ ...prev, commodity: "" }));
+      }
       return;
     }
 
@@ -125,8 +127,10 @@ const TruckScale = ({ user }) => {
     setClientWasteNames(allWasteNames);
 
     // Reset commodity when clientId changes
-    setFormData((prev) => ({ ...prev, commodity: "" }));
-  }, [formData.clientId, quotations]);
+    if (!formData.id) {
+      setFormData((prev) => ({ ...prev, commodity: "" }));
+    }
+  }, [formData.clientId, formData.id, quotations]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -157,9 +161,11 @@ const TruckScale = ({ user }) => {
     if (row) {
       const isValidDate = (date) => date && !isNaN(new Date(date).getTime());
       const isValidTime = (time) => {
-        const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/; // Validates HH:mm or HH:mm:ss format
+        const timeRegex =
+          /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/.test(time); // Validates HH:mm or HH:mm:ss format
 
-        return time && timeRegex.test(time);
+        console.log(timeRegex);
+        return timeRegex ? timeRegex : "";
       };
 
       setFormData({

@@ -5,6 +5,7 @@ import PostAddIcon from "@mui/icons-material/PostAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import QRCode from "qrcode";
 import { tokens } from "../../../../../theme";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
@@ -19,6 +20,11 @@ import {
   formatTime2,
   formatTime4,
 } from "../../../../../OtherComponents/Functions";
+
+const modifyApiUrlPort = (url) => {
+  const portPattern = /:(3001)$/;
+  return url.replace(portPattern, ":3000");
+};
 
 const TruckScale = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -457,42 +463,42 @@ const TruckScale = ({ user }) => {
             const id = params.row.id;
             setLoadingRowId(id);
 
-            // Print window dimensions and position
             const windowWidth = 800;
             const windowHeight = 600;
             const windowLeft = (window.innerWidth - windowWidth) / 2;
             const windowTop = (window.innerHeight - windowHeight) / 2;
 
-            // Open the print window
             const printWindow = window.open(
               "",
               "_blank",
               `width=${windowWidth},height=${windowHeight},left=${windowLeft},top=${windowTop}`
             );
 
-            // Check if the window was successfully opened
             if (printWindow) {
-              // Insert HTML content into the print window
-              const htmlContent = generatePrintHTML(params);
-              printWindow.document.write(htmlContent);
+              // Ensure the content is fully generated and resolved before writing to printWindow
+              const htmlContent = await generatePrintHTML(params); // Ensure it's awaited properly
+              if (typeof htmlContent === "string") {
+                printWindow.document.write(htmlContent);
 
-              // Ensure the logo is loaded before triggering print
-              const logoImage = printWindow.document.getElementById("logo");
-              logoImage.onload = function () {
-                printWindow.document.close(); // Close the document after the image is loaded
-                printWindow.print(); // Trigger the print dialog
+                // Ensure the print window fully loads before attempting to print
+                const logoImage = printWindow.document.getElementById("logo");
+                if (logoImage) {
+                  logoImage.onload = function () {
+                    printWindow.document.close();
+                    printWindow.print();
+                    printWindow.onafterprint = () => {
+                      printWindow.close();
+                    };
+                  };
 
-                // Automatically close the print window after printing
-                printWindow.onafterprint = () => {
-                  printWindow.close();
-                };
-              };
-
-              // In case the image fails to load, trigger print anyway (as a fallback)
-              logoImage.onerror = function () {
-                printWindow.document.close();
-                printWindow.print();
-              };
+                  logoImage.onerror = function () {
+                    printWindow.document.close();
+                    printWindow.print();
+                  };
+                }
+              } else {
+                console.error("Error: HTML content is not a string.");
+              }
             } else {
               console.error("Failed to open print window.");
             }
@@ -559,7 +565,14 @@ const TruckScale = ({ user }) => {
     );
   }
 
-  const generatePrintHTML = (params) => {
+  const generatePrintHTML = async (params) => {
+    const qrCodeURL = `${modifyApiUrlPort(apiUrl)}/truckScaleView/${
+      params.row?.id
+    }`;
+
+    // Generate the QR code as a data URL (base64)
+    const qrCodeDataUrl = await QRCode.toDataURL(qrCodeURL);
+
     return `
       <html>
         <head>
@@ -681,11 +694,15 @@ const TruckScale = ({ user }) => {
                   <td style="padding: 5px;"><strong>Remarks:</strong></td>
                   <td style="padding: 5px;">${params.row.remarks}</td>
                 </tr>
+                <tr>
+                  <td style="padding: 5px;">Scan this QR code to verify the authenticity of the transaction.</td>
+                  <td style="padding: 5px;">            
+                    <img src="${qrCodeDataUrl}" alt="QR Code" width="80" height="80" />
+                </td>
+                </tr>
               </table>
             </div>
-
           </div>
-  
         </body>
       </html>
     `;

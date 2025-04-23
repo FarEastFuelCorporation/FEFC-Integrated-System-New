@@ -60,12 +60,14 @@ const departmentRoutes = require("./departmentRoutes");
 const medicineRoutes = require("./medicineRoutes");
 const medicineLogRoutes = require("./medicineLogRoutes");
 const truckScaleRoutes = require("./truckScaleRoutes");
+const truckScaleVIewRoutes = require("./truckScaleVIewRoutes");
 const { error404Controller } = require("../controllers/othersController");
 
 router.use(authRoutes);
 router.use(othersRoutes);
 // router.use("/attendance", attendanceRoutes);
 router.use("/certificate", certificateRoutes);
+router.use("/truckScaleView", truckScaleVIewRoutes);
 router.use("/billing", billingRoutes);
 router.use("/quotationForm", quotationFormRoutes);
 

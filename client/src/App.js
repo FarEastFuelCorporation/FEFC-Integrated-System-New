@@ -28,6 +28,7 @@ import LandingPageJD from "./JD/OtherComponents/LandingPage";
 import NavbarJD from "./JD/OtherComponents/Navbar";
 import EmployeeJD from "./JD/Auth/Employee";
 import DashboardJD from "./JD/OtherComponents/Dashboard";
+import TruckScaleView from "./OtherComponents/Certificates/TruckScaleView";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -123,6 +124,7 @@ const App = () => {
           <Route path="/quotationForm/:id" element={<QuotationDisplay />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/certificate/:id" element={<Certificate />} />
+          <Route path="/truckScaleView/:id" element={<TruckScaleView />} />
           <Route
             path="/certificate/plasticCredit/:id"
             element={<VerifyPlasticCredit />}

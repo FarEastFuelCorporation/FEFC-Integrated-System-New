@@ -18,6 +18,12 @@ export const CertificateOfDestructionFooter1 = ({
   const typeOfWeight = certifiedTransaction.typeOfWeight;
 
   const weightsByUnit = sortedWasteTransaction.reduce((acc, waste) => {
+    const hasTreatedTransactions =
+      Array.isArray(waste.TreatedWasteTransaction) &&
+      waste.TreatedWasteTransaction.length > 0;
+
+    // 🛑 Skip if false
+    if (!hasTreatedTransactions) return acc;
     const unit =
       typeOfWeight === "CLIENT WEIGHT"
         ? waste.clientUnit

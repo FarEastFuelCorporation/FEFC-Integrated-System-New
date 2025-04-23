@@ -87,7 +87,6 @@ const TreatedTransactions = ({ user }) => {
   const handleOpenModal = (row, waste) => {
     const submitTo =
       row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo;
-
     setFormData({
       row: row,
       waste: waste
@@ -217,7 +216,20 @@ const TreatedTransactions = ({ user }) => {
       validationErrors.push("At least one waste entry is required.");
     } else {
       formData.waste.forEach((waste, wasteIndex) => {
-        if (!waste.sortedWasteTransactionId) {
+        if (
+          !waste.sortedWasteTransactionId &&
+          formData.submitTo === "SORTING"
+        ) {
+          validationErrors.push(
+            `Sorted Waste Transaction ID is required for waste #${
+              wasteIndex + 1
+            }.`
+          );
+        }
+        if (
+          !waste.warehousedTransactionItemId &&
+          formData.submitTo === "WAREHOUSE"
+        ) {
           validationErrors.push(
             `Sorted Waste Transaction ID is required for waste #${
               wasteIndex + 1

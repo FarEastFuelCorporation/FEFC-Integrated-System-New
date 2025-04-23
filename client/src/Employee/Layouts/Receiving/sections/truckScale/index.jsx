@@ -206,7 +206,7 @@ const TruckScale = ({ user }) => {
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/scrapType/${id}`, {
+      await axios.delete(`${apiUrl}/api/truckScale/${id}`, {
         data: { deletedBy: user.id },
       });
 

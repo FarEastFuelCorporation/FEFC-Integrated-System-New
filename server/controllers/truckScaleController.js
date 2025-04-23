@@ -147,53 +147,38 @@ async function updateTruckScaleController(req, res) {
   }
 }
 
-// Delete Truck Scale controller
+// Delete Truck Scale Controller
 async function deleteTruckScaleController(req, res) {
   try {
     const id = req.params.id;
-    const { deletedBy, bookedTransactionId } = req.body;
+    const { deletedBy } = req.body;
 
-    console.log("Soft deleting scheduled transaction with ID:", id);
+    console.log("Soft deleting truck scale record with ID:", id);
 
-    // Find the scheduled transaction by UUID (id)
-    const receivedTransactionToDelete = await ReceivedTransaction.findByPk(id);
+    // Find the truck scale entry by its primary key
+    const truckScaleToDelete = await TruckScale.findByPk(id);
 
-    if (receivedTransactionToDelete) {
-      // Update the deletedBy field
-      receivedTransactionToDelete.updatedBy = deletedBy;
-      receivedTransactionToDelete.deletedBy = deletedBy;
-      await receivedTransactionToDelete.save();
-
-      const updatedBookedTransaction = await BookedTransaction.findByPk(
-        bookedTransactionId
-      );
-      console.log(updatedBookedTransaction);
-
-      updatedBookedTransaction.statusId = 3;
-
-      await updatedBookedTransaction.save();
-
-      // Soft delete the scheduled transaction (sets deletedAt timestamp)
-      await receivedTransactionToDelete.destroy();
-
-      // fetch transactions
-      const data = await fetchData(statusId);
-
-      // Respond with the updated data
-      res.status(200).json({
-        pendingTransactions: data.pending,
-        inProgressTransactions: data.inProgress,
-        finishedTransactions: data.finished,
+    if (!truckScaleToDelete) {
+      return res.status(404).json({
+        message: `Truck Scale entry with ID ${id} not found`,
       });
-    } else {
-      // If scheduled transaction with the specified ID was not found
-      res
-        .status(404)
-        .json({ message: `Scheduled Transaction with ID ${id} not found` });
     }
+
+    // Set updatedBy and deletedBy
+    truckScaleToDelete.updatedBy = deletedBy;
+    truckScaleToDelete.deletedBy = deletedBy;
+
+    // Save the updates before soft deleting
+    await truckScaleToDelete.save();
+
+    // Soft delete the truck scale entry (sets deletedAt timestamp if paranoid: true)
+    await truckScaleToDelete.destroy();
+
+    res.status(200).json({
+      message: "Truck scale entry deleted successfully",
+    });
   } catch (error) {
-    // Handle errors
-    console.error("Error soft-deleting scheduled transaction:", error);
+    console.error("Error deleting truck scale entry:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

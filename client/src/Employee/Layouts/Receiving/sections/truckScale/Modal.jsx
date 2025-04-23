@@ -386,7 +386,10 @@ const SectionModal = ({
                     color: colors.grey[100],
                   },
                 }}
-                disabled={formData.transactionType === "INBOUND"}
+                disabled={
+                  (formData.transactionType === "OUTBOUND" && !!formData.id) ||
+                  (formData.transactionType === "INBOUND" && !formData.id)
+                }
                 autoComplete="off"
               />
             </Grid>
@@ -404,7 +407,10 @@ const SectionModal = ({
                   color: colors.grey[100],
                 },
               }}
-              disabled={formData.transactionType === "OUTBOUND"}
+              disabled={
+                (formData.transactionType === "OUTBOUND" && !formData.id) ||
+                (formData.transactionType === "INBOUND" && !!formData.id)
+              }
               autoComplete="off"
             />
           </Grid>
@@ -422,7 +428,10 @@ const SectionModal = ({
                     color: colors.grey[100],
                   },
                 }}
-                disabled={formData.transactionType === "INBOUND"}
+                disabled={
+                  (formData.transactionType === "OUTBOUND" && !!formData.id) ||
+                  (formData.transactionType === "INBOUND" && !formData.id)
+                }
                 autoComplete="off"
               />
             </Grid>

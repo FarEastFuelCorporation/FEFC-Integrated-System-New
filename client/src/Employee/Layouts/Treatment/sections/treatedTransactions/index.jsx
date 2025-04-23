@@ -151,7 +151,7 @@ const TreatedTransactions = ({ user }) => {
       submitTo:
         row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.submitTo,
       remarks: "",
-      statusId: 8,
+      statusId: row.statusId > 8 ? row.statusId : 8,
       createdBy: user.id,
     });
     setOpenModal(true);

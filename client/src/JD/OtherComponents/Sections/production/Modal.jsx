@@ -97,8 +97,6 @@ const ModalJD = ({
         (ingredient) => ingredient.id === value
       );
 
-      console.log(ingredientItem);
-
       // Calculate amount if quantity or unitPrice is updated
       const updatedTransaction = {
         ...ingredient,

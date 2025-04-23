@@ -59,6 +59,7 @@ const employeeAttachmentMemoRoutes = require("./employeeAttachmentMemoRoutes");
 const departmentRoutes = require("./departmentRoutes");
 const medicineRoutes = require("./medicineRoutes");
 const medicineLogRoutes = require("./medicineLogRoutes");
+const truckScaleRoutes = require("./truckScaleRoutes");
 const { error404Controller } = require("../controllers/othersController");
 
 router.use(authRoutes);
@@ -130,6 +131,7 @@ router.use("/employeeAttachmentMemo", employeeAttachmentMemoRoutes);
 router.use("/department", departmentRoutes);
 router.use("/medicine", medicineRoutes);
 router.use("/medicineLog", medicineLogRoutes);
+router.use("/truckScale", truckScaleRoutes);
 
 router.use(error404Controller);
 

@@ -10,6 +10,7 @@ const {
   createQuotationController,
   deleteQuotationController,
   updateQuotationController,
+  getQuotationWithWasteController,
 } = require("../controllers/quotationControllers");
 
 // Create Quotation route
@@ -20,6 +21,9 @@ router.get("/", getQuotationsController);
 
 // Get Quotations route
 router.get("/full", getQuotationsFullController);
+
+// Get Quotation with Waste route
+router.get("/waste", getQuotationWithWasteController);
 
 // Get Quotation route
 router.get("/:id", getQuotationController);

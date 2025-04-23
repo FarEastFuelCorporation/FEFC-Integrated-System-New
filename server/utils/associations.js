@@ -61,6 +61,7 @@ const WarehousedOutTransaction = require("../models/WarehousedOutTransaction");
 const WarehousedOutTransactionItem = require("../models/WarehousedOutTransactionItem");
 const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
+const TruckScale = require("../models/TruckScale");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -641,6 +642,17 @@ Employee.hasMany(MedicineLog, {
 MedicineLog.belongsTo(Employee, {
   as: "MedicineLogEmployee",
   foreignKey: "employeeId",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(TruckScale, {
+  as: "TruckScale",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+TruckScale.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
   targetKey: "employeeId",
 });
 

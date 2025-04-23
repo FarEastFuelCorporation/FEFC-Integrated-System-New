@@ -426,6 +426,55 @@ async function getQuotationFullController(req, res) {
   }
 }
 
+// Get Quotations with Waste controller
+async function getQuotationWithWasteController(req, res) {
+  try {
+    // Fetch all quotations from the database
+    const quotations = await Quotation.findAll({
+      include: [
+        {
+          model: Client,
+          as: "Client",
+          attributes: { exclude: ["clientPicture"] },
+          attributes: ["clientName"],
+        },
+        {
+          model: QuotationWaste,
+          as: "QuotationWaste",
+          attributes: ["wasteName"],
+        },
+      ],
+      where: {
+        status: "active",
+      },
+      order: [["quotationCode", "ASC"]], // Ordering at the top level
+    });
+
+    // Flatten and format the data
+    const flattenedData = quotations.map((item) => {
+      const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
+      const createdDate = new Date(quotation.dateCreated);
+      const validityDate = new Date(quotation.validity);
+      return {
+        ...quotation,
+        clientName: quotation.Client ? quotation.Client.clientName : null,
+        dateCreated: !isNaN(createdDate.getTime())
+          ? createdDate.toISOString().split("T")[0]
+          : null, // Convert valid date to yyyy-mm-dd format or null if invalid
+        validity: !isNaN(validityDate.getTime())
+          ? validityDate.toISOString().split("T")[0]
+          : null, // Convert valid date to yyyy-mm-dd format or null if invalid
+      };
+    });
+
+    // Send the formatted data
+    res.json({ quotations: flattenedData });
+  } catch (error) {
+    console.error("Error fetching quotations:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 // Update Quotation controller
 async function updateQuotationController(req, res) {
   try {
@@ -851,6 +900,7 @@ module.exports = {
   getQuotationsFullController,
   getQuotationController,
   getQuotationFullController,
+  getQuotationWithWasteController,
   createQuotationController,
   updateQuotationController,
   deleteQuotationController,

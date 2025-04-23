@@ -394,6 +394,7 @@ const SectionModal = ({
               />
             </Grid>
           )}
+
           <Grid item xs={12} lg={4}>
             <TextField
               label="Gross Weight"

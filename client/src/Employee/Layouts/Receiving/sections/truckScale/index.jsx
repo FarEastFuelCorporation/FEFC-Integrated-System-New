@@ -303,7 +303,7 @@ const TruckScale = ({ user, socket }) => {
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 60,
+      minWidth: 80,
     },
     {
       field: "transactionType",
@@ -468,7 +468,7 @@ const TruckScale = ({ user, socket }) => {
       headerAlign: "center",
       align: "center",
       flex: 1.5,
-      minWidth: 150,
+      minWidth: 130,
       renderCell: renderCellWithWrapText,
     },
     {

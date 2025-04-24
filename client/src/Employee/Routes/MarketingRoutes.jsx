@@ -11,8 +11,9 @@ import Commissions from "../../OtherComponents/Sections/commissions";
 import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../../Employee/Layouts/Marketing/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import TruckScale from "../Layouts/Receiving/sections/truckScale";
 
-const MarketingRoutes = ({ user, onUpdateUser }) => (
+const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebar user={user} />}>
@@ -26,6 +27,10 @@ const MarketingRoutes = ({ user, onUpdateUser }) => (
         element={<ScheduledTransactions user={user} />}
       />
       <Route path="commissions" element={<Commissions />} />
+      <Route
+        path="truckScale"
+        element={<TruckScale user={user} socket={socket} />}
+      />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

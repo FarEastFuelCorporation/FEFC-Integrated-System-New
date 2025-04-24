@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ScaleIcon from "@mui/icons-material/Scale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
@@ -34,6 +35,7 @@ const BillingSidebar = ({ user }) => {
       "/dashboard/typeOfWastes": "Type Of Wastes",
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
+      "/dashboard/truckScale": "Truck Scale",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -147,6 +149,14 @@ const BillingSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"quotations"}
+        />
+        <BottomNavItem
+          label="Truck Scale"
+          value="Truck Scale"
+          icon={ScaleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"truckScale"}
         />
         <BottomNavItem
           label="Documents"
@@ -315,7 +325,14 @@ const BillingSidebar = ({ user }) => {
               setSelected={setSelected}
               collapsed={isCollapsed}
             />
-
+            <Item
+              title="Truck Scale"
+              to="truckScale"
+              icon={<ScaleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
             <Item
               title="Documents"
               to="documents"

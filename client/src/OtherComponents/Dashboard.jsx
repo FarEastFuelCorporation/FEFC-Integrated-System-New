@@ -63,7 +63,11 @@ const Dashboard = ({ user, onUpdateUser, socket }) => {
     case 2:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[2]}>
-          <MarketingRoutes user={user} onUpdateUser={onUpdateUser} />
+          <MarketingRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 3:
@@ -89,25 +93,41 @@ const Dashboard = ({ user, onUpdateUser, socket }) => {
     case 5:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[5]}>
-          <SortingRoutes user={user} onUpdateUser={onUpdateUser} />
+          <SortingRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 6:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[6]}>
-          <TreatmentRoutes user={user} onUpdateUser={onUpdateUser} />
+          <TreatmentRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 7:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[7]}>
-          <CertificationRoutes user={user} onUpdateUser={onUpdateUser} />
+          <CertificationRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 8:
       return (
         <RoleProtectedRoute user={user} allowedRoles={[8]}>
-          <BillingRoutes user={user} onUpdateUser={onUpdateUser} />
+          <BillingRoutes
+            user={user}
+            onUpdateUser={onUpdateUser}
+            socket={socket}
+          />
         </RoleProtectedRoute>
       );
     case 9:

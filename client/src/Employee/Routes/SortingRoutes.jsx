@@ -7,14 +7,19 @@ import ScrapTypes from "../../OtherComponents/Sections/scrapTypes";
 import Calendar from "../Layouts/Sorting/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
+import TruckScale from "../Layouts/Receiving/sections/truckScale";
 
-const SortingRoutes = ({ user, onUpdateUser }) => (
+const SortingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
       <Route path="transactions" element={<SortedTransactions user={user} />} />
       <Route path="scrapTypes" element={<ScrapTypes user={user} />} />
+      <Route
+        path="truckScale"
+        element={<TruckScale user={user} socket={socket} />}
+      />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

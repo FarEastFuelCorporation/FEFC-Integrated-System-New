@@ -9,8 +9,9 @@ import Quotations from "../../OtherComponents/Sections/quotations";
 import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../Layouts/Billing/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import TruckScale from "../Layouts/Receiving/sections/truckScale";
 
-const BillingRoutes = ({ user, onUpdateUser }) => (
+const BillingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     {" "}
     <Route path="/" element={<UserSidebar user={user} />}>
@@ -19,6 +20,10 @@ const BillingRoutes = ({ user, onUpdateUser }) => (
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
       <Route path="transactions" element={<BilledTransactions user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
+      <Route
+        path="truckScale"
+        element={<TruckScale user={user} socket={socket} />}
+      />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

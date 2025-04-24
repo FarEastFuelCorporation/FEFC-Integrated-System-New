@@ -10,8 +10,9 @@ import TypeOfWastes from "../../OtherComponents/Sections/typeOfWaste";
 import Calendar from "../Layouts/Certification/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
+import TruckScale from "../Layouts/Receiving/sections/truckScale";
 
-const CertificationRoutes = ({ user, onUpdateUser }) => (
+const CertificationRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
@@ -29,6 +30,10 @@ const CertificationRoutes = ({ user, onUpdateUser }) => (
         element={<TreatmentProcess user={user} />}
       />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
+      <Route
+        path="truckScale"
+        element={<TruckScale user={user} socket={socket} />}
+      />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

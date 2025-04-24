@@ -126,8 +126,8 @@ const ReceivingDashboard = ({ user }) => {
           navigate={"transactions"}
         />
         <BottomNavItem
-          label="Transactions"
-          value="Transactions"
+          label="Truck Scale"
+          value="Truck Scale"
           icon={ScaleIcon}
           selected={selected}
           setSelected={setSelected}

@@ -7,8 +7,9 @@ import TreatmentMachine from "../../OtherComponents/Sections/treatmentMachine";
 import Calendar from "../Layouts/Treatment/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
+import TruckScale from "../Layouts/Receiving/sections/truckScale";
 
-const TreatmentRoutes = ({ user, onUpdateUser }) => (
+const TreatmentRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
     <Route path="/" element={<UserSidebar user={user} />}>
       <Route path="" element={<Dashboard />} />
@@ -19,6 +20,10 @@ const TreatmentRoutes = ({ user, onUpdateUser }) => (
       <Route
         path="treatmentMachines"
         element={<TreatmentMachine user={user} />}
+      />
+      <Route
+        path="truckScale"
+        element={<TruckScale user={user} socket={socket} />}
       />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />

@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ScaleIcon from "@mui/icons-material/Scale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -38,6 +39,7 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
       "/dashboard/commissions": "Commissions",
+      "/dashboard/truckScale": "Truck Scale",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -349,6 +351,14 @@ const MarketingSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
+              title="Truck Scale"
+              to="truckScale"
+              icon={<ScaleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
               title="Documents"
               to="documents"
               icon={<TopicIcon />}
@@ -363,7 +373,6 @@ const MarketingSidebar = ({ user }) => {
             >
               Pages
             </Typography>
-
             <Item
               title="Calendar"
               to="calendar"

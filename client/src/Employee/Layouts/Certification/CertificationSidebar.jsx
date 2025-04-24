@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ScaleIcon from "@mui/icons-material/Scale";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import FireplaceIcon from "@mui/icons-material/Fireplace";
@@ -36,6 +37,7 @@ const CertificationSidebar = ({ user }) => {
       "/dashboard/clients": "Clients",
       "/dashboard/treatmentProcess": "Treatment Process",
       "/dashboard/typeOfWastes": "Waste Types",
+      "/dashboard/truckScale": "Truck Scale",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -157,6 +159,14 @@ const CertificationSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"typeOfWastes"}
+        />
+        <BottomNavItem
+          label="Truck Scale"
+          value="Truck Scale"
+          icon={ScaleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"truckScale"}
         />
         <BottomNavItem
           label="Documents"
@@ -326,6 +336,14 @@ const CertificationSidebar = ({ user }) => {
               title="Type of Wastes"
               to="typeOfWastes"
               icon={<FormatListBulletedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Truck Scale"
+              to="truckScale"
+              icon={<ScaleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

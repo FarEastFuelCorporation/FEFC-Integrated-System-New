@@ -89,7 +89,7 @@ const TruckScale = ({ user, socket }) => {
       const clientData = responseClient.data.clients
         .map((client) => ({
           clientId: client.id,
-          clientName: client.name,
+          clientName: client.clientName,
         }))
         .filter(
           (value, index, self) =>
@@ -289,7 +289,6 @@ const TruckScale = ({ user, socket }) => {
         const timeRegex =
           /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/.test(time); // Validates HH:mm or HH:mm:ss format
 
-        console.log(timeRegex);
         return timeRegex ? timeRegex : "";
       };
 
@@ -890,7 +889,7 @@ const TruckScale = ({ user, socket }) => {
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
         formData={formData}
-        clients={clients}
+        clients={clientNames}
         clientWasteNames={clientWasteNames}
       />
     </Box>

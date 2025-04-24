@@ -656,6 +656,17 @@ TruckScale.belongsTo(Employee, {
   targetKey: "employeeId",
 });
 
+Employee.hasMany(TruckScale, {
+  as: "TruckScale2",
+  foreignKey: "updatedBy",
+  sourceKey: "employeeId",
+});
+TruckScale.belongsTo(Employee, {
+  as: "Employee2",
+  foreignKey: "updatedBy",
+  targetKey: "employeeId",
+});
+
 VehicleType.hasMany(Vehicle, {
   as: "Vehicle",
   foreignKey: "vehicleTypeId",

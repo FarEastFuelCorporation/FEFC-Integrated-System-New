@@ -528,6 +528,18 @@ const TruckScale = ({ user, socket }) => {
       minWidth: 70,
     },
     {
+      field: "createdBy",
+      headerName: "1st Weigher",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return `${params.row.Employee.firstName} ${params.row.Employee.lastName}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "secondScaleDate",
       headerName: "2nd Scale Date",
       headerAlign: "center",
@@ -557,26 +569,29 @@ const TruckScale = ({ user, socket }) => {
       },
     },
     {
+      field: "updatedBy",
+      headerName: "2nd Weigher",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 100,
+      valueGetter: (params) => {
+        return params.row.Employee2
+          ? `${params.row.Employee2?.firstName} ${params.row.Employee2?.lastName}`
+          : "PENDING";
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
       field: "remarks",
       headerName: "Remarks",
       headerAlign: "center",
       align: "center",
       flex: 1.5,
-      minWidth: 130,
+      minWidth: 100,
       renderCell: renderCellWithWrapText,
     },
-    {
-      field: "createdBy",
-      headerName: "Created By",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      valueGetter: (params) => {
-        return `${params.row.Employee.firstName} ${params.row.Employee.lastName}`;
-      },
-      renderCell: renderCellWithWrapText,
-    },
+
     {
       field: "view",
       headerName: "Print",
@@ -584,7 +599,7 @@ const TruckScale = ({ user, socket }) => {
       align: "center",
       sortable: false,
       flex: 1,
-      minWidth: 100,
+      minWidth: 80,
       renderCell: (params) => {
         const secondScaleDate = params.row.secondScaleDate;
         const isValidDate =
@@ -764,74 +779,82 @@ const TruckScale = ({ user, socket }) => {
             <div class="details">
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 5px; width: 35%;"><strong>Truck Scale #:</strong></td>
-                  <td style="padding: 5px; width: 65%;">${
+                  <td style="padding: 0px 5px; width: 35%;"><strong>Truck Scale #:</strong></td>
+                  <td style="padding: 0px 5px; width: 65%;">${
                     params.row.truckScaleNo
                   }</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Transaction Type:</strong></td>
-                  <td style="padding: 5px;">${params.row.transactionType}</td>
+                  <td style="padding: 0px 5px;"><strong>Transaction Type:</strong></td>
+                  <td style="padding: 0px 5px;">${
+                    params.row.transactionType
+                  }</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Client:</strong></td>
-                  <td style="padding: 5px;">${params.row.clientName}</td>
+                  <td style="padding: 0px 5px;"><strong>Client:</strong></td>
+                  <td style="padding: 0px 5px;">${params.row.clientName}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Commodity:</strong></td>
-                  <td style="padding: 5px;">${params.row.commodity}</td>
+                  <td style="padding: 0px 5px;"><strong>Commodity:</strong></td>
+                  <td style="padding: 0px 5px;">${params.row.commodity}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Plate Number:</strong></td>
-                  <td style="padding: 5px;">${params.row.plateNumber}</td>
+                  <td style="padding: 0px 5px;"><strong>Plate Number:</strong></td>
+                  <td style="padding: 0px 5px;">${params.row.plateNumber}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Driver:</strong></td>
-                  <td style="padding: 5px;">${params.row.driver}</td>
+                  <td style="padding: 0px 5px;"><strong>Driver:</strong></td>
+                  <td style="padding: 0px 5px;">${params.row.driver}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Weigh IN:</strong></td>
-                  <td style="padding: 5px;">${formatDate3(
+                  <td style="padding: 0px 5px;"><strong>1st Weigh:</strong></td>
+                  <td style="padding: 0px 5px;">${formatDate3(
                     params.row.firstScaleDate
                   )}<br />${formatTime2(params.row.firstScaleTime)}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Weigh OUT:</strong></td>
-                  <td style="padding: 5px;">${formatDate3(
+                  <td style="padding: 0px 5px;"><strong>1st Weigher:</strong></td>
+                  <td style="padding: 0px 5px;">${
+                    params.row.Employee.firstName
+                  } ${params.row.Employee.lastName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0px 5px;"><strong>2nd Weigh:</strong></td>
+                  <td style="padding: 0px 5px;">${formatDate3(
                     params.row.secondScaleDate
                   )}<br />${formatTime2(params.row.secondScaleTime)}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Gross Weight:</strong></td>
-                  <td style="padding: 5px;">${formatNumber(
+                  <td style="padding: 0px 5px;"><strong>2nd Weigher:</strong></td>
+                  <td style="padding: 0px 5px;">${
+                    params.row.Employee2.firstName
+                  } ${params.row.Employee2.lastName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 0px 5px;"><strong>Gross Weight:</strong></td>
+                  <td style="padding: 0px 5px;">${formatNumber(
                     params.row.grossWeight
                   )}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Tare Weight:</strong></td>
-                  <td style="padding: 5px;">${formatNumber(
+                  <td style="padding: 0px 5px;"><strong>Tare Weight:</strong></td>
+                  <td style="padding: 0px 5px;">${formatNumber(
                     params.row.tareWeight
                   )}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Net Weight:</strong></td>
-                  <td style="padding: 5px;">${formatNumber(
+                  <td style="padding: 0px 5px;"><strong>Net Weight:</strong></td>
+                  <td style="padding: 0px 5px;">${formatNumber(
                     params.row.netWeight
                   )}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Weigher:</strong></td>
-                  <td style="padding: 5px;">${params.row.Employee.firstName} ${
-      params.row.Employee.lastName
-    }</td>
+                  <td style="padding: 0px 5px;"><strong>Remarks:</strong></td>
+                  <td style="padding: 0px 5px;">${params.row.remarks}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 5px;"><strong>Remarks:</strong></td>
-                  <td style="padding: 5px;">${params.row.remarks}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px;">Scan this QR code to verify the authenticity of the transaction.</td>
-                  <td style="padding: 5px;">            
+                  <td style="padding: 0px 5px;">Scan this QR code to verify the authenticity of the transaction.</td>
+                  <td style="padding: 0px 5px;">            
                     <img src="${qrCodeDataUrl}" alt="QR Code" width="80" height="80" />
                 </td>
                 </tr>

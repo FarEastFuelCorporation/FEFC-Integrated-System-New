@@ -121,7 +121,7 @@ const TruckScaleView = () => {
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Weigh IN</strong>
+                <strong>1st Weigh</strong>
               </TableCell>
               <TableCell>
                 {formatDate(truckScaleData.firstScaleDate)}{" "}
@@ -130,11 +130,29 @@ const TruckScaleView = () => {
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Weigh OUT</strong>
+                <strong>1st Weigher</strong>
+              </TableCell>
+              <TableCell>
+                {truckScaleData.Employee2?.firstName}{" "}
+                {truckScaleData.Employee2?.lastName}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>2nd Weigh</strong>
               </TableCell>
               <TableCell>
                 {formatDate(truckScaleData.secondScaleDate)}{" "}
                 {formatTime(truckScaleData.secondScaleTime)}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>2nd Weigher</strong>
+              </TableCell>
+              <TableCell>
+                {truckScaleData.Employee2?.firstName}{" "}
+                {truckScaleData.Employee2?.lastName}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -154,15 +172,6 @@ const TruckScaleView = () => {
                 <strong>Net Weight</strong>
               </TableCell>
               <TableCell>{formatNumber(truckScaleData.netWeight)}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Weigher</strong>
-              </TableCell>
-              <TableCell>
-                {truckScaleData.Employee?.firstName}{" "}
-                {truckScaleData.Employee?.lastName}
-              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>

@@ -58,11 +58,18 @@ async function createTruckScaleController(req, res) {
     });
 
     const truckScale = await TruckScale.findByPk(newEntry.id, {
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Employee,
+          as: "Employee2",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
     });
 
     broadcastMessage({
@@ -85,11 +92,18 @@ async function getTruckScalesController(req, res) {
   try {
     // Fetch all truckScales from the database
     const truckScales = await TruckScale.findAll({
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Employee,
+          as: "Employee2",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
       order: [
         ["createdAt", "DESC"], // Primary sort
       ],
@@ -152,11 +166,18 @@ async function updateTruckScaleController(req, res) {
     await existingEntry.save();
 
     const truckScale = await TruckScale.findByPk(id, {
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Employee,
+          as: "Employee2",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
     });
 
     broadcastMessage({

@@ -17,11 +17,9 @@ async function getTruckScaleViewController(req, res) {
 
     const truckScale = await TruckScale.findByPk(id, {
       include: {
-        include: {
-          model: Employee,
-          as: "Employee",
-          attributes: ["firstName", "lastName"],
-        },
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
       },
     });
 

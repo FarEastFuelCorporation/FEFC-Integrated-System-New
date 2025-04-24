@@ -107,8 +107,12 @@ const TruckScale = ({ user, socket }) => {
             if (index !== -1) {
               // Replace the updated data data
               const updatedData = [...prevData];
-              updatedData[index] = message.data; // Update the data at the found index
-              return updatedData;
+              updatedData[index] = message.data;
+              return updatedData.sort((a, b) => {
+                const aNum = parseInt(a.truckScaleNo.slice(2), 10);
+                const bNum = parseInt(b.truckScaleNo.slice(2), 10);
+                return bNum - aNum; // Descending order
+              });
             } else {
               // If the data is not found, just return the previous state
               return prevData;
@@ -127,16 +131,28 @@ const TruckScale = ({ user, socket }) => {
   }, [socket]);
 
   useEffect(() => {
-    const grossWeight = Number(formData.grossWeight) || 0;
-    const tareWeight = Number(formData.tareWeight) || 0;
+    if (formData.transactionType === "INBOUND") {
+      const grossWeight = Number(formData.grossWeight) || 0;
+      const tareWeight = Number(formData.tareWeight) || 0;
 
-    const netWeight = grossWeight - tareWeight;
+      const netWeight = grossWeight - tareWeight;
 
-    setFormData((prevData) => ({
-      ...prevData,
-      netWeight, // Update netWeight
-    }));
-  }, [formData.grossWeight, formData.tareWeight]);
+      setFormData((prevData) => ({
+        ...prevData,
+        netWeight, // Update netWeight
+      }));
+    } else if (formData.transactionType === "OUTBOUND") {
+      const grossWeight = Number(formData.grossWeight) || 0;
+      const tareWeight = Number(formData.tareWeight) || 0;
+
+      const netWeight = tareWeight - grossWeight;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        netWeight, // Update netWeight
+      }));
+    }
+  }, [formData.grossWeight, formData.transactionType, formData.tareWeight]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -304,6 +320,12 @@ const TruckScale = ({ user, socket }) => {
       align: "center",
       flex: 1,
       minWidth: 80,
+      sortComparator: (v1, v2) => {
+        const n1 = parseInt(v1.slice(2)); // remove "TS" and parse number
+        const n2 = parseInt(v2.slice(2));
+        return n1 - n2;
+      },
+      sortable: true,
     },
     {
       field: "transactionType",
@@ -775,15 +797,16 @@ const TruckScale = ({ user, socket }) => {
       />
       <CustomDataGridStyles>
         <DataGrid
-          rows={truckScales ? truckScales : []}
+          rows={truckScales ?? []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "typeOfScrap", sort: "asc" }],
+          sortModel={[
+            {
+              field: "truckScaleNo",
+              sort: "desc",
             },
-          }}
+          ]}
         />
       </CustomDataGridStyles>
       <SectionModal

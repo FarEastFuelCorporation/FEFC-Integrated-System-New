@@ -14,16 +14,16 @@ async function generateTruckScaleNumber() {
 
     if (latestEntry && latestEntry.truckScaleNo) {
       const latestNumber = latestEntry.truckScaleNo;
-      const latestYear = latestNumber.substring(0, 2);
+      const latestYear = latestNumber.substring(2, 4); // Slice after 'TS'
 
       if (latestYear === currentYear) {
-        const latestSeq = parseInt(latestNumber.substring(2), 10);
+        const latestSeq = parseInt(latestNumber.substring(4), 10); // Extract XXXX
         newSequence = latestSeq + 1;
       }
     }
 
     const paddedSequence = newSequence.toString().padStart(4, "0");
-    const newTruckScaleNumber = `${currentYear}${paddedSequence}`; // Format: YYXXXX
+    const newTruckScaleNumber = `TS${currentYear}${paddedSequence}`; // Format: TSYYXXXX
 
     return newTruckScaleNumber;
   } catch (error) {

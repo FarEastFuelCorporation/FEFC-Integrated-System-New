@@ -1,14 +1,9 @@
 // controllers/truckScaleViewController.js
 
-const BookedTransaction = require("../models/BookedTransaction");
-const CertifiedTransaction = require("../models/CertifiedTransaction");
-const Client = require("../models/Client");
 const Employee = require("../models/Employee");
-const PlasticTransaction = require("../models/PlasticTransaction");
 const TruckScale = require("../models/TruckScale");
-const { getIncludeOptionsVerify } = require("../utils/getBookedTransactions");
 
-// Get Certificate of Destruction controller
+// Get Truck Scale View controller
 async function getTruckScaleViewController(req, res) {
   try {
     const id = req.params.id;
@@ -16,11 +11,18 @@ async function getTruckScaleViewController(req, res) {
     console.log(id);
 
     const truckScale = await TruckScale.findByPk(id, {
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Employee,
+          as: "Employee2",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
     });
 
     res.json({ truckScale });

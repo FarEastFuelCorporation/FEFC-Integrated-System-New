@@ -26,7 +26,7 @@ const modifyApiUrlPort = (url) => {
   return url.replace(portPattern, ":3000");
 };
 
-const TruckScale = ({ user }) => {
+const TruckScale = ({ user, socket }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -89,6 +89,42 @@ const TruckScale = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === "NEW_TRUCK_SCALE") {
+          setTruckScales((prevData) => [...prevData, message.data]);
+        } else if (message.type === "UPDATE_TRUCK_SCALE") {
+          setTruckScales((prevData) => {
+            // Find the index of the data to be updated
+            const index = prevData.findIndex(
+              (prev) => prev.id === message.data.id
+            );
+
+            if (index !== -1) {
+              // Replace the updated data data
+              const updatedData = [...prevData];
+              updatedData[index] = message.data; // Update the data at the found index
+              return updatedData;
+            } else {
+              // If the data is not found, just return the previous state
+              return prevData;
+            }
+          });
+        } else if (message.type === "DELETED_TRUCK_SCALE") {
+          setTruckScales((prevData) => {
+            const updatedData = prevData.filter(
+              (prev) => prev.id !== message.data // Remove the data with matching ID
+            );
+            return updatedData;
+          });
+        }
+      };
+    }
+  }, [socket]);
 
   useEffect(() => {
     const grossWeight = Number(formData.grossWeight) || 0;
@@ -246,7 +282,6 @@ const TruckScale = ({ user }) => {
         setSuccessMessage("Truck Scale Added Successfully!");
       }
 
-      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
       setLoading(false);

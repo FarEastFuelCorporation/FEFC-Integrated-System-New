@@ -56,6 +56,21 @@ async function createTruckScaleController(req, res) {
       createdBy,
     });
 
+    const truckScale = await TruckScale.findByPk(newEntry.id, {
+      include: {
+        include: {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+      },
+    });
+
+    broadcastMessage({
+      type: "NEW_TRUCK_SCALE",
+      data: truckScale,
+    });
+
     res.status(201).json({
       message: "Truck scale entry created successfully",
       data: newEntry,
@@ -137,6 +152,21 @@ async function updateTruckScaleController(req, res) {
 
     await existingEntry.save();
 
+    const truckScale = await TruckScale.findByPk(id, {
+      include: {
+        include: {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+      },
+    });
+
+    broadcastMessage({
+      type: "UPDATE_TRUCK_SCALE",
+      data: truckScale,
+    });
+
     res.status(200).json({
       message: "Truck scale entry updated successfully",
       data: existingEntry,
@@ -173,6 +203,11 @@ async function deleteTruckScaleController(req, res) {
 
     // Soft delete the truck scale entry (sets deletedAt timestamp if paranoid: true)
     await truckScaleToDelete.destroy();
+
+    broadcastMessage({
+      type: "DELETED_TRUCK_SCALE",
+      data: truckScaleToDelete.id,
+    });
 
     res.status(200).json({
       message: "Truck scale entry deleted successfully",

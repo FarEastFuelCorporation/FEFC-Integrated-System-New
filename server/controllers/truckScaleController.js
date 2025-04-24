@@ -13,6 +13,7 @@ const TypeOfWaste = require("../models/TypeOfWaste");
 const generateTruckScaleNumber = require("../utils/generateTruckScaleNumber");
 const TruckScale = require("../models/TruckScale");
 const Employee = require("../models/Employee");
+const { broadcastMessage } = require("../websocketManager");
 const statusId = 2;
 const additionalStatusId = 3;
 

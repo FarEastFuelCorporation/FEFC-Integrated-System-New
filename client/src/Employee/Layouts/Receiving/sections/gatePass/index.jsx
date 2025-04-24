@@ -83,7 +83,6 @@ const GatePass = ({ user, socket }) => {
       const responseClient = await axios.get(`${apiUrl}/api/client`);
 
       // Set state for gatePasses, clients, and
-      console.log(response.data.gatePasses);
       setGatePasses(response.data.gatePasses);
       setClients(responseClient.data.clients);
 

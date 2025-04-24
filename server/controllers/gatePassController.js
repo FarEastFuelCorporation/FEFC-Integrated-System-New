@@ -127,49 +127,65 @@ async function updateGatePassController(req, res) {
     console.log("Updating Gate Pass entry with ID:", id);
 
     const {
-      transactionType,
-      clientName,
-      commodity,
-      driver,
+      dateIn,
+      timeIn,
+      dateOut,
+      timeOut,
+      issuedTo,
+      company,
+      address,
       plateNumber,
-      firstScaleDate,
-      firstScaleTime,
-      secondScaleDate,
-      secondScaleTime,
-      grossWeight,
-      tareWeight,
-      netWeight,
+      vehicle,
+      category,
+      category2,
+      truckScaleNo,
       remarks,
-      createdBy,
+      items,
+      updatedBy,
     } = req.body;
 
     const existingEntry = await GatePass.findByPk(id);
 
     if (!existingEntry) {
-      return res
-        .status(404)
-        .json({ message: `Gate Pass with ID ${id} not found` });
+      return res.status(404).json({
+        message: `Gate Pass with ID ${id} not found`,
+      });
     }
 
-    // Update fields
-    existingEntry.transactionType = transactionType;
-    existingEntry.clientName = clientName?.toUpperCase() || null;
-    existingEntry.commodity = commodity?.toUpperCase() || null;
-    existingEntry.driver = driver?.toUpperCase() || null;
+    // Update main GatePass fields
+    existingEntry.dateIn = dateIn;
+    existingEntry.timeIn = timeIn;
+    existingEntry.dateOut = dateOut;
+    existingEntry.timeOut = timeOut;
+    existingEntry.issuedTo = issuedTo?.toUpperCase() || null;
+    existingEntry.company = company?.toUpperCase() || null;
+    existingEntry.address = address?.toUpperCase() || null;
     existingEntry.plateNumber = plateNumber?.toUpperCase() || null;
-    existingEntry.firstScaleDate = firstScaleDate;
-    existingEntry.firstScaleTime = firstScaleTime;
-    existingEntry.secondScaleDate = secondScaleDate;
-    existingEntry.secondScaleTime = secondScaleTime;
-    existingEntry.grossWeight = grossWeight;
-    existingEntry.tareWeight = tareWeight;
-    existingEntry.netWeight = netWeight;
-    existingEntry.remarks = remarks;
-    existingEntry.updatedBy = createdBy;
+    existingEntry.vehicle = vehicle?.toUpperCase() || null;
+    existingEntry.category = category;
+    existingEntry.category2 = category2;
+    existingEntry.truckScaleNo = truckScaleNo;
+    existingEntry.remarks = remarks?.toUpperCase() || null;
+    existingEntry.updatedBy = updatedBy;
 
     await existingEntry.save();
 
-    const truckScale = await GatePass.findByPk(id, {
+    // Handle GatePassItems update (delete old, insert new)
+    if (Array.isArray(items)) {
+      await GatePassItem.destroy({ where: { gatePassId: id } });
+
+      const formattedItems = items.map((item) => ({
+        gatePassId: id,
+        description: item.description?.toUpperCase() || "",
+        quantity: item.quantity || "",
+        unit: item.unit || "",
+      }));
+
+      await GatePassItem.bulkCreate(formattedItems);
+    }
+
+    // Fetch the updated GatePass with relations
+    const updatedData = await GatePass.findByPk(id, {
       include: [
         {
           model: Employee,
@@ -177,24 +193,24 @@ async function updateGatePassController(req, res) {
           attributes: ["firstName", "lastName"],
         },
         {
-          model: Employee,
-          as: "Employee2",
-          attributes: ["firstName", "lastName"],
+          model: GatePassItem,
+          as: "GatePassItem",
         },
       ],
     });
 
+    // Broadcast the updated gate pass
     broadcastMessage({
-      type: "UPDATE_TRUCK_SCALE",
-      data: truckScale,
+      type: "UPDATE_GATE_PASS",
+      data: updatedData,
     });
 
     res.status(200).json({
-      message: "Truck scale entry updated successfully",
-      data: existingEntry,
+      message: "Gate pass updated successfully",
+      data: updatedData,
     });
   } catch (error) {
-    console.error("Error updating truck scale entry:", error);
+    console.error("Error updating gate pass:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -205,37 +221,37 @@ async function deleteGatePassController(req, res) {
     const id = req.params.id;
     const { deletedBy } = req.body;
 
-    console.log("Soft deleting truck scale record with ID:", id);
+    console.log("Soft deleting gate pass record with ID:", id);
 
-    // Find the truck scale entry by its primary key
-    const truckScaleToDelete = await GatePass.findByPk(id);
+    // Find the gate pass entry by its primary key
+    const gatePassToDelete = await GatePass.findByPk(id);
 
-    if (!truckScaleToDelete) {
+    if (!gatePassToDelete) {
       return res.status(404).json({
         message: `Gate Pass entry with ID ${id} not found`,
       });
     }
 
     // Set updatedBy and deletedBy
-    truckScaleToDelete.updatedBy = deletedBy;
-    truckScaleToDelete.deletedBy = deletedBy;
+    gatePassToDelete.updatedBy = deletedBy;
+    gatePassToDelete.deletedBy = deletedBy;
 
     // Save the updates before soft deleting
-    await truckScaleToDelete.save();
+    await gatePassToDelete.save();
 
-    // Soft delete the truck scale entry (sets deletedAt timestamp if paranoid: true)
-    await truckScaleToDelete.destroy();
+    // Soft delete the gate pass entry (sets deletedAt timestamp if paranoid: true)
+    await gatePassToDelete.destroy();
 
     broadcastMessage({
-      type: "DELETED_TRUCK_SCALE",
-      data: truckScaleToDelete.id,
+      type: "DELETED_GATE_PASS",
+      data: gatePassToDelete.id,
     });
 
     res.status(200).json({
-      message: "Truck scale entry deleted successfully",
+      message: "Gate Pass entry deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting truck scale entry:", error);
+    console.error("Error deleting gate pass entry:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

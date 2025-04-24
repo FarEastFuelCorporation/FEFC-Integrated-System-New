@@ -55,6 +55,7 @@ const TruckScale = ({ user, socket }) => {
 
   const [truckScales, setTruckScales] = useState([]);
   const [clients, setClients] = useState([]);
+  const [clientNames, setClientNames] = useState([]);
   const [quotations, setQuotations] = useState([]);
   const [clientWasteNames, setClientWasteNames] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
@@ -71,15 +72,59 @@ const TruckScale = ({ user, socket }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+
+      // Fetch truck scale, client, and quotation data
       const response = await axios.get(`${apiUrl}/api/truckScale`);
       const responseClient = await axios.get(`${apiUrl}/api/client`);
       const quotationResponse = await axios.get(
         `${apiUrl}/api/quotation/waste`
       );
 
+      // Set state for truckScales, clients, and quotations
       setTruckScales(response.data.truckScales);
       setClients(responseClient.data.clients);
       setQuotations(quotationResponse.data.quotations);
+
+      // Get unique client data from the client response (clientId and clientName)
+      const clientData = responseClient.data.clients
+        .map((client) => ({
+          clientId: client.id,
+          clientName: client.name,
+        }))
+        .filter(
+          (value, index, self) =>
+            index ===
+            self.findIndex(
+              (t) =>
+                t.clientId === value.clientId &&
+                t.clientName === value.clientName
+            )
+        );
+
+      // Get client names from truck scales
+      const clientNamesFromTruckScales = response.data.truckScales
+        .map((truckScale) => truckScale.clientName)
+        .filter(
+          (value, index, self) => index === self.findIndex((t) => t === value)
+        );
+
+      // Merge client names from both sources (clientData and truckScales)
+      const mergedClientData = [
+        ...clientData,
+        ...clientNamesFromTruckScales
+          .filter(
+            (clientName) =>
+              !clientData.some((client) => client.clientName === clientName) // Ensure no duplicates
+          )
+          .map((clientName) => ({
+            clientId: null, // Set clientId as null for truck scale client names
+            clientName,
+          })),
+      ];
+
+      // Set the merged client names
+      setClientNames(mergedClientData);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -96,7 +141,20 @@ const TruckScale = ({ user, socket }) => {
         const message = JSON.parse(event.data);
 
         if (message.type === "NEW_TRUCK_SCALE") {
-          setTruckScales((prevData) => [...prevData, message.data]);
+          setTruckScales((prevData) => {
+            // Check if the clientName exists in the current truckScales state
+            const clientExists = prevData.some(
+              (truckScale) => truckScale.clientName === message.data.clientName
+            );
+
+            // If the clientName doesn't exist, add it to the state
+            if (!clientExists) {
+              return [...prevData, message.data];
+            }
+
+            // If the clientName exists, just return the previous data
+            return prevData;
+          });
         } else if (message.type === "UPDATE_TRUCK_SCALE") {
           setTruckScales((prevData) => {
             // Find the index of the data to be updated
@@ -105,23 +163,38 @@ const TruckScale = ({ user, socket }) => {
             );
 
             if (index !== -1) {
-              // Replace the updated data data
+              // Replace the updated data
               const updatedData = [...prevData];
               updatedData[index] = message.data;
+
+              // Check if the updated truck scale has a new clientName, and add it if it doesn't exist
+              const clientExists = updatedData.some(
+                (truckScale) =>
+                  truckScale.clientName === message.data.clientName
+              );
+
+              if (!clientExists) {
+                updatedData[index] = {
+                  ...updatedData[index],
+                  clientName: message.data.clientName,
+                };
+              }
+
               return updatedData.sort((a, b) => {
                 const aNum = parseInt(a.truckScaleNo.slice(2), 10);
                 const bNum = parseInt(b.truckScaleNo.slice(2), 10);
                 return bNum - aNum; // Descending order
               });
-            } else {
-              // If the data is not found, just return the previous state
-              return prevData;
             }
+
+            // If the data is not found, just return the previous state
+            return prevData;
           });
         } else if (message.type === "DELETED_TRUCK_SCALE") {
           setTruckScales((prevData) => {
+            // Remove the data with matching ID
             const updatedData = prevData.filter(
-              (prev) => prev.id !== message.data // Remove the data with matching ID
+              (prev) => prev.id !== message.data
             );
             return updatedData;
           });

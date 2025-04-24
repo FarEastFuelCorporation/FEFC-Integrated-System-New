@@ -764,8 +764,8 @@ const TruckScale = ({ user, socket }) => {
             <div class="details">
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 5px; width: 50%;"><strong>Truck Scale #:</strong></td>
-                  <td style="padding: 5px; width: 50%;">${
+                  <td style="padding: 5px; width: 35%;"><strong>Truck Scale #:</strong></td>
+                  <td style="padding: 5px; width: 65%;">${
                     params.row.truckScaleNo
                   }</td>
                 </tr>

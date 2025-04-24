@@ -13,19 +13,35 @@ const GatePass = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    truckScaleNo: {
+    gatePassNo: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    transactionType: {
+    dateIn: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    timeIn: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    dateOut: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    timeOut: {
+      type: DataTypes.TIME,
+      allowNull: true,
+    },
+    issuedTo: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    clientName: {
+    company: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    commodity: {
+    address: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -33,37 +49,21 @@ const GatePass = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    driver: {
+    vehicle: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    firstScaleDate: {
-      type: DataTypes.DATEONLY,
+    category: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    firstScaleTime: {
-      type: DataTypes.TIME,
+    category2: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    secondScaleDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: true,
-    },
-    secondScaleTime: {
-      type: DataTypes.TIME,
-      allowNull: true,
-    },
-    grossWeight: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    tareWeight: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    netWeight: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
+    truckScaleNo: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     remarks: {
       type: DataTypes.STRING,

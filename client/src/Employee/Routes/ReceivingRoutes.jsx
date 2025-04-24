@@ -9,6 +9,7 @@ import Calendar from "../../Employee/Layouts/Receiving/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
 import TruckScale from "../Layouts/Receiving/sections/truckScale";
+import GatePass from "../Layouts/Receiving/sections/gatePass";
 
 const ReceivingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
@@ -21,6 +22,10 @@ const ReceivingRoutes = ({ user, onUpdateUser, socket }) => (
       <Route
         path="truckScale"
         element={<TruckScale user={user} socket={socket} />}
+      />
+      <Route
+        path="gatePass"
+        element={<GatePass user={user} socket={socket} />}
       />
       <Route path="vehicleTypes" element={<VehicleTypes user={user} />} />
       <Route path="vehicles" element={<Vehicles user={user} />} />

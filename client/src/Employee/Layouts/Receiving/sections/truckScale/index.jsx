@@ -141,44 +141,60 @@ const TruckScale = ({ user, socket }) => {
         const message = JSON.parse(event.data);
 
         if (message.type === "NEW_TRUCK_SCALE") {
-          setTruckScales((prevData) => {
-            // Check if the clientName exists in the current truckScales state
-            const clientExists = prevData.some(
-              (truckScale) => truckScale.clientName === message.data.clientName
-            );
+          setTruckScales((prevTruckScales) => {
+            const updatedTruckScales = [...prevTruckScales, message.data];
 
-            // If the clientName doesn't exist, add it to the state
-            if (!clientExists) {
-              return [...prevData, message.data];
-            }
+            // Sort by truckScaleNo in descending order (assuming format like 'TS123')
+            updatedTruckScales.sort((a, b) => {
+              const aNum = parseInt(a.truckScaleNo.slice(2), 10);
+              const bNum = parseInt(b.truckScaleNo.slice(2), 10);
+              return bNum - aNum;
+            });
 
-            // If the clientName exists, just return the previous data
-            return prevData;
+            // Update clientNames state if the clientName is new
+            setClientNames((prevClientNames) => {
+              const exists = prevClientNames.some(
+                (client) => client.clientName === message.data.clientName
+              );
+
+              // If it doesn't exist, add it
+              if (!exists) {
+                return [
+                  ...prevClientNames,
+                  { clientId: null, clientName: message.data.clientName },
+                ];
+              }
+
+              return prevClientNames;
+            });
+
+            return updatedTruckScales;
           });
         } else if (message.type === "UPDATE_TRUCK_SCALE") {
           setTruckScales((prevData) => {
-            // Find the index of the data to be updated
             const index = prevData.findIndex(
               (prev) => prev.id === message.data.id
             );
 
             if (index !== -1) {
-              // Replace the updated data
               const updatedData = [...prevData];
               updatedData[index] = message.data;
 
-              // Check if the updated truck scale has a new clientName, and add it if it doesn't exist
-              const clientExists = updatedData.some(
-                (truckScale) =>
-                  truckScale.clientName === message.data.clientName
-              );
+              // Check if clientName is not yet in clientNames and add if missing
+              setClientNames((prevClientNames) => {
+                const exists = prevClientNames.some(
+                  (client) => client.clientName === message.data.clientName
+                );
 
-              if (!clientExists) {
-                updatedData[index] = {
-                  ...updatedData[index],
-                  clientName: message.data.clientName,
-                };
-              }
+                if (!exists) {
+                  return [
+                    ...prevClientNames,
+                    { clientId: null, clientName: message.data.clientName },
+                  ];
+                }
+
+                return prevClientNames;
+              });
 
               return updatedData.sort((a, b) => {
                 const aNum = parseInt(a.truckScaleNo.slice(2), 10);
@@ -187,7 +203,6 @@ const TruckScale = ({ user, socket }) => {
               });
             }
 
-            // If the data is not found, just return the previous state
             return prevData;
           });
         } else if (message.type === "DELETED_TRUCK_SCALE") {
@@ -257,16 +272,6 @@ const TruckScale = ({ user, socket }) => {
     }
   }, [formData.clientId, formData.id, quotations]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
@@ -334,7 +339,6 @@ const TruckScale = ({ user, socket }) => {
         data: { deletedBy: user.id },
       });
 
-      fetchData();
       setSuccessMessage("Truck Scale Deleted Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
@@ -870,7 +874,10 @@ const TruckScale = ({ user, socket }) => {
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
-        <Header title="Truck Scale" subtitle="List of Transactions" />
+        <Header
+          title="Truck Scale"
+          subtitle="List of Truck Scale Transactions"
+        />
         <Box display="flex">
           <IconButton onClick={handleOpenModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />

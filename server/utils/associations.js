@@ -62,6 +62,8 @@ const WarehousedOutTransactionItem = require("../models/WarehousedOutTransaction
 const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 const TruckScale = require("../models/TruckScale");
+const GatePass = require("../models/GatePass");
+const GatePassItem = require("../models/GatePassItem");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -665,6 +667,28 @@ TruckScale.belongsTo(Employee, {
   as: "Employee2",
   foreignKey: "updatedBy",
   targetKey: "employeeId",
+});
+
+Employee.hasMany(GatePass, {
+  as: "GatePass",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+GatePass.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+GatePass.hasMany(GatePassItem, {
+  as: "GatePassItem",
+  foreignKey: "gatePassId",
+  sourceKey: "id",
+});
+GatePassItem.belongsTo(GatePass, {
+  as: "GatePass",
+  foreignKey: "gatePassId",
+  targetKey: "id",
 });
 
 VehicleType.hasMany(Vehicle, {

@@ -1,51 +1,67 @@
-// controllers/truckScaleController.js
+// controllers/gatePassController.js
 
-const generateTruckScaleNumber = require("../utils/generateTruckScaleNumber");
-const TruckScale = require("../models/TruckScale");
+const generateGatePassNumber = require("../utils/generateGatePassNumber");
+const GatePass = require("../models/GatePass");
 const Employee = require("../models/Employee");
 const { broadcastMessage } = require("../websocketManager");
+const GatePassItem = require("../models/GatePassItem");
 
-// Create Truck Scale controller
-async function createTruckScaleController(req, res) {
+// Create Gate Pass controller
+async function createGatePassController(req, res) {
   try {
     const {
-      transactionType,
-      clientName,
-      commodity,
-      driver,
+      dateIn,
+      timeIn,
+      dateOut,
+      timeOut,
+      issuedTo,
+      company,
+      address,
       plateNumber,
-      firstScaleDate,
-      firstScaleTime,
-      secondScaleDate,
-      secondScaleTime,
-      grossWeight,
-      tareWeight,
-      netWeight,
+      vehicle,
+      category,
+      category2,
+      truckScaleNo,
       remarks,
+      items,
       createdBy,
     } = req.body;
 
-    const truckScaleNumber = await generateTruckScaleNumber();
+    const gatePassNo = await generateGatePassNumber();
 
-    const newEntry = await TruckScale.create({
-      truckScaleNo: truckScaleNumber,
-      transactionType,
-      clientName: clientName?.toUpperCase() || null,
-      commodity: commodity?.toUpperCase() || null,
-      driver: driver?.toUpperCase() || null,
+    // Create the main GatePass record
+    const newEntry = await GatePass.create({
+      gatePassNo,
+      dateIn,
+      timeIn,
+      dateOut,
+      timeOut,
+      issuedTo: issuedTo?.toUpperCase() || null,
+      company: company?.toUpperCase() || null,
+      address: address?.toUpperCase() || null,
       plateNumber: plateNumber?.toUpperCase() || null,
-      firstScaleDate,
-      firstScaleTime,
-      secondScaleDate: null,
-      secondScaleTime: null,
-      grossWeight,
-      tareWeight,
-      netWeight,
-      remarks,
+      vehicle: vehicle?.toUpperCase() || null,
+      category,
+      category2,
+      truckScaleNo,
+      remarks: remarks?.toUpperCase() || null,
       createdBy,
     });
 
-    const truckScale = await TruckScale.findByPk(newEntry.id, {
+    // Create associated GatePassItems if any
+    if (Array.isArray(items) && items.length > 0) {
+      const formattedItems = items.map((item) => ({
+        gatePassId: newEntry.id,
+        description: item.description?.toUpperCase() || "",
+        quantity: item.quantity || "",
+        unit: item.unit || "",
+      }));
+
+      await GatePassItem.bulkCreate(formattedItems);
+    }
+
+    // Fetch the newly created GatePass along with Employee and GatePassItems
+    const fullData = await GatePass.findByPk(newEntry.id, {
       include: [
         {
           model: Employee,
@@ -53,33 +69,34 @@ async function createTruckScaleController(req, res) {
           attributes: ["firstName", "lastName"],
         },
         {
-          model: Employee,
-          as: "Employee2",
-          attributes: ["firstName", "lastName"],
+          model: GatePassItem,
+          as: "GatePassItem",
         },
       ],
     });
 
+    // Broadcast the new gate pass to connected clients
     broadcastMessage({
-      type: "NEW_TRUCK_SCALE",
-      data: truckScale,
+      type: "NEW_GATE_PASS",
+      data: fullData,
     });
 
+    // Respond to the client
     res.status(201).json({
-      message: "Truck scale entry created successfully",
-      data: newEntry,
+      message: "Gate pass created successfully",
+      data: fullData,
     });
   } catch (error) {
-    console.error("Error creating truck scale entry:", error);
+    console.error("Error creating gate pass:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Get Truck Scales controller
-async function getTruckScalesController(req, res) {
+// Get Gate Passes controller
+async function getGatePassesController(req, res) {
   try {
-    // Fetch all truckScales from the database
-    const truckScales = await TruckScale.findAll({
+    // Fetch all gatePasses from the database
+    const gatePasses = await GatePass.findAll({
       include: [
         {
           model: Employee,
@@ -87,9 +104,8 @@ async function getTruckScalesController(req, res) {
           attributes: ["firstName", "lastName"],
         },
         {
-          model: Employee,
-          as: "Employee2",
-          attributes: ["firstName", "lastName"],
+          model: GatePassItem,
+          as: "GatePassItem",
         },
       ],
       order: [
@@ -97,18 +113,18 @@ async function getTruckScalesController(req, res) {
       ],
     });
 
-    res.json({ truckScales });
+    res.json({ gatePasses });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
 }
 
-// Update Truck Scale controller
-async function updateTruckScaleController(req, res) {
+// Update Gate Pass controller
+async function updateGatePassController(req, res) {
   try {
     const id = req.params.id;
-    console.log("Updating Truck Scale entry with ID:", id);
+    console.log("Updating Gate Pass entry with ID:", id);
 
     const {
       transactionType,
@@ -127,12 +143,12 @@ async function updateTruckScaleController(req, res) {
       createdBy,
     } = req.body;
 
-    const existingEntry = await TruckScale.findByPk(id);
+    const existingEntry = await GatePass.findByPk(id);
 
     if (!existingEntry) {
       return res
         .status(404)
-        .json({ message: `Truck Scale with ID ${id} not found` });
+        .json({ message: `Gate Pass with ID ${id} not found` });
     }
 
     // Update fields
@@ -153,7 +169,7 @@ async function updateTruckScaleController(req, res) {
 
     await existingEntry.save();
 
-    const truckScale = await TruckScale.findByPk(id, {
+    const truckScale = await GatePass.findByPk(id, {
       include: [
         {
           model: Employee,
@@ -183,8 +199,8 @@ async function updateTruckScaleController(req, res) {
   }
 }
 
-// Delete Truck Scale Controller
-async function deleteTruckScaleController(req, res) {
+// Delete Gate Pass Controller
+async function deleteGatePassController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
@@ -192,11 +208,11 @@ async function deleteTruckScaleController(req, res) {
     console.log("Soft deleting truck scale record with ID:", id);
 
     // Find the truck scale entry by its primary key
-    const truckScaleToDelete = await TruckScale.findByPk(id);
+    const truckScaleToDelete = await GatePass.findByPk(id);
 
     if (!truckScaleToDelete) {
       return res.status(404).json({
-        message: `Truck Scale entry with ID ${id} not found`,
+        message: `Gate Pass entry with ID ${id} not found`,
       });
     }
 
@@ -225,8 +241,8 @@ async function deleteTruckScaleController(req, res) {
 }
 
 module.exports = {
-  createTruckScaleController,
-  getTruckScalesController,
-  updateTruckScaleController,
-  deleteTruckScaleController,
+  createGatePassController,
+  getGatePassesController,
+  updateGatePassController,
+  deleteGatePassController,
 };

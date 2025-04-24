@@ -13,6 +13,7 @@ import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import ScaleIcon from "@mui/icons-material/Scale";
+import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import TopicIcon from "@mui/icons-material/Topic";
@@ -33,6 +34,7 @@ const ReceivingDashboard = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/transactions": "Transactions",
       "/dashboard/truckScale": "Truck Scale",
+      "/dashboard/gatePass": "Gate Pass",
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/documents": "Documents",
@@ -132,6 +134,14 @@ const ReceivingDashboard = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"truckScale"}
+        />
+        <BottomNavItem
+          label="Gate Pass"
+          value="Gate Pass"
+          icon={NoteAltIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"gatePass"}
         />
         <BottomNavItem
           label="Type Of Vehicles"
@@ -286,6 +296,14 @@ const ReceivingDashboard = ({ user }) => {
               title="Truck Scale"
               to="truckScale"
               icon={<ScaleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Gate Pass"
+              to="gatePass"
+              icon={<NoteAltIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

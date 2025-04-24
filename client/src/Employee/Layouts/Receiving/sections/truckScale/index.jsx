@@ -779,82 +779,82 @@ const TruckScale = ({ user, socket }) => {
             <div class="details">
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 0px 5px; width: 35%;"><strong>Truck Scale #:</strong></td>
-                  <td style="padding: 0px 5px; width: 65%;">${
+                  <td style="padding: 2.5px 5px; width: 40%;"><strong>Truck Scale #:</strong></td>
+                  <td style="padding: 2.5px 5px; width: 60%;">${
                     params.row.truckScaleNo
                   }</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Transaction Type:</strong></td>
-                  <td style="padding: 0px 5px;">${
+                  <td style="padding: 2.5px 5px;"><strong>Transaction Type:</strong></td>
+                  <td style="padding: 2.5px 5px;">${
                     params.row.transactionType
                   }</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Client:</strong></td>
-                  <td style="padding: 0px 5px;">${params.row.clientName}</td>
+                  <td style="padding: 2.5px 5px;"><strong>Client:</strong></td>
+                  <td style="padding: 2.5px 5px;">${params.row.clientName}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Commodity:</strong></td>
-                  <td style="padding: 0px 5px;">${params.row.commodity}</td>
+                  <td style="padding: 2.5px 5px;"><strong>Commodity:</strong></td>
+                  <td style="padding: 2.5px 5px;">${params.row.commodity}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Plate Number:</strong></td>
-                  <td style="padding: 0px 5px;">${params.row.plateNumber}</td>
+                  <td style="padding: 2.5px 5px;"><strong>Plate Number:</strong></td>
+                  <td style="padding: 2.5px 5px;">${params.row.plateNumber}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Driver:</strong></td>
-                  <td style="padding: 0px 5px;">${params.row.driver}</td>
+                  <td style="padding: 2.5px 5px;"><strong>Driver:</strong></td>
+                  <td style="padding: 2.5px 5px;">${params.row.driver}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>1st Weigh:</strong></td>
-                  <td style="padding: 0px 5px;">${formatDate3(
+                  <td style="padding: 2.5px 5px;"><strong>1st Weigh:</strong></td>
+                  <td style="padding: 2.5px 5px;">${formatDate3(
                     params.row.firstScaleDate
                   )}<br />${formatTime2(params.row.firstScaleTime)}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>1st Weigher:</strong></td>
-                  <td style="padding: 0px 5px;">${
+                  <td style="padding: 2.5px 5px;"><strong>1st Weigher:</strong></td>
+                  <td style="padding: 2.5px 5px;">${
                     params.row.Employee.firstName
                   } ${params.row.Employee.lastName}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>2nd Weigh:</strong></td>
-                  <td style="padding: 0px 5px;">${formatDate3(
+                  <td style="padding: 2.5px 5px;"><strong>2nd Weigh:</strong></td>
+                  <td style="padding: 2.5px 5px;">${formatDate3(
                     params.row.secondScaleDate
                   )}<br />${formatTime2(params.row.secondScaleTime)}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>2nd Weigher:</strong></td>
-                  <td style="padding: 0px 5px;">${
+                  <td style="padding: 2.5px 5px;"><strong>2nd Weigher:</strong></td>
+                  <td style="padding: 2.5px 5px;">${
                     params.row.Employee2.firstName
                   } ${params.row.Employee2.lastName}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Gross Weight:</strong></td>
-                  <td style="padding: 0px 5px;">${formatNumber(
+                  <td style="padding: 2.5px 5px;"><strong>Gross Weight:</strong></td>
+                  <td style="padding: 2.5px 5px;">${formatNumber(
                     params.row.grossWeight
                   )}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Tare Weight:</strong></td>
-                  <td style="padding: 0px 5px;">${formatNumber(
+                  <td style="padding: 2.5px 5px;"><strong>Tare Weight:</strong></td>
+                  <td style="padding: 2.5px 5px;">${formatNumber(
                     params.row.tareWeight
                   )}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Net Weight:</strong></td>
-                  <td style="padding: 0px 5px;">${formatNumber(
+                  <td style="padding: 2.5px 5px;"><strong>Net Weight:</strong></td>
+                  <td style="padding: 2.5px 5px;">${formatNumber(
                     params.row.netWeight
                   )}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;"><strong>Remarks:</strong></td>
-                  <td style="padding: 0px 5px;">${params.row.remarks}</td>
+                  <td style="padding: 2.5px 5px;"><strong>Remarks:</strong></td>
+                  <td style="padding: 2.5px 5px;">${params.row.remarks}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 0px 5px;">Scan this QR code to verify the authenticity of the transaction.</td>
-                  <td style="padding: 0px 5px;">            
+                  <td style="padding: 2.5px 5px;">Scan this QR code to verify the authenticity of the transaction.</td>
+                  <td style="padding: 2.5px 5px;">            
                     <img src="${qrCodeDataUrl}" alt="QR Code" width="80" height="80" />
                 </td>
                 </tr>

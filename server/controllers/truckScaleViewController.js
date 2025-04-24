@@ -3,6 +3,7 @@
 const BookedTransaction = require("../models/BookedTransaction");
 const CertifiedTransaction = require("../models/CertifiedTransaction");
 const Client = require("../models/Client");
+const Employee = require("../models/Employee");
 const PlasticTransaction = require("../models/PlasticTransaction");
 const TruckScale = require("../models/TruckScale");
 const { getIncludeOptionsVerify } = require("../utils/getBookedTransactions");
@@ -14,7 +15,15 @@ async function getTruckScaleViewController(req, res) {
 
     console.log(id);
 
-    const truckScale = await TruckScale.findByPk(id, {});
+    const truckScale = await TruckScale.findByPk(id, {
+      include: {
+        include: {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+      },
+    });
 
     res.json({ truckScale });
   } catch (error) {

@@ -58,11 +58,9 @@ async function createTruckScaleController(req, res) {
 
     const truckScale = await TruckScale.findByPk(newEntry.id, {
       include: {
-        include: {
-          model: Employee,
-          as: "Employee",
-          attributes: ["firstName", "lastName"],
-        },
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
       },
     });
 
@@ -154,11 +152,9 @@ async function updateTruckScaleController(req, res) {
 
     const truckScale = await TruckScale.findByPk(id, {
       include: {
-        include: {
-          model: Employee,
-          as: "Employee",
-          attributes: ["firstName", "lastName"],
-        },
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
       },
     });
 

@@ -218,7 +218,7 @@ const TruckScale = ({ user, socket }) => {
       const grossWeight = Number(formData.grossWeight) || 0;
       const tareWeight = Number(formData.tareWeight) || 0;
 
-      const netWeight = tareWeight - grossWeight;
+      const netWeight = grossWeight - tareWeight;
 
       setFormData((prevData) => ({
         ...prevData,

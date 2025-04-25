@@ -246,9 +246,11 @@ const TruckScale = ({ user, socket }) => {
     setOpenModal(true);
   };
 
+  console.log("Client Names:", clientNames);
+
   useEffect(() => {
     // 🔍 If clientId is empty, try to derive it from clientName
-    if (!formData.clientId && formData.clientName) {
+    if (formData.clientName) {
       const matchedClient = clientNames.find(
         (client) =>
           client.clientName.toLowerCase().trim() ===
@@ -273,7 +275,7 @@ const TruckScale = ({ user, socket }) => {
       }
     }
 
-    if (!formData.clientId) {
+    if (!formData.clientId && !formData.id) {
       setClientWasteNames([]);
       console.log("Client ID is empty, resetting commodity.");
       setFormData((prev) => ({

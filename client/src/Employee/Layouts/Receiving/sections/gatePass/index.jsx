@@ -786,15 +786,15 @@ const GatePass = ({ user, socket }) => {
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Checked By:</div>
-                <div style="text-align: center;"><u>RONNIE BIBERA</u></div>
+                <div style="text-align: center;"><u>_________________</u></div>
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Approved By:</div>
-                <div style="text-align: center;"><u>JERRY MONTILLA</u></div>
+                <div style="text-align: center;"><u>_________________</u></div>
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Accounting:</div>
-                <div style="text-align: center;"><u>JAIME CRUZ</u></div>
+                <div style="text-align: center;"><u>_________________</u></div>
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Released By:</div>
@@ -953,15 +953,15 @@ const GatePass = ({ user, socket }) => {
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Checked By:</div>
-                <div style="text-align: center;"><u>RONNIE BIBERA</u></div>
+                <div style="text-align: center;"><u>_________________</u></div>
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Approved By:</div>
-                <div style="text-align: center;"><u>JERRY MONTILLA</u></div>
+                <div style="text-align: center;"><u>_________________</u></div>
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Accounting:</div>
-                <div style="text-align: center;"><u>JAIME CRUZ</u></div>
+                <div style="text-align: center;"><u>_________________</u></div>
               </div>
               <div style="box-sizing: border-box; width: calc((100% - 80px) / 5); height: 80px; padding: 5px; border-left: 1px solid black; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>Released By:</div>

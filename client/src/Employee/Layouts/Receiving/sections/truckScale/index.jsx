@@ -88,7 +88,7 @@ const TruckScale = ({ user, socket }) => {
       // Get unique client data from the client response (clientId and clientName)
       const clientData = responseClient.data.clients
         .map((client) => ({
-          clientId: client.id,
+          clientId: client.clientId,
           clientName: client.clientName,
         }))
         .filter(
@@ -247,12 +247,39 @@ const TruckScale = ({ user, socket }) => {
   };
 
   useEffect(() => {
+    // 🔍 If clientId is empty, try to derive it from clientName
+    if (!formData.clientId && formData.clientName) {
+      const matchedClient = clientNames.find(
+        (client) =>
+          client.clientName.toLowerCase().trim() ===
+          formData.clientName.toLowerCase().trim()
+      );
+
+      if (matchedClient) {
+        console.log("Client name matched from list. Setting clientId.");
+        setFormData((prev) => ({
+          ...prev,
+          clientId: matchedClient.clientId,
+        }));
+      } else {
+        console.log("No matching client name found. Clearing clientId.");
+        setFormData((prev) => ({
+          ...prev,
+          clientId: "",
+          commodity: "",
+        }));
+        setClientWasteNames([]);
+        return;
+      }
+    }
+
     if (!formData.clientId) {
       setClientWasteNames([]);
-      // Reset commodity when clientId is cleared
-      if (!formData.id) {
-        setFormData((prev) => ({ ...prev, commodity: "" }));
-      }
+      console.log("Client ID is empty, resetting commodity.");
+      setFormData((prev) => ({
+        ...prev,
+        commodity: "",
+      }));
       return;
     }
 
@@ -270,7 +297,17 @@ const TruckScale = ({ user, socket }) => {
     if (!formData.id) {
       setFormData((prev) => ({ ...prev, commodity: "" }));
     }
-  }, [formData.clientId, formData.id, quotations]);
+  }, [
+    formData.clientId,
+    formData.clientName,
+    formData.id,
+    quotations,
+    clientNames,
+  ]);
+
+  console.log(formData);
+  console.log(quotations);
+  console.log(clientWasteNames);
 
   const handleCloseModal = () => {
     setOpenModal(false);

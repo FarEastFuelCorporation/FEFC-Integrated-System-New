@@ -141,25 +141,10 @@ const SectionModal = ({
                 }}
                 onChange={(event, newValue) => {
                   if (typeof newValue === "object" && newValue !== null) {
-                    // Selected from the list
                     handleInputChange({
                       target: {
                         name: "clientName",
                         value: newValue.clientName,
-                      },
-                    });
-                    handleInputChange({
-                      target: {
-                        name: "clientId",
-                        value: newValue.clientId,
-                      },
-                    });
-                  } else {
-                    // Manually typed
-                    handleInputChange({
-                      target: {
-                        name: "clientId",
-                        value: "",
                       },
                     });
                   }
@@ -180,6 +165,7 @@ const SectionModal = ({
                 )}
               />
             )}
+
             {!formData.id && (
               <Autocomplete
                 value={formData.commodity}

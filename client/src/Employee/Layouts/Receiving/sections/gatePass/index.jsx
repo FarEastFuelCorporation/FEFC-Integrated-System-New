@@ -688,7 +688,7 @@ const GatePass = ({ user, socket }) => {
               </div>
               <div style="display: flex; flex-direction: column; width: 30%; border-left: 1px solid black;">
                 <div style="text-align: center;">
-                  <div class="header" style="font-size: 20px; background-color: green; color: white;">Gate Pass #</div>
+                  <div class="header" style="font-size: 20px; background-color: #008000; color: white;">Gate Pass #</div>
                   <div style="font-size: 29.5px; font-weight: bold;">${
                     params.row.gatePassNo
                   }</div>
@@ -855,7 +855,7 @@ const GatePass = ({ user, socket }) => {
               </div>
               <div style="display: flex; flex-direction: column; width: 30%; border-left: 1px solid black;">
                 <div style="text-align: center;">
-                  <div class="header" style="font-size: 20px; background-color: red; color: white;">Gate Pass #</div>
+                  <div class="header" style="font-size: 20px; background-color: #FF0000; color: white;">Gate Pass #</div>
                   <div style="font-size: 29.5px; font-weight: bold;">${
                     params.row.gatePassNo
                   }</div>

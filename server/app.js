@@ -100,17 +100,8 @@ const {
   handleAttendanceSync,
   syncSpecificEmployeeToLocal,
 } = require("./syncronize");
-const Quotation = require("./models/Quotation");
-const EmployeeAttachmentLegal = require("./models/EmployeeAttachmentLegal");
-const EmployeeAttachmentMemo = require("./models/EmployeeAttachmentMemo");
-const BookedTransaction = require("./models/BookedTransaction");
-const EmployeeRolesEmployeeJD = require("./jd/models/EmployeeRolesEmployee");
-const EmployeeJD = require("./jd/models/Employee");
-const UserJD = require("./jd/models/User");
-const EmployeeRoleJD = require("./jd/models/EmployeeRole");
 const sequelizeJD = require("./jd/config/database");
-const ProductionJD = require("./jd/models/Production");
-const LedgerJD = require("./jd/models/Ledger");
+const PTT = require("./models/PTT");
 
 // Function to initialize the application
 async function initializeApp() {
@@ -118,7 +109,7 @@ async function initializeApp() {
     console.log("Syncing models to the database...");
 
     // await sequelizeJD.sync({ alter: true });
-    // await LedgerJD.sync({ alter: true });
+    // await PTT.sync({ alter: true });
 
     // await handleAttendanceSync();
 

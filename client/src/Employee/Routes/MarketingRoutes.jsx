@@ -12,6 +12,7 @@ import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../../Employee/Layouts/Marketing/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import TruckScale from "../Layouts/Receiving/sections/truckScale";
+import PTT from "../../OtherComponents/Sections/ptt";
 
 const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
@@ -20,6 +21,7 @@ const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
       <Route path="" element={<Dashboard user={user} />} />
       <Route path="clients" element={<Clients user={user} />} />
       <Route path="typeOfWastes" element={<TypeOfWastes user={user} />} />
+      <Route path="ptt" element={<PTT user={user} socket={socket} />} />
       <Route path="logistics" element={<Logistics user={user} />} />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route

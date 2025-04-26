@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import ScaleIcon from "@mui/icons-material/Scale";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import RecyclingIcon from "@mui/icons-material/Recycling";
@@ -35,6 +36,7 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/dashboard": "Dashboard",
       "/dashboard/clients": "Clients",
       "/dashboard/typeOfWastes": "Type Of Wastes",
+      "/dashboard/ptt": "Permit To Transport",
       "/dashboard/logistics": "Logistics",
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
@@ -145,6 +147,14 @@ const MarketingSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"typeOfWastes"}
+        />
+        <BottomNavItem
+          label="Permit To Transport"
+          value="Permit To Transport"
+          icon={AssignmentIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"ptt"}
         />
         <BottomNavItem
           label="Logistics"
@@ -322,6 +332,14 @@ const MarketingSidebar = ({ user }) => {
               title="Type Of Wastes"
               to="typeOfWastes"
               icon={<RecyclingIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Permit To Transport"
+              to="ptt"
+              icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

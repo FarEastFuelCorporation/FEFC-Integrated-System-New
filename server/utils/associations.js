@@ -64,6 +64,9 @@ const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 const TruckScale = require("../models/TruckScale");
 const GatePass = require("../models/GatePass");
 const GatePassItem = require("../models/GatePassItem");
+const PTTWaste = require("../models/PTTWaste");
+const PTT = require("../models/PTT");
+const PTTWasteLog = require("../models/PTTWasteLog");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -1343,6 +1346,50 @@ Medicine.hasMany(MedicineLog, {
 MedicineLog.belongsTo(Medicine, {
   as: "Medicine",
   foreignKey: "medicineId",
+  targetKey: "id",
+});
+
+Client.hasMany(PTT, {
+  as: "PTT",
+  foreignKey: "clientId",
+  sourceKey: "clientId",
+});
+PTT.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "clientId",
+  targetKey: "clientId",
+});
+
+PTT.hasMany(PTTWaste, {
+  as: "PTTWaste",
+  foreignKey: "pttId",
+  sourceKey: "id",
+});
+PTTWaste.belongsTo(PTT, {
+  as: "PTT",
+  foreignKey: "pttId",
+  targetKey: "id",
+});
+
+TypeOfWaste.hasMany(PTTWaste, {
+  as: "PTTWaste",
+  foreignKey: "wasteId",
+  sourceKey: "id",
+});
+PTTWaste.belongsTo(TypeOfWaste, {
+  as: "TypeOfWaste",
+  foreignKey: "wasteId",
+  targetKey: "id",
+});
+
+PTTWaste.hasMany(PTTWasteLog, {
+  as: "PTTWasteLog",
+  foreignKey: "pttWasteId",
+  sourceKey: "id",
+});
+PTTWasteLog.belongsTo(PTTWaste, {
+  as: "PTTWaste",
+  foreignKey: "pttWasteId",
   targetKey: "id",
 });
 

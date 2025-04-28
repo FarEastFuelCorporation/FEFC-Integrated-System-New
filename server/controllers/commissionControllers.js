@@ -9,7 +9,7 @@ const TypeOfWaste = require("../models/TypeOfWaste");
 const VehicleType = require("../models/VehicleType");
 const QuotationWaste = require("../models/QuotationWaste");
 const Quotation = require("../models/Quotation");
-const Commission = require("../models/COmmission");
+const Commission = require("../models/Commission");
 
 // Create Commission controller
 async function createCommissionController(req, res) {

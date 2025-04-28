@@ -68,7 +68,7 @@ const PTTWaste = require("../models/PTTWaste");
 const PTT = require("../models/PTT");
 const PTTWasteLog = require("../models/PTTWasteLog");
 const CommissionWaste = require("../models/CommissionWaste");
-const Commission = require("../models/COmmission");
+const Commission = require("../models/Commission");
 
 // Define associations
 IdInformation.hasMany(Attendance, {

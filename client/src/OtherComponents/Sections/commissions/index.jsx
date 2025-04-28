@@ -644,13 +644,13 @@ const Commissions = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Commissions" subtitle="List of Agent's Commissions" />
-        {user.userType === 2 && (
+        {/* {user.userType === 2 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
               <PostAddIcon sx={{ fontSize: "40px" }} />
             </IconButton>
           </Box>
-        )}
+        )} */}
       </Box>
       {showSuccessMessage && (
         <SuccessMessage

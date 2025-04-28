@@ -459,7 +459,7 @@ const TreatedWarehouseTransaction = ({
         {" "}
         <Typography variant="h5">
           Finished Treatment Date:{" "}
-          {warehousedTransaction[0].isFinishTreated
+          {warehousedTransaction[0]?.isFinishTreated
             ? latestTreatedDate &&
               format(new Date(latestTreatedDate), "MMMM dd, yyyy")
             : totalTreatedWeight > 0
@@ -468,7 +468,7 @@ const TreatedWarehouseTransaction = ({
         </Typography>
         <Typography variant="h5">
           Finished Treatment Time:{" "}
-          {warehousedTransaction[0].isFinishTreated
+          {warehousedTransaction[0]?.isFinishTreated
             ? latestTreatedDate &&
               format(parseTimeString(latestTreatedTime), "hh:mm aa")
             : totalTreatedWeight > 0

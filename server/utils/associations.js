@@ -67,6 +67,8 @@ const GatePassItem = require("../models/GatePassItem");
 const PTTWaste = require("../models/PTTWaste");
 const PTT = require("../models/PTT");
 const PTTWasteLog = require("../models/PTTWasteLog");
+const CommissionWaste = require("../models/CommissionWaste");
+const Commission = require("../models/COmmission");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -1391,6 +1393,43 @@ PTTWasteLog.belongsTo(PTTWaste, {
   as: "PTTWaste",
   foreignKey: "pttWasteId",
   targetKey: "id",
+});
+
+Commission.hasMany(CommissionWaste, {
+  as: "CommissionWaste",
+  foreignKey: "commissionId",
+  sourceKey: "id",
+});
+CommissionWaste.belongsTo(Commission, {
+  as: "Commission",
+  foreignKey: "commissionId",
+  targetKey: "id",
+});
+
+Quotation.hasMany(Commission, {
+  as: "Commission",
+  foreignKey: "quotationId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+Commission.belongsTo(Quotation, {
+  as: "Quotation",
+  foreignKey: "quotationId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+QuotationWaste.hasMany(CommissionWaste, {
+  as: "CommissionWaste",
+  foreignKey: "quotationWasteId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CommissionWaste.belongsTo(QuotationWaste, {
+  as: "QuotationWaste",
+  foreignKey: "quotationWasteId",
+  targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 // Export the associations

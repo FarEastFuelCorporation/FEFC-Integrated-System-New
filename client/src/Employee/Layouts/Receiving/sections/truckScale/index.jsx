@@ -246,8 +246,6 @@ const TruckScale = ({ user, socket }) => {
     setOpenModal(true);
   };
 
-  console.log("Client Names:", clientNames);
-
   useEffect(() => {
     // 🔍 If clientId is empty, try to derive it from clientName
     if (formData.clientName) {
@@ -258,13 +256,11 @@ const TruckScale = ({ user, socket }) => {
       );
 
       if (matchedClient) {
-        console.log("Client name matched from list. Setting clientId.");
         setFormData((prev) => ({
           ...prev,
           clientId: matchedClient.clientId,
         }));
       } else {
-        console.log("No matching client name found. Clearing clientId.");
         setFormData((prev) => ({
           ...prev,
           clientId: "",
@@ -277,7 +273,6 @@ const TruckScale = ({ user, socket }) => {
 
     if (!formData.clientId && !formData.id) {
       setClientWasteNames([]);
-      console.log("Client ID is empty, resetting commodity.");
       setFormData((prev) => ({
         ...prev,
         commodity: "",
@@ -306,10 +301,6 @@ const TruckScale = ({ user, socket }) => {
     quotations,
     clientNames,
   ]);
-
-  console.log(formData);
-  console.log(quotations);
-  console.log(clientWasteNames);
 
   const handleCloseModal = () => {
     setOpenModal(false);

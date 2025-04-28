@@ -435,8 +435,7 @@ async function getQuotationWithWasteController(req, res) {
         {
           model: Client,
           as: "Client",
-          attributes: { exclude: ["clientPicture"] },
-          attributes: ["clientName"],
+          attributes: ["clientName", "clientId"],
         },
         {
           model: QuotationWaste,
@@ -447,12 +446,12 @@ async function getQuotationWithWasteController(req, res) {
       where: {
         status: "active",
       },
-      order: [["quotationCode", "ASC"]], // Ordering at the top level
+      order: [["quotationCode", "ASC"]],
     });
 
-    // Flatten and format the data
+    // Flatten and format the data (your original format)
     const flattenedData = quotations.map((item) => {
-      const quotation = item.toJSON(); // Convert Sequelize object to plain JSON
+      const quotation = item.toJSON();
       const createdDate = new Date(quotation.dateCreated);
       const validityDate = new Date(quotation.validity);
       return {
@@ -460,15 +459,45 @@ async function getQuotationWithWasteController(req, res) {
         clientName: quotation.Client ? quotation.Client.clientName : null,
         dateCreated: !isNaN(createdDate.getTime())
           ? createdDate.toISOString().split("T")[0]
-          : null, // Convert valid date to yyyy-mm-dd format or null if invalid
+          : null,
         validity: !isNaN(validityDate.getTime())
           ? validityDate.toISOString().split("T")[0]
-          : null, // Convert valid date to yyyy-mm-dd format or null if invalid
+          : null,
       };
     });
 
-    // Send the formatted data
-    res.json({ quotations: flattenedData });
+    // Group data by client (new structure you want)
+    const clientsMap = new Map();
+
+    quotations.forEach((item) => {
+      const quotation = item.toJSON();
+      const clientId = quotation.Client?.clientId;
+      const clientName = quotation.Client?.clientName;
+
+      if (!clientId) return; // Skip if no client
+
+      if (!clientsMap.has(clientId)) {
+        clientsMap.set(clientId, {
+          clientId,
+          clientName,
+          quotations: [],
+        });
+      }
+
+      // Push the quotation into the right client
+      clientsMap.get(clientId).quotations.push({
+        id: quotation.id,
+        quotationCode: quotation.quotationCode,
+        quotationDate: quotation.dateCreated,
+        validity: quotation.validity,
+        QuotationWaste: quotation.QuotationWaste, // Array of waste objects
+      });
+    });
+
+    const clientsArray = Array.from(clientsMap.values());
+
+    // Send both sets
+    res.json({ quotations: flattenedData, clients: clientsArray });
   } catch (error) {
     console.error("Error fetching quotations:", error);
     res.status(500).json({ message: "Internal Server Error" });

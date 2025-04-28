@@ -63,6 +63,7 @@ const truckScaleRoutes = require("./truckScaleRoutes");
 const truckScaleVIewRoutes = require("./truckScaleVIewRoutes");
 const gatePassRoutes = require("./gatePassRoutes");
 const pttRoutes = require("./pttRoutes");
+const commissionRoutes = require("./commissionRoutes");
 const { error404Controller } = require("../controllers/othersController");
 
 router.use(authRoutes);
@@ -138,6 +139,7 @@ router.use("/medicineLog", medicineLogRoutes);
 router.use("/truckScale", truckScaleRoutes);
 router.use("/gatePass", gatePassRoutes);
 router.use("/ptt", pttRoutes);
+router.use("/commission", commissionRoutes);
 
 router.use(error404Controller);
 

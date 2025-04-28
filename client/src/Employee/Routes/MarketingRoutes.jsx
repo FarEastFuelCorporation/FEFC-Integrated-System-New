@@ -28,7 +28,10 @@ const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
         path="transactions"
         element={<ScheduledTransactions user={user} />}
       />
-      <Route path="commissions" element={<Commissions />} />
+      <Route
+        path="commissions"
+        element={<Commissions user={user} socket={socket} />}
+      />
       <Route
         path="truckScale"
         element={<TruckScale user={user} socket={socket} />}

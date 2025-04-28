@@ -63,8 +63,6 @@ const SectionModal = ({
         [field]: value,
       };
 
-      console.log("Updated Waste:", field);
-
       // If wasteId is changed, also update wasteName using wasteDescription
       if (field === "wasteId") {
         const selectedWaste = wasteTypes.find((w) => w.id === value);

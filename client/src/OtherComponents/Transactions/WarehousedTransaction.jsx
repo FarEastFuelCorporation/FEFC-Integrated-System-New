@@ -322,8 +322,8 @@ const WarehousedTransaction = ({ row }) => {
           </Typography>
           <Typography variant="h5">
             Warehoused In By:{" "}
-            {`${warehousedTransaction.Employee.firstName || ""} ${
-              warehousedTransaction.Employee.lastName || ""
+            {`${warehousedTransaction?.Employee?.firstName || ""} ${
+              warehousedTransaction?.Employee?.lastName || ""
             }`}
           </Typography>
           <br />

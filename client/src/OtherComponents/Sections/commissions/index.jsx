@@ -423,69 +423,69 @@ const Commissions = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
     },
-    {
-      field: "view",
-      headerName: "View File",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 80,
-      renderCell: (params) => (
-        <IconButton
-          color="secondary"
-          onClick={async () => {
-            try {
-              const id = params.row.id; // Get the document ID
+    // {
+    //   field: "view",
+    //   headerName: "View File",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 80,
+    //   renderCell: (params) => (
+    //     <IconButton
+    //       color="secondary"
+    //       onClick={async () => {
+    //         try {
+    //           const id = params.row.id; // Get the document ID
 
-              // Fetch the attachment from the API using the document ID
-              const response = await axios.get(
-                `${apiUrl}/api/quotation/full/${id}`
-              );
+    //           // Fetch the attachment from the API using the document ID
+    //           const response = await axios.get(
+    //             `${apiUrl}/api/quotation/full/${id}`
+    //           );
 
-              // Call the view handler with the fetched data
+    //           // Call the view handler with the fetched data
 
-              handleViewClick(response.data.commissions[0]);
-            } catch (error) {
-              console.error("Error fetching document file:", error);
-              // Optional: Show error message to the user
-            }
-          }}
-        >
-          <PageviewIcon sx={{ fontSize: "2rem" }} />
-        </IconButton>
-      ),
-    },
-    {
-      field: "download",
-      headerName: "Download",
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      width: 80,
-      renderCell: (params) => (
-        <IconButton
-          color="secondary"
-          onClick={async () => {
-            try {
-              const id = params.row.id; // Get the document ID
+    //           handleViewClick(response.data.commissions[0]);
+    //         } catch (error) {
+    //           console.error("Error fetching document file:", error);
+    //           // Optional: Show error message to the user
+    //         }
+    //       }}
+    //     >
+    //       <PageviewIcon sx={{ fontSize: "2rem" }} />
+    //     </IconButton>
+    //   ),
+    // },
+    // {
+    //   field: "download",
+    //   headerName: "Download",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   sortable: false,
+    //   width: 80,
+    //   renderCell: (params) => (
+    //     <IconButton
+    //       color="secondary"
+    //       onClick={async () => {
+    //         try {
+    //           const id = params.row.id; // Get the document ID
 
-              // Fetch the attachment from the API using the document ID
-              const response = await axios.get(
-                `${apiUrl}/api/quotation/full/${id}`
-              );
+    //           // Fetch the attachment from the API using the document ID
+    //           const response = await axios.get(
+    //             `${apiUrl}/api/quotation/full/${id}`
+    //           );
 
-              // Call the download handler with the fetched data
-              handleDownloadClick(response.data.commissions[0]);
-            } catch (error) {
-              console.error("Error fetching document file:", error);
-              // Optional: Show error message to the user
-            }
-          }}
-        >
-          <DownloadIcon sx={{ fontSize: "2rem" }} />
-        </IconButton>
-      ),
-    },
+    //           // Call the download handler with the fetched data
+    //           handleDownloadClick(response.data.commissions[0]);
+    //         } catch (error) {
+    //           console.error("Error fetching document file:", error);
+    //           // Optional: Show error message to the user
+    //         }
+    //       }}
+    //     >
+    //       <DownloadIcon sx={{ fontSize: "2rem" }} />
+    //     </IconButton>
+    //   ),
+    // },
   ];
 
   if (user.userType === 2) {

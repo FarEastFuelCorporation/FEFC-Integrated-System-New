@@ -309,7 +309,7 @@ const BillingStatementHeader = ({
                     isIndividualBillingToBill
                       ? groupedTransactions?.totals?.credits.vatInclusive -
                           toBeDiscount
-                      : credits.vatInclusive + toBeDiscount
+                      : credits.vatInclusive + credits.nonVatable + toBeDiscount
                   )}
             </Typography>
           </Box>
@@ -343,13 +343,16 @@ const BillingStatementHeader = ({
                           (isChargeToProcess
                             ? 0
                             : groupedTransactions?.totals?.credits
-                                .vatInclusive) -
+                                .vatInclusive +
+                              groupedTransactions?.totals?.credits.nonVatable) -
                           toBeDiscount
                       : amounts.nonVatable +
                           amounts.vatExclusive +
                           amounts.vatInclusive / 1.12 +
                           vat -
-                          (isChargeToProcess ? 0 : credits.vatInclusive) -
+                          (isChargeToProcess
+                            ? 0
+                            : credits.vatInclusive + credits.nonVatable) -
                           toBeDiscount
                   )}
             </Typography>

@@ -316,24 +316,28 @@ async function deleteCommissionController(req, res) {
     const id = req.params.id;
     console.log("Soft deleting commission with ID:", id);
 
-    // Find the client by UUID (id)
+    // Find the commission by primary key
     const commissionToDelete = await Commission.findByPk(id);
 
-    if (commissionToDelete) {
-      // Soft delete the client (sets deletedAt timestamp)
-      await commissionToDelete.destroy();
-
-      // Respond with a success message
-      res.json({
-        message: `Commission with ID ${commissionToDelete.commissionCode} soft-deleted successfully`,
-      });
-    } else {
-      // If client with the specified ID was not found
-      res.status(404).json({ message: `Client with ID ${id} not found` });
+    if (!commissionToDelete) {
+      return res
+        .status(404)
+        .json({ message: `Commission with ID ${id} not found` });
     }
+
+    // Soft delete associated CommissionWaste records
+    await CommissionWaste.destroy({
+      where: { commissionId: id },
+    });
+
+    // Soft delete the commission itself
+    await commissionToDelete.destroy();
+
+    res.json({
+      message: `Commission ${commissionToDelete.commissionCode} and its items soft-deleted successfully`,
+    });
   } catch (error) {
-    // Handle errors
-    console.error("Error soft-deleting client:", error);
+    console.error("Error soft-deleting commission:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

@@ -1399,11 +1399,13 @@ Commission.hasMany(CommissionWaste, {
   as: "CommissionWaste",
   foreignKey: "commissionId",
   sourceKey: "id",
+  onDelete: "CASCADE",
 });
 CommissionWaste.belongsTo(Commission, {
   as: "Commission",
   foreignKey: "commissionId",
   targetKey: "id",
+  onDelete: "CASCADE",
 });
 
 QuotationWaste.hasMany(CommissionWaste, {

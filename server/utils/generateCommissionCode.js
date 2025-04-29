@@ -13,6 +13,7 @@ async function generateCommissionCode() {
       },
     },
     order: [["commissionCode", "DESC"]],
+    paranoid: false,
   });
 
   let nextSequence = 1;

@@ -106,7 +106,6 @@ const Commissions = ({ user }) => {
       const response = await axios.get(`${apiUrl}/api/commission`);
 
       setCommissionsData(response.data.commissions);
-      console.log(response.data.commissions);
 
       const [clientsResponse, quotationWasteResponse, employeeResponse] =
         await Promise.all([
@@ -119,8 +118,6 @@ const Commissions = ({ user }) => {
       setAllQuotationWaste(quotationWasteResponse.data.clients); // store full list
       setQuotationWaste([]); // start empty
       setEmployees(employeeResponse.data.employees); // start empty
-      console.log(employeeResponse.data.employees); // start empty
-      console.log(quotationWasteResponse.data.clients);
 
       setLoading(false);
     } catch (error) {
@@ -132,8 +129,6 @@ const Commissions = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  console.log("formData Data:", formData);
-
   // Filter when clientId changes
   useEffect(() => {
     if (formData.clientId) {
@@ -141,7 +136,6 @@ const Commissions = ({ user }) => {
         (item) => item.clientId === formData.clientId
       );
       const filteredWastes = filteredItem?.quotationWaste || [];
-      console.log(filteredWastes);
       setQuotationWaste(filteredWastes);
     }
   }, [formData.clientId, allQuotationWaste]);
@@ -318,19 +312,19 @@ const Commissions = ({ user }) => {
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Quotation?");
+    setDialog("Are you sure you want to Delete this Commission?");
     setDialogAction(() => () => handleConfirmDelete(id));
   };
 
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/quotation/${id}`, {
+      await axios.delete(`${apiUrl}/api/commission/${id}`, {
         data: { deletedBy: user.id },
       });
 
       fetchData();
-      setSuccessMessage("Quotation Deleted Successfully!");
+      setSuccessMessage("Commission Deleted Successfully!");
       setLoading(false);
     } catch (error) {
       console.error("Error:", error);

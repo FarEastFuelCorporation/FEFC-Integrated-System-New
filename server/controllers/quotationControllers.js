@@ -435,6 +435,7 @@ async function getQuotationWithWasteController(req, res) {
           model: Client,
           as: "Client",
           attributes: ["clientName", "clientId"],
+          where: { clientStatus: "ACTIVE" }, // Filter clients
         },
         {
           model: QuotationWaste,

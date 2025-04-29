@@ -53,6 +53,12 @@ const Client = sequelize.define(
       ],
       allowNull: true,
     },
+    clientStatus: {
+      type: DataTypes.ENUM,
+      values: ["ACTIVE", "INACTIVE"],
+      defaultValue: "ACTIVE",
+      allowNull: false,
+    },
     billerName: {
       type: DataTypes.STRING,
       allowNull: true,

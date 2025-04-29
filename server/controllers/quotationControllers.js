@@ -429,7 +429,6 @@ async function getQuotationFullController(req, res) {
 // Get Quotations with Waste controller
 async function getQuotationWithWasteController(req, res) {
   try {
-    // Fetch all quotations from the database
     const quotations = await Quotation.findAll({
       include: [
         {
@@ -440,7 +439,7 @@ async function getQuotationWithWasteController(req, res) {
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          attributes: ["wasteName"],
+          attributes: ["wasteName", "id"],
         },
       ],
       where: {
@@ -449,55 +448,46 @@ async function getQuotationWithWasteController(req, res) {
       order: [["quotationCode", "ASC"]],
     });
 
-    // Flatten and format the data (your original format)
-    const flattenedData = quotations.map((item) => {
-      const quotation = item.toJSON();
-      const createdDate = new Date(quotation.dateCreated);
-      const validityDate = new Date(quotation.validity);
-      return {
-        ...quotation,
-        clientName: quotation.Client ? quotation.Client.clientName : null,
-        dateCreated: !isNaN(createdDate.getTime())
-          ? createdDate.toISOString().split("T")[0]
-          : null,
-        validity: !isNaN(validityDate.getTime())
-          ? validityDate.toISOString().split("T")[0]
-          : null,
-      };
-    });
-
-    // Group data by client (new structure you want)
     const clientsMap = new Map();
 
-    quotations.forEach((item) => {
-      const quotation = item.toJSON();
+    quotations.forEach((quotationItem) => {
+      const quotation = quotationItem.toJSON();
       const clientId = quotation.Client?.clientId;
       const clientName = quotation.Client?.clientName;
 
-      if (!clientId) return; // Skip if no client
+      if (!clientId) return;
 
       if (!clientsMap.has(clientId)) {
         clientsMap.set(clientId, {
           clientId,
           clientName,
-          quotations: [],
+          quotationWaste: [],
         });
       }
 
-      // Push the quotation into the right client
-      clientsMap.get(clientId).quotations.push({
-        id: quotation.id,
-        quotationCode: quotation.quotationCode,
-        quotationDate: quotation.dateCreated,
-        validity: quotation.validity,
-        QuotationWaste: quotation.QuotationWaste, // Array of waste objects
-      });
+      if (Array.isArray(quotation.QuotationWaste)) {
+        quotation.QuotationWaste.forEach((wasteItem) => {
+          clientsMap.get(clientId).quotationWaste.push({
+            id: wasteItem.id,
+            wasteName: wasteItem.wasteName,
+          });
+        });
+      }
     });
 
-    const clientsArray = Array.from(clientsMap.values());
+    let clientsArray = Array.from(clientsMap.values());
 
-    // Send both sets
-    res.json({ quotations: flattenedData, clients: clientsArray });
+    // Sort each client's quotationWaste by wasteName
+    clientsArray.forEach((client) => {
+      client.quotationWaste.sort((a, b) =>
+        a.wasteName.localeCompare(b.wasteName)
+      );
+    });
+
+    // Sort clients by clientName
+    clientsArray.sort((a, b) => a.clientName.localeCompare(b.clientName));
+
+    res.json({ clients: clientsArray });
   } catch (error) {
     console.error("Error fetching quotations:", error);
     res.status(500).json({ message: "Internal Server Error" });

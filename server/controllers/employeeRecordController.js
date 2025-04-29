@@ -221,7 +221,21 @@ async function getEmployeeRecordsController(req, res) {
       ],
     });
 
-    res.json({ employeeRecords });
+    // Create a new array with only employeeId and employeeName
+    const employees = employeeRecords.map((record) => {
+      const employee = record.toJSON();
+      return {
+        employeeId: employee.employeeId,
+        employeeName: `${employee.firstName || ""} ${
+          employee.lastName || ""
+        }`.trim(),
+      };
+    });
+
+    res.json({
+      employeeRecords,
+      employees,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

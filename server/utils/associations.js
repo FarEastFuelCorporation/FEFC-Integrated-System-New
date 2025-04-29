@@ -1406,19 +1406,6 @@ CommissionWaste.belongsTo(Commission, {
   targetKey: "id",
 });
 
-Quotation.hasMany(Commission, {
-  as: "Commission",
-  foreignKey: "quotationId",
-  sourceKey: "id",
-  onDelete: "CASCADE",
-});
-Commission.belongsTo(Quotation, {
-  as: "Quotation",
-  foreignKey: "quotationId",
-  targetKey: "id",
-  onDelete: "CASCADE",
-});
-
 QuotationWaste.hasMany(CommissionWaste, {
   as: "CommissionWaste",
   foreignKey: "quotationWasteId",
@@ -1429,6 +1416,32 @@ CommissionWaste.belongsTo(QuotationWaste, {
   as: "QuotationWaste",
   foreignKey: "quotationWasteId",
   targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(Commission, {
+  as: "Commission",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+Commission.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Client.hasMany(Commission, {
+  as: "Commission",
+  foreignKey: "clientId",
+  sourceKey: "clientId",
+  onDelete: "CASCADE",
+});
+Commission.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "clientId",
+  targetKey: "clientId",
   onDelete: "CASCADE",
 });
 

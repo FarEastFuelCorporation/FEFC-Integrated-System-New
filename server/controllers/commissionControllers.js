@@ -1,112 +1,65 @@
 // controllers/commissionControllers.js
 
 const Client = require("../models/Client");
-const Employee = require("../models/Employee");
-const IdInformation = require("../models/IdInformation");
+const EmployeeRecord = require("../models/EmployeeRecord");
 const CommissionWaste = require("../models/CommissionWaste");
-const TreatmentProcess = require("../models/TreatmentProcess");
 const TypeOfWaste = require("../models/TypeOfWaste");
-const VehicleType = require("../models/VehicleType");
 const QuotationWaste = require("../models/QuotationWaste");
 const Quotation = require("../models/Quotation");
 const Commission = require("../models/Commission");
+const generateCommissionCode = require("../utils/generateCommissionCode");
 
 // Create Commission controller
 async function createCommissionController(req, res) {
-  let {
-    commissionCode,
-    dateCreated,
-    validity,
+  const {
     clientId,
-    termsChargeDays,
-    termsCharge,
-    termsBuyingDays,
-    termsBuying,
-    isPDC,
-    termsPDCDays,
-    scopeOfWork,
-    contactPerson,
+    employeeId,
+    transactionDate,
     remarks,
-    isOneTime,
     createdBy,
-    commissionWastes, // This should be an array of commission wastes
-    commissionTransportation, // This should be an array of commission transportation
+    items, // This is the array of items (wastes)
   } = req.body;
 
-  scopeOfWork = scopeOfWork && scopeOfWork.toUpperCase();
-  contactPerson = contactPerson && contactPerson.toUpperCase();
-  remarks = remarks && remarks.toUpperCase();
+  const commissionCode = await generateCommissionCode(); // Generate a new commission code
 
   try {
     // Create the commission record
     const commission = await Commission.create({
-      commissionCode,
-      dateCreated,
-      validity,
+      employeeId,
       clientId,
-      termsChargeDays,
-      termsCharge,
-      termsBuyingDays,
-      termsBuying,
-      isPDC,
-      termsPDCDays,
-      scopeOfWork,
-      contactPerson,
-      remarks,
-      isOneTime,
+      commissionCode,
+      transactionDate,
+      remarks: remarks?.toUpperCase() || "",
       createdBy,
     });
 
-    // Create the commission wastes associated with this commission
+    // Create the commission items associated with this commission
     await Promise.all(
-      commissionWastes.map(async (waste) => {
-        let {
-          wasteId,
-          treatmentProcessId,
-          wasteName,
-          mode,
-          quantity,
-          unit,
-          unitPrice,
-          vatCalculation,
-          hasTransportation,
-          hasFixedRate,
-          fixedWeight,
-          fixedPrice,
-          isMonthly,
-        } = waste;
+      items.map(async (item) => {
+        const { quotationWasteId, amount } = item;
 
-        wasteName = wasteName && wasteName.toUpperCase();
+        // Validation for each item
+        if (!quotationWasteId || quotationWasteId.trim() === "") {
+          throw new Error("Waste Type is required for each item.");
+        }
+
+        if (amount <= 0) {
+          throw new Error("Amount must be greater than 0 for each item.");
+        }
 
         return await CommissionWaste.create({
           commissionId: commission.id,
-          wasteId,
-          treatmentProcessId: treatmentProcessId ? treatmentProcessId : null,
-          wasteName,
-          mode,
-          quantity,
-          unit,
-          unitPrice,
-          vatCalculation,
-          hasTransportation,
-          hasFixedRate,
-          fixedWeight,
-          fixedPrice,
-          isMonthly,
+          quotationWasteId,
+          amount,
           createdBy,
         });
       })
     );
 
+    // Retrieve the commission with its items and related data for the response
     const commissions = await Commission.findAll({
-      where: {
-        id: commission.id,
-      },
+      where: { id: commission.id },
       include: [
-        {
-          model: Quotation,
-          as: "Quotation",
-        },
         {
           model: CommissionWaste,
           as: "CommissionWaste",
@@ -114,28 +67,30 @@ async function createCommissionController(req, res) {
             {
               model: QuotationWaste,
               as: "QuotationWaste",
-              include: [
-                {
-                  model: TypeOfWaste,
-                  as: "TypeOfWaste",
-                  attributes: ["wasteCode"],
-                },
-              ],
             },
           ],
         },
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
+        },
       ],
-      where: {
-        status: "active",
-      },
-      order: [["commissionCode", "ASC"]], // Ordering at the top level
+      order: [["commissionCode", "ASC"]],
     });
 
-    // Respond with updated commission and its wastes
+    // Respond with the newly created commission and its associated items
     res.status(201).json({ commissions });
   } catch (error) {
     console.error("Error creating commission:", error);
-    res.status(500).json({ error: "Failed to create commission" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to create commission" });
   }
 }
 
@@ -146,10 +101,6 @@ async function getCommissionsController(req, res) {
     const commissions = await Commission.findAll({
       include: [
         {
-          model: Quotation,
-          as: "Quotation",
-        },
-        {
           model: CommissionWaste,
           as: "CommissionWaste",
           include: [
@@ -165,6 +116,16 @@ async function getCommissionsController(req, res) {
               ],
             },
           ],
+        },
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
         },
       ],
     });
@@ -205,6 +166,16 @@ async function getCommissionController(req, res) {
             },
           ],
         },
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
+        },
       ],
       where: {
         status: "active",
@@ -222,375 +193,120 @@ async function getCommissionController(req, res) {
 
 // Update Commission controller
 async function updateCommissionController(req, res) {
+  const {
+    id,
+    clientId,
+    employeeId,
+    commissionCode,
+    transactionDate,
+    remarks,
+    createdBy,
+    items,
+  } = req.body;
+
   try {
-    const id = req.params.id;
-    console.log("Updating commission with ID:", id);
+    const commission = await Commission.findByPk(id);
+    if (!commission) {
+      return res.status(404).json({ error: "Commission not found." });
+    }
 
-    let {
-      commissionCode,
-      dateCreated,
-      validity,
+    // Update main commission
+    await commission.update({
+      employeeId,
       clientId,
-      termsChargeDays,
-      termsCharge,
-      termsBuyingDays,
-      termsBuying,
-      isPDC,
-      termsPDCDays,
-      scopeOfWork,
-      contactPerson,
-      remarks,
-      isOneTime,
-      isRevised,
+      commissionCode,
+      transactionDate,
+      remarks: remarks?.toUpperCase() || "",
       createdBy,
-      commissionWastes, // This should be an array of commission wastes
-      commissionTransportation, // This should be an array of commission transportation
-    } = req.body;
+    });
 
-    scopeOfWork = scopeOfWork && scopeOfWork.toUpperCase();
-    contactPerson = contactPerson && contactPerson.toUpperCase();
-    remarks = remarks && remarks.toUpperCase();
+    // Get existing CommissionWaste entries
+    const existingItems = await CommissionWaste.findAll({
+      where: { commissionId: id },
+    });
 
-    // Find the commission by ID and update it
-    const updatedCommission = await Commission.findByPk(id);
-    let revisionNumber = updatedCommission.revisionNumber;
+    // Track incoming item IDs
+    const incomingIds = items
+      .filter((item) => item.id) // only items with IDs
+      .map((item) => item.id);
 
-    revisionNumber = (parseInt(revisionNumber) + 1).toString().padStart(2, "0");
+    // Delete CommissionWaste items not present in incoming data
+    await Promise.all(
+      existingItems.map(async (existingItem) => {
+        if (!incomingIds.includes(existingItem.id.toString())) {
+          await existingItem.destroy(); // delete removed items
+        }
+      })
+    );
 
-    if (updatedCommission) {
-      if (isRevised) {
-        // Update commission attributes
-        updatedCommission.status = "inactive";
+    // Add or update items
+    await Promise.all(
+      items.map(async (item) => {
+        const { id: itemId, quotationWasteId, amount } = item;
 
-        // Save the updated commission
-        await updatedCommission.save();
+        if (!quotationWasteId || quotationWasteId.trim() === "") {
+          throw new Error("Waste Type is required for each item.");
+        }
 
-        // Create the commission record
-        const commission = await Commission.create({
-          commissionCode,
-          revisionNumber,
-          dateCreated,
-          validity,
-          clientId,
-          termsChargeDays,
-          termsCharge,
-          termsBuyingDays,
-          termsBuying,
-          isPDC,
-          termsPDCDays,
-          scopeOfWork,
-          contactPerson,
-          remarks,
-          isOneTime,
+        if (amount <= 0) {
+          throw new Error("Amount must be greater than 0 for each item.");
+        }
+
+        if (itemId) {
+          const existingItem = await CommissionWaste.findByPk(itemId);
+          if (existingItem) {
+            return await existingItem.update({
+              quotationWasteId,
+              amount,
+              createdBy,
+            });
+          }
+        }
+
+        // If no id or not found, create new
+        await CommissionWaste.create({
+          commissionId: id,
+          quotationWasteId,
+          amount,
           createdBy,
         });
+      })
+    );
 
-        // Create the commission wastes associated with this commission
-        await Promise.all(
-          commissionWastes.map(async (waste) => {
-            let {
-              wasteId,
-              treatmentProcessId,
-              wasteName,
-              mode,
-              quantity,
-              unit,
-              unitPrice,
-              vatCalculation,
-              hasTransportation,
-              hasFixedRate,
-              fixedWeight,
-              fixedPrice,
-              isMonthly,
-            } = waste;
-
-            wasteName = wasteName && wasteName.toUpperCase();
-
-            return await CommissionWaste.create({
-              commissionId: commission.id,
-              wasteId,
-              treatmentProcessId: treatmentProcessId
-                ? treatmentProcessId
-                : null,
-              wasteName,
-              mode,
-              quantity,
-              unit,
-              unitPrice,
-              vatCalculation,
-              hasTransportation,
-              hasFixedRate,
-              fixedWeight,
-              fixedPrice,
-              isMonthly,
-              createdBy,
-            });
-          })
-        );
-
-        // Create the commission transportation associated with this commission
-        await Promise.all(
-          commissionTransportation.map(async (transportation) => {
-            let {
-              vehicleTypeId,
-              haulingArea,
-              mode,
-              quantity,
-              unit,
-              unitPrice,
-              vatCalculation,
-              hasFixedRate,
-              fixedWeight,
-              fixedPrice,
-              isMonthly,
-            } = transportation;
-
-            haulingArea = haulingArea && haulingArea.toUpperCase();
-
-            return await CommissionTransportation.create({
-              commissionId: commission.id,
-              vehicleTypeId,
-              haulingArea,
-              mode,
-              quantity,
-              unit,
-              unitPrice,
-              vatCalculation,
-              hasFixedRate,
-              fixedWeight,
-              fixedPrice,
-              isMonthly,
-              createdBy,
-            });
-          })
-        );
-      } else {
-        // Update commission details
-        updatedCommission.dateCreated = dateCreated;
-        updatedCommission.validity = validity;
-        updatedCommission.termsChargeDays = termsChargeDays;
-        updatedCommission.termsCharge = termsCharge;
-        updatedCommission.termsBuyingDays = termsBuyingDays;
-        updatedCommission.termsBuying = termsBuying;
-        updatedCommission.isPDC = isPDC;
-        updatedCommission.termsPDCDays = termsPDCDays;
-        updatedCommission.scopeOfWork = scopeOfWork;
-        updatedCommission.contactPerson = contactPerson;
-        updatedCommission.remarks = remarks;
-        updatedCommission.isOneTime = isOneTime;
-        updatedCommission.updatedBy = createdBy;
-
-        // Save the updated commission
-        await updatedCommission.save();
-
-        const existingWastes = await CommissionWaste.findAll({
-          where: { commissionId: updatedCommission.id },
-        });
-
-        // Extract the IDs from the incoming commissionWastes
-        const incomingWasteIds = commissionWastes.map((waste) => waste.id);
-
-        // Identify and delete wastes that are no longer present in the incoming data
-        await Promise.all(
-          existingWastes.map(async (existingWaste) => {
-            if (!incomingWasteIds.includes(existingWaste.id)) {
-              // Permanently delete the waste
-              await existingWaste.destroy();
-            }
-          })
-        );
-
-        const existingTransportations = await CommissionTransportation.findAll({
-          where: { commissionId: updatedCommission.id },
-        });
-
-        // Extract the IDs from the incoming commissionWastes
-        const incomingTransportationIds = commissionTransportation.map(
-          (waste) => waste.id
-        );
-
-        // Identify and delete wastes that are no longer present in the incoming data
-        await Promise.all(
-          existingTransportations.map(async (existingTransportation) => {
-            if (
-              !incomingTransportationIds.includes(existingTransportation.id)
-            ) {
-              // Permanently delete the waste
-              await existingTransportation.destroy();
-            }
-          })
-        );
-
-        // Update the commission wastes
-        await Promise.all(
-          commissionWastes.map(async (waste) => {
-            const {
-              id,
-              wasteId,
-              treatmentProcessId,
-              wasteName,
-              mode,
-              quantity,
-              unit,
-              unitPrice,
-              vatCalculation,
-              hasTransportation,
-              hasFixedRate,
-              fixedWeight,
-              fixedPrice,
-              isMonthly,
-            } = waste;
-
-            const existingWaste = await CommissionWaste.findByPk(id);
-
-            if (existingWaste) {
-              // Update existing waste
-              existingWaste.wasteId = wasteId;
-              existingWaste.treatmentProcessId = treatmentProcessId
-                ? treatmentProcessId
-                : null;
-              existingWaste.wasteName = wasteName && wasteName.toUpperCase();
-              existingWaste.mode = mode;
-              existingWaste.quantity = quantity;
-              existingWaste.unit = unit;
-              existingWaste.unitPrice = unitPrice;
-              existingWaste.vatCalculation = vatCalculation;
-              existingWaste.hasTransportation = hasTransportation;
-              existingWaste.hasFixedRate = hasFixedRate;
-              existingWaste.fixedWeight = fixedWeight;
-              existingWaste.fixedPrice = fixedPrice;
-              existingWaste.isMonthly = isMonthly;
-
-              await existingWaste.save();
-            } else {
-              // Create new waste if it doesn't exist
-              await CommissionWaste.create({
-                commissionId: updatedCommission.id,
-                wasteId,
-                treatmentProcessId: treatmentProcessId
-                  ? treatmentProcessId
-                  : null,
-                wasteName: wasteName && wasteName.toUpperCase(),
-                mode,
-                quantity,
-                unit,
-                unitPrice,
-                vatCalculation,
-                hasTransportation,
-                hasFixedRate,
-                fixedWeight,
-                fixedPrice,
-                isMonthly,
-                createdBy,
-              });
-            }
-          })
-        );
-
-        // Update the commission transportation
-        await Promise.all(
-          commissionTransportation.map(async (transportation) => {
-            const {
-              id,
-              vehicleTypeId,
-              haulingArea,
-              mode,
-              quantity,
-              unit,
-              unitPrice,
-              vatCalculation,
-              hasFixedRate,
-              fixedWeight,
-              fixedPrice,
-              isMonthly,
-            } = transportation;
-
-            const existingTransportation =
-              await CommissionTransportation.findByPk(id);
-
-            if (existingTransportation) {
-              // Update existing transportation
-              existingTransportation.vehicleTypeId = vehicleTypeId;
-              existingTransportation.haulingArea =
-                haulingArea && haulingArea.toUpperCase();
-              existingTransportation.mode = mode;
-              existingTransportation.quantity = quantity;
-              existingTransportation.unit = unit;
-              existingTransportation.unitPrice = unitPrice;
-              existingTransportation.vatCalculation = vatCalculation;
-              existingTransportation.hasFixedRate = hasFixedRate;
-              existingTransportation.fixedWeight = fixedWeight;
-              existingTransportation.fixedPrice = fixedPrice;
-              existingTransportation.isMonthly = isMonthly;
-
-              await existingTransportation.save();
-            } else {
-              // Create new transportation if it doesn't exist
-              await CommissionTransportation.create({
-                commissionId: updatedCommission.id,
-                vehicleTypeId,
-                haulingArea: haulingArea && haulingArea.toUpperCase(),
-                mode,
-                quantity,
-                unit,
-                unitPrice,
-                vatCalculation,
-                hasFixedRate,
-                fixedWeight,
-                fixedPrice,
-                isMonthly,
-                createdBy,
-              });
-            }
-          })
-        );
-      }
-
-      const commissions = await Commission.findAll({
-        where: {
-          id: updatedCommission.id,
+    // Final fetch
+    const commissions = await Commission.findAll({
+      where: { id },
+      include: [
+        {
+          model: CommissionWaste,
+          as: "CommissionWaste",
+          include: [
+            {
+              model: QuotationWaste,
+              as: "QuotationWaste",
+            },
+          ],
         },
-        include: [
-          {
-            model: Quotation,
-            as: "Quotation",
-          },
-          {
-            model: CommissionWaste,
-            as: "CommissionWaste",
-            include: [
-              {
-                model: QuotationWaste,
-                as: "QuotationWaste",
-                include: [
-                  {
-                    model: TypeOfWaste,
-                    as: "TypeOfWaste",
-                    attributes: ["wasteCode"],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        where: {
-          status: "active",
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
         },
-        order: [["commissionCode", "ASC"]], // Ordering at the top level
-      });
+        {
+          model: Client,
+          as: "Client",
+          attributes: ["clientName"],
+        },
+      ],
+      order: [["commissionCode", "ASC"]],
+    });
 
-      // Respond with the updated commission and its wastes
-      res.json({
-        commissions,
-      });
-    } else {
-      // If commission with the specified ID was not found
-      res.status(404).json({ message: `Commission with ID ${id} not found` });
-    }
+    res.status(200).json({ commissions });
   } catch (error) {
-    // Handle errors
     console.error("Error updating commission:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to update commission" });
   }
 }
 

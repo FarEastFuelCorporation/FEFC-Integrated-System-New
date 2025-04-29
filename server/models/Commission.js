@@ -13,8 +13,12 @@ const Commission = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    quotationId: {
-      type: DataTypes.UUID,
+    employeeId: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    clientId: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     commissionCode: {

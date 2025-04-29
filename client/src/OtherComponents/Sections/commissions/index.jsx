@@ -20,12 +20,12 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import Header from "../../Header";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
-import QuotationFormModal from "../../Modals/QuotationFormModal";
 import QuotationForm from "../../Quotations/QuotationForm";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import SectionModal from "./SectionModal";
 import SuccessMessage from "../../SuccessMessage";
+import { validateTransactionForm } from "./Validation";
 
 // Define a sorting function for QuotationWaste
 const sortQuotationWaste = (a, b) => {
@@ -63,55 +63,16 @@ const Commissions = ({ user }) => {
   const initialFormData = {
     id: "",
     clientId: "",
-    quotationCode: "",
-    dateCreated: "",
-    validity: "",
-    termsChargeDays: 0,
-    termsCharge: "",
-    termsBuyingDays: 0,
-    termsBuying: "",
-    isPDC: false,
-    termsPDCDays: 0,
-    scopeOfWork: "",
-    contactPerson: "",
+    employeeId: "",
+    commissionCode: "",
+    transactionDate: "",
     remarks: "",
-    isOneTime: false,
-    isRevised: false,
     createdBy: user.id,
-    quotationWastes: [
+    items: [
       {
-        id: null,
-        quotationId: null,
-        wasteId: "",
-        treatmentProcessId: "",
-        wasteName: "",
-        mode: "",
-        quantity: 1,
-        unit: "",
-        unitPrice: 0,
-        vatCalculation: "",
-        hasTransportation: true,
-        hasFixedRate: false,
-        fixedWeight: 0,
-        fixedPrice: 0,
-        isMonthly: false,
-      },
-    ],
-    quotationTransportation: [
-      {
-        id: null,
-        quotationId: null,
-        vehicleTypeId: "",
-        haulingArea: "",
-        mode: "",
-        quantity: 1,
-        unit: "",
-        unitPrice: 0,
-        vatCalculation: "",
-        hasFixedRate: false,
-        fixedWeight: 0,
-        fixedPrice: 0,
-        isMonthly: false,
+        id: "",
+        quotationWasteId: "",
+        amount: 0,
       },
     ],
   };
@@ -120,8 +81,14 @@ const Commissions = ({ user }) => {
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [commissionsData, setCommissionsData] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [allQuotationWaste, setAllQuotationWaste] = useState([]);
+  const [quotationWaste, setQuotationWaste] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingPicture, setLoadingPicture] = useState(true);
   const [isContentReady, setIsContentReady] = useState(false);
@@ -136,10 +103,24 @@ const Commissions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      setLoadingPicture(true);
       const response = await axios.get(`${apiUrl}/api/commission`);
 
       setCommissionsData(response.data.commissions);
+      console.log(response.data.commissions);
+
+      const [clientsResponse, quotationWasteResponse, employeeResponse] =
+        await Promise.all([
+          axios.get(`${apiUrl}/api/client`),
+          axios.get(`${apiUrl}/api/quotation/waste`),
+          axios.get(`${apiUrl}/api/employeeRecord`),
+        ]);
+
+      setClients(clientsResponse.data.clients);
+      setAllQuotationWaste(quotationWasteResponse.data.clients); // store full list
+      setQuotationWaste([]); // start empty
+      setEmployees(employeeResponse.data.employees); // start empty
+      console.log(employeeResponse.data.employees); // start empty
+      console.log(quotationWasteResponse.data.clients);
 
       setLoading(false);
     } catch (error) {
@@ -150,6 +131,20 @@ const Commissions = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  console.log("formData Data:", formData);
+
+  // Filter when clientId changes
+  useEffect(() => {
+    if (formData.clientId) {
+      const filteredItem = allQuotationWaste.find(
+        (item) => item.clientId === formData.clientId
+      );
+      const filteredWastes = filteredItem?.quotationWaste || [];
+      console.log(filteredWastes);
+      setQuotationWaste(filteredWastes);
+    }
+  }, [formData.clientId, allQuotationWaste]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -297,37 +292,27 @@ const Commissions = ({ user }) => {
   }, [isDownloadContentReady, selectedQuotation]);
 
   const handleEditClick = (row) => {
-    const formattedDateCreated = new Date(row.dateCreated)
-      .toISOString()
-      .split("T")[0];
-    const formattedDate = new Date(row.validity).toISOString().split("T")[0];
     if (row) {
       setFormData({
-        id: row.id,
-        clientId: row.clientId,
-        quotationCode: row.quotationCode,
-        dateCreated: formattedDateCreated,
-        validity: formattedDate,
-        termsCharge: row.termsCharge,
-        termsChargeDays: row.termsChargeDays,
-        termsBuying: row.termsBuying,
-        termsBuyingDays: row.termsBuyingDays,
-        isPDC: row.isPDC,
-        termsPDCDays: row.termsPDCDays,
-        scopeOfWork: row.scopeOfWork,
-        contactPerson: row.contactPerson,
-        remarks: row.remarks,
-        isOneTime: row.isOneTime,
-        isRevised: row.isRevised,
+        id: row.id || "",
+        clientId: row.clientId || "",
+        employeeId: row.employeeId || "",
+        commissionCode: row.commissionCode || "",
+        transactionDate: row.transactionDate || "",
+        remarks: row.remarks || "",
         createdBy: user.id,
-        quotationWastes: row.QuotationWaste ? row.QuotationWaste : [], // Ensure quotationWastes is an array
-        quotationTransportation: row.QuotationTransportation
-          ? row.QuotationTransportation
-          : [], // Ensure quotationWastes is an array
+        items: row.CommissionWaste
+          ? row.CommissionWaste.map((item) => ({
+              id: item.id || "",
+              quotationWasteId: item.quotationWasteId || "",
+              amount: item.amount || 0,
+            }))
+          : [],
       });
+
       handleOpenModal();
     } else {
-      console.error(`Quotation with ID ${row.id} not found for editing.`);
+      console.error(`Commission with ID ${row?.id} not found for editing.`);
     }
   };
 
@@ -357,18 +342,26 @@ const Commissions = ({ user }) => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    const validationErrors = validateTransactionForm(formData);
+
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
+      setShowErrorMessage(true);
+      return;
+    }
+
     try {
       setLoading(true);
       if (formData.id) {
-        // Update existing quotation
-        await axios.put(`${apiUrl}/api/quotation/${formData.id}`, formData);
+        // Update existing commission
+        await axios.put(`${apiUrl}/api/commission/${formData.id}`, formData);
 
-        setSuccessMessage("Quotation Updated Successfully!");
+        setSuccessMessage("Commission Updated Successfully!");
       } else {
-        // Add new quotation
-        await axios.post(`${apiUrl}/api/quotation`, formData);
+        // Add new commission
+        await axios.post(`${apiUrl}/api/commission`, formData);
 
-        setSuccessMessage("Quotation Added Successfully!");
+        setSuccessMessage("Commission Added Successfully!");
       }
       fetchData();
       setShowSuccessMessage(true);
@@ -387,126 +380,16 @@ const Commissions = ({ user }) => {
 
   const columns = [
     {
-      field: "quotationCode",
-      headerName: "Quotation Code",
+      field: "commissionCode",
+      headerName: "Commission Code",
       headerAlign: "center",
       align: "center",
       width: 120,
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "revisionNumber",
-      headerName: "Revision Number",
-      headerAlign: "center",
-      align: "center",
-      minWidth: 120,
-      renderCell: renderCellWithWrapText,
-    },
-    // Conditionally render "Logo" column based on userType
-    ...(Number.isInteger(user?.userType)
-      ? [
-          {
-            field: "clientPicture",
-            headerName: "Logo",
-            headerAlign: "center",
-            align: "center",
-            sortable: false,
-            width: 50,
-            renderCell: (params) => {
-              if (loadingPicture) {
-                return <CircularProgress size={20} color="secondary" />; // Spinner while loading pictures
-              }
-              return (
-                <img
-                  src={params.value || "/assets/unknown.png"}
-                  alt="Logo"
-                  style={{ width: 40, height: 40, borderRadius: "50%" }}
-                />
-              );
-            },
-          },
-        ]
-      : []), // Exclude the column if userType is not an integer
-    // Conditionally render "Client Name" column based on userType
-    ...(Number.isInteger(user?.userType)
-      ? [
-          {
-            field: "clientName",
-            headerName: "Client Name",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-            minWidth: 150,
-            renderCell: renderCellWithWrapText,
-          },
-        ]
-      : []), // Exclude the column if userType is not an integer
-    {
-      field: "termsCharge",
-      headerName: "Terms (Charge)",
-      headerAlign: "center",
-      align: "center",
-      minWidth: 200,
-      renderCell: (params) => {
-        let termsCharge;
-
-        if (params.row?.termsCharge) {
-          if (params.row?.termsCharge === "N/A") {
-            termsCharge = "N/A";
-          } else {
-            let days = params.row.termsChargeDays;
-            days =
-              days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
-
-            termsCharge = `${days} ${params.row.termsCharge}`;
-          }
-        }
-
-        let value = {};
-        value.value = termsCharge || "";
-
-        return renderCellWithWrapText(value);
-      },
-    },
-    {
-      field: "termsBuying",
-      headerName: "Terms (Buying)",
-      headerAlign: "center",
-      align: "center",
-      width: 200,
-      renderCell: (params) => {
-        let termsBuying;
-
-        if (params.row?.termsBuying) {
-          if (params.row?.termsBuying === "N/A") {
-            termsBuying = "N/A";
-          } else {
-            let days = params.row.termsBuyingDays;
-            days =
-              days === 0 ? "CASH" : days === 1 ? `${days} DAY` : `${days} DAYS`;
-
-            termsBuying = `${days} ${params.row.termsBuying}`;
-          }
-        }
-
-        let value = {};
-        value.value = termsBuying || "";
-
-        return renderCellWithWrapText(value);
-      },
-    },
-    {
-      field: "scopeOfWork",
-      headerName: "Scope Of Work",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 180,
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "validity",
-      headerName: "Validity",
+      field: "transactionDate",
+      headerName: "Date",
       headerAlign: "center",
       align: "center",
       minWidth: 120,
@@ -521,6 +404,30 @@ const Commissions = ({ user }) => {
 
         return renderCellWithWrapText(value);
       },
+    },
+    {
+      field: "employeeId",
+      headerName: "Agent",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return `${params.row.EmployeeRecord?.firstName} ${params.row.EmployeeRecord?.lastName}`;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "clientName",
+      headerName: "Client Name",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 150,
+      valueGetter: (params) => {
+        return params.row.Client?.clientName;
+      },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "view",
@@ -599,22 +506,7 @@ const Commissions = ({ user }) => {
         renderCell: (params) => (
           <IconButton
             color="warning"
-            onClick={async () => {
-              try {
-                const id = params.row.id; // Get the document ID
-
-                // Fetch the attachment from the API using the document ID
-                const response = await axios.get(
-                  `${apiUrl}/api/quotation/full/${id}`
-                );
-
-                // Call the download handler with the fetched data
-                handleEditClick(response.data.commissions[0]);
-              } catch (error) {
-                console.error("Error fetching document file:", error);
-                // Optional: Show error message to the user
-              }
-            }}
+            onClick={() => handleEditClick(params.row)}
           >
             <EditIcon />
           </IconButton>
@@ -644,13 +536,13 @@ const Commissions = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Commissions" subtitle="List of Agent's Commissions" />
-        {/* {user.userType === 2 && (
+        {user.userType === 2 && (
           <Box display="flex">
             <IconButton onClick={handleOpenModal}>
               <PostAddIcon sx={{ fontSize: "40px" }} />
             </IconButton>
           </Box>
-        )} */}
+        )}
       </Box>
       {showSuccessMessage && (
         <SuccessMessage
@@ -682,8 +574,15 @@ const Commissions = ({ user }) => {
         open={openModal}
         handleCloseModal={handleCloseModal}
         formData={formData}
+        setFormData={setFormData}
         handleInputChange={handleInputChange}
         handleFormSubmit={handleFormSubmit}
+        errorMessage={errorMessage}
+        showErrorMessage={showErrorMessage}
+        clients={clients}
+        quotationWaste={quotationWaste}
+        setQuotationWaste={setQuotationWaste}
+        employees={employees}
       />
       {showQuotationForm && (
         <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>

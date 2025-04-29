@@ -429,18 +429,18 @@ async function getQuotationFullController(req, res) {
 // Get Quotations with Waste controller
 async function getQuotationWithWasteController(req, res) {
   try {
+    // Fetch all quotations from the database
     const quotations = await Quotation.findAll({
       include: [
         {
           model: Client,
           as: "Client",
           attributes: ["clientName", "clientId"],
-          where: { clientStatus: "ACTIVE" }, // Filter clients
         },
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          attributes: ["wasteName", "id"],
+          attributes: ["wasteName"],
         },
       ],
       where: {
@@ -449,6 +449,24 @@ async function getQuotationWithWasteController(req, res) {
       order: [["quotationCode", "ASC"]],
     });
 
+    // Flatten and format the data (your original format)
+    const flattenedData = quotations.map((item) => {
+      const quotation = item.toJSON();
+      const createdDate = new Date(quotation.dateCreated);
+      const validityDate = new Date(quotation.validity);
+      return {
+        ...quotation,
+        clientName: quotation.Client ? quotation.Client.clientName : null,
+        dateCreated: !isNaN(createdDate.getTime())
+          ? createdDate.toISOString().split("T")[0]
+          : null,
+        validity: !isNaN(validityDate.getTime())
+          ? validityDate.toISOString().split("T")[0]
+          : null,
+      };
+    });
+
+    // Group data by client (new structure you want)
     const clientsMap = new Map();
 
     quotations.forEach((quotationItem) => {
@@ -488,12 +506,82 @@ async function getQuotationWithWasteController(req, res) {
     // Sort clients by clientName
     clientsArray.sort((a, b) => a.clientName.localeCompare(b.clientName));
 
-    res.json({ clients: clientsArray });
+    // Send both sets
+    res.json({ quotations: flattenedData, clients: clientsArray });
   } catch (error) {
     console.error("Error fetching quotations:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+// // Get Quotations with Waste controller
+// async function getQuotationWithWasteController(req, res) {
+//   try {
+//     const quotations = await Quotation.findAll({
+//       include: [
+//         {
+//           model: Client,
+//           as: "Client",
+//           attributes: ["clientName", "clientId"],
+//           where: { clientStatus: "ACTIVE" }, // Filter clients
+//         },
+//         {
+//           model: QuotationWaste,
+//           as: "QuotationWaste",
+//           attributes: ["wasteName", "id"],
+//         },
+//       ],
+//       where: {
+//         status: "active",
+//       },
+//       order: [["quotationCode", "ASC"]],
+//     });
+
+//     const clientsMap = new Map();
+
+//     quotations.forEach((quotationItem) => {
+//       const quotation = quotationItem.toJSON();
+//       const clientId = quotation.Client?.clientId;
+//       const clientName = quotation.Client?.clientName;
+
+//       if (!clientId) return;
+
+//       if (!clientsMap.has(clientId)) {
+//         clientsMap.set(clientId, {
+//           clientId,
+//           clientName,
+//           quotationWaste: [],
+//         });
+//       }
+
+//       if (Array.isArray(quotation.QuotationWaste)) {
+//         quotation.QuotationWaste.forEach((wasteItem) => {
+//           clientsMap.get(clientId).quotationWaste.push({
+//             id: wasteItem.id,
+//             wasteName: wasteItem.wasteName,
+//           });
+//         });
+//       }
+//     });
+
+//     let clientsArray = Array.from(clientsMap.values());
+
+//     // Sort each client's quotationWaste by wasteName
+//     clientsArray.forEach((client) => {
+//       client.quotationWaste.sort((a, b) =>
+//         a.wasteName.localeCompare(b.wasteName)
+//       );
+//     });
+
+//     // Sort clients by clientName
+//     clientsArray.sort((a, b) => a.clientName.localeCompare(b.clientName));
+
+//     res.json({ clients: clientsArray });
+//   } catch (error) {
+//     console.error("Error fetching quotations:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// }
 
 // Update Quotation controller
 async function updateQuotationController(req, res) {

@@ -52,9 +52,7 @@ const SectionModal = ({
   };
 
   const handleRemoveItem = (index) => {
-    const updatedItems = formData.quotationItems.filter(
-      (waste, i) => i !== index
-    );
+    const updatedItems = formData.items.filter((waste, i) => i !== index);
     handleInputChange({
       target: { name: "items", value: updatedItems },
     });

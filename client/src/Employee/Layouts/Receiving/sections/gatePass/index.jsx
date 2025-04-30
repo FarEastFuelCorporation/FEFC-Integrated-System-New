@@ -1011,7 +1011,7 @@ const GatePass = ({ user, socket }) => {
           getRowId={(row) => row.id}
           sortModel={[
             {
-              field: "truckScaleNo",
+              field: "gatePassNo",
               sort: "desc",
             },
           ]}

@@ -1087,6 +1087,7 @@ const ModalJD = ({
                 shrink: true,
               }}
               autoComplete="off"
+              disabled
             />
           </Grid>
           <Grid item xs={12} lg={2}>

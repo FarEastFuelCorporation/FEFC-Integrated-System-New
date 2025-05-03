@@ -260,7 +260,7 @@ const SectionModal = ({
                     <Select
                       labelId={`waste-type-select-label-${index}`}
                       name={`items[${index}].quotationWasteId`}
-                      value={waste.quotationWasteId}
+                      value={waste.quotationWasteId || ""}
                       onChange={(e) =>
                         handleWasteChange(
                           index,
@@ -270,12 +270,10 @@ const SectionModal = ({
                       }
                       label="Type of Waste"
                       fullWidth
-                      InputLabelProps={{
-                        style: {
-                          color: colors.grey[100],
-                        },
-                      }}
                     >
+                      <MenuItem value="" disabled>
+                        Select Waste Type
+                      </MenuItem>
                       {quotationWaste.map((waste) => (
                         <MenuItem key={waste.id} value={waste.id}>
                           {waste.wasteName}

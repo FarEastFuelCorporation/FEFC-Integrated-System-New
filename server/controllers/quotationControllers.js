@@ -440,7 +440,7 @@ async function getQuotationWithWasteController(req, res) {
         {
           model: QuotationWaste,
           as: "QuotationWaste",
-          attributes: ["wasteName"],
+          attributes: ["id", "wasteName"],
         },
       ],
       where: {

@@ -253,6 +253,32 @@ const ScheduledTransactions = ({ user }) => {
     }
   };
 
+  const handleDeleteClickBook = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Cancel this Book Transaction?");
+    setDialogAction(() => () => handleConfirmDeleteBook(id));
+  };
+
+  const handleConfirmDeleteBook = async (row) => {
+    try {
+      setLoading(true);
+      await axios.delete(`${apiUrl}/api/bookedTransaction/${row.id}`, {
+        data: { deletedBy: user.id },
+      });
+
+      fetchData();
+
+      setSuccessMessage("Booked Transaction Canceled Successfully!");
+      setShowSuccessMessage(true);
+      setOpenTransactionModal(false);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setOpenDialog(false); // Close the dialog
+    }
+  };
+
   return (
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
@@ -288,6 +314,7 @@ const ScheduledTransactions = ({ user }) => {
         handleOpenModal={handleOpenModal}
         handleEditClick={handleEditClick}
         handleDeleteClick={handleDeleteClick}
+        handleDeleteClickBook={handleDeleteClickBook}
         openTransactionModal={openTransactionModal}
         setOpenTransactionModal={setOpenTransactionModal}
       />

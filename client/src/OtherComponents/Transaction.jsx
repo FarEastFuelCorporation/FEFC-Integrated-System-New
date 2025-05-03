@@ -56,6 +56,7 @@ const Transaction = ({
   handleOpenModal,
   handleEditClick,
   handleDeleteClick,
+  handleDeleteClickBook,
   setSuccessMessage,
   setShowSuccessMessage,
   openTransactionModal,
@@ -697,8 +698,20 @@ const Transaction = ({
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "end",
+                            gap: 1,
                           }}
                         >
+                          {user.userType === 2 && (
+                            <Button
+                              onClick={() => handleDeleteClickBook(row)}
+                              sx={{
+                                backgroundColor: "#f44336",
+                                color: `${colors.grey[100]}`,
+                              }}
+                            >
+                              CANCEL
+                            </Button>
+                          )}
                           {Number.isInteger(user.userType) && (
                             <Button
                               onClick={() => handleOpenModal(row)}

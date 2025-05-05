@@ -25,9 +25,20 @@ const CollectedTransaction = sequelize.define(
       type: DataTypes.TIME,
       allowNull: false,
     },
+    billedAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    withHoldingTax: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0,
+    },
     collectedAmount: {
       type: DataTypes.FLOAT,
       allowNull: false,
+      defaultValue: 0,
     },
     remarks: {
       type: DataTypes.STRING,

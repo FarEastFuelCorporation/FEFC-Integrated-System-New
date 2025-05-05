@@ -21,6 +21,8 @@ const CollectedTransactions = ({ user }) => {
   // Create refs for the input fields
   const collectedDateRef = useRef();
   const collectedTimeRef = useRef();
+  const billedAmountRef = useRef();
+  const withHoldingTaxRef = useRef();
   const collectedAmountRef = useRef();
   const remarksRef = useRef();
 
@@ -30,6 +32,8 @@ const CollectedTransactions = ({ user }) => {
     billingApprovalTransactionId: "",
     collectedDate: "",
     collectedTime: "",
+    billedAmount: 0,
+    withHoldingTax: 0,
     collectedAmount: 0,
     remarks: "",
     statusId: 13,
@@ -111,8 +115,23 @@ const CollectedTransactions = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    console.log("Input changed:", name, value);
+
+    console.log(name === "billedAmount");
+
+    if (name === "billedAmount") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        withHoldingTax: value * 0.02,
+        collectedAmount: value - value * 0.02,
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+
+  console.log(formData);
 
   const handleEditClick = (row) => {
     const typeToEdit = row;
@@ -129,6 +148,8 @@ const CollectedTransactions = ({ user }) => {
           collectedTransaction.billingDistributionTransactionId,
         collectedDate: collectedTransaction.collectedDate,
         collectedTime: collectedTransaction.collectedTime,
+        billedAmount: collectedTransaction.billedAmount,
+        withHoldingTax: collectedTransaction.withHoldingTax,
         collectedAmount: collectedTransaction.collectedAmount,
         remarks: collectedTransaction.remarks,
         statusId: typeToEdit.statusId,
@@ -208,6 +229,8 @@ const CollectedTransactions = ({ user }) => {
       ...formData,
       collectedDate: collectedDateRef.current.value,
       collectedTime: collectedTimeRef.current.value,
+      billedAmount: billedAmountRef.current.value,
+      withHoldingTax: withHoldingTaxRef.current.value,
       collectedAmount: collectedAmountRef.current.value,
       remarks: remarksRef.current.value,
     };
@@ -303,6 +326,8 @@ const CollectedTransactions = ({ user }) => {
         refs={{
           collectedDateRef,
           collectedTimeRef,
+          billedAmountRef,
+          withHoldingTaxRef,
           collectedAmountRef,
           remarksRef,
         }}

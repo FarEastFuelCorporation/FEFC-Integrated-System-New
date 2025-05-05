@@ -16,6 +16,8 @@ async function createCollectedTransactionController(req, res) {
       billingDistributionTransactionId,
       collectedDate,
       collectedTime,
+      billedAmount,
+      withHoldingTax,
       collectedAmount,
       remarks,
       statusId,
@@ -33,6 +35,8 @@ async function createCollectedTransactionController(req, res) {
         billingDistributionTransactionId,
         collectedDate,
         collectedTime,
+        billedAmount,
+        withHoldingTax,
         collectedAmount,
         remarks,
         createdBy,
@@ -108,6 +112,8 @@ async function updateCollectedTransactionController(req, res) {
       billingDistributionTransactionId,
       collectedDate,
       collectedTime,
+      billedAmount,
+      withHoldingTax,
       collectedAmount,
       remarks,
       statusId,
@@ -127,6 +133,8 @@ async function updateCollectedTransactionController(req, res) {
       // Update the CollectedTransaction fields
       collectedTransaction.collectedDate = collectedDate;
       collectedTransaction.collectedTime = collectedTime;
+      collectedTransaction.billedAmount = billedAmount;
+      collectedTransaction.withHoldingTax = withHoldingTax;
       collectedTransaction.collectedAmount = collectedAmount;
       collectedTransaction.remarks = remarks;
       collectedTransaction.updatedBy = updatedBy;

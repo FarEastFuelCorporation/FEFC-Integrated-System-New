@@ -6,6 +6,8 @@ import {
   useTheme,
   TextField,
   Button,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { tokens } from "../../theme";
 // import CertificateOfDestruction from "../../OtherComponents/Certificates/CertificateOfDestruction";
@@ -14,13 +16,21 @@ const CollectionModal = ({
   open,
   onClose,
   formData,
+  handleInputChange,
   handleFormSubmit,
   errorMessage,
   showErrorMessage,
+  setIsWasteNameToBill,
+  setFormData,
   refs,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const handleCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
+    setFormData({ ...formData, withTax: isChecked }); // Update formData state
+  };
 
   return (
     <Box>
@@ -54,6 +64,16 @@ const CollectionModal = ({
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.isWasteName}
+                onChange={handleCheckboxChange}
+                color="secondary"
+              />
+            }
+            label="Amount Withheld"
+          />
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>
             <TextField
               label="Collected Date"
@@ -85,22 +105,81 @@ const CollectionModal = ({
               }}
               autoComplete="off"
             />
-            <TextField
-              label="Collected Amount"
-              inputRef={refs.collectedAmountRef}
-              defaultValue={formData.collectedAmount}
-              fullWidth
-              type="number"
-              required
-              InputLabelProps={{
-                shrink: true,
-                style: {
-                  color: colors.grey[100],
-                },
-              }}
-              autoComplete="off"
-            />
+            {!formData.withTax && (
+              <TextField
+                label="Collected Amount"
+                inputRef={refs.collectedAmountRef}
+                defaultValue={formData.collectedAmount}
+                fullWidth
+                type="number"
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            )}
           </div>
+          {formData.withTax && (
+            <div style={{ width: "100%", display: "flex", gap: "20px" }}>
+              <TextField
+                label="Billed Amount"
+                inputRef={refs.billedAmountRef}
+                defaultValue={formData.billedAmount}
+                name="billedAmount"
+                fullWidth
+                type="number"
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                onChange={handleInputChange}
+                autoComplete="off"
+              />
+              <TextField
+                label="Withholding Tax"
+                inputRef={refs.withHoldingTaxRef}
+                defaultValue={formData.withHoldingTax}
+                value={formData.withHoldingTax}
+                name="withHoldingTax"
+                fullWidth
+                type="number"
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                onChange={handleInputChange}
+                autoComplete="off"
+              />
+              <TextField
+                label="Collected Amount"
+                inputRef={refs.collectedAmountRef}
+                defaultValue={formData.collectedAmount}
+                value={formData.collectedAmount}
+                name="collectedAmount"
+                fullWidth
+                type="number"
+                required
+                InputLabelProps={{
+                  shrink: true,
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                onChange={handleInputChange}
+                autoComplete="off"
+              />
+            </div>
+          )}
           <TextField
             label="Remarks"
             inputRef={refs.remarksRef}

@@ -115,9 +115,6 @@ const CollectedTransactions = ({ user }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log("Input changed:", name, value);
-
-    console.log(name === "billedAmount");
 
     if (name === "billedAmount") {
       setFormData({
@@ -130,8 +127,6 @@ const CollectedTransactions = ({ user }) => {
       setFormData({ ...formData, [name]: value });
     }
   };
-
-  console.log(formData);
 
   const handleEditClick = (row) => {
     const typeToEdit = row;
@@ -229,9 +224,6 @@ const CollectedTransactions = ({ user }) => {
       ...formData,
       collectedDate: collectedDateRef.current.value,
       collectedTime: collectedTimeRef.current.value,
-      billedAmount: billedAmountRef.current.value,
-      withHoldingTax: withHoldingTaxRef.current.value,
-      collectedAmount: collectedAmountRef.current.value,
       remarks: remarksRef.current.value,
     };
 

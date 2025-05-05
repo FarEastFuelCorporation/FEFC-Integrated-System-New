@@ -108,8 +108,8 @@ const CollectionModal = ({
             {!formData.withTax && (
               <TextField
                 label="Collected Amount"
-                inputRef={refs.collectedAmountRef}
-                defaultValue={formData.collectedAmount}
+                value={formData.collectedAmount}
+                name="collectedAmount"
                 fullWidth
                 type="number"
                 required
@@ -119,6 +119,7 @@ const CollectionModal = ({
                     color: colors.grey[100],
                   },
                 }}
+                onChange={handleInputChange}
                 autoComplete="off"
               />
             )}
@@ -127,8 +128,6 @@ const CollectionModal = ({
             <div style={{ width: "100%", display: "flex", gap: "20px" }}>
               <TextField
                 label="Billed Amount"
-                inputRef={refs.billedAmountRef}
-                defaultValue={formData.billedAmount}
                 name="billedAmount"
                 fullWidth
                 type="number"
@@ -144,8 +143,6 @@ const CollectionModal = ({
               />
               <TextField
                 label="Withholding Tax"
-                inputRef={refs.withHoldingTaxRef}
-                defaultValue={formData.withHoldingTax}
                 value={formData.withHoldingTax}
                 name="withHoldingTax"
                 fullWidth
@@ -162,8 +159,6 @@ const CollectionModal = ({
               />
               <TextField
                 label="Collected Amount"
-                inputRef={refs.collectedAmountRef}
-                defaultValue={formData.collectedAmount}
                 value={formData.collectedAmount}
                 name="collectedAmount"
                 fullWidth

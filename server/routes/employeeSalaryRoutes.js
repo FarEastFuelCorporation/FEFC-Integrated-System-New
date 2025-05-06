@@ -8,7 +8,9 @@ const {
   getEmployeeSalaryController,
   updateEmployeeSalaryController,
   deleteEmployeeSalaryController,
+  uploadEmployeeSalaryExcel,
 } = require("../controllers/employeeSalaryController");
+const upload = require("../middlewares/uploadExcel");
 
 // Create EmployeeSalary route
 router.post("/", createEmployeeSalaryController);
@@ -24,5 +26,8 @@ router.put("/:id", updateEmployeeSalaryController);
 
 // Delete EmployeeSalary route
 router.delete("/:id", deleteEmployeeSalaryController);
+
+// Upload EmployeeSalary route
+router.post("/upload", upload.single("file"), uploadEmployeeSalaryExcel);
 
 module.exports = router;

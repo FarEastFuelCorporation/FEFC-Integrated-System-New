@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import BillingStatementForm from "../BillingStatement/BillingStatementForm";
+import BillingInvoice from "../BillingStatement/BillingInvoice";
 
 const BillModal = ({
   open,
@@ -268,6 +269,17 @@ const BillModal = ({
           </Button>
 
           <BillingStatementForm
+            row={formData.row}
+            review={true}
+            bookedTransactionIds={formData.bookedTransactionId}
+            isWasteNameToBill={isWasteNameToBill}
+            isPerClientToBill={isPerClientToBill}
+            isIndividualBillingToBill={isIndividualBillingToBill}
+            isIndividualWasteToBill={isIndividualWasteToBill}
+            isChargeToBill={isChargeToBill}
+            discount={discount}
+          />
+          <BillingInvoice
             row={formData.row}
             review={true}
             bookedTransactionIds={formData.bookedTransactionId}

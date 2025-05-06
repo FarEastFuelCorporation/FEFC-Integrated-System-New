@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import { CircleLogo } from "../CustomAccordionStyles";
@@ -8,9 +8,12 @@ import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 import { timestampDate, parseTimeString } from "../Functions";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import BillingInvoice from "../BillingStatement/BillingInvoice";
 
 const BillingApprovalTransaction = ({ row, user }) => {
   const certificateRef = useRef();
+  const invoiceRef = useRef();
+  const [isRendering, setIsRendering] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -60,7 +63,65 @@ const BillingApprovalTransaction = ({ row, user }) => {
     processPage(0, pages); // Start processing pages from the first one
   };
 
-  const handleOpenPDFInNewTab = () => {
+  const handleDownloadPDF2 = () => {
+    const input = invoiceRef.current;
+    const pageHeight = 1056;
+    const pageWidth = 816;
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [pageWidth, pageHeight], // Page size in px
+    });
+
+    // Function to process and add each page
+    const processPage = (pageIndex, pages) => {
+      if (pageIndex >= pages.length) {
+        // All pages are processed, save the PDF
+        pdf.save(
+          `${row.BilledTransaction[0].billingNumber}-${row.Client.clientName}-INVOICE.pdf`
+        );
+        return;
+      }
+
+      // Capture the content of the current page using html2canvas
+      html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
+
+        if (pageIndex === 0) {
+          // Add the first page
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        } else {
+          // Add subsequent pages
+          pdf.addPage([pageWidth, pageHeight]);
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        }
+
+        // Process the next page
+        processPage(pageIndex + 1, pages);
+      });
+    };
+
+    // Break the content into multiple pages if needed
+    const pages = Array.from(input.children); // Assuming each page is a child of input
+    processPage(0, pages); // Start processing pages from the first one
+  };
+
+  // Memoize waitForRender with useCallback
+  const waitForRender = useCallback(() => {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (certificateRef.current) {
+          clearInterval(interval); // Clear the interval once it's ready
+          resolve();
+        }
+      }, 100); // Check every 100ms
+    });
+  }, []);
+
+  const handleOpenPDFInNewTab = async () => {
+    setIsRendering(true);
+    await waitForRender(); // Wait for the DOM to render
+
     const input = certificateRef.current;
 
     const pageHeight = 1056;
@@ -211,6 +272,9 @@ const BillingApprovalTransaction = ({ row, user }) => {
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingStatementForm statementRef={certificateRef} row={row} />
               </Box>
+              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+                <BillingInvoice statementRef={invoiceRef} row={row} />
+              </Box>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <Button
                   variant="contained"
@@ -223,8 +287,16 @@ const BillingApprovalTransaction = ({ row, user }) => {
                   variant="contained"
                   color="secondary"
                   onClick={handleOpenPDFInNewTab}
+                  disabled={isRendering}
                 >
-                  View Billing Statement
+                  {isRendering ? "Opening..." : "View Billing Statement"}
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleDownloadPDF2}
+                >
+                  Download Sales Invoice
                 </Button>
               </Box>
             </>

@@ -1,5 +1,6 @@
 // controllers/employeeSalaryController.js
 
+const XLSX = require("xlsx");
 const Employee = require("../models/Employee");
 const EmployeeSalary = require("../models/EmployeeSalary");
 
@@ -244,10 +245,42 @@ async function deleteEmployeeSalaryController(req, res) {
   }
 }
 
+// Upload EmployeeSalary controller
+const uploadEmployeeSalaryExcel = async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: "No file uploaded." });
+
+    const workbook = XLSX.read(file.buffer, { type: "buffer" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+    const salaryEntries = jsonData.map((row) => ({
+      id: uuidv4(),
+      employeeId: row.employeeId,
+      payrollType: row.payrollType,
+      salaryType: row.salaryType,
+      compensationType: row.compensationType,
+      salary: row.salary,
+      dayAllowance: row.dayAllowance,
+      nightAllowance: row.nightAllowance,
+      createdBy: row.createdBy || null,
+    }));
+
+    await EmployeeSalary.bulkCreate(salaryEntries);
+
+    res.status(200).json({ message: "Excel data uploaded successfully." });
+  } catch (error) {
+    console.error("Upload Error:", error);
+    res.status(500).json({ message: "Error uploading data", error });
+  }
+};
+
 module.exports = {
   createEmployeeSalaryController,
   getEmployeeSalariesController,
   getEmployeeSalaryController,
   updateEmployeeSalaryController,
   deleteEmployeeSalaryController,
+  uploadEmployeeSalaryExcel,
 };

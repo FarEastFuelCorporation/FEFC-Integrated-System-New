@@ -247,6 +247,7 @@ const WarehousedTransactions = ({ user }) => {
         discrepancyWeight: warehousedTransaction.discrepancyWeight,
         warehousedItems: warehousedTransaction.WarehousedTransactionItem
           ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
+              id: item.id || "",
               warehousedTransactionId: item.warehousedTransactionId || "",
               quotationWasteId: item.quotationWasteId || "",
               description: item.description || "",
@@ -272,6 +273,7 @@ const WarehousedTransactions = ({ user }) => {
       warehousedItemsRef.current =
         warehousedTransaction.WarehousedTransactionItem
           ? warehousedTransaction.WarehousedTransactionItem.map((item) => ({
+              id: item.id || "",
               warehousedTransactionId: item.warehousedTransactionId || "",
               quotationWasteId: item.quotationWasteId || "",
               description: item.description || "",
@@ -354,6 +356,7 @@ const WarehousedTransactions = ({ user }) => {
         if (!itemRef) return;
 
         const itemData = {
+          id: itemRef.querySelector(`[name='id-${index}']`)?.value || "",
           description:
             itemRef.querySelector(`[name='description-${index}']`)?.value || "",
           unit: itemRef.querySelector(`[name='unit-${index}']`)?.value || "",

@@ -159,24 +159,44 @@ const WarehouseModal = forwardRef(
     };
 
     const handleCategoryChange = (index, value) => {
-      // Access the specific element in the warehousedItemsRef using index
+      // Find the selected waste item from quotations
+      let selectedWaste = null;
+      for (const quotation of quotations) {
+        selectedWaste = quotation.QuotationWaste.find(
+          (waste) => waste.id === value
+        );
+        if (selectedWaste) break;
+      }
+
+      const wasteName = selectedWaste ? selectedWaste.wasteName : "";
+
+      // Update the ref
       const itemRef = warehousedItemsRef.current[index];
       if (itemRef) {
-        itemRef.quotationWasteId = value; // Update the value in the ref
-
-        const quotationWasteId = document.querySelector(
-          `#quotationWasteId-${index}`
-        );
-
-        setFormData((prev) => ({
-          ...prev,
-          warehousedItems: prev.warehousedItems.map((item, idx) =>
-            idx === index ? { ...item, quotationWasteId: value } : item
-          ),
-        }));
-
-        quotationWasteId.value = value;
+        itemRef.quotationWasteId = value;
       }
+
+      // Update form data state
+      setFormData((prev) => ({
+        ...prev,
+        warehousedItems: prev.warehousedItems.map((item, idx) =>
+          idx === index
+            ? {
+                ...item,
+                quotationWasteId: value,
+                description: wasteName, // set description as wasteName
+              }
+            : item
+        ),
+      }));
+
+      // Update DOM elements directly if needed
+      const quotationWasteId = document.querySelector(
+        `#quotationWasteId-${index}`
+      );
+      const description = document.querySelector(`#description-${index}`);
+      if (quotationWasteId) quotationWasteId.value = value;
+      if (description) description.value = wasteName;
     };
 
     return (
@@ -302,6 +322,15 @@ const WarehouseModal = forwardRef(
                   <Typography my={1}>Item {index + 1}</Typography>
                   <Box id={`warehoused-item-${index}`}>
                     <Grid container spacing={2}>
+                      <TextField
+                        name={`id-${index}`}
+                        id={`id-${index}`}
+                        label="Id"
+                        defaultValue={item.id}
+                        fullWidth
+                        autoComplete="off"
+                        style={{ display: "none" }}
+                      />
                       <Grid item xs={2.75}>
                         <FormControl fullWidth>
                           <InputLabel

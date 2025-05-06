@@ -44,7 +44,6 @@ const BillingInvoice = ({
 }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
-  console.log(row);
 
   const [transactions, setTransactions] = useState([]);
 

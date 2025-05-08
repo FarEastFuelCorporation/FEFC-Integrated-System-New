@@ -1,6 +1,7 @@
 // controllers/dispatchedTransactionController.js
 
 const Department = require("../models/Department");
+const EmployeeRecord = require("../models/EmployeeRecord");
 
 // Create Department controller
 async function createDepartmentController(req, res) {
@@ -30,16 +31,46 @@ async function createDepartmentController(req, res) {
   }
 }
 
-// Get Departments controller
+// Get Department controller
 async function getDepartmentsController(req, res) {
   try {
-    // Fetch all departments from the database
     const departments = await Department.findAll({
+      include: {
+        model: EmployeeRecord,
+        as: "EmployeeRecord",
+        attributes: ["gender"],
+      },
       order: [["department", "ASC"]],
     });
 
-    // Respond with the updated data
-    res.json({ departments });
+    let totalMale = 0;
+    let totalFemale = 0;
+
+    const departmentsWithGenderCount = departments.map((dept) => {
+      const employees = dept.EmployeeRecord || [];
+      const maleCount = employees.filter((e) => e.gender === "MALE").length;
+      const femaleCount = employees.filter((e) => e.gender === "FEMALE").length;
+
+      totalMale += maleCount;
+      totalFemale += femaleCount;
+
+      return {
+        id: dept.id,
+        department: dept.department,
+        maleCount,
+        femaleCount,
+      };
+    });
+
+    // Add a total row
+    departmentsWithGenderCount.push({
+      id: "Total",
+      department: "Total",
+      maleCount: totalMale,
+      femaleCount: totalFemale,
+    });
+
+    res.json({ departments: departmentsWithGenderCount });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

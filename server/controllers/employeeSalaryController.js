@@ -3,6 +3,7 @@
 const XLSX = require("xlsx");
 const Employee = require("../models/Employee");
 const EmployeeSalary = require("../models/EmployeeSalary");
+const { v4: uuidv4 } = require("uuid");
 
 // Create EmployeeSalary controller
 async function createEmployeeSalaryController(req, res) {
@@ -249,27 +250,38 @@ async function deleteEmployeeSalaryController(req, res) {
 const uploadEmployeeSalaryExcel = async (req, res) => {
   try {
     const file = req.file;
+    const createdBy = req.body.createdBy;
+
     if (!file) return res.status(400).json({ message: "No file uploaded." });
 
     const workbook = XLSX.read(file.buffer, { type: "buffer" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-    const salaryEntries = jsonData.map((row) => ({
-      id: uuidv4(),
-      employeeId: row.employeeId,
-      payrollType: row.payrollType,
-      salaryType: row.salaryType,
-      compensationType: row.compensationType,
-      salary: row.salary,
-      dayAllowance: row.dayAllowance,
-      nightAllowance: row.nightAllowance,
-      createdBy: row.createdBy || null,
-    }));
+    for (const row of jsonData) {
+      const employeeId = String(row.employeeId).padStart(5, "0");
 
-    await EmployeeSalary.bulkCreate(salaryEntries);
+      const [record, created] = await EmployeeSalary.upsert(
+        {
+          employeeId: employeeId,
+          payrollType: row.payrollType,
+          salaryType: row.salaryType,
+          compensationType: row.compensationType,
+          salary: row.salary,
+          dayAllowance: row.dayAllowance,
+          nightAllowance: row.nightAllowance,
+          createdBy: createdBy || null,
+        },
+        {
+          // Define how uniqueness is checked (based on employeeId)
+          conflictFields: ["employeeId"],
+        }
+      );
+    }
 
-    res.status(200).json({ message: "Excel data uploaded successfully." });
+    res
+      .status(200)
+      .json({ message: "Excel data uploaded and synced successfully." });
   } catch (error) {
     console.error("Upload Error:", error);
     res.status(500).json({ message: "Error uploading data", error });

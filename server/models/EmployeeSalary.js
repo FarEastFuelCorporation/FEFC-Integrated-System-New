@@ -14,6 +14,7 @@ const EmployeeSalary = sequelize.define("EmployeeSalary", {
   employeeId: {
     type: DataTypes.STRING(50),
     allowNull: false,
+    unique: true,
   },
   payrollType: {
     type: DataTypes.ENUM,

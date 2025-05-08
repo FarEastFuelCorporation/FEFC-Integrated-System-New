@@ -50,6 +50,7 @@ const Departments = ({ user }) => {
       const response = await axios.get(`${apiUrl}/api/department`);
 
       setDepartments(response.data.departments);
+      console.log(response.data.departments);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -169,7 +170,7 @@ const Departments = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "maleEmployee",
+      field: "maleCount",
       headerName: "Male Employee",
       headerAlign: "center",
       align: "center",
@@ -177,7 +178,7 @@ const Departments = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "femaleEmployee",
+      field: "femaleCount",
       headerName: "Female Employee",
       headerAlign: "center",
       align: "center",
@@ -190,6 +191,11 @@ const Departments = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
+      valueGetter: (params) => {
+        const value = params.row.maleCount + params.row.femaleCount;
+
+        return value;
+      },
       renderCell: renderCellWithWrapText,
     },
   ];

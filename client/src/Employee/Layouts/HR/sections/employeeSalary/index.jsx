@@ -17,6 +17,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import axios from "axios";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
@@ -46,6 +47,9 @@ const EmployeeSalary = ({ user }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
+  const [openModal2, setOpenModal2] = useState(false);
+  const [formData2, setFormData2] = useState(initialFormData);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [dataRecords, setRecords] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -82,18 +86,35 @@ const EmployeeSalary = ({ user }) => {
     setOpenModal(true);
   };
 
+  const handleOpenModal2 = () => {
+    setOpenModal2(true);
+  };
+
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
+  };
+
+  const handleCloseModal2 = () => {
+    setOpenModal2(false);
+    clearFormData2();
   };
 
   const clearFormData = () => {
     setFormData(initialFormData);
   };
 
+  const clearFormData2 = () => {
+    setFormData(initialFormData);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
   };
 
   const handleEditClick = (id) => {
@@ -221,6 +242,44 @@ const EmployeeSalary = ({ user }) => {
     }
   };
 
+  // Update your handleFormSubmit2 to use FormData
+  const handleFormSubmit2 = async (event) => {
+    event.preventDefault();
+
+    if (!selectedFile) {
+      setErrorMessage("Please select a file first.");
+      setShowErrorMessage(true);
+      return;
+    }
+
+    const formDataUpload = new FormData();
+    formDataUpload.append("file", selectedFile);
+    formDataUpload.append("createdBy", user.id); // Send createdBy
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/employeeSalary/upload`,
+        formDataUpload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        handleCloseModal2();
+        setSelectedFile(null);
+      } else {
+        setErrorMessage(response.data.message || "Upload failed.");
+        setShowErrorMessage(true);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setErrorMessage("Something went wrong during upload.");
+      setShowErrorMessage(true);
+    }
+  };
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
       {params.value}
@@ -382,6 +441,9 @@ const EmployeeSalary = ({ user }) => {
       <Box display="flex" justifyContent="space-between">
         <Header title="Employee Salary" subtitle="List of Employee Salaries" />
         <Box display="flex">
+          <IconButton onClick={handleOpenModal2}>
+            <UploadFileIcon sx={{ fontSize: "40px" }} />
+          </IconButton>
           <IconButton onClick={handleOpenModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />
           </IconButton>
@@ -633,6 +695,63 @@ const EmployeeSalary = ({ user }) => {
             onClick={handleFormSubmit}
           >
             {formData.id ? "Update" : "Add"}
+          </Button>
+        </Box>
+      </Modal>
+
+      <Modal open={openModal2} onClose={handleCloseModal2}>
+        <Box
+          component="form"
+          onSubmit={handleFormSubmit2}
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 600,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <Typography variant="h6" component="h2">
+            {formData2.id ? "Update Employee Salary" : "Upload Employee Salary"}
+          </Typography>
+
+          {showErrorMessage && (
+            <Typography variant="h6" component="h2" color="error">
+              {errorMessage}
+            </Typography>
+          )}
+
+          {/* Hidden Input Field */}
+          <input
+            accept=".xlsx, .xls"
+            type="file"
+            id="excel-upload"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+
+          {/* Button to Trigger File Input */}
+          <label htmlFor="excel-upload">
+            <Button variant="outlined" color="secondary" component="span">
+              Choose Excel File
+            </Button>
+          </label>
+
+          {/* Show File Name if Selected */}
+          {selectedFile && (
+            <Typography variant="body2" color="text.secondary">
+              Selected File: {selectedFile.name}
+            </Typography>
+          )}
+
+          <Button type="submit" variant="contained" color="primary">
+            {formData2.id ? "Update" : "Upload"}
           </Button>
         </Box>
       </Modal>

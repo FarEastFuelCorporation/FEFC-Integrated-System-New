@@ -69,6 +69,7 @@ const PTT = require("../models/PTT");
 const PTTWasteLog = require("../models/PTTWasteLog");
 const CommissionWaste = require("../models/CommissionWaste");
 const Commission = require("../models/Commission");
+const EmployeeTimeRecord = require("../models/EmployeeTimeRecord");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -1432,6 +1433,19 @@ Commission.belongsTo(EmployeeRecord, {
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(EmployeeTimeRecord, {
+  as: "EmployeeTimeRecord",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "SET NULL",
+});
+EmployeeTimeRecord.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "SET NULL",
 });
 
 Client.hasMany(Commission, {

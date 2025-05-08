@@ -13,108 +13,61 @@ const ViolationListLocal = require("./modelsLocal/ViolationListLocal");
 // Function to sync `IdInformation` to `IdInformationLocal`
 async function syncIdInformationToLocal() {
   try {
-    // Fetch all records from the cloud IdInformation table
-    const cloudData = await IdInformation.findAll();
+    const batchSize = 10;
 
-    // Create a set of employee_ids from cloud data for quick lookup
-    const cloudIds = new Set(cloudData.map((item) => item.employee_id));
-
-    // Fetch existing records from the local IdInformationLocal table
-    const existingLocalRecords = await IdInformationLocal.findAll({
-      where: { employee_id: Array.from(cloudIds) },
+    // Step 1: Get all employee_ids from cloud and local
+    const cloudIdsRaw = await IdInformation.findAll({
+      attributes: ["employee_id"],
+    });
+    const localIdsRaw = await IdInformationLocal.findAll({
+      attributes: ["employee_id"],
     });
 
-    // Create a map of existing local records by employee_id for quick lookup
-    const localRecordsMap = new Map(
-      existingLocalRecords.map((record) => [record.employee_id, record])
+    const cloudIds = cloudIdsRaw.map((r) => r.employee_id);
+    const localIdsSet = new Set(localIdsRaw.map((r) => r.employee_id));
+
+    // Step 2: Determine missing and existing IDs
+    const idsToInsert = cloudIds.filter((id) => !localIdsSet.has(id));
+    const idsToUpdate = cloudIds.filter((id) => localIdsSet.has(id));
+
+    console.log(
+      `Found ${idsToInsert.length} new records and ${idsToUpdate.length} to update.`
     );
 
-    const updates = [];
-    const newRecords = [];
+    // Helper to fetch full records in batch by employee_ids
+    const fetchCloudRecordsByIds = async (idsBatch) => {
+      return await IdInformation.findAll({ where: { employee_id: idsBatch } });
+    };
 
-    // Iterate through cloud data to determine updates and new inserts
-    cloudData.forEach((item) => {
-      const localRecord = localRecordsMap.get(item.employee_id);
+    // Step 3: Process INSERTS by batch
+    for (let i = 0; i < idsToInsert.length; i += batchSize) {
+      const batchIds = idsToInsert.slice(i, i + batchSize);
+      const records = await fetchCloudRecordsByIds(batchIds);
 
-      if (localRecord) {
-        // Prepare update for existing local record
-        updates.push({
-          id: localRecord.id, // Ensure to include the primary key for update
-          first_name: item.first_name,
-          middle_name: item.middle_name,
-          last_name: item.last_name,
-          affix: item.affix,
-          type_of_employee: item.type_of_employee,
-          designation: item.designation,
-          url: item.url,
-          birthday: item.birthday,
-          contact_number: item.contact_number,
-          address: item.address,
-          sss_no: item.sss_no,
-          pag_ibig_no: item.pag_ibig_no,
-          philhealth_no: item.philhealth_no,
-          tin_no: item.tin_no,
-          contact_person: item.contact_person,
-          contact_person_number: item.contact_person_number,
-          contact_person_address: item.contact_person_address,
-          address2: item.address2,
-          contact_person_address2: item.contact_person_address2,
-          date_expire: item.date_expire,
-          profile_picture: item.profile_picture,
-          signature: item.signature,
-        });
-      } else {
-        // Add to new records if not found in local
-        newRecords.push(item);
-      }
-    });
-
-    // If updates are found, use bulkCreate with updateOnDuplicate
-    if (updates.length > 0) {
-      await IdInformationLocal.bulkCreate(updates, {
-        updateOnDuplicate: [
-          "first_name",
-          "middle_name",
-          "last_name",
-          "affix",
-          "type_of_employee",
-          "designation",
-          "url",
-          "birthday",
-          "contact_number",
-          "address",
-          "sss_no",
-          "pag_ibig_no",
-          "philhealth_no",
-          "tin_no",
-          "contact_person",
-          "contact_person_number",
-          "contact_person_address",
-          "address2",
-          "contact_person_address2",
-          "date_expire",
-          "profile_picture",
-          "signature",
-        ], // Specify fields to update
-      });
-      console.log(
-        `Updated ${updates.length} existing records in IdInformationLocal.`
-      );
-    } else {
-      console.log("No existing records to update.");
+      await IdInformationLocal.bulkCreate(records.map((item) => item.toJSON()));
+      console.log(`Inserted ${records.length} records.`);
     }
 
-    // If new records are found, insert them into IdInformationLocal
-    if (newRecords.length > 0) {
-      await IdInformationLocal.bulkCreate(newRecords);
-      console.log(
-        `Inserted ${newRecords.length} new records into IdInformationLocal.`
-      );
-    } else {
-      console.log("No new records to insert.");
-    }
+    // Step 4: Process UPDATES by batch
+    // for (let i = 0; i < idsToUpdate.length; i += batchSize) {
+    //   const batchIds = idsToUpdate.slice(i, i + batchSize);
+    //   const records = await fetchCloudRecordsByIds(batchIds);
+
+    //   const updates = records.map((item) => item.toJSON());
+
+    //   for (const record of updates) {
+    //     await IdInformationLocal.upsert(record); // performs insert or update
+    //   }
+
+    //   console.log(`Upserted ${updates.length} records.`);
+    // }
+
+    console.log("✅ Sync complete.");
   } catch (error) {
-    console.error("Error syncing IdInformation to IdInformationLocal:", error);
+    console.error(
+      "❌ Error syncing IdInformation to IdInformationLocal:",
+      error
+    );
   }
 }
 

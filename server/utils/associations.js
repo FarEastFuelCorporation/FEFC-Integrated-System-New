@@ -1435,18 +1435,18 @@ Commission.belongsTo(EmployeeRecord, {
   onDelete: "CASCADE",
 });
 
-EmployeeRecord.hasMany(EmployeeTimeRecord, {
-  as: "EmployeeTimeRecord",
-  foreignKey: "employeeId",
-  sourceKey: "employeeId",
-  onDelete: "SET NULL",
-});
-EmployeeTimeRecord.belongsTo(EmployeeRecord, {
-  as: "EmployeeRecord",
-  foreignKey: "employeeId",
-  targetKey: "employeeId",
-  onDelete: "SET NULL",
-});
+// EmployeeRecord.hasMany(EmployeeTimeRecord, {
+//   as: "EmployeeTimeRecord",
+//   foreignKey: "employeeId",
+//   sourceKey: "employeeId",
+//   onDelete: "SET NULL",
+// });
+// EmployeeTimeRecord.belongsTo(EmployeeRecord, {
+//   as: "EmployeeRecord",
+//   foreignKey: "employeeId",
+//   targetKey: "employeeId",
+//   onDelete: "SET NULL",
+// });
 
 Client.hasMany(Commission, {
   as: "Commission",

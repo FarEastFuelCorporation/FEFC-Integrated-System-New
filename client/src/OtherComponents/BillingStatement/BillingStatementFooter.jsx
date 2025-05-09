@@ -123,9 +123,9 @@ const BillingStatementFooter = ({ row, qrCodeURL }) => {
         </Box>
       </Box>
       <Typography sx={{ fontSize: "10px" }}>
-        Note: This is a system generated quotation. To verify the authenticity
-        of this file, kindly scan the generated QR Code using your QR Code
-        scanner / reader
+        Note: This is a system generated Billing Statement. To verify the
+        authenticity of this file, kindly scan the generated QR Code using your
+        QR Code scanner / reader
       </Typography>
     </Box>
   );

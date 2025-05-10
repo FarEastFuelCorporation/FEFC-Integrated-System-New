@@ -414,6 +414,12 @@ const QuotationFormModal = ({
                   >
                     UPON RECEIVING OF DOCUMENTS
                   </MenuItem>
+                  <MenuItem
+                    key={"UPON RELEASE OF THE CERTIFICATION"}
+                    value={"UPON RELEASE OF THE CERTIFICATION"}
+                  >
+                    UPON RELEASE OF THE CERTIFICATION
+                  </MenuItem>
                   <MenuItem key={"UPON HAULING"} value={"UPON HAULING"}>
                     UPON HAULING
                   </MenuItem>

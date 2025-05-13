@@ -139,6 +139,11 @@ const VehicleProfileModal = ({
       return;
     }
 
+    if (!fileNameToSubmit) {
+      alert("Filename is Required.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -747,6 +752,11 @@ const VehicleProfileModal = ({
                         required
                         autoComplete="off"
                         sx={{ mt: 2 }}
+                        InputLabelProps={{
+                          style: {
+                            color: colors.grey[100],
+                          },
+                        }}
                       />
                       <Button
                         variant="contained"

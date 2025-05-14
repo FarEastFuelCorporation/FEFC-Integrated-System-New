@@ -850,6 +850,7 @@ const BillingInvoice = ({
 
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "90px",
@@ -864,6 +865,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "110px",
@@ -878,6 +880,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "138px",
@@ -888,6 +891,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "260px",
@@ -900,6 +904,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "281px",
@@ -910,6 +915,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "281px",
@@ -920,6 +926,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "302px",
@@ -930,6 +937,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "302px",
@@ -940,6 +948,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "323px",
@@ -950,6 +959,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "323px",
@@ -960,6 +970,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "344px",
@@ -971,6 +982,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "344px",
@@ -982,6 +994,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "365px",
@@ -994,6 +1007,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "365px",
@@ -1006,6 +1020,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "386px",
@@ -1017,6 +1032,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "386px",
@@ -1028,6 +1044,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "670px",
@@ -1042,6 +1059,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "700px",
@@ -1056,6 +1074,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "775px",
@@ -1070,6 +1089,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "800px",
@@ -1084,6 +1104,7 @@ const BillingInvoice = ({
                 </Typography>
                 <Typography
                   sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "828px",

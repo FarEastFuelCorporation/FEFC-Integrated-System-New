@@ -70,6 +70,7 @@ const PTTWasteLog = require("../models/PTTWasteLog");
 const CommissionWaste = require("../models/CommissionWaste");
 const Commission = require("../models/Commission");
 const EmployeeTimeRecord = require("../models/EmployeeTimeRecord");
+const CommissionedTransaction = require("../models/CommissionedTransaction");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -560,6 +561,17 @@ Employee.hasMany(BilledTransaction, {
   sourceKey: "employeeId",
 });
 BilledTransaction.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+Employee.hasMany(CommissionedTransaction, {
+  as: "CommissionedTransaction",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+CommissionedTransaction.belongsTo(Employee, {
   as: "Employee",
   foreignKey: "createdBy",
   targetKey: "employeeId",
@@ -1274,6 +1286,19 @@ BookedTransaction.hasMany(BilledTransaction, {
   onDelete: "CASCADE",
 });
 BilledTransaction.belongsTo(BookedTransaction, {
+  as: "BookedTransaction",
+  foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+BookedTransaction.hasMany(CommissionedTransaction, {
+  as: "CommissionedTransaction",
+  foreignKey: "bookedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CommissionedTransaction.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
   targetKey: "id",

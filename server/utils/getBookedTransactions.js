@@ -33,6 +33,9 @@ const WarehousedTransaction = require("../models/WarehousedTransaction");
 const WarehousedTransactionItem = require("../models/WarehousedTransactionItem");
 const WarehousedOutTransaction = require("../models/WarehousedOutTransaction");
 const WarehousedOutTransactionItem = require("../models/WarehousedOutTransactionItem");
+const CommissionedTransaction = require("../models/CommissionedTransaction");
+const Commission = require("../models/Commission");
+const CommissionWaste = require("../models/CommissionWaste");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -72,6 +75,11 @@ const getIncludeOptions = () => [
   {
     model: Client,
     as: "Client",
+    required: false,
+    include: {
+      model: Commission,
+      as: "Commission",
+    },
   },
   {
     model: Attachment,
@@ -347,6 +355,269 @@ const getIncludeOptions = () => [
                   },
                 ],
               },
+              // {
+              //   model: Employee,
+              //   as: "Employee",
+              //   attributes: ["firstName", "lastName"],
+              // },
+            ],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CertifiedTransaction,
+    as: "CertifiedTransaction",
+    required: false,
+    include: [
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+];
+
+const getIncludeOptionsSorting = () => [
+  {
+    model: QuotationWaste,
+    as: "QuotationWaste",
+    include: [
+      {
+        model: TypeOfWaste,
+        as: "TypeOfWaste",
+        attributes: ["wasteCode"],
+      },
+      {
+        model: Quotation,
+        as: "Quotation",
+      },
+    ],
+  },
+  {
+    model: QuotationTransportation,
+    as: "QuotationTransportation",
+    required: false,
+    include: [
+      {
+        model: VehicleType,
+        as: "VehicleType",
+        attributes: ["typeOfVehicle"],
+      },
+    ],
+  },
+  {
+    model: TransporterClient,
+    as: "TransporterClient",
+    attributes: ["clientName", "address"],
+    required: false,
+  },
+  {
+    model: Client,
+    as: "Client",
+    required: false,
+    include: {
+      model: Commission,
+      as: "Commission",
+    },
+  },
+  {
+    model: Attachment,
+    as: "Attachment",
+    required: false,
+    attributes: { exclude: ["attachment"] },
+    include: {
+      model: Employee,
+      as: "Employee",
+      attributes: ["firstName", "lastName"],
+    },
+  },
+  {
+    model: ScheduledTransaction,
+    as: "ScheduledTransaction",
+    required: false,
+    include: [
+      {
+        model: DispatchedTransaction,
+        as: "DispatchedTransaction",
+        required: false,
+        include: [
+          {
+            model: Employee,
+            as: "EmployeeDriver",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: Vehicle,
+            as: "Vehicle",
+            attributes: ["plateNumber"],
+            include: {
+              model: VehicleType,
+              as: "VehicleType",
+              attributes: ["typeOfVehicle"],
+            },
+          },
+        ],
+      },
+      {
+        model: ReceivedTransaction,
+        as: "ReceivedTransaction",
+        required: false,
+        include: [
+          {
+            model: SortedTransaction,
+            as: "SortedTransaction",
+            required: false,
+            paranoid: true,
+            include: [
+              {
+                model: SortedWasteTransaction,
+                as: "SortedWasteTransaction",
+                required: false,
+                include: [
+                  {
+                    model: QuotationWaste,
+                    as: "QuotationWaste",
+                    include: [
+                      {
+                        model: TypeOfWaste,
+                        as: "TypeOfWaste",
+                        attributes: ["wasteCode"],
+                      },
+                      {
+                        model: CommissionWaste,
+                        as: "CommissionWaste",
+                      },
+                    ],
+                  },
+                  {
+                    model: TransporterClient,
+                    as: "TransporterClient",
+                    attributes: ["clientName"],
+                  },
+                  {
+                    model: TreatmentProcess,
+                    as: "TreatmentProcess",
+                    attributes: ["treatmentProcess"],
+                  },
+                  {
+                    model: TreatedWasteTransaction,
+                    as: "TreatedWasteTransaction",
+                    required: false,
+                    include: [
+                      {
+                        model: TreatmentMachine,
+                        as: "TreatmentMachine",
+                        required: false,
+                        include: [
+                          {
+                            model: TreatmentProcess,
+                            as: "TreatmentProcess",
+                            required: false,
+                          },
+                        ],
+                      },
+                      {
+                        model: TreatedTransaction,
+                        as: "TreatedTransaction",
+                        required: false,
+                        paranoid: true,
+                        include: {
+                          model: Employee,
+                          as: "Employee",
+                          attributes: ["firstName", "lastName"],
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                model: SortedScrapTransaction,
+                as: "SortedScrapTransaction",
+                required: false,
+                include: {
+                  model: ScrapType,
+                  as: "ScrapType",
+                  required: false,
+                },
+              },
+              {
+                model: TreatedTransaction,
+                as: "TreatedTransaction",
+                required: false,
+                paranoid: true,
+              },
+              {
+                model: Employee,
+                as: "Employee",
+                attributes: ["firstName", "lastName"],
+              },
+            ],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      },
+      {
+        model: Logistics,
+        as: "Logistics",
+        attributes: ["logisticsName"],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: BilledTransaction,
+    as: "BilledTransaction",
+    required: false,
+    include: [
+      {
+        model: BillingApprovalTransaction,
+        as: "BillingApprovalTransaction",
+        required: false,
+        include: [
+          {
+            model: BillingDistributionTransaction,
+            as: "BillingDistributionTransaction",
+            required: false,
+            include: [
+              {
+                model: CollectedTransaction,
+                as: "CollectedTransaction",
+                required: false,
+                include: [
+                  {
+                    model: Employee,
+                    as: "Employee",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
               {
                 model: Employee,
                 as: "Employee",
@@ -371,6 +642,294 @@ const getIncludeOptions = () => [
   {
     model: CertifiedTransaction,
     as: "CertifiedTransaction",
+    required: false,
+    include: [
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CommissionedTransaction,
+    as: "CommissionedTransaction",
+    required: false,
+    include: [
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+];
+
+const getIncludeOptionsWarehouse = () => [
+  {
+    model: QuotationWaste,
+    as: "QuotationWaste",
+    include: [
+      {
+        model: TypeOfWaste,
+        as: "TypeOfWaste",
+        attributes: ["wasteCode"],
+      },
+      {
+        model: Quotation,
+        as: "Quotation",
+      },
+    ],
+  },
+  {
+    model: QuotationTransportation,
+    as: "QuotationTransportation",
+    required: false,
+    include: [
+      {
+        model: VehicleType,
+        as: "VehicleType",
+        attributes: ["typeOfVehicle"],
+      },
+    ],
+  },
+  {
+    model: TransporterClient,
+    as: "TransporterClient",
+    attributes: ["clientName", "address"],
+    required: false,
+  },
+  {
+    model: Client,
+    as: "Client",
+  },
+  {
+    model: Attachment,
+    as: "Attachment",
+    required: false,
+    attributes: { exclude: ["attachment"] },
+    include: {
+      model: Employee,
+      as: "Employee",
+      attributes: ["firstName", "lastName"],
+    },
+  },
+  {
+    model: ScheduledTransaction,
+    as: "ScheduledTransaction",
+    required: false,
+    include: [
+      {
+        model: DispatchedTransaction,
+        as: "DispatchedTransaction",
+        required: false,
+        include: [
+          {
+            model: Employee,
+            as: "EmployeeDriver",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+          {
+            model: Vehicle,
+            as: "Vehicle",
+            attributes: ["plateNumber"],
+            include: {
+              model: VehicleType,
+              as: "VehicleType",
+              attributes: ["typeOfVehicle"],
+            },
+          },
+        ],
+      },
+      {
+        model: ReceivedTransaction,
+        as: "ReceivedTransaction",
+        required: false,
+        include: [
+          {
+            model: WarehousedTransaction,
+            as: "WarehousedTransaction",
+            required: false,
+            include: [
+              {
+                model: WarehousedTransactionItem,
+                as: "WarehousedTransactionItem",
+                required: false,
+                include: [
+                  {
+                    model: WarehousedOutTransactionItem,
+                    as: "WarehousedTransactionItemToOut",
+                    required: false,
+                    include: {
+                      model: WarehousedOutTransaction,
+                      as: "WarehousedOutTransaction",
+                      required: false,
+                    },
+                  },
+                  {
+                    model: TreatedWasteTransaction,
+                    as: "TreatedWasteTransaction",
+                    required: false,
+                    include: [
+                      {
+                        model: TreatmentMachine,
+                        as: "TreatmentMachine",
+                        required: false,
+                        include: [
+                          {
+                            model: TreatmentProcess,
+                            as: "TreatmentProcess",
+                            required: false,
+                          },
+                        ],
+                      },
+                      {
+                        model: TreatedTransaction,
+                        as: "TreatedTransaction",
+                        required: false,
+                        paranoid: true,
+                        include: {
+                          model: Employee,
+                          as: "Employee",
+                          attributes: ["firstName", "lastName"],
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    model: QuotationWaste,
+                    as: "QuotationWaste",
+                    include: [
+                      {
+                        model: TypeOfWaste,
+                        as: "TypeOfWaste",
+                        attributes: ["wasteCode"],
+                      },
+                      {
+                        model: CommissionWaste,
+                        as: "CommissionWaste",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                model: WarehousedOutTransaction,
+                as: "WarehousedOutTransaction",
+                required: false,
+                include: [
+                  {
+                    model: WarehousedOutTransactionItem,
+                    as: "WarehousedOutTransactionItem",
+                    required: false,
+                  },
+                  {
+                    model: Employee,
+                    as: "Employee",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
+              {
+                model: TreatedTransaction,
+                as: "TreatedTransaction",
+                required: false,
+                paranoid: true,
+              },
+              {
+                model: Employee,
+                as: "Employee",
+                attributes: ["firstName", "lastName"],
+              },
+            ],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      },
+      {
+        model: Logistics,
+        as: "Logistics",
+        attributes: ["logisticsName"],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: BilledTransaction,
+    as: "BilledTransaction",
+    required: false,
+    include: [
+      {
+        model: BillingApprovalTransaction,
+        as: "BillingApprovalTransaction",
+        required: false,
+        include: [
+          {
+            model: BillingDistributionTransaction,
+            as: "BillingDistributionTransaction",
+            required: false,
+            include: [
+              {
+                model: CollectedTransaction,
+                as: "CollectedTransaction",
+                required: false,
+                include: [
+                  {
+                    model: Employee,
+                    as: "Employee",
+                    attributes: ["firstName", "lastName"],
+                  },
+                ],
+              },
+              {
+                model: Employee,
+                as: "Employee",
+                attributes: ["firstName", "lastName"],
+              },
+            ],
+          },
+          {
+            model: Employee,
+            as: "Employee",
+            attributes: ["firstName", "lastName"],
+          },
+        ],
+      },
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CertifiedTransaction,
+    as: "CertifiedTransaction",
+    required: false,
+    include: [
+      {
+        model: Employee,
+        as: "Employee",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CommissionedTransaction,
+    as: "CommissionedTransaction",
     required: false,
     include: [
       {
@@ -740,6 +1299,11 @@ const getIncludeOptionsPartial = () => [
     model: Client,
     as: "Client",
     attributes: ["clientName", "address"],
+    required: false,
+    include: {
+      model: Commission,
+      as: "Commission",
+    },
   },
   {
     model: ScheduledTransaction,
@@ -1028,10 +1592,13 @@ const fetchData = async (
   }
 };
 
-const fetchDataFull = async (id) => {
+const fetchDataFull = async (id, submitTo) => {
   try {
     const transaction = await BookedTransaction.findByPk(id, {
-      include: getIncludeOptions(),
+      include:
+        submitTo === "WAREHOUSE"
+          ? getIncludeOptionsWarehouse()
+          : getIncludeOptionsSorting(),
       order: [
         ["transactionId", "DESC"], // This orders BookedTransaction records by id in descending order.
       ],
@@ -1047,30 +1614,30 @@ const fetchDataFull = async (id) => {
   }
 };
 
-const fetchDataFullMultiple = async (ids) => {
-  try {
-    const transactions = await BookedTransaction.findAll({
-      where: { transactionId: ids }, // Fetch records matching the provided IDs
-      include: getIncludeOptions(),
-      order: [
-        ["transactionId", "DESC"], // Order records by transactionId in descending order
-      ],
-    });
+// const fetchDataFullMultiple = async (ids) => {
+//   try {
+//     const transactions = await BookedTransaction.findAll({
+//       where: { transactionId: ids }, // Fetch records matching the provided IDs
+//       include: getIncludeOptions(),
+//       order: [
+//         ["transactionId", "DESC"], // Order records by transactionId in descending order
+//       ],
+//     });
 
-    // Return the fetched transactions
-    return {
-      transactions,
-    };
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+//     // Return the fetched transactions
+//     return {
+//       transactions,
+//     };
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
+// };
 
 module.exports = {
   fetchData,
   fetchDataFull,
-  fetchDataFullMultiple,
+  // fetchDataFullMultiple,
   getIncludeOptions,
   getIncludeOptionsVerify,
 };

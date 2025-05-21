@@ -17,6 +17,7 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import PaidIcon from "@mui/icons-material/Paid";
 import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
@@ -40,6 +41,7 @@ const MarketingSidebar = ({ user }) => {
       "/dashboard/logistics": "Logistics",
       "/dashboard/quotations": "Quotations",
       "/dashboard/transactions": "Transactions",
+      "/dashboard/commissionTransactions": "Commission Transactions",
       "/dashboard/commissions": "Commissions",
       "/dashboard/truckScale": "Truck Scale",
       "/dashboard/documents": "Documents",
@@ -131,6 +133,14 @@ const MarketingSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"transactions"}
+        />
+        <BottomNavItem
+          label="Commission Transactions"
+          value="Commission Transactions"
+          icon={MonetizationOnIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"commissionTransactions"}
         />
         <BottomNavItem
           label="Clients"
@@ -309,6 +319,14 @@ const MarketingSidebar = ({ user }) => {
               title="Transactions"
               to="transactions"
               icon={<PointOfSaleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Commission Transactions"
+              to="commissionTransactions"
+              icon={<MonetizationOnIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

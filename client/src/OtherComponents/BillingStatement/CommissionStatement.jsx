@@ -25,8 +25,8 @@ const modifyApiUrlPort = (url) => {
   return url.replace(portPattern, ":3000");
 };
 
-const pageHeight = 850; // Full page height (A4 paper size in pixels)
-const defaultHeaderHeight = 320; // Default approximate height for header
+const pageHeight = 800; // Full page height (A4 paper size in pixels)
+const defaultHeaderHeight = 300; // Default approximate height for header
 const defaultFooterHeight = 120; // Default approximate height for footer
 
 const CommissionStatement = ({
@@ -854,6 +854,8 @@ const CommissionStatement = ({
                   bodyRows.BillingTableHead.header = <BillingTableHead />;
 
                   const waste = item; // Assuming item contains waste details
+
+                  console.log("Waste", waste);
 
                   // Check if we should include this row
                   const shouldIncludeRow =

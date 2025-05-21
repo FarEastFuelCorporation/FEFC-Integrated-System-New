@@ -8,18 +8,17 @@ import Transaction from "../../../../../OtherComponents/Transaction";
 import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 
-const ScheduledTransactions = ({ user }) => {
+const CommissionedTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   const initialFormData = {
     id: "",
-    bookedTransactionId: "",
-    logisticsId: "",
-    scheduledDate: "",
-    scheduledTime: "",
+    bookedTransactionId: [],
+    commissionedDate: "",
+    commissionedTime: "",
     remarks: "",
-    statusId: 2,
     createdBy: user.id,
   };
 
@@ -38,18 +37,21 @@ const ScheduledTransactions = ({ user }) => {
   const [dialogAction, setDialogAction] = useState(false);
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
 
+  const [selectedIds, setSelectedIds] = useState([]);
+
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const scheduledTransactionResponse = await axios.get(
-        `${apiUrl}/api/scheduledTransaction`
+        `${apiUrl}/api/commissionedTransaction`
       );
 
       // For pending transactions
       setPendingTransactions(
         scheduledTransactionResponse.data.pendingTransactions
       );
+      console.log(scheduledTransactionResponse.data.pendingTransactions);
 
       // For in progress transactions
       setInProgressTransactions(
@@ -72,15 +74,28 @@ const ScheduledTransactions = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  const handleOpenModal = (row) => {
+  const handleOpenModal = async (row) => {
+    const firstSelectedId = selectedIds[0];
+
+    const response = await axios.get(
+      `${apiUrl}/api/bookedTransaction/full/${firstSelectedId}`
+    );
+
+    let newRow;
+
+    if (row.id) {
+      newRow = row;
+    } else {
+      newRow = response.data.transaction.transaction;
+    }
+
     setFormData({
+      row: newRow,
       id: "",
-      bookedTransactionId: row.id,
-      logisticsId: "",
-      scheduledDate: "",
-      scheduledTime: "",
+      bookedTransactionId: selectedIds,
+      commissionedDate: "",
+      commissionedTime: "",
       remarks: "",
-      statusId: 2,
       createdBy: user.id,
     });
     setOpenModal(true);
@@ -101,31 +116,31 @@ const ScheduledTransactions = ({ user }) => {
   };
 
   const handleEditClick = (row) => {
-    const typeToEdit = row;
-
-    if (typeToEdit) {
-      const scheduledTransaction = typeToEdit.ScheduledTransaction?.[0];
+    if (row) {
+      const commissionedTransaction = row.CommissionedTransaction?.[0];
 
       setFormData({
-        id: scheduledTransaction?.id,
-        bookedTransactionId: typeToEdit.id,
-        logisticsId: scheduledTransaction.logisticsId,
-        scheduledDate: scheduledTransaction?.scheduledDate,
-        scheduledTime: scheduledTransaction?.scheduledTime,
-        remarks: scheduledTransaction?.remarks,
-        statusId: typeToEdit.statusId,
+        id: commissionedTransaction?.id,
+        bookedTransactionId: row.id,
+        logisticsId: commissionedTransaction.logisticsId,
+        commissionedDate: commissionedTransaction?.commissionedDate,
+        commissionedTime: commissionedTransaction?.commissionedTime,
+        remarks: commissionedTransaction?.remarks,
+        statusId: row.statusId,
         createdBy: user.id,
       });
 
       setOpenModal(true);
     } else {
-      console.error(`Vehicle type with ID ${row.id} not found for editing.`);
+      console.error(
+        `Commissioned Transaction with ID ${row.id} not found for editing.`
+      );
     }
   };
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Scheduled Transaction?");
+    setDialog("Are you sure you want to Delete this Commissioned Transaction?");
     setDialogAction(() => () => handleConfirmDelete(id));
   };
 
@@ -134,7 +149,7 @@ const ScheduledTransactions = ({ user }) => {
       setLoading(true);
       // Make the delete request
       await axios.delete(
-        `${apiUrl}/api/scheduledTransaction/${row.ScheduledTransaction[0].id}`,
+        `${apiUrl}/api/commissionedTransaction/${row.ScheduledTransaction[0].id}`,
         {
           data: { deletedBy: user.id },
         }
@@ -158,7 +173,7 @@ const ScheduledTransactions = ({ user }) => {
       // );
       fetchData();
       // Display success message
-      setSuccessMessage("Scheduled Transaction Deleted Successfully!");
+      setSuccessMessage("Commissioned Transaction Deleted Successfully!");
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);
       setLoading(false);
@@ -193,7 +208,7 @@ const ScheduledTransactions = ({ user }) => {
       setLoading(true);
       if (formData.id) {
         newTransaction = await axios.put(
-          `${apiUrl}/api/scheduledTransaction/${formData.id}`,
+          `${apiUrl}/api/commissionedTransaction/${formData.id}`,
           formData
         );
         // Update the existing transaction in each state
@@ -218,7 +233,7 @@ const ScheduledTransactions = ({ user }) => {
         //   ),
         //   ...newTransaction.data.finishedTransactions,
         // ]);
-        setSuccessMessage("Scheduled Transaction Updated Successfully!");
+        setSuccessMessage("Commissioned Transaction Updated Successfully!");
       } else {
         newTransaction = await axios.post(
           `${apiUrl}/api/scheduledTransaction`,
@@ -240,7 +255,7 @@ const ScheduledTransactions = ({ user }) => {
         //   ...prevFinishedTransactions,
         //   ...newTransaction.data.finishedTransactions,
         // ]);
-        setSuccessMessage("Scheduled Transaction Submitted Successfully!");
+        setSuccessMessage("Commissioned Transaction Submitted Successfully!");
       }
       fetchData();
       setShowSuccessMessage(true);
@@ -284,13 +299,11 @@ const ScheduledTransactions = ({ user }) => {
       <LoadingSpinner isLoading={loading} />
       <Box display="flex" justifyContent="space-between">
         <Header title="Transactions" subtitle="List of Transactions" />
-        {user.userType === "GEN" && (
-          <Box display="flex">
-            <IconButton onClick={handleOpenModal}>
-              <PostAddIcon sx={{ fontSize: "40px" }} />
-            </IconButton>
-          </Box>
-        )}
+        <Box display="flex">
+          <IconButton onClick={handleOpenModal}>
+            <ReceiptIcon sx={{ fontSize: "40px" }} />
+          </IconButton>
+        </Box>
       </Box>
 
       {showSuccessMessage && (
@@ -307,7 +320,7 @@ const ScheduledTransactions = ({ user }) => {
       />
       <Transaction
         user={user}
-        buttonText={"Schedule"}
+        buttonText={"Commission"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
@@ -317,8 +330,11 @@ const ScheduledTransactions = ({ user }) => {
         handleDeleteClickBook={handleDeleteClickBook}
         openTransactionModal={openTransactionModal}
         setOpenTransactionModal={setOpenTransactionModal}
-        hasCancel={true}
+        selectedIds={selectedIds}
+        setSelectedIds={setSelectedIds}
+        hasCancel={false}
       />
+      {console.log("Selected IDs:", selectedIds)}
       <Modal
         user={user}
         open={openModal}
@@ -328,10 +344,10 @@ const ScheduledTransactions = ({ user }) => {
         handleFormSubmit={handleFormSubmit}
         errorMessage={errorMessage}
         showErrorMessage={showErrorMessage}
-        schedule={true}
+        schedule={false}
       />
     </Box>
   );
 };
 
-export default ScheduledTransactions;
+export default CommissionedTransactions;

@@ -13,6 +13,7 @@ import BillingDistributionModal from "./TransactionModals/BillingDistributionMod
 import CollectionModal from "./TransactionModals/CollectionModal";
 import WarehouseModal from "./TransactionModals/WarehouseModal";
 import WarehouseOutModal from "./TransactionModals/WarehouseOutModal";
+import CommissionModal from "./TransactionModals/CommissionModal";
 
 const Modal = forwardRef(
   (
@@ -45,6 +46,7 @@ const Modal = forwardRef(
       setIsChargeToBill,
       discount,
       setDiscount,
+      schedule,
     },
     ref
   ) => {
@@ -67,8 +69,18 @@ const Modal = forwardRef(
         );
         break;
       case 2:
-        ModalComponent = (
+        ModalComponent = schedule ? (
           <ScheduleModal
+            open={open}
+            onClose={onClose}
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleFormSubmit={handleFormSubmit}
+            errorMessage={errorMessage}
+            showErrorMessage={showErrorMessage}
+          />
+        ) : (
+          <CommissionModal
             open={open}
             onClose={onClose}
             formData={formData}

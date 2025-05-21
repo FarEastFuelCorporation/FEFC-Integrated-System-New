@@ -13,6 +13,7 @@ import Calendar from "../../Employee/Layouts/Marketing/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import TruckScale from "../Layouts/Receiving/sections/truckScale";
 import PTT from "../../OtherComponents/Sections/ptt";
+import CommissionedTransactions from "../Layouts/Marketing/sections/commissionedTransactions";
 
 const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
@@ -27,6 +28,10 @@ const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
       <Route
         path="transactions"
         element={<ScheduledTransactions user={user} />}
+      />
+      <Route
+        path="commissionTransactions"
+        element={<CommissionedTransactions user={user} />}
       />
       <Route
         path="commissions"

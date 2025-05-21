@@ -718,7 +718,7 @@ const CommissionContent = ({
                           )}
                         </TableRow>
                       }
-                      {hasFixedRateIndividual &&
+                      {/* {hasFixedRateIndividual &&
                         !isMonthly &&
                         fixedWeight &&
                         usedWeight > fixedWeight && (
@@ -875,7 +875,7 @@ const CommissionContent = ({
                               </TableCell>
                             )}
                           </TableRow>
-                        )}
+                        )} */}
                     </Box>
                   );
                 });
@@ -905,7 +905,7 @@ const CommissionContent = ({
 
                 return combinedRows;
               })}
-            {!hasDemurrage && hasFixedRate && isMonthly && (
+            {/* {!hasDemurrage && hasFixedRate && isMonthly && (
               <TableRow key={`add-${1}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>
                 <TableCell sx={bodyCellStyles({ width: 40 })}></TableCell>
@@ -995,7 +995,7 @@ const CommissionContent = ({
                     {vatCalculation}
                   </TableCell>
                 </TableRow>
-              )}
+              )} */}
             {remarks && (
               <TableRow key={`add-${5}`} sx={{ border: "black" }}>
                 <TableCell sx={bodyCellStyles({ width: 60 })}></TableCell>

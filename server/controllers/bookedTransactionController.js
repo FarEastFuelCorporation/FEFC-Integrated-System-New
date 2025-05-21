@@ -181,9 +181,12 @@ async function getBookedTransactionsController(req, res) {
 async function getBookedTransactionFullController(req, res) {
   try {
     const id = req.params.id;
+    const submitTo = req.query.submitTo;
+
+    console.log("Submit To:", submitTo);
 
     // fetch transactions
-    const transaction = await fetchDataFull(id);
+    const transaction = await fetchDataFull(id, submitTo);
 
     res.status(200).json({
       transaction,

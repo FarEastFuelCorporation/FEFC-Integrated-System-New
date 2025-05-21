@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
@@ -11,7 +12,7 @@ import jsPDF from "jspdf";
 import BillingInvoice from "../BillingStatement/BillingInvoice";
 import CommissionStatement from "../BillingStatement/CommissionStatement";
 
-const BillingApprovalTransaction = ({ row, user }) => {
+const CommissionTransaction = ({ row, user }) => {
   const certificateRef = useRef();
   const invoiceRef = useRef();
   const commissionRef = useRef();
@@ -212,10 +213,12 @@ const BillingApprovalTransaction = ({ row, user }) => {
 
   return (
     <Box>
-      {row.statusId === 10 ? (
+      {row.statusId > 10 &&
+      row.Client?.Commission.length > 0 &&
+      row.CommissionedTransaction.length === 0 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <AssignmentTurnedInIcon
+            <MonetizationOnIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -229,17 +232,19 @@ const BillingApprovalTransaction = ({ row, user }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Billing Approval
+              For Commission
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
           <br />
           <hr />
         </Box>
-      ) : (
+      ) : row.statusId > 10 &&
+        row.Client?.Commission.length > 0 &&
+        row.CommissionedTransaction.length > 0 ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <AssignmentTurnedInIcon
+            <MonetizationOnIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -257,7 +262,7 @@ const BillingApprovalTransaction = ({ row, user }) => {
           >
             <Grid item xs={12} md={6}>
               <Typography variant="h4" color={colors.greenAccent[400]}>
-                Billing Approved
+                Commissioned
               </Typography>
             </Grid>
             <Grid
@@ -320,6 +325,11 @@ const BillingApprovalTransaction = ({ row, user }) => {
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingInvoice statementRef={invoiceRef} row={row} />
               </Box>
+              <Box
+              // sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}
+              >
+                <CommissionStatement statementRef={commissionRef} row={row} />
+              </Box>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <Button
                   variant="contained"
@@ -345,15 +355,26 @@ const BillingApprovalTransaction = ({ row, user }) => {
                     Download Sales Invoice
                   </Button>
                 )}
+                {Number.isInteger(user.userType) && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleDownloadPDF3}
+                  >
+                    Download Commission Statement
+                  </Button>
+                )}
               </Box>
             </>
           )}
           <br />
           <hr />
         </Box>
+      ) : (
+        ""
       )}
     </Box>
   );
 };
 
-export default BillingApprovalTransaction;
+export default CommissionTransaction;

@@ -46,6 +46,7 @@ import {
 import axios from "axios";
 import WarehousedOutTransaction from "./Transactions/WarehousedOutTransaction";
 import TreatedWarehouseTransaction from "./Transactions/TreatedWarehouseTransaction";
+import CommissionTransaction from "./Transactions/CommissionTransaction";
 
 const Transaction = ({
   user,
@@ -64,6 +65,7 @@ const Transaction = ({
   selectedIds,
   setSelectedIds,
   discount,
+  hasCancel,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -392,9 +394,17 @@ const Transaction = ({
               const id = params.row.id; // Get the document ID
               setLoadingRowId(id);
 
-              // Fetch the attachment from the API using the document ID
+              const submitTo =
+                params.row.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+                  ?.submitTo;
+
               const response = await axios.get(
-                `${apiUrl}/api/bookedTransaction/full/${id}`
+                `${apiUrl}/api/bookedTransaction/full/${id}`,
+                {
+                  params: {
+                    submitTo: submitTo,
+                  },
+                }
               );
 
               // Check for errors in the response
@@ -520,9 +530,13 @@ const Transaction = ({
             apiRef={apiRef}
             rows={transactions ? transactions : []}
             columns={filteredColumns}
-            checkboxSelection={user.userType === 8}
+            checkboxSelection={
+              user.userType === 8 || (user.userType === 2 && !hasCancel)
+            }
             onSelectionModelChange={
-              user.userType === 8 ? handleSelection : undefined
+              user.userType === 8 || (user.userType === 2 && !hasCancel)
+                ? handleSelection
+                : undefined
             }
             getRowClassName={(params) => {
               const daysRemaining = params.row.ScheduledTransaction?.[0]
@@ -639,7 +653,7 @@ const Transaction = ({
                       <Grid
                         item
                         md={9}
-                        lg={9}
+                        lg={8}
                         sx={{
                           display: "flex",
                           alignItems: "center",
@@ -693,7 +707,7 @@ const Transaction = ({
                           item
                           xs={12}
                           md={12}
-                          lg={1}
+                          lg={2}
                           sx={{
                             display: "flex",
                             alignItems: "center",
@@ -701,7 +715,7 @@ const Transaction = ({
                             gap: 1,
                           }}
                         >
-                          {user.userType === 2 && (
+                          {user.userType === 2 && hasCancel && (
                             <Button
                               onClick={() => handleDeleteClickBook(row)}
                               sx={{
@@ -961,6 +975,15 @@ const Transaction = ({
                           user={user}
                         />
                       )}
+                      {row.statusId >= 10 &&
+                        Number.isInteger(user.userType) && (
+                          <CommissionTransaction
+                            row={row}
+                            handleOpenModal={handleOpenModal}
+                            handleDeleteClick={handleDeleteClick}
+                            user={user}
+                          />
+                        )}
                       {(row.statusId >= 9 ||
                         row.BilledTransaction.length > 0) && (
                         <BilledTransaction

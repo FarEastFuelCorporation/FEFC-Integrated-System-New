@@ -436,6 +436,8 @@ const CommissionContent = ({
 
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
+                  const amount =
+                    waste.QuotationWaste?.CommissionWaste?.[0]?.amount;
 
                   return (
                     <Box>
@@ -644,8 +646,8 @@ const CommissionContent = ({
                             }}
                           >
                             {hasFixedRateIndividual && !fixedWeight
-                              ? formatNumber2(waste.QuotationWaste.fixedPrice)
-                              : formatNumber2(waste.QuotationWaste.unitPrice)}
+                              ? formatNumber2(amount)
+                              : formatNumber2(amount)}
                           </TableCell>
                           <TableCell
                             sx={{
@@ -662,9 +664,9 @@ const CommissionContent = ({
                                   waste.duration
                                     ? waste.duration *
                                         new Decimal(usedWeight).toNumber() *
-                                        waste.QuotationWaste.unitPrice
+                                        amount
                                     : new Decimal(usedWeight).toNumber() *
-                                        waste.QuotationWaste.unitPrice
+                                        amount
                                 )}
                           </TableCell>
                           <TableCell

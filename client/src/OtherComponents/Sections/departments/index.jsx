@@ -50,7 +50,6 @@ const Departments = ({ user }) => {
       const response = await axios.get(`${apiUrl}/api/department`);
 
       setDepartments(response.data.departments);
-      console.log(response.data.departments);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);

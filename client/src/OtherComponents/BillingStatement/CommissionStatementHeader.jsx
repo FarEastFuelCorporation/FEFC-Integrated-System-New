@@ -167,8 +167,11 @@ const CommissionStatementHeader = ({
             padding: 1,
           }}
         >
-          <Typography fontWeight="bold">{clientData?.billerName}</Typography>
-          <Typography fontSize="12px">{clientData?.billerAddress}</Typography>
+          <Typography fontWeight="bold">
+            {row.Client?.Commission?.[0]?.EmployeeRecord?.firstName}{" "}
+            {row.Client?.Commission?.[0]?.EmployeeRecord?.lastName}
+          </Typography>
+          {/* <Typography fontSize="12px">{clientData?.billerAddress}</Typography>
           {clientData?.billerTinNumber && (
             <Typography fontSize="12px">
               TIN NUMBER: {clientData?.billerTinNumber}
@@ -185,7 +188,7 @@ const CommissionStatementHeader = ({
               {" "}
               Contact Number: {clientData?.billerContactNumber}
             </Typography>
-          )}
+          )} */}
         </Box>
 
         <Box
@@ -237,17 +240,7 @@ const CommissionStatementHeader = ({
             }}
           >
             <Typography>Total Non-Vatable Sale:</Typography>
-            <Typography>
-              {hasDemurrage
-                ? vatCalculation === "NON VATABLE"
-                  ? formatNumber(demurrageDays * demurrageFee)
-                  : 0
-                : formatNumber(
-                    isIndividualBillingToBill
-                      ? groupedTransactions?.totals?.amounts.nonVatable
-                      : amounts.nonVatable
-                  )}
-            </Typography>
+            <Typography>{formatNumber(0)}</Typography>
           </Box>
           <Box
             sx={{
@@ -256,21 +249,7 @@ const CommissionStatementHeader = ({
             }}
           >
             <Typography>Total Vatable Sale:</Typography>
-            <Typography>
-              {hasDemurrage
-                ? vatCalculation === "VAT EXCLUSIVE"
-                  ? formatNumber(demurrageDays * demurrageFee)
-                  : vatCalculation === "VAT INCLUSIVE"
-                  ? formatNumber((demurrageDays * demurrageFee) / 1.12)
-                  : 0
-                : formatNumber(
-                    isIndividualBillingToBill
-                      ? groupedTransactions?.totals?.amounts.vatExclusive +
-                          groupedTransactions?.totals?.amounts.vatInclusive /
-                            1.12
-                      : amounts.vatExclusive + amounts.vatInclusive / 1.12
-                  )}
-            </Typography>
+            <Typography>{formatNumber(0)}</Typography>
           </Box>
           <Box
             sx={{
@@ -279,18 +258,7 @@ const CommissionStatementHeader = ({
             }}
           >
             <Typography>VAT (12%):</Typography>
-            <Typography>
-              {hasDemurrage
-                ? vatCalculation === "VAT EXCLUSIVE"
-                  ? formatNumber(demurrageDays * demurrageFee * 0.12)
-                  : vatCalculation === "VAT INCLUSIVE"
-                  ? formatNumber(
-                      demurrageDays * demurrageFee -
-                        (demurrageDays * demurrageFee) / 1.12
-                    )
-                  : 0
-                : formatNumber(vat)}
-            </Typography>
+            <Typography>{formatNumber(0)}</Typography>
           </Box>
           <Box
             sx={{
@@ -301,16 +269,26 @@ const CommissionStatementHeader = ({
               color: "red",
             }}
           >
-            <Typography sx={{ fontWeight: "bold" }}>LESS:</Typography>
+            <Typography sx={{ fontWeight: "bold" }}>LESS: 10% Tax</Typography>
             <Typography sx={{ fontWeight: "bold" }}>
-              {isChargeToProcess
-                ? formatNumber(0)
-                : formatNumber(
-                    isIndividualBillingToBill
-                      ? groupedTransactions?.totals?.credits.vatInclusive -
-                          toBeDiscount
-                      : credits.vatInclusive + credits.nonVatable + toBeDiscount
-                  )}
+              {formatNumber(
+                parseFloat(
+                  hasDemurrage
+                    ? vatCalculation === "VAT EXCLUSIVE"
+                      ? demurrageDays * demurrageFee +
+                        demurrageDays * demurrageFee * 0.12
+                      : demurrageDays * demurrageFee
+                    : isIndividualBillingToBill
+                    ? groupedTransactions?.totals?.amounts.nonVatable +
+                      groupedTransactions?.totals?.amounts.vatExclusive +
+                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
+                      vat
+                    : amounts.nonVatable +
+                      amounts.vatExclusive +
+                      amounts.vatInclusive / 1.12 +
+                      vat
+                ) * 0.1
+              )}
             </Typography>
           </Box>
           <Box
@@ -325,36 +303,42 @@ const CommissionStatementHeader = ({
               Total Amount Due:
             </Typography>
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-              {hasDemurrage
-                ? vatCalculation === "VAT EXCLUSIVE"
-                  ? formatNumber(
-                      demurrageDays * demurrageFee +
-                        demurrageDays * demurrageFee * 0.12 -
-                        toBeDiscount
-                    )
-                  : formatNumber(demurrageDays * demurrageFee + toBeDiscount)
-                : formatNumber(
-                    isIndividualBillingToBill
+              {formatNumber(
+                parseFloat(
+                  hasDemurrage
+                    ? vatCalculation === "VAT EXCLUSIVE"
+                      ? demurrageDays * demurrageFee +
+                        demurrageDays * demurrageFee * 0.12
+                      : demurrageDays * demurrageFee
+                    : isIndividualBillingToBill
+                    ? groupedTransactions?.totals?.amounts.nonVatable +
+                      groupedTransactions?.totals?.amounts.vatExclusive +
+                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
+                      vat
+                    : amounts.nonVatable +
+                      amounts.vatExclusive +
+                      amounts.vatInclusive / 1.12 +
+                      vat
+                ) -
+                  parseFloat(
+                    hasDemurrage
+                      ? vatCalculation === "VAT EXCLUSIVE"
+                        ? demurrageDays * demurrageFee +
+                          demurrageDays * demurrageFee * 0.12
+                        : demurrageDays * demurrageFee
+                      : isIndividualBillingToBill
                       ? groupedTransactions?.totals?.amounts.nonVatable +
-                          groupedTransactions?.totals?.amounts.vatExclusive +
-                          groupedTransactions?.totals?.amounts.vatInclusive /
-                            1.12 +
-                          vat -
-                          (isChargeToProcess
-                            ? 0
-                            : groupedTransactions?.totals?.credits
-                                .vatInclusive +
-                              groupedTransactions?.totals?.credits.nonVatable) -
-                          toBeDiscount
+                        groupedTransactions?.totals?.amounts.vatExclusive +
+                        groupedTransactions?.totals?.amounts.vatInclusive /
+                          1.12 +
+                        vat
                       : amounts.nonVatable +
-                          amounts.vatExclusive +
-                          amounts.vatInclusive / 1.12 +
-                          vat -
-                          (isChargeToProcess
-                            ? 0
-                            : credits.vatInclusive + credits.nonVatable) -
-                          toBeDiscount
-                  )}
+                        amounts.vatExclusive +
+                        amounts.vatInclusive / 1.12 +
+                        vat
+                  ) *
+                    0.1
+              )}
             </Typography>
           </Box>
           <Box
@@ -367,18 +351,7 @@ const CommissionStatementHeader = ({
             <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
               Due Date:
             </Typography>
-            <Box>
-              {termsChargeDays === 0 ? (
-                <Typography sx={{ fontWeight: "bold" }}>{`CASH`}</Typography>
-              ) : (
-                <Typography sx={{ fontWeight: "bold" }}>{`${termsChargeDays} ${
-                  termsChargeDays === 1 ? "DAY" : "DAYS"
-                }`}</Typography>
-              )}
-              <Typography sx={{ fontWeight: "bold" }}>
-                {`${termsCharge}`}
-              </Typography>
-            </Box>
+            <Typography sx={{ fontWeight: "bold" }}>UPON COLLECTION</Typography>
           </Box>
         </Box>
       </Box>

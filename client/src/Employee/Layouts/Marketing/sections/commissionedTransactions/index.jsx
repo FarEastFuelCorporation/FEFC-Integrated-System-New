@@ -334,7 +334,6 @@ const CommissionedTransactions = ({ user }) => {
         setSelectedIds={setSelectedIds}
         hasCancel={false}
       />
-      {console.log("Selected IDs:", selectedIds)}
       <Modal
         user={user}
         open={openModal}

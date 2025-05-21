@@ -203,187 +203,39 @@ const CommissionStatement = ({
     let hasTransportation = false;
     let transportation = [];
 
-    // SMB
-    if (hasFixedRate && isMonthly) {
-      let vatCalculation;
-      let fixedWeight;
-      let fixedPrice;
-      let unitPrice;
+    aggregatedWasteTransactions.forEach((item) => {
+      const { weight, clientWeight, QuotationWaste } = item;
 
-      let target;
+      const selectedWeight =
+        typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
-      aggregatedWasteTransactions.forEach((item) => {
-        const { weight, clientWeight, QuotationWaste } = item;
+      const totalWeightPrice = item.duration
+        ? item.duration *
+          selectedWeight *
+          QuotationWaste?.CommissionWaste?.[0]?.amount
+        : selectedWeight * QuotationWaste?.CommissionWaste?.[0]?.amount; // Total weight multiplied by unit price
 
-        const selectedWeight =
-          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
+      const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
-        totalWeight = totalWeight.plus(selectedWeight); // Total weight multiplied by unit price
+      hasTransportation = QuotationWaste.hasTransportation;
 
-        target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
+      // Collect transportation flags
+      transportation.push(QuotationWaste.hasTransportation);
 
-        vatCalculation = QuotationWaste.vatCalculation;
-        fixedWeight = QuotationWaste.fixedWeight;
-        fixedPrice = QuotationWaste.fixedPrice;
-        unitPrice = QuotationWaste.unitPrice;
-        hasTransportation = QuotationWaste.hasTransportation;
-      });
-
-      switch (vatCalculation) {
+      switch ("NON VATABLE") {
         case "VAT EXCLUSIVE":
-          target.vatExclusive = fixedPrice;
+          target.vatExclusive += totalWeightPrice;
           break;
         case "VAT INCLUSIVE":
-          target.vatInclusive = fixedPrice;
+          target.vatInclusive += totalWeightPrice;
           break;
         case "NON VATABLE":
-          target.nonVatable = fixedPrice;
+          target.nonVatable += totalWeightPrice;
           break;
         default:
           break;
       }
-
-      if (fixedWeight !== 0) {
-        if (totalWeight.toNumber() > fixedWeight) {
-          const excessWeight = totalWeight.minus(fixedWeight);
-
-          const excessPrice = excessWeight * unitPrice;
-
-          switch (vatCalculation) {
-            case "VAT EXCLUSIVE":
-              target.vatExclusive += excessPrice;
-              break;
-            case "VAT INCLUSIVE":
-              target.vatInclusive += excessPrice;
-              break;
-            case "NON VATABLE":
-              target.nonVatable += excessPrice;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-    }
-    // LOREAL, RED CROSS
-    else if (hasFixedRate && !isMonthly) {
-      let hasFixedRateIndividual;
-      let vatCalculation;
-      let fixedWeight;
-      let fixedPrice;
-      let unitPrice;
-
-      let target;
-
-      let usedWeight = 0;
-
-      aggregatedWasteTransactions.forEach((item) => {
-        const { weight, clientWeight, QuotationWaste } = item;
-
-        const selectedWeight =
-          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
-
-        usedWeight = selectedWeight;
-
-        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
-
-        target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
-
-        hasFixedRateIndividual = QuotationWaste.hasFixedRate;
-        if (hasFixedRateIndividual) {
-          vatCalculation = QuotationWaste.vatCalculation;
-          fixedWeight = QuotationWaste.fixedWeight;
-          fixedPrice = QuotationWaste.fixedPrice;
-          unitPrice = QuotationWaste.unitPrice;
-          hasTransportation = QuotationWaste.hasTransportation;
-        }
-
-        if (!hasFixedRateIndividual) {
-          switch (QuotationWaste.vatCalculation) {
-            case "VAT EXCLUSIVE":
-              target.vatExclusive += totalWeightPrice;
-              break;
-            case "VAT INCLUSIVE":
-              target.vatInclusive += totalWeightPrice;
-              break;
-            case "NON VATABLE":
-              target.nonVatable += totalWeightPrice;
-              break;
-            default:
-              break;
-          }
-        } else {
-          if (usedWeight > fixedWeight) {
-            const excessWeight = new Decimal(usedWeight)
-              .minus(new Decimal(fixedWeight))
-              .toNumber();
-
-            const excessPrice = excessWeight * unitPrice;
-
-            switch (vatCalculation) {
-              case "VAT EXCLUSIVE":
-                target.vatExclusive += excessPrice;
-                break;
-              case "VAT INCLUSIVE":
-                target.vatInclusive += excessPrice;
-                break;
-              case "NON VATABLE":
-                target.nonVatable += excessPrice;
-                break;
-              default:
-                break;
-            }
-          }
-        }
-      });
-
-      switch (vatCalculation) {
-        case "VAT EXCLUSIVE":
-          target.vatExclusive += fixedPrice;
-          break;
-        case "VAT INCLUSIVE":
-          target.vatInclusive += fixedPrice;
-          break;
-        case "NON VATABLE":
-          target.nonVatable += fixedPrice;
-          break;
-        default:
-          break;
-      }
-    } else {
-      // Calculate amounts and credits based on vatCalculation and mode
-      aggregatedWasteTransactions.forEach((item) => {
-        const { weight, clientWeight, QuotationWaste } = item;
-
-        const selectedWeight =
-          typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
-
-        const totalWeightPrice = item.duration
-          ? item.duration * selectedWeight * QuotationWaste.unitPrice
-          : selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
-
-        const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
-
-        hasTransportation = QuotationWaste.hasTransportation;
-
-        // Collect transportation flags
-        transportation.push(QuotationWaste.hasTransportation);
-
-        switch (QuotationWaste.vatCalculation) {
-          case "VAT EXCLUSIVE":
-            target.vatExclusive += totalWeightPrice;
-            break;
-          case "VAT INCLUSIVE":
-            target.vatInclusive += totalWeightPrice;
-            break;
-          case "NON VATABLE":
-            target.nonVatable += totalWeightPrice;
-            break;
-          default:
-            break;
-        }
-      });
-    }
+    });
 
     // Check if any entry in transportation is false
     hasTransportation = transportation.every(Boolean);
@@ -855,8 +707,6 @@ const CommissionStatement = ({
 
                   const waste = item; // Assuming item contains waste details
 
-                  console.log("Waste", waste);
-
                   // Check if we should include this row
                   const shouldIncludeRow =
                     !isChargeToProcess || waste[9] !== "BUYING";
@@ -947,12 +797,7 @@ const CommissionStatement = ({
                                 waste[9] === "BUYING" ? "red" : "black"
                               )}
                             >
-                              {!hasDemurrage &&
-                              hasFixedRate &&
-                              isMonthly &&
-                              waste[0] !== ""
-                                ? ""
-                                : waste[6]}
+                              {waste[6]}
                             </TableCell>
                             <TableCell
                               align="center"
@@ -963,12 +808,7 @@ const CommissionStatement = ({
                                 waste[9] === "BUYING" ? "red" : "black"
                               )}
                             >
-                              {!hasDemurrage &&
-                              hasFixedRate &&
-                              isMonthly &&
-                              waste[0] !== ""
-                                ? ""
-                                : waste[7]}
+                              {waste[7]}
                             </TableCell>
                             <TableCell
                               align="center"

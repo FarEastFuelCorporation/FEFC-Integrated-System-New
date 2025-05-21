@@ -36,6 +36,7 @@ const WarehousedOutTransactionItem = require("../models/WarehousedOutTransaction
 const CommissionedTransaction = require("../models/CommissionedTransaction");
 const Commission = require("../models/Commission");
 const CommissionWaste = require("../models/CommissionWaste");
+const EmployeeRecord = require("../models/EmployeeRecord");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -79,6 +80,13 @@ const getIncludeOptions = () => [
     include: {
       model: Commission,
       as: "Commission",
+      include: [
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
     },
   },
   {
@@ -149,6 +157,7 @@ const getIncludeOptions = () => [
                         as: "TypeOfWaste",
                         attributes: ["wasteCode"],
                       },
+                      { model: CommissionWaste, as: "CommissionWaste" },
                     ],
                   },
                   {
@@ -209,11 +218,11 @@ const getIncludeOptions = () => [
                 required: false,
                 paranoid: true,
               },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
-              },
+              // {
+              //   model: Employee,
+              //   as: "Employee",
+              //   attributes: ["firstName", "lastName"],
+              // },
             ],
           },
           {
@@ -275,6 +284,8 @@ const getIncludeOptions = () => [
                         as: "TypeOfWaste",
                         attributes: ["wasteCode"],
                       },
+
+                      { model: CommissionWaste, as: "CommissionWaste" },
                     ],
                   },
                 ],
@@ -302,11 +313,11 @@ const getIncludeOptions = () => [
                 required: false,
                 paranoid: true,
               },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
-              },
+              // {
+              //   model: Employee,
+              //   as: "Employee",
+              //   attributes: ["firstName", "lastName"],
+              // },
             ],
           },
           {
@@ -347,13 +358,13 @@ const getIncludeOptions = () => [
                 model: CollectedTransaction,
                 as: "CollectedTransaction",
                 required: false,
-                include: [
-                  {
-                    model: Employee,
-                    as: "Employee",
-                    attributes: ["firstName", "lastName"],
-                  },
-                ],
+                // include: [
+                //   {
+                //     model: Employee,
+                //     as: "Employee",
+                //     attributes: ["firstName", "lastName"],
+                //   },
+                // ],
               },
               // {
               //   model: Employee,
@@ -431,6 +442,13 @@ const getIncludeOptionsSorting = () => [
     include: {
       model: Commission,
       as: "Commission",
+      include: [
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
     },
   },
   {
@@ -702,6 +720,18 @@ const getIncludeOptionsWarehouse = () => [
   {
     model: Client,
     as: "Client",
+    required: false,
+    include: {
+      model: Commission,
+      as: "Commission",
+      include: [
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: ["firstName", "lastName"],
+        },
+      ],
+    },
   },
   {
     model: Attachment,

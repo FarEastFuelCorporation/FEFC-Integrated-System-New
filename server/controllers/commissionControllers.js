@@ -146,10 +146,6 @@ async function getCommissionController(req, res) {
     const commissions = await Commission.findAll({
       include: [
         {
-          model: Quotation,
-          as: "Quotation",
-        },
-        {
           model: CommissionWaste,
           as: "CommissionWaste",
           include: [
@@ -175,12 +171,13 @@ async function getCommissionController(req, res) {
           model: Client,
           as: "Client",
           attributes: ["clientName"],
+          where: {
+            status: "active",
+            clientId: id,
+          },
         },
       ],
-      where: {
-        status: "active",
-        clientId: id,
-      },
+
       order: [["commissionCode", "ASC"]],
     });
 

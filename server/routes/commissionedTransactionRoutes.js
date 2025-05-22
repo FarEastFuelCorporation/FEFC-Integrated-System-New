@@ -3,29 +3,29 @@
 const express = require("express");
 const router = express.Router();
 const {
-  createScheduledTransactionController,
-  getScheduledTransactionsController,
-  updateScheduledTransactionController,
-  deleteScheduledTransactionController,
-  getScheduledTransactionsDashboardController,
+  createCommissionedTransactionController,
+  getCommissionedTransactionsController,
+  updateCommissionedTransactionController,
+  deleteCommissionedTransactionController,
+  getCommissionedTransactionsDashboardController,
 } = require("../controllers/commissionedTransactionController");
 
-// Create Scheduled Transaction route
-router.post("/", createScheduledTransactionController);
+// Create Commissioned Transaction route
+router.post("/", createCommissionedTransactionController);
 
-// Get Scheduled Transactions route
-router.get("/", getScheduledTransactionsController);
+// Get Commissioned Transactions route
+router.get("/", getCommissionedTransactionsController);
 
-// Update Scheduled Transaction route
-router.put("/:id", updateScheduledTransactionController);
+// Update Commissioned Transaction route
+router.put("/:id", updateCommissionedTransactionController);
 
-// Delete Scheduled Transaction route
-router.delete("/:id", deleteScheduledTransactionController);
+// Delete Commissioned Transaction route
+router.delete("/:id", deleteCommissionedTransactionController);
 
-// Get Scheduled Transactions Dashboard route
+// Get Commissioned Transactions Dashboard route
 router.get(
   "/dashboard/:startDate/:endDate/",
-  getScheduledTransactionsDashboardController
+  getCommissionedTransactionsDashboardController
 );
 
 module.exports = router;

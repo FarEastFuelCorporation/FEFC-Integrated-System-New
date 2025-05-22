@@ -14,6 +14,7 @@ import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import TruckScale from "../Layouts/Receiving/sections/truckScale";
 import PTT from "../../OtherComponents/Sections/ptt";
 import CommissionedTransactions from "../Layouts/Marketing/sections/commissionedTransactions";
+import Agents from "../../OtherComponents/Sections/agents";
 
 const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
@@ -33,6 +34,7 @@ const MarketingRoutes = ({ user, onUpdateUser, socket }) => (
         path="commissionTransactions"
         element={<CommissionedTransactions user={user} />}
       />
+      <Route path="agents" element={<Agents user={user} socket={socket} />} />
       <Route
         path="commissions"
         element={<Commissions user={user} socket={socket} />}

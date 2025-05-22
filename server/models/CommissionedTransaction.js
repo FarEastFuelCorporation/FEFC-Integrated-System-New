@@ -29,10 +29,6 @@ const CommissionedTransaction = sequelize.define(
       type: DataTypes.TIME,
       allowNull: false,
     },
-    amount: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,

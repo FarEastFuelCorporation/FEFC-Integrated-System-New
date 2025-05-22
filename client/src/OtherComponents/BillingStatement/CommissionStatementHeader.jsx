@@ -67,6 +67,7 @@ const CommissionStatementHeader = ({
         index
       )
     : row?.BilledTransaction?.[0]?.billingNumber;
+  const commissionNumber = row?.CommissionedTransaction?.[0]?.commissionNumber;
 
   return (
     <Box>
@@ -105,7 +106,7 @@ const CommissionStatementHeader = ({
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {billingNumber}
+              {commissionNumber}
             </Typography>
             <Typography
               mt={1}
@@ -122,8 +123,10 @@ const CommissionStatementHeader = ({
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              {row?.BilledTransaction?.[0]
-                ? formatDateFull(row?.BilledTransaction?.[0]?.billedDate)
+              {row?.CommissionedTransaction?.[0]
+                ? formatDateFull(
+                    row?.CommissionedTransaction?.[0]?.commissionedDate
+                  )
                 : ""}
             </Typography>
           </Box>
@@ -171,24 +174,12 @@ const CommissionStatementHeader = ({
             {row.Client?.Commission?.[0]?.EmployeeRecord?.firstName}{" "}
             {row.Client?.Commission?.[0]?.EmployeeRecord?.lastName}
           </Typography>
-          {/* <Typography fontSize="12px">{clientData?.billerAddress}</Typography>
+          <Typography fontSize="12px"></Typography>
           {clientData?.billerTinNumber && (
             <Typography fontSize="12px">
-              TIN NUMBER: {clientData?.billerTinNumber}
+              BIlling Number: {billingNumber}
             </Typography>
           )}
-          {clientData?.natureOfBusiness && (
-            <Typography fontSize="12px">
-              {" "}
-              BUSINESS STYLE: {clientData?.natureOfBusiness}
-            </Typography>
-          )}
-          {clientData?.billerContactNumber && (
-            <Typography fontSize="12px">
-              {" "}
-              Contact Number: {clientData?.billerContactNumber}
-            </Typography>
-          )} */}
         </Box>
 
         <Box

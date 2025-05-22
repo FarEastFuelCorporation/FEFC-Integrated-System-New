@@ -5,7 +5,7 @@ const moment = require("moment"); // Ensure you have moment.js installed
 const BookedTransaction = require("../models/BookedTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
 const ReceivedTransaction = require("../models/ReceivedTransaction");
-const ScheduledTransaction = require("../models/ScheduledTransaction");
+const CommissionedTransaction = require("../models/CommissionedTransaction");
 const { fetchData } = require("../utils/getBookedTransactions");
 const Vehicle = require("../models/Vehicle");
 const QuotationTransportation = require("../models/QuotationTransportation");
@@ -39,8 +39,8 @@ function getLast8Weeks() {
   return weeks.reverse(); // Return in ascending order
 }
 
-// Create Scheduled Transaction controller
-async function createScheduledTransactionController(req, res) {
+// Create Commissioned Transaction controller
+async function createCommissionedTransactionController(req, res) {
   try {
     // Extracting data from the request body
     let {
@@ -56,7 +56,7 @@ async function createScheduledTransactionController(req, res) {
     remarks = remarks && remarks.toUpperCase();
 
     // Creating a new transaction
-    const scheduledTransaction = await ScheduledTransaction.create({
+    const scheduledTransaction = await CommissionedTransaction.create({
       bookedTransactionId,
       logisticsId,
       scheduledDate,
@@ -120,7 +120,7 @@ async function createScheduledTransactionController(req, res) {
         }
       );
 
-      const scheduledTransactionData = await ScheduledTransaction.findByPk(
+      const scheduledTransactionData = await CommissionedTransaction.findByPk(
         scheduledTransaction.id,
         {
           attributes: ["createdBy"],
@@ -156,7 +156,7 @@ async function createScheduledTransactionController(req, res) {
       try {
         sendEmail(
           clientEmail, // Recipient
-          `${transactionId} - Scheduled Transaction: ${clientName}`, // Subject
+          `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
           "Please view this email in HTML format.", // Plain-text fallback
           emailBody, // HTML content
           ["marketing@fareastfuelcorp.com"], // cc
@@ -193,7 +193,7 @@ async function createScheduledTransactionController(req, res) {
         try {
           sendEmail(
             "logistics@fareastfuelcorp.com", // Recipient
-            `${transactionId} - Scheduled Transaction: ${clientName}`, // Subject
+            `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
             "Please view this email in HTML format.", // Plain-text fallback
             emailBody2, // HTML content
             ["marketing@fareastfuelcorp.com"], // cc
@@ -232,8 +232,8 @@ async function createScheduledTransactionController(req, res) {
   }
 }
 
-// Get Scheduled Transactions controller
-async function getScheduledTransactionsController(req, res) {
+// Get Commissioned Transactions controller
+async function getCommissionedTransactionsController(req, res) {
   try {
     // fetch transactions
     const data = await fetchData(statusId, null, additionalStatusId);
@@ -259,8 +259,8 @@ async function getScheduledTransactionsController(req, res) {
   }
 }
 
-// Update Scheduled Transaction controller
-async function updateScheduledTransactionController(req, res) {
+// Update Commissioned Transaction controller
+async function updateCommissionedTransactionController(req, res) {
   try {
     const id = req.params.id;
     console.log("Updating scheduled transaction with ID:", id);
@@ -277,19 +277,20 @@ async function updateScheduledTransactionController(req, res) {
     remarks = remarks && remarks.toUpperCase();
 
     // Find the scheduled transaction by UUID (id) and update it
-    const updatedScheduledTransaction = await ScheduledTransaction.findByPk(id);
+    const updatedCommissionedTransaction =
+      await CommissionedTransaction.findByPk(id);
 
-    if (updatedScheduledTransaction) {
+    if (updatedCommissionedTransaction) {
       // Update scheduled transaction attributes
-      updatedScheduledTransaction.bookedTransactionId = bookedTransactionId;
-      updatedScheduledTransaction.logisticsId = logisticsId;
-      updatedScheduledTransaction.scheduledDate = scheduledDate;
-      updatedScheduledTransaction.scheduledTime = scheduledTime;
-      updatedScheduledTransaction.remarks = remarks;
-      updatedScheduledTransaction.updatedBy = createdBy;
+      updatedCommissionedTransaction.bookedTransactionId = bookedTransactionId;
+      updatedCommissionedTransaction.logisticsId = logisticsId;
+      updatedCommissionedTransaction.scheduledDate = scheduledDate;
+      updatedCommissionedTransaction.scheduledTime = scheduledTime;
+      updatedCommissionedTransaction.remarks = remarks;
+      updatedCommissionedTransaction.updatedBy = createdBy;
 
       // Save the updated booked transaction
-      await updatedScheduledTransaction.save();
+      await updatedCommissionedTransaction.save();
 
       const updatedBookedTransaction = await BookedTransaction.findByPk(
         bookedTransactionId,
@@ -318,7 +319,7 @@ async function updateScheduledTransactionController(req, res) {
       // If scheduled transaction with the specified ID was not found
       res
         .status(404)
-        .json({ message: `Scheduled Transaction with ID ${id} not found` });
+        .json({ message: `Commissioned Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
@@ -327,8 +328,8 @@ async function updateScheduledTransactionController(req, res) {
   }
 }
 
-// Delete Scheduled Transaction controller
-async function deleteScheduledTransactionController(req, res) {
+// Delete Commissioned Transaction controller
+async function deleteCommissionedTransactionController(req, res) {
   try {
     const id = req.params.id;
     const { deletedBy } = req.body;
@@ -336,7 +337,7 @@ async function deleteScheduledTransactionController(req, res) {
     console.log("Soft deleting scheduled transaction with ID:", id);
 
     // Find the scheduled transaction by UUID (id)
-    const scheduledTransactionToDelete = await ScheduledTransaction.findByPk(
+    const scheduledTransactionToDelete = await CommissionedTransaction.findByPk(
       id
     );
 
@@ -360,13 +361,13 @@ async function deleteScheduledTransactionController(req, res) {
 
       // Respond with a success message
       res.json({
-        message: `Scheduled Transaction with ID ${id} soft-deleted successfully`,
+        message: `Commissioned Transaction with ID ${id} soft-deleted successfully`,
       });
     } else {
       // If scheduled transaction with the specified ID was not found
       res
         .status(404)
-        .json({ message: `Scheduled Transaction with ID ${id} not found` });
+        .json({ message: `Commissioned Transaction with ID ${id} not found` });
     }
   } catch (error) {
     // Handle errors
@@ -375,8 +376,8 @@ async function deleteScheduledTransactionController(req, res) {
   }
 }
 
-// Get Scheduled Transactions Dashboard controller
-async function getScheduledTransactionsDashboardController(req, res) {
+// Get Commissioned Transactions Dashboard controller
+async function getCommissionedTransactionsDashboardController(req, res) {
   try {
     const { startDate, endDate } = req.params;
     const { selectedEmployee } = req.query;
@@ -392,7 +393,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
     const last8Weeks = getLast8Weeks();
 
     // Initialize an array to hold the grouped transactions
-    const formattedScheduledCounts = [];
+    const formattedCommissionedCounts = [];
 
     // Iterate over each week
     for (const week of last8Weeks) {
@@ -400,8 +401,8 @@ async function getScheduledTransactionsDashboardController(req, res) {
       const startDate = new Date(week.weekStart);
       const endDate = new Date(week.weekEnd);
 
-      // Query the ScheduledTransaction model for transactions within the current week
-      const transactions = await ScheduledTransaction.count({
+      // Query the CommissionedTransaction model for transactions within the current week
+      const transactions = await CommissionedTransaction.count({
         where: {
           scheduledDate: {
             [Op.between]: [startDate, endDate],
@@ -410,7 +411,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
       });
 
       // Push the transactions into the groupedTransactions array
-      formattedScheduledCounts.push({
+      formattedCommissionedCounts.push({
         weekStart: week.weekStart,
         weekEnd: week.weekEnd,
         transactions: transactions,
@@ -418,10 +419,10 @@ async function getScheduledTransactionsDashboardController(req, res) {
     }
 
     // groupedTransactions now contains the transactions grouped by week
-    console.log(formattedScheduledCounts);
+    console.log(formattedCommissionedCounts);
 
     console.log("last8Weeks", last8Weeks);
-    console.log("formattedScheduledCounts", formattedScheduledCounts);
+    console.log("formattedCommissionedCounts", formattedCommissionedCounts);
 
     const pendingCount = await BookedTransaction.count({
       where: { statusId: 1 },
@@ -486,7 +487,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
     console.log(employeeWhereClause);
 
     // Fetch all dispatched transactions between the provided date range
-    const scheduledTransactions = await ScheduledTransaction.findAll({
+    const scheduledTransactions = await CommissionedTransaction.findAll({
       attributes: ["id", "logisticsId", "scheduledDate", "scheduledTime"],
       where: {
         scheduledDate: {
@@ -573,7 +574,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
           let otherLogistics = 0;
           let total = 0;
 
-          // Check logisticsId of the current transaction (ScheduledTransaction) directly
+          // Check logisticsId of the current transaction (CommissionedTransaction) directly
           if (transaction.logisticsId === matchingLogisticsId) {
             inHouseLogistics++; // Increment for inhouse logistics
             total++;
@@ -610,7 +611,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
         let otherLogistics = 0;
         let total = 0;
 
-        // Check logisticsId of the current transaction (ScheduledTransaction) directly
+        // Check logisticsId of the current transaction (CommissionedTransaction) directly
         if (transaction.logisticsId === matchingLogisticsId) {
           inHouseLogistics++; // Increment for inhouse logistics
           total++;
@@ -660,7 +661,7 @@ async function getScheduledTransactionsDashboardController(req, res) {
       totalClients,
       clientCountByEmployeeData,
       result: filteredResultArray,
-      scheduledTransactionCounts: formattedScheduledCounts,
+      scheduledTransactionCounts: formattedCommissionedCounts,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -669,9 +670,9 @@ async function getScheduledTransactionsDashboardController(req, res) {
 }
 
 module.exports = {
-  createScheduledTransactionController,
-  getScheduledTransactionsController,
-  updateScheduledTransactionController,
-  deleteScheduledTransactionController,
-  getScheduledTransactionsDashboardController,
+  createCommissionedTransactionController,
+  getCommissionedTransactionsController,
+  updateCommissionedTransactionController,
+  deleteCommissionedTransactionController,
+  getCommissionedTransactionsDashboardController,
 };

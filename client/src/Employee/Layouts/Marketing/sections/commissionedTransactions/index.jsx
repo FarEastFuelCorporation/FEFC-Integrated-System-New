@@ -149,7 +149,7 @@ const CommissionedTransactions = ({ user }) => {
       setLoading(true);
       // Make the delete request
       await axios.delete(
-        `${apiUrl}/api/commissionedTransaction/${row.ScheduledTransaction[0].id}`,
+        `${apiUrl}/api/commissionedTransaction/${row.CommissionedTransaction[0].id}`,
         {
           data: { deletedBy: user.id },
         }
@@ -188,16 +188,9 @@ const CommissionedTransactions = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { scheduledDate, scheduledTime, logisticsId, statusId, createdBy } =
-      formData;
+    const { commissionedDate, commissionedTime } = formData;
 
-    if (
-      !scheduledDate ||
-      !scheduledTime ||
-      !logisticsId ||
-      !statusId ||
-      !createdBy
-    ) {
+    if (!commissionedDate || !commissionedTime) {
       setErrorMessage("Please fill all required fields.");
       setShowErrorMessage(true);
       return;
@@ -236,7 +229,7 @@ const CommissionedTransactions = ({ user }) => {
         setSuccessMessage("Commissioned Transaction Updated Successfully!");
       } else {
         newTransaction = await axios.post(
-          `${apiUrl}/api/scheduledTransaction`,
+          `${apiUrl}/api/commissionedTransaction`,
           formData
         );
 

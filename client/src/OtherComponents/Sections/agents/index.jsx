@@ -7,6 +7,11 @@ import {
   TextField,
   Button,
   useTheme,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../Header";
@@ -18,6 +23,7 @@ import { tokens } from "../../../theme";
 import SuccessMessage from "../../SuccessMessage";
 import CustomDataGridStyles from "../../CustomDataGridStyles";
 import LoadingSpinner from "../../LoadingSpinner";
+import { validateAgentForm } from "./Validation";
 // import ConfirmationDialog from "../../ConfirmationDialog";
 
 const Agents = ({ user }) => {
@@ -25,23 +31,25 @@ const Agents = ({ user }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Create refs for the input fields
-  const logisticsNameRef = useRef();
-  const addressRef = useRef();
-  const contactNumberRef = useRef();
-
   const initialFormData = {
-    id: "",
-    logisticsName: "",
-    address: "",
-    contactNumber: "",
+    agentId: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    affix: "",
+    gender: "",
+    civilStatus: "",
+    birthDate: "",
+    mobileNo: "",
+    emailAddress: "",
+    permanentAddress: "",
     createdBy: user.id,
   };
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [logistics, setLogistics] = useState([]);
+  const [agents, setAgents] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -51,12 +59,15 @@ const Agents = ({ user }) => {
   // const [dialog, setDialog] = useState(false);
   // const [dialogAction, setDialogAction] = useState(false);
 
+  const [gender, setGender] = useState(formData.gender);
+  const [civilStatus, setCivilStatus] = useState(formData.civilStatus);
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${apiUrl}/api/logistics`);
+      const response = await axios.get(`${apiUrl}/api/agent`);
 
-      setLogistics(response.data.logistics);
+      setAgents(response.data.agents);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -70,16 +81,6 @@ const Agents = ({ user }) => {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [showSuccessMessage]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -95,37 +96,43 @@ const Agents = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleEditClick = (id) => {
-    const typeToEdit = logistics.find((type) => type.id === id);
-    if (typeToEdit) {
+  const handleEditClick = (row) => {
+    if (row) {
       setFormData({
-        id: typeToEdit.id,
-        logisticsName: typeToEdit.logisticsName,
-        address: typeToEdit.address,
-        contactNumber: typeToEdit.contactNumber,
+        agentId: row.agentId,
+        firstName: row.firstName,
+        middleName: row.middleName,
+        lastName: row.lastName,
+        affix: row.affix,
+        gender: row.gender,
+        civilStatus: row.civilStatus,
+        birthDate: row.birthDate,
+        mobileNo: row.mobileNo,
+        emailAddress: row.emailAddress,
+        permanentAddress: row.permanentAddress,
         createdBy: user.id,
       });
       handleOpenModal();
     } else {
-      console.error(`Logistics with ID ${id} not found for editing.`);
+      console.error(`Agent with ID ${row.agentId} not found for editing.`);
     }
   };
 
   // const handleDeleteClick = (id) => {
   //   setOpenDialog(true);
-  //   setDialog("Are you sure you want to Delete this Logistics?");
+  //   setDialog("Are you sure you want to Delete this Agent?");
   //   setDialogAction(() => () => handleConfirmDelete(id));
   // };
 
   // const handleConfirmDelete = async (id) => {
   //   try {
   //     setLoading(true);
-  //     await axios.delete(`${apiUrl}/api/logistics/${id}`, {
+  //     await axios.delete(`${apiUrl}/api/agents/${id}`, {
   //       data: { deletedBy: user.id },
   //     });
 
   //     fetchData();
-  //     setSuccessMessage("Logistics Deleted Successfully!");
+  //     setSuccessMessage("Agent Deleted Successfully!");
   //     setShowSuccessMessage(true);
   //     setLoading(false);
   //   } catch (error) {
@@ -135,69 +142,29 @@ const Agents = ({ user }) => {
   //   }
   // };
 
-  const validateForm = (data) => {
-    let validationErrors = [];
-
-    // Validate logisticsName
-    if (!data.logisticsName || data.logisticsName.trim() === "") {
-      validationErrors.push("TPL Name is required.");
-    }
-
-    // Validate address
-    if (!data.address || data.address.trim() === "") {
-      validationErrors.push("Address is required.");
-    }
-
-    // Validate contactNumber (assuming a minimum length of 10 for a valid contact number)
-    if (!data.contactNumber || data.contactNumber.trim() === "") {
-      validationErrors.push("Contact Number is required.");
-    } else if (!/^\d{10,}$/.test(data.contactNumber)) {
-      // Optional: Adjust for your required contact number format
-      validationErrors.push("Contact Number must be at least 10 digits.");
-    }
-
-    if (validationErrors.length > 0) {
-      setErrorMessage(validationErrors.join(" "));
-      setShowErrorMessage(true);
-      return false;
-    }
-
-    setShowErrorMessage(false);
-    setErrorMessage("");
-    return true;
-  };
-
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Set formData from refs before validation
-    const updatedFormData = {
-      ...formData,
-      logisticsName: logisticsNameRef.current.value,
-      address: addressRef.current.value,
-      contactNumber: contactNumberRef.current.value,
-    };
+    const validationErrors = validateAgentForm(formData);
 
-    // Perform client-side validation
-    if (!validateForm(updatedFormData)) {
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
+      setShowErrorMessage(true);
       return;
     }
 
     try {
       setLoading(true);
-      if (updatedFormData.id) {
-        // Update existing third party logistics
-        await axios.put(
-          `${apiUrl}/api/logistics/${updatedFormData.id}`,
-          updatedFormData
-        );
+      if (formData.agentId) {
+        // Update existing agent
+        await axios.put(`${apiUrl}/api/agent/${formData.agentId}`, formData);
 
-        setSuccessMessage("Logistics Updated Successfully!");
+        setSuccessMessage("Agent Updated Successfully!");
       } else {
-        // Add new third party logistics
-        await axios.post(`${apiUrl}/api/logistics`, updatedFormData);
+        // Add new agent
+        await axios.post(`${apiUrl}/api/agent`, formData);
 
-        setSuccessMessage("Logistics Added Successfully!");
+        setSuccessMessage("Agent Added Successfully!");
       }
 
       fetchData();
@@ -209,6 +176,18 @@ const Agents = ({ user }) => {
     }
   };
 
+  const handleGenderChange = (event) => {
+    const selectedGender = event.target.value;
+    setGender(selectedGender);
+    handleInputChange(event);
+  };
+
+  const handleCivilStatusChange = (event) => {
+    const selectedCivilStatus = event.target.value;
+    setCivilStatus(selectedCivilStatus);
+    handleInputChange(event);
+  };
+
   const renderCellWithWrapText = (params) => (
     <div className={"wrap-text"} style={{ textAlign: "center" }}>
       {params.value}
@@ -217,30 +196,70 @@ const Agents = ({ user }) => {
 
   const columns = [
     {
-      field: "logisticsName",
-      headerName: "Logistics",
+      field: "agentId",
+      headerName: "Agent ID",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      width: 80,
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "address",
-      headerName: "Address",
+      field: "agentName",
+      headerName: "Agent",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      width: 150,
+      valueGetter: (params) => {
+        return `${params.row.firstName} ${params.row.lastName} ${
+          params.row.affix ? params.row.affix : ""
+        }`;
+      },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "contactNumber",
+      field: "gender",
+      headerName: "Gender",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "civilStatus",
+      headerName: "Civil Status",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "mobileNo",
       headerName: "Contact Number",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "emailAddress",
+      headerName: "Email Address",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      width: 150,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "permanentAddress",
+      headerName: "Address",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      width: 150,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -251,10 +270,7 @@ const Agents = ({ user }) => {
       sortable: false,
       width: 100,
       renderCell: (params) => (
-        <IconButton
-          color="warning"
-          onClick={() => handleEditClick(params.row.id)}
-        >
+        <IconButton color="warning" onClick={() => handleEditClick(params.row)}>
           <EditIcon />
         </IconButton>
       ),
@@ -276,12 +292,6 @@ const Agents = ({ user }) => {
     //   ),
     // },
   ];
-
-  const refs = {
-    logisticsNameRef,
-    addressRef,
-    contactNumberRef,
-  };
 
   return (
     <Box p="20px" width="100% !important" position="relative">
@@ -309,10 +319,10 @@ const Agents = ({ user }) => {
       /> */}
       <CustomDataGridStyles>
         <DataGrid
-          rows={logistics ? logistics : []}
+          rows={agents ? agents : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
-          getRowId={(row) => row.id}
+          getRowId={(row) => row.agentId}
         />
       </CustomDataGridStyles>
       <Modal open={openModal} onClose={handleCloseModal}>
@@ -324,63 +334,211 @@ const Agents = ({ user }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 1000,
+            maxHeight: "80vh",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
             display: "flex",
             flexDirection: "column",
             gap: 2,
+            overflowY: "scroll",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
           <Typography variant="h6" component="h2">
-            {formData.id ? "Update Logistics" : "Add New Logistics"}
+            {formData.agentId ? "Update Agent" : "Add New Agent"}
           </Typography>
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
-          <TextField
-            label="Logistics"
-            inputRef={refs.logisticsNameRef}
-            defaultValue={formData.logisticsName}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Address"
-            inputRef={refs.addressRef}
-            defaultValue={formData.address}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Contact Number"
-            inputRef={refs.contactNumberRef}
-            defaultValue={formData.contactNumber}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            InputLabelProps={{
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="First Name"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="Middle Name"
+                name="middleName"
+                value={formData.middleName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="Last Name"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="Affix"
+                name="affix"
+                value={formData.affix}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6} lg={3}>
+              <FormControl fullWidth>
+                <InputLabel
+                  id="gender-select-label"
+                  style={{ color: colors.grey[100] }}
+                  required
+                >
+                  Gender
+                </InputLabel>
+                <Select
+                  labelId="gender-select-label"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleGenderChange}
+                  label="Gender"
+                  fullWidth
+                >
+                  <MenuItem value={"MALE"}>MALE</MenuItem>
+                  <MenuItem value={"FEMALE"}>FEMALE</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <FormControl fullWidth>
+                <InputLabel
+                  id="civilStatus-select-label"
+                  style={{ color: colors.grey[100] }}
+                  required
+                >
+                  Civil Status
+                </InputLabel>
+                <Select
+                  labelId="civilStatus-select-label"
+                  name="civilStatus"
+                  value={formData.civilStatus}
+                  onChange={handleCivilStatusChange}
+                  label="civilStatus"
+                  fullWidth
+                >
+                  <MenuItem value={"SINGLE"}>SINGLE</MenuItem>
+                  <MenuItem value={"MARRIED"}>MARRIED</MenuItem>
+                  <MenuItem value={gender === "MALE" ? "WIDOWER" : "WIDOW"}>
+                    {gender === "MALE" ? "WIDOWER" : "WIDOW"}
+                  </MenuItem>
+                  <MenuItem value={"LIVE-IN"}>LIVE-IN</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="Birth Date"
+                name="birthDate"
+                value={formData.birthDate}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                type="date"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                  shrink: true,
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="Mobile No."
+                name="mobileNo"
+                value={formData.mobileNo}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={6} lg={3}>
+              <TextField
+                label="Email Address"
+                name="emailAddress"
+                value={formData.emailAddress}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                type="email"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                  shrink: true,
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+            <Grid item xs={6} lg={9}>
+              <TextField
+                label="Address"
+                name="permanentAddress"
+                value={formData.permanentAddress}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+                autoComplete="off"
+              />
+            </Grid>
+          </Grid>
+
           <TextField
             label="Created By"
             name="createdBy"
@@ -395,7 +553,7 @@ const Agents = ({ user }) => {
             color="primary"
             onClick={handleFormSubmit}
           >
-            {formData.id ? "Update" : "Add"}
+            {formData.agentId ? "Update" : "Add"}
           </Button>
         </Box>
       </Modal>

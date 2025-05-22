@@ -45,7 +45,7 @@ const Agent = sequelize.define(
     permanentAddress: {
       type: DataTypes.TEXT, // Changed to TEXT
     },
-    submittedBy: {
+    createdBy: {
       type: DataTypes.TEXT,
     },
   },

@@ -34,7 +34,7 @@ const SectionModal = ({
   showErrorMessage,
   clients,
   quotationWaste,
-  employees,
+  agents,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -181,18 +181,18 @@ const SectionModal = ({
           </Grid>
           <Grid item xs={12} lg={6}>
             <Autocomplete
-              options={employees}
-              getOptionLabel={(option) => option.employeeName || ""}
+              options={agents}
+              getOptionLabel={(option) =>
+                `${option.firstName} ${option.lastName}` || ""
+              }
               value={
-                employees.find(
-                  (emp) => emp.employeeId === formData.employeeId
-                ) || null
+                agents.find((emp) => emp.agentId === formData.agentId) || null
               }
               onChange={(event, newValue) => {
                 handleInputChange({
                   target: {
-                    name: "employeeId",
-                    value: newValue ? newValue.employeeId : "",
+                    name: "agentId",
+                    value: newValue ? newValue.agentId : "",
                   },
                 });
               }}

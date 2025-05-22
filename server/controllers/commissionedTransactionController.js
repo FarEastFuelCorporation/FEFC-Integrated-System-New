@@ -18,6 +18,7 @@ const {
 } = require("../utils/emailFormat");
 const sendEmail = require("../sendEmail");
 const QuotationWaste = require("../models/QuotationWaste");
+const generateCommissionNumber = require("../utils/generateCommissionNumber");
 const statusId = 10;
 const additionalStatusId = [11, 12, 13];
 
@@ -43,188 +44,186 @@ function getLast8Weeks() {
 async function createCommissionedTransactionController(req, res) {
   try {
     // Extracting data from the request body
-    let {
+    const {
       bookedTransactionId,
-      logisticsId,
-      scheduledDate,
-      scheduledTime,
+      commissionedDate,
+      commissionedTime,
       remarks,
-      statusId,
       createdBy,
     } = req.body;
 
-    remarks = remarks && remarks.toUpperCase();
-
-    // Creating a new transaction
-    const scheduledTransaction = await CommissionedTransaction.create({
-      bookedTransactionId,
-      logisticsId,
-      scheduledDate,
-      scheduledTime,
-      remarks,
-      createdBy,
-    });
-
-    const updatedBookedTransaction = await BookedTransaction.findByPk(
-      bookedTransactionId,
-      {
-        attributes: [
-          "id",
-          "transactionId",
-          "quotationWasteId",
-          "quotationTransportationId",
-          "statusId",
-          "createdBy",
-        ],
-        include: {
-          model: Client,
-          as: "Client",
-          attributes: ["clientName", "email"],
-        },
-      }
-    );
-
-    if (updatedBookedTransaction) {
-      // Update booked transaction attributes
-      updatedBookedTransaction.statusId = statusId;
-
-      // Save the updated booked transaction
-      await updatedBookedTransaction.save();
-
-      // fetch transactions
-      const transactionId = updatedBookedTransaction.transactionId;
-
-      const newTransaction = await fetchData(
-        statusId,
-        null,
-        null,
-        transactionId
-      );
-
-      const quotationWaste = await QuotationWaste.findByPk(
-        updatedBookedTransaction.quotationWasteId,
-        {
-          attributes: ["wasteName"],
-        }
-      );
-
-      const quotationTransportation = await QuotationTransportation.findByPk(
-        updatedBookedTransaction.quotationTransportationId,
-        {
-          attributes: ["vehicleTypeId"],
-          include: {
-            model: VehicleType,
-            as: "VehicleType",
-            attributes: ["typeOfVehicle"],
-          },
-        }
-      );
-
-      const scheduledTransactionData = await CommissionedTransaction.findByPk(
-        scheduledTransaction.id,
-        {
-          attributes: ["createdBy"],
-          include: {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
-        }
-      );
-
-      const wasteName = quotationWaste ? quotationWaste.wasteName : "";
-      const typeOfVehicle =
-        quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
-      const clientName = updatedBookedTransaction?.Client?.clientName || "";
-      const clientId = updatedBookedTransaction?.createdBy || "";
-      const clientType = clientId?.slice(0, 3) || "";
-      const clientEmail = updatedBookedTransaction?.Client?.email || "";
-      const scheduledBy = `${scheduledTransactionData.Employee.firstName} ${scheduledTransactionData.Employee.lastName}`;
-
-      const emailBody = await ScheduleTransactionEmailFormat(
-        clientType,
-        clientName,
-        transactionId,
-        scheduledDate,
-        scheduledTime,
-        wasteName,
-        typeOfVehicle,
-        remarks,
-        scheduledBy
-      );
-
-      try {
-        sendEmail(
-          clientEmail, // Recipient
-          `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
-          "Please view this email in HTML format.", // Plain-text fallback
-          emailBody, // HTML content
-          ["marketing@fareastfuelcorp.com"], // cc
-          [
-            "rmangaron@fareastfuelcorp.com",
-            "edevera@fareastfuelcorp.com",
-            "eb.devera410@gmail.com",
-            "cc.duran@fareastfuel.com",
-            "dcardinez@fareastfuelcorp.com",
-            "dm.cardinez@fareastfuel.com",
-            "je.soriano@fareastfuel.com",
-          ] // bcc
-        ).catch((emailError) => {
-          console.error("Error sending email:", emailError);
-        });
-      } catch (error) {
-        console.error("Unexpected error when sending email:", error);
-      }
-
-      if (logisticsId === "0577d985-8f6f-47c7-be3c-20ca86021154") {
-        console.log("pass");
-        const emailBody2 = await ScheduleTransactionEmailToLogisticsFormat(
-          clientType,
-          clientName,
-          transactionId,
-          scheduledDate,
-          scheduledTime,
-          wasteName,
-          typeOfVehicle,
-          remarks,
-          scheduledBy
-        );
-
-        try {
-          sendEmail(
-            "logistics@fareastfuelcorp.com", // Recipient
-            `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
-            "Please view this email in HTML format.", // Plain-text fallback
-            emailBody2, // HTML content
-            ["marketing@fareastfuelcorp.com"], // cc
-            [
-              "rmangaron@fareastfuelcorp.com",
-              "edevera@fareastfuelcorp.com",
-              "eb.devera410@gmail.com",
-              "cc.duran@fareastfuel.com",
-              "dcardinez@fareastfuelcorp.com",
-              "dm.cardinez@fareastfuel.com",
-            ] // bcc
-          ).catch((emailError) => {
-            console.error("Error sending email:", emailError);
-          });
-        } catch (error) {
-          console.error("Unexpected error when sending email:", error);
-        }
-      }
-
-      // Respond with the updated data
-      res.status(201).json({
-        pendingTransactions: newTransaction.pending,
-        inProgressTransactions: newTransaction.inProgress,
-        finishedTransactions: newTransaction.finished,
-      });
-    } else {
-      // If booked transaction with the specified ID was not found
-      res
-        .status(404)
-        .json({ message: `Booked Transaction with ID ${id} not found` });
+    if (!Array.isArray(bookedTransactionId)) {
+      throw new Error("bookedTransactionId must be an array");
     }
+
+    const commissionNumber = await generateCommissionNumber(); // Generate a new commission number
+
+    for (const id of bookedTransactionId) {
+      // Creating a new transaction
+      const commissionedTransaction = await CommissionedTransaction.create({
+        bookedTransactionId: id,
+        commissionNumber,
+        commissionedDate,
+        commissionedTime,
+        remarks: remarks?.toUpperCase() || "",
+        createdBy,
+      });
+    }
+
+    // const updatedBookedTransaction = await BookedTransaction.findByPk(
+    //   bookedTransactionId,
+    //   {
+    //     attributes: [
+    //       "id",
+    //       "transactionId",
+    //       "quotationWasteId",
+    //       "quotationTransportationId",
+    //       "statusId",
+    //       "createdBy",
+    //     ],
+    //     include: {
+    //       model: Client,
+    //       as: "Client",
+    //       attributes: ["clientName", "email"],
+    //     },
+    //   }
+    // );
+
+    // if (updatedBookedTransaction) {
+    //   // fetch transactions
+    //   const transactionId = updatedBookedTransaction.transactionId;
+
+    //   const newTransaction = await fetchData(
+    //     statusId,
+    //     null,
+    //     null,
+    //     transactionId
+    //   );
+
+    //   const quotationWaste = await QuotationWaste.findByPk(
+    //     updatedBookedTransaction.quotationWasteId,
+    //     {
+    //       attributes: ["wasteName"],
+    //     }
+    //   );
+
+    //   const quotationTransportation = await QuotationTransportation.findByPk(
+    //     updatedBookedTransaction.quotationTransportationId,
+    //     {
+    //       attributes: ["vehicleTypeId"],
+    //       include: {
+    //         model: VehicleType,
+    //         as: "VehicleType",
+    //         attributes: ["typeOfVehicle"],
+    //       },
+    //     }
+    //   );
+
+    //   const commissionedTransactionData =
+    //     await CommissionedTransaction.findByPk(commissionedTransaction.id, {
+    //       attributes: ["createdBy"],
+    //       include: {
+    //         model: Employee,
+    //         as: "Employee",
+    //         attributes: ["firstName", "lastName"],
+    //       },
+    //     });
+
+    //   const wasteName = quotationWaste ? quotationWaste.wasteName : "";
+    //   const typeOfVehicle =
+    //     quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
+    //   const clientName = updatedBookedTransaction?.Client?.clientName || "";
+    //   const clientId = updatedBookedTransaction?.createdBy || "";
+    //   const clientType = clientId?.slice(0, 3) || "";
+    //   const clientEmail = updatedBookedTransaction?.Client?.email || "";
+    //   const scheduledBy = `${commissionedTransactionData.Employee.firstName} ${commissionedTransactionData.Employee.lastName}`;
+
+    //   const emailBody = await ScheduleTransactionEmailFormat(
+    //     clientType,
+    //     clientName,
+    //     transactionId,
+    //     scheduledDate,
+    //     scheduledTime,
+    //     wasteName,
+    //     typeOfVehicle,
+    //     remarks,
+    //     scheduledBy
+    //   );
+
+    //   try {
+    //     sendEmail(
+    //       clientEmail, // Recipient
+    //       `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
+    //       "Please view this email in HTML format.", // Plain-text fallback
+    //       emailBody, // HTML content
+    //       ["marketing@fareastfuelcorp.com"], // cc
+    //       [
+    //         "rmangaron@fareastfuelcorp.com",
+    //         "edevera@fareastfuelcorp.com",
+    //         "eb.devera410@gmail.com",
+    //         "cc.duran@fareastfuel.com",
+    //         "dcardinez@fareastfuelcorp.com",
+    //         "dm.cardinez@fareastfuel.com",
+    //         "je.soriano@fareastfuel.com",
+    //       ] // bcc
+    //     ).catch((emailError) => {
+    //       console.error("Error sending email:", emailError);
+    //     });
+    //   } catch (error) {
+    //     console.error("Unexpected error when sending email:", error);
+    //   }
+
+    //   if (logisticsId === "0577d985-8f6f-47c7-be3c-20ca86021154") {
+    //     console.log("pass");
+    //     const emailBody2 = await ScheduleTransactionEmailToLogisticsFormat(
+    //       clientType,
+    //       clientName,
+    //       transactionId,
+    //       scheduledDate,
+    //       scheduledTime,
+    //       wasteName,
+    //       typeOfVehicle,
+    //       remarks,
+    //       scheduledBy
+    //     );
+
+    //     try {
+    //       sendEmail(
+    //         "logistics@fareastfuelcorp.com", // Recipient
+    //         `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
+    //         "Please view this email in HTML format.", // Plain-text fallback
+    //         emailBody2, // HTML content
+    //         ["marketing@fareastfuelcorp.com"], // cc
+    //         [
+    //           "rmangaron@fareastfuelcorp.com",
+    //           "edevera@fareastfuelcorp.com",
+    //           "eb.devera410@gmail.com",
+    //           "cc.duran@fareastfuel.com",
+    //           "dcardinez@fareastfuelcorp.com",
+    //           "dm.cardinez@fareastfuel.com",
+    //         ] // bcc
+    //       ).catch((emailError) => {
+    //         console.error("Error sending email:", emailError);
+    //       });
+    //     } catch (error) {
+    //       console.error("Unexpected error when sending email:", error);
+    //     }
+    //   }
+
+    //   // Respond with the updated data
+    //   res.status(201).json({
+    //     pendingTransactions: newTransaction.pending,
+    //     inProgressTransactions: newTransaction.inProgress,
+    //     finishedTransactions: newTransaction.finished,
+    //   });
+    // } else {
+    //   // If booked transaction with the specified ID was not found
+    //   res
+    //     .status(404)
+    //     .json({ message: `Booked Transaction with ID ${id} not found` });
+    // }
+
+    res.status(201).json();
   } catch (error) {
     // Handling errors
     console.error("Error:", error);
@@ -239,7 +238,10 @@ async function getCommissionedTransactionsController(req, res) {
     const data = await fetchData(statusId, null, additionalStatusId);
 
     const filteredPending = data.pending.filter(
-      (item) => item.Client?.Commission?.length > 0
+      (item) =>
+        item.Client?.Commission?.length > 0 &&
+        (!item.CommissionedTransaction ||
+          item.CommissionedTransaction.length === 0)
     );
     const filteredInProgress = data.inProgress.filter(
       (item) => item.Client?.Commission?.length > 0
@@ -337,27 +339,26 @@ async function deleteCommissionedTransactionController(req, res) {
     console.log("Soft deleting scheduled transaction with ID:", id);
 
     // Find the scheduled transaction by UUID (id)
-    const scheduledTransactionToDelete = await CommissionedTransaction.findByPk(
-      id
-    );
+    const commissionedTransactionToDelete =
+      await CommissionedTransaction.findByPk(id);
 
-    if (scheduledTransactionToDelete) {
+    if (commissionedTransactionToDelete) {
       // Update the deletedBy field
-      scheduledTransactionToDelete.updatedBy = deletedBy;
-      scheduledTransactionToDelete.deletedBy = deletedBy;
-      await scheduledTransactionToDelete.save();
+      commissionedTransactionToDelete.updatedBy = deletedBy;
+      commissionedTransactionToDelete.deletedBy = deletedBy;
+      await commissionedTransactionToDelete.save();
 
-      console.log(scheduledTransactionToDelete.bookedTransactionId);
+      console.log(commissionedTransactionToDelete.bookedTransactionId);
 
       const updatedBookedTransaction = await BookedTransaction.findByPk(
-        scheduledTransactionToDelete.bookedTransactionId
+        commissionedTransactionToDelete.bookedTransactionId
       );
       updatedBookedTransaction.statusId = 1;
 
       await updatedBookedTransaction.save();
 
       // Soft delete the scheduled transaction (sets deletedAt timestamp)
-      await scheduledTransactionToDelete.destroy();
+      await commissionedTransactionToDelete.destroy();
 
       // Respond with a success message
       res.json({
@@ -487,7 +488,7 @@ async function getCommissionedTransactionsDashboardController(req, res) {
     console.log(employeeWhereClause);
 
     // Fetch all dispatched transactions between the provided date range
-    const scheduledTransactions = await CommissionedTransaction.findAll({
+    const commissionedTransactions = await CommissionedTransaction.findAll({
       attributes: ["id", "logisticsId", "scheduledDate", "scheduledTime"],
       where: {
         scheduledDate: {
@@ -523,10 +524,10 @@ async function getCommissionedTransactionsDashboardController(req, res) {
     let lateSchedule = 0;
     const result = {};
 
-    console.log("scheduledTransactions", scheduledTransactions.length);
+    console.log("commissionedTransactions", commissionedTransactions.length);
 
     // Iterate through dispatched transactions and compare dates and times
-    scheduledTransactions.forEach((transaction) => {
+    commissionedTransactions.forEach((transaction) => {
       const bookedTransaction = transaction.BookedTransaction;
       const bookedTransactionEmployeeId =
         transaction.BookedTransaction.Client.Employee.employeeId;
@@ -657,11 +658,11 @@ async function getCommissionedTransactionsDashboardController(req, res) {
       onTimeSchedule,
       onTimePercentage,
       lateSchedule,
-      scheduledTransactions,
+      commissionedTransactions,
       totalClients,
       clientCountByEmployeeData,
       result: filteredResultArray,
-      scheduledTransactionCounts: formattedCommissionedCounts,
+      commissionedTransactionCounts: formattedCommissionedCounts,
     });
   } catch (error) {
     console.error("Error:", error);

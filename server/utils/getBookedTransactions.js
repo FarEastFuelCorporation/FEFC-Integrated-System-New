@@ -37,6 +37,7 @@ const CommissionedTransaction = require("../models/CommissionedTransaction");
 const Commission = require("../models/Commission");
 const CommissionWaste = require("../models/CommissionWaste");
 const EmployeeRecord = require("../models/EmployeeRecord");
+const Agent = require("../models/Agent");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -82,9 +83,8 @@ const getIncludeOptions = () => [
       as: "Commission",
       include: [
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
-          attributes: ["firstName", "lastName"],
+          model: Agent,
+          as: "Agent",
         },
       ],
     },
@@ -444,9 +444,8 @@ const getIncludeOptionsSorting = () => [
       as: "Commission",
       include: [
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
-          attributes: ["firstName", "lastName"],
+          model: Agent,
+          as: "Agent",
         },
       ],
     },
@@ -726,9 +725,8 @@ const getIncludeOptionsWarehouse = () => [
       as: "Commission",
       include: [
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
-          attributes: ["firstName", "lastName"],
+          model: Agent,
+          as: "Agent",
         },
       ],
     },

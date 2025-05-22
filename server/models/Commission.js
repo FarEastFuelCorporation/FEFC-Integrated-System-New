@@ -13,9 +13,9 @@ const Commission = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    employeeId: {
+    agentId: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     clientId: {
       type: DataTypes.STRING,

@@ -1,7 +1,7 @@
 // controllers/commissionControllers.js
 
 const Client = require("../models/Client");
-const EmployeeRecord = require("../models/EmployeeRecord");
+const Agent = require("../models/Agent");
 const CommissionWaste = require("../models/CommissionWaste");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const QuotationWaste = require("../models/QuotationWaste");
@@ -71,8 +71,8 @@ async function createCommissionController(req, res) {
           ],
         },
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
+          model: Agent,
+          as: "Agent",
           attributes: ["firstName", "lastName"],
         },
         {
@@ -118,8 +118,8 @@ async function getCommissionsController(req, res) {
           ],
         },
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
+          model: Agent,
+          as: "Agent",
           attributes: ["firstName", "lastName"],
         },
         {
@@ -163,8 +163,8 @@ async function getCommissionController(req, res) {
           ],
         },
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
+          model: Agent,
+          as: "Agent",
           attributes: ["firstName", "lastName"],
         },
         {
@@ -285,8 +285,8 @@ async function updateCommissionController(req, res) {
           ],
         },
         {
-          model: EmployeeRecord,
-          as: "EmployeeRecord",
+          model: Agent,
+          as: "Agent",
           attributes: ["firstName", "lastName"],
         },
         {

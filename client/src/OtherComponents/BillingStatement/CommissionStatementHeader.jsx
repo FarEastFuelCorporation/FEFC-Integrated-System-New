@@ -98,7 +98,7 @@ const CommissionStatementHeader = ({
               textAlign="center"
               sx={{ height: "16px" }}
             >
-              Commission Number
+              Commission Statement Number
             </Typography>
             <Typography
               variant="h6"
@@ -171,15 +171,21 @@ const CommissionStatementHeader = ({
           }}
         >
           <Typography fontWeight="bold">
-            {row.Client?.Commission?.[0]?.EmployeeRecord?.firstName}{" "}
-            {row.Client?.Commission?.[0]?.EmployeeRecord?.lastName}
+            {row.Client?.Commission?.[0]?.Agent?.firstName}{" "}
+            {row.Client?.Commission?.[0]?.Agent?.lastName}
+            {row.Client?.Commission?.[0]?.Agent?.affix
+              ? row.Client?.Commission?.[0]?.Agent?.affix
+              : ""}
           </Typography>
-          <Typography fontSize="12px"></Typography>
-          {clientData?.billerTinNumber && (
-            <Typography fontSize="12px">
-              BIlling Number: {billingNumber}
-            </Typography>
-          )}
+          <Typography fontSize="12px">
+            Contact Number: {row.Client?.Commission?.[0]?.Agent?.mobileNo}
+          </Typography>
+          <Typography fontSize="12px">
+            Email Address: {row.Client?.Commission?.[0]?.Agent?.emailAddress}
+          </Typography>
+          <Typography fontSize="12px">
+            BIlling Number: {billingNumber}
+          </Typography>
         </Box>
 
         <Box

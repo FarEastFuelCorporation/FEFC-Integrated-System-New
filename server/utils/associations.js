@@ -71,6 +71,7 @@ const CommissionWaste = require("../models/CommissionWaste");
 const Commission = require("../models/Commission");
 const EmployeeTimeRecord = require("../models/EmployeeTimeRecord");
 const CommissionedTransaction = require("../models/CommissionedTransaction");
+const Agent = require("../models/Agent");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -1447,16 +1448,16 @@ CommissionWaste.belongsTo(QuotationWaste, {
   onDelete: "CASCADE",
 });
 
-EmployeeRecord.hasMany(Commission, {
+Agent.hasMany(Commission, {
   as: "Commission",
-  foreignKey: "employeeId",
-  sourceKey: "employeeId",
+  foreignKey: "agentId",
+  sourceKey: "agentId",
   onDelete: "CASCADE",
 });
-Commission.belongsTo(EmployeeRecord, {
-  as: "EmployeeRecord",
-  foreignKey: "employeeId",
-  targetKey: "employeeId",
+Commission.belongsTo(Agent, {
+  as: "Agent",
+  foreignKey: "agentId",
+  targetKey: "agentId",
   onDelete: "CASCADE",
 });
 

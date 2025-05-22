@@ -1,6 +1,6 @@
-// utils/generateCertificateNumber
+// utils/generateCommissionNumber
 
-const BilledTransaction = require("../models/BilledTransaction");
+const CommissionedTransaction = require("../models/CommissionedTransaction");
 
 async function generateCommissionNumber() {
   try {
@@ -12,7 +12,7 @@ async function generateCommissionNumber() {
       .padStart(2, "0"); // Ensure month is 2 digits (e.g., '09')
 
     // Find the latest transaction ID with the specified prefix
-    const latestTransaction = await BilledTransaction.findOne({
+    const latestTransaction = await CommissionedTransaction.findOne({
       order: [["createdAt", "DESC"]],
       paranoid: false, // Include soft-deleted records
     });
@@ -31,7 +31,7 @@ async function generateCommissionNumber() {
 
     // Pad the ID number with leading zeros
     const newIdString = newIdNumber.toString().padStart(3, "0");
-    const newTransactionId = `B${currentYear}-${currentMonth}-${newIdString}`; // Format as BYY-MM-XXX
+    const newTransactionId = `CSN${currentYear}-${currentMonth}-${newIdString}`; // Format as BYY-MM-XXX
 
     return newTransactionId;
   } catch (error) {

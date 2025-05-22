@@ -63,7 +63,7 @@ const Commissions = ({ user }) => {
   const initialFormData = {
     id: "",
     clientId: "",
-    employeeId: "",
+    agentId: "",
     commissionCode: "",
     transactionDate: "",
     remarks: "",
@@ -84,7 +84,7 @@ const Commissions = ({ user }) => {
   const [clients, setClients] = useState([]);
   const [allQuotationWaste, setAllQuotationWaste] = useState([]);
   const [quotationWaste, setQuotationWaste] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  const [agents, setAgents] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -107,17 +107,17 @@ const Commissions = ({ user }) => {
 
       setCommissionsData(response.data.commissions);
 
-      const [clientsResponse, quotationWasteResponse, employeeResponse] =
+      const [clientsResponse, quotationWasteResponse, agentResponse] =
         await Promise.all([
           axios.get(`${apiUrl}/api/client`),
           axios.get(`${apiUrl}/api/quotation/waste`),
-          axios.get(`${apiUrl}/api/employeeRecord`),
+          axios.get(`${apiUrl}/api/agent`),
         ]);
 
       setClients(clientsResponse.data.clients);
       setAllQuotationWaste(quotationWasteResponse.data.clients); // store full list
       setQuotationWaste([]); // start empty
-      setEmployees(employeeResponse.data.employees); // start empty
+      setAgents(agentResponse.data.agents); // start empty
 
       setLoading(false);
     } catch (error) {
@@ -290,7 +290,7 @@ const Commissions = ({ user }) => {
       setFormData({
         id: row.id || "",
         clientId: row.clientId || "",
-        employeeId: row.employeeId || "",
+        agentId: row.agentId || "",
         commissionCode: row.commissionCode || "",
         transactionDate: row.transactionDate || "",
         remarks: row.remarks || "",
@@ -400,14 +400,14 @@ const Commissions = ({ user }) => {
       },
     },
     {
-      field: "employeeId",
+      field: "agentId",
       headerName: "Agent",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
-        return `${params.row.EmployeeRecord?.firstName} ${params.row.EmployeeRecord?.lastName}`;
+        return `${params.row.Agent?.firstName} ${params.row.Agent?.lastName}`;
       },
       renderCell: renderCellWithWrapText,
     },
@@ -576,7 +576,7 @@ const Commissions = ({ user }) => {
         clients={clients}
         quotationWaste={quotationWaste}
         setQuotationWaste={setQuotationWaste}
-        employees={employees}
+        agents={agents}
       />
       {showQuotationForm && (
         <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>

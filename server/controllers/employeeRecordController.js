@@ -4,6 +4,7 @@ const EmployeeAttachment = require("../models/EmployeeAttachment");
 const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 const EmployeeRecord = require("../models/EmployeeRecord");
+const IdInformation = require("../models/IdInformation");
 const Vehicle = require("../models/Vehicle");
 
 // Create EmployeeRecord controller
@@ -274,6 +275,23 @@ async function getEmployeeRecordsFullController(req, res) {
     res.status(500).send("Internal Server Error");
   }
 }
+// Delete EmployeeRecord controller
+async function getEmployeeRecordSignatureController(req, res) {
+  try {
+    const id = req.params.id;
+
+    const signature = await IdInformation.findOne({
+      where: { employee_id: id },
+      attributes: ["signature"],
+    });
+
+    res.json({ signature });
+  } catch (error) {
+    // Handle errors
+    console.error("Error soft-deleting Vehicle:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 // Update EmployeeRecord controller
 async function updateEmployeeRecordController(req, res) {
@@ -517,4 +535,5 @@ module.exports = {
   getEmployeeRecordsFullController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
+  getEmployeeRecordSignatureController,
 };

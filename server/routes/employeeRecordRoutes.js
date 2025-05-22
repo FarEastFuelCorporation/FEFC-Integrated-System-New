@@ -10,6 +10,7 @@ const {
   getEmployeeRecordsFullController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
+  getEmployeeRecordSignatureController,
 } = require("../controllers/employeeRecordController");
 
 // Create EmployeeRecord route
@@ -27,6 +28,9 @@ router.get("/", getEmployeeRecordsController);
 
 // Get EmployeeRecords route
 router.get("/full", getEmployeeRecordsFullController);
+
+// get  Signature route
+router.get("/signature/:id", getEmployeeRecordSignatureController);
 
 // Update EmployeeRecord route
 router.put(

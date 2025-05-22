@@ -10,7 +10,7 @@ import {
 
 import letterhead from "../../images/letterhead.jpg";
 import invoice from "../../images/INVOICE.jpg";
-import BillingStatementFooter from "./BillingStatementFooter";
+import CommissionStatementFooter from "./CommissionStatementFooter";
 import financeStaffSignature from "../../images/FLORES_FRANK.png";
 import axios from "axios";
 import BillingTableHead from "./BillingTableHead";
@@ -30,6 +30,7 @@ const defaultHeaderHeight = 300; // Default approximate height for header
 const defaultFooterHeight = 120; // Default approximate height for footer
 
 const CommissionStatement = ({
+  user,
   row,
   verify = null,
   statementRef,
@@ -46,6 +47,7 @@ const CommissionStatement = ({
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
 
   const [transactions, setTransactions] = useState([]);
+  const [signature, setSignature] = useState([]);
 
   const [pagesContent, setPagesContent] = useState([]);
   const contentRef = useRef(null);
@@ -72,8 +74,6 @@ const CommissionStatement = ({
     setHeightsReady(true);
   }, []);
 
-  console.log(row);
-
   // Fetch data function
   const fetchData = useCallback(async () => {
     try {
@@ -91,11 +91,12 @@ const CommissionStatement = ({
         );
       }
 
-      // const commissionStatementResponse = await axios.get(
-      //   `${REACT_APP_API_URL}/api/commission/${row?.Client?.clientId}`
-      // );
+      const signatureResponse = await axios.get(
+        `${REACT_APP_API_URL}/api/employeeRecord/signature/${user?.id}`
+      );
 
-      // console.log(commissionStatementResponse);
+      console.log(signatureResponse.data.signature.signature);
+      setSignature(signatureResponse.data.signature.signature);
 
       // For pending transactions
       setTransactions(billingStatementResponse.data.bookedTransactions);
@@ -448,7 +449,7 @@ const CommissionStatement = ({
                     QuotationWaste.mode === "CHARGE" ? "amounts" : "credits";
 
                   const amount =
-                    (QuotationWaste.unitPrice || 0) *
+                    (QuotationWaste?.CommissionWaste?.[0]?.amount || 0) *
                     (typeOfWeight === "CLIENT WEIGHT"
                       ? waste.clientWeight || 0
                       : waste.weight || 0);
@@ -527,113 +528,6 @@ const CommissionStatement = ({
     fontWeight: fontWeight,
   });
 
-  const vat = isIndividualBillingToBill
-    ? groupedTransactions?.totals?.amounts.vatExclusive * 0.12 +
-      groupedTransactions?.totals?.amounts.vatInclusive -
-      groupedTransactions?.totals?.amounts.vatInclusive / 1.12
-    : amounts.vatExclusive * 0.12 +
-      (amounts.vatInclusive - amounts.vatInclusive / 1.12);
-
-  hasDemurrage =
-    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.hasDemurrage;
-  const demurrageDays =
-    row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.demurrageDays;
-
-  const demurrageFee = parseFloat(row?.QuotationTransportation?.unitPrice);
-  const vatCalculation = row?.QuotationTransportation?.vatCalculation;
-
-  const discountAmount = row?.BilledTransaction?.[0]?.discountAmount || 0;
-
-  const toBeDiscount = discountAmount ? discountAmount : discount || 0;
-
-  const totalAmountPayable = hasDemurrage
-    ? vatCalculation === "VAT EXCLUSIVE"
-      ? formatNumber(
-          demurrageDays * demurrageFee + demurrageDays * demurrageFee * 0.12
-        )
-      : formatNumber(demurrageDays * demurrageFee)
-    : formatNumber(
-        isIndividualBillingToBill
-          ? groupedTransactions?.totals?.amounts.nonVatable +
-              groupedTransactions?.totals?.amounts.vatExclusive +
-              groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
-              vat
-          : amounts.nonVatable +
-              amounts.vatExclusive +
-              amounts.vatInclusive / 1.12 +
-              vat
-      );
-
-  const nonVatableSales = hasDemurrage
-    ? vatCalculation === "NON VATABLE"
-      ? formatNumber(demurrageDays * demurrageFee)
-      : 0
-    : formatNumber(
-        isIndividualBillingToBill
-          ? groupedTransactions?.totals?.amounts.nonVatable
-          : amounts.nonVatable
-      );
-
-  const vatableSales = hasDemurrage
-    ? vatCalculation === "VAT EXCLUSIVE"
-      ? formatNumber(demurrageDays * demurrageFee)
-      : vatCalculation === "VAT INCLUSIVE"
-      ? formatNumber((demurrageDays * demurrageFee) / 1.12)
-      : 0
-    : formatNumber(
-        isIndividualBillingToBill
-          ? groupedTransactions?.totals?.amounts.vatExclusive +
-              groupedTransactions?.totals?.amounts.vatInclusive / 1.12
-          : amounts.vatExclusive + amounts.vatInclusive / 1.12
-      );
-
-  const vatSales = hasDemurrage
-    ? vatCalculation === "VAT EXCLUSIVE"
-      ? formatNumber(demurrageDays * demurrageFee * 0.12)
-      : vatCalculation === "VAT INCLUSIVE"
-      ? formatNumber(
-          demurrageDays * demurrageFee - (demurrageDays * demurrageFee) / 1.12
-        )
-      : 0
-    : formatNumber(vat);
-
-  const less = isChargeToProcess
-    ? formatNumber(0)
-    : formatNumber(
-        isIndividualBillingToBill
-          ? groupedTransactions?.totals?.credits.vatInclusive - toBeDiscount
-          : credits.vatInclusive + credits.nonVatable + toBeDiscount
-      );
-
-  const totalAmountDue = hasDemurrage
-    ? vatCalculation === "VAT EXCLUSIVE"
-      ? formatNumber(
-          demurrageDays * demurrageFee +
-            demurrageDays * demurrageFee * 0.12 -
-            toBeDiscount
-        )
-      : formatNumber(demurrageDays * demurrageFee + toBeDiscount)
-    : formatNumber(
-        isIndividualBillingToBill
-          ? groupedTransactions?.totals?.amounts.nonVatable +
-              groupedTransactions?.totals?.amounts.vatExclusive +
-              groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
-              vat -
-              (isChargeToProcess
-                ? 0
-                : groupedTransactions?.totals?.credits.vatInclusive +
-                  groupedTransactions?.totals?.credits.nonVatable) -
-              toBeDiscount
-          : amounts.nonVatable +
-              amounts.vatExclusive +
-              amounts.vatInclusive / 1.12 +
-              vat -
-              (isChargeToProcess
-                ? 0
-                : credits.vatInclusive + credits.nonVatable) -
-              toBeDiscount
-      );
-
   return (
     <>
       {isFetched && (
@@ -677,7 +571,12 @@ const CommissionStatement = ({
 
             {/* Footer */}
             <Box ref={footerRef} sx={{ zIndex: 1 }}>
-              <BillingStatementFooter row={row} qrCodeURL={qrCodeURL} />
+              <CommissionStatementFooter
+                user={user}
+                signature={signature}
+                row={row}
+                qrCodeURL={qrCodeURL}
+              />
             </Box>
           </Box>
 
@@ -935,7 +834,9 @@ const CommissionStatement = ({
                       {index === pagesContent.length - 1 &&
                         !isIndividualBillingToProcess && (
                           <Box>
-                            <BillingStatementFooter
+                            <CommissionStatementFooter
+                              user={user}
+                              signature={signature}
                               row={row}
                               qrCodeURL={qrCodeURL}
                             />
@@ -944,7 +845,9 @@ const CommissionStatement = ({
 
                       {isIndividualBillingToProcess && (
                         <Box>
-                          <BillingStatementFooter
+                          <CommissionStatementFooter
+                            user={user}
+                            signature={signature}
                             row={row}
                             qrCodeURL={qrCodeURL}
                           />

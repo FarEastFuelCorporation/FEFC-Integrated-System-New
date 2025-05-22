@@ -81,6 +81,7 @@ const Modal = forwardRef(
           />
         ) : (
           <CommissionModal
+            user={user}
             open={open}
             onClose={onClose}
             formData={formData}

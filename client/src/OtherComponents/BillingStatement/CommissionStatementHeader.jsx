@@ -17,6 +17,8 @@ const CommissionStatementHeader = ({
   datePlusOneMonth.setMonth(today.getMonth() + 1);
   const clientData = row?.Client;
 
+  console.log(amounts);
+
   const vat = isIndividualBillingToBill
     ? groupedTransactions?.totals?.amounts.vatExclusive * 0.12 +
       groupedTransactions?.totals?.amounts.vatInclusive -
@@ -218,15 +220,8 @@ const CommissionStatementHeader = ({
                   : formatNumber(demurrageDays * demurrageFee)
                 : formatNumber(
                     isIndividualBillingToBill
-                      ? groupedTransactions?.totals?.amounts.nonVatable +
-                          groupedTransactions?.totals?.amounts.vatExclusive +
-                          groupedTransactions?.totals?.amounts.vatInclusive /
-                            1.12 +
-                          vat
-                      : amounts.nonVatable +
-                          amounts.vatExclusive +
-                          amounts.vatInclusive / 1.12 +
-                          vat
+                      ? groupedTransactions?.totals?.amounts.nonVatable
+                      : amounts.nonVatable
                   )}
             </Typography>
           </Box>
@@ -276,14 +271,8 @@ const CommissionStatementHeader = ({
                         demurrageDays * demurrageFee * 0.12
                       : demurrageDays * demurrageFee
                     : isIndividualBillingToBill
-                    ? groupedTransactions?.totals?.amounts.nonVatable +
-                      groupedTransactions?.totals?.amounts.vatExclusive +
-                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
-                      vat
-                    : amounts.nonVatable +
-                      amounts.vatExclusive +
-                      amounts.vatInclusive / 1.12 +
-                      vat
+                    ? groupedTransactions?.totals?.amounts.nonVatable
+                    : amounts.nonVatable
                 ) * 0.1
               )}
             </Typography>
@@ -308,14 +297,8 @@ const CommissionStatementHeader = ({
                         demurrageDays * demurrageFee * 0.12
                       : demurrageDays * demurrageFee
                     : isIndividualBillingToBill
-                    ? groupedTransactions?.totals?.amounts.nonVatable +
-                      groupedTransactions?.totals?.amounts.vatExclusive +
-                      groupedTransactions?.totals?.amounts.vatInclusive / 1.12 +
-                      vat
-                    : amounts.nonVatable +
-                      amounts.vatExclusive +
-                      amounts.vatInclusive / 1.12 +
-                      vat
+                    ? groupedTransactions?.totals?.amounts.nonVatable
+                    : amounts.nonVatable
                 ) -
                   parseFloat(
                     hasDemurrage
@@ -324,15 +307,8 @@ const CommissionStatementHeader = ({
                           demurrageDays * demurrageFee * 0.12
                         : demurrageDays * demurrageFee
                       : isIndividualBillingToBill
-                      ? groupedTransactions?.totals?.amounts.nonVatable +
-                        groupedTransactions?.totals?.amounts.vatExclusive +
-                        groupedTransactions?.totals?.amounts.vatInclusive /
-                          1.12 +
-                        vat
-                      : amounts.nonVatable +
-                        amounts.vatExclusive +
-                        amounts.vatInclusive / 1.12 +
-                        vat
+                      ? groupedTransactions?.totals?.amounts.nonVatable
+                      : amounts.nonVatable
                   ) *
                     0.1
               )}

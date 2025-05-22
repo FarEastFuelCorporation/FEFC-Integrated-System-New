@@ -13,6 +13,7 @@ import { tokens } from "../../theme";
 import CommissionStatement from "../BillingStatement/CommissionStatement";
 
 const CommissionModal = ({
+  user,
   open,
   onClose,
   formData,
@@ -145,6 +146,7 @@ const CommissionModal = ({
           {formData.id ? "Update" : "Submit"}
         </Button>
         <CommissionStatement
+          user={user}
           row={formData.row}
           review={true}
           bookedTransactionIds={formData.bookedTransactionId}

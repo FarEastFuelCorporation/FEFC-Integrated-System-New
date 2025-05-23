@@ -29,6 +29,7 @@ import NavbarJD from "./JD/OtherComponents/Navbar";
 import EmployeeJD from "./JD/Auth/Employee";
 import DashboardJD from "./JD/OtherComponents/Dashboard";
 import TruckScaleView from "./OtherComponents/Certificates/TruckScaleView";
+import CommissionVerify from "./OtherComponents/BillingStatement/CommissionVerify";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -134,6 +135,7 @@ const App = () => {
             element={<VerifyPlasticWasteDiversion />}
           />
           <Route path="/billing/:id" element={<BillingVerify />} />
+          <Route path="/commissionVerify/:id" element={<CommissionVerify />} />
           <Route
             path="/travelOrderVerify/:id"
             element={<VerifyTravelOrder />}

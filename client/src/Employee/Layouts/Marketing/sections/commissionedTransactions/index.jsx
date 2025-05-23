@@ -51,7 +51,6 @@ const CommissionedTransactions = ({ user }) => {
       setPendingTransactions(
         scheduledTransactionResponse.data.pendingTransactions
       );
-      console.log(scheduledTransactionResponse.data.pendingTransactions);
 
       // For in progress transactions
       setInProgressTransactions(

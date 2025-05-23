@@ -567,15 +567,15 @@ BilledTransaction.belongsTo(Employee, {
   targetKey: "employeeId",
 });
 
-Employee.hasMany(CommissionedTransaction, {
+IdInformation.hasMany(CommissionedTransaction, {
   as: "CommissionedTransaction",
   foreignKey: "createdBy",
-  sourceKey: "employeeId",
+  sourceKey: "employee_id",
 });
-CommissionedTransaction.belongsTo(Employee, {
-  as: "Employee",
+CommissionedTransaction.belongsTo(IdInformation, {
+  as: "IdInformation",
   foreignKey: "createdBy",
-  targetKey: "employeeId",
+  targetKey: "employee_id",
 });
 
 Employee.hasMany(BillingApprovalTransaction, {

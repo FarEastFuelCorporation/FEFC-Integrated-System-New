@@ -44,6 +44,7 @@ const certificateRoutes = require("./certificateRoutes");
 const plasticTransactionRoutes = require("./plasticTransactionRoutes");
 const billedTransactionRoutes = require("./billedTransactionRoutes");
 const billingRoutes = require("./billingRoutes");
+const commissionVerifyRoutes = require("./commissionVerifyRoutes");
 const billingApprovalTransactionRoutes = require("./billingApprovalTransactionRoutes");
 const billingDistributionTransactionRoutes = require("./billingDistributionTransactionRoutes");
 const collectionTransactionRoutes = require("./collectionTransactionRoutes");
@@ -74,6 +75,7 @@ router.use("/attendance", attendanceRoutes);
 router.use("/certificate", certificateRoutes);
 router.use("/truckScaleView", truckScaleVIewRoutes);
 router.use("/billing", billingRoutes);
+router.use("/commissionVerify", commissionVerifyRoutes);
 router.use("/quotationForm", quotationFormRoutes);
 
 // Route to check authentication status

@@ -61,6 +61,7 @@ const CommissionStatement = ({
   const [isFetched, setIsFetched] = useState(false);
 
   const billedTransaction = row?.BilledTransaction?.[0] || "";
+  const commissionedTransaction = row?.CommissionedTransaction?.[0] || "";
 
   const hasFixedRate = row?.QuotationWaste?.hasFixedRate;
   const isMonthly = row?.QuotationWaste?.isMonthly;
@@ -91,12 +92,13 @@ const CommissionStatement = ({
         );
       }
 
-      const signatureResponse = await axios.get(
-        `${REACT_APP_API_URL}/api/employeeRecord/signature/${user?.id}`
-      );
+      if (user?.id) {
+        const signatureResponse = await axios.get(
+          `${REACT_APP_API_URL}/api/employeeRecord/signature/${user?.id}`
+        );
 
-      console.log(signatureResponse.data.signature.signature);
-      setSignature(signatureResponse.data.signature.signature);
+        setSignature(signatureResponse.data.signature.signature);
+      }
 
       // For pending transactions
       setTransactions(billingStatementResponse.data.bookedTransactions);
@@ -110,6 +112,7 @@ const CommissionStatement = ({
     billedTransaction.billingNumber,
     review,
     bookedTransactionIds,
+    user?.id,
   ]);
 
   // Fetch data when component mounts or apiUrl/processDataTransaction changes
@@ -482,7 +485,7 @@ const CommissionStatement = ({
     totals: data.totals,
   }));
 
-  const qrCodeURL = `${apiUrl}/billing/${billedTransaction.id}`;
+  const qrCodeURL = `${apiUrl}/commissionVerify/${commissionedTransaction.id}`;
 
   // Recalculate height and generate content whenever row or heights change
   useEffect(() => {

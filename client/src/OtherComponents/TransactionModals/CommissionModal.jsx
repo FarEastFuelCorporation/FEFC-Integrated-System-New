@@ -26,8 +26,6 @@ const CommissionModal = ({
   const colors = tokens(theme.palette.mode);
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
-  console.log("CommissionModal formData:", formData.row);
-
   const [logistics, setThirdPartyLogistics] = useState([]);
 
   // Fetch data function

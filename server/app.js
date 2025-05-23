@@ -102,6 +102,7 @@ const {
 } = require("./syncronize");
 const sequelizeJD = require("./jd/config/database");
 const PTT = require("./models/PTT");
+const CommissionedTransaction = require("./models/CommissionedTransaction");
 
 // Function to initialize the application
 async function initializeApp() {
@@ -109,7 +110,7 @@ async function initializeApp() {
     console.log("Syncing models to the database...");
 
     // await sequelizeJD.sync({ alter: true });
-    // await PTT.sync({ alter: true });
+    // await CommissionedTransaction.sync({ alter: true });
 
     // await handleAttendanceSync();
 

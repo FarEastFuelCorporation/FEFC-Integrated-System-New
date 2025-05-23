@@ -38,6 +38,7 @@ const Commission = require("../models/Commission");
 const CommissionWaste = require("../models/CommissionWaste");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const Agent = require("../models/Agent");
+const IdInformation = require("../models/IdInformation");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -674,9 +675,9 @@ const getIncludeOptionsSorting = () => [
     required: false,
     include: [
       {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
+        model: IdInformation,
+        as: "IdInformation",
+        attributes: ["first_name", "last_name", "signature"],
       },
     ],
   },
@@ -961,9 +962,9 @@ const getIncludeOptionsWarehouse = () => [
     required: false,
     include: [
       {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
+        model: IdInformation,
+        as: "IdInformation",
+        attributes: ["first_name", "last_name", "signature"],
       },
     ],
   },
@@ -1006,6 +1007,17 @@ const getIncludeOptionsVerify = () => [
   {
     model: Client,
     as: "Client",
+    required: false,
+    include: {
+      model: Commission,
+      as: "Commission",
+      include: [
+        {
+          model: Agent,
+          as: "Agent",
+        },
+      ],
+    },
   },
   {
     model: ScheduledTransaction,
@@ -1017,16 +1029,6 @@ const getIncludeOptionsVerify = () => [
         as: "DispatchedTransaction",
         required: false,
         include: [
-          {
-            model: Employee,
-            as: "EmployeeDriver",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
           {
             model: Vehicle,
             as: "Vehicle",
@@ -1098,11 +1100,6 @@ const getIncludeOptionsVerify = () => [
                         as: "TreatedTransaction",
                         required: false,
                         paranoid: true,
-                        include: {
-                          model: Employee,
-                          as: "Employee",
-                          attributes: ["firstName", "lastName"],
-                        },
                       },
                     ],
                   },
@@ -1123,11 +1120,6 @@ const getIncludeOptionsVerify = () => [
                 as: "TreatedTransaction",
                 required: false,
                 paranoid: true,
-              },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
               },
             ],
           },
@@ -1173,11 +1165,6 @@ const getIncludeOptionsVerify = () => [
                         as: "TreatedTransaction",
                         required: false,
                         paranoid: true,
-                        include: {
-                          model: Employee,
-                          as: "Employee",
-                          attributes: ["firstName", "lastName"],
-                        },
                       },
                     ],
                   },
@@ -1216,11 +1203,6 @@ const getIncludeOptionsVerify = () => [
                 as: "TreatedTransaction",
                 required: false,
                 paranoid: true,
-              },
-              {
-                model: Employee,
-                as: "Employee",
-                attributes: ["firstName", "lastName"],
               },
             ],
           },
@@ -1300,6 +1282,18 @@ const getIncludeOptionsVerify = () => [
         model: Employee,
         as: "Employee",
         attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CommissionedTransaction,
+    as: "CommissionedTransaction",
+    required: false,
+    include: [
+      {
+        model: IdInformation,
+        as: "IdInformation",
+        attributes: ["first_name", "last_name", "signature"],
       },
     ],
   },

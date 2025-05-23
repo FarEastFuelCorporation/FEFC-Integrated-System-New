@@ -439,9 +439,6 @@ const CommissionContent = ({
                   const amount =
                     waste.QuotationWaste?.CommissionWaste?.[0]?.amount;
 
-                  console.log(waste.QuotationWaste);
-                  console.log(amount);
-
                   return (
                     <Box>
                       {newClient && isPerClientToBill && (

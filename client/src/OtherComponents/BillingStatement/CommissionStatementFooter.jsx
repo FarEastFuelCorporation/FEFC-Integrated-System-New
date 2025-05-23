@@ -23,6 +23,16 @@ const CommissionStatementFooter = ({ user, signature, row, qrCodeURL }) => {
     setApproved(isApproved);
   }, [isApproved]);
 
+  const hasCommissionTransaction = row?.CommissionedTransaction?.length > 0;
+
+  const signatureToUse = hasCommissionTransaction
+    ? row?.CommissionedTransaction?.[0]?.IdInformation?.signature
+    : signature;
+
+  const employeeNameToUse = hasCommissionTransaction
+    ? `${row?.CommissionedTransaction?.[0]?.IdInformation?.first_name} ${row?.CommissionedTransaction?.[0]?.IdInformation?.last_name}`
+    : `${user?.employeeDetails?.firstName} ${user?.employeeDetails?.lastName}`;
+
   return (
     <Box sx={{ width: "100%" }}>
       {/* Footer */}
@@ -41,7 +51,7 @@ const CommissionStatementFooter = ({ user, signature, row, qrCodeURL }) => {
           </Typography>
           <Box mt={3} position="relative">
             <SignatureComponent
-              signature={signature}
+              signature={signatureToUse}
               style={{ top: "-40px", left: "30px" }}
             />
             <Typography
@@ -50,8 +60,7 @@ const CommissionStatementFooter = ({ user, signature, row, qrCodeURL }) => {
               textAlign="center"
               sx={{ textDecoration: "underline" }}
             >
-              {user?.employeeDetails?.firstName}{" "}
-              {user?.employeeDetails?.lastName}
+              {employeeNameToUse}
             </Typography>
             <Typography textAlign="center">Marketing Staff / CSR</Typography>
           </Box>

@@ -244,7 +244,10 @@ async function getCommissionedTransactionsController(req, res) {
           item.CommissionedTransaction.length === 0)
     );
     const filteredInProgress = data.inProgress.filter(
-      (item) => item.Client?.Commission?.length > 0
+      (item) =>
+        item.Client?.Commission?.length > 0 &&
+        (item.CommissionedTransaction ||
+          item.CommissionedTransaction.length > 0)
     );
     const filteredFinished = data.finished.filter(
       (item) => item.Client?.Commission?.length > 0

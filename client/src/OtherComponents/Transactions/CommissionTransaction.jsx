@@ -23,6 +23,8 @@ const CommissionTransaction = ({ row, user }) => {
   const billingApprovalTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction;
 
+  const commissionedTransaction = row.CommissionedTransaction[0];
+
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
     const pageHeight = 1056;
@@ -279,42 +281,42 @@ const CommissionTransaction = ({ row, user }) => {
               }}
             >
               <Typography variant="h5">
-                {billingApprovalTransaction?.createdAt
-                  ? timestampDate(billingApprovalTransaction?.createdAt)
+                {commissionedTransaction?.createdAt
+                  ? timestampDate(commissionedTransaction?.createdAt)
                   : ""}
               </Typography>
             </Grid>
           </Grid>
           <Typography variant="h5">
             Approved Date:{" "}
-            {billingApprovalTransaction?.approvedDate &&
-            billingApprovalTransaction.approvedDate !== "0000-00-00"
+            {commissionedTransaction?.commissionedDate &&
+            commissionedTransaction.commissionedDate !== "0000-00-00"
               ? format(
-                  new Date(billingApprovalTransaction?.approvedDate),
+                  new Date(commissionedTransaction?.commissionedDate),
                   "MMMM dd, yyyy"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Approved Time:{" "}
-            {billingApprovalTransaction?.approvedTime &&
-            billingApprovalTransaction.approvedDate !== "0000-00-00"
+            {commissionedTransaction?.commissionedTime &&
+            commissionedTransaction.commissionedDate !== "0000-00-00"
               ? format(
-                  parseTimeString(billingApprovalTransaction?.approvedTime),
+                  parseTimeString(commissionedTransaction?.commissionedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {billingApprovalTransaction?.remarks
-              ? billingApprovalTransaction?.remarks
+            {commissionedTransaction?.remarks
+              ? commissionedTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Approved By:{" "}
-            {`${billingApprovalTransaction?.Employee.firstName || ""} ${
-              billingApprovalTransaction?.Employee.lastName || ""
+            Submitted By:{" "}
+            {`${commissionedTransaction?.IdInformation?.first_name || ""} ${
+              commissionedTransaction?.IdInformation?.last_name || ""
             }`}
           </Typography>
           {row.statusId > 10 && (
@@ -325,9 +327,7 @@ const CommissionTransaction = ({ row, user }) => {
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingInvoice statementRef={invoiceRef} row={row} />
               </Box>
-              <Box
-              // sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}
-              >
+              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <CommissionStatement statementRef={commissionRef} row={row} />
               </Box>
               <Box sx={{ display: "flex", gap: 2 }}>

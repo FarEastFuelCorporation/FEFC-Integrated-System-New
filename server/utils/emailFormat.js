@@ -819,7 +819,7 @@ async function CommissionApprovalEmailFormat(
               </div>
               <div class="content">
                 <p>Dear Accounting Head,</p>
-                <p>The Commission Statement for the following client is pending approval. Please check the billing statement on the system:</p>
+                <p>The Commission Statement for the following client is pending approval. Please check the commission statement on the system:</p>
                 <p><strong>Client Name:</strong> ${clientName}</p>
                 <p><strong>Agent Name:</strong> ${agentName}</p>
                 <table>

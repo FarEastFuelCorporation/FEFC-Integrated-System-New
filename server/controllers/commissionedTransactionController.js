@@ -71,7 +71,7 @@ async function createCommissionedTransactionController(req, res) {
 
     for (const id of bookedTransactionId) {
       // Creating a new transaction
-      const commissionedTransaction = await CommissionedTransaction.create(
+      await CommissionedTransaction.create(
         {
           bookedTransactionId: id,
           commissionNumber,
@@ -122,8 +122,8 @@ async function createCommissionedTransactionController(req, res) {
       agentName = `${
         updatedBookedTransaction.Client?.Commission?.[0]?.Agent?.firstName
       } ${updatedBookedTransaction.Client?.Commission?.[0]?.Agent?.lastName} ${
-        row.Client?.Commission?.[0]?.Agent?.affix
-          ? row.Client?.Commission?.[0]?.Agent?.affix
+        updatedBookedTransaction.Client?.Commission?.[0]?.Agent?.affix
+          ? updatedBookedTransaction.Client?.Commission?.[0]?.Agent?.affix
           : ""
       }`;
 
@@ -134,7 +134,7 @@ async function createCommissionedTransactionController(req, res) {
       transactions[id].transactionId = updatedBookedTransaction.transactionId;
       transactions[id].haulingDate = updatedBookedTransaction.haulingDate;
       transactions[id].billingNumber =
-        updatedBookedTransaction.BilledTransaction?.billingNumber;
+        updatedBookedTransaction.BilledTransaction?.[0]?.billingNumber;
       transactions[id].commissionNumber = commissionNumber;
     }
 

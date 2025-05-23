@@ -20,7 +20,7 @@ async function createBilledTransactionController(req, res) {
   const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
-    let {
+    const {
       bookedTransactionId, // Now an array
       billedDate,
       billedTime,
@@ -44,8 +44,6 @@ async function createBilledTransactionController(req, res) {
       throw new Error("bookedTransactionId must be an array");
     }
 
-    remarks = remarks && remarks.toUpperCase();
-
     // const billingNumber = await generateBillingNumber();
 
     let clientName;
@@ -68,7 +66,7 @@ async function createBilledTransactionController(req, res) {
           isChargeOnly,
           billedAmount,
           discount,
-          remarks,
+          remarks: remarks?.toUpperCase() || "",
           createdBy,
         },
         { transaction }

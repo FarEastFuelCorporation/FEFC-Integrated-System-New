@@ -1,6 +1,7 @@
 // controllers/commissionedTransactionController.js
 
 const { Op, fn, col, literal } = require("sequelize");
+const sequelize = require("../config/database");
 const moment = require("moment"); // Ensure you have moment.js installed
 const BookedTransaction = require("../models/BookedTransaction");
 const DispatchedTransaction = require("../models/DispatchedTransaction");
@@ -15,10 +16,15 @@ const Employee = require("../models/Employee");
 const {
   ScheduleTransactionEmailFormat,
   ScheduleTransactionEmailToLogisticsFormat,
+  BillingApprovalEmailFormat,
+  CommissionApprovalEmailFormat,
 } = require("../utils/emailFormat");
 const sendEmail = require("../sendEmail");
 const QuotationWaste = require("../models/QuotationWaste");
 const generateCommissionNumber = require("../utils/generateCommissionNumber");
+const Commission = require("../models/Commission");
+const Agent = require("../models/Agent");
+const BilledTransaction = require("../models/BilledTransaction");
 const statusId = 10;
 const additionalStatusId = [11, 12, 13];
 
@@ -42,6 +48,7 @@ function getLast8Weeks() {
 
 // Create Commissioned Transaction controller
 async function createCommissionedTransactionController(req, res) {
+  const transaction = await sequelize.transaction();
   try {
     // Extracting data from the request body
     const {
@@ -56,172 +63,119 @@ async function createCommissionedTransactionController(req, res) {
       throw new Error("bookedTransactionId must be an array");
     }
 
+    let clientName;
+    let agentName;
+    let transactions = {};
+
     const commissionNumber = await generateCommissionNumber(); // Generate a new commission number
 
     for (const id of bookedTransactionId) {
       // Creating a new transaction
-      const commissionedTransaction = await CommissionedTransaction.create({
-        bookedTransactionId: id,
-        commissionNumber,
-        commissionedDate,
-        commissionedTime,
-        remarks: remarks?.toUpperCase() || "",
-        createdBy,
+      const commissionedTransaction = await CommissionedTransaction.create(
+        {
+          bookedTransactionId: id,
+          commissionNumber,
+          commissionedDate,
+          commissionedTime,
+          remarks: remarks?.toUpperCase() || "",
+          createdBy,
+        },
+        { transaction }
+      );
+
+      const updatedBookedTransaction = await BookedTransaction.findByPk(id, {
+        attributes: [
+          "id",
+          "transactionId",
+          "haulingDate",
+          "createdBy",
+          "statusId",
+        ],
+        include: [
+          {
+            model: Client,
+            as: "Client",
+            attributes: ["clientName", "email"],
+            required: false,
+            include: {
+              model: Commission,
+              as: "Commission",
+              include: [
+                {
+                  model: Agent,
+                  as: "Agent",
+                },
+              ],
+            },
+          },
+          {
+            model: BilledTransaction,
+            as: "BilledTransaction",
+            required: false,
+            attributes: ["billingNumber"],
+          },
+        ],
+        transaction,
       });
+
+      clientName = updatedBookedTransaction.Client.clientName;
+      agentName = `${
+        updatedBookedTransaction.Client?.Commission?.[0]?.Agent?.firstName
+      } ${updatedBookedTransaction.Client?.Commission?.[0]?.Agent?.lastName} ${
+        row.Client?.Commission?.[0]?.Agent?.affix
+          ? row.Client?.Commission?.[0]?.Agent?.affix
+          : ""
+      }`;
+
+      if (!transactions[id]) {
+        transactions[id] = {}; // Initialize as an object if not already set
+      }
+
+      transactions[id].transactionId = updatedBookedTransaction.transactionId;
+      transactions[id].haulingDate = updatedBookedTransaction.haulingDate;
+      transactions[id].billingNumber =
+        updatedBookedTransaction.BilledTransaction?.billingNumber;
+      transactions[id].commissionNumber = commissionNumber;
     }
 
-    // const updatedBookedTransaction = await BookedTransaction.findByPk(
-    //   bookedTransactionId,
-    //   {
-    //     attributes: [
-    //       "id",
-    //       "transactionId",
-    //       "quotationWasteId",
-    //       "quotationTransportationId",
-    //       "statusId",
-    //       "createdBy",
-    //     ],
-    //     include: {
-    //       model: Client,
-    //       as: "Client",
-    //       attributes: ["clientName", "email"],
-    //     },
-    //   }
-    // );
+    // Sorting transactions by transactionId
+    const sortedTransactions = Object.values(transactions).sort((a, b) => {
+      if (a.transactionId < b.transactionId) return -1; // Ascending order
+      if (a.transactionId > b.transactionId) return 1;
+      return 0;
+    });
 
-    // if (updatedBookedTransaction) {
-    //   // fetch transactions
-    //   const transactionId = updatedBookedTransaction.transactionId;
+    // Commit the transaction
+    await transaction.commit();
 
-    //   const newTransaction = await fetchData(
-    //     statusId,
-    //     null,
-    //     null,
-    //     transactionId
-    //   );
+    const emailBody = await CommissionApprovalEmailFormat(
+      clientName,
+      agentName,
+      sortedTransactions
+    );
+    console.log(emailBody);
 
-    //   const quotationWaste = await QuotationWaste.findByPk(
-    //     updatedBookedTransaction.quotationWasteId,
-    //     {
-    //       attributes: ["wasteName"],
-    //     }
-    //   );
-
-    //   const quotationTransportation = await QuotationTransportation.findByPk(
-    //     updatedBookedTransaction.quotationTransportationId,
-    //     {
-    //       attributes: ["vehicleTypeId"],
-    //       include: {
-    //         model: VehicleType,
-    //         as: "VehicleType",
-    //         attributes: ["typeOfVehicle"],
-    //       },
-    //     }
-    //   );
-
-    //   const commissionedTransactionData =
-    //     await CommissionedTransaction.findByPk(commissionedTransaction.id, {
-    //       attributes: ["createdBy"],
-    //       include: {
-    //         model: Employee,
-    //         as: "Employee",
-    //         attributes: ["firstName", "lastName"],
-    //       },
-    //     });
-
-    //   const wasteName = quotationWaste ? quotationWaste.wasteName : "";
-    //   const typeOfVehicle =
-    //     quotationTransportation?.VehicleType?.typeOfVehicle || "CLIENT VEHICLE";
-    //   const clientName = updatedBookedTransaction?.Client?.clientName || "";
-    //   const clientId = updatedBookedTransaction?.createdBy || "";
-    //   const clientType = clientId?.slice(0, 3) || "";
-    //   const clientEmail = updatedBookedTransaction?.Client?.email || "";
-    //   const scheduledBy = `${commissionedTransactionData.Employee.firstName} ${commissionedTransactionData.Employee.lastName}`;
-
-    //   const emailBody = await ScheduleTransactionEmailFormat(
-    //     clientType,
-    //     clientName,
-    //     transactionId,
-    //     scheduledDate,
-    //     scheduledTime,
-    //     wasteName,
-    //     typeOfVehicle,
-    //     remarks,
-    //     scheduledBy
-    //   );
-
-    //   try {
-    //     sendEmail(
-    //       clientEmail, // Recipient
-    //       `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
-    //       "Please view this email in HTML format.", // Plain-text fallback
-    //       emailBody, // HTML content
-    //       ["marketing@fareastfuelcorp.com"], // cc
-    //       [
-    //         "rmangaron@fareastfuelcorp.com",
-    //         "edevera@fareastfuelcorp.com",
-    //         "eb.devera410@gmail.com",
-    //         "cc.duran@fareastfuel.com",
-    //         "dcardinez@fareastfuelcorp.com",
-    //         "dm.cardinez@fareastfuel.com",
-    //         "je.soriano@fareastfuel.com",
-    //       ] // bcc
-    //     ).catch((emailError) => {
-    //       console.error("Error sending email:", emailError);
-    //     });
-    //   } catch (error) {
-    //     console.error("Unexpected error when sending email:", error);
-    //   }
-
-    //   if (logisticsId === "0577d985-8f6f-47c7-be3c-20ca86021154") {
-    //     console.log("pass");
-    //     const emailBody2 = await ScheduleTransactionEmailToLogisticsFormat(
-    //       clientType,
-    //       clientName,
-    //       transactionId,
-    //       scheduledDate,
-    //       scheduledTime,
-    //       wasteName,
-    //       typeOfVehicle,
-    //       remarks,
-    //       scheduledBy
-    //     );
-
-    //     try {
-    //       sendEmail(
-    //         "logistics@fareastfuelcorp.com", // Recipient
-    //         `${transactionId} - Commissioned Transaction: ${clientName}`, // Subject
-    //         "Please view this email in HTML format.", // Plain-text fallback
-    //         emailBody2, // HTML content
-    //         ["marketing@fareastfuelcorp.com"], // cc
-    //         [
-    //           "rmangaron@fareastfuelcorp.com",
-    //           "edevera@fareastfuelcorp.com",
-    //           "eb.devera410@gmail.com",
-    //           "cc.duran@fareastfuel.com",
-    //           "dcardinez@fareastfuelcorp.com",
-    //           "dm.cardinez@fareastfuel.com",
-    //         ] // bcc
-    //       ).catch((emailError) => {
-    //         console.error("Error sending email:", emailError);
-    //       });
-    //     } catch (error) {
-    //       console.error("Unexpected error when sending email:", error);
-    //     }
-    //   }
-
-    //   // Respond with the updated data
-    //   res.status(201).json({
-    //     pendingTransactions: newTransaction.pending,
-    //     inProgressTransactions: newTransaction.inProgress,
-    //     finishedTransactions: newTransaction.finished,
-    //   });
-    // } else {
-    //   // If booked transaction with the specified ID was not found
-    //   res
-    //     .status(404)
-    //     .json({ message: `Booked Transaction with ID ${id} not found` });
-    // }
+    try {
+      sendEmail(
+        "jmfalar@fareastfuelcorp.com", // Recipient
+        // "dcardinez@fareastfuelcorp.com", // Recipient
+        `${commissionNumber} - For Commission Statement Approval: ${clientName}`, // Subject
+        "Please view this email in HTML format.", // Plain-text fallback
+        emailBody
+        // ["dm.cardinez@fareastfuel.com"], // HTML content // cc
+        // [
+        //   "rmangaron@fareastfuelcorp.com",
+        //   "edevera@fareastfuelcorp.com",
+        //   "eb.devera410@gmail.com",
+        //   "cc.duran@fareastfuel.com",
+        //   "jmfalar@fareastfuelcorp.com",
+        // ] // bcc
+      ).catch((emailError) => {
+        console.error("Error sending email:", emailError);
+      });
+    } catch (error) {
+      console.error("Unexpected error when sending email:", error);
+    }
 
     res.status(201).json();
   } catch (error) {

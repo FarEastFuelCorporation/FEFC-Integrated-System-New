@@ -331,30 +331,6 @@ const CommissionTransaction = ({ row, user }) => {
                 <CommissionStatement statementRef={commissionRef} row={row} />
               </Box>
               <Box sx={{ display: "flex", gap: 2 }}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleDownloadPDF}
-                >
-                  Download Billing Statement
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleOpenPDFInNewTab}
-                  disabled={isRendering}
-                >
-                  {isRendering ? "Opening..." : "View Billing Statement"}
-                </Button>
-                {(user.userType === 8 || user.userType === 9) && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleDownloadPDF2}
-                  >
-                    Download Sales Invoice
-                  </Button>
-                )}
                 {Number.isInteger(user.userType) && (
                   <Button
                     variant="contained"

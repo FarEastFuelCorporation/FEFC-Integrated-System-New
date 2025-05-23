@@ -711,13 +711,123 @@ async function BillingApprovalEmailFormat(clientName, transactions) {
               </div>
               <div class="content">
                 <p>Dear Accounting Head,</p>
-                <p>The billing statement for the following client is pending approval. Please check the billing statement on the system:</p>
+                <p>The Billing Statement for the following client is pending approval. Please check the billing statement on the system:</p>
                 <p><strong>Client Name:</strong> ${clientName}</p>
                 <table>
                   <tr>
                       <th>Transaction ID</th>
                       <th>Hauling Date</th>
                       <th>Billing Number</th>
+                  </tr>
+                  ${transactionRows}
+                </table>
+                <p>Thank you for your prompt attention to this matter.</p>
+              </div>
+              <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+    return emailTemplate;
+  } catch (error) {
+    console.error("Error generating billing approval email template:", error);
+    throw error;
+  }
+}
+
+async function CommissionApprovalEmailFormat(
+  clientName,
+  agentName,
+  transactions
+) {
+  try {
+    const transactionRows = Object.values(transactions)
+      .map(
+        (transaction) => `
+        <tr>
+          <td>${transaction.transactionId}</td>
+          <td>${formatDate(transaction.haulingDate)}</td>
+          <td>${transaction.billingNumber}</td>
+          <td>${transaction.commissionNumber}</td>
+        </tr>`
+      )
+      .join("");
+
+    const emailTemplate = `
+          <html>
+          <head>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+              }
+              .container {
+                max-width: 600px;
+                margin: 0 auto;
+                border: 1px solid #ddd;
+                padding: 20px;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+              }
+              .header {
+                text-align: center;
+                background-color: #dc3545;
+                color: white;
+                padding: 10px 0;
+                border-radius: 8px 8px 0 0;
+              }
+              .header h1 {
+                margin: 0;
+                font-size: 24px;
+              }
+              .content {
+                margin: 20px 0;
+              }
+              .content p {
+                margin: 10px 0;
+              }
+              .footer {
+                text-align: center;
+                font-size: 12px;
+                color: #777;
+                margin-top: 20px;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              th {
+                background-color: #dc3545;
+                color: white;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Commission Statement Approval Notification</h1>
+              </div>
+              <div class="content">
+                <p>Dear Accounting Head,</p>
+                <p>The Commission Statement for the following client is pending approval. Please check the billing statement on the system:</p>
+                <p><strong>Client Name:</strong> ${clientName}</p>
+                <p><strong>Agent Name:</strong> ${agentName}</p>
+                <table>
+                  <tr>
+                      <th>Transaction ID</th>
+                      <th>Hauling Date</th>
+                      <th>Billing Number</th>
+                      <th>Commission Number</th>
                   </tr>
                   ${transactionRows}
                 </table>
@@ -1047,6 +1157,7 @@ module.exports = {
   CertifiedTransactionEmailFormat,
   CertifiedTransactionEmailToAccountingFormat,
   BillingApprovalEmailFormat,
+  CommissionApprovalEmailFormat,
   BillingApprovedEmailFormat,
   sendOtpFormat,
 };

@@ -111,16 +111,16 @@ const getIncludeOptions = () => [
         as: "DispatchedTransaction",
         required: false,
         include: [
-          {
-            model: Employee,
-            as: "EmployeeDriver",
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: Employee,
-            as: "Employee",
-            attributes: ["firstName", "lastName"],
-          },
+          // {
+          //   model: Employee,
+          //   as: "EmployeeDriver",
+          //   attributes: ["firstName", "lastName"],
+          // },
+          // {
+          //   model: Employee,
+          //   as: "Employee",
+          //   attributes: ["firstName", "lastName"],
+          // },
           {
             model: Vehicle,
             as: "Vehicle",
@@ -397,6 +397,18 @@ const getIncludeOptions = () => [
         model: Employee,
         as: "Employee",
         attributes: ["firstName", "lastName"],
+      },
+    ],
+  },
+  {
+    model: CommissionedTransaction,
+    as: "CommissionedTransaction",
+    required: false,
+    include: [
+      {
+        model: IdInformation,
+        as: "IdInformation",
+        attributes: ["first_name", "last_name", "signature"],
       },
     ],
   },
@@ -1393,6 +1405,18 @@ const getIncludeOptionsPartial = () => [
     as: "CertifiedTransaction",
     attributes: ["createdAt"],
     required: false,
+  },
+  {
+    model: CommissionedTransaction,
+    as: "CommissionedTransaction",
+    required: false,
+    include: [
+      {
+        model: IdInformation,
+        as: "IdInformation",
+        attributes: ["first_name", "last_name", "signature"],
+      },
+    ],
   },
 ];
 

@@ -78,11 +78,22 @@ const Clients = ({ user }) => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/api/client`);
 
-      setClientData(response.data.clients);
+      // Compute daysRemaining for each client row here
+      const clientsWithRemainingDays = response.data.clients.map((client) => {
+        if (!client.moaEndDate || client.moaEndDate === "0000-00-00") {
+          return { ...client, daysRemaining: null };
+        }
+        const { totalDays } = calculateRemainingTime(client.moaEndDate);
+        return { ...client, daysRemaining: totalDays };
+      });
+
+      console.log(clientsWithRemainingDays);
+      setClientData(clientsWithRemainingDays);
 
       setLoading(false);
     } catch (error) {
       console.error("Error fetching clientData:", error);
+      setLoading(false);
     }
   }, [apiUrl]);
 
@@ -386,22 +397,35 @@ const Clients = ({ user }) => {
       headerName: "Days to Expire",
       headerAlign: "center",
       align: "center",
-      WIDTH: 150,
-      renderCell: (params) => {
-        // Return empty string if registrationExpirationDate is null
+      width: 150,
+      valueGetter: (params) => {
+        const moaEndDate = params.row.moaEndDate;
+
         if (
-          params.row.moaEndDate === "0000-00-00" ||
-          params.row.moaEndDate === undefined ||
-          params.row.moaEndDate === null
+          moaEndDate === "0000-00-00" ||
+          moaEndDate === undefined ||
+          moaEndDate === null
         ) {
-          return <div>N/A</div>; // Return empty div for null
+          return null; // Let null values sort to bottom
         }
 
-        const { years, months, days, isExpired } = calculateRemainingTime(
-          params.row.moaEndDate
-        );
+        const { totalDays } = calculateRemainingTime(moaEndDate);
+        return totalDays;
+      },
+      renderCell: (params) => {
+        const moaEndDate = params.row.moaEndDate;
 
-        // Determine the display value
+        if (
+          moaEndDate === "0000-00-00" ||
+          moaEndDate === undefined ||
+          moaEndDate === null
+        ) {
+          return <div>N/A</div>;
+        }
+
+        const { years, months, days, isExpired } =
+          calculateRemainingTime(moaEndDate);
+
         let displayValue;
         if (isExpired) {
           displayValue = `${
@@ -412,7 +436,7 @@ const Clients = ({ user }) => {
               : ""
           }${days} Day${days === 1 ? "" : "s"} Expired`;
         } else if (years === 0 && months === 0 && days === 0) {
-          displayValue = "Expires Today"; // Show if it expires today
+          displayValue = "Expires Today";
         } else {
           displayValue = `${
             years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
@@ -420,7 +444,7 @@ const Clients = ({ user }) => {
             months > 0
               ? months + " Month" + (months === 1 ? "" : "s") + ", "
               : ""
-          }${days} Day${days === 1 ? "" : "s"} Remaining`; // Show years, months, and days remaining
+          }${days} Day${days === 1 ? "" : "s"} Remaining`;
         }
 
         return (
@@ -430,16 +454,10 @@ const Clients = ({ user }) => {
         );
       },
       sortComparator: (v1, v2) => {
-        const getDaysValue = (value) => {
-          if (value === null) return 1000000; // Null should be last (highest value)
+        const getValue = (v) =>
+          v === null || v === undefined ? Number.MAX_SAFE_INTEGER : v;
 
-          return value;
-        };
-
-        const daysValue1 = getDaysValue(v1);
-        const daysValue2 = getDaysValue(v2);
-
-        return daysValue1 - daysValue2; // Sort based on the calculated values
+        return getValue(v1) - getValue(v2);
       },
     },
     {
@@ -554,9 +572,16 @@ const Clients = ({ user }) => {
             }
             return ""; // Default class if no blinking is needed
           }}
+          // initialState={{
+          //   sorting: {
+          //     sortModel: [{ field: "clientId", sort: "asc" }],
+          //   },
+          // }}
           initialState={{
             sorting: {
-              sortModel: [{ field: "clientId", sort: "asc" }],
+              sortModel: [
+                { field: "remainingDays", sort: "asc" }, // First sort by remaining days
+              ],
             },
           }}
         />

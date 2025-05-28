@@ -331,13 +331,10 @@ const Clients = ({ user }) => {
       headerAlign: "center",
       align: "center",
       width: 150,
-      renderCell: (params) => {
-        const employee = params.row.Employee;
-        let fullName = {};
-        fullName.value = `${employee.firstName} ${employee.lastName}`;
-
-        return renderCellWithWrapText(fullName);
+      valueGetter: (params) => {
+        return `${params.row.Employee?.firstName} ${params.row.Employee?.lastName}`;
       },
+      renderCell: renderCellWithWrapText,
     },
   ];
 

@@ -72,6 +72,7 @@ const Commission = require("../models/Commission");
 const EmployeeTimeRecord = require("../models/EmployeeTimeRecord");
 const CommissionedTransaction = require("../models/CommissionedTransaction");
 const Agent = require("../models/Agent");
+const ClientAttachment = require("../models/ClientAttachment");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -223,6 +224,32 @@ ClientUser.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
   targetKey: "clientId",
+  onDelete: "CASCADE",
+});
+
+Client.hasMany(ClientAttachment, {
+  as: "ClientAttachment",
+  foreignKey: "clientId",
+  sourceKey: "clientId",
+  onDelete: "CASCADE",
+});
+ClientAttachment.belongsTo(Client, {
+  as: "Client",
+  foreignKey: "clientId",
+  targetKey: "clientId",
+  onDelete: "CASCADE",
+});
+
+Employee.hasMany(ClientAttachment, {
+  as: "ClientAttachment",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+ClientAttachment.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
   onDelete: "CASCADE",
 });
 

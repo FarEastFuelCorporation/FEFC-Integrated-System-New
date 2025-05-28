@@ -2,6 +2,7 @@
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
+const ClientAttachment = require("../models/cLIENTAttachment");
 const Employee = require("../models/Employee");
 const generateClientId = require("../utils/generateClientId");
 
@@ -111,6 +112,13 @@ async function getClientController(req, res) {
           model: Employee,
           as: "Employee",
           attributes: ["firstName", "lastName"],
+        },
+        {
+          model: ClientAttachment,
+          as: "ClientAttachment",
+          attributes: {
+            exclude: ["attachment"], // Exclude the BLOB
+          },
         },
         {
           model: BookedTransaction,

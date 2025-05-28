@@ -16,6 +16,7 @@ import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { tokens } from "../../theme";
 import {
   formatDate,
@@ -25,6 +26,7 @@ import {
 } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
 import { format } from "date-fns";
+import ConfirmationDialog from "../ConfirmationDialog";
 
 const maintenanceRows = [
   {
@@ -97,11 +99,14 @@ const ClientProfileModal = ({
   const colors = tokens(theme.palette.mode);
   const [fileName, setFileName] = useState("");
   const [fileNameToSubmit, setFileNameToSubmit] = useState("");
-  const [maintenanceData, setMaintenanceData] = useState([]);
   const [attachmentData, setAttachmentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
 
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
@@ -111,23 +116,18 @@ const ClientProfileModal = ({
       ? rowHeight + headerHeight
       : attachmentData.length * rowHeight + headerHeight;
 
-  const maintenanceTableHeight =
-    maintenanceData.length === 0
-      ? rowHeight + headerHeight
-      : maintenanceData.length * rowHeight + headerHeight;
+  console.log("Attachment Table Height:", user);
 
   const fetchData = useCallback(async () => {
-    if (!selectedRow || !selectedRow.plateNumber) {
+    if (!selectedRow || !selectedRow.clientId) {
       return;
     }
     try {
-      const vehicleAttachmentResponse = await axios.get(
-        `${apiUrl}/api/vehicleAttachment/${selectedRow.plateNumber}`
+      const clientAttachmentResponse = await axios.get(
+        `${apiUrl}/api/clientAttachment/${selectedRow.clientId}`
       );
 
-      setAttachmentData(vehicleAttachmentResponse.data.vehicleAttachments);
-
-      setMaintenanceData(selectedRow.maintenanceHistory || maintenanceRows);
+      setAttachmentData(clientAttachmentResponse.data.clientAttachments);
     } catch (error) {
       console.error("Error fetching provinces:", error);
     }
@@ -216,27 +216,56 @@ const ClientProfileModal = ({
 
       const formData = new FormData();
       const fileInput = document.querySelector("#attachment").files[0];
-      formData.append("plateNumber", selectedRow.plateNumber);
+      formData.append("clientId", selectedRow.clientId);
       formData.append("attachment", fileInput);
       formData.append("fileName", fileNameToSubmit);
       formData.append("createdBy", user.id);
 
       // Submit the form data with file upload
-      await axios.post(`${apiUrl}/api/vehicleAttachment`, formData);
+      await axios.post(`${apiUrl}/api/clientAttachment`, formData);
 
       setSuccessMessage("File uploaded successfully!");
       setShowSuccessMessage(true);
-      const vehicleAttachmentResponse = await axios.get(
-        `${apiUrl}/api/vehicleAttachment/${selectedRow.plateNumber}`
+      const clientAttachmentResponse = await axios.get(
+        `${apiUrl}/api/clientAttachment/${selectedRow.clientId}`
       );
 
-      setAttachmentData(vehicleAttachmentResponse.data.vehicleAttachments);
+      setAttachmentData(clientAttachmentResponse.data.clientAttachments);
       setFileName("");
       setFileNameToSubmit("");
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Attachment?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
+
+  const handleConfirmDelete = async (id) => {
+    try {
+      setLoading(true);
+
+      const url = "clientAttachment";
+
+      await axios.delete(`${apiUrl}/api/${url}/${id}`, {
+        data: { deletedBy: user.id },
+      });
+
+      setAttachmentData((prevData) =>
+        prevData.filter((attachment) => attachment.id !== id)
+      );
+
+      setSuccessMessage("Attachment Deleted Successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+      setOpenDialog(false); // Close the dialog
     }
   };
 
@@ -379,50 +408,33 @@ const ClientProfileModal = ({
         </IconButton>
       ),
     },
-  ];
-
-  const maintenanceColumns = [
     {
-      field: "date",
-      headerName: "Service Date",
+      field: "delete",
+      headerName: "Delete",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
-      valueGetter: (params) => {
-        const value = params.row.date;
-        if (!value) return ""; // Handle null or undefined values
-        return format(new Date(value), "MMMM dd yyyy");
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "dueDate",
-      headerName: "Next Service Due",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      valueGetter: (params) => {
-        const value = params.row.dueDate;
-        if (!value) return ""; // Handle null or undefined values
-        return format(new Date(value), "MMMM dd yyyy");
-      },
-      renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "createdAt",
-      headerName: "Timestamp",
-      headerAlign: "center",
-      align: "center",
-      flex: 1,
-      minWidth: 150,
-      renderCell: renderCellWithWrapText,
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+          >
+            <DeleteIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
     },
   ];
 
   return (
     <Box>
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Modal
         open={open}
         onClose={handleClose}
@@ -553,7 +565,7 @@ const ClientProfileModal = ({
                     },
                   }}
                 >
-                  <Tab label="Details" />
+                  <Tab label="Client Details" />
                   <Tab label="Billing Details" />
                   <Tab label="Attachments" />
                 </Tabs>

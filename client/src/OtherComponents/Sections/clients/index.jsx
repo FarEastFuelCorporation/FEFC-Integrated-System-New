@@ -112,7 +112,6 @@ const Clients = ({ user }) => {
   };
 
   const handleRowClick = (params) => {
-    console.log(params);
     setSelectedRow(params);
     setOpen(true);
   };

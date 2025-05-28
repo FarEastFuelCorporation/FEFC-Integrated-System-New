@@ -116,8 +116,6 @@ const ClientProfileModal = ({
       ? rowHeight + headerHeight
       : attachmentData.length * rowHeight + headerHeight;
 
-  console.log("Attachment Table Height:", user);
-
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.clientId) {
       return;

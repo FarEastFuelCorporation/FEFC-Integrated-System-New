@@ -2,8 +2,12 @@ export const validateClientForm = (data) => {
   const errors = [];
 
   // MOA Date
-  if (!data.moaDate || isNaN(new Date(data.moaDate).getTime())) {
-    errors.push("MOA Date is required.");
+  if (data.moaDate && isNaN(new Date(data.moaDate).getTime())) {
+    errors.push("MOA Date is invalid.");
+  }
+
+  if (data.moaEndDate && isNaN(new Date(data.moaEndDate).getTime())) {
+    errors.push("MOA End Date is invalid.");
   }
 
   // Certification Details

@@ -403,7 +403,8 @@ const SortModal = ({
                         <MenuItem key={waste.id} value={waste.id}>
                           {waste.wasteName} {"("}
                           {waste.TypeOfWaste.wasteCode}
-                          {")"} - {waste.unit}
+                          {")"} - {waste.unit} ({waste.Quotation?.quotationCode}
+                          )
                         </MenuItem>
                       ))}
                   </Select>

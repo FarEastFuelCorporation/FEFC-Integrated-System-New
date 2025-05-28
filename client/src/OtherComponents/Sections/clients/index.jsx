@@ -87,7 +87,6 @@ const Clients = ({ user }) => {
         return { ...client, daysRemaining: totalDays };
       });
 
-      console.log(clientsWithRemainingDays);
       setClientData(clientsWithRemainingDays);
 
       setLoading(false);
@@ -471,22 +470,22 @@ const Clients = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
     },
-    // {
-    //   field: "view",
-    //   headerName: "View",
-    //   headerAlign: "center",
-    //   align: "center",
-    //   width: 100,
-    //   renderCell: (params) => (
-    //     <Button
-    //       color="secondary"
-    //       variant="contained"
-    //       onClick={() => handleRowClick(params.row)}
-    //     >
-    //       View
-    //     </Button>
-    //   ),
-    // },
+    {
+      field: "view",
+      headerName: "View",
+      headerAlign: "center",
+      align: "center",
+      width: 100,
+      renderCell: (params) => (
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => handleRowClick(params.row)}
+        >
+          View
+        </Button>
+      ),
+    },
   ];
 
   if (user.userType === 2) {

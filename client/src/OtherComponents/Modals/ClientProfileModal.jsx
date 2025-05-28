@@ -17,7 +17,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
 import { tokens } from "../../theme";
-import { formatNumber } from "../Functions";
+import {
+  formatDate,
+  formatDate2,
+  formatDate3,
+  formatNumber,
+} from "../Functions";
 import SuccessMessage from "../SuccessMessage";
 import { format } from "date-fns";
 
@@ -136,15 +141,17 @@ const ClientProfileModal = ({
 
   if (
     selectedRow &&
-    selectedRow.picture &&
-    selectedRow.picture.data &&
-    selectedRow.picture.type
+    selectedRow.clientPicture &&
+    selectedRow.clientPicture.data &&
+    selectedRow.clientPicture.type
   ) {
     try {
       // Convert Buffer to Uint8Array
-      const uint8Array = new Uint8Array(selectedRow.picture.data);
+      const uint8Array = new Uint8Array(selectedRow.clientPicture.data);
       // Create Blob from Uint8Array
-      const blob = new Blob([uint8Array], { type: selectedRow.picture.type });
+      const blob = new Blob([uint8Array], {
+        type: selectedRow.clientPicture.type,
+      });
       // Create object URL from Blob
       const imageUrl = URL.createObjectURL(blob);
 
@@ -446,7 +453,7 @@ const ClientProfileModal = ({
                 mb={2}
                 sx={{ textAlign: "center", fontStyle: "italic" }}
               >
-                Vehicle Profile
+                Client Profile
               </Typography>
               {user.userType === 2 && (
                 <IconButton
@@ -470,93 +477,64 @@ const ClientProfileModal = ({
                   {employeePicture}
                 </Box>
                 <Grid container spacing={2} sx={{ minHeight: 220 }}>
-                  <Grid item xs={12} md={6} lg={7}>
-                    {" "}
+                  <Grid item xs={12} md={6} lg={9}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">Plate Number:</Typography>
+                      <Grid item xs={12} md={6} lg={3}>
+                        <Typography variant="h3">Client ID:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
+                      <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.plateNumber
-                            ? selectedRow.plateNumber
+                          {selectedRow.clientId
+                            ? selectedRow.clientId
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">Vehicle Name:</Typography>
+                      <Grid item xs={12} md={6} lg={3}>
+                        <Typography variant="h3">Client Type:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
+                      <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.vehicleName
-                            ? selectedRow.vehicleName
+                          {selectedRow.clientType
+                            ? selectedRow.clientType
+                            : "(No Data)"}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6} lg={3}>
+                        <Typography variant="h3">Client Name:</Typography>
+                      </Grid>{" "}
+                      <Grid item xs={12} md={6} lg={9}>
+                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                          {selectedRow.clientName
+                            ? selectedRow.clientName
+                            : "(No Data)"}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6} lg={3}>
+                        <Typography variant="h3">Address:</Typography>
+                      </Grid>{" "}
+                      <Grid item xs={12} md={6} lg={9}>
+                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                          {selectedRow.address
+                            ? selectedRow.address
                             : "(No Data)"}{" "}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">Vehicle Type:</Typography>
+                      <Grid item xs={12} md={6} lg={3}>
+                        <Typography variant="h3">Status:</Typography>
                       </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
+                      <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.typeOfVehicle
-                            ? selectedRow.typeOfVehicle
-                            : "(No Data)"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">Net Capacity:</Typography>
-                      </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
-                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.netCapacity
-                            ? `${formatNumber(
-                                selectedRow.netCapacity * 1000
-                              )} KG`
-                            : "(No Data)"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">Ownership:</Typography>
-                      </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
-                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.ownership
-                            ? selectedRow.ownership
-                            : "(No Data)"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">Make and Model:</Typography>
-                      </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
-                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.makeModel
-                            ? selectedRow.makeModel
-                            : "(No Data)"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={5}>
-                        <Typography variant="h3">
-                          Year of Manufacture:
-                        </Typography>
-                      </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={7}>
-                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.yearManufacture
-                            ? selectedRow.yearManufacture
-                            : "(No Data)"}
+                          {selectedRow.clientStatus
+                            ? selectedRow.clientStatus
+                            : "(No Data)"}{" "}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -575,9 +553,8 @@ const ClientProfileModal = ({
                     },
                   }}
                 >
-                  <Tab label="Registration and Ownership" />
-                  <Tab label="Vehicle Specifications" />
-                  <Tab label="Maintenance and Service History" />
+                  <Tab label="Details" />
+                  <Tab label="Billing Details" />
                   <Tab label="Attachments" />
                 </Tabs>
                 {selectedTab === 0 && (
@@ -585,67 +562,59 @@ const ClientProfileModal = ({
                     <Grid container spacing={2} mt={2}>
                       <Grid item xs={12} md={6} lg={4}>
                         <Typography variant="h3">
-                          Registration Number:
+                          Nature Of Business:
                         </Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={8}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.registrationNumber
-                            ? selectedRow.registrationNumber
+                          {selectedRow.natureOfBusiness
+                            ? selectedRow.natureOfBusiness
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={4}>
-                        <Typography variant="h3">
-                          Owner/Company Name:
-                        </Typography>
+                        <Typography variant="h3">Contact Number:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={8}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.owner ? selectedRow.owner : "(No Data)"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={4}>
-                        <Typography variant="h3">
-                          Registration Expiry Date:
-                        </Typography>
-                      </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={8}>
-                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.registrationExpirationDate
-                            ? selectedRow.registrationExpirationDate
+                          {selectedRow.contactNumber
+                            ? selectedRow.contactNumber
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={4}>
-                        <Typography variant="h3">
-                          Insurance Provider:
-                        </Typography>
+                        <Typography variant="h3">Email:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={8}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.insuranceProvider
-                            ? selectedRow.insuranceProvider
+                          {selectedRow.email ? selectedRow.email : "(No Data)"}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6} lg={4}>
+                        <Typography variant="h3">MOA Date:</Typography>
+                      </Grid>{" "}
+                      <Grid item xs={12} md={6} lg={8}>
+                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                          {selectedRow.moaDate
+                            ? formatDate3(selectedRow.moaDate)
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={4}>
-                        <Typography variant="h3">
-                          Insurance Expiry Date::
-                        </Typography>
+                        <Typography variant="h3">MOA End Date:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={8}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.insuranceExpirationDate
-                            ? selectedRow.insuranceExpirationDate
+                          {selectedRow.moaEndDate
+                            ? formatDate3(selectedRow.moaEndDate)
                             : "(No Data)"}
                         </Typography>
                       </Grid>
@@ -656,80 +625,60 @@ const ClientProfileModal = ({
                   <Box>
                     <Grid container spacing={2} mt={2}>
                       <Grid item xs={12} md={6} lg={3}>
-                        <Typography variant="h3">Engine Type:</Typography>
+                        <Typography variant="h3">Name:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.engineType
-                            ? selectedRow.engineType
+                          {selectedRow.billerName
+                            ? selectedRow.billerName
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={3}>
-                        <Typography variant="h3">Fuel Type:</Typography>
+                        <Typography variant="h3">Address:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.fuelType
-                            ? selectedRow.fuelType
+                          {selectedRow.billerAddress
+                            ? selectedRow.billerAddress
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={3}>
-                        <Typography variant="h3">Transmission:</Typography>
+                        <Typography variant="h3">Contact Person:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.transmission
-                            ? selectedRow.transmission
+                          {selectedRow.billerContactPerson
+                            ? selectedRow.billerContactPerson
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={3}>
-                        <Typography variant="h3">
-                          Gross Vehicle Weight:
-                        </Typography>
+                        <Typography variant="h3">Contact Number:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.grossVehicleWeight
-                            ? `${formatNumber(
-                                selectedRow.grossVehicleWeight * 1000
-                              )} KG`
+                          {selectedRow.billerContactNumber
+                            ? selectedRow.billerContactNumber
                             : "(No Data)"}
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6} lg={3}>
-                        <Typography variant="h3">Curb Weight:</Typography>
+                        <Typography variant="h3">TIN Number:</Typography>
                       </Grid>{" "}
                       <Grid item xs={12} md={6} lg={9}>
                         <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.curbWeight
-                            ? `${formatNumber(
-                                selectedRow.curbWeight * 1000
-                              )} KG`
-                            : "(No Data)"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6} lg={3}>
-                        <Typography variant="h3">Net Capacity:</Typography>
-                      </Grid>{" "}
-                      <Grid item xs={12} md={6} lg={9}>
-                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                          {selectedRow.netCapacity
-                            ? `${formatNumber(
-                                selectedRow.netCapacity * 1000
-                              )} KG`
+                          {selectedRow.billerTinNumber
+                            ? selectedRow.billerTinNumber
                             : "(No Data)"}
                         </Typography>
                       </Grid>
@@ -737,58 +686,6 @@ const ClientProfileModal = ({
                   </Box>
                 )}
                 {selectedTab === 2 && (
-                  <Box position="relative">
-                    <Typography variant="h3" gutterBottom mt={5}>
-                      History
-                    </Typography>
-                    <DataGrid
-                      sx={{
-                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
-                          {
-                            height: maintenanceTableHeight,
-                          },
-                        "& .MuiDataGrid-root": {
-                          border: "none",
-                          width: "100%",
-                          color: colors.grey[100],
-                        },
-                        "& .MuiDataGrid-overlayWrapper": {
-                          minHeight: "52px",
-                        },
-                        "& .name-column--cell": {
-                          color: colors.greenAccent[300],
-                        },
-                        "& .MuiDataGrid-columnHeaders": {
-                          backgroundColor: colors.blueAccent[700],
-                          borderBottom: "none",
-                        },
-                        "& .MuiDataGrid-columnHeaderTitle": {
-                          whiteSpace: "normal !important",
-                          wordWrap: "break-word !important",
-                          lineHeight: "1.2 !important",
-                        },
-                        "& .MuiDataGrid-virtualScroller": {
-                          backgroundColor: colors.primary[400],
-                        },
-                        "& .MuiDataGrid-toolbarContainer": {
-                          display: "none",
-                        },
-                        "& .MuiDataGrid-footerContainer": {
-                          display: "none",
-                        },
-                      }}
-                      rows={maintenanceData || []}
-                      columns={maintenanceColumns}
-                      components={{ Toolbar: GridToolbar }}
-                      getRowId={(row) => row.id}
-                      localeText={{ noRowsLabel: "No Data" }}
-                      initialState={{
-                        sortModel: [{ field: "createdAt", sort: "asc" }],
-                      }}
-                    />
-                  </Box>
-                )}
-                {selectedTab === 3 && (
                   <Box position="relative">
                     <Typography variant="h3" gutterBottom mt={2}>
                       Upload Attachment
@@ -810,7 +707,7 @@ const ClientProfileModal = ({
                           component="span"
                           sx={{ mt: 2, backgroundColor: colors.primary[500] }}
                         >
-                          Upload Vehicle Attachment
+                          Choose File
                         </Button>
                       </label>
                       <TextField

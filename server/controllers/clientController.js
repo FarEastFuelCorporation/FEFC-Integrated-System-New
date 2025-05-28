@@ -1,5 +1,6 @@
 // controllers/clientController.js
 
+const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
 const generateClientId = require("../utils/generateClientId");
@@ -75,16 +76,23 @@ async function createClientController(req, res) {
 // Get Clients controller
 async function getClientsController(req, res) {
   try {
-    // Fetch all clients from the database
     const clients = await Client.findAll({
-      // attributes: { exclude: ["clientPicture"] },
-      where: { clientStatus: "ACTIVE" }, // Filter clients
+      where: { clientStatus: "ACTIVE" },
       order: [["clientName", "ASC"]],
-      include: {
-        model: Employee,
-        as: "Employee",
-        attributes: ["firstName", "lastName"],
-      },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          separate: true, // Fetch only the last transaction separately
+          limit: 1,
+          order: [["createdAt", "DESC"]], // Assumes you have createdAt timestamps
+        },
+      ],
     });
 
     res.json({ clients });
@@ -97,9 +105,26 @@ async function getClientsController(req, res) {
 // Get Client controller
 async function getClientController(req, res) {
   try {
-    const client = await Client.findByPk(req.params.id);
+    const client = await Client.findByPk(req.params.id, {
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          separate: true,
+          limit: 1,
+          order: [["createdAt", "DESC"]], // Assumes you have createdAt in BookedTransaction
+        },
+      ],
+    });
+
     res.json({ client });
   } catch (error) {
+    console.error("Error fetching client:", error);
     res.status(500).json({ error: error.message });
   }
 }

@@ -236,9 +236,10 @@ const VehicleMaintenanceRequest = ({ user }) => {
       headerAlign: "center",
       align: "center",
       minWidth: 120,
-      valueFormatter: (params) => {
-        if (!params.value) return ""; // Handle empty or null values
-        return format(new Date(params.value), "MMMM dd yyyy");
+      valueGetter: (params) => {
+        const value = params.row.createdAt;
+        if (!value) return ""; // Handle null or undefined values
+        return format(new Date(value), "MMMM dd yyyy");
       },
       renderCell: renderCellWithWrapText,
     },

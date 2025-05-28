@@ -91,6 +91,10 @@ const Client = sequelize.define(
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
+    moaEndDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

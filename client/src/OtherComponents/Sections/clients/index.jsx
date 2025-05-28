@@ -22,6 +22,12 @@ import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import { validateClientForm } from "./Validation";
+import ClientProfileModal from "../../Modals/ClientProfileModal";
+import {
+  calculateRemainingDays,
+  calculateRemainingTime,
+  formatDateFull,
+} from "../../Functions";
 
 const Clients = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -32,6 +38,7 @@ const Clients = ({ user }) => {
     id: "",
     clientId: "",
     moaDate: "",
+    moaEndDate: "",
     clientName: "",
     address: "",
     natureOfBusiness: "",
@@ -62,6 +69,10 @@ const Clients = ({ user }) => {
   const [dialog, setDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState(false);
 
+  const [open, setOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -90,6 +101,17 @@ const Clients = ({ user }) => {
     setErrorMessage("");
   };
 
+  const handleRowClick = (params) => {
+    setSelectedRow(params);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedRow(null);
+    setSelectedTab(0);
+  };
+
   const clearFormData = () => {
     setFormData(initialFormData);
   };
@@ -106,6 +128,7 @@ const Clients = ({ user }) => {
         id: clientToEdit.id,
         clientId: clientToEdit.clientId,
         moaDate: clientToEdit.moaDate || "",
+        moaEndDate: clientToEdit.moaEndDate || "",
         clientName: clientToEdit.clientName || "",
         address: clientToEdit.address || "",
         natureOfBusiness: clientToEdit.natureOfBusiness || "",
@@ -175,6 +198,7 @@ const Clients = ({ user }) => {
       setLoading(true);
       const formDataToSend = new FormData();
       formDataToSend.append("moaDate", formData.moaDate);
+      formDataToSend.append("moaEndDate", formData.moaEndDate);
       formDataToSend.append("clientName", formData.clientName);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("natureOfBusiness", formData.natureOfBusiness);
@@ -214,6 +238,8 @@ const Clients = ({ user }) => {
       fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
+
+      setOpen(false);
 
       setLoading(false);
     } catch (error) {
@@ -326,6 +352,96 @@ const Clients = ({ user }) => {
       renderCell: renderCellWithWrapText,
     },
     {
+      field: "moaDate",
+      headerName: "MOA Date",
+      headerAlign: "center",
+      align: "center",
+      width: 80,
+      renderCell: (params) => {
+        const formattedDate = formatDateFull(params.value);
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: formattedDate })}
+          </div>
+        );
+      },
+    },
+    {
+      field: "moaEndDate",
+      headerName: "MOA End Date",
+      headerAlign: "center",
+      align: "center",
+      width: 80,
+      renderCell: (params) => {
+        const formattedDate = formatDateFull(params.value);
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: formattedDate })}
+          </div>
+        );
+      },
+    },
+    {
+      field: "remainingDays",
+      headerName: "Days to Expire",
+      headerAlign: "center",
+      align: "center",
+      WIDTH: 150,
+      renderCell: (params) => {
+        // Return empty string if registrationExpirationDate is null
+        if (
+          params.row.moaEndDate === "0000-00-00" ||
+          params.row.moaEndDate === undefined
+        ) {
+          return <div>N/A</div>; // Return empty div for null
+        }
+
+        const { years, months, days, isExpired } = calculateRemainingTime(
+          params.row.moaEndDate
+        );
+
+        // Determine the display value
+        let displayValue;
+        if (isExpired) {
+          displayValue = `${
+            years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
+          }${
+            months > 0
+              ? months + " Month" + (months === 1 ? "" : "s") + ", "
+              : ""
+          }${days} Day${days === 1 ? "" : "s"} Expired`;
+        } else if (years === 0 && months === 0 && days === 0) {
+          displayValue = "Expires Today"; // Show if it expires today
+        } else {
+          displayValue = `${
+            years > 0 ? years + " Year" + (years === 1 ? "" : "s") + ", " : ""
+          }${
+            months > 0
+              ? months + " Month" + (months === 1 ? "" : "s") + ", "
+              : ""
+          }${days} Day${days === 1 ? "" : "s"} Remaining`; // Show years, months, and days remaining
+        }
+
+        return (
+          <div>
+            {renderCellWithWrapText({ ...params, value: displayValue })}
+          </div>
+        );
+      },
+      sortComparator: (v1, v2) => {
+        const getDaysValue = (value) => {
+          if (value === null) return 1000000; // Null should be last (highest value)
+
+          return value;
+        };
+
+        const daysValue1 = getDaysValue(v1);
+        const daysValue2 = getDaysValue(v2);
+
+        return daysValue1 - daysValue2; // Sort based on the calculated values
+      },
+    },
+    {
       field: "accountHandler",
       headerName: "Account Handler",
       headerAlign: "center",
@@ -336,6 +452,22 @@ const Clients = ({ user }) => {
       },
       renderCell: renderCellWithWrapText,
     },
+    // {
+    //   field: "view",
+    //   headerName: "View",
+    //   headerAlign: "center",
+    //   align: "center",
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <Button
+    //       color="secondary"
+    //       variant="contained"
+    //       onClick={() => handleRowClick(params.row)}
+    //     >
+    //       View
+    //     </Button>
+    //   ),
+    // },
   ];
 
   if (user.userType === 2) {
@@ -409,6 +541,18 @@ const Clients = ({ user }) => {
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
+          getRowClassName={(params) => {
+            const daysRemaining = calculateRemainingDays(params.row.moaEndDate);
+
+            if (daysRemaining !== null) {
+              if (daysRemaining < 0) {
+                return "blink-red"; // Expired
+              } else if (daysRemaining <= 30) {
+                return "blink-yellow"; // Near expired
+              }
+            }
+            return ""; // Default class if no blinking is needed
+          }}
           initialState={{
             sorting: {
               sortModel: [{ field: "clientId", sort: "asc" }],
@@ -446,6 +590,23 @@ const Clients = ({ user }) => {
                 label="MOA Date"
                 name="moaDate"
                 value={formData.moaDate}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                  shrink: true,
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="MOA End Date"
+                name="moaEndDate"
+                value={formData.moaEndDate}
                 onChange={handleInputChange}
                 type="date"
                 fullWidth
@@ -667,6 +828,16 @@ const Clients = ({ user }) => {
           </Button>
         </Box>
       </Modal>
+      <ClientProfileModal
+        user={user}
+        selectedRow={selectedRow}
+        open={open}
+        openModal={openModal}
+        handleClose={handleClose}
+        handleEditClick={handleEditClick}
+        selectedTab={selectedTab}
+        setSelectedTab={setSelectedTab}
+      />
     </Box>
   );
 };

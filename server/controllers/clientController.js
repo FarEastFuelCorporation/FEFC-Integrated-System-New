@@ -20,6 +20,8 @@ async function createClientController(req, res) {
       billerContactNumber,
       billerTinNumber,
       email,
+      moaDate,
+      moaEndDate,
       createdBy,
     } = req.body;
 
@@ -53,6 +55,8 @@ async function createClientController(req, res) {
       billerContactNumber,
       billerTinNumber,
       email,
+      moaDate,
+      moaEndDate,
       clientPicture,
       createdBy,
     });
@@ -118,6 +122,8 @@ async function updateClientController(req, res) {
       billerContactNumber,
       billerTinNumber,
       email,
+      moaDate,
+      moaEndDate,
       createdBy,
     } = req.body;
 
@@ -158,6 +164,8 @@ async function updateClientController(req, res) {
       if (clientPicture !== null) {
         updatedClient.clientPicture = clientPicture;
       }
+      updatedClient.moaDate = moaDate || null;
+      updatedClient.moaEndDate = moaEndDate || null;
 
       // Save the updated client
       await updatedClient.save();

@@ -78,7 +78,7 @@ const maintenanceRows = [
   },
 ];
 
-const VehicleProfileModal = ({
+const ClientProfileModal = ({
   user,
   selectedRow,
   open,
@@ -448,7 +448,7 @@ const VehicleProfileModal = ({
               >
                 Vehicle Profile
               </Typography>
-              {user.userType === 3 && (
+              {user.userType === 2 && (
                 <IconButton
                   color="warning"
                   onClick={() => handleEditClick(selectedRow.id)}
@@ -906,4 +906,4 @@ const VehicleProfileModal = ({
   );
 };
 
-export default VehicleProfileModal;
+export default ClientProfileModal;

@@ -629,6 +629,24 @@ const ClientProfileModal = ({
                         </Typography>
                       </Grid>
                     </Grid>
+                    <br />
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6} lg={4}>
+                        <Typography variant="h3">
+                          Latest Transaction:
+                        </Typography>
+                      </Grid>{" "}
+                      <Grid item xs={12} md={6} lg={8}>
+                        <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                          {selectedRow.BookedTransaction.length > 0
+                            ? formatDate3(
+                                selectedRow.BookedTransaction?.[0]
+                                  ?.ScheduledTransaction?.[0]?.scheduledDate
+                              )
+                            : "(No Data)"}{" "}
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </Box>
                 )}
                 {selectedTab === 1 && (

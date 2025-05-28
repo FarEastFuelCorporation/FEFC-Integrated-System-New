@@ -4,6 +4,7 @@ const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
 const ClientAttachment = require("../models/cLIENTAttachment");
 const Employee = require("../models/Employee");
+const ScheduledTransaction = require("../models/ScheduledTransaction");
 const generateClientId = require("../utils/generateClientId");
 
 // Create Client controller
@@ -92,6 +93,13 @@ async function getClientsController(req, res) {
           separate: true, // Fetch only the last transaction separately
           limit: 1,
           order: [["createdAt", "DESC"]], // Assumes you have createdAt timestamps
+          include: [
+            {
+              model: ScheduledTransaction,
+              as: "ScheduledTransaction",
+              attributes: ["scheduledDate"],
+            },
+          ],
         },
       ],
     });
@@ -126,6 +134,13 @@ async function getClientController(req, res) {
           separate: true,
           limit: 1,
           order: [["createdAt", "DESC"]], // Assumes you have createdAt in BookedTransaction
+          include: [
+            {
+              model: ScheduledTransaction,
+              as: "ScheduledTransaction",
+              attributes: ["scheduledDate"],
+            },
+          ],
         },
       ],
     });

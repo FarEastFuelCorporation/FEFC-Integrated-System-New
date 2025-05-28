@@ -391,7 +391,8 @@ const Clients = ({ user }) => {
         // Return empty string if registrationExpirationDate is null
         if (
           params.row.moaEndDate === "0000-00-00" ||
-          params.row.moaEndDate === undefined
+          params.row.moaEndDate === undefined ||
+          params.row.moaEndDate === null
         ) {
           return <div>N/A</div>; // Return empty div for null
         }

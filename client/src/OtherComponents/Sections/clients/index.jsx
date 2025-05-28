@@ -490,23 +490,23 @@ const Clients = ({ user }) => {
 
   if (user.userType === 2) {
     columns.push(
-      {
-        field: "edit",
-        headerName: "Edit",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) =>
-          params.row.createdBy === user.id || user.id === "23108" ? (
-            <IconButton
-              color="warning"
-              onClick={() => handleEditClick(params.row.id)}
-            >
-              <EditIcon />
-            </IconButton>
-          ) : null, // Return null if condition is not met
-      },
+      // {
+      //   field: "edit",
+      //   headerName: "Edit",
+      //   headerAlign: "center",
+      //   align: "center",
+      //   sortable: false,
+      //   width: 60,
+      //   renderCell: (params) =>
+      //     params.row.createdBy === user.id || user.id === "23108" ? (
+      //       <IconButton
+      //         color="warning"
+      //         onClick={() => handleEditClick(params.row.id)}
+      //       >
+      //         <EditIcon />
+      //       </IconButton>
+      //     ) : null, // Return null if condition is not met
+      // },
       {
         field: "delete",
         headerName: "Delete",

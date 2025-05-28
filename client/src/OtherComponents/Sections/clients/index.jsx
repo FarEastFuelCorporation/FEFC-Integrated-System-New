@@ -21,6 +21,7 @@ import CustomDataGridStyles from "../../CustomDataGridStyles";
 import SuccessMessage from "../../SuccessMessage";
 import LoadingSpinner from "../../LoadingSpinner";
 import ConfirmationDialog from "../../ConfirmationDialog";
+import { validateClientForm } from "./Validation";
 
 const Clients = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
@@ -30,6 +31,7 @@ const Clients = ({ user }) => {
   const initialFormData = {
     id: "",
     clientId: "",
+    moaDate: "",
     clientName: "",
     address: "",
     natureOfBusiness: "",
@@ -84,6 +86,8 @@ const Clients = ({ user }) => {
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
+    setShowErrorMessage(false);
+    setErrorMessage("");
   };
 
   const clearFormData = () => {
@@ -101,6 +105,7 @@ const Clients = ({ user }) => {
       setFormData({
         id: clientToEdit.id,
         clientId: clientToEdit.clientId,
+        moaDate: clientToEdit.moaDate || "",
         clientName: clientToEdit.clientName || "",
         address: clientToEdit.address || "",
         natureOfBusiness: clientToEdit.natureOfBusiness || "",
@@ -155,25 +160,21 @@ const Clients = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const { clientName, address, billerName, billerAddress, clientType } =
-      formData;
+    const validationErrors = validateClientForm(formData);
 
-    // Check if all required fields are filled
-    if (
-      !clientName ||
-      !address ||
-      !billerName ||
-      !billerAddress ||
-      !clientType
-    ) {
-      setErrorMessage("Please fill all required fields.");
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
       setShowErrorMessage(true);
       return;
     }
 
+    setShowErrorMessage(false);
+    setErrorMessage("");
+
     try {
       setLoading(true);
       const formDataToSend = new FormData();
+      formDataToSend.append("moaDate", formData.moaDate);
       formDataToSend.append("clientName", formData.clientName);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("natureOfBusiness", formData.natureOfBusiness);
@@ -442,6 +443,25 @@ const Clients = ({ user }) => {
           <Typography variant="h6" component="h2" color="error">
             {showErrorMessage && errorMessage}
           </Typography>
+          <Grid container spacing={2} my={2}>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="MOA Date"
+                name="moaDate"
+                value={formData.moaDate}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                  shrink: true,
+                }}
+              />
+            </Grid>
+          </Grid>
           <Grid container spacing={2} my={2}>
             <Grid item xs={12} lg={6}>
               <Typography variant="subtitle2" gutterBottom>

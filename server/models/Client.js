@@ -87,6 +87,10 @@ const Client = sequelize.define(
       type: DataTypes.BLOB("long"),
       allowNull: true,
     },
+    moaDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

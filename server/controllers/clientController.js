@@ -2,7 +2,7 @@
 
 const BookedTransaction = require("../models/BookedTransaction");
 const Client = require("../models/Client");
-const ClientAttachment = require("../models/cLIENTAttachment");
+const ClientAttachment = require("../models/ClientAttachment");
 const Employee = require("../models/Employee");
 const ScheduledTransaction = require("../models/ScheduledTransaction");
 const generateClientId = require("../utils/generateClientId");

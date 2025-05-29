@@ -18,72 +18,9 @@ import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { tokens } from "../../theme";
-import {
-  formatDate,
-  formatDate2,
-  formatDate3,
-  formatNumber,
-} from "../Functions";
+import { formatDate3 } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
-import { format } from "date-fns";
 import ConfirmationDialog from "../ConfirmationDialog";
-
-const maintenanceRows = [
-  {
-    id: 9,
-    date: "2025-04-05T08:00:00.000Z",
-    dueDate: "2025-07-05T08:00:00.000Z",
-    createdAt: "2025-04-05T09:00:00.000Z",
-  },
-  {
-    id: 8,
-    date: "2025-01-05T08:00:00.000Z",
-    dueDate: "2025-04-05T08:00:00.000Z",
-    createdAt: "2025-01-05T09:00:00.000Z",
-  },
-  {
-    id: 7,
-    date: "2024-10-05T08:00:00.000Z",
-    dueDate: "2025-01-05T08:00:00.000Z",
-    createdAt: "2024-10-05T09:00:00.000Z",
-  },
-  {
-    id: 6,
-    date: "2024-07-05T08:00:00.000Z",
-    dueDate: "2024-10-05T08:00:00.000Z",
-    createdAt: "2024-07-05T09:00:00.000Z",
-  },
-  {
-    id: 5,
-    date: "2024-04-05T08:00:00.000Z",
-    dueDate: "2024-07-05T08:00:00.000Z",
-    createdAt: "2024-04-05T09:00:00.000Z",
-  },
-  {
-    id: 4,
-    date: "2024-01-05T08:00:00.000Z",
-    dueDate: "2024-04-05T08:00:00.000Z",
-    createdAt: "2024-01-05T09:00:00.000Z",
-  },
-  {
-    id: 3,
-    date: "2023-10-05T08:00:00.000Z",
-    dueDate: "2024-01-05T08:00:00.000Z",
-    createdAt: "2023-10-05T09:00:00.000Z",
-  },
-  {
-    id: 2,
-    date: "2023-07-05T08:00:00.000Z",
-    dueDate: "2023-10-05T08:00:00.000Z",
-    createdAt: "2023-07-05T09:00:00.000Z",
-  },
-  {
-    id: 1,
-    date: "2023-04-05T08:00:00.000Z",
-    dueDate: "2023-07-05T08:00:00.000Z",
-    createdAt: "2023-04-05T09:00:00.000Z",
-  },
-];
 
 const ClientProfileModal = ({
   user,
@@ -293,8 +230,9 @@ const ClientProfileModal = ({
       renderCell: (params) => {
         let value = {};
         value.value =
-          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${params.row.Employee.affix}` ||
-          "";
+          `${params.row.Employee.lastName}, ${params.row.Employee.firstName} ${
+            params.row.Employee.affix ? params.row.Employee.affix : ""
+          }` || "";
 
         return renderCellWithWrapText(value);
       },

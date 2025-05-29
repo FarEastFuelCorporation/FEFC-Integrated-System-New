@@ -55,8 +55,6 @@ const ClientProfileModal = ({
       ? rowHeight + headerHeight
       : attachmentData.length * rowHeight + headerHeight;
 
-  console.log(selectedRow);
-
   const fetchData = useCallback(async () => {
     setLoadingData(true);
     if (!selectedRow || !selectedRow.clientId) {
@@ -285,11 +283,6 @@ const ClientProfileModal = ({
             try {
               const clientAttachmentResponse = await axios.get(
                 `${apiUrl}/api/clientAttachment/attachment/${params.row.id}`
-              );
-
-              console.log(
-                "Client Attachment Response:",
-                clientAttachmentResponse.data
               );
 
               const attachment =

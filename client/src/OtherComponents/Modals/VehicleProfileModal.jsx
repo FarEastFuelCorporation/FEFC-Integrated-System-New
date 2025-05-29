@@ -109,8 +109,6 @@ const VehicleProfileModal = ({
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
 
-  console.log("Selected Row:", selectedRow);
-
   const attachmentTableHeight =
     attachmentData.length === 0
       ? rowHeight + headerHeight

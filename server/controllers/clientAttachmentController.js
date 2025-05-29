@@ -30,6 +30,7 @@ async function createClientAttachmentController(req, res) {
     const newAttachment = await ClientAttachment.findByPk(
       newAttachmentData.id,
       {
+        attributes: { exclude: ["attachment"] },
         include: [
           {
             model: Employee,
@@ -53,6 +54,7 @@ async function getClientAttachmentsController(req, res) {
   try {
     // Fetch all Client Attachments from the database
     const clientAttachments = await ClientAttachment.findAll({
+      attributes: { exclude: ["attachment"] },
       include: [
         {
           model: Employee,
@@ -76,7 +78,31 @@ async function getClientAttachmentController(req, res) {
     const clientId = req.params.id;
     // Fetch Client Attachment from the database
     const clientAttachments = await ClientAttachment.findAll({
+      attributes: { exclude: ["attachment"] },
       where: { clientId },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          attributes: ["firstName", "lastName", "affix"], // Include only necessary fields
+        },
+      ],
+    });
+
+    res.json({ clientAttachments });
+  } catch (error) {
+    // Handling errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Get Client With Attachment controller
+async function getClientWithAttachmentController(req, res) {
+  try {
+    const id = req.params.id;
+    // Fetch Client Attachment from the database
+    const clientAttachments = await ClientAttachment.findByPk(id, {
       include: [
         {
           model: Employee,
@@ -128,5 +154,6 @@ module.exports = {
   createClientAttachmentController,
   getClientAttachmentsController,
   getClientAttachmentController,
+  getClientWithAttachmentController,
   deleteClientAttachmentController,
 };

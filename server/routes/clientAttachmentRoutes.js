@@ -9,6 +9,7 @@ const {
   getClientAttachmentsController,
   getClientAttachmentController,
   deleteClientAttachmentController,
+  getClientWithAttachmentController,
 } = require("../controllers/clientAttachmentController");
 
 // Create Client Attachment route
@@ -20,7 +21,10 @@ router.get("/", getClientAttachmentsController);
 // Get Client Attachment route
 router.get("/:id", getClientAttachmentController);
 
-// Delete Client Transaction route
+// Get Client Attachment route
+router.get("/attachment/:id", getClientWithAttachmentController);
+
+// Delete Client Attachment route
 router.delete("/:id", deleteClientAttachmentController);
 
 module.exports = router;

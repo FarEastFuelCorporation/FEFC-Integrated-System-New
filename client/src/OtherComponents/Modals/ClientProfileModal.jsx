@@ -21,6 +21,7 @@ import { tokens } from "../../theme";
 import { formatDate3 } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
 import ConfirmationDialog from "../ConfirmationDialog";
+import CustomLoadingOverlay from "../CustomLoadingOverlay";
 
 const ClientProfileModal = ({
   user,
@@ -38,6 +39,7 @@ const ClientProfileModal = ({
   const [fileNameToSubmit, setFileNameToSubmit] = useState("");
   const [attachmentData, setAttachmentData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -53,7 +55,10 @@ const ClientProfileModal = ({
       ? rowHeight + headerHeight
       : attachmentData.length * rowHeight + headerHeight;
 
+  console.log(selectedRow);
+
   const fetchData = useCallback(async () => {
+    setLoadingData(true);
     if (!selectedRow || !selectedRow.clientId) {
       return;
     }
@@ -65,6 +70,8 @@ const ClientProfileModal = ({
       setAttachmentData(clientAttachmentResponse.data.clientAttachments);
     } catch (error) {
       console.error("Error fetching provinces:", error);
+    } finally {
+      setLoadingData(false);
     }
   }, [apiUrl, selectedRow]);
 
@@ -156,18 +163,24 @@ const ClientProfileModal = ({
       formData.append("fileName", fileNameToSubmit);
       formData.append("createdBy", user.id);
 
+      setLoadingData(true);
+
       // Submit the form data with file upload
-      await axios.post(`${apiUrl}/api/clientAttachment`, formData);
+      const newAttachment = await axios.post(
+        `${apiUrl}/api/clientAttachment`,
+        formData
+      );
 
       setSuccessMessage("File uploaded successfully!");
       setShowSuccessMessage(true);
-      const clientAttachmentResponse = await axios.get(
-        `${apiUrl}/api/clientAttachment/${selectedRow.clientId}`
-      );
+      setAttachmentData((prevData) => [
+        ...prevData,
+        newAttachment.data.newAttachment,
+      ]);
 
-      setAttachmentData(clientAttachmentResponse.data.clientAttachments);
       setFileName("");
       setFileNameToSubmit("");
+      setLoadingData(false);
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
@@ -183,7 +196,8 @@ const ClientProfileModal = ({
 
   const handleConfirmDelete = async (id) => {
     try {
-      setLoading(true);
+      setOpenDialog(false); // Close the dialog
+      setLoadingData(true);
 
       const url = "clientAttachment";
 
@@ -195,12 +209,12 @@ const ClientProfileModal = ({
         prevData.filter((attachment) => attachment.id !== id)
       );
 
+      setShowSuccessMessage(true);
       setSuccessMessage("Attachment Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      setLoading(false);
-      setOpenDialog(false); // Close the dialog
+      setLoadingData(false);
     }
   };
 
@@ -267,29 +281,44 @@ const ClientProfileModal = ({
       renderCell: (params) => (
         <IconButton
           sx={{ color: colors.greenAccent[400], fontSize: "large" }}
-          onClick={() => {
-            const attachment = params.row.attachment; // Access the longblob data
+          onClick={async () => {
+            try {
+              const clientAttachmentResponse = await axios.get(
+                `${apiUrl}/api/clientAttachment/attachment/${params.row.id}`
+              );
 
-            if (attachment) {
-              const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
+              console.log(
+                "Client Attachment Response:",
+                clientAttachmentResponse.data
+              );
 
-              // Determine the MIME type based on the file's magic number (first few bytes)
-              let mimeType = "application/octet-stream"; // Default MIME type
-              const magicNumbers = byteArray.slice(0, 4).join(",");
+              const attachment =
+                clientAttachmentResponse.data.clientAttachments?.attachment;
 
-              // Common magic numbers
-              if (magicNumbers.startsWith("255,216,255")) {
-                mimeType = "image/jpeg";
-              } else if (magicNumbers.startsWith("137,80,78,71")) {
-                mimeType = "image/png";
-              } else if (magicNumbers.startsWith("37,80,68,70")) {
-                mimeType = "application/pdf";
+              if (attachment) {
+                const byteArray = new Uint8Array(attachment.data);
+
+                // Detect MIME type
+                let mimeType = "application/octet-stream";
+                const magicNumbers = byteArray.slice(0, 4).join(",");
+
+                if (magicNumbers.startsWith("255,216,255")) {
+                  mimeType = "image/jpeg";
+                } else if (magicNumbers.startsWith("137,80,78,71")) {
+                  mimeType = "image/png";
+                } else if (magicNumbers.startsWith("37,80,68,70")) {
+                  mimeType = "application/pdf";
+                }
+
+                const blob = new Blob([byteArray], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");
+              } else {
+                alert("No attachment found.");
               }
-              // Add more magic numbers as necessary
-
-              const blob = new Blob([byteArray], { type: mimeType });
-              const url = URL.createObjectURL(blob); // Create an object URL from the Blob
-              window.open(url, "_blank"); // Open the URL in a new tab
+            } catch (error) {
+              console.error("Error fetching attachment:", error);
+              alert("Failed to retrieve the attachment.");
             }
           }}
         >
@@ -307,9 +336,14 @@ const ClientProfileModal = ({
       renderCell: (params) => (
         <IconButton
           sx={{ color: colors.blueAccent[400], fontSize: "large" }}
-          onClick={() => {
-            const attachment = params.row.attachment; // Access the longblob data
-            const fileName = params.row.fileName; // Access the file name
+          onClick={async () => {
+            const clientAttachmentResponse = await axios.get(
+              `${apiUrl}/api/clientAttachment/attachment/${params.row.id}`
+            );
+            const attachment =
+              clientAttachmentResponse.data.clientAttachments?.attachment;
+            const fileName =
+              clientAttachmentResponse.data.clientAttachments?.fileName;
 
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
@@ -333,7 +367,10 @@ const ClientProfileModal = ({
 
               const link = document.createElement("a");
               link.href = url;
-              link.setAttribute("download", fileName); // Use the file name for the download
+              link.setAttribute(
+                "download",
+                `${fileName} ${selectedRow.clientName}`
+              ); // Use the file name for the download
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -384,7 +421,7 @@ const ClientProfileModal = ({
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 1050,
-            minHeight: "90%",
+            height: "90%",
             overflowY: "scroll",
             bgcolor: "background.paper",
             border: "2px solid #000",
@@ -708,6 +745,7 @@ const ClientProfileModal = ({
                       <SuccessMessage
                         message={successMessage}
                         onClose={() => setShowSuccessMessage(false)}
+                        marginLess="0px"
                       />
                     )}
                     <Typography variant="h3" gutterBottom mt={5}>
@@ -751,9 +789,13 @@ const ClientProfileModal = ({
                       }}
                       rows={attachmentData || []}
                       columns={columns}
-                      components={{ Toolbar: GridToolbar }}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      loading={loadingData}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}

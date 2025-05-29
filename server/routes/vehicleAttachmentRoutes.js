@@ -8,6 +8,8 @@ const {
   createVehicleAttachmentController,
   getVehicleAttachmentsController,
   getVehicleAttachmentController,
+  deleteVehicleAttachmentController,
+  getVehicleWithAttachmentController,
 } = require("../controllers/vehicleAttachmentController");
 
 // Create Vehicle Attachment route
@@ -22,5 +24,11 @@ router.get("/", getVehicleAttachmentsController);
 
 // Get Vehicle Attachment route
 router.get("/:id", getVehicleAttachmentController);
+
+// Get Vehicle With Attachment route
+router.get("/attachment/:id", getVehicleWithAttachmentController);
+
+// Delete Vehicle Attachment route
+router.delete("/:id", deleteVehicleAttachmentController);
 
 module.exports = router;

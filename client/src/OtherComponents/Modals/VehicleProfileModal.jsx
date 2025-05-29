@@ -16,10 +16,13 @@ import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import PageviewIcon from "@mui/icons-material/Pageview";
 import DownloadIcon from "@mui/icons-material/Download";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { tokens } from "../../theme";
 import { formatNumber } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
+import CustomLoadingOverlay from "../CustomLoadingOverlay";
+import ConfirmationDialog from "../ConfirmationDialog";
 
 const maintenanceRows = [
   {
@@ -95,11 +98,18 @@ const VehicleProfileModal = ({
   const [maintenanceData, setMaintenanceData] = useState([]);
   const [attachmentData, setAttachmentData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState(false);
+
   const rowHeight = 52; // Default row height in Material-UI DataGrid
   const headerHeight = 56; // Default header height
+
+  console.log("Selected Row:", selectedRow);
 
   const attachmentTableHeight =
     attachmentData.length === 0
@@ -115,6 +125,7 @@ const VehicleProfileModal = ({
     if (!selectedRow || !selectedRow.plateNumber) {
       return;
     }
+    setLoadingData(true);
     try {
       const vehicleAttachmentResponse = await axios.get(
         `${apiUrl}/api/vehicleAttachment/${selectedRow.plateNumber}`
@@ -125,6 +136,8 @@ const VehicleProfileModal = ({
       setMaintenanceData(selectedRow.maintenanceHistory || maintenanceRows);
     } catch (error) {
       console.error("Error fetching provinces:", error);
+    } finally {
+      setLoadingData(false);
     }
   }, [apiUrl, selectedRow]);
 
@@ -214,6 +227,8 @@ const VehicleProfileModal = ({
       formData.append("fileName", fileNameToSubmit);
       formData.append("createdBy", user.id);
 
+      setLoadingData(true);
+
       // Submit the form data with file upload
       await axios.post(`${apiUrl}/api/vehicleAttachment`, formData);
 
@@ -226,10 +241,41 @@ const VehicleProfileModal = ({
       setAttachmentData(vehicleAttachmentResponse.data.vehicleAttachments);
       setFileName("");
       setFileNameToSubmit("");
+      setLoadingData(false);
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (id) => {
+    setOpenDialog(true);
+    setDialog("Are you sure you want to Delete this Attachment?");
+    setDialogAction(() => () => handleConfirmDelete(id));
+  };
+
+  const handleConfirmDelete = async (id) => {
+    try {
+      setOpenDialog(false); // Close the dialog
+      setLoadingData(true);
+
+      const url = "vehicleAttachment";
+
+      await axios.delete(`${apiUrl}/api/${url}/${id}`, {
+        data: { deletedBy: user.id },
+      });
+
+      setAttachmentData((prevData) =>
+        prevData.filter((attachment) => attachment.id !== id)
+      );
+
+      setShowSuccessMessage(true);
+      setSuccessMessage("Attachment Deleted Successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoadingData(false);
     }
   };
 
@@ -296,29 +342,38 @@ const VehicleProfileModal = ({
       renderCell: (params) => (
         <IconButton
           sx={{ color: colors.greenAccent[400], fontSize: "large" }}
-          onClick={() => {
-            const attachment = params.row.attachment; // Access the longblob data
+          onClick={async () => {
+            try {
+              const vehicleAttachmentResponse = await axios.get(
+                `${apiUrl}/api/vehicleAttachment/attachment/${params.row.id}`
+              );
+              const attachment =
+                vehicleAttachmentResponse.data.vehicleAttachments?.attachment;
 
-            if (attachment) {
-              const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
+              if (attachment) {
+                const byteArray = new Uint8Array(attachment.data);
 
-              // Determine the MIME type based on the file's magic number (first few bytes)
-              let mimeType = "application/octet-stream"; // Default MIME type
-              const magicNumbers = byteArray.slice(0, 4).join(",");
+                // Detect MIME type
+                let mimeType = "application/octet-stream";
+                const magicNumbers = byteArray.slice(0, 4).join(",");
 
-              // Common magic numbers
-              if (magicNumbers.startsWith("255,216,255")) {
-                mimeType = "image/jpeg";
-              } else if (magicNumbers.startsWith("137,80,78,71")) {
-                mimeType = "image/png";
-              } else if (magicNumbers.startsWith("37,80,68,70")) {
-                mimeType = "application/pdf";
+                if (magicNumbers.startsWith("255,216,255")) {
+                  mimeType = "image/jpeg";
+                } else if (magicNumbers.startsWith("137,80,78,71")) {
+                  mimeType = "image/png";
+                } else if (magicNumbers.startsWith("37,80,68,70")) {
+                  mimeType = "application/pdf";
+                }
+
+                const blob = new Blob([byteArray], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");
+              } else {
+                alert("No attachment found.");
               }
-              // Add more magic numbers as necessary
-
-              const blob = new Blob([byteArray], { type: mimeType });
-              const url = URL.createObjectURL(blob); // Create an object URL from the Blob
-              window.open(url, "_blank"); // Open the URL in a new tab
+            } catch (error) {
+              console.error("Error fetching attachment:", error);
+              alert("Failed to retrieve the attachment.");
             }
           }}
         >
@@ -336,9 +391,14 @@ const VehicleProfileModal = ({
       renderCell: (params) => (
         <IconButton
           sx={{ color: colors.blueAccent[400], fontSize: "large" }}
-          onClick={() => {
-            const attachment = params.row.attachment; // Access the longblob data
-            const fileName = params.row.fileName; // Access the file name
+          onClick={async () => {
+            const vehicleAttachmentResponse = await axios.get(
+              `${apiUrl}/api/vehicleAttachment/attachment/${params.row.id}`
+            );
+            const attachment =
+              vehicleAttachmentResponse.data.vehicleAttachments?.attachment;
+            const fileName =
+              vehicleAttachmentResponse.data.vehicleAttachments?.fileName;
 
             if (attachment) {
               const byteArray = new Uint8Array(attachment.data); // Convert binary data to a byte array
@@ -362,7 +422,10 @@ const VehicleProfileModal = ({
 
               const link = document.createElement("a");
               link.href = url;
-              link.setAttribute("download", fileName); // Use the file name for the download
+              link.setAttribute(
+                "download",
+                `${fileName} ${selectedRow.plateNumber}`
+              ); // Use the file name for the download
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -372,6 +435,23 @@ const VehicleProfileModal = ({
           <DownloadIcon sx={{ fontSize: "2rem" }} />
         </IconButton>
       ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) =>
+        params.row.createdBy === user.id ? ( // Check if createdBy matches user.id
+          <IconButton
+            color="error"
+            onClick={() => handleDeleteClick(params.row.id)} // Assuming you have a handleDeleteClick function
+          >
+            <DeleteIcon />
+          </IconButton>
+        ) : null, // Return null if the condition is not met
     },
   ];
 
@@ -417,6 +497,12 @@ const VehicleProfileModal = ({
 
   return (
     <Box>
+      <ConfirmationDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={dialogAction}
+        text={dialog}
+      />
       <Modal
         open={open}
         onClose={handleClose}
@@ -780,7 +866,10 @@ const VehicleProfileModal = ({
                       }}
                       rows={maintenanceData || []}
                       columns={maintenanceColumns}
-                      components={{ Toolbar: GridToolbar }}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Data" }}
                       initialState={{
@@ -846,6 +935,7 @@ const VehicleProfileModal = ({
                       <SuccessMessage
                         message={successMessage}
                         onClose={() => setShowSuccessMessage(false)}
+                        marginLess="0px"
                       />
                     )}
                     <Typography variant="h3" gutterBottom mt={5}>
@@ -889,7 +979,11 @@ const VehicleProfileModal = ({
                       }}
                       rows={attachmentData || []}
                       columns={columns}
-                      components={{ Toolbar: GridToolbar }}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
+                      loading={loadingData}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
                       initialState={{

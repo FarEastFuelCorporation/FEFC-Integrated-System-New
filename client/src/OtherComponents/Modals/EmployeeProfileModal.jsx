@@ -27,6 +27,7 @@ import {
 } from "../Functions";
 import SuccessMessage from "../SuccessMessage";
 import ConfirmationDialog from "../ConfirmationDialog";
+import CustomLoadingOverlay from "../CustomLoadingOverlay";
 
 const EmployeeProfileModal = ({
   user,
@@ -48,6 +49,7 @@ const EmployeeProfileModal = ({
   const [attachmentLegalData, setAttachmentLegalData] = useState([]);
   const [attachmentMemoData, setAttachmentMemoData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -76,6 +78,7 @@ const EmployeeProfileModal = ({
     if (!selectedRow || !selectedRow.employeeId) {
       return;
     }
+    setLoadingData(true);
     try {
       const [
         employeeResponse,
@@ -107,6 +110,8 @@ const EmployeeProfileModal = ({
       );
     } catch (error) {
       console.error("Error fetching provinces:", error);
+    } finally {
+      setLoadingData(false);
     }
   }, [apiUrl, selectedRow]);
 
@@ -242,7 +247,8 @@ const EmployeeProfileModal = ({
 
   const handleConfirmDelete = async (id) => {
     try {
-      setLoading(true);
+      setOpenDialog(false); // Close the dialog
+      setLoadingData(true);
 
       const url =
         selectedTab === 5
@@ -270,12 +276,12 @@ const EmployeeProfileModal = ({
         );
       }
 
+      setShowSuccessMessage(true);
       setSuccessMessage("Attachment Deleted Successfully!");
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      setLoading(false);
-      setOpenDialog(false); // Close the dialog
+      setLoadingData(false);
     }
   };
 
@@ -1326,6 +1332,7 @@ const EmployeeProfileModal = ({
                       <SuccessMessage
                         message={successMessage}
                         onClose={() => setShowSuccessMessage(false)}
+                        marginLess="0px"
                       />
                     )}
                     <Typography variant="h3" gutterBottom mt={5}>
@@ -1369,9 +1376,13 @@ const EmployeeProfileModal = ({
                       }}
                       rows={attachmentMedicalData || []}
                       columns={columns}
-                      components={{ Toolbar: GridToolbar }}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      loading={loadingData}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}
@@ -1430,6 +1441,7 @@ const EmployeeProfileModal = ({
                       <SuccessMessage
                         message={successMessage}
                         onClose={() => setShowSuccessMessage(false)}
+                        marginLess="0px"
                       />
                     )}
                     <Typography variant="h3" gutterBottom mt={5}>
@@ -1473,9 +1485,13 @@ const EmployeeProfileModal = ({
                       }}
                       rows={attachmentLegalData || []}
                       columns={columns}
-                      components={{ Toolbar: GridToolbar }}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      loading={loadingData}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}
@@ -1534,6 +1550,7 @@ const EmployeeProfileModal = ({
                       <SuccessMessage
                         message={successMessage}
                         onClose={() => setShowSuccessMessage(false)}
+                        marginLess="0px"
                       />
                     )}
                     <Typography variant="h3" gutterBottom mt={5}>
@@ -1577,9 +1594,13 @@ const EmployeeProfileModal = ({
                       }}
                       rows={attachmentMemoData || []}
                       columns={columns}
-                      components={{ Toolbar: GridToolbar }}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      loading={loadingData}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}

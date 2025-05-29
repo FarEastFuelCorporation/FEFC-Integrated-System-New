@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
-const SuccessMessage = ({ message, onClose }) => {
+const SuccessMessage = ({ message, onClose, marginLess = "40px" }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [showMessage, setShowMessage] = useState(true);
@@ -22,7 +22,7 @@ const SuccessMessage = ({ message, onClose }) => {
     <Box
       sx={{
         position: "absolute",
-        width: "calc(100% - 40px)",
+        width: `calc(100% - ${marginLess})`,
         backgroundColor: "#8bc34a", // Light green color
         color: colors.grey[100],
         padding: "10px 20px",

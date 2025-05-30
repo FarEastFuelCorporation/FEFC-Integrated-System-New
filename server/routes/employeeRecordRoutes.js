@@ -7,10 +7,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 const {
   createEmployeeRecordController,
   getEmployeeRecordsController,
-  getEmployeeRecordsFullController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
   getEmployeeRecordSignatureController,
+  getEmployeeRecordController,
+  getEmployeeRecordPictureController,
 } = require("../controllers/employeeRecordController");
 
 // Create EmployeeRecord route
@@ -26,10 +27,10 @@ router.post(
 // Get EmployeeRecords route
 router.get("/", getEmployeeRecordsController);
 
-// Get EmployeeRecords route
-router.get("/full", getEmployeeRecordsFullController);
+// Get EmployeeRecord Picture route
+router.get("/picture/:id", getEmployeeRecordPictureController);
 
-// get  Signature route
+// Get EmployeeRecord Signature route
 router.get("/signature/:id", getEmployeeRecordSignatureController);
 
 // Update EmployeeRecord route

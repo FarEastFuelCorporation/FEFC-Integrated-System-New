@@ -1,6 +1,7 @@
 // controllers/employeeRecordController.js
 
 const EmployeeAttachment = require("../models/EmployeeAttachment");
+const EmployeeAttachmentCertificate = require("../models/EmployeeAttachmentCertificate");
 const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 const EmployeeRecord = require("../models/EmployeeRecord");
@@ -184,6 +185,11 @@ async function createEmployeeRecordController(req, res) {
           as: "EmployeeAttachmentMemo",
           attributes: ["fileName", "createdBy"], // Include only necessary fields
         },
+        {
+          model: EmployeeAttachmentCertificate,
+          as: "EmployeeAttachmentCertificate",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
       ],
     });
 
@@ -201,7 +207,7 @@ async function getEmployeeRecordsController(req, res) {
   try {
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
-      attributes: { exclude: ["picture", "signature"] },
+      attributes: { exclude: ["signature", "picture"] },
       order: [["employeeId", "ASC"]],
       include: [
         {
@@ -217,6 +223,11 @@ async function getEmployeeRecordsController(req, res) {
         {
           model: EmployeeAttachmentMemo,
           as: "EmployeeAttachmentMemo",
+          attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+        {
+          model: EmployeeAttachmentCertificate,
+          as: "EmployeeAttachmentCertificate",
           attributes: ["fileName", "createdBy"], // Include only necessary fields
         },
       ],
@@ -243,39 +254,25 @@ async function getEmployeeRecordsController(req, res) {
   }
 }
 
-// Get EmployeeRecords controller
-async function getEmployeeRecordsFullController(req, res) {
+// Get EmployeeRecord Picture controller
+async function getEmployeeRecordPictureController(req, res) {
   try {
-    // Fetch all EmployeeRecords from the database
-    const employeeRecords = await EmployeeRecord.findAll({
-      attributes: { exclude: ["signature"] },
-      order: [["employeeId", "ASC"]],
-      include: [
-        {
-          model: EmployeeAttachment,
-          as: "EmployeeAttachment",
-          attributes: ["fileName", "createdBy"], // Include only necessary fields
-        },
-        {
-          model: EmployeeAttachmentLegal,
-          as: "EmployeeAttachmentLegal",
-          attributes: ["fileName", "createdBy"], // Include only necessary fields
-        },
-        {
-          model: EmployeeAttachmentMemo,
-          as: "EmployeeAttachmentMemo",
-          attributes: ["fileName", "createdBy"], // Include only necessary fields
-        },
-      ],
+    const id = req.params.id;
+
+    const profile_picture = await IdInformation.findOne({
+      where: { employee_id: id },
+      attributes: ["profile_picture"],
     });
 
-    res.json({ employeeRecords });
+    res.json({ profile_picture });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
+    // Handle errors
+    console.error("Error soft-deleting Vehicle:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 }
-// Delete EmployeeRecord controller
+
+// Get EmployeeRecord Signature controller
 async function getEmployeeRecordSignatureController(req, res) {
   try {
     const id = req.params.id;
@@ -474,6 +471,11 @@ async function updateEmployeeRecordController(req, res) {
             as: "EmployeeAttachmentMemo",
             attributes: ["fileName", "createdBy"], // Include only necessary fields
           },
+          {
+            model: EmployeeAttachmentCertificate,
+            as: "EmployeeAttachmentCertificate",
+            attributes: ["fileName", "createdBy"], // Include only necessary fields
+          },
         ],
       });
 
@@ -532,7 +534,7 @@ async function deleteEmployeeRecordController(req, res) {
 module.exports = {
   createEmployeeRecordController,
   getEmployeeRecordsController,
-  getEmployeeRecordsFullController,
+  getEmployeeRecordPictureController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
   getEmployeeRecordSignatureController,

@@ -157,11 +157,6 @@ async function deleteEmployeeAttachmentLegalController(req, res) {
       await EmployeeAttachmentLegal.findByPk(id);
 
     if (employeeAttachmentLegalToDelete) {
-      // Update the deletedBy field
-      employeeAttachmentLegalToDelete.updatedBy = deletedBy;
-      employeeAttachmentLegalToDelete.deletedBy = deletedBy;
-      await employeeAttachmentLegalToDelete.save();
-
       // Soft delete the Employee AttachmentLegalType (sets deletedAt timestamp)
       await employeeAttachmentLegalToDelete.destroy();
 

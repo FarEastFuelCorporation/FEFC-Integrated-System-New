@@ -157,11 +157,6 @@ async function deleteEmployeeAttachmentMemoController(req, res) {
       await EmployeeAttachmentMemo.findByPk(id);
 
     if (employeeAttachmentMemoToDelete) {
-      // Update the deletedBy field
-      employeeAttachmentMemoToDelete.updatedBy = deletedBy;
-      employeeAttachmentMemoToDelete.deletedBy = deletedBy;
-      await employeeAttachmentMemoToDelete.save();
-
       // Soft delete the Employee AttachmentMemoType (sets deletedAt timestamp)
       await employeeAttachmentMemoToDelete.destroy();
 

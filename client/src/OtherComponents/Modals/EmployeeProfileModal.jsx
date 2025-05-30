@@ -28,6 +28,7 @@ import {
 import SuccessMessage from "../SuccessMessage";
 import ConfirmationDialog from "../ConfirmationDialog";
 import CustomLoadingOverlay from "../CustomLoadingOverlay";
+import LoadingSpinnerComponent from "../LoadingSpinnerComponent";
 
 const EmployeeProfileModal = ({
   user,
@@ -41,6 +42,7 @@ const EmployeeProfileModal = ({
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [employeePictureData, setEmployeePictureData] = useState({});
   const [employeesData, setEmployeesData] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [fileName, setFileName] = useState("");
@@ -48,8 +50,12 @@ const EmployeeProfileModal = ({
   const [attachmentMedicalData, setAttachmentMedicalData] = useState([]);
   const [attachmentLegalData, setAttachmentLegalData] = useState([]);
   const [attachmentMemoData, setAttachmentMemoData] = useState([]);
+  const [attachmentCertificateData, setAttachmentCertificateData] = useState(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [loadingPicture, setLoadingPicture] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -70,9 +76,14 @@ const EmployeeProfileModal = ({
       : attachmentLegalData.length * rowHeight + headerHeight;
 
   const attachmentMemoTableHeight =
-    attachmentMemoData.length === 0
+    attachmentMemoData?.length === 0
       ? rowHeight + headerHeight
-      : attachmentMemoData.length * rowHeight + headerHeight;
+      : attachmentMemoData?.length * rowHeight + headerHeight;
+
+  const attachmentCertificateTableHeight =
+    attachmentCertificateData?.length === 0
+      ? rowHeight + headerHeight
+      : attachmentCertificateData?.length * rowHeight + headerHeight;
 
   const fetchData = useCallback(async () => {
     if (!selectedRow || !selectedRow.employeeId) {
@@ -80,13 +91,19 @@ const EmployeeProfileModal = ({
     }
     setLoadingData(true);
     try {
+      setLoadingPicture(true);
       const [
+        employeeRecordPictureResponse,
         employeeResponse,
         departmentResponse,
         employeeAttachmentResponse,
         employeeAttachmentLegalResponse,
         employeeAttachmentMemoResponse,
+        employeeAttachmentCertificateResponse,
       ] = await Promise.all([
+        axios.get(
+          `${apiUrl}/api/employeeRecord/picture/${selectedRow.employeeId}`
+        ),
         axios.get(`${apiUrl}/api/employee`),
         axios.get(`${apiUrl}/api/department`),
         axios.get(`${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`),
@@ -96,22 +113,33 @@ const EmployeeProfileModal = ({
         axios.get(
           `${apiUrl}/api/employeeAttachmentMemo/${selectedRow.employeeId}`
         ),
+        axios.get(
+          `${apiUrl}/api/employeeAttachmentCertificate/${selectedRow.employeeId}`
+        ),
       ]);
+      setEmployeePictureData(
+        employeeRecordPictureResponse.data.profile_picture
+      );
       setEmployeesData(employeeResponse.data.employees);
       setDepartments(departmentResponse.data.departments);
       setAttachmentMedicalData(
-        employeeAttachmentResponse.data.employeeAttachments
+        employeeAttachmentResponse.data.employeeAttachments || []
       );
       setAttachmentLegalData(
-        employeeAttachmentLegalResponse.data.employeeAttachmentLegals
+        employeeAttachmentLegalResponse.data.employeeAttachmentLegals || []
       );
       setAttachmentMemoData(
-        employeeAttachmentMemoResponse.data.employeeAttachmentMemos
+        employeeAttachmentMemoResponse.data.employeeAttachmentMemos || []
+      );
+      setAttachmentCertificateData(
+        employeeAttachmentCertificateResponse.data
+          .employeeAttachmentCertificates || []
       );
     } catch (error) {
       console.error("Error fetching provinces:", error);
     } finally {
       setLoadingData(false);
+      setLoadingPicture(false);
     }
   }, [apiUrl, selectedRow]);
 
@@ -122,16 +150,20 @@ const EmployeeProfileModal = ({
   let employeePicture;
 
   if (
-    selectedRow &&
-    selectedRow.picture &&
-    selectedRow.picture.data &&
-    selectedRow.picture.type
+    employeePictureData &&
+    employeePictureData.profile_picture &&
+    employeePictureData.profile_picture.data &&
+    employeePictureData.profile_picture.type
   ) {
     try {
       // Convert Buffer to Uint8Array
-      const uint8Array = new Uint8Array(selectedRow.picture.data);
+      const uint8Array = new Uint8Array(
+        employeePictureData.profile_picture.data
+      );
       // Create Blob from Uint8Array
-      const blob = new Blob([uint8Array], { type: selectedRow.picture.type });
+      const blob = new Blob([uint8Array], {
+        type: employeePictureData.profile_picture.type,
+      });
       // Create object URL from Blob
       const imageUrl = URL.createObjectURL(blob);
 
@@ -216,7 +248,9 @@ const EmployeeProfileModal = ({
           ? uploadResponse.data.newAttachment
           : selectedTab === 6
           ? uploadResponse.data.newAttachmentLegal
-          : uploadResponse.data.newAttachmentMemo;
+          : selectedTab === 7
+          ? uploadResponse.data.newAttachmentMemo
+          : uploadResponse.data.newAttachmentCertificate;
 
       // Append the new attachment data to the existing data (if any)
       if (selectedTab === 5) {
@@ -226,8 +260,13 @@ const EmployeeProfileModal = ({
         ]);
       } else if (selectedTab === 6) {
         setAttachmentLegalData((prevData) => [...prevData, newAttachmentData]);
-      } else {
+      } else if (selectedTab === 7) {
         setAttachmentMemoData((prevData) => [...prevData, newAttachmentData]);
+      } else {
+        setAttachmentCertificateData((prevData) => [
+          ...prevData,
+          newAttachmentData,
+        ]);
       }
 
       setFileName("");
@@ -255,7 +294,9 @@ const EmployeeProfileModal = ({
           ? "employeeAttachment"
           : selectedTab === 6
           ? "employeeAttachmentLegal"
-          : "employeeAttachmentMemo";
+          : selectedTab === 7
+          ? "employeeAttachmentMemo"
+          : "employeeAttachmentCertificate";
 
       await axios.delete(`${apiUrl}/api/${url}/${id}`, {
         data: { deletedBy: user.id },
@@ -270,8 +311,12 @@ const EmployeeProfileModal = ({
         setAttachmentLegalData((prevData) =>
           prevData.filter((attachment) => attachment.id !== id)
         );
-      } else {
+      } else if (selectedTab === 7) {
         setAttachmentMemoData((prevData) =>
+          prevData.filter((attachment) => attachment.id !== id)
+        );
+      } else {
+        setAttachmentCertificateData((prevData) =>
           prevData.filter((attachment) => attachment.id !== id)
         );
       }
@@ -478,7 +523,7 @@ const EmployeeProfileModal = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 1400,
+            width: "80%",
             height: "90%",
             overflowY: "scroll",
             bgcolor: "background.paper",
@@ -517,7 +562,11 @@ const EmployeeProfileModal = ({
                     width: "192px",
                   }}
                 >
-                  {employeePicture}
+                  {loadingPicture ? (
+                    <LoadingSpinnerComponent isLoading={loadingPicture} />
+                  ) : (
+                    employeePicture
+                  )}
                 </Box>
                 <Grid container spacing={2} sx={{ minHeight: 220 }}>
                   <Grid item xs={12} md={6} lg={6.5}>
@@ -660,6 +709,8 @@ const EmployeeProfileModal = ({
                 <Tabs
                   value={selectedTab}
                   onChange={handleChangeTab}
+                  variant="scrollable"
+                  scrollButtons="auto"
                   sx={{
                     "& .Mui-selected": {
                       backgroundColor: colors.greenAccent[400],
@@ -676,7 +727,9 @@ const EmployeeProfileModal = ({
                   <Tab label="Medical Documents" />
                   <Tab label="Legal Documents" />
                   <Tab label="Memo" />
+                  <Tab label="Certificates" />
                 </Tabs>
+
                 {selectedTab === 0 && (
                   <Box>
                     <Grid container spacing={2} mt={2}>
@@ -1302,7 +1355,7 @@ const EmployeeProfileModal = ({
                           component="span"
                           sx={{ mt: 2, backgroundColor: colors.primary[500] }}
                         >
-                          Upload Employee Attachment
+                          Choose File
                         </Button>
                       </label>
                       <TextField
@@ -1411,7 +1464,7 @@ const EmployeeProfileModal = ({
                           component="span"
                           sx={{ mt: 2, backgroundColor: colors.primary[500] }}
                         >
-                          Upload Employee Attachment
+                          Choose File
                         </Button>
                       </label>
                       <TextField
@@ -1520,7 +1573,7 @@ const EmployeeProfileModal = ({
                           component="span"
                           sx={{ mt: 2, backgroundColor: colors.primary[500] }}
                         >
-                          Upload Employee Attachment
+                          Choose File
                         </Button>
                       </label>
                       <TextField
@@ -1593,6 +1646,115 @@ const EmployeeProfileModal = ({
                         },
                       }}
                       rows={attachmentMemoData || []}
+                      columns={columns}
+                      components={{
+                        Toolbar: GridToolbar,
+                        LoadingOverlay: CustomLoadingOverlay,
+                      }}
+                      getRowId={(row) => row.id}
+                      localeText={{ noRowsLabel: "No Files Uploaded" }}
+                      loading={loadingData}
+                      initialState={{
+                        sortModel: [{ field: "createdAt", sort: "asc" }],
+                      }}
+                    />
+                  </Box>
+                )}
+                {selectedTab === 8 && (
+                  <Box position="relative">
+                    <Typography variant="h3" gutterBottom mt={2}>
+                      Upload Attachment
+                    </Typography>
+                    <Grid item xs={12} md={6} lg={4} mb={2}>
+                      <input
+                        type="file"
+                        className="form-control visually-hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        id="attachment"
+                        name="attachment"
+                        style={{ display: "none" }}
+                      />
+                      <label htmlFor="attachment">
+                        <Typography>File: {fileName}</Typography>
+                        <Button
+                          variant="contained"
+                          component="span"
+                          sx={{ mt: 2, backgroundColor: colors.primary[500] }}
+                        >
+                          Choose File
+                        </Button>
+                      </label>
+                      <TextField
+                        label="File Name"
+                        variant="outlined"
+                        value={fileNameToSubmit}
+                        onChange={handleFileNameChange}
+                        fullWidth
+                        required
+                        autoComplete="off"
+                        sx={{ mt: 2 }}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={handleFormSubmit}
+                        sx={{
+                          mt: 2,
+                          backgroundColor: colors.greenAccent[500],
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? "Uploading..." : "Submit Attachment"}
+                      </Button>
+                    </Grid>
+                    <hr />
+                    {showSuccessMessage && (
+                      <SuccessMessage
+                        message={successMessage}
+                        onClose={() => setShowSuccessMessage(false)}
+                        marginLess="0px"
+                      />
+                    )}
+                    <Typography variant="h3" gutterBottom mt={5}>
+                      Certificates
+                    </Typography>
+                    <DataGrid
+                      sx={{
+                        "&.MuiDataGrid-root.MuiDataGrid-root--densityStandard":
+                          {
+                            height: attachmentCertificateTableHeight,
+                          },
+                        "& .MuiDataGrid-root": {
+                          border: "none",
+                          width: "100%",
+                          color: colors.grey[100],
+                        },
+                        "& .MuiDataGrid-overlayWrapper": {
+                          minHeight: "52px",
+                        },
+                        "& .name-column--cell": {
+                          color: colors.greenAccent[300],
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                          backgroundColor: colors.blueAccent[700],
+                          borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-columnHeaderTitle": {
+                          whiteSpace: "normal !important",
+                          wordWrap: "break-word !important",
+                          lineHeight: "1.2 !important",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                          backgroundColor: colors.primary[400],
+                        },
+                        "& .MuiDataGrid-toolbarContainer": {
+                          display: "none",
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                          display: "none",
+                        },
+                      }}
+                      rows={attachmentCertificateData || []}
                       columns={columns}
                       components={{
                         Toolbar: GridToolbar,

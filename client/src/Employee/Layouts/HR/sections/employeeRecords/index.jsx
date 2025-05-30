@@ -95,7 +95,6 @@ const EmployeeRecords = ({ user }) => {
   const [signatureFileName, setSignatureFileName] = useState("");
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingPicture, setLoadingPicture] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -113,13 +112,6 @@ const EmployeeRecords = ({ user }) => {
       setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
       setDepartments(departmentResponse.data.departments);
       setLoading(false);
-      // Now fetch the full data with pictures
-      setLoadingPicture(true);
-      const fullEmployeeRecordResponse = await axios.get(
-        `${apiUrl}/api/employeeRecord/full`
-      );
-      setEmployeeRecord(fullEmployeeRecordResponse.data.employeeRecords);
-      setLoadingPicture(false);
     } catch (error) {
       console.error("Error fetching employeeData:", error);
     }
@@ -560,45 +552,6 @@ const EmployeeRecords = ({ user }) => {
     </div>
   );
 
-  const renderPictureCell = (params) => {
-    if (loadingPicture) {
-      return <CircularProgress size={20} color="secondary" />; // Spinner while loading pictures
-    }
-
-    if (params.value && params.value.data && params.value.type) {
-      try {
-        const uint8Array = new Uint8Array(params.value.data);
-        const blob = new Blob([uint8Array], { type: params.value.type });
-        const imageUrl = URL.createObjectURL(blob);
-
-        return (
-          <img
-            src={imageUrl}
-            alt="Employee"
-            style={{ width: 40, height: 40, borderRadius: "50%" }}
-          />
-        );
-      } catch (error) {
-        console.error("Error creating image URL:", error);
-        return (
-          <img
-            src="/assets/unknown.png"
-            alt="Employee"
-            style={{ width: 40, height: 40, borderRadius: "50%" }}
-          />
-        );
-      }
-    } else {
-      return (
-        <img
-          src="/assets/unknown.png"
-          alt="Employee"
-          style={{ width: 40, height: 40, borderRadius: "50%" }}
-        />
-      );
-    }
-  };
-
   const columns = [
     {
       field: "employeeId",
@@ -606,15 +559,6 @@ const EmployeeRecords = ({ user }) => {
       width: 80,
       headerAlign: "center",
       renderCell: renderCellWithWrapText,
-    },
-    {
-      field: "picture",
-      headerName: "Picture",
-      align: "center",
-      sortable: false,
-      width: 70,
-      headerAlign: "center",
-      renderCell: renderPictureCell,
     },
     {
       field: "employeeStatus",

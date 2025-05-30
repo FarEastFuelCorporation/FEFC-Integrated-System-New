@@ -5,30 +5,30 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 const {
-  createEmployeeAttachmentMemoController,
-  getEmployeeAttachmentsMemoController,
-  getEmployeeAttachmentMemoController,
-  getEmployeeAttachmentMemoFullController,
-  deleteEmployeeAttachmentMemoController,
-} = require("../controllers/employeeAttachmentMemoController");
+  createEmployeeAttachmentCertificateController,
+  getEmployeeAttachmentsCertificateController,
+  getEmployeeAttachmentCertificateController,
+  getEmployeeAttachmentCertificateFullController,
+  deleteEmployeeAttachmentCertificateController,
+} = require("../controllers/employeeAttachmentCertificateController");
 
-// Create Employee AttachmentMemo route
+// Create Employee AttachmentCertificate route
 router.post(
   "/",
   upload.single("attachment"),
-  createEmployeeAttachmentMemoController
+  createEmployeeAttachmentCertificateController
 );
 
-// Get Employee AttachmentMemos route
-router.get("/", getEmployeeAttachmentsMemoController);
+// Get Employee AttachmentCertificates route
+router.get("/", getEmployeeAttachmentsCertificateController);
 
-// Get Employee AttachmentMemo route
-router.get("/:id", getEmployeeAttachmentMemoController);
+// Get Employee AttachmentCertificate route
+router.get("/:id", getEmployeeAttachmentCertificateController);
 
-// Get Employee AttachmentMemo Full route
-router.get("/full/:id", getEmployeeAttachmentMemoFullController);
+// Get Employee AttachmentCertificate Full route
+router.get("/full/:id", getEmployeeAttachmentCertificateFullController);
 
 // Delete Booked Transaction route
-router.delete("/:id", deleteEmployeeAttachmentMemoController);
+router.delete("/:id", deleteEmployeeAttachmentCertificateController);
 
 module.exports = router;

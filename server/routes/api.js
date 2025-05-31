@@ -59,6 +59,7 @@ const employeeAttachmentRoutes = require("./employeeAttachmentRoutes");
 const employeeAttachmentLegalRoutes = require("./employeeAttachmentLegalRoutes");
 const employeeAttachmentMemoRoutes = require("./employeeAttachmentMemoRoutes");
 const employeeAttachmentCertificateRoutes = require("./employeeAttachmentCertificateRoutes");
+const employeeAttachmentIncidentRoutes = require("./employeeAttachmentIncidentRoutes");
 const departmentRoutes = require("./departmentRoutes");
 const medicineRoutes = require("./medicineRoutes");
 const medicineLogRoutes = require("./medicineLogRoutes");
@@ -144,6 +145,7 @@ router.use(
   "/employeeAttachmentCertificate",
   employeeAttachmentCertificateRoutes
 );
+router.use("/employeeAttachmentIncident", employeeAttachmentIncidentRoutes);
 router.use("/department", departmentRoutes);
 router.use("/medicine", medicineRoutes);
 router.use("/medicineLog", medicineLogRoutes);

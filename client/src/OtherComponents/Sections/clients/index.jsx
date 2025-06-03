@@ -37,6 +37,8 @@ const Clients = ({ user }) => {
   const initialFormData = {
     id: "",
     clientId: "",
+    clientActivityStatus: "",
+    clientTransactionStatus: "",
     moaDate: "",
     moaEndDate: "",
     clientName: "",
@@ -137,6 +139,8 @@ const Clients = ({ user }) => {
       setFormData({
         id: clientToEdit.id,
         clientId: clientToEdit.clientId,
+        clientActivityStatus: clientToEdit.clientActivityStatus || "",
+        clientTransactionStatus: clientToEdit.clientTransactionStatus || "",
         moaDate: clientToEdit.moaDate || "",
         moaEndDate: clientToEdit.moaEndDate || "",
         clientName: clientToEdit.clientName || "",
@@ -207,6 +211,14 @@ const Clients = ({ user }) => {
     try {
       setLoading(true);
       const formDataToSend = new FormData();
+      formDataToSend.append(
+        "clientActivityStatus",
+        formData.clientActivityStatus
+      );
+      formDataToSend.append(
+        "clientTransactionStatus",
+        formData.clientTransactionStatus
+      );
       formDataToSend.append("moaDate", formData.moaDate);
       formDataToSend.append("moaEndDate", formData.moaEndDate);
       formDataToSend.append("clientName", formData.clientName);
@@ -269,7 +281,7 @@ const Clients = ({ user }) => {
       headerName: "Client ID",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      width: 80,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -350,7 +362,7 @@ const Clients = ({ user }) => {
       headerName: "Contact Number",
       headerAlign: "center",
       align: "center",
-      minWidth: 150,
+      minWidth: 80,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -358,7 +370,23 @@ const Clients = ({ user }) => {
       headerName: "Client Type",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      width: 80,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "clientActivityStatus",
+      headerName: "Activity Status",
+      headerAlign: "center",
+      align: "center",
+      width: 80,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "clientTransactionStatus",
+      headerName: "Transaction Status",
+      headerAlign: "center",
+      align: "center",
+      width: 80,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -464,7 +492,7 @@ const Clients = ({ user }) => {
       headerName: "Account Handler",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      width: 100,
       valueGetter: (params) => {
         return `${params.row.Employee?.firstName} ${params.row.Employee?.lastName}`;
       },
@@ -643,6 +671,52 @@ const Clients = ({ user }) => {
                   shrink: true,
                 }}
               />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} my={2}>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Activity Status"
+                name="clientActivityStatus"
+                value={formData.clientActivityStatus}
+                onChange={handleInputChange}
+                select
+                required
+                fullWidth
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              >
+                <MenuItem value="ACTIVE">ACTIVE</MenuItem>
+                <MenuItem value="INACTIVE">INACTIVE</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <TextField
+                label="Transaction Status"
+                name="clientTransactionStatus"
+                value={formData.clientTransactionStatus}
+                onChange={handleInputChange}
+                select
+                required
+                fullWidth
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              >
+                <MenuItem value="QUOTATION REQUEST">QUOTATION REQUEST</MenuItem>
+                <MenuItem value="QUOTATION APPROVAL">
+                  QUOTATION APPROVAL
+                </MenuItem>
+                <MenuItem value="DRAFT MOA SENT">DRAFT MOA SENT</MenuItem>
+                <MenuItem value="MOA APPROVED">MOA APPROVED</MenuItem>
+              </TextField>
             </Grid>
           </Grid>
           <Grid container spacing={2} my={2}>

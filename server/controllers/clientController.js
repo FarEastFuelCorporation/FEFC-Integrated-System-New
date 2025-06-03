@@ -12,6 +12,8 @@ async function createClientController(req, res) {
   try {
     // Extracting data from the request body
     let {
+      clientActivityStatus,
+      clientTransactionStatus,
       clientName,
       address,
       natureOfBusiness,
@@ -47,6 +49,8 @@ async function createClientController(req, res) {
     // Creating a new client
     await Client.create({
       clientId,
+      clientActivityStatus,
+      clientTransactionStatus,
       clientName,
       address,
       natureOfBusiness,
@@ -159,6 +163,8 @@ async function updateClientController(req, res) {
     console.log("Updating client with ID:", id);
 
     let {
+      clientActivityStatus,
+      clientTransactionStatus,
       clientName,
       address,
       natureOfBusiness,
@@ -196,6 +202,8 @@ async function updateClientController(req, res) {
     const updatedClient = await Client.findByPk(id);
 
     if (updatedClient) {
+      updatedClient.clientActivityStatus = clientActivityStatus || "";
+      updatedClient.clientTransactionStatus = clientTransactionStatus || "";
       updatedClient.clientName = clientName || "";
       // Update client attributes
       updatedClient.address = address || "";

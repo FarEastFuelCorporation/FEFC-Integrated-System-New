@@ -112,7 +112,7 @@ async function initializeApp() {
     console.log("Syncing models to the database...");
 
     // await sequelizeJD.sync({ alter: true });
-    // await ClientAttachment.sync({ alter: true });
+    // await Client.sync({ alter: true });
 
     // await handleAttendanceSync();
 

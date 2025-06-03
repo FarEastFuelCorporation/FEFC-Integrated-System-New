@@ -86,5 +86,18 @@ export const validateClientForm = (data) => {
     );
   }
 
+  // Client Activity Status: Required
+  if (!data.clientActivityStatus || data.clientActivityStatus.trim() === "") {
+    errors.push("Client Activity Status is required.");
+  }
+
+  // Client Transaction Status: Required
+  if (
+    !data.clientTransactionStatus ||
+    data.clientTransactionStatus.trim() === ""
+  ) {
+    errors.push("Client Transaction Status is required.");
+  }
+
   return errors;
 };

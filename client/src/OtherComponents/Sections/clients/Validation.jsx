@@ -51,10 +51,10 @@ export const validateClientForm = (data) => {
   // Contact Person: Optional
   if (
     data.billerContactPerson &&
-    !/^[a-zA-Z\s.']{2,}$/.test(data.billerContactPerson.trim())
+    !/^[a-zA-Z\s.'\-&,()]{2,}$/.test(data.billerContactPerson.trim())
   ) {
     errors.push(
-      "Biller Contact Person must contain only letters and valid characters."
+      "Biller Contact Person must contain only letters and valid special characters (e.g., . ' - & , ())."
     );
   }
 

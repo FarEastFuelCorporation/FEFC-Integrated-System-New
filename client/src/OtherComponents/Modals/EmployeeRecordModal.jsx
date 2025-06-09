@@ -729,7 +729,29 @@ const EmployeeRecordModal = ({
             {currentStep === 1 && (
               <Box>
                 <Grid container spacing={2} mb={2}>
-                  <Grid item xs={12} md={6} lg={3}>
+                  <Grid item xs={12} md={6} lg={12 / 5}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        id="employeeStatus-select-label"
+                        style={{ color: colors.grey[100] }}
+                        required
+                      >
+                        Employee Status
+                      </InputLabel>
+                      <Select
+                        labelId="employeeStatus-select-label"
+                        name="employeeStatus"
+                        value={formData.employeeStatus}
+                        onChange={handleInputChange}
+                        label="Employee Type"
+                        fullWidth
+                      >
+                        <MenuItem value={"ACTIVE"}>ACTIVE</MenuItem>
+                        <MenuItem value={"INACTIVE"}>INACTIVE</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={12 / 5}>
                     <TextField
                       label="Date of Hire"
                       name="dateHire"
@@ -745,7 +767,7 @@ const EmployeeRecordModal = ({
                       autoComplete="off"
                     />
                   </Grid>
-                  <Grid item xs={12} md={6} lg={3}>
+                  <Grid item xs={12} md={6} lg={12 / 5}>
                     <FormControl fullWidth>
                       <InputLabel
                         id="employeeType-select-label"
@@ -775,7 +797,7 @@ const EmployeeRecordModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} md={6} lg={3}>
+                  <Grid item xs={12} md={6} lg={12 / 5}>
                     <FormControl fullWidth>
                       <InputLabel
                         id="payrollType-select-label"
@@ -797,7 +819,7 @@ const EmployeeRecordModal = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} md={6} lg={3}>
+                  <Grid item xs={12} md={6} lg={12 / 5}>
                     <FormControl fullWidth>
                       <InputLabel
                         id="salaryType-select-label"

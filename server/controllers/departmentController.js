@@ -39,6 +39,10 @@ async function getDepartmentsController(req, res) {
         model: EmployeeRecord,
         as: "EmployeeRecord",
         attributes: ["gender"],
+        where: {
+          employeeStatus: "ACTIVE",
+        },
+        required: false, // Set to true if you only want departments that have active employees
       },
       order: [["department", "ASC"]],
     });

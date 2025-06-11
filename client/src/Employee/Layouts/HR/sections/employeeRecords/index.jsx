@@ -572,12 +572,10 @@ const EmployeeRecords = ({ user }) => {
       headerName: "First Name",
       width: 100,
       headerAlign: "center",
-      renderCell: (params) => {
-        let value = {};
-        value.value = `${params.row.firstName} ${params.row.affix}` || "";
-
-        return renderCellWithWrapText(value);
+      valueGetter: (params) => {
+        return `${params.row.firstName} ${params.row.affix}` || "";
       },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "middleName",
@@ -617,29 +615,61 @@ const EmployeeRecords = ({ user }) => {
     {
       field: "birthday",
       headerName: "Birthday",
-      width: 80,
+      width: 150,
       headerAlign: "center",
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.birthday
-          ? formatDate3(params.row.birthday)
-          : null || "";
+      sortable: true,
 
-        return renderCellWithWrapText(value);
+      // Return raw Date for sorting
+      sortComparator: (v1, v2) => {
+        const date1 = new Date(v1);
+        const date2 = new Date(v2);
+        return date1 - date2;
+      },
+
+      // Value used for filtering
+      valueGetter: (params) => {
+        const date = new Date(params.row.birthday);
+        if (isNaN(date)) return "";
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }); // e.g., "June 5, 2024"
+      },
+
+      // Cell rendering
+      renderCell: (params) => {
+        return renderCellWithWrapText({ value: params.value });
       },
     },
     {
       field: "dateHire",
       headerName: "Date Hire",
-      width: 80,
+      width: 150,
       headerAlign: "center",
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.dateHire
-          ? formatDate3(params.row.dateHire)
-          : null;
+      sortable: true,
 
-        return renderCellWithWrapText(value);
+      // Return raw Date for sorting
+      sortComparator: (v1, v2) => {
+        const date1 = new Date(v1);
+        const date2 = new Date(v2);
+        return date1 - date2;
+      },
+
+      // Value used for filtering
+      valueGetter: (params) => {
+        const date = new Date(params.row.dateHire);
+        if (isNaN(date)) return "";
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }); // e.g., "June 5, 2024"
+      },
+
+      // Cell rendering
+      renderCell: (params) => {
+        return renderCellWithWrapText({ value: params.value });
       },
     },
     {
@@ -663,16 +693,11 @@ const EmployeeRecords = ({ user }) => {
       headerName: "Department",
       width: 200,
       headerAlign: "center",
-      renderCell: (params) => {
-        const department = departments.find(
-          (department) => department.id === params.value
-        );
-
-        let value = {};
-        value.value = department ? department.department : "(No Data)";
-
-        return renderCellWithWrapText(value);
+      valueGetter: (params) => {
+        return params.row.Department?.department;
       },
+
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "mobileNumber",

@@ -1,5 +1,6 @@
 // controllers/employeeRecordController.js
 
+const Department = require("../models/Department");
 const EmployeeAttachment = require("../models/EmployeeAttachment");
 const EmployeeAttachmentCertificate = require("../models/EmployeeAttachmentCertificate");
 const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
@@ -229,6 +230,11 @@ async function getEmployeeRecordsController(req, res) {
           model: EmployeeAttachmentCertificate,
           as: "EmployeeAttachmentCertificate",
           attributes: ["fileName", "createdBy"], // Include only necessary fields
+        },
+        {
+          model: Department,
+          as: "Department",
+          attributes: ["department"], // Include only necessary fields
         },
       ],
     });

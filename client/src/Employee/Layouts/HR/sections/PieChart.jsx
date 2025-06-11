@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../../../../theme";
 import { useTheme } from "@emotion/react";
+import axios from "axios";
 
 const PieChart = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -9,21 +10,35 @@ const PieChart = () => {
   const colors = tokens(theme.palette.mode);
   const [data, setData] = useState([]);
 
+  const departmentLabelMap = {
+    "ADMIN DEPARTMENT": "ADMIN DEPT.",
+    "WAREHOUSE & RENDERING DEPARTMENT": "W&R DEPT.",
+    "TREATMENT DEPARTMENT": "TREATMENT DEPT.",
+    "LOGISTICS DEPARTMENT": "LOGISTICS DEPT.",
+    "FACILITY MANAGEMENT SERVICES DEPARTMENT": "FMS DEPT.",
+    "EXECUTIVE DEPARTMENT": "EXECUTIVE DEPT.",
+    "MARKETING DEPARTMENT": "MARKETING DEPT.",
+    "ENGINEERING/ RESEARCH AND DEVELOPMENT DEPARTMENT": "ERD DEPT.",
+  };
+
   useEffect(() => {
     const fetchDepartmentCounts = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/hrDashboard/employee`);
-        const data = await response.json();
+        const response = await axios.get(`${apiUrl}/api/department/count`);
+        const departments = response.data.departments;
 
-        const departmentCounts = data.departmentCounts; // Assuming departmentCounts is directly in response.data
+        const formattedData = departments.map((dept) => {
+          const rawDept = dept.department;
+          const mappedLabel =
+            departmentLabelMap[rawDept] || rawDept.replace(" DEPARTMENT", "");
 
-        // Convert the departmentCounts to the format required by the pie chart
-        const formattedData = Object.keys(departmentCounts).map((key) => ({
-          id: key.replace(" DEPARTMENT", ""),
-          label: key.replace(" DEPARTMENT", ""),
-          value: departmentCounts[key],
-          color: "hsl(210, 70%, 50%)", // You can set a default color or customize as needed
-        }));
+          return {
+            id: mappedLabel,
+            label: mappedLabel,
+            value: dept.employeeCount,
+            color: "hsl(210, 70%, 50%)",
+          };
+        });
 
         setData(formattedData);
       } catch (error) {
@@ -64,6 +79,11 @@ const PieChart = () => {
             fill: colors.grey[100],
           },
         },
+        tooltip: {
+          container: {
+            color: colors.primary[500],
+          },
+        },
       }}
       margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
       innerRadius={0.5}
@@ -75,7 +95,7 @@ const PieChart = () => {
         from: "color",
         modifiers: [["darker", 0.2]],
       }}
-      arcLinkLabelsSkipAngle={10}
+      arcLinkLabelsSkipAngle={0}
       arcLinkLabelsTextColor={colors.grey[100]}
       arcLinkLabelsThickness={2}
       arcLinkLabelsColor={{ from: "color" }}

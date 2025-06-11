@@ -81,6 +81,38 @@ async function getDepartmentsController(req, res) {
   }
 }
 
+// Get Department Employee Count controller
+async function getDepartmentEmployeeCountController(req, res) {
+  try {
+    const departments = await Department.findAll({
+      include: {
+        model: EmployeeRecord,
+        as: "EmployeeRecord",
+        attributes: ["id"], // Only need ID to count
+        where: {
+          employeeStatus: "ACTIVE",
+        },
+        required: false,
+      },
+      order: [["department", "ASC"]],
+    });
+
+    const departmentCounts = departments.map((dept) => {
+      const activeEmployees = dept.EmployeeRecord || [];
+      return {
+        id: dept.id,
+        department: dept.department,
+        employeeCount: activeEmployees.length,
+      };
+    });
+
+    res.json({ departments: departmentCounts });
+  } catch (error) {
+    console.error("Error in getDepartmentEmployeeCountController:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 // Update Department controller
 async function updateDepartmentController(req, res) {
   try {
@@ -162,6 +194,7 @@ async function deleteDepartmentController(req, res) {
 module.exports = {
   createDepartmentController,
   getDepartmentsController,
+  getDepartmentEmployeeCountController,
   updateDepartmentController,
   deleteDepartmentController,
 };

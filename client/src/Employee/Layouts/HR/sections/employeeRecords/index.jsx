@@ -1,19 +1,52 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Box, IconButton } from "@mui/material";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import Header from "../Header";
 import axios from "axios";
+import OrgChart from "@dabeng/react-orgchart";
+import Tree from "react-d3-tree";
 import EmployeeRecordModal from "../../../../../OtherComponents/Modals/EmployeeRecordModal";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
 import EmployeeProfileModal from "../../../../../OtherComponents/Modals/EmployeeProfileModal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
-import CircularProgress from "@mui/material/CircularProgress";
-import { formatDate3 } from "../../../../../OtherComponents/Functions";
+import { tokens } from "../../../../../theme";
+import { useTheme } from "@emotion/react";
+
+function buildTree(list) {
+  const map = {};
+  const roots = [];
+
+  list.forEach((emp) => {
+    map[emp.employeeId] = { ...emp, children: [] };
+  });
+
+  list.forEach((emp) => {
+    if (emp.employeeStatus === "ACTIVE") {
+      if (emp.immediateHeadId && map[emp.immediateHeadId]) {
+        map[emp.immediateHeadId].children.push(map[emp.employeeId]);
+      } else {
+        roots.push(map[emp.employeeId]);
+      }
+    }
+  });
+
+  return roots[0]; // assuming one root
+}
 
 const EmployeeRecords = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   const initialFormData = {
     id: "",
@@ -81,8 +114,9 @@ const EmployeeRecords = ({ user }) => {
     signature: null,
     createdBy: user.id,
   };
-
+  const [selectedTabMain, setSelectedTabMain] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const [orgData, setOrgData] = useState([]);
   const [formData, setFormData] = useState(initialFormData);
   const [selectedTab, setSelectedTab] = useState(0);
   const [employeeRecords, setEmployeeRecord] = useState([]);
@@ -93,7 +127,6 @@ const EmployeeRecords = ({ user }) => {
   const [pictureFileName, setPictureFileName] = useState("");
   const [signatureFile, setSignatureFile] = useState(null);
   const [signatureFileName, setSignatureFileName] = useState("");
-  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [successMessage, setSuccessMessage] = useState("");
@@ -104,13 +137,17 @@ const EmployeeRecords = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [employeeRecordResponse, departmentResponse] = await Promise.all([
-        axios.get(`${apiUrl}/api/employeeRecord`),
-        axios.get(`${apiUrl}/api/department`),
-      ]);
+
+      const employeeRecordResponse = await axios.get(
+        `${apiUrl}/api/employeeRecord`
+      );
 
       setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
-      setDepartments(departmentResponse.data.departments);
+
+      const orgData = buildTree(employeeRecordResponse.data.employeeRecords);
+
+      setOrgData(orgData);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching employeeData:", error);
@@ -120,6 +157,10 @@ const EmployeeRecords = ({ user }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleChangeTabMain = (event, newValue) => {
+    setSelectedTabMain(newValue);
+  };
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -573,7 +614,7 @@ const EmployeeRecords = ({ user }) => {
       width: 100,
       headerAlign: "center",
       valueGetter: (params) => {
-        return `${params.row.firstName} ${params.row.affix}` || "";
+        return `${params.row.firstName} ${params.row.affix || ""}` || "";
       },
       renderCell: renderCellWithWrapText,
     },
@@ -722,6 +763,48 @@ const EmployeeRecords = ({ user }) => {
     setSelectedTab(0);
   };
 
+  const renderMuiNode = ({ nodeDatum }) => {
+    return (
+      <foreignObject width="200" height="100" x={-100} y={-50}>
+        <Card
+          variant="outlined"
+          sx={{
+            bgcolor: colors.grey[900],
+            borderColor: colors.greenAccent[400],
+          }}
+        >
+          <CardContent sx={{ p: 1 }}>
+            <Typography variant="body1" fontWeight="bold" align="center">
+              {`${nodeDatum.lastName}, ${nodeDatum.firstName} ${
+                nodeDatum.affix
+              } ${nodeDatum.middleName} ${
+                nodeDatum.gender === "MALE"
+                  ? ""
+                  : nodeDatum.civilStatus === "SINGLE" ||
+                    nodeDatum.civilStatus === "LIVE-IN"
+                  ? ""
+                  : ` - ${nodeDatum.husbandSurname}`
+              }`}
+            </Typography>
+            <Typography variant="body2" align="center" color="text.secondary">
+              {nodeDatum.designation}
+            </Typography>
+            <Typography
+              variant="caption"
+              align="center"
+              display="block"
+              color="text.secondary"
+            >
+              {nodeDatum.Department.department}
+            </Typography>
+          </CardContent>
+        </Card>
+      </foreignObject>
+    );
+  };
+
+  const treeContainerRef = useRef();
+
   return (
     <Box p="20px" width="100% !important" position="relative">
       <LoadingSpinner isLoading={loading} />
@@ -744,14 +827,64 @@ const EmployeeRecords = ({ user }) => {
           onClose={() => setShowSuccessMessage(false)}
         />
       )}
-      <CustomDataGridStyles>
-        <DataGrid
-          rows={employeeRecords ? employeeRecords : []}
-          columns={columns}
-          components={{ Toolbar: GridToolbar }}
-          {...{ onRowClick: handleRowClick }}
-        />
-      </CustomDataGridStyles>
+      <Card>
+        <Tabs
+          value={selectedTabMain}
+          onChange={handleChangeTabMain}
+          sx={{
+            "& .Mui-selected": {
+              backgroundColor: colors.greenAccent[400],
+              boxShadow: "none",
+              borderBottom: `1px solid ${colors.grey[100]}`,
+            },
+            "& .MuiTab-root > span": {
+              paddingRight: "10px",
+            },
+          }}
+        >
+          <Tab label={"Records"} />
+          <Tab label={"Org Chart"} />
+        </Tabs>
+        {selectedTabMain === 0 && (
+          <CustomDataGridStyles margin={0}>
+            <DataGrid
+              rows={employeeRecords ? employeeRecords : []}
+              columns={columns}
+              components={{ Toolbar: GridToolbar }}
+              {...{ onRowClick: handleRowClick }}
+            />
+          </CustomDataGridStyles>
+        )}
+        {selectedTabMain === 1 && (
+          <Box height={"75vh"}>
+            {/* <OrgChart
+              datasource={orgData}
+              chartClass="my-org-chart"
+              NodeTemplate={MyNodeComponent}
+            /> */}
+            <div
+              id="treeWrapper"
+              ref={treeContainerRef}
+              style={{
+                width: "100%",
+                height: "100vh",
+                backgroundColor: colors.grey[100],
+              }}
+            >
+              <Tree
+                data={orgData}
+                orientation="vertical"
+                renderCustomNodeElement={renderMuiNode}
+                translate={{ x: 400, y: 300 }}
+                nodeSize={{ x: 220, y: 140 }} // Adjust these for spacing
+                zoomable
+                collapsible
+                pathFunc="elbow"
+              />
+            </div>
+          </Box>
+        )}
+      </Card>
       <EmployeeRecordModal
         user={user}
         openModal={openModal}

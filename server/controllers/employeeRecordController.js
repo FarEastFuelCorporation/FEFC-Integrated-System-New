@@ -209,6 +209,69 @@ async function getEmployeeRecordsController(req, res) {
   try {
     // Fetch all EmployeeRecords from the database
     const employeeRecords = await EmployeeRecord.findAll({
+      attributes: [
+        "id",
+        "employeeId",
+        "employeeStatus",
+        "firstName",
+        "middleName",
+        "lastName",
+        "husbandSurname",
+        "affix",
+        "gender",
+        "civilStatus",
+        "birthday",
+        "dateHire",
+        "employeeType",
+        "designation",
+        "departmentId",
+        "mobileNumber",
+      ],
+      order: [["employeeId", "ASC"]],
+      include: [
+        {
+          model: Department,
+          as: "Department",
+          attributes: ["department"], // Include only necessary fields
+        },
+        {
+          model: EmployeeContract,
+          as: "EmployeeContract",
+          attributes: {
+            exclude: ["attachment"],
+          },
+        },
+      ],
+    });
+
+    // Create a new array with only employeeId and employeeName
+    const employees = employeeRecords.map((record) => {
+      const employee = record.toJSON();
+      return {
+        employeeId: employee.employeeId,
+        employeeName: `${employee.firstName || ""} ${
+          employee.lastName || ""
+        }`.trim(),
+      };
+    });
+
+    res.json({
+      employeeRecords,
+      employees,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
+// Get EmployeeRecord controller
+async function getEmployeeRecordController(req, res) {
+  try {
+    const id = req.params.id;
+    // Fetch all EmployeeRecords from the database
+    const employeeRecord = await EmployeeRecord.findOne({
+      where: { employeeId: id },
       attributes: { exclude: ["signature", "picture"] },
       order: [["employeeId", "ASC"]],
       include: [
@@ -247,20 +310,8 @@ async function getEmployeeRecordsController(req, res) {
       ],
     });
 
-    // Create a new array with only employeeId and employeeName
-    const employees = employeeRecords.map((record) => {
-      const employee = record.toJSON();
-      return {
-        employeeId: employee.employeeId,
-        employeeName: `${employee.firstName || ""} ${
-          employee.lastName || ""
-        }`.trim(),
-      };
-    });
-
     res.json({
-      employeeRecords,
-      employees,
+      employeeRecord,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -548,6 +599,7 @@ async function deleteEmployeeRecordController(req, res) {
 module.exports = {
   createEmployeeRecordController,
   getEmployeeRecordsController,
+  getEmployeeRecordController,
   getEmployeeRecordPictureController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,

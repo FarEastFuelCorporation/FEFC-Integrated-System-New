@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Modal,
   Box,
@@ -565,7 +565,7 @@ const EmployeeProfileModal = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "80%",
+            width: "70%",
             height: "90%",
             overflowY: "scroll",
             bgcolor: "background.paper",

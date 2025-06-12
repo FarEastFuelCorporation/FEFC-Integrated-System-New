@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   IconButton,
@@ -12,7 +13,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import Header from "../Header";
 import axios from "axios";
-import OrgChart from "@dabeng/react-orgchart";
+import PageviewIcon from "@mui/icons-material/Pageview";
 import Tree from "react-d3-tree";
 import EmployeeRecordModal from "../../../../../OtherComponents/Modals/EmployeeRecordModal";
 import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
@@ -128,6 +129,8 @@ const EmployeeRecords = ({ user }) => {
   const [signatureFile, setSignatureFile] = useState(null);
   const [signatureFileName, setSignatureFileName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingRowId, setLoadingRowId] = useState(null);
+  const [row, setViewData] = useState(null);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -142,6 +145,7 @@ const EmployeeRecords = ({ user }) => {
         `${apiUrl}/api/employeeRecord`
       );
 
+      console.log(employeeRecordResponse.data.employeeRecords);
       setEmployeeRecord(employeeRecordResponse.data.employeeRecords);
 
       const orgData = buildTree(employeeRecordResponse.data.employeeRecords);
@@ -595,6 +599,57 @@ const EmployeeRecords = ({ user }) => {
 
   const columns = [
     {
+      field: "view",
+      headerName: "View",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 50,
+      renderCell: (params) => (
+        <IconButton
+          color="secondary"
+          variant="contained"
+          disabled={loading}
+          onClick={async () => {
+            try {
+              const id = params.row.id; // Get the document ID
+              const employeeId = params.row.employeeId; // Get the document ID
+              setLoadingRowId(id);
+
+              const response = await axios.get(
+                `${apiUrl}/api/employeeRecord/${employeeId}`
+              );
+
+              // Check for errors in the response
+              if (response.data?.error) {
+                throw new Error(response.data.error);
+              }
+
+              // Ensure the data structure is valid
+              if (!response.data?.employeeRecord) {
+                throw new Error("Invalid data received from the server.");
+              }
+              // Only call these functions if there are no errors
+              if (response.data.employeeRecord) {
+                setSelectedRow(response.data.employeeRecord);
+                setOpen(true);
+              }
+            } catch (error) {
+              console.error("Error fetching document file:", error);
+              alert(
+                error.response?.data?.message ||
+                  "An error occurred while fetching the transaction. Please try again."
+              );
+            } finally {
+              setLoadingRowId(null); // Reset the loading row ID after the API call completes
+            }
+          }}
+        >
+          <PageviewIcon sx={{ fontSize: "2rem" }} />
+        </IconButton>
+      ),
+    },
+    {
       field: "employeeId",
       headerName: "Employee ID",
       width: 80,
@@ -611,7 +666,7 @@ const EmployeeRecords = ({ user }) => {
     {
       field: "firstName",
       headerName: "First Name",
-      width: 100,
+      width: 80,
       headerAlign: "center",
       valueGetter: (params) => {
         return `${params.row.firstName} ${params.row.affix || ""}` || "";
@@ -628,14 +683,14 @@ const EmployeeRecords = ({ user }) => {
     {
       field: "lastName",
       headerName: "Last Name",
-      width: 100,
+      width: 80,
       headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "husbandSurname",
       headerName: "Husband Surname",
-      width: 100,
+      width: 80,
       headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
@@ -649,14 +704,14 @@ const EmployeeRecords = ({ user }) => {
     {
       field: "civilStatus",
       headerName: "Civil Status",
-      width: 100,
+      width: 80,
       headerAlign: "center",
       renderCell: renderCellWithWrapText,
     },
     {
       field: "birthday",
       headerName: "Birthday",
-      width: 150,
+      width: 125,
       headerAlign: "center",
       sortable: true,
 
@@ -686,7 +741,7 @@ const EmployeeRecords = ({ user }) => {
     {
       field: "dateHire",
       headerName: "Date Hire",
-      width: 150,
+      width: 125,
       headerAlign: "center",
       sortable: true,
 
@@ -745,6 +800,10 @@ const EmployeeRecords = ({ user }) => {
       headerName: "Moblie Number",
       width: 150,
       headerAlign: "center",
+      valueGetter: (params) =>
+        params.row.mobileNumber
+          ? params.row.mobileNumber.replace(/-/g, "")
+          : "",
       renderCell: renderCellWithWrapText,
     },
   ];
@@ -851,7 +910,6 @@ const EmployeeRecords = ({ user }) => {
               rows={employeeRecords ? employeeRecords : []}
               columns={columns}
               components={{ Toolbar: GridToolbar }}
-              {...{ onRowClick: handleRowClick }}
             />
           </CustomDataGridStyles>
         )}

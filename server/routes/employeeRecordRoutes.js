@@ -27,6 +27,9 @@ router.post(
 // Get EmployeeRecords route
 router.get("/", getEmployeeRecordsController);
 
+// Get EmployeeRecord route
+router.get("/:id", getEmployeeRecordController);
+
 // Get EmployeeRecord Picture route
 router.get("/picture/:id", getEmployeeRecordPictureController);
 

@@ -119,6 +119,8 @@ async function getEmployeeAttachmentCertificateFullController(req, res) {
   try {
     const id = req.params.id;
 
+    console.log("responded");
+
     // Fetch Employee AttachmentCertificate from the database
     const employeeAttachmentCertificate =
       await EmployeeAttachmentCertificate.findOne({

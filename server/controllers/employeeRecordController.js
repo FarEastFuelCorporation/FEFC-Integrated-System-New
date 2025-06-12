@@ -224,6 +224,7 @@ async function getEmployeeRecordsController(req, res) {
         "dateHire",
         "employeeType",
         "designation",
+        "immediateHeadId",
         "departmentId",
         "mobileNumber",
       ],

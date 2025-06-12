@@ -811,11 +811,6 @@ const EmployeeRecords = ({ user }) => {
   const [open, setOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const handleRowClick = (params) => {
-    setSelectedRow(params.row);
-    setOpen(true);
-  };
-
   const handleClose = () => {
     setOpen(false);
     setSelectedRow(null);

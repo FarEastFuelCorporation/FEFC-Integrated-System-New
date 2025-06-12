@@ -442,7 +442,11 @@ const EmployeeProfileModal = ({
                   ? "employeeAttachment"
                   : selectedTab === 6
                   ? "employeeAttachmentLegal"
-                  : "employeeAttachmentMemo";
+                  : selectedTab === 7
+                  ? "employeeAttachmentMemo"
+                  : selectedTab === 8
+                  ? "employeeAttachmentCertificate"
+                  : "employeeAttachmentIncident";
 
               const documentId = params.row.id; // Get the document ID
 
@@ -452,16 +456,28 @@ const EmployeeProfileModal = ({
                 { responseType: "arraybuffer" } // Get binary data
               );
 
-              // Create a Blob from the response data
-              const blob = new Blob([response.data], {
-                type: response.headers["content-type"], // Use the Content-Type from the response header
-              });
+              // Get the content type from the response
+              const contentType =
+                response.headers["content-type"] || "application/octet-stream";
 
-              // Create an object URL for the Blob
+              // Create a Blob using the actual content type
+              const blob = new Blob([response.data], { type: contentType });
+
+              // Create an object URL
               const urlFile = URL.createObjectURL(blob);
 
-              // Open the file in a new tab
-              window.open(urlFile, "_blank");
+              // Attempt to preview in new tab
+              const newWindow = window.open(urlFile, "_blank");
+
+              // Optional: fallback if popup is blocked
+              if (!newWindow) {
+                const link = document.createElement("a");
+                link.href = urlFile;
+                link.download = "downloaded-file"; // you can add .pdf/.jpg etc. based on contentType if desired
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }
             } catch (error) {
               console.error("Error fetching document file:", error);
             }
@@ -488,7 +504,11 @@ const EmployeeProfileModal = ({
                   ? "employeeAttachment"
                   : selectedTab === 6
                   ? "employeeAttachmentLegal"
-                  : "employeeAttachmentMemo";
+                  : selectedTab === 7
+                  ? "employeeAttachmentMemo"
+                  : selectedTab === 8
+                  ? "employeeAttachmentCertificate"
+                  : "employeeAttachmentIncident";
 
               const documentId = params.row.id; // Get the document ID
               const fileName =

@@ -75,6 +75,7 @@ const Agent = require("../models/Agent");
 const ClientAttachment = require("../models/ClientAttachment");
 const EmployeeAttachmentCertificate = require("../models/EmployeeAttachmentCertificate");
 const EmployeeAttachmentIncident = require("../models/EmployeeAttachmentIncident");
+const EmployeeContract = require("../models/EmployeeContract");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -109,6 +110,45 @@ EmployeeRecord.belongsTo(Department, {
   as: "Department",
   foreignKey: "departmentId",
   targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+Department.hasMany(EmployeeContract, {
+  as: "EmployeeContract",
+  foreignKey: "departmentId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+EmployeeContract.belongsTo(Department, {
+  as: "Department",
+  foreignKey: "departmentId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(EmployeeContract, {
+  as: "EmployeeContract",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeContract.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(EmployeeContract, {
+  as: "EmployeeContractCreatedBy",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeContract.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecordCreatedBy",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
   onDelete: "CASCADE",
 });
 

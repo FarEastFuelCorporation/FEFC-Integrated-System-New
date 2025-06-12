@@ -17,7 +17,12 @@ async function createEmployeeSignupController(req, res) {
     const { employeeId, employeeUsername, password } = req.body;
 
     // Check if the employeeId is in the Employee table
-    const existingEmployee = await Employee.findOne({ where: { employeeId } });
+    const existingEmployee = await Employee.findOne({
+      where: {
+        employeeId,
+        employeeStatus: "ACTIVE",
+      },
+    });
 
     if (!existingEmployee) {
       // Employee ID is not valid, send an error response
@@ -101,7 +106,12 @@ async function createEmployeeUpdateController(req, res) {
     const { employeeId, employeeUsername, password } = req.body;
 
     // Check if the employeeId is in the Employee table
-    const existingEmployee = await Employee.findOne({ where: { employeeId } });
+    const existingEmployee = await Employee.findOne({
+      where: {
+        employeeId,
+        employeeStatus: "ACTIVE",
+      },
+    });
 
     if (!existingEmployee) {
       // Employee ID is not valid, send an error response
@@ -180,8 +190,18 @@ async function createEmployeeLoginController(req, res) {
   console.log("pass");
   try {
     // Find the user with the provided employee ID
-    const user = await User.findOne({ where: { employeeUsername } });
-    const employeeId = user.employeeId;
+    const user = await User.findOne({
+      where: { employeeUsername },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          where: { employeeStatus: "ACTIVE" }, // Filter for active employees
+        },
+      ],
+    });
+
+    const employeeId = user?.employeeId;
 
     // Check if the user exists
     if (!user) {

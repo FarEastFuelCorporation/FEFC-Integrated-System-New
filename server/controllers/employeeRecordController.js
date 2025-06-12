@@ -5,6 +5,7 @@ const EmployeeAttachment = require("../models/EmployeeAttachment");
 const EmployeeAttachmentCertificate = require("../models/EmployeeAttachmentCertificate");
 const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
+const EmployeeContract = require("../models/EmployeeContract");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const IdInformation = require("../models/IdInformation");
 const Vehicle = require("../models/Vehicle");
@@ -235,6 +236,13 @@ async function getEmployeeRecordsController(req, res) {
           model: Department,
           as: "Department",
           attributes: ["department"], // Include only necessary fields
+        },
+        {
+          model: EmployeeContract,
+          as: "EmployeeContract",
+          attributes: {
+            exclude: ["attachment"],
+          },
         },
       ],
     });

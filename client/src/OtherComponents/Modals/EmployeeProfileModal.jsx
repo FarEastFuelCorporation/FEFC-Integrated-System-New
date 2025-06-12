@@ -57,6 +57,7 @@ const EmployeeProfileModal = ({
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingPicture, setLoadingPicture] = useState(false);
+  const [loadingAttachment, setLoadingAttachment] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -95,24 +96,36 @@ const EmployeeProfileModal = ({
     if (!selectedRow || !selectedRow.employeeId) {
       return;
     }
-    setLoadingData(true);
     try {
+      setLoadingData(true);
       setLoadingPicture(true);
+      setLoadingAttachment(true);
+
+      const [employeeResponse, departmentResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/employee`),
+        axios.get(`${apiUrl}/api/department`),
+      ]);
+
+      setEmployeesData(employeeResponse.data.employees);
+      setDepartments(departmentResponse.data.departments);
+      setLoadingData(false);
+
+      const employeeRecordPictureResponse = await axios.get(
+        `${apiUrl}/api/employeeRecord/picture/${selectedRow.employeeId}`
+      );
+
+      setEmployeePictureData(
+        employeeRecordPictureResponse.data.profile_picture
+      );
+      setLoadingPicture(false);
+
       const [
-        employeeRecordPictureResponse,
-        employeeResponse,
-        departmentResponse,
         employeeAttachmentResponse,
         employeeAttachmentLegalResponse,
         employeeAttachmentMemoResponse,
         employeeAttachmentCertificateResponse,
         employeeAttachmentIncidentResponse,
       ] = await Promise.all([
-        axios.get(
-          `${apiUrl}/api/employeeRecord/picture/${selectedRow.employeeId}`
-        ),
-        axios.get(`${apiUrl}/api/employee`),
-        axios.get(`${apiUrl}/api/department`),
         axios.get(`${apiUrl}/api/employeeAttachment/${selectedRow.employeeId}`),
         axios.get(
           `${apiUrl}/api/employeeAttachmentLegal/${selectedRow.employeeId}`
@@ -127,11 +140,7 @@ const EmployeeProfileModal = ({
           `${apiUrl}/api/employeeAttachmentIncident/${selectedRow.employeeId}`
         ),
       ]);
-      setEmployeePictureData(
-        employeeRecordPictureResponse.data.profile_picture
-      );
-      setEmployeesData(employeeResponse.data.employees);
-      setDepartments(departmentResponse.data.departments);
+
       setAttachmentMedicalData(
         employeeAttachmentResponse.data.employeeAttachments || []
       );
@@ -155,6 +164,7 @@ const EmployeeProfileModal = ({
     } finally {
       setLoadingData(false);
       setLoadingPicture(false);
+      setLoadingAttachment(false);
     }
   }, [apiUrl, selectedRow]);
 
@@ -1468,7 +1478,7 @@ const EmployeeProfileModal = ({
                       }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
-                      loading={loadingData}
+                      loading={loadingAttachment}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}
@@ -1577,7 +1587,7 @@ const EmployeeProfileModal = ({
                       }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
-                      loading={loadingData}
+                      loading={loadingAttachment}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}
@@ -1686,7 +1696,7 @@ const EmployeeProfileModal = ({
                       }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
-                      loading={loadingData}
+                      loading={loadingAttachment}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}
@@ -1795,7 +1805,7 @@ const EmployeeProfileModal = ({
                       }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
-                      loading={loadingData}
+                      loading={loadingAttachment}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}
@@ -1904,7 +1914,7 @@ const EmployeeProfileModal = ({
                       }}
                       getRowId={(row) => row.id}
                       localeText={{ noRowsLabel: "No Files Uploaded" }}
-                      loading={loadingData}
+                      loading={loadingAttachment}
                       initialState={{
                         sortModel: [{ field: "createdAt", sort: "asc" }],
                       }}

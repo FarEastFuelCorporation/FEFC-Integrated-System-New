@@ -77,6 +77,7 @@ const ReceivedTransactions = ({ user, socket }) => {
       setPendingTransactions(filteredPendingTransactions);
 
       // For in-progress transactions
+      console.log(receivedTransactionResponse.data.inProgressTransactions);
       setInProgressTransactions(
         receivedTransactionResponse.data.inProgressTransactions
       );

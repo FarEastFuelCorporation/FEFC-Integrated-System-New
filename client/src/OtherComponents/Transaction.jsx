@@ -226,7 +226,7 @@ const Transaction = ({
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 150,
+      minWidth: 80,
       valueGetter: (params) => {
         if (
           params.row?.ScheduledTransaction?.[0]?.DispatchedTransaction &&
@@ -240,6 +240,25 @@ const Transaction = ({
           params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction.length > 0
         ) {
           return params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.vehicle.toUpperCase();
+        } else {
+          return "PENDING";
+        }
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "pullOutFormNo",
+      headerName: "Pull Out Form",
+      headerAlign: "center",
+      align: "center",
+      flex: 1,
+      minWidth: 80,
+      valueGetter: (params) => {
+        if (
+          params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction &&
+          params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction.length > 0
+        ) {
+          return params.row?.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]?.pullOutFormNo.toUpperCase();
         } else {
           return "PENDING";
         }

@@ -1366,7 +1366,7 @@ const getIncludeOptionsPartial = () => [
         model: ReceivedTransaction,
         as: "ReceivedTransaction",
         required: false,
-        attributes: ["submitTo", "vehicle"],
+        attributes: ["submitTo", "vehicle", "pullOutFormNo"],
       },
     ],
   },

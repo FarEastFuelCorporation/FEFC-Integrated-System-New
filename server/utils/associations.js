@@ -105,12 +105,14 @@ Department.hasMany(EmployeeRecord, {
   foreignKey: "departmentId",
   sourceKey: "id",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 EmployeeRecord.belongsTo(Department, {
   as: "Department",
   foreignKey: "departmentId",
   targetKey: "id",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 Department.hasMany(EmployeeContract, {
@@ -131,12 +133,15 @@ EmployeeRecord.hasMany(EmployeeContract, {
   foreignKey: "employeeId",
   sourceKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
+
 EmployeeContract.belongsTo(EmployeeRecord, {
   as: "EmployeeRecord",
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 EmployeeRecord.hasMany(EmployeeContract, {
@@ -144,12 +149,14 @@ EmployeeRecord.hasMany(EmployeeContract, {
   foreignKey: "createdBy",
   sourceKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 EmployeeContract.belongsTo(EmployeeRecord, {
   as: "EmployeeRecordCreatedBy",
   foreignKey: "createdBy",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 EmployeeRecord.hasMany(EmployeeAttachment, {
@@ -157,12 +164,14 @@ EmployeeRecord.hasMany(EmployeeAttachment, {
   foreignKey: "employeeId",
   sourceKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 EmployeeAttachment.belongsTo(EmployeeRecord, {
   as: "EmployeeRecord",
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 EmployeeRecord.hasMany(EmployeeAttachmentLegal, {
@@ -176,6 +185,7 @@ EmployeeAttachmentLegal.belongsTo(EmployeeRecord, {
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 EmployeeRecord.hasMany(EmployeeAttachmentMemo, {
@@ -183,12 +193,14 @@ EmployeeRecord.hasMany(EmployeeAttachmentMemo, {
   foreignKey: "employeeId",
   sourceKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 EmployeeAttachmentMemo.belongsTo(EmployeeRecord, {
   as: "EmployeeRecord",
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 EmployeeRecord.hasMany(EmployeeAttachmentCertificate, {
@@ -196,12 +208,14 @@ EmployeeRecord.hasMany(EmployeeAttachmentCertificate, {
   foreignKey: "employeeId",
   sourceKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 EmployeeAttachmentCertificate.belongsTo(EmployeeRecord, {
   as: "EmployeeRecord",
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 EmployeeRecord.hasMany(EmployeeAttachmentIncident, {
@@ -209,12 +223,14 @@ EmployeeRecord.hasMany(EmployeeAttachmentIncident, {
   foreignKey: "employeeId",
   sourceKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 EmployeeAttachmentIncident.belongsTo(EmployeeRecord, {
   as: "EmployeeRecord",
   foreignKey: "employeeId",
   targetKey: "employeeId",
   onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 Employee.hasMany(EmployeeAttachment, {

@@ -364,19 +364,19 @@ const EmployeeRecords = ({ user }) => {
     if (!firstName) errors.push("First Name is required");
     if (!lastName) errors.push("Last Name is required");
     if (!birthday) errors.push("Birthday is required");
-    if (!birthPlace) errors.push("Place of Birth is required");
-    if (!citizenship) errors.push("Citizenship is required");
-    if (!religion) errors.push("Religion is required");
-    if (!province) errors.push("Province is required");
-    if (!municipality) errors.push("City/Municipality is required");
-    if (!barangay) errors.push("Barangay is required");
-    if (!address) errors.push("House No./Street Name is required");
-    if (!otherProvince) errors.push("Other Province is required");
-    if (!otherMunicipality) errors.push("Other City/Municipality is required");
-    if (!otherBarangay) errors.push("Other Barangay is required");
-    if (!otherAddress) errors.push("Other House No./Street Name is required");
+    // if (!birthPlace) errors.push("Place of Birth is required");
+    // if (!citizenship) errors.push("Citizenship is required");
+    // if (!religion) errors.push("Religion is required");
+    // if (!province) errors.push("Province is required");
+    // if (!municipality) errors.push("City/Municipality is required");
+    // if (!barangay) errors.push("Barangay is required");
+    // if (!address) errors.push("House No./Street Name is required");
+    // if (!otherProvince) errors.push("Other Province is required");
+    // if (!otherMunicipality) errors.push("Other City/Municipality is required");
+    // if (!otherBarangay) errors.push("Other Barangay is required");
+    // if (!otherAddress) errors.push("Other House No./Street Name is required");
     if (!mobileNumber) errors.push("Mobile Number is required");
-    if (!emailAddress) errors.push("Email Address is required");
+    // if (!emailAddress) errors.push("Email Address is required");
 
     // Newly added required fields validation
     if (!dateHire) errors.push("Date of Hire is required");
@@ -386,64 +386,64 @@ const EmployeeRecords = ({ user }) => {
     if (!designation) errors.push("Designation is required");
     if (!departmentId) errors.push("Department is required");
     if (!immediateHeadId) errors.push("Immediate Head is required");
-    if (!tinId) errors.push("TIN ID # is required");
-    if (!philhealthId) errors.push("Philhealth ID # is required");
-    if (!sssId) errors.push("SSS ID # is required");
-    if (!pagibigId) errors.push("Pag-ibig ID # is required");
+    // if (!tinId) errors.push("TIN ID # is required");
+    // if (!philhealthId) errors.push("Philhealth ID # is required");
+    // if (!sssId) errors.push("SSS ID # is required");
+    // if (!pagibigId) errors.push("Pag-ibig ID # is required");
 
     // Father's Information validation
-    if (!fathersName) errors.push("Father's Name is required");
-    if (!fathersReligion) errors.push("Father's Religion is required");
-    if (!fathersAddress) errors.push("Father's Address is required");
-    if (!fathersMobileNumber) errors.push("Father's Mobile Number is required");
+    // if (!fathersName) errors.push("Father's Name is required");
+    // if (!fathersReligion) errors.push("Father's Religion is required");
+    // if (!fathersAddress) errors.push("Father's Address is required");
+    // if (!fathersMobileNumber) errors.push("Father's Mobile Number is required");
 
     // Mother's Information validation
-    if (!mothersName) errors.push("Mother's Name is required");
-    if (!mothersReligion) errors.push("Mother's Religion is required");
-    if (!mothersAddress) errors.push("Mother's Address is required");
-    if (!mothersMobileNumber) errors.push("Mother's Mobile Number is required");
+    // if (!mothersName) errors.push("Mother's Name is required");
+    // if (!mothersReligion) errors.push("Mother's Religion is required");
+    // if (!mothersAddress) errors.push("Mother's Address is required");
+    // if (!mothersMobileNumber) errors.push("Mother's Mobile Number is required");
 
     // Spouse Information validation (if married)
-    if (civilStatus === "MARRIED") {
-      if (!spouseName)
-        errors.push(
-          `${gender === "MALE" ? "Wife's" : "Husband's"} Name is required`
-        );
-      if (!spouseReligion)
-        errors.push(
-          `${gender === "MALE" ? "Wife's" : "Husband's"} Religion is required`
-        );
-      if (!spouseAddress)
-        errors.push(
-          `${gender === "MALE" ? "Wife's" : "Husband's"} Address is required`
-        );
-      if (!spouseMobileNumber)
-        errors.push(
-          `${
-            gender === "MALE" ? "Wife's" : "Husband's"
-          } Mobile Number is required`
-        );
-    }
+    // if (civilStatus === "MARRIED") {
+    //   if (!spouseName)
+    //     errors.push(
+    //       `${gender === "MALE" ? "Wife's" : "Husband's"} Name is required`
+    //     );
+    //   if (!spouseReligion)
+    //     errors.push(
+    //       `${gender === "MALE" ? "Wife's" : "Husband's"} Religion is required`
+    //     );
+    //   if (!spouseAddress)
+    //     errors.push(
+    //       `${gender === "MALE" ? "Wife's" : "Husband's"} Address is required`
+    //     );
+    //   if (!spouseMobileNumber)
+    //     errors.push(
+    //       `${
+    //         gender === "MALE" ? "Wife's" : "Husband's"
+    //       } Mobile Number is required`
+    //     );
+    // }
 
     // Educational Attainment validation
-    if (!educationalAttainment)
-      errors.push("Educational Attainment is required");
-    if (!schoolName) errors.push("School Name is required");
-    if (!course) errors.push("Course is required");
-    if (!level) errors.push("Level is required");
-    if (!year) errors.push("Year is required");
+    // if (!educationalAttainment)
+    //   errors.push("Educational Attainment is required");
+    // if (!schoolName) errors.push("School Name is required");
+    // if (!course) errors.push("Course is required");
+    // if (!level) errors.push("Level is required");
+    // if (!year) errors.push("Year is required");
 
-    // Reference Information validation
-    if (!referenceName) errors.push("Reference Name is required");
-    if (!referenceAddress) errors.push("Reference Address is required");
-    if (!referenceMobileNumber)
-      errors.push("Reference Mobile Number is required");
+    // // Reference Information validation
+    // if (!referenceName) errors.push("Reference Name is required");
+    // if (!referenceAddress) errors.push("Reference Address is required");
+    // if (!referenceMobileNumber)
+    //   errors.push("Reference Mobile Number is required");
 
-    // Emergency Contact validation
-    if (!emergencyName) errors.push("Emergency Contact Name is required");
-    if (!emergencyAddress) errors.push("Emergency Contact Address is required");
-    if (!emergencyMobileNumber)
-      errors.push("Emergency Contact Mobile Number is required");
+    // // Emergency Contact validation
+    // if (!emergencyName) errors.push("Emergency Contact Name is required");
+    // if (!emergencyAddress) errors.push("Emergency Contact Address is required");
+    // if (!emergencyMobileNumber)
+    //   errors.push("Emergency Contact Mobile Number is required");
 
     if (errors.length > 0) {
       setErrorMessage(errors.join(", "));

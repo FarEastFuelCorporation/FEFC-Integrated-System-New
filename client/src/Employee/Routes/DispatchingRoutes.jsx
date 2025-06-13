@@ -10,6 +10,7 @@ import VehicleMaintenanceRequest from "../../OtherComponents/Sections/vehicleMai
 import Calendar from "../../Employee/Layouts/Dispatching/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
 import Documents from "../../OtherComponents/Sections/documents";
+import Clients from "../../OtherComponents/Sections/clients";
 
 const DispatchingRoutes = ({ user, onUpdateUser, socket }) => (
   <Routes>
@@ -29,6 +30,7 @@ const DispatchingRoutes = ({ user, onUpdateUser, socket }) => (
         path="vehicleMaintenanceRequests"
         element={<VehicleMaintenanceRequest user={user} />}
       />
+      <Route path="clients" element={<Clients user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />
       <Route path="calendar" element={<Calendar />} />
       <Route

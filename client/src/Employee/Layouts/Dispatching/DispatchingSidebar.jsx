@@ -20,6 +20,7 @@ import TopicIcon from "@mui/icons-material/Topic";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import Item from "../../../OtherComponents/Item";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import BottomNavItem from "../../../OtherComponents/BottomNavItem";
@@ -37,6 +38,7 @@ const DispatchingSidebar = ({ user }) => {
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/vehicleMaintenanceRequests": "Vehicle Maintenance Request",
+      "/dashboard/clients": "Clients",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -159,6 +161,14 @@ const DispatchingSidebar = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"vehicleMaintenanceRequests"}
+        />
+        <BottomNavItem
+          label="Clients"
+          value="Clients"
+          icon={PeopleOutlinedIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"clients"}
         />
         <BottomNavItem
           label="Documents"
@@ -328,6 +338,14 @@ const DispatchingSidebar = ({ user }) => {
               title="Vehicle Maintenance Request"
               to="vehicleMaintenanceRequests"
               icon={<BuildIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Clients"
+              to="clients"
+              icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}

@@ -86,6 +86,7 @@ const BillingStatementForm = ({
       }
 
       // For pending transactions
+      console.log(billingStatementResponse.data.bookedTransactions);
       setTransactions(billingStatementResponse.data.bookedTransactions);
       setIsFetched(true);
       // setLoading(false);
@@ -139,12 +140,14 @@ const BillingStatementForm = ({
       ? certifiedTransaction.typeOfWeight
       : "SORTED WEIGHT";
 
+    console.log("transaction", transaction);
+
     const sortedWasteTransaction =
       submitTo === "WAREHOUSE"
-        ? transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-            .WarehousedTransaction[0].WarehousedTransactionItem
-        : transaction.ScheduledTransaction[0].ReceivedTransaction[0]
-            .SortedTransaction[0].SortedWasteTransaction;
+        ? transaction.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.WarehousedTransaction?.[0]?.WarehousedTransactionItem ?? []
+        : transaction.ScheduledTransaction?.[0]?.ReceivedTransaction?.[0]
+            ?.SortedTransaction?.[0]?.SortedWasteTransaction ?? [];
 
     isWasteName = transaction?.BilledTransaction?.[0]?.isWasteName;
     isPerClient = transaction?.BilledTransaction?.[0]?.isPerClient;

@@ -76,6 +76,8 @@ const ClientAttachment = require("../models/ClientAttachment");
 const EmployeeAttachmentCertificate = require("../models/EmployeeAttachmentCertificate");
 const EmployeeAttachmentIncident = require("../models/EmployeeAttachmentIncident");
 const EmployeeContract = require("../models/EmployeeContract");
+const DeliveryReceipt = require("../models/DeliveryReceipt");
+const DeliveryReceiptItem = require("../models/DeliveryReceiptItem");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -843,6 +845,28 @@ GatePass.hasMany(GatePassItem, {
 });
 GatePassItem.belongsTo(GatePass, {
   as: "GatePass",
+  foreignKey: "gatePassId",
+  targetKey: "id",
+});
+
+Employee.hasMany(DeliveryReceipt, {
+  as: "DeliveryReceipt",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+});
+DeliveryReceipt.belongsTo(Employee, {
+  as: "Employee",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+});
+
+DeliveryReceipt.hasMany(DeliveryReceiptItem, {
+  as: "DeliveryReceiptItem",
+  foreignKey: "gatePassId",
+  sourceKey: "id",
+});
+DeliveryReceiptItem.belongsTo(DeliveryReceipt, {
+  as: "DeliveryReceipt",
   foreignKey: "gatePassId",
   targetKey: "id",
 });

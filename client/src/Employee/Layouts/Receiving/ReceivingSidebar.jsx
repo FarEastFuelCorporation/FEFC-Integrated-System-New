@@ -35,6 +35,7 @@ const ReceivingDashboard = ({ user }) => {
       "/dashboard/transactions": "Transactions",
       "/dashboard/truckScale": "Truck Scale",
       "/dashboard/gatePass": "Gate Pass",
+      "/dashboard/deliveryReceipt": "Delivery Receipt",
       "/dashboard/vehicleTypes": "Type Of Vehicles",
       "/dashboard/vehicles": "Vehicles",
       "/dashboard/documents": "Documents",
@@ -142,6 +143,14 @@ const ReceivingDashboard = ({ user }) => {
           selected={selected}
           setSelected={setSelected}
           navigate={"gatePass"}
+        />
+        <BottomNavItem
+          label="Delivery Receipt"
+          value="Delivery Receipt"
+          icon={NoteAltIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"deliveryReceipt"}
         />
         <BottomNavItem
           label="Type Of Vehicles"
@@ -303,6 +312,14 @@ const ReceivingDashboard = ({ user }) => {
             <Item
               title="Gate Pass"
               to="gatePass"
+              icon={<NoteAltIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
+            <Item
+              title="Delivery Receipt"
+              to="deliveryReceipt"
               icon={<NoteAltIcon />}
               selected={selected}
               setSelected={setSelected}

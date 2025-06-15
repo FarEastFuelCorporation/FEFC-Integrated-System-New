@@ -768,7 +768,7 @@ const DeliveryReceipt = ({ user, socket }) => {
             </div>
           </div>
           <hr />
-<div class="container">
+<div class="container" style="margin-top: 0.25in;">
   <div style="display: flex; border: 1px solid black; width: 100%">
     <div style="display: flex; flex-direction: column; width: 70%">
       <div style="display: flex">

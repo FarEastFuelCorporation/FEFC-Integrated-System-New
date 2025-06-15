@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../LoadingSpinner";
-import { formatDate3 } from "../Functions";
+import { formatDate3, formatTime2 } from "../Functions";
 
 const formatDate = (dateStr) =>
   dateStr ? new Date(dateStr).toLocaleDateString() : "";
@@ -22,10 +22,10 @@ const formatTime = (timeStr) =>
 const formatNumber = (num) =>
   num ? parseFloat(num).toLocaleString() + " kg" : "0 kg";
 
-const DeliveryReceiptView = () => {
+const GatePassView = () => {
   const [loading, setLoading] = useState(true);
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
-  const [deliveryReceiptData, setDeliveryReceiptData] = useState(null);
+  const [gatePassData, setGatePassData] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -36,10 +36,8 @@ const DeliveryReceiptView = () => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${apiUrl}/api/deliveryReceiptView/${id}`
-      );
-      setDeliveryReceiptData(response.data.deliveryReceipt);
+      const response = await axios.get(`${apiUrl}/api/gatePassView/${id}`);
+      setGatePassData(response.data.gatePass);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -54,7 +52,7 @@ const DeliveryReceiptView = () => {
     return <LoadingSpinner isLoading />;
   }
 
-  if (!deliveryReceiptData) {
+  if (!gatePassData) {
     return (
       <Box
         sx={{
@@ -67,10 +65,10 @@ const DeliveryReceiptView = () => {
         }}
       >
         <Typography variant="h4" color="textSecondary" gutterBottom>
-          No Delivery Receipt Found
+          No Gate Pass Found
         </Typography>
         <Typography variant="body1" color="textSecondary" paragraph>
-          We couldn't find the delivery receipt data you're looking for.
+          We couldn't find the gate Pass data you're looking for.
         </Typography>
         <Button variant="contained" color="error" onClick={handleGoBack}>
           Go Back
@@ -82,7 +80,7 @@ const DeliveryReceiptView = () => {
   return (
     <Box sx={{ my: 10, p: 3 }}>
       <Typography variant="h4" gutterBottom align="center">
-        Delivery Receipt Details
+        Gate Pass Details
       </Typography>
 
       <Paper elevation={3} sx={{ maxWidth: 800, mx: "auto", p: 3, mb: 4 }}>
@@ -91,57 +89,97 @@ const DeliveryReceiptView = () => {
           <TableBody>
             <TableRow>
               <TableCell>
-                <strong>Delivery Receipt #</strong>
+                <strong>Gate Pass #</strong>
               </TableCell>
-              <TableCell>{deliveryReceiptData.deliveryReceiptNo}</TableCell>
+              <TableCell>{gatePassData.gatePassNo}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Delivery Date</strong>
+                <strong>Date IN</strong>
               </TableCell>
+              <TableCell>{formatDate3(gatePassData.dateIn)}</TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>
-                {formatDate3(deliveryReceiptData.dateOfDelivery)}
+                <strong>Time IN</strong>
               </TableCell>
+              <TableCell>{formatTime2(gatePassData.timeIn)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Date OUT</strong>
+              </TableCell>
+              <TableCell>{formatDate3(gatePassData.dateOut)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Time OUT</strong>
+              </TableCell>
+              <TableCell>{formatTime2(gatePassData.timeOut)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Issued To</strong>
+              </TableCell>
+              <TableCell>{gatePassData.issuedTo}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Company</strong>
               </TableCell>
-              <TableCell>{deliveryReceiptData.company}</TableCell>
+              <TableCell>{gatePassData.company}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Address</strong>
               </TableCell>
-              <TableCell>{deliveryReceiptData.address}</TableCell>
+              <TableCell>{gatePassData.address}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Vehicle</strong>
+              </TableCell>
+              <TableCell>{gatePassData.vehicle}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Plate Number</strong>
               </TableCell>
-              <TableCell>{deliveryReceiptData.plateNumber}</TableCell>
+              <TableCell>{gatePassData.plateNumber}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Driver</strong>
+                <strong>Category</strong>
               </TableCell>
-              <TableCell>{deliveryReceiptData.driver}</TableCell>
+              <TableCell>{gatePassData.category}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Category 2</strong>
+              </TableCell>
+              <TableCell>{gatePassData.truckScaleNo}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Plate Number</strong>
+              </TableCell>
+              <TableCell>{gatePassData.plateNumber}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Remarks</strong>
               </TableCell>
-              <TableCell>{deliveryReceiptData.remarks}</TableCell>
+              <TableCell>{gatePassData.remarks}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
 
         {/* Section Title */}
         <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 4, mb: 1 }}>
-          Items Delivered
+          Items
         </Typography>
 
-        {/* Items Delivered Table (Scrollable, but contained in Paper) */}
+        {/* Items  Table (Scrollable, but contained in Paper) */}
         <Box sx={{ overflowX: "auto" }}>
           <Table size="small" sx={{ minWidth: 300, whiteSpace: "nowrap" }}>
             <TableHead>
@@ -161,7 +199,7 @@ const DeliveryReceiptView = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {deliveryReceiptData.DeliveryReceiptItem?.map((item, index) => (
+              {gatePassData.GatePassItem?.map((item, index) => (
                 <TableRow key={index}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{item.description}</TableCell>
@@ -179,4 +217,4 @@ const DeliveryReceiptView = () => {
   );
 };
 
-export default DeliveryReceiptView;
+export default GatePassView;

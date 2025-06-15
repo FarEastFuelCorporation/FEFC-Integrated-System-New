@@ -31,6 +31,7 @@ import DashboardJD from "./JD/OtherComponents/Dashboard";
 import TruckScaleView from "./OtherComponents/Certificates/TruckScaleView";
 import CommissionVerify from "./OtherComponents/BillingStatement/CommissionVerify";
 import DeliveryReceiptView from "./OtherComponents/Certificates/DeliveryReceiptView";
+import GatePassView from "./OtherComponents/Certificates/GatePassView";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -127,6 +128,7 @@ const App = () => {
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/certificate/:id" element={<Certificate />} />
           <Route path="/truckScaleView/:id" element={<TruckScaleView />} />
+          <Route path="/gatePassView/:id" element={<GatePassView />} />
           <Route
             path="/deliveryReceiptView/:id"
             element={<DeliveryReceiptView />}

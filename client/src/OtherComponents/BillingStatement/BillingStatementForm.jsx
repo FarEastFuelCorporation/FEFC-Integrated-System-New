@@ -86,7 +86,6 @@ const BillingStatementForm = ({
       }
 
       // For pending transactions
-      console.log(billingStatementResponse.data.bookedTransactions);
       setTransactions(billingStatementResponse.data.bookedTransactions);
       setIsFetched(true);
       // setLoading(false);
@@ -139,8 +138,6 @@ const BillingStatementForm = ({
     const typeOfWeight = certifiedTransaction?.typeOfWeight
       ? certifiedTransaction.typeOfWeight
       : "SORTED WEIGHT";
-
-    console.log("transaction", transaction);
 
     const sortedWasteTransaction =
       submitTo === "WAREHOUSE"

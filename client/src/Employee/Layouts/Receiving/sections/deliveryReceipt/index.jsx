@@ -74,7 +74,6 @@ const DeliveryReceipt = ({ user, socket }) => {
       const responseClient = await axios.get(`${apiUrl}/api/client`);
 
       // Set state for deliveryReceipts, clients, and
-      console.log(response.data.deliveryReceipts);
       setDeliveryReceipts(response.data.deliveryReceipts);
       setClients(responseClient.data.clients);
 

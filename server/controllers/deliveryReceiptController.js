@@ -210,27 +210,27 @@ async function deleteDeliveryReceiptController(req, res) {
     console.log("Soft deleting gate pass record with ID:", id);
 
     // Find the gate pass entry by its primary key
-    const gatePassToDelete = await DeliveryReceipt.findByPk(id);
+    const deliveryReceiptToDelete = await DeliveryReceipt.findByPk(id);
 
-    if (!gatePassToDelete) {
+    if (!deliveryReceiptToDelete) {
       return res.status(404).json({
         message: `Delivery Receipt entry with ID ${id} not found`,
       });
     }
 
     // Set updatedBy and deletedBy
-    gatePassToDelete.updatedBy = deletedBy;
-    gatePassToDelete.deletedBy = deletedBy;
+    deliveryReceiptToDelete.updatedBy = deletedBy;
+    deliveryReceiptToDelete.deletedBy = deletedBy;
 
     // Save the updates before soft deleting
-    await gatePassToDelete.save();
+    await deliveryReceiptToDelete.save();
 
     // Soft delete the gate pass entry (sets deletedAt timestamp if paranoid: true)
-    await gatePassToDelete.destroy();
+    await deliveryReceiptToDelete.destroy();
 
     broadcastMessage({
-      type: "DELETED_GATE_PASS",
-      data: gatePassToDelete.id,
+      type: "DELETED_DELIVERY_RECEIPT",
+      data: deliveryReceiptToDelete.id,
     });
 
     res.status(200).json({

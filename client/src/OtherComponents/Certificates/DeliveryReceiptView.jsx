@@ -23,7 +23,7 @@ const formatNumber = (num) =>
 const DeliveryReceiptView = () => {
   const [loading, setLoading] = useState(true);
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
-  const [truckScaleData, setTruckScaleData] = useState(null);
+  const [deliveryReceiptData, setDeliveryReceiptData] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -37,7 +37,8 @@ const DeliveryReceiptView = () => {
       const response = await axios.get(
         `${apiUrl}/api/deliveryReceiptView/${id}`
       );
-      setTruckScaleData(response.data.truckScale);
+      setDeliveryReceiptData(response.data.deliveryReceipt);
+      console.log(response.data.deliveryReceipt);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -52,7 +53,7 @@ const DeliveryReceiptView = () => {
     return <LoadingSpinner isLoading />;
   }
 
-  if (!truckScaleData) {
+  if (!deliveryReceiptData) {
     return (
       <Box
         sx={{
@@ -89,45 +90,45 @@ const DeliveryReceiptView = () => {
               <TableCell>
                 <strong>Truck Scale #</strong>
               </TableCell>
-              <TableCell>{truckScaleData.truckScaleNo}</TableCell>
+              <TableCell>{deliveryReceiptData.truckScaleNo}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Transaction Type</strong>
               </TableCell>
-              <TableCell>{truckScaleData.transactionType}</TableCell>
+              <TableCell>{deliveryReceiptData.transactionType}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Client</strong>
               </TableCell>
-              <TableCell>{truckScaleData.clientName}</TableCell>
+              <TableCell>{deliveryReceiptData.clientName}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Commodity</strong>
               </TableCell>
-              <TableCell>{truckScaleData.commodity}</TableCell>
+              <TableCell>{deliveryReceiptData.commodity}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Plate Number</strong>
               </TableCell>
-              <TableCell>{truckScaleData.plateNumber}</TableCell>
+              <TableCell>{deliveryReceiptData.plateNumber}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Driver</strong>
               </TableCell>
-              <TableCell>{truckScaleData.driver}</TableCell>
+              <TableCell>{deliveryReceiptData.driver}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>1st Weigh</strong>
               </TableCell>
               <TableCell>
-                {formatDate(truckScaleData.firstScaleDate)}{" "}
-                {formatTime(truckScaleData.firstScaleTime)}
+                {formatDate(deliveryReceiptData.firstScaleDate)}{" "}
+                {formatTime(deliveryReceiptData.firstScaleTime)}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -135,8 +136,8 @@ const DeliveryReceiptView = () => {
                 <strong>1st Weigher</strong>
               </TableCell>
               <TableCell>
-                {truckScaleData.Employee2?.firstName}{" "}
-                {truckScaleData.Employee2?.lastName}
+                {deliveryReceiptData.Employee2?.firstName}{" "}
+                {deliveryReceiptData.Employee2?.lastName}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -144,8 +145,8 @@ const DeliveryReceiptView = () => {
                 <strong>2nd Weigh</strong>
               </TableCell>
               <TableCell>
-                {formatDate(truckScaleData.secondScaleDate)}{" "}
-                {formatTime(truckScaleData.secondScaleTime)}
+                {formatDate(deliveryReceiptData.secondScaleDate)}{" "}
+                {formatTime(deliveryReceiptData.secondScaleTime)}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -153,33 +154,39 @@ const DeliveryReceiptView = () => {
                 <strong>2nd Weigher</strong>
               </TableCell>
               <TableCell>
-                {truckScaleData.Employee2?.firstName}{" "}
-                {truckScaleData.Employee2?.lastName}
+                {deliveryReceiptData.Employee2?.firstName}{" "}
+                {deliveryReceiptData.Employee2?.lastName}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Gross Weight</strong>
               </TableCell>
-              <TableCell>{formatNumber(truckScaleData.grossWeight)}</TableCell>
+              <TableCell>
+                {formatNumber(deliveryReceiptData.grossWeight)}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Tare Weight</strong>
               </TableCell>
-              <TableCell>{formatNumber(truckScaleData.tareWeight)}</TableCell>
+              <TableCell>
+                {formatNumber(deliveryReceiptData.tareWeight)}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Net Weight</strong>
               </TableCell>
-              <TableCell>{formatNumber(truckScaleData.netWeight)}</TableCell>
+              <TableCell>
+                {formatNumber(deliveryReceiptData.netWeight)}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Remarks</strong>
               </TableCell>
-              <TableCell>{truckScaleData.remarks}</TableCell>
+              <TableCell>{deliveryReceiptData.remarks}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

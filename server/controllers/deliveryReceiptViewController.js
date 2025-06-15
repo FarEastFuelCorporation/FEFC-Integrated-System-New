@@ -11,16 +11,11 @@ async function getDeliveryReceiptViewController(req, res) {
 
     console.log(id);
 
-    const truckScale = await DeliveryReceipt.findByPk(id, {
+    const deliveryReceipt = await DeliveryReceipt.findByPk(id, {
       include: [
         {
           model: Employee,
           as: "Employee",
-          attributes: ["firstName", "lastName"],
-        },
-        {
-          model: Employee,
-          as: "Employee2",
           attributes: ["firstName", "lastName"],
         },
         {
@@ -30,7 +25,7 @@ async function getDeliveryReceiptViewController(req, res) {
       ],
     });
 
-    res.json({ truckScale });
+    res.json({ deliveryReceipt });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");

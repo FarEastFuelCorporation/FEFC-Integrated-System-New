@@ -465,40 +465,22 @@ const DeliveryReceipt = ({ user, socket }) => {
   ];
 
   if (user.userType === 4) {
-    columns.push(
-      {
-        field: "edit",
-        headerName: "Edit",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="warning"
-            onClick={() => handleEditClick(params.row)}
-          >
-            <EditIcon />
-          </IconButton>
-        ),
-      },
-      {
-        field: "delete",
-        headerName: "Delete",
-        headerAlign: "center",
-        align: "center",
-        sortable: false,
-        width: 60,
-        renderCell: (params) => (
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteClick(params.row.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        ),
-      }
-    );
+    columns.push({
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteClick(params.row.id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    });
   }
 
   const generatePrintHTML = async (params) => {

@@ -862,12 +862,12 @@ DeliveryReceipt.belongsTo(Employee, {
 
 DeliveryReceipt.hasMany(DeliveryReceiptItem, {
   as: "DeliveryReceiptItem",
-  foreignKey: "gatePassId",
+  foreignKey: "deliveryReceiptId",
   sourceKey: "id",
 });
 DeliveryReceiptItem.belongsTo(DeliveryReceipt, {
   as: "DeliveryReceipt",
-  foreignKey: "gatePassId",
+  foreignKey: "deliveryReceiptId",
   targetKey: "id",
 });
 

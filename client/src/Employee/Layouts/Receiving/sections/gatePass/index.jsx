@@ -724,7 +724,7 @@ const GatePass = ({ user, socket }) => {
                 <!-- Table content remains the same -->
                 <tr>
                   <td style="padding: 2.5px 5px; width: 10%;"><strong>Item #:</strong></td>
-                  <td style="padding: 2.5px 5px; width: 50%;"><strong>Truck Scale #:</strong></td>
+                  <td style="padding: 2.5px 5px; width: 50%;"><strong>Description:</strong></td>
                   <td style="padding: 2.5px 5px; width: 20%;"><strong>Quantity:</strong></td>
                   <td style="padding: 2.5px 5px; width: 20%;"><strong>Unit:</strong></td>
                 </tr>
@@ -773,7 +773,7 @@ const GatePass = ({ user, socket }) => {
               <div style="box-sizing: border-box; width: 40%; padding: 5px; border-left: 1px solid black; display: flex;">
                 <div>Truck Scale #: </div>
                 <div style="text-align: center;">${
-                  params.row.truckScaleNo
+                  params.row.truckScaleNo || "N/A"
                 }</div>
               </div>
             </div>

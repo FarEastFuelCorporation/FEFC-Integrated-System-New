@@ -74,6 +74,7 @@ const DeliveryReceipt = ({ user, socket }) => {
       const responseClient = await axios.get(`${apiUrl}/api/client`);
 
       // Set state for deliveryReceipts, clients, and
+      console.log(response.data.deliveryReceipts);
       setDeliveryReceipts(response.data.deliveryReceipts);
       setClients(responseClient.data.clients);
 
@@ -607,7 +608,7 @@ const DeliveryReceipt = ({ user, socket }) => {
   <div style="display: flex; border: 1px solid black; width: 100%">
     <div style="display: flex; flex-direction: column; width: 70%">
       <div style="display: flex; border-top: 1px solid black">
-        <div style="padding: 2.5px 5px; width: 10.5%">Company:</div>
+        <div style="padding: 2.5px 5px; width: 14.2%">Company:</div>
         <div style="padding: 2.5px 5px; border-left: 1px solid black">
           <strong>${params.row.company}</strong>
         </div>
@@ -616,12 +617,12 @@ const DeliveryReceipt = ({ user, socket }) => {
     <div style="display: flex; flex-direction: column; width: 30%">
       <div style="display: flex; border-top: 1px solid black">
         <div
-          style="padding: 2.5px 5px; border-left: 1px solid black; width: 50%"
+          style="padding: 2.5px 5px; border-left: 1px solid black; width: 40%"
         >
           Delivery Date:
         </div>
         <div style="padding: 2.5px 5px; border-left: 1px solid black">
-          <strong>${params.row.dateOfDelivery}</strong>
+          <strong>${formatDate3(params.row.dateOfDelivery)}</strong>
         </div>
       </div>
     </div>
@@ -629,7 +630,7 @@ const DeliveryReceipt = ({ user, socket }) => {
   <div style="display: flex; border: 1px solid black; width: 100%">
     <div>
       <div style="display: flex; border-top: 1px solid black">
-        <div style="padding: 2.5px 5px; width: 15%">Address:</div>
+        <div style="padding: 2.5px 5px; width: 11.3%">Address:</div>
         <div style="padding: 2.5px 5px; border-left: 1px solid black">
           <strong>${params.row.address}</strong>
         </div>
@@ -639,7 +640,7 @@ const DeliveryReceipt = ({ user, socket }) => {
   <div style="display: flex; border: 1px solid black; width: 100%">
     <div style="display: flex; flex-direction: column; width: 70%">
       <div style="display: flex; border-top: 1px solid black">
-        <div style="padding: 2.5px 5px; width: 15%">Driver:</div>
+        <div style="padding: 2.5px 5px; width: 14.2%">Driver:</div>
         <div style="padding: 2.5px 5px; border-left: 1px solid black">
           <strong>${params.row.driver}</strong>
         </div>
@@ -707,31 +708,19 @@ const DeliveryReceipt = ({ user, socket }) => {
             </div>
             <div style="display: flex; width: 100%; border: 1px solid black">
               <div
-                style="box-sizing: border-box; width: 60%; padding: 5px; display: flex"
+                style="box-sizing: border-box; width: 100%; padding: 5px; display: flex"
               >
                 <div>Remarks:</div>
                 <div style="text-align: center">
                   ${params.row.remarks ? params.row.remarks : "NO REMARKS"}
                 </div>
               </div>
-              <div
-                style="
-                  box-sizing: border-box;
-                  width: 40%;
-                  padding: 5px;
-                  border-left: 1px solid black;
-                  display: flex;
-                "
-              >
-                <div>Truck Scale #:</div>
-                <div style="text-align: center">${params.row.truckScaleNo}</div>
-              </div>
             </div>
             <div style="display: flex; width: 100%; border: 1px solid black">
               <div
                 style="
                   box-sizing: border-box;
-                  width: calc((100% - 80px) / 5);
+                  width: calc((100% - 80px) / 2);
                   height: 80px;
                   padding: 5px;
                   display: flex;
@@ -751,7 +740,7 @@ const DeliveryReceipt = ({ user, socket }) => {
               <div
                 style="
                   box-sizing: border-box;
-                  width: calc((100% - 80px) / 5);
+                  width: calc((100% - 80px) / 2);
                   height: 80px;
                   padding: 5px;
                   border-left: 1px solid black;
@@ -760,54 +749,9 @@ const DeliveryReceipt = ({ user, socket }) => {
                   justify-content: space-between;
                 "
               >
-                <div>Checked By:</div>
-                <div style="text-align: center"><u>_________________</u></div>
-              </div>
-              <div
-                style="
-                  box-sizing: border-box;
-                  width: calc((100% - 80px) / 5);
-                  height: 80px;
-                  padding: 5px;
-                  border-left: 1px solid black;
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: space-between;
-                "
-              >
-                <div>Approved By:</div>
-                <div style="text-align: center"><u>_________________</u></div>
-              </div>
-              <div
-                style="
-                  box-sizing: border-box;
-                  width: calc((100% - 80px) / 5);
-                  height: 80px;
-                  padding: 5px;
-                  border-left: 1px solid black;
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: space-between;
-                "
-              >
-                <div>Accounting:</div>
-                <div style="text-align: center"><u>_________________</u></div>
-              </div>
-              <div
-                style="
-                  box-sizing: border-box;
-                  width: calc((100% - 80px) / 5);
-                  height: 80px;
-                  padding: 5px;
-                  border-left: 1px solid black;
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: space-between;
-                "
-              >
-                <div>Released By:</div>
+                <div>Received By:</div>
                 <div style="text-align: center">
-                  _________________ <br />GUARD ON DUTY
+                  _________________ <br />Name Date and Signature
                 </div>
               </div>
               <div
@@ -825,7 +769,213 @@ const DeliveryReceipt = ({ user, socket }) => {
             </div>
           </div>
           <hr />
-
+<div class="container">
+  <div style="display: flex; border: 1px solid black; width: 100%">
+    <div style="display: flex; flex-direction: column; width: 70%">
+      <div style="display: flex">
+        <div class="logo">
+          <img
+            id="logo"
+            src="/assets/logo.png"
+            alt="FAR EAST FUEL CORPORATION Logo"
+            style="width: 0.6in; height: 0.6in"
+          />
+        </div>
+        <div style="margin-left: 10px">
+          <div class="header" style="font-size: 20px">
+            FAR EAST FUEL CORPORATION
+          </div>
+          <div>
+            888 Irabagon St, Purok 5, Brgy. Anyatam, San Ildefonso, Bulacan
+          </div>
+          <div>Email: info@fareastfuelcorp.com Tel #; (044 813 9037)</div>
+        </div>
+      </div>
+    </div>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        width: 30%;
+        border-left: 1px solid black;
+      "
+    >
+      <div style="text-align: center">
+        <div
+          class="header"
+          style="font-size: 20px; background-color: #FF0000; color: white"
+        >
+          Delivery Receipt #
+        </div>
+        <div style="font-size: 29.5px; font-weight: bold">
+          ${params.row.deliveryReceiptNo}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display: flex; border: 1px solid black; width: 100%">
+    <div style="display: flex; flex-direction: column; width: 70%">
+      <div style="display: flex; border-top: 1px solid black">
+        <div style="padding: 2.5px 5px; width: 14.2%">Company:</div>
+        <div style="padding: 2.5px 5px; border-left: 1px solid black">
+          <strong>${params.row.company}</strong>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; width: 30%">
+      <div style="display: flex; border-top: 1px solid black">
+        <div
+          style="padding: 2.5px 5px; border-left: 1px solid black; width: 40%"
+        >
+          Delivery Date:
+        </div>
+        <div style="padding: 2.5px 5px; border-left: 1px solid black">
+          <strong>${formatDate3(params.row.dateOfDelivery)}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display: flex; border: 1px solid black; width: 100%">
+    <div>
+      <div style="display: flex; border-top: 1px solid black">
+        <div style="padding: 2.5px 5px; width: 11.3%">Address:</div>
+        <div style="padding: 2.5px 5px; border-left: 1px solid black">
+          <strong>${params.row.address}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display: flex; border: 1px solid black; width: 100%">
+    <div style="display: flex; flex-direction: column; width: 70%">
+      <div style="display: flex; border-top: 1px solid black">
+        <div style="padding: 2.5px 5px; width: 14.2%">Driver:</div>
+        <div style="padding: 2.5px 5px; border-left: 1px solid black">
+          <strong>${params.row.driver}</strong>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; width: 30%">
+      <div style="display: flex; border-top: 1px solid black">
+        <div
+          style="padding: 2.5px 5px; border-left: 1px solid black; width: 50%"
+        >
+          Plate Number:
+        </div>
+        <div style="padding: 2.5px 5px; border-left: 1px solid black">
+          <strong>${params.row.plateNumber}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+            <div class="details">
+              <table style="width: 100%; border-collapse: collapse">
+                <!-- Table content remains the same -->
+                <tr>
+                  <td style="padding: 2.5px 5px; width: 10%"><strong>Item #:</strong></td>
+                  <td style="padding: 2.5px 5px; width: 50%">
+                    <strong>Truck Scale #:</strong>
+                  </td>
+                  <td style="padding: 2.5px 5px; width: 20%">
+                    <strong>Quantity:</strong>
+                  </td>
+                  <td style="padding: 2.5px 5px; width: 20%"><strong>Unit:</strong></td>
+                </tr>
+                ${params.row.DeliveryReceiptItem.map(
+                  (item, index) => `
+                  <tr>
+                    <td style="padding: 2.5px 5px;">${index + 1}</td>
+                    <td style="padding: 2.5px 5px;">${item.description}</td>
+                    <td style="padding: 2.5px 5px;">${item.quantity}</td>
+                    <td style="padding: 2.5px 5px;">${item.unit}</td>
+                  </tr>
+                `
+                ).join("")}
+                
+                ${Array(12 - params.row.DeliveryReceiptItem.length)
+                  .fill()
+                  .map(
+                    (_, index) => `
+                  <tr>
+                    <td style="padding: 2.5px 5px;"></td>
+                    <td style="padding: 2.5px 5px;">${
+                      index === 0
+                        ? "<i>-------------------- Nothing Follows --------------------</i>"
+                        : ""
+                    }</td>
+                    <td style="padding: 2.5px 5px;">${
+                      index === 0 ? "<i>--------------------</i>" : ""
+                    }</td>
+                    <td style="padding: 2.5px 5px;">${
+                      index === 0 ? "<i>--------------------</i>" : ""
+                    }</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </table>
+            </div>
+            <div style="display: flex; width: 100%; border: 1px solid black">
+              <div
+                style="box-sizing: border-box; width: 100%; padding: 5px; display: flex"
+              >
+                <div>Remarks:</div>
+                <div style="text-align: center">
+                  ${params.row.remarks ? params.row.remarks : "NO REMARKS"}
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; width: 100%; border: 1px solid black">
+              <div
+                style="
+                  box-sizing: border-box;
+                  width: calc((100% - 80px) / 2);
+                  height: 80px;
+                  padding: 5px;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                "
+              >
+                <div>Prepared By:</div>
+                <div style="text-align: center">
+                  <u
+                    >${params.row.Employee.firstName} ${
+      params.row.Employee.lastName
+    }</u
+                  >
+                </div>
+              </div>
+              <div
+                style="
+                  box-sizing: border-box;
+                  width: calc((100% - 80px) / 2);
+                  height: 80px;
+                  padding: 5px;
+                  border-left: 1px solid black;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                "
+              >
+                <div>Received By:</div>
+                <div style="text-align: center">
+                  _________________ <br />Name Date and Signature
+                </div>
+              </div>
+              <div
+                style="
+                  box-sizing: border-box;
+                  padding: 2.5px 5px;
+                  border-left: 1px solid black;
+                "
+              >
+                <img src="${qrCodeDataUrl}" alt="QR Code" width="80px" height="80px" />
+              </div>
+            </div>
+            <div style="padding: 2.5px 5px">
+              Scan this QR code to verify the authenticity of the transaction.
+            </div>
+          </div>
         </body>
       </html>
     `;

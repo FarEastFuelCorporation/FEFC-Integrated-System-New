@@ -30,6 +30,7 @@ import EmployeeJD from "./JD/Auth/Employee";
 import DashboardJD from "./JD/OtherComponents/Dashboard";
 import TruckScaleView from "./OtherComponents/Certificates/TruckScaleView";
 import CommissionVerify from "./OtherComponents/BillingStatement/CommissionVerify";
+import DeliveryReceiptView from "./OtherComponents/Certificates/DeliveryReceiptView";
 
 const App = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -126,6 +127,10 @@ const App = () => {
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/certificate/:id" element={<Certificate />} />
           <Route path="/truckScaleView/:id" element={<TruckScaleView />} />
+          <Route
+            path="/deliveryReceiptView/:id"
+            element={<DeliveryReceiptView />}
+          />
           <Route
             path="/certificate/plasticCredit/:id"
             element={<VerifyPlasticCredit />}

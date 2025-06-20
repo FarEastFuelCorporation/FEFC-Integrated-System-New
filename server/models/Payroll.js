@@ -1,4 +1,4 @@
-// models/Leave.js
+// models/Payroll.js
 
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database.js");

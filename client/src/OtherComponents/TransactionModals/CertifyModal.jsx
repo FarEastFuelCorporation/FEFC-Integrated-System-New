@@ -53,6 +53,11 @@ const CertifyModal = ({
     setFormData({ ...formData, isAcceptance: isChecked }); // Update formData state
   };
 
+  const handleCheckboxChange4 = (e) => {
+    const isChecked = e.target.checked;
+    setFormData({ ...formData, isServiceReport: isChecked }); // Update formData state
+  };
+
   return (
     <Box>
       <Modal open={open} onClose={onClose}>
@@ -115,6 +120,16 @@ const CertifyModal = ({
                 />
               }
               label="Certificate of Acceptance"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isServiceReport}
+                  onChange={handleCheckboxChange4}
+                  color="secondary"
+                />
+              }
+              label="Service Report"
             />
           </Box>
           <div style={{ width: "100%", display: "flex", gap: "20px" }}>

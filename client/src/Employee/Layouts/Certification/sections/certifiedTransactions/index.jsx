@@ -25,6 +25,7 @@ const CertifiedTransactions = ({ user }) => {
     isDestruction: false,
     isDisposal: false,
     isAcceptance: false,
+    isServiceReport: false,
     typeOfCertificate: "",
     typeOfWeight: "",
     remarks: "",
@@ -103,6 +104,7 @@ const CertifiedTransactions = ({ user }) => {
       isDestruction: false,
       isDisposal: false,
       isAcceptance: false,
+      isServiceReport: false,
       typeOfCertificate: "",
       typeOfWeight: "",
       remarks: "",
@@ -158,6 +160,8 @@ const CertifiedTransactions = ({ user }) => {
           typeOfCertificateArray.includes("CERTIFICATE OF DISPOSAL") || false,
         isAcceptance:
           typeOfCertificateArray.includes("CERTIFICATE OF ACCEPTANCE") || false,
+        isServiceReport:
+          typeOfCertificateArray.includes("SERVICE REPORT") || false,
         typeOfCertificate: certifiedTransaction.typeOfCertificate,
         typeOfWeight: certifiedTransaction.typeOfWeight,
         remarks: certifiedTransaction.remarks,
@@ -218,6 +222,9 @@ const CertifiedTransactions = ({ user }) => {
     }
     if (formData.isAcceptance) {
       typeOfCertificate.push("CERTIFICATE OF ACCEPTANCE");
+    }
+    if (formData.isServiceReport) {
+      typeOfCertificate.push("SERVICE REPORT");
     }
 
     formData.typeOfCertificate = typeOfCertificate.join(", ");

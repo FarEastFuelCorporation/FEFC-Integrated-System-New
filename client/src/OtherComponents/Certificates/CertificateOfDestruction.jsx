@@ -24,6 +24,7 @@ import {
   CertificateOfAcceptanceFooter1,
   CertificateOfAcceptanceFooter2,
 } from "./CertificateOfAcceptanceFooter";
+import ServiceReportHeader from "./ServiceReportHeader";
 
 const modifyApiUrlPort = (url) => {
   const portPattern = /:(3001)$/;
@@ -213,12 +214,18 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                   row={row}
                   certifiedTransaction={certifiedTransaction}
                 />
+              ) : typeOfCertificate === "SERVICE REPORT" ? (
+                <ServiceReportHeader
+                  row={row}
+                  certifiedTransaction={certifiedTransaction}
+                />
               ) : (
                 <CertificateOfDestructionHeader
                   row={row}
                   certifiedTransaction={certifiedTransaction}
                 />
               )}
+
               <TableContainer
                 component={Paper}
                 sx={{

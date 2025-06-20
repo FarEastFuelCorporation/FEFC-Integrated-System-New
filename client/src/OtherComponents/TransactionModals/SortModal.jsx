@@ -401,10 +401,12 @@ const SortModal = ({
                       .sort((a, b) => a.wasteName.localeCompare(b.wasteName)) // Sort by wasteName in ascending order
                       .map((waste) => (
                         <MenuItem key={waste.id} value={waste.id}>
-                          {waste.wasteName} {"("}
-                          {waste.TypeOfWaste.wasteCode}
-                          {")"} - {waste.unit} ({waste.Quotation?.quotationCode}
-                          )
+                          {waste.wasteName}
+                          {` (${waste.TypeOfWaste.wasteCode})`} - {waste.unit}
+                          {` (${waste.Quotation?.quotationCode})`}{" "}
+                          {waste.TreatmentProcess
+                            ? `(${waste.TreatmentProcess.treatmentProcess})`
+                            : ""}
                         </MenuItem>
                       ))}
                   </Select>

@@ -173,6 +173,7 @@ const BilledTransactions = ({ user }) => {
       const billedTransaction = typeToEdit.BilledTransaction?.[0] || {};
 
       setFormData({
+        row: typeToEdit,
         clientType: row.createdBy.substring(0, 3),
         id: billedTransaction.id,
         bookedTransactionId: typeToEdit.id,

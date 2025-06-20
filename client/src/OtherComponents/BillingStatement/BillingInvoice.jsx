@@ -861,7 +861,7 @@ const BillingInvoice = ({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {row.Client.clientName}
+                  {row.Client?.clientName}
                 </Typography>
                 <Typography
                   sx={{
@@ -876,7 +876,7 @@ const BillingInvoice = ({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {row.Client.address}
+                  {row.Client?.address}
                 </Typography>
                 <Typography
                   sx={{
@@ -887,7 +887,7 @@ const BillingInvoice = ({
                     left: "80px",
                   }}
                 >
-                  {row.Client.billerTinNumber}
+                  {row.Client?.billerTinNumber}
                 </Typography>
                 <Typography
                   sx={{

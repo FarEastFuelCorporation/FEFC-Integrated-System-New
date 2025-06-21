@@ -101,6 +101,8 @@ const Dashboard = ({ user }) => {
       setTransactions(response.data.result);
       setClientCountByEmployeeData(response.data.clientCountByEmployeeData);
 
+      console.log(response.data.scheduledTransactionCounts);
+
       const transformedData = response.data.scheduledTransactionCounts.map(
         (item) => ({
           id: `${formatDate2(item.weekStart)} - ${formatDate2(item.weekEnd)}`,

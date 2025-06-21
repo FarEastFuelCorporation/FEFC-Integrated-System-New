@@ -736,6 +736,8 @@ const Clients = ({ user }) => {
                 <MenuItem value="WAITING FOR SCHEDULE">
                   WAITING FOR SCHEDULE
                 </MenuItem>
+                <MenuItem value="NEW CLIENT">NEW CLIENT</MenuItem>
+                <MenuItem value="EXISTING">EXISTING</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12} lg={4}>

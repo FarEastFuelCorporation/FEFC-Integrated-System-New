@@ -98,6 +98,10 @@ export const validateClientForm = (data) => {
   ) {
     errors.push("Client Transaction Status is required.");
   }
+  // Client Hauling Status: Required
+  if (!data.clientHaulingStatus || data.clientHaulingStatus.trim() === "") {
+    errors.push("Client Hauling Status is required.");
+  }
 
   return errors;
 };

@@ -1,6 +1,8 @@
 export const validateClientForm = (data) => {
   const errors = [];
 
+  console.log("Validating client form data:", data);
+
   // MOA Date
   if (data.moaDate && isNaN(new Date(data.moaDate).getTime())) {
     errors.push("MOA Date is invalid.");
@@ -97,10 +99,6 @@ export const validateClientForm = (data) => {
     data.clientTransactionStatus.trim() === ""
   ) {
     errors.push("Client Transaction Status is required.");
-  }
-  // Client Hauling Status: Required
-  if (!data.clientHaulingStatus || data.clientHaulingStatus.trim() === "") {
-    errors.push("Client Hauling Status is required.");
   }
 
   return errors;

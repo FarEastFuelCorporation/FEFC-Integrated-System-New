@@ -134,6 +134,14 @@ const Clients = ({ user }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const isValidDate = (dateStr) => {
+    return (
+      !!dateStr &&
+      dateStr !== "0000-00-00" &&
+      !isNaN(new Date(dateStr).getTime())
+    );
+  };
+
   const handleEditClick = (id) => {
     const clientToEdit = clientData.find((client) => client.id === id);
     if (clientToEdit) {
@@ -143,8 +151,10 @@ const Clients = ({ user }) => {
         clientActivityStatus: clientToEdit.clientActivityStatus || "",
         clientTransactionStatus: clientToEdit.clientTransactionStatus || "",
         clientHaulingStatus: clientToEdit.clientHaulingStatus || "",
-        moaDate: clientToEdit.moaDate || "",
-        moaEndDate: clientToEdit.moaEndDate || "",
+        moaDate: isValidDate(clientToEdit.moaDate) ? clientToEdit.moaDate : "",
+        moaEndDate: isValidDate(clientToEdit.moaEndDate)
+          ? clientToEdit.moaEndDate
+          : "",
         clientName: clientToEdit.clientName || "",
         address: clientToEdit.address || "",
         natureOfBusiness: clientToEdit.natureOfBusiness || "",

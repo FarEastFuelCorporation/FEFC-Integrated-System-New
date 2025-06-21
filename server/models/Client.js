@@ -67,6 +67,10 @@ const Client = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    clientHaulingStatus: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     billerName: {
       type: DataTypes.STRING,
       allowNull: true,

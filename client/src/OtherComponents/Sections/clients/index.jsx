@@ -674,7 +674,7 @@ const Clients = ({ user }) => {
             </Grid>
           </Grid>
           <Grid container spacing={2} my={2}>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={4}>
               <TextField
                 label="Activity Status"
                 name="clientActivityStatus"
@@ -694,7 +694,7 @@ const Clients = ({ user }) => {
                 <MenuItem value="INACTIVE">INACTIVE</MenuItem>
               </TextField>
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12} lg={4}>
               <TextField
                 label="Transaction Status"
                 name="clientTransactionStatus"
@@ -716,6 +716,29 @@ const Clients = ({ user }) => {
                 </MenuItem>
                 <MenuItem value="DRAFT MOA SENT">DRAFT MOA SENT</MenuItem>
                 <MenuItem value="MOA APPROVED">MOA APPROVED</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <TextField
+                label="Hauling Status"
+                name="clientHaulingStatus"
+                value={formData.clientHaulingStatus}
+                onChange={handleInputChange}
+                select
+                required
+                fullWidth
+                autoComplete="off"
+                InputLabelProps={{
+                  style: {
+                    color: colors.grey[100],
+                  },
+                }}
+              >
+                <MenuItem value="DAILY">DAILY</MenuItem>
+                <MenuItem value="WEEKLY">WEEKLY</MenuItem>
+                <MenuItem value="MONTHLY">MONTHLY</MenuItem>
+                <MenuItem value="QUARTERLY">QUARTERLY</MenuItem>
+                <MenuItem value="YEARLY">YEARLY</MenuItem>
               </TextField>
             </Grid>
           </Grid>

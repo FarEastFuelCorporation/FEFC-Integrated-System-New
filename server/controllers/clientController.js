@@ -14,6 +14,7 @@ async function createClientController(req, res) {
     let {
       clientActivityStatus,
       clientTransactionStatus,
+      clientHaulingStatus,
       clientName,
       address,
       natureOfBusiness,
@@ -51,6 +52,7 @@ async function createClientController(req, res) {
       clientId,
       clientActivityStatus,
       clientTransactionStatus,
+      clientHaulingStatus,
       clientName,
       address,
       natureOfBusiness,
@@ -165,6 +167,7 @@ async function updateClientController(req, res) {
     let {
       clientActivityStatus,
       clientTransactionStatus,
+      clientHaulingStatus,
       clientName,
       address,
       natureOfBusiness,
@@ -204,6 +207,7 @@ async function updateClientController(req, res) {
     if (updatedClient) {
       updatedClient.clientActivityStatus = clientActivityStatus || "";
       updatedClient.clientTransactionStatus = clientTransactionStatus || "";
+      updatedClient.clientHaulingStatus = clientHaulingStatus || "";
       updatedClient.clientName = clientName || "";
       // Update client attributes
       updatedClient.address = address || "";

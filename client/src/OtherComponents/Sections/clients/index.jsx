@@ -39,6 +39,7 @@ const Clients = ({ user }) => {
     clientId: "",
     clientActivityStatus: "",
     clientTransactionStatus: "",
+    clientHaulingStatus: "",
     moaDate: "",
     moaEndDate: "",
     clientName: "",
@@ -141,6 +142,7 @@ const Clients = ({ user }) => {
         clientId: clientToEdit.clientId,
         clientActivityStatus: clientToEdit.clientActivityStatus || "",
         clientTransactionStatus: clientToEdit.clientTransactionStatus || "",
+        clientHaulingStatus: clientToEdit.clientHaulingStatus || "",
         moaDate: clientToEdit.moaDate || "",
         moaEndDate: clientToEdit.moaEndDate || "",
         clientName: clientToEdit.clientName || "",
@@ -218,6 +220,10 @@ const Clients = ({ user }) => {
       formDataToSend.append(
         "clientTransactionStatus",
         formData.clientTransactionStatus
+      );
+      formDataToSend.append(
+        "clientHaulingStatus",
+        formData.clientHaulingStatus
       );
       formDataToSend.append("moaDate", formData.moaDate);
       formDataToSend.append("moaEndDate", formData.moaEndDate);
@@ -384,6 +390,14 @@ const Clients = ({ user }) => {
     {
       field: "clientTransactionStatus",
       headerName: "Transaction Status",
+      headerAlign: "center",
+      align: "center",
+      width: 80,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "clientHaulingStatus",
+      headerName: "Hauling Status",
       headerAlign: "center",
       align: "center",
       width: 80,
@@ -716,6 +730,12 @@ const Clients = ({ user }) => {
                 </MenuItem>
                 <MenuItem value="DRAFT MOA SENT">DRAFT MOA SENT</MenuItem>
                 <MenuItem value="MOA APPROVED">MOA APPROVED</MenuItem>
+                <MenuItem value="ONGOING PPT APPLICATION">
+                  ONGOING PPT APPLICATION
+                </MenuItem>
+                <MenuItem value="WAITING FOR SCHEDULE">
+                  WAITING FOR SCHEDULE
+                </MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12} lg={4}>

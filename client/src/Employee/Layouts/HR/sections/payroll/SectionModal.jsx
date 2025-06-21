@@ -343,8 +343,6 @@ const SectionModal = ({
     };
   };
 
-  console.log(formData);
-
   return (
     <Modal open={openModal} onClose={handleCloseModal}>
       <Box

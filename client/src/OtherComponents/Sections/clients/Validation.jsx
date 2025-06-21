@@ -1,8 +1,6 @@
 export const validateClientForm = (data) => {
   const errors = [];
 
-  console.log("Validating client form data:", data);
-
   // MOA Date
   if (data.moaDate && isNaN(new Date(data.moaDate).getTime())) {
     errors.push("MOA Date is invalid.");

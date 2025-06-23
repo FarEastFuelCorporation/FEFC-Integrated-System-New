@@ -297,7 +297,7 @@ const Payroll = ({ user }) => {
       ] = await Promise.all([
         axios.get(`${apiUrl}/api/employeeSalary`),
         axios.get(`${apiUrl}/api/attendanceRecord`),
-        axios.get(`${apiUrl}/api/employee`),
+        axios.get(`${apiUrl}/api/employeeRecord/salary`),
         axios.get(`${apiUrl}/api/overtime/approved`),
         axios.get(`${apiUrl}/api/workSchedule`),
       ]);
@@ -311,7 +311,8 @@ const Payroll = ({ user }) => {
       setRecords(attendanceResponse.data.data);
 
       // Logging and setting employee data
-      setEmployees(employeeResponse.data.employees);
+      console.log(employeeResponse.data.employeeRecords);
+      setEmployees(employeeResponse.data.employeeRecords);
 
       // Logging and setting overtime records
       console.log(overtimeResponse.data.overtimes);

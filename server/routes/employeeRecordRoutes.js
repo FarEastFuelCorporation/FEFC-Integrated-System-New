@@ -12,6 +12,7 @@ const {
   getEmployeeRecordSignatureController,
   getEmployeeRecordController,
   getEmployeeRecordPictureController,
+  getEmployeeRecordsWithSalaryController,
 } = require("../controllers/employeeRecordController");
 
 // Create EmployeeRecord route
@@ -26,6 +27,9 @@ router.post(
 
 // Get EmployeeRecords route
 router.get("/", getEmployeeRecordsController);
+
+// Get EmployeeRecords with Salary route
+router.get("/salary", getEmployeeRecordsWithSalaryController);
 
 // Get EmployeeRecord route
 router.get("/:id", getEmployeeRecordController);

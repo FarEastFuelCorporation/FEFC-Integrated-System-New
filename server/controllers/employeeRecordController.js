@@ -7,6 +7,7 @@ const EmployeeAttachmentLegal = require("../models/EmployeeAttachmentLegal");
 const EmployeeAttachmentMemo = require("../models/EmployeeAttachmentMemo");
 const EmployeeContract = require("../models/EmployeeContract");
 const EmployeeRecord = require("../models/EmployeeRecord");
+const EmployeeSalary = require("../models/EmployeeSalary");
 const IdInformation = require("../models/IdInformation");
 const Vehicle = require("../models/Vehicle");
 
@@ -357,6 +358,28 @@ async function getEmployeeRecordSignatureController(req, res) {
   }
 }
 
+// Get EmployeeRecord with Salary controller
+async function getEmployeeRecordsWithSalaryController(req, res) {
+  try {
+    const employeeRecords = await EmployeeRecord.findAll({
+      attributes: { exclude: ["signature", "picture"] },
+      order: [["employeeId", "ASC"]],
+      include: [
+        {
+          model: EmployeeSalary,
+          as: "EmployeeSalary",
+        },
+      ],
+    });
+
+    res.json({ employeeRecords });
+  } catch (error) {
+    // Handle errors
+    console.error("Error soft-deleting Vehicle:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 // Update EmployeeRecord controller
 async function updateEmployeeRecordController(req, res) {
   try {
@@ -603,6 +626,7 @@ module.exports = {
   getEmployeeRecordsController,
   getEmployeeRecordController,
   getEmployeeRecordPictureController,
+  getEmployeeRecordsWithSalaryController,
   updateEmployeeRecordController,
   deleteEmployeeRecordController,
   getEmployeeRecordSignatureController,

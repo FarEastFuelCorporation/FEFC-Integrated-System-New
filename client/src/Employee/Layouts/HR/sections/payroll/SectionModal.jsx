@@ -411,7 +411,13 @@ const SectionModal = ({
                 setFormData((prevFormData) => ({
                   ...prevFormData,
                   employeeId: newValue.employeeId, // Set the employeeId
-                  designation: newValue.designation, // Set the employeeId
+                  payrollType: newValue.EmployeeSalary?.[0]?.payrollType,
+                  salaryType: newValue.EmployeeSalary?.[0]?.salaryType,
+                  compensationType:
+                    newValue.EmployeeSalary?.[0]?.compensationType,
+                  salary: newValue.EmployeeSalary?.[0]?.salary,
+                  dayAllowance: newValue.EmployeeSalary?.[0]?.dayAllowance,
+                  nightAllowance: newValue.EmployeeSalary?.[0]?.nightAllowance,
                 }));
               }
             }}
@@ -423,6 +429,7 @@ const SectionModal = ({
             value={formData.designation || ""}
             fullWidth
             required
+            disabled
             InputLabelProps={{
               shrink: true,
               style: {
@@ -451,6 +458,7 @@ const SectionModal = ({
               value={formData.payrollType}
               onChange={handleInputChange}
               label="Payroll Type"
+              disabled
             >
               <MenuItem value="SEMI-MONTHLY" sx={{ height: 50 }}>
                 SEMI-MONTHLY
@@ -475,6 +483,7 @@ const SectionModal = ({
               value={formData.salaryType}
               onChange={handleInputChange}
               label="Salary Type"
+              disabled
             >
               <MenuItem value="CASH" sx={{ height: 50 }}>
                 CASH
@@ -499,6 +508,7 @@ const SectionModal = ({
               value={formData.compensationType}
               onChange={handleInputChange}
               label="Compensation Type"
+              disabled
             >
               <MenuItem value="FIXED" sx={{ height: 50 }}>
                 FIXED
@@ -515,6 +525,7 @@ const SectionModal = ({
             onChange={handleInputChange}
             fullWidth
             required
+            disabled
             InputLabelProps={{
               shrink: true,
               style: {
@@ -530,6 +541,7 @@ const SectionModal = ({
             onChange={handleInputChange}
             fullWidth
             required
+            disabled
             InputLabelProps={{
               shrink: true,
               style: {
@@ -545,6 +557,7 @@ const SectionModal = ({
             onChange={handleInputChange}
             fullWidth
             required
+            disabled
             InputLabelProps={{
               shrink: true,
               style: {

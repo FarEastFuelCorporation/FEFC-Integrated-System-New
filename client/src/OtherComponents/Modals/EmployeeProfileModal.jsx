@@ -56,6 +56,7 @@ const EmployeeProfileModal = ({
   const [attachmentIncidentData, setAttachmentIncidentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
   const [loadingPicture, setLoadingPicture] = useState(false);
   const [loadingAttachment, setLoadingAttachment] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -172,52 +173,41 @@ const EmployeeProfileModal = ({
     fetchData();
   }, [fetchData]);
 
-  let employeePicture;
+  useEffect(() => {
+    if (
+      employeePictureData &&
+      employeePictureData.profile_picture &&
+      employeePictureData.profile_picture.data &&
+      employeePictureData.profile_picture.type
+    ) {
+      try {
+        const uint8Array = new Uint8Array(
+          employeePictureData.profile_picture.data
+        );
+        const blob = new Blob([uint8Array], {
+          type: employeePictureData.profile_picture.type,
+        });
+        const objectUrl = URL.createObjectURL(blob);
+        setImageUrl(objectUrl);
 
-  if (
-    employeePictureData &&
-    employeePictureData.profile_picture &&
-    employeePictureData.profile_picture.data &&
-    employeePictureData.profile_picture.type
-  ) {
-    try {
-      // Convert Buffer to Uint8Array
-      const uint8Array = new Uint8Array(
-        employeePictureData.profile_picture.data
-      );
-      // Create Blob from Uint8Array
-      const blob = new Blob([uint8Array], {
-        type: employeePictureData.profile_picture.type,
-      });
-      // Create object URL from Blob
-      const imageUrl = URL.createObjectURL(blob);
-
-      employeePicture = (
-        <img
-          src={imageUrl}
-          alt="Employee"
-          style={{ width: 192, height: 192 }}
-        />
-      );
-    } catch (error) {
-      console.error("Error creating image URL:", error);
-      employeePicture = (
-        <img
-          src="/assets/unknown.png"
-          alt="Employee"
-          style={{ width: 192, height: 192 }}
-        />
-      );
+        // Clean up old object URLs
+        return () => URL.revokeObjectURL(objectUrl);
+      } catch (error) {
+        console.error("Error creating image URL:", error);
+        setImageUrl(null);
+      }
+    } else {
+      setImageUrl(null);
     }
-  } else {
-    employeePicture = (
-      <img
-        src="/assets/unknown.png"
-        alt="Employee"
-        style={{ width: 192, height: 192 }}
-      />
-    );
-  }
+  }, [employeePictureData]);
+
+  const employeePicture = (
+    <img
+      src={imageUrl || "/assets/unknown.png"}
+      alt="Employee"
+      style={{ width: 192, height: 192 }}
+    />
+  );
 
   const handleChangeTab = (event, newValue) => {
     setSelectedTab(newValue);
@@ -605,6 +595,24 @@ const EmployeeProfileModal = ({
               >
                 Employee Profile
               </Typography>
+              {imageUrl && (
+                <IconButton
+                  color="warning"
+                  sx={{ position: "absolute", right: 100, top: 20 }}
+                  component="a"
+                  href={imageUrl}
+                  download={`${selectedRow.employeeId}-${
+                    selectedRow.lastName
+                  }, ${selectedRow.firstName} ${selectedRow.middleName} ${
+                    selectedRow.husbandSurname
+                      ? `- ${selectedRow.husbandSurname}`
+                      : ""
+                  }.jpg`}
+                >
+                  <DownloadIcon />
+                  Photo
+                </IconButton>
+              )}
               {user.userType === 21 && (
                 <IconButton
                   color="warning"

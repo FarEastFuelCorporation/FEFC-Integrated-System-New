@@ -628,6 +628,7 @@ const EmployeeRecords = ({ user }) => {
               }
               // Only call these functions if there are no errors
               if (response.data.employeeRecord) {
+                console.log(response.data.employeeRecord);
                 setSelectedRow(response.data.employeeRecord);
                 setOpen(true);
               }

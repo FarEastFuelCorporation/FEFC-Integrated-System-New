@@ -522,6 +522,19 @@ EmployeeSalary.belongsTo(Employee, {
   onDelete: "CASCADE",
 });
 
+EmployeeRecord.hasMany(EmployeeSalary, {
+  as: "EmployeeSalary",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+EmployeeSalary.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
 Employee.hasMany(EmployeeSalary, {
   as: "EmployeeCreatedBy",
   foreignKey: "createdBy",

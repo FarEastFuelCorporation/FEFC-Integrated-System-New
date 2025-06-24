@@ -423,3 +423,63 @@ export const formatTimeRange = (inTime, outTime) => {
 
   return `${formattedIn} - ${formattedOut}`;
 };
+
+export const generateWeeklyOptions = (year) => {
+  return Array.from({ length: 53 }, (_, i) => {
+    const weekNum = i + 1;
+    const label = `Week ${weekNum} – ${getWeekDateRange(year, weekNum)}`;
+    return { label, value: `Week ${weekNum}` };
+  });
+};
+
+export const getWeekDateRange = (year, weekNumber) => {
+  const simple = new Date(year, 0, 1 + (weekNumber - 1) * 7);
+  const dayOfWeek = simple.getDay(); // Sunday = 0, Monday = 1
+  const isoDay = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Shift to Monday
+
+  const startDate = new Date(simple);
+  startDate.setDate(simple.getDate() + isoDay);
+
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+
+  const format = (d) =>
+    d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
+  return `${format(startDate)} – ${format(endDate)}`;
+};
+
+export const getFullSemiMonthlyCutoffs = (year) => {
+  const cutoffs = [];
+  let startDate = new Date(year - 1, 11, 26); // Dec 26 of previous year
+
+  for (let i = 1; i <= 24; i++) {
+    let endDate = new Date(startDate);
+    if (i % 2 === 1) {
+      // 1st cut-off of the month: 26–10
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(10);
+    } else {
+      // 2nd cut-off: 11–25
+      endDate = new Date(startDate);
+      endDate.setDate(25);
+    }
+
+    const format = (d) =>
+      d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+    cutoffs.push({
+      label: `Cut-off ${i} – ${format(startDate)} to ${format(endDate)}`,
+      value: `Cut-off ${i}`,
+    });
+
+    // Next start: day after current end
+    startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() + 1);
+  }
+
+  return cutoffs;
+};

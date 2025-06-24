@@ -303,7 +303,10 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
                       return (
                         <TableRow key={index} sx={{ border: "black" }}>
                           <TableCell sx={bodyCellStyles(false)}>
-                            {formatDate(row.haulingDate)}
+                            {formatDate(
+                              row.ScheduledTransaction?.[0]?.scheduledDate ||
+                                row.haulingDate
+                            )}
                           </TableCell>
                           <TableCell sx={bodyCellStyles(false)}>
                             {wasteName}

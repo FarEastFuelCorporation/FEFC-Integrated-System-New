@@ -14,15 +14,37 @@ import {
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
+import {
+  generateWeeklyOptions,
+  getFullSemiMonthlyCutoffs,
+} from "../../../../../OtherComponents/Functions";
 
-const timeFields = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
+const timeFieldsWeekly = [
+  "day1",
+  "day2",
+  "day3",
+  "day4",
+  "day5",
+  "day6",
+  "day7",
+];
+const timeFieldsSemiMonthly = [
+  "day1",
+  "day2",
+  "day3",
+  "day4",
+  "day5",
+  "day6",
+  "day7",
+  "day8",
+  "day9",
+  "day10",
+  "day11",
+  "day12",
+  "day13",
+  "day14",
+  "day15",
+  "day16",
 ];
 
 const statusOptions = [
@@ -120,6 +142,9 @@ const SectionModal = ({
   colors,
   employees,
 }) => {
+  const timeFields =
+    formData?.payrollType === "WEEKLY" ? timeFieldsWeekly : timeFieldsWeekly;
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -371,296 +396,446 @@ const SectionModal = ({
         <Typography variant="h6" component="h2" color="error">
           {showErrorMessage && errorMessage}
         </Typography>
-        <div
-          style={{
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "20px",
-          }}
-        >
-          <Autocomplete
-            options={employees || []} // Subordinates array for autocomplete
-            getOptionLabel={(option) =>
-              `${option.lastName}, ${option.firstName} ${option.affix || ""}`
-            } // Display full name
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Full Name"
-                name="employeeId"
-                fullWidth
-                required
-                InputLabelProps={{
-                  shrink: true,
-                  style: {
-                    color: colors.grey[100],
-                  },
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <Autocomplete
+              options={employees || []} // Subordinates array for autocomplete
+              getOptionLabel={(option) =>
+                `${option.lastName}, ${option.firstName} ${option.affix || ""}`
+              } // Display full name
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Full Name"
+                  name="employeeId"
+                  fullWidth
+                  required
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: colors.grey[100],
+                    },
+                  }}
+                  autoComplete="off"
+                />
+              )}
+              value={
+                employees.find(
+                  (option) => option.employeeId === formData.employeeId
+                ) || null
+              } // Set the value to the current employee
+              onChange={(event, newValue) => {
+                // Handle selection and set the employeeId as the value
+                if (newValue) {
+                  setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    employeeId: newValue.employeeId, // Set the employeeId
+                    designation: newValue.designation,
+                    payrollType: newValue.EmployeeSalary?.[0]?.payrollType,
+                    salaryType: newValue.EmployeeSalary?.[0]?.salaryType,
+                    compensationType:
+                      newValue.EmployeeSalary?.[0]?.compensationType,
+                    salary: newValue.EmployeeSalary?.[0]?.salary,
+                    dayAllowance: newValue.EmployeeSalary?.[0]?.dayAllowance,
+                    nightAllowance:
+                      newValue.EmployeeSalary?.[0]?.nightAllowance,
+                  }));
+                }
+              }}
+              autoHighlight
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              label="Designation"
+              name="designation"
+              value={formData.designation || ""}
+              fullWidth
+              required
+              disabled
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              InputProps={{
+                readOnly: true,
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={1}>
+            {/* Year Field (common to both WEEKLY and SEMI-MONTHLY) */}
+            <FormControl fullWidth required>
+              <InputLabel
+                id="year-label"
+                style={{
+                  color: colors.grey[100],
                 }}
-                autoComplete="off"
-              />
-            )}
-            value={
-              employees.find(
-                (option) => option.employeeId === formData.employeeId
-              ) || null
-            } // Set the value to the current employee
-            onChange={(event, newValue) => {
-              // Handle selection and set the employeeId as the value
-              if (newValue) {
-                setFormData((prevFormData) => ({
-                  ...prevFormData,
-                  employeeId: newValue.employeeId, // Set the employeeId
-                  payrollType: newValue.EmployeeSalary?.[0]?.payrollType,
-                  salaryType: newValue.EmployeeSalary?.[0]?.salaryType,
-                  compensationType:
-                    newValue.EmployeeSalary?.[0]?.compensationType,
-                  salary: newValue.EmployeeSalary?.[0]?.salary,
-                  dayAllowance: newValue.EmployeeSalary?.[0]?.dayAllowance,
-                  nightAllowance: newValue.EmployeeSalary?.[0]?.nightAllowance,
-                }));
-              }
-            }}
-            autoHighlight
-          />
-          <TextField
-            label="Designation"
-            name="designation"
-            value={formData.designation || ""}
-            fullWidth
-            required
-            disabled
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            InputProps={{
-              readOnly: true,
-            }}
-            autoComplete="off"
-          />
-        </div>
-        <div style={{ width: "100%", display: "flex", gap: "20px" }}>
-          <FormControl fullWidth required>
-            <InputLabel
-              id="payrollType-label"
-              style={{
-                color: colors.grey[100],
-              }}
-            >
-              Payroll Type
-            </InputLabel>
-            <Select
-              labelId="payrollType-label"
-              name="payrollType"
-              value={formData.payrollType}
-              onChange={handleInputChange}
-              label="Payroll Type"
-              disabled
-            >
-              <MenuItem value="SEMI-MONTHLY" sx={{ height: 50 }}>
-                SEMI-MONTHLY
-              </MenuItem>
-              <MenuItem value="WEEKLY" sx={{ height: 50 }}>
-                WEEKLY
-              </MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth required>
-            <InputLabel
-              id="salaryType-label"
-              style={{
-                color: colors.grey[100],
-              }}
-            >
-              Salary Type
-            </InputLabel>
-            <Select
-              labelId="salaryType-label"
-              name="salaryType"
-              value={formData.salaryType}
-              onChange={handleInputChange}
-              label="Salary Type"
-              disabled
-            >
-              <MenuItem value="CASH" sx={{ height: 50 }}>
-                CASH
-              </MenuItem>
-              <MenuItem value="ATM" sx={{ height: 50 }}>
-                ATM
-              </MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth required>
-            <InputLabel
-              id="compensationType-label"
-              style={{
-                color: colors.grey[100],
-              }}
-            >
-              Compensation Type
-            </InputLabel>
-            <Select
-              labelId="compensationType-label"
-              name="compensationType"
-              value={formData.compensationType}
-              onChange={handleInputChange}
-              label="Compensation Type"
-              disabled
-            >
-              <MenuItem value="FIXED" sx={{ height: 50 }}>
-                FIXED
-              </MenuItem>
-              <MenuItem value="TIME BASED" sx={{ height: 50 }}>
-                TIME BASED
-              </MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            label="Salary"
-            name="salary"
-            value={formData.salary || ""}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            disabled
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Day Allowance"
-            name="dayAllowance"
-            value={formData.dayAllowance || ""}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            disabled
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            label="Night Allowance"
-            name="nightAllowance"
-            value={formData.nightAllowance || ""}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            disabled
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            autoComplete="off"
-          />
-          <TextField
-            fullWidth
-            label="In"
-            name="scheduledIn"
-            type="time"
-            value={formData.scheduledIn || ""}
-            onChange={handleInputChange}
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            InputProps={{
-              sx: {
-                "& input::-webkit-calendar-picker-indicator": {
-                  display: "none",
-                  WebkitAppearance: "none",
-                },
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            label="Out"
-            name="scheduledOut"
-            type="time"
-            value={formData.scheduledOut || ""}
-            onChange={handleInputChange}
-            InputLabelProps={{
-              shrink: true,
-              style: {
-                color: colors.grey[100],
-              },
-            }}
-            InputProps={{
-              sx: {
-                "& input::-webkit-calendar-picker-indicator": {
-                  display: "none",
-                  WebkitAppearance: "none",
-                },
-              },
-            }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                color="secondary"
-                checked={formData.paidBreak || false}
-                onChange={(e) =>
+              >
+                Year
+              </InputLabel>
+              <Select
+                labelId="year-label"
+                name="year"
+                value={formData.year}
+                onChange={handleInputChange}
+                label="Year"
+              >
+                <MenuItem value={new Date().getFullYear()} sx={{ height: 50 }}>
+                  {new Date().getFullYear()}
+                </MenuItem>
+                <MenuItem
+                  value={new Date().getFullYear() - 1}
+                  sx={{ height: 50 }}
+                >
+                  {new Date().getFullYear() - 1}
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            {/* Week Number Autocomplete for WEEKLY */}
+            {formData.payrollType === "WEEKLY" && formData.year && (
+              <Autocomplete
+                options={generateWeeklyOptions(Number(formData.year))}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) =>
+                  option.value === value.value
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Week Number"
+                    name="weekNumber"
+                    required
+                    autoComplete="off"
+                    InputLabelProps={{
+                      shrink: true,
+                      style: {
+                        color: colors.grey[100],
+                      },
+                    }}
+                  />
+                )}
+                value={
+                  generateWeeklyOptions(Number(formData.year)).find(
+                    (opt) => opt.value === formData.weekNumber
+                  ) || null
+                }
+                onChange={(event, newValue) =>
                   setFormData((prev) => ({
                     ...prev,
-                    paidBreak: e.target.checked,
+                    weekNumber: newValue?.value || "",
                   }))
                 }
               />
-            }
-            label="Paid Break"
-          />
-        </div>
+            )}
 
-        <Grid container spacing={2}>
-          {timeFields.map((day) => (
-            <Grid item xs={12} sm={6} md={12 / 7} key={day}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 500, mb: 1, textAlign: "center" }}
-              >
-                {day.charAt(0).toUpperCase() + day.slice(1)}
-              </Typography>
-              <FormGroup row sx={{ justifyContent: "space-around", mb: 1 }}>
-                {statusOptions.map(({ label, name }) => (
-                  <Box
-                    key={name}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      mx: -1,
+            {/* Cut-off Autocomplete for SEMI-MONTHLY */}
+            {formData.payrollType === "SEMI-MONTHLY" && formData.year && (
+              <Autocomplete
+                options={getFullSemiMonthlyCutoffs(
+                  Number(formData.year),
+                  new Date().getMonth()
+                )}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) =>
+                  option.value === value.value
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Cut-Off"
+                    name="cutOff"
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                      style: {
+                        color: colors.grey[100],
+                      },
                     }}
-                  >
-                    <Typography variant="caption">{label}</Typography>
-                    <Checkbox
-                      size="small"
-                      color="secondary"
-                      checked={(formData[day] || "").split(",").includes(label)}
-                      onChange={handleCheckboxChange(day, label)}
-                    />
-                  </Box>
-                ))}
-              </FormGroup>
-            </Grid>
-          ))}
+                  />
+                )}
+                value={
+                  getFullSemiMonthlyCutoffs(
+                    Number(formData.year),
+                    new Date().getMonth()
+                  ).find((opt) => opt.value === formData.cutOff) || null
+                }
+                onChange={(event, newValue) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    cutOff: newValue?.value || "",
+                  }))
+                }
+              />
+            )}
+          </Grid>
         </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12 / 9}>
+            <FormControl fullWidth required>
+              <InputLabel
+                id="payrollType-label"
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Payroll Type
+              </InputLabel>
+              <Select
+                labelId="payrollType-label"
+                name="payrollType"
+                value={formData.payrollType}
+                onChange={handleInputChange}
+                label="Payroll Type"
+                disabled
+              >
+                <MenuItem value="SEMI-MONTHLY" sx={{ height: 50 }}>
+                  SEMI-MONTHLY
+                </MenuItem>
+                <MenuItem value="WEEKLY" sx={{ height: 50 }}>
+                  WEEKLY
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <FormControl fullWidth required>
+              <InputLabel
+                id="salaryType-label"
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Salary Type
+              </InputLabel>
+              <Select
+                labelId="salaryType-label"
+                name="salaryType"
+                value={formData.salaryType}
+                onChange={handleInputChange}
+                label="Salary Type"
+                disabled
+              >
+                <MenuItem value="CASH" sx={{ height: 50 }}>
+                  CASH
+                </MenuItem>
+                <MenuItem value="ATM" sx={{ height: 50 }}>
+                  ATM
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <FormControl fullWidth required>
+              <InputLabel
+                id="compensationType-label"
+                style={{
+                  color: colors.grey[100],
+                }}
+              >
+                Compensation Type
+              </InputLabel>
+              <Select
+                labelId="compensationType-label"
+                name="compensationType"
+                value={formData.compensationType}
+                onChange={handleInputChange}
+                label="Compensation Type"
+                disabled
+              >
+                <MenuItem value="FIXED" sx={{ height: 50 }}>
+                  FIXED
+                </MenuItem>
+                <MenuItem value="TIME BASED" sx={{ height: 50 }}>
+                  TIME BASED
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <TextField
+              label="Salary"
+              name="salary"
+              value={formData.salary || ""}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              disabled
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <TextField
+              label="Day Allowance"
+              name="dayAllowance"
+              value={formData.dayAllowance || ""}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              disabled
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <TextField
+              label="Night Allowance"
+              name="nightAllowance"
+              value={formData.nightAllowance || ""}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              disabled
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              autoComplete="off"
+            />
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <TextField
+              fullWidth
+              label="In"
+              name="scheduledIn"
+              type="time"
+              value={formData.scheduledIn || ""}
+              onChange={handleInputChange}
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              InputProps={{
+                sx: {
+                  "& input::-webkit-calendar-picker-indicator": {
+                    display: "none",
+                    WebkitAppearance: "none",
+                  },
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <TextField
+              fullWidth
+              label="Out"
+              name="scheduledOut"
+              type="time"
+              value={formData.scheduledOut || ""}
+              onChange={handleInputChange}
+              InputLabelProps={{
+                shrink: true,
+                style: {
+                  color: colors.grey[100],
+                },
+              }}
+              InputProps={{
+                sx: {
+                  "& input::-webkit-calendar-picker-indicator": {
+                    display: "none",
+                    WebkitAppearance: "none",
+                  },
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12 / 9}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  color="secondary"
+                  checked={formData.paidBreak || false}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      paidBreak: e.target.checked,
+                    }))
+                  }
+                />
+              }
+              label="Paid Break"
+            />
+          </Grid>
+        </Grid>
+
+        <Box
+          sx={{
+            overflowX: timeFields.length > 7 ? "auto" : "visible",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              width:
+                timeFields.length > 7
+                  ? `${(100 / 7) * timeFields.length}%`
+                  : "100%",
+              minWidth: timeFields.length > 7 ? "max-content" : "auto",
+            }}
+          >
+            {timeFields.map((day) => (
+              <Box
+                key={day}
+                sx={{
+                  width: "14.28%", // 100 / 7
+                  minWidth: "150px",
+                  px: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 500, mb: 1, textAlign: "center" }}
+                >
+                  {day.charAt(0).toUpperCase() + day.slice(1)}
+                </Typography>
+                <FormGroup row sx={{ justifyContent: "space-around", mb: 1 }}>
+                  {statusOptions.map(({ label, name }) => (
+                    <Box
+                      key={name}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        mx: -1,
+                      }}
+                    >
+                      <Typography variant="caption">{label}</Typography>
+                      <Checkbox
+                        size="small"
+                        color="secondary"
+                        checked={(formData[day] || "")
+                          .split(",")
+                          .includes(label)}
+                        onChange={handleCheckboxChange(day, label)}
+                      />
+                    </Box>
+                  ))}
+                </FormGroup>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
         <Grid container spacing={2}>
           {timeFields.map((day) => (
             <Grid item xs={12} sm={6} md={12 / 7} key={day}>

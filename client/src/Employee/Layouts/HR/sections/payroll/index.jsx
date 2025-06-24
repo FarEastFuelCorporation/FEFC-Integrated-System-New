@@ -42,22 +42,6 @@ const Payroll = ({ user }) => {
     salary: "",
     dayAllowance: "",
     nightAllowance: "",
-    weekNo: "",
-    mondayIn: "",
-    mondayOut: "",
-    tuesdayIn: "",
-    tuesdayOut: "",
-    wednesdayIn: "",
-    wednesdayOut: "",
-    thursdayIn: "",
-    thursdayOut: "",
-    fridayIn: "",
-    fridayOut: "",
-    saturdayIn: "",
-    saturdayOut: "",
-    sundayIn: "",
-    sundayOut: "",
-    restDay: "",
     createdBy: user.id,
   };
 
@@ -354,6 +338,8 @@ const Payroll = ({ user }) => {
   const handleEditClick = (id) => {
     handleOpenModal();
   };
+
+  console.log(formData);
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);

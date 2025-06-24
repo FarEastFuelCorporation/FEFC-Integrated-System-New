@@ -78,6 +78,9 @@ const EmployeeAttachmentIncident = require("../models/EmployeeAttachmentIncident
 const EmployeeContract = require("../models/EmployeeContract");
 const DeliveryReceipt = require("../models/DeliveryReceipt");
 const DeliveryReceiptItem = require("../models/DeliveryReceiptItem");
+const Payroll = require("../models/Payroll");
+const PayrollDeduction = require("../models/PayrollDeduction");
+const PayrollAdjustment = require("../models/PayrollAdjustment");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -1658,6 +1661,58 @@ Commission.belongsTo(Client, {
   as: "Client",
   foreignKey: "clientId",
   targetKey: "clientId",
+  onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(Payroll, {
+  as: "Payroll",
+  foreignKey: "employeeId",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+Payroll.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecord",
+  foreignKey: "employeeId",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+EmployeeRecord.hasMany(Payroll, {
+  as: "PayrollCreatedBy",
+  foreignKey: "createdBy",
+  sourceKey: "employeeId",
+  onDelete: "CASCADE",
+});
+Payroll.belongsTo(EmployeeRecord, {
+  as: "EmployeeRecordCreatedBy",
+  foreignKey: "createdBy",
+  targetKey: "employeeId",
+  onDelete: "CASCADE",
+});
+
+Payroll.hasMany(PayrollDeduction, {
+  as: "PayrollDeduction",
+  foreignKey: "payrollId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+PayrollDeduction.belongsTo(Payroll, {
+  as: "Payroll",
+  foreignKey: "payrollId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+Payroll.hasMany(PayrollAdjustment, {
+  as: "PayrollAdjustment",
+  foreignKey: "payrollId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+PayrollAdjustment.belongsTo(Payroll, {
+  as: "Payroll",
+  foreignKey: "payrollId",
+  targetKey: "id",
   onDelete: "CASCADE",
 });
 

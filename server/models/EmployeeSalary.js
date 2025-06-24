@@ -39,10 +39,6 @@ const EmployeeSalary = sequelize.define("EmployeeSalary", {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
-  nightAllowance: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
   createdBy: {
     type: DataTypes.STRING(50),
     allowNull: true,

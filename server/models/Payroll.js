@@ -36,11 +36,7 @@ const Payroll = sequelize.define("Payroll", {
   },
   dayAllowance: {
     type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  nightAllowance: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   year: {
     type: DataTypes.INTEGER,
@@ -50,7 +46,6 @@ const Payroll = sequelize.define("Payroll", {
     type: DataTypes.STRING,
     allowNull: true,
   },
-
   paidBreak: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
@@ -62,6 +57,22 @@ const Payroll = sequelize.define("Payroll", {
   },
   scheduledOut: {
     type: DataTypes.TIME,
+    allowNull: false,
+  },
+  totalGrossAmount: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  totalDeductionAmount: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  totalAdjustmentAmount: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  netAmount: {
+    type: DataTypes.FLOAT,
     allowNull: false,
   },
   day1: {
@@ -76,7 +87,6 @@ const Payroll = sequelize.define("Payroll", {
     type: DataTypes.TIME,
     allowNull: true,
   },
-  createdBy: {
   day2: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -113,7 +123,7 @@ const Payroll = sequelize.define("Payroll", {
     type: DataTypes.TIME,
     allowNull: true,
   },
-    day5: {
+  day5: {
     type: DataTypes.STRING,
     allowNull: true,
   },

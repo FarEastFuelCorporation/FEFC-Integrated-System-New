@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import {
   Autocomplete,
   Box,
@@ -26,6 +32,7 @@ import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialo
 import { tokens } from "../../../../../theme";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
 import SectionModal from "./SectionModal";
+import { PayrollValidation } from "./Validation";
 
 const Payroll = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -42,17 +49,29 @@ const Payroll = ({ user }) => {
     salary: "",
     dayAllowance: "",
     nightAllowance: "",
+    deductions: [],
+    adjustments: [],
     createdBy: user.id,
   };
+
+  const formDeductionRef = useRef({
+    deductions: [
+      {
+        otherDeduction: "",
+      },
+    ],
+    adjustments: [
+      {
+        adjustment: "",
+      },
+    ],
+  });
 
   const [openModal, setOpenModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
-  const [dataRecords, setRecords] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [employeeSalaryRecords, setEmployeeSalaryRecords] = useState([]);
-  const [overtimeRecords, setOvertimeRecords] = useState([]);
-  const [workSchedule, setWorkScheduleRecords] = useState([]);
+  const [payrollRecords, setPayrollRecords] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -98,213 +117,23 @@ const Payroll = ({ user }) => {
   const regularHolidayNightOT = 2.86;
   const regularHolidayRestDayDutyNightOT = 3.718;
 
-  function calculateHours(dayString, data, day) {
-    // Check if dayString is valid
-    if (!dayString || typeof dayString !== "string") {
-      return null; // Return null if dayString is invalid
-    }
-
-    // Split the string to get multiple time intervals using the semicolon
-    const timeIntervals = dayString.split(";");
-
-    // Initialize total hours worked
-    let totalHoursWorked = 0;
-    let totalLateMinutes = 0; // Variable to store total late minutes
-
-    // Initialize global variable for hourly rate
-    let hourlyRate;
-
-    // Check if workSchedule exists and is an array
-    if (workSchedule && Array.isArray(workSchedule)) {
-      // Find the schedule for the employee that matches data.employee_id
-      const employeeSchedule = workSchedule.find(
-        (schedule) => schedule.employeeId === data.employee_id
-      );
-
-      // If a matching employee record is found, calculate the total amount
-      if (!employeeSchedule) {
-        return null; // Return null if no matching record is found
-      }
-
-      // If a matching schedule is found, extract the day-specific attributes
-      const dayIn = employeeSchedule[`${day}In`]; // e.g., "08:00:00"
-      const dayOut = employeeSchedule[`${day}Out`]; // e.g., "17:00:00"
-
-      // Check if dayIn and dayOut are valid
-      if (!dayIn || !dayOut) {
-        return null; // Return null if dayIn or dayOut is invalid
-      }
-
-      console.log(dayIn); // e.g., "08:00:00"
-      console.log(dayOut); // e.g., "17:00:00"
-
-      // Iterate through each time interval
-      for (const interval of timeIntervals) {
-        const trimmedInterval = interval.trim();
-        const [startTime, endTime] = trimmedInterval.split(" - ");
-
-        console.log(startTime); // e.g., "10/21/2024 7:41:17 AM"
-        console.log(endTime); // e.g., "10/21/2024 5:00:37 PM"
-
-        // Extract the time components without parsing dates
-        const startParts = startTime.split(" ");
-        const endParts = endTime.split(" ");
-        const startOnlyTime = startParts[1] + " " + startParts[2]; // e.g., "7:41:17 AM"
-        const endOnlyTime = endParts[1] + " " + endParts[2]; // e.g., "5:00:37 PM"
-
-        console.log("Start Only Time:", startOnlyTime);
-        console.log("End Only Time:", endOnlyTime);
-
-        // Construct Date objects for the start and end of the workday
-        const startOfWorkParts = dayIn.split(":");
-        const endOfWorkParts = dayOut.split(":");
-
-        const startOfWork = new Date(1970, 0, 1, ...startOfWorkParts); // Create Date object for dayIn
-        const endOfWork = new Date(1970, 0, 1, ...endOfWorkParts); // Create Date object for dayOut
-
-        // Create Date objects for the start and end of the interval
-        let [hours, minutes, seconds] = startOnlyTime.split(/[:\s]/);
-        const start = new Date(
-          1970,
-          0,
-          1,
-          (hours % 12) + (startParts[2] === "PM" ? 12 : 0),
-          minutes,
-          seconds
-        );
-
-        [hours, minutes, seconds] = endOnlyTime.split(/[:\s]/);
-        let end = new Date(
-          1970,
-          0,
-          1,
-          (hours % 12) + (endParts[2] === "PM" ? 12 : 0),
-          minutes,
-          seconds
-        );
-
-        // Adjust for night shifts by checking if the end time is before the start time
-        if (end < start) {
-          end.setDate(end.getDate() + 1); // Add 1 day to the end time
-        }
-
-        console.log("Start:", start);
-        console.log("End:", end);
-        console.log("startOfWork:", startOfWork);
-        console.log("endOfWork:", endOfWork);
-
-        // Check if the work hours fall within the employee's scheduled hours
-        if (end > startOfWork) {
-          // Set effectiveStart to startOfWork since we only want to count hours from there
-          const effectiveStart = startOfWork;
-
-          // Calculate the difference in milliseconds
-          const diffInMs = end - effectiveStart;
-
-          // Ensure the difference is positive before calculating hours
-          if (diffInMs > 0) {
-            const hoursWorked = diffInMs / (1000 * 60 * 60); // Convert from milliseconds to hours
-
-            // Add to the total hours worked
-            totalHoursWorked += hoursWorked;
-
-            // Calculate late minutes if the start time is after startOfWork
-            if (start > startOfWork) {
-              // Calculate late time in minutes
-              const lateTimeMs = start - startOfWork; // Time late in milliseconds
-              const lateMinutes = Math.floor(lateTimeMs / (1000 * 60)); // Convert to minutes
-              totalLateMinutes += lateMinutes; // Accumulate late minutes
-            }
-          }
-        }
-      }
-    }
-
-    // Find the employee salary record that matches the employee_id
-    let employeeRecord; // Declare employeeRecord
-    if (employeeSalaryRecords && Array.isArray(employeeSalaryRecords)) {
-      employeeRecord = employeeSalaryRecords.find(
-        (record) => record.employeeId === data.employee_id
-      );
-    }
-
-    // If a matching employee record is found, set hourlyRate
-    if (employeeRecord) {
-      hourlyRate = employeeRecord.salary / 8; // Calculate hourly rate here
-
-      // Check if the dayString indicates "On Duty"
-      if (dayString.includes("On Duty")) {
-        return "On Duty"; // Return "On Duty" if found
-      }
-
-      // Initialize overtime to 0
-      let overtime = 0;
-      let regularHours = Math.min(totalHoursWorked, 8); // Cap regular hours at 8
-
-      // Calculate regular and overtime pay
-      const regularPay = (regularHours * hourlyRate).toFixed(2);
-      const overtimePay = (overtime * (hourlyRate * 1.5)).toFixed(2); // Overtime pay at 1.5x rate
-
-      const totalAmount = (
-        parseFloat(regularPay) + parseFloat(overtimePay)
-      ).toFixed(2); // Calculate total amount
-
-      // Calculate late pay based on hourly rate per minute
-      let latePay = 0; // Initialize latePay variable
-      if (hourlyRate !== undefined) {
-        latePay = (hourlyRate / 60) * totalLateMinutes; // Calculate late pay
-        console.log(
-          `Late Pay for ${totalLateMinutes} minutes: ${latePay.toFixed(2)}`
-        );
-      }
-
-      // Return only the total amount less late pay
-      const finalAmount = (totalAmount - latePay).toFixed(2);
-      return Math.max(finalAmount, 0); // Return the final amount
-    }
-
-    // If no matching employee record is found, return null
-    return null;
-  }
-
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
 
       // Using Promise.all to fetch all data concurrently
-      const [
-        employeeSalaryResponse,
-        attendanceResponse,
-        employeeResponse,
-        overtimeResponse,
-        workScheduleResponse,
-      ] = await Promise.all([
-        axios.get(`${apiUrl}/api/employeeSalary`),
-        axios.get(`${apiUrl}/api/attendanceRecord`),
+      const [employeeResponse, payrollResponse] = await Promise.all([
         axios.get(`${apiUrl}/api/employeeRecord/salary`),
-        axios.get(`${apiUrl}/api/overtime/approved`),
-        axios.get(`${apiUrl}/api/workSchedule`),
+        axios.get(`${apiUrl}/api/payroll`),
       ]);
-
-      // Logging and setting employee salary records
-      console.log(employeeSalaryResponse.data.employeeSalaries);
-      setEmployeeSalaryRecords(employeeSalaryResponse.data.employeeSalaries);
-
-      // Logging and setting attendance records
-      console.log(attendanceResponse.data.data);
-      setRecords(attendanceResponse.data.data);
 
       // Logging and setting employee data
       console.log(employeeResponse.data.employeeRecords);
       setEmployees(employeeResponse.data.employeeRecords);
 
-      // Logging and setting overtime records
-      console.log(overtimeResponse.data.overtimes);
-      setOvertimeRecords(overtimeResponse.data.overtimes);
-
-      // Logging and setting overtime records
-      console.log(workScheduleResponse.data.workSchedules);
-      setWorkScheduleRecords(workScheduleResponse.data.workSchedules);
+      // Logging and setting payrolls
+      console.log(payrollResponse.data.payrolls);
+      setPayrollRecords(payrollResponse.data.payrolls);
 
       setLoading(false);
     } catch (error) {
@@ -324,18 +153,19 @@ const Payroll = ({ user }) => {
   const handleCloseModal = () => {
     setOpenModal(false);
     clearFormData();
+    setErrorMessage("");
   };
 
   const clearFormData = () => {
     setFormData(initialFormData);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleEditClick = (id) => {
+  const handleEditClick = (row) => {
+    setFormData({
+      ...row,
+      adjustments: row.PayrollAdjustment,
+      deductions: row.PayrollDeduction,
+    });
     handleOpenModal();
   };
 
@@ -343,17 +173,20 @@ const Payroll = ({ user }) => {
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
-    setDialog("Are you sure you want to Delete this Employee Salary?");
+    setDialog("Are you sure you want to Delete this Payroll?");
     setDialogAction(() => () => handleConfirmDelete(id));
   };
 
   const handleConfirmDelete = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`${apiUrl}/api/employeeSalary/${id}`);
+      await axios.delete(`${apiUrl}/api/payroll/${id}`);
+      // Filter out the deleted record
+      setPayrollRecords((prevRecords) =>
+        prevRecords.filter((record) => record.id !== id)
+      );
 
-      fetchData();
-      setSuccessMessage("Employee Salary Deleted Successfully!");
+      setSuccessMessage("Payroll Deleted Successfully!");
       setShowSuccessMessage(true);
       setLoading(false);
     } catch (error) {
@@ -363,81 +196,54 @@ const Payroll = ({ user }) => {
     }
   };
 
-  const validateFormData = (formData) => {
-    const {
-      employeeId,
-      payrollType,
-      salaryType,
-      compensationType,
-      salary,
-      dayAllowance,
-      nightAllowance,
-    } = formData;
-
-    const errors = []; // Initialize an array to collect error messages
-
-    // Check for required fields and push error messages to the array
-    if (!employeeId) {
-      errors.push("Please select an employee.");
-    }
-    if (!payrollType) {
-      errors.push("Please select a payroll type.");
-    }
-    if (!salaryType) {
-      errors.push("Please select a salary type.");
-    }
-    if (!compensationType) {
-      errors.push("Please select a compensation type.");
-    }
-    if (!salary) {
-      errors.push("Salary is required.");
-    }
-    if (!dayAllowance) {
-      errors.push("Day allowance is required.");
-    }
-    if (!nightAllowance) {
-      errors.push("Night allowance is required.");
-    }
-
-    // Return concatenated error messages or null if no errors
-    return errors.length > 0 ? errors.join(" ") : null;
-  };
-
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     // Perform client-side validation
-    // Validate the form data
-    const validationError = validateFormData(formData);
-    if (validationError) {
-      setErrorMessage(validationError);
+    const validationErrors = PayrollValidation(formData);
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.join(", "));
       setShowErrorMessage(true);
       return;
     }
 
     try {
       setLoading(true);
+
       if (formData.id) {
-        // Update existing employee salary
-        await axios.put(
-          `${apiUrl}/api/employeeSalary/${formData.id}`,
+        // 🔁 Update existing record
+        const res = await axios.put(
+          `${apiUrl}/api/payroll/${formData.id}`,
           formData
         );
 
-        setSuccessMessage("Employee Salary Updated Successfully!");
-      } else {
-        // Add new employee salary
-        await axios.post(`${apiUrl}/api/employeeSalary`, formData);
+        setPayrollRecords((prevRecords) =>
+          prevRecords.map((record) =>
+            record.id === formData.id ? res.data.updatedPayroll : record
+          )
+        );
 
-        setSuccessMessage("Employee Salary Added Successfully!");
+        setSuccessMessage("Payroll Updated Successfully!");
+      } else {
+        // ➕ Create new record
+        const res = await axios.post(`${apiUrl}/api/payroll`, formData);
+
+        setPayrollRecords((prevRecords) => [
+          ...prevRecords,
+          res.data.newPayroll,
+        ]);
+
+        setSuccessMessage("Payroll Added Successfully!");
       }
 
-      fetchData();
       setShowSuccessMessage(true);
       handleCloseModal();
-      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
+      setErrorMessage("Something went wrong.");
+      setShowErrorMessage(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -449,11 +255,11 @@ const Payroll = ({ user }) => {
 
   const columns = [
     {
-      field: "employee_id",
+      field: "employeeId",
       headerName: "Employee ID",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      width: 120,
       renderCell: renderCellWithWrapText,
     },
     {
@@ -463,6 +269,12 @@ const Payroll = ({ user }) => {
       align: "center",
       flex: 1,
       minWidth: 150,
+      valueGetter: (params) => {
+        return `${params.row.EmployeeRecord?.firstName} ${
+          params.row.EmployeeRecord?.husbandSurname ||
+          params.row.EmployeeRecord?.lastName
+        }${params.row.EmployeeRecord?.affix || ""}`;
+      },
       renderCell: renderCellWithWrapText,
     },
     {
@@ -470,136 +282,92 @@ const Payroll = ({ user }) => {
       headerName: "Designation",
       headerAlign: "center",
       align: "center",
-      flex: 1,
-      minWidth: 150,
+      width: 150,
+      valueGetter: (params) => {
+        return params.row.EmployeeRecord?.designation;
+      },
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "compensationType",
+      headerName: "Compensation Type",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "salaryType",
+      headerName: "Salary Type",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
+      renderCell: renderCellWithWrapText,
+    },
+    {
+      field: "payrollType",
+      headerName: "Payroll Type",
+      headerAlign: "center",
+      align: "center",
+      width: 120,
       renderCell: renderCellWithWrapText,
     },
     {
       field: "weekNumber",
-      headerName: "Week Number",
+      headerName: "Week/Cut-Off",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      width: 120,
+      valueGetter: (params) => {
+        return params.row.payrollType === "SEMI-MONTHLY"
+          ? params.row.cutOff
+          : params.row.weekNumber;
+      },
       renderCell: renderCellWithWrapText,
     },
     {
-      field: "Monday",
-      headerName: "Monday",
+      field: "totalGrossAmount",
+      headerName: "Gross Salary",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Monday
-          ? formatNumber(
-              calculateHours(params.row.Monday, params.row, "monday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
+      width: 120,
+      valueGetter: (params) => {
+        return formatNumber(params.row.totalGrossAmount);
       },
+      renderCell: renderCellWithWrapText,
     },
     {
-      field: "Tuesday",
-      headerName: "Tuesday",
+      field: "totalDeductionAmount",
+      headerName: "Deduction",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Tuesday
-          ? formatNumber(
-              calculateHours(params.row.Tuesday, params.row, "tuesday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
+      width: 120,
+      valueGetter: (params) => {
+        return formatNumber(params.row.totalDeductionAmount);
       },
+      renderCell: renderCellWithWrapText,
     },
     {
-      field: "Wednesday",
-      headerName: "Wednesday",
+      field: "totalAdjustmentAmount",
+      headerName: "Adjustment",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Wednesday
-          ? formatNumber(
-              calculateHours(params.row.Wednesday, params.row, "wednesday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
+      width: 120,
+      valueGetter: (params) => {
+        return formatNumber(params.row.totalAdjustmentAmount);
       },
+      renderCell: renderCellWithWrapText,
     },
     {
-      field: "Thursday",
-      headerName: "Thursday",
+      field: "netAmount",
+      headerName: "Net Salary",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Thursday
-          ? formatNumber(
-              calculateHours(params.row.Thursday, params.row, "thursday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
+      width: 120,
+      valueGetter: (params) => {
+        return formatNumber(params.row.netAmount);
       },
-    },
-    {
-      field: "Friday",
-      headerName: "Friday",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Friday
-          ? formatNumber(
-              calculateHours(params.row.Friday, params.row, "friday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
-      },
-    },
-    {
-      field: "Saturday",
-      headerName: "Saturday",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Saturday
-          ? formatNumber(
-              calculateHours(params.row.Saturday, params.row, "saturday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
-      },
-    },
-    {
-      field: "Sunday",
-      headerName: "Sunday",
-      headerAlign: "center",
-      align: "center",
-      width: 100,
-      renderCell: (params) => {
-        let value = {};
-        value.value = params.row.Sunday
-          ? formatNumber(
-              calculateHours(params.row.Sunday, params.row, "sunday")
-            )
-          : null;
-
-        return renderCellWithWrapText(value);
-      },
+      renderCell: renderCellWithWrapText,
     },
     {
       field: "edit",
@@ -614,14 +382,22 @@ const Payroll = ({ user }) => {
         </IconButton>
       ),
     },
-    // {
-    //   field: "daysOfWork",
-    //   headerName: "# of Days Worked",
-    //   headerAlign: "center",
-    //   align: "center",
-    //   width: 125,
-    //   renderCell: renderCellWithWrapText,
-    // },
+    {
+      field: "delete",
+      headerName: "Delete",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      width: 60,
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteClick(params.row.id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
@@ -649,7 +425,7 @@ const Payroll = ({ user }) => {
       />
       <CustomDataGridStyles>
         <DataGrid
-          rows={dataRecords ? dataRecords : []}
+          rows={payrollRecords ? payrollRecords : []}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.id}
@@ -660,6 +436,7 @@ const Payroll = ({ user }) => {
         openModal={openModal}
         handleCloseModal={handleCloseModal}
         handleFormSubmit={handleFormSubmit}
+        formRef={formDeductionRef}
         formData={formData}
         setFormData={setFormData}
         showErrorMessage={showErrorMessage}

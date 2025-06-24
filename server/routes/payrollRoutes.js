@@ -3,26 +3,26 @@
 const express = require("express");
 const router = express.Router();
 const {
-  createEmployeeSalaryController,
-  getEmployeeSalariesController,
-  getEmployeeSalaryController,
-  updateEmployeeSalaryController,
-  deleteEmployeeSalaryController,
+  createPayrollController,
+  getPayrollsController,
+  getPayrollController,
+  updatePayrollController,
+  deletePayrollController,
 } = require("../controllers/payrollController");
 
-// Create EmployeeSalary route
-router.post("/", createEmployeeSalaryController);
+// Create Payroll route
+router.post("/", createPayrollController);
 
-// Get EmployeeSalaries route
-router.get("/", getEmployeeSalariesController);
+// Get Payrolls route
+router.get("/", getPayrollsController);
 
-// Get EmployeeSalary route
-router.get("/:id", getEmployeeSalaryController);
+// Get Payroll route
+router.get("/:id", getPayrollController);
 
-// Update EmployeeSalary route
-router.put("/:id", updateEmployeeSalaryController);
+// Update Payroll route
+router.put("/:id", updatePayrollController);
 
-// Delete EmployeeSalary route
-router.delete("/:id", deleteEmployeeSalaryController);
+// Delete Payroll route
+router.delete("/:id", deletePayrollController);
 
 module.exports = router;

@@ -146,7 +146,7 @@ const MULTIPLIERS = {
   l: { day: 0.0, night: 0.0, otDay: 0.0, otNight: 0.0 },
 };
 
-const SectionModal = ({
+const PayslipModal = ({
   openModal,
   handleCloseModal,
   handleFormSubmit,
@@ -2027,4 +2027,4 @@ const SectionModal = ({
   );
 };
 
-export default SectionModal;
+export default PayslipModal;

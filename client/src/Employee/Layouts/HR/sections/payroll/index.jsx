@@ -1,24 +1,5 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-import {
-  Autocomplete,
-  Box,
-  Button,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Modal,
-  Select,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Box, IconButton, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import axios from "axios";
@@ -31,8 +12,9 @@ import SuccessMessage from "../../../../../OtherComponents/SuccessMessage";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 import { tokens } from "../../../../../theme";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
-import SectionModal from "./SectionModal";
+import PayrollModal from "./PayrollModal";
 import { PayrollValidation } from "./Validation";
+import PayslipModal from "./PayslipModal";
 
 const Payroll = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -67,7 +49,8 @@ const Payroll = ({ user }) => {
     ],
   });
 
-  const [openModal, setOpenModal] = useState(false);
+  const [openPayrollModal, setOpenPayrollModal] = useState(false);
+  const [openPayslipModal, setOpenPayslipModal] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
 
   const [employees, setEmployees] = useState([]);
@@ -147,11 +130,11 @@ const Payroll = ({ user }) => {
   }, [fetchData]);
 
   const handleOpenModal = () => {
-    setOpenModal(true);
+    setOpenPayrollModal(true);
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);
+    setOpenPayrollModal(false);
     clearFormData();
     setErrorMessage("");
   };
@@ -432,8 +415,20 @@ const Payroll = ({ user }) => {
         />
       </CustomDataGridStyles>
 
-      <SectionModal
-        openModal={openModal}
+      <PayrollModal
+        openPayrollModal={openPayrollModal}
+        handleCloseModal={handleCloseModal}
+        handleFormSubmit={handleFormSubmit}
+        formRef={formDeductionRef}
+        formData={formData}
+        setFormData={setFormData}
+        showErrorMessage={showErrorMessage}
+        errorMessage={errorMessage}
+        colors={colors}
+        employees={employees}
+      />
+      <PayslipModal
+        openPayrollModal={openPayrollModal}
         handleCloseModal={handleCloseModal}
         handleFormSubmit={handleFormSubmit}
         formRef={formDeductionRef}

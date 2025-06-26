@@ -188,6 +188,67 @@ async function getPayrollsController(req, res) {
   }
 }
 
+// Get Payrolls By Period controller
+async function getPayrollsByPeriodController(req, res) {
+  try {
+    const { payrollType, year, period } = req.query;
+
+    console.log(payrollType);
+    console.log(year);
+    console.log(period);
+
+    // Fetch all employeeSalaries from the database
+    const payrolls = await Payroll.findAll({
+      where: {
+        payrollType,
+        year,
+        weekNumber: period,
+      },
+      include: [
+        {
+          model: PayrollDeduction,
+          as: "PayrollDeduction",
+          order: [["deduction", "ASC"]],
+        },
+        {
+          model: PayrollAdjustment,
+          as: "PayrollAdjustment",
+          order: [["adjustment", "ASC"]],
+        },
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecord",
+          attributes: [
+            "employeeId",
+            "firstName",
+            "middleName",
+            "lastName",
+            "husbandSurname",
+            "affix",
+            "designation",
+          ],
+        },
+        {
+          model: EmployeeRecord,
+          as: "EmployeeRecordCreatedBy",
+          attributes: [
+            "firstName",
+            "middleName",
+            "lastName",
+            "husbandSurname",
+            "affix",
+          ],
+        },
+      ],
+    });
+
+    res.json({ payrolls });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 // Get Payroll controller
 async function getPayrollController(req, res) {
   try {
@@ -405,6 +466,7 @@ async function deletePayrollController(req, res) {
 module.exports = {
   createPayrollController,
   getPayrollsController,
+  getPayrollsByPeriodController,
   getPayrollController,
   updatePayrollController,
   deletePayrollController,

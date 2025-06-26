@@ -269,7 +269,6 @@ const uploadEmployeeSalaryExcel = async (req, res) => {
           compensationType: row.compensationType,
           salary: row.salary,
           dayAllowance: row.dayAllowance,
-          nightAllowance: row.nightAllowance,
           createdBy: createdBy || null,
         },
         {

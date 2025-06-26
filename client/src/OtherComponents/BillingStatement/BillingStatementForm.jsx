@@ -235,7 +235,10 @@ const BillingStatementForm = ({
         if (totalWeight.toNumber() > fixedWeight) {
           const excessWeight = totalWeight.minus(fixedWeight);
 
-          const excessPrice = excessWeight * unitPrice;
+          const excessPrice = new Decimal(excessWeight)
+            .mul(unitPrice)
+            .toDecimalPlaces(2, Decimal.ROUND_HALF_UP) // standard rounding
+            .toNumber();
 
           switch (vatCalculation) {
             case "VAT EXCLUSIVE":
@@ -273,7 +276,10 @@ const BillingStatementForm = ({
 
         usedWeight = selectedWeight;
 
-        const totalWeightPrice = selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+        const totalWeightPrice = new Decimal(selectedWeight)
+          .mul(QuotationWaste.unitPrice)
+          .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+          .toNumber();
 
         target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 
@@ -306,7 +312,10 @@ const BillingStatementForm = ({
               .minus(new Decimal(fixedWeight))
               .toNumber();
 
-            const excessPrice = excessWeight * unitPrice;
+            const excessPrice = new Decimal(excessWeight)
+              .mul(unitPrice)
+              .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+              .toNumber();
 
             switch (vatCalculation) {
               case "VAT EXCLUSIVE":
@@ -347,8 +356,15 @@ const BillingStatementForm = ({
           typeOfWeight === "CLIENT WEIGHT" ? clientWeight : weight;
 
         const totalWeightPrice = item.duration
-          ? item.duration * selectedWeight * QuotationWaste.unitPrice
-          : selectedWeight * QuotationWaste.unitPrice; // Total weight multiplied by unit price
+          ? new Decimal(item.duration)
+              .mul(selectedWeight)
+              .mul(QuotationWaste.unitPrice)
+              .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+              .toNumber()
+          : new Decimal(selectedWeight)
+              .mul(QuotationWaste.unitPrice)
+              .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+              .toNumber();
 
         const target = QuotationWaste.mode === "BUYING" ? credits : amounts; // Determine if it should go to credits or amounts
 

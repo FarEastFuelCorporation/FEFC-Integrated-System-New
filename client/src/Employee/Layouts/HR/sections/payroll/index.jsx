@@ -4,6 +4,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../Header";
 import axios from "axios";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CustomDataGridStyles from "../../../../../OtherComponents/CustomDataGridStyles";
@@ -13,15 +14,30 @@ import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialo
 import { tokens } from "../../../../../theme";
 import { formatNumber } from "../../../../../OtherComponents/Functions";
 import PayrollModal from "./PayrollModal";
-import { PayrollValidation } from "./Validation";
 import PayslipModal from "./PayslipModal";
+import { PayrollValidation } from "./Validation";
 
 const Payroll = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const initialFormData = {
+  const initialPayrollFormData = {
+    id: "",
+    employeeId: "",
+    designation: "",
+    payrollType: "",
+    salaryType: "",
+    compensationType: "",
+    salary: "",
+    dayAllowance: "",
+    nightAllowance: "",
+    deductions: [],
+    adjustments: [],
+    createdBy: user.id,
+  };
+
+  const initialPayslipFormData = {
     id: "",
     employeeId: "",
     designation: "",
@@ -51,7 +67,12 @@ const Payroll = ({ user }) => {
 
   const [openPayrollModal, setOpenPayrollModal] = useState(false);
   const [openPayslipModal, setOpenPayslipModal] = useState(false);
-  const [formData, setFormData] = useState(initialFormData);
+  const [payrollFormData, setPayrollFormData] = useState(
+    initialPayrollFormData
+  );
+  const [payslipFormData, setPayslipFormData] = useState(
+    initialPayslipFormData
+  );
 
   const [employees, setEmployees] = useState([]);
   const [payrollRecords, setPayrollRecords] = useState([]);
@@ -129,30 +150,30 @@ const Payroll = ({ user }) => {
     fetchData();
   }, [fetchData]);
 
-  const handleOpenModal = () => {
+  const handleOpenPayrollModal = () => {
     setOpenPayrollModal(true);
   };
 
-  const handleCloseModal = () => {
+  const handleClosePayrollModal = () => {
     setOpenPayrollModal(false);
-    clearFormData();
+    clearPayrollFormData();
     setErrorMessage("");
   };
 
-  const clearFormData = () => {
-    setFormData(initialFormData);
+  const clearPayrollFormData = () => {
+    setPayrollFormData(initialPayrollFormData);
   };
 
   const handleEditClick = (row) => {
-    setFormData({
+    setPayrollFormData({
       ...row,
       adjustments: row.PayrollAdjustment,
       deductions: row.PayrollDeduction,
     });
-    handleOpenModal();
+    handleOpenPayrollModal();
   };
 
-  console.log(formData);
+  console.log(payrollFormData);
 
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
@@ -183,7 +204,7 @@ const Payroll = ({ user }) => {
     e.preventDefault();
 
     // Perform client-side validation
-    const validationErrors = PayrollValidation(formData);
+    const validationErrors = PayrollValidation(payrollFormData);
     if (validationErrors.length > 0) {
       setErrorMessage(validationErrors.join(", "));
       setShowErrorMessage(true);
@@ -193,23 +214,23 @@ const Payroll = ({ user }) => {
     try {
       setLoading(true);
 
-      if (formData.id) {
+      if (payrollFormData.id) {
         // 🔁 Update existing record
         const res = await axios.put(
-          `${apiUrl}/api/payroll/${formData.id}`,
-          formData
+          `${apiUrl}/api/payroll/${payrollFormData.id}`,
+          payrollFormData
         );
 
         setPayrollRecords((prevRecords) =>
           prevRecords.map((record) =>
-            record.id === formData.id ? res.data.updatedPayroll : record
+            record.id === payrollFormData.id ? res.data.updatedPayroll : record
           )
         );
 
         setSuccessMessage("Payroll Updated Successfully!");
       } else {
         // ➕ Create new record
-        const res = await axios.post(`${apiUrl}/api/payroll`, formData);
+        const res = await axios.post(`${apiUrl}/api/payroll`, payrollFormData);
 
         setPayrollRecords((prevRecords) => [
           ...prevRecords,
@@ -220,7 +241,7 @@ const Payroll = ({ user }) => {
       }
 
       setShowSuccessMessage(true);
-      handleCloseModal();
+      handleClosePayrollModal();
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("Something went wrong.");
@@ -228,6 +249,20 @@ const Payroll = ({ user }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenPayslipModal = () => {
+    setOpenPayslipModal(true);
+  };
+
+  const handleClosePayslipModal = () => {
+    setOpenPayslipModal(false);
+    clearPayslipFormData();
+    setErrorMessage("");
+  };
+
+  const clearPayslipFormData = () => {
+    setPayslipFormData(initialPayslipFormData);
   };
 
   const renderCellWithWrapText = (params) => (
@@ -389,7 +424,10 @@ const Payroll = ({ user }) => {
       <Box display="flex" justifyContent="space-between">
         <Header title="Payroll" subtitle="List of Employee Payroll" />
         <Box display="flex">
-          <IconButton onClick={handleOpenModal}>
+          <IconButton onClick={handleOpenPayslipModal}>
+            <ReceiptLongIcon sx={{ fontSize: "40px" }} />
+          </IconButton>
+          <IconButton onClick={handleOpenPayrollModal}>
             <PostAddIcon sx={{ fontSize: "40px" }} />
           </IconButton>
         </Box>
@@ -415,25 +453,25 @@ const Payroll = ({ user }) => {
         />
       </CustomDataGridStyles>
 
-      <PayrollModal
-        openPayrollModal={openPayrollModal}
-        handleCloseModal={handleCloseModal}
+      <PayslipModal
+        openModal={openPayslipModal}
+        handleCloseModal={handleClosePayslipModal}
         handleFormSubmit={handleFormSubmit}
         formRef={formDeductionRef}
-        formData={formData}
-        setFormData={setFormData}
+        formData={payrollFormData}
+        setFormData={setPayrollFormData}
         showErrorMessage={showErrorMessage}
         errorMessage={errorMessage}
         colors={colors}
         employees={employees}
       />
-      <PayslipModal
-        openPayrollModal={openPayrollModal}
-        handleCloseModal={handleCloseModal}
+      <PayrollModal
+        openModal={openPayrollModal}
+        handleCloseModal={handleClosePayrollModal}
         handleFormSubmit={handleFormSubmit}
         formRef={formDeductionRef}
-        formData={formData}
-        setFormData={setFormData}
+        formData={payrollFormData}
+        setFormData={setPayrollFormData}
         showErrorMessage={showErrorMessage}
         errorMessage={errorMessage}
         colors={colors}

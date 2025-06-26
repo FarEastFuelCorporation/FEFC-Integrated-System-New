@@ -8,6 +8,7 @@ const {
   getPayrollController,
   updatePayrollController,
   deletePayrollController,
+  getPayrollsByPeriodController,
 } = require("../controllers/payrollController");
 
 // Create Payroll route
@@ -15,6 +16,9 @@ router.post("/", createPayrollController);
 
 // Get Payrolls route
 router.get("/", getPayrollsController);
+
+// Get Payrolls By Period route
+router.get("/period", getPayrollsByPeriodController);
 
 // Get Payroll route
 router.get("/:id", getPayrollController);

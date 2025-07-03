@@ -437,7 +437,7 @@ const Transaction = ({
               }
               // Only call these functions if there are no errors
               if (response.data.transaction.transaction) {
-                // console.log(response.data.transaction.transaction);
+                console.log(response.data.transaction.transaction);
                 setRow(response.data.transaction.transaction);
                 handleOpenTransactionModal(
                   response.data.transaction.transaction

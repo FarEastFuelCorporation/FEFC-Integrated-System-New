@@ -157,19 +157,20 @@ async function createCommissionedTransactionController(req, res) {
 
     try {
       sendEmail(
-        "jmfalar@fareastfuelcorp.com", // Recipient
-        // "dcardinez@fareastfuelcorp.com", // Recipient
+        // "jmfalar@fareastfuelcorp.com", // Recipient
+        "dcardinez@fareastfuelcorp.com", // Recipient
         `${commissionNumber} - For Commission Statement Approval: ${clientName}`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody
-        // ["dm.cardinez@fareastfuel.com"], // HTML content // cc
-        // [
-        //   "rmangaron@fareastfuelcorp.com",
-        //   "edevera@fareastfuelcorp.com",
-        //   "eb.devera410@gmail.com",
-        //   "cc.duran@fareastfuel.com",
-        //   "jmfalar@fareastfuelcorp.com",
-        // ] // bcc
+        emailBody,
+        ["dm.cardinez@fareastfuel.com", "marketing@fareastfuelcorp.com"], // HTML content // cc
+        [
+          "rmangaron@fareastfuelcorp.com",
+          "edevera@fareastfuelcorp.com",
+          "eb.devera410@gmail.com",
+          "cc.duran@fareastfuel.com",
+          "cduran@fareastfuelcorp.com",
+          "jmfalar@fareastfuelcorp.com",
+        ] // bcc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
       });
@@ -297,17 +298,15 @@ async function deleteCommissionedTransactionController(req, res) {
 
     // Find the scheduled transaction by UUID (id)
 
+    const commissionedTransaction = await CommissionedTransaction.findByPk(id);
+
+    const commissionNumber = commissionedTransaction.commissionNumber;
+
+    console.log(commissionNumber);
+
     const commissionedTransactionToDelete =
-      await CommissionedTransaction.findByPk(id, {
-        include: {
-          model: BookedTransaction,
-          as: "BookedTransaction",
-          include: {
-            model: BilledTransaction,
-            as: "BilledTransaction",
-            attributes: ["billingNumber"],
-          },
-        },
+      await CommissionedTransaction.findAll({
+        where: { commissionNumber },
       });
 
     if (!commissionedTransactionToDelete) {
@@ -316,50 +315,18 @@ async function deleteCommissionedTransactionController(req, res) {
       });
     }
 
-    console.log(
-      commissionedTransactionToDelete.BookedTransaction.BilledTransaction
-    );
-
-    const billingNumber =
-      commissionedTransactionToDelete.BookedTransaction.BilledTransaction
-        .billingNumber;
-
-    // Fetch all BilledTransactions associated with the same billingNumber
-    const billedTransactionIds = await BilledTransaction.findAll({
-      where: { billingNumber },
-      attributes: ["id", "bookedTransactionId"],
-      include: {
-        model: BookedTransaction,
-        as: "BookedTransaction",
-        include: {
-          model: CommissionedTransaction,
-          as: "CommissionedTransaction",
-        },
-      },
-    });
-
-    for (const billedTransaction of billedTransactionIds) {
-      const commissionedTransactions =
-        billedTransaction.BookedTransaction.CommissionedTransaction;
-
-      if (commissionedTransactions) {
+    for (const commissionedTransaction of commissionedTransactionToDelete) {
+      if (commissionedTransaction) {
         // Update the deletedBy field and perform soft delete (set deletedAt)
-        commissionedTransactions.updatedBy = deletedBy;
-        commissionedTransactions.deletedBy = deletedBy;
-        await commissionedTransactions.save();
-        await commissionedTransactions.destroy(); // Soft delete
+        commissionedTransaction.updatedBy = deletedBy;
+        commissionedTransaction.deletedBy = deletedBy;
+        await commissionedTransaction.save();
+        await commissionedTransaction.destroy(); // Soft delete
       }
     }
 
-    // Fetch the updated data after deletion
-    const data = await fetchData("transactionStatusId"); // Fetch with the updated status ID
-
     // Respond with the updated data
-    res.status(200).json({
-      pendingTransactions: data.pending,
-      inProgressTransactions: data.inProgress,
-      finishedTransactions: data.finished,
-    });
+    res.status(200).json();
   } catch (error) {
     // Handle errors
     console.error("Error soft-deleting scheduled transaction:", error);

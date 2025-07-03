@@ -296,37 +296,70 @@ async function deleteCommissionedTransactionController(req, res) {
     console.log("Soft deleting scheduled transaction with ID:", id);
 
     // Find the scheduled transaction by UUID (id)
+
     const commissionedTransactionToDelete =
-      await CommissionedTransaction.findByPk(id);
-
-    if (commissionedTransactionToDelete) {
-      // Update the deletedBy field
-      commissionedTransactionToDelete.updatedBy = deletedBy;
-      commissionedTransactionToDelete.deletedBy = deletedBy;
-      await commissionedTransactionToDelete.save();
-
-      console.log(commissionedTransactionToDelete.bookedTransactionId);
-
-      const updatedBookedTransaction = await BookedTransaction.findByPk(
-        commissionedTransactionToDelete.bookedTransactionId
-      );
-      updatedBookedTransaction.statusId = 1;
-
-      await updatedBookedTransaction.save();
-
-      // Soft delete the scheduled transaction (sets deletedAt timestamp)
-      await commissionedTransactionToDelete.destroy();
-
-      // Respond with a success message
-      res.json({
-        message: `Commissioned Transaction with ID ${id} soft-deleted successfully`,
+      await CommissionedTransaction.findByPk(id, {
+        include: {
+          model: BookedTransaction,
+          as: "BookedTransaction",
+          include: {
+            model: BilledTransaction,
+            as: "BilledTransaction",
+            attributes: ["billingNumber"],
+          },
+        },
       });
-    } else {
-      // If scheduled transaction with the specified ID was not found
-      res
-        .status(404)
-        .json({ message: `Commissioned Transaction with ID ${id} not found` });
+
+    if (!commissionedTransactionToDelete) {
+      return res.status(404).json({
+        message: `Commissioned Transaction Transaction with ID ${id} not found`,
+      });
     }
+
+    console.log(
+      commissionedTransactionToDelete.BookedTransaction.BilledTransaction
+    );
+
+    const billingNumber =
+      commissionedTransactionToDelete.BookedTransaction.BilledTransaction
+        .billingNumber;
+
+    // Fetch all BilledTransactions associated with the same billingNumber
+    const billedTransactionIds = await BilledTransaction.findAll({
+      where: { billingNumber },
+      attributes: ["id", "bookedTransactionId"],
+      include: {
+        model: BookedTransaction,
+        as: "BookedTransaction",
+        include: {
+          model: CommissionedTransaction,
+          as: "CommissionedTransaction",
+        },
+      },
+    });
+
+    for (const billedTransaction of billedTransactionIds) {
+      const commissionedTransactions =
+        billedTransaction.BookedTransaction.CommissionedTransaction;
+
+      if (commissionedTransactions) {
+        // Update the deletedBy field and perform soft delete (set deletedAt)
+        commissionedTransactions.updatedBy = deletedBy;
+        commissionedTransactions.deletedBy = deletedBy;
+        await commissionedTransactions.save();
+        await commissionedTransactions.destroy(); // Soft delete
+      }
+    }
+
+    // Fetch the updated data after deletion
+    const data = await fetchData("transactionStatusId"); // Fetch with the updated status ID
+
+    // Respond with the updated data
+    res.status(200).json({
+      pendingTransactions: data.pending,
+      inProgressTransactions: data.inProgress,
+      finishedTransactions: data.finished,
+    });
   } catch (error) {
     // Handle errors
     console.error("Error soft-deleting scheduled transaction:", error);

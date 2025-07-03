@@ -171,17 +171,17 @@ const CommissionStatementHeader = ({
           }}
         >
           <Typography fontWeight="bold">
-            {row.Client?.Commission?.[0]?.Agent?.firstName}{" "}
-            {row.Client?.Commission?.[0]?.Agent?.lastName}
-            {row.Client?.Commission?.[0]?.Agent?.affix
-              ? row.Client?.Commission?.[0]?.Agent?.affix
+            {row?.Client?.Commission?.[0]?.Agent?.firstName}{" "}
+            {row?.Client?.Commission?.[0]?.Agent?.lastName}
+            {row?.Client?.Commission?.[0]?.Agent?.affix
+              ? row?.Client?.Commission?.[0]?.Agent?.affix
               : ""}
           </Typography>
           <Typography fontSize="12px">
-            Contact Number: {row.Client?.Commission?.[0]?.Agent?.mobileNo}
+            Contact Number: {row?.Client?.Commission?.[0]?.Agent?.mobileNo}
           </Typography>
           <Typography fontSize="12px">
-            Email Address: {row.Client?.Commission?.[0]?.Agent?.emailAddress}
+            Email Address: {row?.Client?.Commission?.[0]?.Agent?.emailAddress}
           </Typography>
           <Typography fontSize="12px">
             BIlling Number: {billingNumber}

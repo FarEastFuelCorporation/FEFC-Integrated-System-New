@@ -17,7 +17,12 @@ import axios from "axios";
 import BillingContent from "./BillingContent";
 import BillingTableHead from "./BillingTableHead";
 import Decimal from "decimal.js";
-import { formatNumber } from "../Functions";
+import {
+  formatDate,
+  formatDate2,
+  formatDate3,
+  formatNumber,
+} from "../Functions";
 import SignatureComponent from "../SignatureComponent ";
 
 const modifyApiUrlPort = (url) => {
@@ -877,6 +882,22 @@ const BillingInvoice = ({
                   }}
                 >
                   {row.Client?.address}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: '"Arial Narrow", Arial, sans-serif',
+                    position: "absolute",
+                    zIndex: 0,
+                    top: "150px",
+                    right: "20px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {row.BilledTransaction?.[0]?.billedDate
+                    ? formatDate3(row.BilledTransaction?.[0]?.billedDate)
+                    : ""}
                 </Typography>
                 <Typography
                   sx={{

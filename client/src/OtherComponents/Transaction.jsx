@@ -437,6 +437,7 @@ const Transaction = ({
               }
               // Only call these functions if there are no errors
               if (response.data.transaction.transaction) {
+                // console.log(response.data.transaction.transaction);
                 setRow(response.data.transaction.transaction);
                 handleOpenTransactionModal(
                   response.data.transaction.transaction
@@ -786,7 +787,12 @@ const Transaction = ({
                               user.userType !== 6
                             ) {
                               if (
-                                (user.userType === 2 && row.statusId === 2) ||
+                                (user.userType === 2 &&
+                                  buttonText === "Schedule" &&
+                                  row.statusId === 2) ||
+                                (user.userType === 2 &&
+                                  buttonText === "Commission" &&
+                                  row.statusId >= 10) ||
                                 (user.userType === 3 && row.statusId === 3) ||
                                 (user.userType === 4 && row.statusId === 4) ||
                                 // (user.userType === 5 && row.statusId === 5) ||
@@ -880,7 +886,12 @@ const Transaction = ({
                     {!Number.isInteger(user.userType) && (
                       <BookedTransaction row={row} user={user} />
                     )}
-                    {user.userType === 2 && <ScheduledTransaction row={row} />}
+                    {user.userType === 2 && buttonText === "Schedule" && (
+                      <ScheduledTransaction row={row} />
+                    )}
+                    {user.userType === 2 && buttonText === "Commission" && (
+                      <CommissionTransaction row={row} user={user} />
+                    )}
                     {user.userType === 3 && <DispatchedTransaction row={row} />}
                     {user.userType === 4 && <ReceivedTransaction row={row} />}
                     {user.userType === 5 && <SortedTransaction row={row} />}

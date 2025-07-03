@@ -120,6 +120,7 @@ const CommissionedTransactions = ({ user }) => {
 
       setFormData({
         id: commissionedTransaction?.id,
+        Client: row.Client,
         bookedTransactionId: row.id,
         logisticsId: commissionedTransaction.logisticsId,
         commissionedDate: commissionedTransaction?.commissionedDate,
@@ -154,22 +155,6 @@ const CommissionedTransactions = ({ user }) => {
         }
       );
 
-      // Filter out the deleted transaction from each state
-      // setPendingTransactions((prevPendingTransactions) =>
-      //   prevPendingTransactions.filter(
-      //     (transaction) => transaction.id !== row.id
-      //   )
-      // );
-      // setInProgressTransactions((prevInProgressTransactions) =>
-      //   prevInProgressTransactions.filter(
-      //     (transaction) => transaction.id !== row.id
-      //   )
-      // );
-      // setFinishedTransactions((prevFinishedTransactions) =>
-      //   prevFinishedTransactions.filter(
-      //     (transaction) => transaction.id !== row.id
-      //   )
-      // );
       fetchData();
       // Display success message
       setSuccessMessage("Commissioned Transaction Deleted Successfully!");

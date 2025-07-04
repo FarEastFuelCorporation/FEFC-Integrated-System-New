@@ -164,20 +164,20 @@ async function createCommissionApprovalTransactionController(req, res) {
 
     try {
       sendEmail(
-        "jmfalar@fareastfuelcorp.com", // Recipient
-        // agentEmail, // Recipient
+        // "jmfalar@fareastfuelcorp.com", // Recipient
+        agentEmail, // Recipient
         `${commissionNumber} - Commission Statement Notification`, // Subject
         "Please view this email in HTML format.", // Plain-text fallback
-        emailBody
-        // ["marketing@fareastfuelcorp.com", "accounting@fareastfuelcorp.com"], // HTML content // cc
-        // [
-        //   "rmangaron@fareastfuelcorp.com",
-        //   "edevera@fareastfuelcorp.com",
-        //   "eb.devera410@gmail.com",
-        //   "cc.duran@fareastfuel.com",
-        //   "dm.cardinez@fareastfuel.com",
-        //   "dcardinez@fareastfuelcorp.com",
-        // ] // bcc
+        emailBody,
+        ["marketing@fareastfuelcorp.com", "accounting@fareastfuelcorp.com"], // HTML content // cc
+        [
+          "rmangaron@fareastfuelcorp.com",
+          "edevera@fareastfuelcorp.com",
+          "eb.devera410@gmail.com",
+          "cc.duran@fareastfuel.com",
+          "dm.cardinez@fareastfuel.com",
+          "dcardinez@fareastfuelcorp.com",
+        ] // bcc
       ).catch((emailError) => {
         console.error("Error sending email:", emailError);
       });

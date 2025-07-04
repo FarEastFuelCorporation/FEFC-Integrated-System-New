@@ -904,11 +904,14 @@ const BillingInvoice = ({
                     fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
-                    top: "138px",
+                    top: "130px",
                     left: "120px",
                   }}
                 >
                   {row.Client?.billerTinNumber}
+                  {row.Client?.natureOfBusiness
+                    ? ` / ${row.Client?.natureOfBusiness}`
+                    : ""}
                 </Typography>
                 <Typography
                   sx={{

@@ -899,6 +899,7 @@ const BillingInvoice = ({
                     ? formatDate3(row.BilledTransaction?.[0]?.billedDate)
                     : ""}
                 </Typography>
+
                 <Typography
                   sx={{
                     fontFamily: '"Arial Narrow", Arial, sans-serif',

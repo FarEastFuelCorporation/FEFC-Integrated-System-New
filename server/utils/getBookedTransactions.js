@@ -695,7 +695,6 @@ const getIncludeOptionsSorting = () => [
       {
         model: CommissionApprovalTransaction,
         as: "CommissionApprovalTransaction",
-        attributes: ["id"],
         required: false,
       },
     ],
@@ -988,7 +987,6 @@ const getIncludeOptionsWarehouse = () => [
       {
         model: CommissionApprovalTransaction,
         as: "CommissionApprovalTransaction",
-        attributes: ["id"],
         required: false,
       },
     ],
@@ -1323,7 +1321,6 @@ const getIncludeOptionsVerify = () => [
       {
         model: CommissionApprovalTransaction,
         as: "CommissionApprovalTransaction",
-        attributes: ["id"],
         required: false,
       },
     ],
@@ -1438,7 +1435,6 @@ const getIncludeOptionsPartial = () => [
       {
         model: CommissionApprovalTransaction,
         as: "CommissionApprovalTransaction",
-        attributes: ["id"],
         required: false,
       },
     ],

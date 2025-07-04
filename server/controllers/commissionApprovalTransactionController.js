@@ -161,7 +161,6 @@ async function createCommissionApprovalTransactionController(req, res) {
       clientName,
       sortedTransactions
     );
-    console.log(emailBody);
 
     try {
       sendEmail(

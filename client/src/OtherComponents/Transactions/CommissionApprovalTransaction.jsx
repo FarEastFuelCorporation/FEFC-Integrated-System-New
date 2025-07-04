@@ -286,36 +286,36 @@ const CommissionApprovalTransaction = ({ row, user }) => {
               }}
             >
               <Typography variant="h5">
-                {billingApprovalTransaction?.createdAt
-                  ? timestampDate(billingApprovalTransaction?.createdAt)
+                {commissionApprovalTransaction?.createdAt
+                  ? timestampDate(commissionApprovalTransaction?.createdAt)
                   : ""}
               </Typography>
             </Grid>
           </Grid>
           <Typography variant="h5">
             Approved Date:{" "}
-            {billingApprovalTransaction?.approvedDate &&
-            billingApprovalTransaction.approvedDate !== "0000-00-00"
+            {commissionApprovalTransaction?.approvedDate &&
+            commissionApprovalTransaction.approvedDate !== "0000-00-00"
               ? format(
-                  new Date(billingApprovalTransaction?.approvedDate),
+                  new Date(commissionApprovalTransaction?.approvedDate),
                   "MMMM dd, yyyy"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Approved Time:{" "}
-            {billingApprovalTransaction?.approvedTime &&
-            billingApprovalTransaction.approvedDate !== "0000-00-00"
+            {commissionApprovalTransaction?.approvedTime &&
+            commissionApprovalTransaction.approvedDate !== "0000-00-00"
               ? format(
-                  parseTimeString(billingApprovalTransaction?.approvedTime),
+                  parseTimeString(commissionApprovalTransaction?.approvedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
             Remarks:{" "}
-            {billingApprovalTransaction?.remarks
-              ? billingApprovalTransaction?.remarks
+            {commissionApprovalTransaction?.remarks
+              ? commissionApprovalTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
@@ -349,7 +349,7 @@ const CommissionApprovalTransaction = ({ row, user }) => {
                   onClick={handleOpenPDFInNewTab}
                   disabled={isRendering}
                 >
-                  {isRendering ? "Opening..." : "View Billing Statement"}
+                  {isRendering ? "Opening..." : "View Commission Statement"}
                 </Button>
               </Box>
             </>

@@ -15,10 +15,12 @@ const CommissionStatementFooter = ({ user, signature, row, qrCodeURL }) => {
 
   // Only set approved if row.approved changes
 
-  const isApproved = false;
-  // row?.BilledTransaction?.[0]?.BillingApprovalTransaction?.approvedDate !==
-  // undefined;
+  const isApproved =
+    row?.CommissionedTransaction?.[0]?.CommissionApprovalTransaction
+      ?.approvedDate !== undefined;
 
+  console.log(row?.CommissionedTransaction?.[0]?.CommissionApprovalTransaction);
+  console.log(isApproved);
   useEffect(() => {
     setApproved(isApproved);
   }, [isApproved]);

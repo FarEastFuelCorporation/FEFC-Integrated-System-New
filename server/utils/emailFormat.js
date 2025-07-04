@@ -952,6 +952,119 @@ async function BillingApprovedEmailFormat(clientName, transactions) {
   }
 }
 
+async function CommissionApprovedEmailFormat(
+  agentName,
+  clientName,
+  transactions
+) {
+  try {
+    const transactionRows = Object.values(transactions)
+      .map(
+        (transaction) => `
+        <tr>
+          <td>${transaction.transactionId}</td>
+          <td>${formatDate(transaction.haulingDate)}</td>
+          <td>${transaction.commissionNumber}</td>
+        </tr>`
+      )
+      .join("");
+
+    const emailTemplate = `
+      <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+          }
+          .header {
+            text-align: center;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 0;
+            border-radius: 8px 8px 0 0;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .content {
+            margin: 20px 0;
+          }
+          .content p {
+            margin: 10px 0;
+          }
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+          }
+          th {
+            background-color: #dc3545;
+            color: white;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Commission Statement Notification</h1>
+          </div>
+          <div class="content">
+            <p>Dear ${agentName},</p>
+            <p><strong>Client Name:</strong> ${clientName}</p>
+        
+            <p>We are pleased to inform you that your commission statement has been completed and is now available for download on our system.</p>
+            <table>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Hauling Date</th>
+                <th>Commission Number</th>
+              </tr>
+              ${transactionRows}
+            </table>
+            <p>To access and download the commission statement, please log in to your account on our system.</p>
+            <p>If you have any questions or need further assistance, feel free to contact us.</p>
+            <p>Thank you for trusting FAR EAST FUEL CORPORATION.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} FAR EAST FUEL CORPORATION. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return emailTemplate;
+  } catch (error) {
+    console.error(
+      "Error generating commission completion email template:",
+      error
+    );
+    throw error;
+  }
+}
+
 async function CollectedTransactionEmailFormat(
   clientName,
   transactions,
@@ -1159,5 +1272,6 @@ module.exports = {
   BillingApprovalEmailFormat,
   CommissionApprovalEmailFormat,
   BillingApprovedEmailFormat,
+  CommissionApprovedEmailFormat,
   sendOtpFormat,
 };

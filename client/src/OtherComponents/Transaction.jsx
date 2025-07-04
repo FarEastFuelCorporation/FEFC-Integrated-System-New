@@ -47,6 +47,7 @@ import axios from "axios";
 import WarehousedOutTransaction from "./Transactions/WarehousedOutTransaction";
 import TreatedWarehouseTransaction from "./Transactions/TreatedWarehouseTransaction";
 import CommissionTransaction from "./Transactions/CommissionTransaction";
+import CommissionApprovalTransaction from "./Transactions/CommissionApprovalTransaction";
 
 const Transaction = ({
   user,
@@ -437,7 +438,7 @@ const Transaction = ({
               }
               // Only call these functions if there are no errors
               if (response.data.transaction.transaction) {
-                console.log(response.data.transaction.transaction);
+                // console.log(response.data.transaction.transaction);
                 setRow(response.data.transaction.transaction);
                 handleOpenTransactionModal(
                   response.data.transaction.transaction
@@ -812,7 +813,12 @@ const Transaction = ({
                                     row.statusId === 11 ||
                                     row.statusId === 12 ||
                                     row.statusId === 13)) ||
-                                (user.userType === 9 && row.statusId === 11) ||
+                                (user.userType === 9 &&
+                                  buttonText === "Billing Approve" &&
+                                  row.statusId === 11) ||
+                                (user.userType === 9 &&
+                                  buttonText === "Commission Approve" &&
+                                  row.statusId === 11) ||
                                 (user.userType === 10 && row.statusId === 12) ||
                                 (user.userType === 11 && row.statusId === 13) ||
                                 (user.userType === 11 && row.statusId === 13) ||
@@ -942,14 +948,24 @@ const Transaction = ({
                         discount={discount}
                       />
                     )}
-                    {user.userType === 9 && (
-                      <BillingApprovalTransaction
-                        row={row}
-                        handleOpenModal={handleOpenModal}
-                        handleDeleteClick={handleDeleteClick}
-                        user={user}
-                      />
-                    )}
+                    {user.userType === 9 &&
+                      buttonText === "Billing Approve" && (
+                        <BillingApprovalTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
+                    {user.userType === 9 &&
+                      buttonText === "Commission Approve" && (
+                        <CommissionApprovalTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
                     {user.userType === 10 && (
                       <BillingDistributionTransaction
                         row={row}
@@ -993,6 +1009,14 @@ const Transaction = ({
                       )}
                       {row.statusId >= 11 && (
                         <BillingDistributionTransaction
+                          row={row}
+                          handleOpenModal={handleOpenModal}
+                          handleDeleteClick={handleDeleteClick}
+                          user={user}
+                        />
+                      )}
+                      {row.statusId >= 10 && (
+                        <CommissionApprovalTransaction
                           row={row}
                           handleOpenModal={handleOpenModal}
                           handleDeleteClick={handleDeleteClick}

@@ -33,7 +33,8 @@ const AccountingHeadSidebar = ({ user }) => {
       "/dashboard/clients": "Clients",
       "/dashboard/typeOfWastes": "Type Of Wastes",
       "/dashboard/quotations": "Quotations",
-      "/dashboard/transactions": "Transactions",
+      "/dashboard/transactions": "Billing Approval Transactions",
+      "/dashboard/transactions2": "Commission Approval Transactions",
       "/dashboard/documents": "Documents",
       "/dashboard/calendar": "Calendar",
       "/dashboard/switchUser": "Switch User",
@@ -117,12 +118,20 @@ const AccountingHeadSidebar = ({ user }) => {
           navigate={""}
         />
         <BottomNavItem
-          label="Transactions"
-          value="Transactions"
+          label="Billing"
+          value="Billing Approval Transactions"
           icon={PointOfSaleIcon}
           selected={selected}
           setSelected={setSelected}
           navigate={"transactions"}
+        />
+        <BottomNavItem
+          label="Commission"
+          value="Commission Approval Transactions"
+          icon={PointOfSaleIcon}
+          selected={selected}
+          setSelected={setSelected}
+          navigate={"transactions2"}
         />
         <BottomNavItem
           label="Clients"
@@ -277,13 +286,21 @@ const AccountingHeadSidebar = ({ user }) => {
               collapsed={isCollapsed}
             />
             <Item
-              title="Transactions"
+              title="Billing Approval Transactions"
               to="transactions"
               icon={<PointOfSaleIcon />}
               selected={selected}
               setSelected={setSelected}
               collapsed={isCollapsed}
-            ></Item>
+            />
+            <Item
+              title="Commission Approval Transactions"
+              to="transactions2"
+              icon={<PointOfSaleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              collapsed={isCollapsed}
+            />
             <Typography
               variant="h6"
               color={colors.grey[300]}

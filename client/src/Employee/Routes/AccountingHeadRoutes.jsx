@@ -9,6 +9,7 @@ import Quotations from "../../OtherComponents/Sections/quotations";
 import Documents from "../../OtherComponents/Sections/documents";
 import Calendar from "../Layouts/AccountingHead/sections/calendar";
 import SwitchUsers from "../../OtherComponents/Sections/switchUsers";
+import CommissionApprovalTransactions from "../Layouts/AccountingHead/sections/commissionApprovalTransactions";
 
 const AccountingHeadRoutes = ({ user, onUpdateUser }) => (
   <Routes>
@@ -20,6 +21,10 @@ const AccountingHeadRoutes = ({ user, onUpdateUser }) => (
       <Route
         path="transactions"
         element={<BillingApprovalTransactions user={user} />}
+      />
+      <Route
+        path="transactions2"
+        element={<CommissionApprovalTransactions user={user} />}
       />
       <Route path="quotations" element={<Quotations user={user} />} />
       <Route path="documents" element={<Documents user={user} />} />

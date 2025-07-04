@@ -9,6 +9,8 @@ import {
   TableRow,
   Paper,
   Button,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import letterhead from "../../images/letterhead.jpg";
@@ -35,6 +37,10 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
   const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
   const apiUrl = modifyApiUrlPort(REACT_APP_API_URL);
   const certificateRef = useRef();
+
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const certifiedTransaction = row.CertifiedTransaction?.[0];
 
@@ -409,7 +415,13 @@ const CertificateOfDestruction = ({ row, verify = null }) => {
       {verify ? (
         ""
       ) : (
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            gap: 2,
+          }}
+        >
           <Button
             variant="contained"
             color="secondary"

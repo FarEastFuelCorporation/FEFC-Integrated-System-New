@@ -1,15 +1,22 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
-import ReceiptIcon from "@mui/icons-material/Receipt";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
 import { tokens } from "../../theme";
-import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 import { timestampDate, parseTimeString } from "../Functions";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import CommissionStatement from "../BillingStatement/CommissionStatement";
 
-const BilledTransaction = ({ row, user, discount }) => {
+const CommissionApprovalTransaction = ({ row, user }) => {
   const certificateRef = useRef();
   const invoiceRef = useRef();
   const commissionRef = useRef();
@@ -17,8 +24,15 @@ const BilledTransaction = ({ row, user, discount }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const billedTransaction = row.BilledTransaction[0];
-  const billingNumber = billedTransaction?.billingNumber;
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const billingApprovalTransaction =
+    row.BilledTransaction[0].BillingApprovalTransaction;
+
+  console.log(row);
+
+  const commissionApprovalTransaction =
+    row.CommissionedTransaction?.[0]?.CommissionApprovalTransaction;
 
   const handleDownloadPDF = () => {
     const input = certificateRef.current;
@@ -35,7 +49,7 @@ const BilledTransaction = ({ row, user, discount }) => {
       if (pageIndex >= pages.length) {
         // All pages are processed, save the PDF
         pdf.save(
-          `${billedTransaction.billingNumber}-${row.Client.clientName}.pdf`
+          `${row.BilledTransaction[0].billingNumber}-${row.Client.clientName}.pdf`
         );
         return;
       }
@@ -161,7 +175,7 @@ const BilledTransaction = ({ row, user, discount }) => {
     });
   }, []);
 
-  const handleOpenPDFInNewTab = useCallback(async () => {
+  const handleOpenPDFInNewTab = async () => {
     setIsRendering(true);
     await waitForRender(); // Wait for the DOM to render
 
@@ -187,7 +201,7 @@ const BilledTransaction = ({ row, user, discount }) => {
 
       // Capture the content of the current page using html2canvas
       html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
+        const imgData = canvas.toDataURL("image/png");
 
         if (pageIndex === 0) {
           // Add the first page
@@ -206,17 +220,14 @@ const BilledTransaction = ({ row, user, discount }) => {
     // Break the content into multiple pages if needed
     const pages = Array.from(input.children); // Assuming each page is a child of input
     processPage(0, pages); // Start processing pages from the first one
-    setIsRendering(false);
-  }, [waitForRender]);
-
-  const isBilled = row.BilledTransaction.length === 0 ? false : true;
+  };
 
   return (
     <Box>
-      {!isBilled ? (
+      {row.statusId >= 10 && !commissionApprovalTransaction ? (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo pending={true}>
-            <ReceiptIcon
+            <AssignmentTurnedInIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[500]}`,
@@ -230,7 +241,7 @@ const BilledTransaction = ({ row, user, discount }) => {
             }}
           >
             <Typography variant="h4" my={1} color={colors.greenAccent[400]}>
-              For Billing
+              For Commission Approval
             </Typography>
           </Box>
           <Typography variant="h5">Pending</Typography>
@@ -240,7 +251,7 @@ const BilledTransaction = ({ row, user, discount }) => {
       ) : (
         <Box sx={{ my: 3, position: "relative" }}>
           <CircleLogo>
-            <ReceiptIcon
+            <AssignmentTurnedInIcon
               sx={{
                 fontSize: "30px",
                 color: `${colors.grey[100]}`,
@@ -258,7 +269,7 @@ const BilledTransaction = ({ row, user, discount }) => {
           >
             <Grid item xs={12} md={6}>
               <Typography variant="h4" color={colors.greenAccent[400]}>
-                Billed
+                Commission Approved
               </Typography>
             </Grid>
             <Grid
@@ -275,70 +286,62 @@ const BilledTransaction = ({ row, user, discount }) => {
               }}
             >
               <Typography variant="h5">
-                {billedTransaction?.createdAt
-                  ? timestampDate(billedTransaction.createdAt)
+                {billingApprovalTransaction?.createdAt
+                  ? timestampDate(billingApprovalTransaction?.createdAt)
                   : ""}
               </Typography>
             </Grid>
           </Grid>
           <Typography variant="h5">
-            Billed Date:{" "}
-            {billedTransaction?.billedDate
-              ? format(new Date(billedTransaction.billedDate), "MMMM dd, yyyy")
+            Approved Date:{" "}
+            {billingApprovalTransaction?.approvedDate &&
+            billingApprovalTransaction.approvedDate !== "0000-00-00"
+              ? format(
+                  new Date(billingApprovalTransaction?.approvedDate),
+                  "MMMM dd, yyyy"
+                )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Billed Time:{" "}
-            {billedTransaction?.billedTime
+            Approved Time:{" "}
+            {billingApprovalTransaction?.approvedTime &&
+            billingApprovalTransaction.approvedDate !== "0000-00-00"
               ? format(
-                  parseTimeString(billedTransaction.billedTime),
+                  parseTimeString(billingApprovalTransaction?.approvedTime),
                   "hh:mm aa"
                 )
               : "Pending"}
           </Typography>
           <Typography variant="h5">
-            Billing Number: {billingNumber ? billingNumber : ""}
-          </Typography>
-          <Typography variant="h5">
-            Service Invoice Number:{" "}
-            {billedTransaction?.serviceInvoiceNumber
-              ? billedTransaction.serviceInvoiceNumber
-              : "NO REMARKS"}
-          </Typography>
-          <Typography variant="h5">
             Remarks:{" "}
-            {billedTransaction?.remarks
-              ? billedTransaction.remarks
+            {billingApprovalTransaction?.remarks
+              ? billingApprovalTransaction?.remarks
               : "NO REMARKS"}
           </Typography>
           <Typography variant="h5">
-            Billed By:{" "}
-            {`${billedTransaction?.Employee?.firstName || ""} ${
-              billedTransaction?.Employee?.lastName || ""
+            Approved By:{" "}
+            {`${billingApprovalTransaction?.Employee.firstName || ""} ${
+              billingApprovalTransaction?.Employee.lastName || ""
             }`}
           </Typography>
-          {isBilled && row.statusId < 11 && (
+          {row.statusId > 10 && (
             <>
+              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+                <CommissionStatement statementRef={certificateRef} row={row} />
+              </Box>
               <Box
                 sx={{
-                  position: "absolute",
-                  left: "-9999px",
-                  zIndex: 9999,
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: 2,
                 }}
               >
-                <BillingStatementForm
-                  statementRef={certificateRef}
-                  row={row}
-                  discount={discount}
-                />
-              </Box>
-              <Box sx={{ display: "flex", gap: 2 }}>
                 <Button
                   variant="contained"
                   color="secondary"
                   onClick={handleDownloadPDF}
                 >
-                  Download Billing Statement
+                  Download Commission Statement
                 </Button>
                 <Button
                   variant="contained"
@@ -348,28 +351,9 @@ const BilledTransaction = ({ row, user, discount }) => {
                 >
                   {isRendering ? "Opening..." : "View Billing Statement"}
                 </Button>
-                {(user.userType === 8 || user.userType === 9) && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleDownloadPDF2}
-                  >
-                    Download Sales Invoice
-                  </Button>
-                )}
-                {/* {Number.isInteger(user.userType) && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleDownloadPDF3}
-                  >
-                    Download Commission Statement
-                  </Button>
-                )} */}
               </Box>
             </>
           )}
-
           <br />
           <hr />
         </Box>
@@ -378,4 +362,4 @@ const BilledTransaction = ({ row, user, discount }) => {
   );
 };
 
-export default BilledTransaction;
+export default CommissionApprovalTransaction;

@@ -81,6 +81,7 @@ const DeliveryReceiptItem = require("../models/DeliveryReceiptItem");
 const Payroll = require("../models/Payroll");
 const PayrollDeduction = require("../models/PayrollDeduction");
 const PayrollAdjustment = require("../models/PayrollAdjustment");
+const CommissionApprovalTransaction = require("../models/CommissionApprovalTransaction");
 
 // Define associations
 IdInformation.hasMany(Attendance, {
@@ -1479,6 +1480,19 @@ BookedTransaction.hasMany(CommissionedTransaction, {
 CommissionedTransaction.belongsTo(BookedTransaction, {
   as: "BookedTransaction",
   foreignKey: "bookedTransactionId",
+  targetKey: "id",
+  onDelete: "CASCADE",
+});
+
+CommissionedTransaction.hasOne(CommissionApprovalTransaction, {
+  as: "CommissionApprovalTransaction",
+  foreignKey: "commissionedTransactionId",
+  sourceKey: "id",
+  onDelete: "CASCADE",
+});
+CommissionApprovalTransaction.belongsTo(CommissionedTransaction, {
+  as: "CommissionedTransaction",
+  foreignKey: "commissionedTransactionId",
   targetKey: "id",
   onDelete: "CASCADE",
 });

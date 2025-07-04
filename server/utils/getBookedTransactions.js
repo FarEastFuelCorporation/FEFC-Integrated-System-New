@@ -39,6 +39,7 @@ const CommissionWaste = require("../models/CommissionWaste");
 const EmployeeRecord = require("../models/EmployeeRecord");
 const Agent = require("../models/Agent");
 const IdInformation = require("../models/IdInformation");
+const CommissionApprovalTransaction = require("../models/CommissionApprovalTransaction");
 
 // Reusable include structure for both functions
 const getIncludeOptions = () => [
@@ -691,6 +692,12 @@ const getIncludeOptionsSorting = () => [
         as: "IdInformation",
         attributes: ["first_name", "last_name", "signature"],
       },
+      {
+        model: CommissionApprovalTransaction,
+        as: "CommissionApprovalTransaction",
+        attributes: ["id"],
+        required: false,
+      },
     ],
   },
 ];
@@ -977,6 +984,12 @@ const getIncludeOptionsWarehouse = () => [
         model: IdInformation,
         as: "IdInformation",
         attributes: ["first_name", "last_name", "signature"],
+      },
+      {
+        model: CommissionApprovalTransaction,
+        as: "CommissionApprovalTransaction",
+        attributes: ["id"],
+        required: false,
       },
     ],
   },
@@ -1307,6 +1320,12 @@ const getIncludeOptionsVerify = () => [
         as: "IdInformation",
         attributes: ["first_name", "last_name", "signature"],
       },
+      {
+        model: CommissionApprovalTransaction,
+        as: "CommissionApprovalTransaction",
+        attributes: ["id"],
+        required: false,
+      },
     ],
   },
 ];
@@ -1415,6 +1434,12 @@ const getIncludeOptionsPartial = () => [
         model: IdInformation,
         as: "IdInformation",
         attributes: ["first_name", "last_name", "signature"],
+      },
+      {
+        model: CommissionApprovalTransaction,
+        as: "CommissionApprovalTransaction",
+        attributes: ["id"],
+        required: false,
       },
     ],
   },

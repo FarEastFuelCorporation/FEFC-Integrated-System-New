@@ -1,5 +1,12 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { CircleLogo } from "../CustomAccordionStyles";
@@ -19,6 +26,8 @@ const CommissionTransaction = ({ row, user }) => {
   const [isRendering, setIsRendering] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const billingApprovalTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction;
@@ -126,7 +135,7 @@ const CommissionTransaction = ({ row, user }) => {
       if (pageIndex >= pages.length) {
         // All pages are processed, save the PDF
         pdf.save(
-          `${row.BilledTransaction[0].billingNumber}-${row.Client.clientName}-COMMISSION_STATEMENT.pdf`
+          `${row.CommissionedTransaction[0].commissionNumber}-${row.Client.clientName}-COMMISSION_STATEMENT.pdf`
         );
         return;
       }
@@ -158,7 +167,7 @@ const CommissionTransaction = ({ row, user }) => {
   const waitForRender = useCallback(() => {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
-        if (certificateRef.current) {
+        if (commissionRef.current) {
           clearInterval(interval); // Clear the interval once it's ready
           resolve();
         }
@@ -166,11 +175,11 @@ const CommissionTransaction = ({ row, user }) => {
     });
   }, []);
 
-  const handleOpenPDFInNewTab = async () => {
+  const handleOpenPDFInNewTab = useCallback(async () => {
     setIsRendering(true);
     await waitForRender(); // Wait for the DOM to render
 
-    const input = certificateRef.current;
+    const input = commissionRef.current;
 
     const pageHeight = 1056;
     const pageWidth = 816;
@@ -192,7 +201,7 @@ const CommissionTransaction = ({ row, user }) => {
 
       // Capture the content of the current page using html2canvas
       html2canvas(pages[pageIndex], { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
 
         if (pageIndex === 0) {
           // Add the first page
@@ -211,11 +220,12 @@ const CommissionTransaction = ({ row, user }) => {
     // Break the content into multiple pages if needed
     const pages = Array.from(input.children); // Assuming each page is a child of input
     processPage(0, pages); // Start processing pages from the first one
-  };
+    setIsRendering(false);
+  }, [waitForRender]);
 
   return (
     <Box>
-      {row.statusId > 10 &&
+      {row.statusId >= 10 &&
       row.Client?.Commission.length > 0 &&
       row.CommissionedTransaction.length === 0 ? (
         <Box sx={{ my: 3, position: "relative" }}>
@@ -241,7 +251,7 @@ const CommissionTransaction = ({ row, user }) => {
           <br />
           <hr />
         </Box>
-      ) : row.statusId > 10 &&
+      ) : row.statusId >= 10 &&
         row.Client?.Commission.length > 0 &&
         row.CommissionedTransaction.length > 0 ? (
         <Box sx={{ my: 3, position: "relative" }}>
@@ -319,26 +329,42 @@ const CommissionTransaction = ({ row, user }) => {
               commissionedTransaction?.IdInformation?.last_name || ""
             }`}
           </Typography>
-          {row.statusId > 10 && (
+          {row.statusId >= 10 && (
             <>
-              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
-                <BillingStatementForm statementRef={certificateRef} row={row} />
-              </Box>
-              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
-                <BillingInvoice statementRef={invoiceRef} row={row} />
-              </Box>
-              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: "-9999px",
+                  zIndex: 9999,
+                }}
+              >
                 <CommissionStatement statementRef={commissionRef} row={row} />
               </Box>
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: 2,
+                }}
+              >
                 {Number.isInteger(user.userType) && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleDownloadPDF3}
-                  >
-                    Download Commission Statement
-                  </Button>
+                  <>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleDownloadPDF3}
+                    >
+                      Download Commission Statement
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleOpenPDFInNewTab}
+                      disabled={isRendering}
+                    >
+                      {isRendering ? "Opening..." : "View Commission Statement"}
+                    </Button>
+                  </>
                 )}
               </Box>
             </>

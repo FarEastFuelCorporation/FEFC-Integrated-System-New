@@ -7,7 +7,7 @@ export const validateTransactionForm = (formData) => {
     errors.push("Client is required.");
   }
 
-  if (!formData.employeeId || formData.employeeId.trim() === "") {
+  if (!formData.agentId || formData.agentId.trim() === "") {
     errors.push("Agent (Employee) is required.");
   }
 

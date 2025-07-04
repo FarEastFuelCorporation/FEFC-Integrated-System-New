@@ -47,6 +47,7 @@ const billedTransactionRoutes = require("./billedTransactionRoutes");
 const billingRoutes = require("./billingRoutes");
 const commissionVerifyRoutes = require("./commissionVerifyRoutes");
 const billingApprovalTransactionRoutes = require("./billingApprovalTransactionRoutes");
+const commissionApprovalTransactionRoutes = require("./commissionApprovalTransactionRoutes");
 const billingDistributionTransactionRoutes = require("./billingDistributionTransactionRoutes");
 const collectionTransactionRoutes = require("./collectionTransactionRoutes");
 const hrDashboardRoutes = require("./hr_dashboard");
@@ -132,6 +133,10 @@ router.use("/certifiedTransaction", certifiedTransactionRoutes);
 router.use("/plasticTransaction", plasticTransactionRoutes);
 router.use("/billedTransaction", billedTransactionRoutes);
 router.use("/billingApprovalTransaction", billingApprovalTransactionRoutes);
+router.use(
+  "/commissionApprovalTransaction",
+  commissionApprovalTransactionRoutes
+);
 router.use(
   "/billingDistributionTransaction",
   billingDistributionTransactionRoutes

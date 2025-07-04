@@ -14,6 +14,7 @@ import CollectionModal from "./TransactionModals/CollectionModal";
 import WarehouseModal from "./TransactionModals/WarehouseModal";
 import WarehouseOutModal from "./TransactionModals/WarehouseOutModal";
 import CommissionModal from "./TransactionModals/CommissionModal";
+import CommissionApprovalModal from "./TransactionModals/CommissionApprovalModal";
 
 const Modal = forwardRef(
   (
@@ -47,6 +48,7 @@ const Modal = forwardRef(
       discount,
       setDiscount,
       schedule,
+      commission,
     },
     ref
   ) => {
@@ -210,7 +212,23 @@ const Modal = forwardRef(
         );
         break;
       case 9:
-        ModalComponent = (
+        ModalComponent = commission ? (
+          <CommissionApprovalModal
+            user={user}
+            error={error}
+            open={open}
+            onClose={onClose}
+            formData={formData}
+            setFormData={setFormData}
+            handleInputChange={handleInputChange}
+            handleFormSubmit={handleFormSubmit}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            showErrorMessage={showErrorMessage}
+            setShowErrorMessage={setShowErrorMessage}
+            refs={refs}
+          />
+        ) : (
           <BillingApprovalModal
             user={user}
             error={error}

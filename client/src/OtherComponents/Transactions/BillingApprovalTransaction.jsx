@@ -1,5 +1,12 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import { CircleLogo } from "../CustomAccordionStyles";
 import { format } from "date-fns";
@@ -18,6 +25,8 @@ const BillingApprovalTransaction = ({ row, user }) => {
   const [isRendering, setIsRendering] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const billingApprovalTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction;
@@ -320,7 +329,13 @@ const BillingApprovalTransaction = ({ row, user }) => {
               <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
                 <BillingInvoice statementRef={invoiceRef} row={row} />
               </Box>
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: 2,
+                }}
+              >
                 <Button
                   variant="contained"
                   color="secondary"

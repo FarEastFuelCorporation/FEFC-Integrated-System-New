@@ -15,7 +15,7 @@ import Modal from "../../../../../OtherComponents/Modal";
 import LoadingSpinner from "../../../../../OtherComponents/LoadingSpinner";
 import ConfirmationDialog from "../../../../../OtherComponents/ConfirmationDialog";
 
-const BillingApprovalTransactions = ({ user }) => {
+const CommissionApprovalTransactions = ({ user }) => {
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
   // Create refs for the input fields
@@ -26,7 +26,7 @@ const BillingApprovalTransactions = ({ user }) => {
   const initialFormData = {
     id: "",
     bookedTransactionId: "",
-    billedTransactionId: "",
+    commissionedTransactionId: "",
     approvedDate: "",
     approvedTime: "",
     remarks: "",
@@ -53,22 +53,22 @@ const BillingApprovalTransactions = ({ user }) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const billingApprovalTransactionResponse = await axios.get(
-        `${apiUrl}/api/billingApprovalTransaction`
+      const commissionApprovalTransactionResponse = await axios.get(
+        `${apiUrl}/api/commissionApprovalTransaction`
       );
       // For pending transactions
       setPendingTransactions(
-        billingApprovalTransactionResponse.data.pendingTransactions
+        commissionApprovalTransactionResponse.data.pendingTransactions
       );
 
       // For in progress transactions
       setInProgressTransactions(
-        billingApprovalTransactionResponse.data.inProgressTransactions
+        commissionApprovalTransactionResponse.data.inProgressTransactions
       );
 
       // For finished transactions
       setFinishedTransactions(
-        billingApprovalTransactionResponse.data.finishedTransactions
+        commissionApprovalTransactionResponse.data.finishedTransactions
       );
       setLoading(false);
     } catch (error) {
@@ -85,7 +85,7 @@ const BillingApprovalTransactions = ({ user }) => {
     setFormData({
       id: "",
       bookedTransactionId: row.id,
-      billedTransactionId: row.BilledTransaction[0].id,
+      commissionedTransactionId: row.CommissionedTransaction[0].id,
       approvedDate: "",
       approvedTime: "",
       remarks: "",
@@ -112,16 +112,17 @@ const BillingApprovalTransactions = ({ user }) => {
   const handleEditClick = (row) => {
     const typeToEdit = row;
     if (typeToEdit) {
-      const billingApprovalTransaction =
-        typeToEdit.BilledTransaction?.[0].BillingApprovalTransaction || {};
+      const commissionApprovalTransaction =
+        typeToEdit.CommissionedTransaction?.[0].CommissionApprovalTransaction ||
+        {};
 
       setFormData({
-        id: billingApprovalTransaction.id,
+        id: commissionApprovalTransaction.id,
         bookedTransactionId: typeToEdit.id,
-        billedTransactionId: typeToEdit.BilledTransaction?.[0].id,
-        approvedDate: billingApprovalTransaction.approvedDate,
-        approvedTime: billingApprovalTransaction.approvedTime,
-        remarks: billingApprovalTransaction.remarks,
+        commissionedTransactionId: typeToEdit.CommissionedTransaction?.[0].id,
+        approvedDate: commissionApprovalTransaction.approvedDate,
+        approvedTime: commissionApprovalTransaction.approvedTime,
+        remarks: commissionApprovalTransaction.remarks,
         statusId: typeToEdit.statusId,
         createdBy: user.id,
       });
@@ -129,7 +130,7 @@ const BillingApprovalTransactions = ({ user }) => {
       setOpenModal(true);
     } else {
       console.error(
-        `Billing Approval Transaction with ID ${row.id} not found for editing.`
+        `Commission Approval Transaction with ID ${row.id} not found for editing.`
       );
     }
   };
@@ -137,7 +138,7 @@ const BillingApprovalTransactions = ({ user }) => {
   const handleDeleteClick = (id) => {
     setOpenDialog(true);
     setDialog(
-      "Are you sure you want to Delete this Billing Approval Transaction?"
+      "Are you sure you want to Delete this Commission Approval Transaction?"
     );
     setDialogAction(() => () => handleConfirmDelete(id));
   };
@@ -146,7 +147,7 @@ const BillingApprovalTransactions = ({ user }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `${apiUrl}/api/billingApprovalTransaction/${row.BilledTransaction?.[0]?.BillingApprovalTransaction.id}`,
+        `${apiUrl}/api/commissionApprovalTransaction/${row.CommissionedTransaction?.[0]?.CommissionApprovalTransaction.id}`,
         {
           data: {
             deletedBy: user.id,
@@ -157,7 +158,9 @@ const BillingApprovalTransactions = ({ user }) => {
 
       fetchData();
 
-      setSuccessMessage("Billing Approval Transaction Deleted Successfully!");
+      setSuccessMessage(
+        "Commission Approval Transaction Deleted Successfully!"
+      );
       setShowSuccessMessage(true);
       setOpenTransactionModal(false);
       setLoading(false);
@@ -213,19 +216,21 @@ const BillingApprovalTransactions = ({ user }) => {
 
       if (updatedFormData.id) {
         await axios.put(
-          `${apiUrl}/api/billingApprovalTransaction/${updatedFormData.id}`,
-          updatedFormData
-        );
-
-        setSuccessMessage("Billing Approval Transaction Updated Successfully!");
-      } else {
-        await axios.post(
-          `${apiUrl}/api/billingApprovalTransaction`,
+          `${apiUrl}/api/commissionApprovalTransaction/${updatedFormData.id}`,
           updatedFormData
         );
 
         setSuccessMessage(
-          "Billing Approval Transaction Submitted Successfully!"
+          "Commission Approval Transaction Updated Successfully!"
+        );
+      } else {
+        await axios.post(
+          `${apiUrl}/api/commissionApprovalTransaction`,
+          updatedFormData
+        );
+
+        setSuccessMessage(
+          "Commission Approval Transaction Submitted Successfully!"
         );
       }
 
@@ -269,7 +274,7 @@ const BillingApprovalTransactions = ({ user }) => {
       />
       <Transaction
         user={user}
-        buttonText={"Billing Approve"}
+        buttonText={"Commission Approve"}
         pendingTransactions={pendingTransactions}
         inProgressTransactions={inProgressTransactions}
         finishedTransactions={finishedTransactions}
@@ -298,9 +303,10 @@ const BillingApprovalTransactions = ({ user }) => {
           approvedTimeRef,
           remarksRef,
         }}
+        commission={true}
       />
     </Box>
   );
 };
 
-export default BillingApprovalTransactions;
+export default CommissionApprovalTransactions;

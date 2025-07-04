@@ -19,12 +19,15 @@ async function generateCommissionNumber() {
 
     // Generate the new transaction ID
     let newIdNumber = 1;
-    if (latestTransaction) {
-      const latestTransactionId = latestTransaction.billingNumber;
-      const latestYear = latestTransactionId.substring(1, 3); // Get last two digits of the year
-      const latestMonth = latestTransactionId.substring(4, 6); // Get the month
+    if (latestTransaction?.commissionNumber) {
+      const latestTransactionId = latestTransaction.commissionNumber;
+
+      // Extract parts correctly
+      const latestYear = latestTransactionId.substring(3, 5); // Should get "25"
+      const latestMonth = latestTransactionId.substring(6, 8); // Should get "07"
+
       if (latestYear === currentYear && latestMonth === currentMonth) {
-        const latestIdNumber = parseInt(latestTransactionId.substring(7), 10); // Get the ID number part
+        const latestIdNumber = parseInt(latestTransactionId.substring(9), 10); // Should get "001"
         newIdNumber = latestIdNumber + 1;
       }
     }

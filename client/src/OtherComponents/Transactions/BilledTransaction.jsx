@@ -8,6 +8,7 @@ import BillingStatementForm from "../BillingStatement/BillingStatementForm";
 import { timestampDate, parseTimeString } from "../Functions";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import BillingInvoice from "../BillingStatement/BillingInvoice";
 
 const BilledTransaction = ({ row, user, discount }) => {
   const certificateRef = useRef();
@@ -72,6 +73,8 @@ const BilledTransaction = ({ row, user, discount }) => {
       unit: "px",
       format: [pageWidth, pageHeight], // Page size in px
     });
+
+    console.log(input);
 
     // Function to process and add each page
     const processPage = (pageIndex, pages) => {
@@ -331,6 +334,9 @@ const BilledTransaction = ({ row, user, discount }) => {
                   row={row}
                   discount={discount}
                 />
+              </Box>
+              <Box sx={{ position: "absolute", left: "-9999px", zIndex: 9999 }}>
+                <BillingInvoice statementRef={invoiceRef} row={row} />
               </Box>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <Button

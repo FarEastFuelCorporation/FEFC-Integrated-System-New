@@ -401,20 +401,6 @@ async function deleteCommissionApprovalTransactionController(req, res) {
       await transaction.destroy(); // Soft delete (sets deletedAt timestamp)
     }
 
-    // Update the status of all related booked transactions
-    for (const bt of commissionedTransactionIds) {
-      const bookedTransaction = await BookedTransaction.findByPk(
-        bt.bookedTransactionId
-      );
-      if (bookedTransaction) {
-        bookedTransaction.statusId = transactionStatusId; // Update to the desired status
-        await bookedTransaction.save();
-      }
-    }
-
-    // Fetch updated transactions
-    const data = await fetchData(8); // Replace `8` with the appropriate status ID if needed
-
     // Respond with the updated data
     res.status(200).json({
       message:

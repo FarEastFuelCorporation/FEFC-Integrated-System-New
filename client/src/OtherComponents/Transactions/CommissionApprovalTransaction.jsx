@@ -29,8 +29,6 @@ const CommissionApprovalTransaction = ({ row, user }) => {
   const billingApprovalTransaction =
     row.BilledTransaction[0].BillingApprovalTransaction;
 
-  console.log(row);
-
   const commissionApprovalTransaction =
     row.CommissionedTransaction?.[0]?.CommissionApprovalTransaction;
 

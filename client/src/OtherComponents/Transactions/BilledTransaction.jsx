@@ -74,8 +74,6 @@ const BilledTransaction = ({ row, user, discount }) => {
       format: [pageWidth, pageHeight], // Page size in px
     });
 
-    console.log(input);
-
     // Function to process and add each page
     const processPage = (pageIndex, pages) => {
       if (pageIndex >= pages.length) {
@@ -105,8 +103,10 @@ const BilledTransaction = ({ row, user, discount }) => {
     };
 
     // Break the content into multiple pages if needed
-    const pages = Array.from(input.children); // Assuming each page is a child of input
-    processPage(0, pages); // Start processing pages from the first one
+    if (input) {
+      const pages = Array.from(input?.children); // Assuming each page is a child of input
+      processPage(0, pages); // Start processing pages from the first one
+    }
   };
 
   const handleDownloadPDF3 = () => {

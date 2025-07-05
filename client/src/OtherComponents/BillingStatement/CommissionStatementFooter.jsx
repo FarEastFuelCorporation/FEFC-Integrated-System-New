@@ -19,9 +19,6 @@ const CommissionStatementFooter = ({ user, signature, row, qrCodeURL }) => {
     row?.CommissionedTransaction?.[0]?.CommissionApprovalTransaction
       ?.approvedDate !== undefined;
 
-  console.log(row?.CommissionedTransaction?.[0]);
-  console.log(row?.CommissionedTransaction?.[0]?.CommissionApprovalTransaction);
-  console.log(isApproved);
   useEffect(() => {
     setApproved(isApproved);
   }, [isApproved]);

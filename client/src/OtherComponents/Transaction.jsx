@@ -895,9 +895,11 @@ const Transaction = ({
                     {user.userType === 2 && buttonText === "Schedule" && (
                       <ScheduledTransaction row={row} />
                     )}
-                    {user.userType === 2 && buttonText === "Commission" && (
-                      <CommissionTransaction row={row} user={user} />
-                    )}
+                    {Number.isInteger(user.userType) &&
+                      user.userType === 2 &&
+                      buttonText === "Commission" && (
+                        <CommissionTransaction row={row} user={user} />
+                      )}
                     {user.userType === 3 && <DispatchedTransaction row={row} />}
                     {user.userType === 4 && <ReceivedTransaction row={row} />}
                     {user.userType === 5 && <SortedTransaction row={row} />}
@@ -957,7 +959,8 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                    {user.userType === 9 &&
+                    {Number.isInteger(user.userType) &&
+                      user.userType === 9 &&
                       buttonText === "Commission Approve" && (
                         <CommissionApprovalTransaction
                           row={row}
@@ -1015,14 +1018,15 @@ const Transaction = ({
                           user={user}
                         />
                       )}
-                      {row.statusId >= 10 && (
-                        <CommissionApprovalTransaction
-                          row={row}
-                          handleOpenModal={handleOpenModal}
-                          handleDeleteClick={handleDeleteClick}
-                          user={user}
-                        />
-                      )}
+                      {Number.isInteger(user.userType) &&
+                        row.statusId >= 10 && (
+                          <CommissionApprovalTransaction
+                            row={row}
+                            handleOpenModal={handleOpenModal}
+                            handleDeleteClick={handleDeleteClick}
+                            user={user}
+                          />
+                        )}
                       {row.statusId >= 10 && (
                         <BillingApprovalTransaction
                           row={row}

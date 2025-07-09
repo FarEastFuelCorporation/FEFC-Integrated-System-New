@@ -40,6 +40,7 @@ const QuotationFormModal = ({
     "PC",
     "KG",
     "L",
+    "UNIT",
     "DRUM",
     "LOT",
     "CASE",

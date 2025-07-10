@@ -619,7 +619,7 @@ const QuotationFormModal = ({
                           color: colors.grey[100],
                         }}
                       >
-                        Type of Waste
+                        Category
                       </InputLabel>
                       <Select
                         labelId={`waste-type-select-label-${index}`}
@@ -646,7 +646,7 @@ const QuotationFormModal = ({
                   </Grid>
                   <Grid item xs={2}>
                     <TextField
-                      label="Waste Name"
+                      label="Category Name"
                       name={`quotationWastes[${index}].wasteName`}
                       value={waste.wasteName}
                       onChange={(e) =>

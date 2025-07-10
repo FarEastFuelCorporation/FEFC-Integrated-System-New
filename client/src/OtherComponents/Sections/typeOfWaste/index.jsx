@@ -360,6 +360,7 @@ const TypeOfWastes = ({ user }) => {
                 color: colors.grey[100],
               },
             }}
+            autoComplete="off"
           />
           <TextField
             label="Waste Description"
@@ -373,6 +374,7 @@ const TypeOfWastes = ({ user }) => {
                 color: colors.grey[100],
               },
             }}
+            autoComplete="off"
           />
           <TextField
             label="Treatment Process"

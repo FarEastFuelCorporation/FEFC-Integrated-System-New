@@ -13,7 +13,6 @@ const User = sequelize.define("User", {
   employeeId: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
   employeeUsername: {
     type: DataTypes.STRING,
@@ -22,6 +21,11 @@ const User = sequelize.define("User", {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  isGoogle: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   },
   createdAt: {
     type: DataTypes.DATE,

@@ -34,7 +34,9 @@ async function createEmployeeSignupController(req, res) {
     }
 
     // Check if the employeeId is already registered in the User table
-    const existingUser = await User.findOne({ where: { employeeId } });
+    const existingUser = await User.findOne({
+      where: { employeeId, isGoogle: false },
+    });
 
     if (existingUser) {
       // Employee is already registered, send an error response
@@ -49,6 +51,7 @@ async function createEmployeeSignupController(req, res) {
       employeeId,
       employeeUsername,
       password: hashedPassword,
+      isGoogle: false,
     });
 
     // Find the user's roles from the EmployeeRolesEmployee table
@@ -132,7 +135,9 @@ async function createEmployeeSignupGoogleController(req, res) {
     }
 
     // Check if the employeeId is already registered in the User table
-    const existingUser = await User.findOne({ where: { employeeId } });
+    const existingUser = await User.findOne({
+      where: { employeeId, isGoogle: true },
+    });
 
     if (existingUser) {
       // Employee is already registered, send an error response
@@ -147,6 +152,7 @@ async function createEmployeeSignupGoogleController(req, res) {
       employeeId,
       employeeUsername: email,
       password: hashedPassword,
+      isGoogle: true,
     });
 
     // Find the user's roles from the EmployeeRolesEmployee table

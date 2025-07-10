@@ -608,7 +608,7 @@ const QuotationFormModal = ({
             {formData.quotationWastes.map((waste, index) => (
               <Box key={index} sx={{ mb: 2 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Waste Entry #{index + 1}
+                  Entry #{index + 1}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={0.75}>

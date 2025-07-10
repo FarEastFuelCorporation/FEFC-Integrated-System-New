@@ -197,7 +197,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
 
             // Process each item in the tableData
             tableData.forEach((item, index) => {
-              if (item[0] === "Item" && item[1] === "Description of Waste") {
+              if (item[0] === "Item" && item[1] === "Description") {
                 bodyRows.QuotationWasteTableHead.header = (
                   <QuotationWasteTableHead row={row} />
                 );
@@ -407,7 +407,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                       fontWeight="bold"
                       textAlign="center"
                     >
-                      WASTE CLASSIFICATION
+                      CLASSIFICATION
                     </Typography>
                   )}
                   {/* Render Waste Table */}

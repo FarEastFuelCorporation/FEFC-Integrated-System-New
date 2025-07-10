@@ -6,9 +6,11 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 const EmployeeSignup = ({ onLogin }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -97,6 +99,47 @@ const EmployeeSignup = ({ onLogin }) => {
     }
   };
 
+  const handleSignUpSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!employeeId || employeeId.trim() === "") {
+        alert("Employee ID is required.");
+        return;
+      }
+
+      const token = credentialResponse.credential;
+      const response = await axios.post(`${apiUrl}/api/employeeSignup/google`, {
+        employeeId,
+        token,
+      });
+
+      const { user } = response.data;
+      onLogin(user); // Update user state in App component
+      navigate("/dashboard"); // Redirect user to the specified URL
+    } catch (error) {
+      if (error.response) {
+        console.error("Error response status:", error.response.status);
+        console.error("Error response data:", error.response.data);
+
+        if (error.response.status === 401) {
+          setError("Invalid username or password");
+        } else {
+          setError("An error occurred. Please try again.");
+        }
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+        setError("Network error. Please try again later.");
+      } else {
+        console.error("Error message:", error.message);
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Error config:", error.config);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <LoadingSpinner isLoading={loading} />
@@ -167,6 +210,15 @@ const EmployeeSignup = ({ onLogin }) => {
         <button type="submit" disabled={loading}>
           {loading ? "Signing up..." : "Sign up"}
         </button>
+        <GoogleOAuthProvider clientId={CLIENT_ID}>
+          <div style={{ textAlign: "center" }}>
+            <h4>Sign in with Google</h4>
+            <GoogleLogin
+              onSuccess={handleSignUpSuccess}
+              onError={() => console.log("Sign Up Failed")}
+            />
+          </div>
+        </GoogleOAuthProvider>
       </form>
     </div>
   );

@@ -10,6 +10,10 @@ const bcrypt = require("bcrypt");
 const generateOtp = require("../utils/generateOtp");
 const { sendOtpFormat } = require("../utils/emailFormat");
 const sendEmail = require("../sendEmail");
+const { OAuth2Client } = require("google-auth-library");
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const client = new OAuth2Client(CLIENT_ID);
 
 // Create Employee Signup controller
 async function createEmployeeSignupController(req, res) {
@@ -44,6 +48,104 @@ async function createEmployeeSignupController(req, res) {
     const newUser = await User.create({
       employeeId,
       employeeUsername,
+      password: hashedPassword,
+    });
+
+    // Find the user's roles from the EmployeeRolesEmployee table
+    const employeeRoles = await EmployeeRolesEmployee.findAll({
+      where: { employeeId },
+    });
+
+    // Determine the userType, defaulting to 1 if no roles are found
+    const userType =
+      employeeRoles.length > 0 ? employeeRoles[0].employeeRoleId : 1;
+
+    const role = employeeRoles.length > 0 ? "employee" : "defaultRole";
+
+    const employeeDetails = await Employee.findOne({
+      where: { employeeId },
+      attributes: [
+        "firstName",
+        "middleName",
+        "lastName",
+        "affix",
+        "department",
+        "designation",
+      ],
+    });
+
+    const employeePicture = await IdInformation.findOne({
+      where: { employee_id: employeeId },
+      attributes: ["profile_picture"],
+    });
+
+    // Set session data
+    req.session.user = {
+      id: newUser.employeeId,
+      userType: userType,
+      role: role,
+      employeeDetails: employeeDetails,
+      employeePicture: employeePicture,
+    };
+
+    // Respond with redirect URL and session details
+    res.status(200).json({
+      user: {
+        id: newUser.employeeId,
+        userType: userType,
+        role: role,
+        employeeDetails: employeeDetails,
+        employeePicture: employeePicture,
+      },
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+// Create Employee Signup Google controller
+async function createEmployeeSignupGoogleController(req, res) {
+  try {
+    const { employeeId, token } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const { sub: googleId, email } = payload;
+
+    // Check if the employeeId is in the Employee table
+    const existingEmployee = await Employee.findOne({
+      where: {
+        employeeId,
+        employeeStatus: "ACTIVE",
+      },
+    });
+
+    if (!existingEmployee) {
+      // Employee ID is not valid, send an error response
+      return res.status(400).json({ error: "Invalid Employee ID" });
+    }
+
+    // Check if the employeeId is already registered in the User table
+    const existingUser = await User.findOne({ where: { employeeId } });
+
+    if (existingUser) {
+      // Employee is already registered, send an error response
+      return res.status(400).json({ error: "Employee is already registered" });
+    }
+
+    // Hash the password before storing it in the database
+    const hashedPassword = await bcrypt.hash(googleId, 10);
+
+    // Create a new user in the User table
+    const newUser = await User.create({
+      employeeId,
+      employeeUsername: email,
       password: hashedPassword,
     });
 
@@ -210,6 +312,103 @@ async function createEmployeeLoginController(req, res) {
 
     // Check if the password is correct
     const passwordMatch = await bcrypt.compare(password, user.password);
+    // const passwordMatch = true;
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Invalid employee ID or password" });
+    }
+
+    // Find the user's roles from the EmployeeRolesEmployee table
+    const employeeRoles = await EmployeeRolesEmployee.findAll({
+      where: { employeeId },
+    });
+
+    // Determine the userType, defaulting to 1 if no roles are found
+    const userType =
+      employeeRoles.length > 0 ? employeeRoles[0].employeeRoleId : 1;
+
+    const role = employeeRoles.length > 0 ? "employee" : "defaultRole";
+
+    const employeeDetails = await Employee.findOne({
+      where: { employeeId },
+      attributes: [
+        "firstName",
+        "middleName",
+        "lastName",
+        "affix",
+        "department",
+        "designation",
+      ],
+    });
+
+    // let employeePicture;
+
+    const employeePicture = await IdInformation.findOne({
+      where: { employee_id: employeeId },
+      attributes: ["profile_picture"],
+    });
+
+    // Set session data
+    req.session.user = {
+      id: user.employeeId,
+      userType: userType,
+      role: role,
+      employeeDetails: employeeDetails,
+      employeePicture: employeePicture,
+    };
+
+    console.log(req.session.user);
+
+    // Respond with redirect URL and session details
+    res.status(200).json({
+      user: {
+        id: user.employeeId,
+        userType: userType,
+        role: role,
+        employeeDetails: employeeDetails,
+        employeePicture: employeePicture,
+      },
+    });
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+// Create Employee Login Google controller
+async function createEmployeeLoginGoogleController(req, res) {
+  const { token } = req.body;
+  console.log("pass");
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const { sub: googleId, email } = payload;
+
+    // Find the user with the provided employee ID
+    const user = await User.findOne({
+      where: { employeeUsername: email },
+      include: [
+        {
+          model: Employee,
+          as: "Employee",
+          where: { employeeStatus: "ACTIVE" }, // Filter for active employees
+        },
+      ],
+    });
+
+    const employeeId = user?.employeeId;
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(401).json({ error: "Invalid employee ID or password" });
+    }
+
+    // Check if the password is correct
+    const passwordMatch = await bcrypt.compare(googleId, user.password);
     // const passwordMatch = true;
     if (!passwordMatch) {
       return res.status(401).json({ error: "Invalid employee ID or password" });
@@ -522,8 +721,10 @@ async function sendOTPController(req, res) {
 
 module.exports = {
   createEmployeeSignupController,
+  createEmployeeSignupGoogleController,
   createEmployeeUpdateController,
   createEmployeeLoginController,
+  createEmployeeLoginGoogleController,
   createClientSignupController,
   createClientUpdateController,
   createClientLoginController,

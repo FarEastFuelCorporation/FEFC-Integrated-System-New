@@ -6,9 +6,11 @@ import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 const EmployeeLogin = ({ onLogin }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -239,6 +241,41 @@ const EmployeeLogin = ({ onLogin }) => {
   if (progress <= 25) {
     colorProgress = "red"; // Red color for timer <= 45
   }
+
+  const handleLoginSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = credentialResponse.credential;
+      const response = await axios.post(`${apiUrl}/api/employeeLogin/google`, {
+        token,
+      });
+
+      const { user } = response.data;
+      onLogin(user); // Update user state in App component
+      navigate("/dashboard"); // Redirect user to the specified URL
+    } catch (error) {
+      if (error.response) {
+        console.error("Error response status:", error.response.status);
+        console.error("Error response data:", error.response.data);
+
+        if (error.response.status === 401) {
+          setError("Invalid username or password");
+        } else {
+          setError("An error occurred. Please try again.");
+        }
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+        setError("Network error. Please try again later.");
+      } else {
+        console.error("Error message:", error.message);
+        setError("An error occurred. Please try again.");
+      }
+      console.error("Error config:", error.config);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -500,6 +537,15 @@ const EmployeeLogin = ({ onLogin }) => {
           </button>
         </form>
       )}
+      <GoogleOAuthProvider clientId={CLIENT_ID}>
+        <div style={{ textAlign: "center" }}>
+          <h4>Sign Up with Google</h4>
+          <GoogleLogin
+            onSuccess={handleLoginSuccess}
+            onError={() => console.log("Login Failed")}
+          />
+        </div>
+      </GoogleOAuthProvider>
     </div>
   );
 };

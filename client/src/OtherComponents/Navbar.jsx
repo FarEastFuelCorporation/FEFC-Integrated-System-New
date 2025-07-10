@@ -20,7 +20,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-const Navbar = () => {
+const Navbar = ({ user }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,10 +44,20 @@ const Navbar = () => {
         withCredentials: true, // send cookies if any
       });
 
+      let route;
+
+      if (Number.isInteger(user?.userType)) {
+        route = "/employee";
+      } else if (!Number.isInteger(user?.userType)) {
+        route = "/client";
+      } else {
+        route = "/";
+      }
+
       if (response.status === 200) {
         // Prevent navigation back to the session by clearing history
-        window.history.replaceState(null, "", response.data.route); // Replace history entry
-        navigate(response.data.route, { replace: true }); // Navigate to login or appropriate route
+        window.history.replaceState(null, "", route); // Replace history entry
+        navigate(route, { replace: true }); // Navigate to login or appropriate route
         window.location.reload(); // Ensure all in-memory data is cleared      } else {
       }
     } catch (error) {

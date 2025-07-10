@@ -121,7 +121,7 @@ const App = () => {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {isJDRoute ? <NavbarJD /> : <Navbar />}
+        {isJDRoute ? <NavbarJD /> : <Navbar user={user} />}
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/quotationForm/:id" element={<QuotationDisplay />} />

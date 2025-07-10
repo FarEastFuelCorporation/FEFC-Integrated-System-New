@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../OtherComponents/LoadingSpinner";
-import { useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -213,10 +213,12 @@ const EmployeeSignup = ({ onLogin }) => {
         <GoogleOAuthProvider clientId={CLIENT_ID}>
           <div style={{ textAlign: "center" }}>
             <h4>Sign in with Google</h4>
-            <GoogleLogin
-              onSuccess={handleSignUpSuccess}
-              onError={() => console.log("Sign Up Failed")}
-            />
+            <Box alignContent={"center"}>
+              <GoogleLogin
+                onSuccess={handleSignUpSuccess}
+                onError={() => console.log("Sign Up Failed")}
+              />
+            </Box>
           </div>
         </GoogleOAuthProvider>
       </form>

@@ -313,8 +313,10 @@ const BillingContent = ({
                 } else {
                   aggregatedWasteTransactions = Object.values(
                     submitTo === "WAREHOUSE"
-                      ? transaction.ScheduledTransaction[0].ReceivedTransaction[0].WarehousedTransaction[0].WarehousedTransactionItem.reduce(
-                          (acc, current) => {
+                      ? transaction.ScheduledTransaction?.[0]
+                          ?.ReceivedTransaction?.[0]?.WarehousedTransaction?.[0]
+                          ?.WarehousedTransactionItem ||
+                          [].reduce((acc, current) => {
                             const { id } = current.QuotationWaste;
 
                             const currentWeight = new Decimal(current.weight); // Use Decimal.js
@@ -343,11 +345,11 @@ const BillingContent = ({
                             }
 
                             return acc;
-                          },
-                          {}
-                        )
-                      : transaction.ScheduledTransaction[0].ReceivedTransaction[0].SortedTransaction[0].SortedWasteTransaction.reduce(
-                          (acc, current) => {
+                          }, {})
+                      : transaction.ScheduledTransaction?.[0]
+                          ?.ReceivedTransaction?.[0]?.SortedTransaction?.[0]
+                          ?.SortedWasteTransaction ||
+                          [].reduce((acc, current) => {
                             const { id } = current.QuotationWaste;
 
                             const currentWeight = new Decimal(current.weight); // Use Decimal.js
@@ -376,9 +378,7 @@ const BillingContent = ({
                             }
 
                             return acc;
-                          },
-                          {}
-                        )
+                          }, {})
                   ).map((item) => ({
                     ...item,
                     weight: item.weight.toNumber(), // Convert Decimal back to a standard number

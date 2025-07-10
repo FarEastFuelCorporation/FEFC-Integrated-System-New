@@ -14,8 +14,6 @@ const EmployeeLogin = ({ onLogin }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  console.log(CLIENT_ID);
-
   const navigate = useNavigate();
   const [employeeUsername, setEmployeeUsername] = useState("");
   const [password, setPassword] = useState("");

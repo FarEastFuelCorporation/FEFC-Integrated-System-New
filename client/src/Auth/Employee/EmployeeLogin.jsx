@@ -539,17 +539,17 @@ const EmployeeLogin = ({ onLogin }) => {
           </button>
         </form>
       )}
-      <GoogleOAuthProvider clientId={CLIENT_ID}>
-        <div style={{ textAlign: "center" }}>
-          <h4>Sign Up with Google</h4>
-          <Box alignContent={"center"}>
+      <Box alignContent={"center"} width={"100%"}>
+        <GoogleOAuthProvider clientId={CLIENT_ID}>
+          <div style={{ textAlign: "center" }}>
+            <h4>Sign Up with Google</h4>
             <GoogleLogin
               onSuccess={handleLoginSuccess}
               onError={() => console.log("Login Failed")}
             />
-          </Box>
-        </div>
-      </GoogleOAuthProvider>
+          </div>
+        </GoogleOAuthProvider>
+      </Box>
     </div>
   );
 };

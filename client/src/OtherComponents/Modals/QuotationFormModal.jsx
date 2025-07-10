@@ -46,6 +46,7 @@ const QuotationFormModal = ({
     "CASE",
     "PALLET",
     "CUBIC METER",
+    "TRANSACTION",
     "TRIP",
   ];
   const vatCalculationOptions = [

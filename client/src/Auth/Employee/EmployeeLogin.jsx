@@ -539,7 +539,13 @@ const EmployeeLogin = ({ onLogin }) => {
           </button>
         </form>
       )}
-      <Box alignContent={"center"} width={"100%"}>
+      <Box
+        alignContent={"center"}
+        width={"100%"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
         <GoogleOAuthProvider clientId={CLIENT_ID}>
           <div style={{ textAlign: "center" }}>
             <h4>Sign Up with Google</h4>

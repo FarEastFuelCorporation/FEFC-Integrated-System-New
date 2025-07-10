@@ -22,6 +22,7 @@ const EmployeeSignup = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isGoogle, setIsGoogle] = useState(false);
 
   const handleClick = () => {
     setIsVisible(!isVisible);
@@ -140,76 +141,17 @@ const EmployeeSignup = ({ onLogin }) => {
     }
   };
 
+  const toggleGoogleChange = () => {
+    setIsGoogle(!isGoogle);
+    console.log(isGoogle);
+  };
+
   return (
     <div>
       <LoadingSpinner isLoading={loading} />
       <h2>Employee Sign Up</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={submit} disabled={loading}>
-        <label htmlFor="employeeId">
-          Employee Id:
-          <input
-            type="text"
-            name="employeeId"
-            id="employeeId"
-            required
-            autoFocus
-            value={employeeId}
-            autoComplete="off"
-            placeholder="Input your Employee Id"
-            onChange={(e) => setEmployeeId(e.target.value)}
-          />
-        </label>
-        <br />
-        <label htmlFor="employeeUsername">
-          Employee Username:
-          <input
-            type="text"
-            name="employeeUsername"
-            id="employeeUsername"
-            required
-            autoFocus
-            value={employeeUsername}
-            autoComplete="off"
-            placeholder="Input your Employee Username"
-            onChange={(e) => setEmployeeUsername(e.target.value)}
-          />
-        </label>
-        <br />
-        <label htmlFor="password">
-          Password:
-          <div style={{ position: "relative" }}>
-            <input
-              type={isVisible ? "text" : "password"}
-              name="password"
-              id="password"
-              required
-              value={password}
-              autoComplete="off"
-              placeholder="Input your Password"
-              onChange={handlePasswordChange}
-            />
-            <FontAwesomeIcon
-              icon={isVisible ? faEye : faEyeSlash}
-              onClick={handleClick}
-              style={{
-                position: "absolute",
-                right: "20px",
-                top: "45%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                color: colors.primary[500],
-                fontSize: 20,
-              }}
-            />
-          </div>
-          {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
-        </label>
-        <br />
-        <br />
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing up..." : "Sign up"}
-        </button>
         <Box
           alignContent={"center"}
           width={"100%"}
@@ -218,15 +160,115 @@ const EmployeeSignup = ({ onLogin }) => {
           alignItems={"center"}
         >
           <GoogleOAuthProvider clientId={CLIENT_ID}>
-            <div style={{ textAlign: "center" }}>
-              <h4>Sign in with Google</h4>
-              <GoogleLogin
-                onSuccess={handleSignUpSuccess}
-                onError={() => console.log("Sign Up Failed")}
-              />
+            <div>
+              <h4
+                onClick={toggleGoogleChange}
+                style={{
+                  textDecoration: "none",
+                  color: colors.grey[100],
+                  cursor: "pointer",
+                  textAlign: "center",
+                }}
+              >
+                {!isGoogle
+                  ? "Switch to Sign in with Google"
+                  : "Switch to Sign in with Username and Password"}
+              </h4>
+              {isGoogle && (
+                <>
+                  <Box mb={2}>
+                    <label htmlFor="employeeId">
+                      Employee Id:
+                      <input
+                        type="text"
+                        name="employeeId"
+                        id="employeeId"
+                        required
+                        autoFocus
+                        value={employeeId}
+                        autoComplete="off"
+                        placeholder="Input your Employee Id"
+                        onChange={(e) => setEmployeeId(e.target.value)}
+                      />
+                    </label>
+                  </Box>
+                  <GoogleLogin
+                    onSuccess={handleSignUpSuccess}
+                    onError={() => console.log("Sign Up Failed")}
+                  />
+                </>
+              )}
             </div>
           </GoogleOAuthProvider>
         </Box>
+        {!isGoogle && (
+          <>
+            <label htmlFor="employeeId">
+              Employee Id:
+              <input
+                type="text"
+                name="employeeId"
+                id="employeeId"
+                required
+                autoFocus
+                value={employeeId}
+                autoComplete="off"
+                placeholder="Input your Employee Id"
+                onChange={(e) => setEmployeeId(e.target.value)}
+              />
+            </label>
+            <br />
+            <label htmlFor="employeeUsername">
+              Employee Username:
+              <input
+                type="text"
+                name="employeeUsername"
+                id="employeeUsername"
+                required
+                autoFocus
+                value={employeeUsername}
+                autoComplete="off"
+                placeholder="Input your Employee Username"
+                onChange={(e) => setEmployeeUsername(e.target.value)}
+              />
+            </label>
+            <br />
+            <label htmlFor="password">
+              Password:
+              <div style={{ position: "relative" }}>
+                <input
+                  type={isVisible ? "text" : "password"}
+                  name="password"
+                  id="password"
+                  required
+                  value={password}
+                  autoComplete="off"
+                  placeholder="Input your Password"
+                  onChange={handlePasswordChange}
+                />
+                <FontAwesomeIcon
+                  icon={isVisible ? faEye : faEyeSlash}
+                  onClick={handleClick}
+                  style={{
+                    position: "absolute",
+                    right: "20px",
+                    top: "45%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                    color: colors.primary[500],
+                    fontSize: 20,
+                  }}
+                />
+              </div>
+              {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
+            </label>
+            <br />
+            <br />
+            <button type="submit" disabled={loading}>
+              {loading ? "Signing up..." : "Sign up"}
+            </button>
+          </>
+        )}
       </form>
     </div>
   );

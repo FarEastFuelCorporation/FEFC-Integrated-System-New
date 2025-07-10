@@ -545,13 +545,12 @@ const EmployeeLogin = ({ onLogin }) => {
         alignItems={"center"}
       >
         <GoogleOAuthProvider clientId={CLIENT_ID}>
-          <div style={{ textAlign: "center" }}>
-            <h4>Sign Up with Google</h4>
+          <Box sx={{ textAlign: "center", mt: 2 }}>
             <GoogleLogin
               onSuccess={handleLoginSuccess}
               onError={() => console.log("Login Failed")}
             />
-          </div>
+          </Box>
         </GoogleOAuthProvider>
       </Box>
     </div>

@@ -2,7 +2,7 @@ import React from "react";
 
 const LandingPage = () => {
   return (
-    <div className="login-page">
+    <div>
       <div className="landing-page-container">
         <div className="landing-page-content">
           <img

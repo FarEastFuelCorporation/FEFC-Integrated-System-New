@@ -381,8 +381,12 @@ const BillingContent = ({
                           }, {})
                   ).map((item) => ({
                     ...item,
-                    weight: item.weight.toNumber(), // Convert Decimal back to a standard number
-                    clientWeight: item.clientWeight.toNumber(), // Convert Decimal back to a standard number
+                    weight:
+                      item?.weight?.toNumber?.() ?? Number(item?.weight) ?? 0,
+                    clientWeight:
+                      item?.clientWeight?.toNumber?.() ??
+                      Number(item?.clientWeight) ??
+                      0,
                   }));
                 }
 

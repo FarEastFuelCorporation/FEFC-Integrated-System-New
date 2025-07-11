@@ -251,14 +251,14 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                         align="center"
                         sx={getCellStyle(false, columnWidths.waste[5])}
                       >
-                        {formatNumber(waste[5])}
+                        {`₱${formatNumber(waste[5])}`}
                       </TableCell>
                       {row.isOneTime && (
                         <TableCell
                           align="center"
                           sx={getCellStyle(false, columnWidths.waste[6])}
                         >
-                          {formatNumber(waste[6])}
+                          {`₱${formatNumber(waste[6])}`}
                         </TableCell>
                       )}
                       <TableCell
@@ -325,8 +325,8 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                         sx={getCellStyle(false, columnWidths.transportation[5])}
                       >
                         {transportation[7] === "FREE OF CHARGE"
-                          ? "0.00"
-                          : formatNumber(transportation[5])}
+                          ? "₱0.00"
+                          : `₱${formatNumber(transportation[5])}`}
                       </TableCell>
                       {row.isOneTime && (
                         <TableCell
@@ -336,7 +336,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                             columnWidths.transportation[6]
                           )}
                         >
-                          {formatNumber(transportation[6])}
+                          {`₱${formatNumber(transportation[6])}`}
                         </TableCell>
                       )}
                       <TableCell
@@ -469,7 +469,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {formatNumber(calculateTotal(row).totalAmount)}
+                          ₱{formatNumber(calculateTotal(row).totalAmount)}
                         </Box>
                         <Box
                           sx={{
@@ -490,7 +490,7 @@ const QuotationForm = forwardRef(({ row, setIsContentReady }, ref) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {calculateTotal(row).vatCalculation}
+                          ₱{calculateTotal(row).vatCalculation}
                         </Box>
                       </Box>
                     </>

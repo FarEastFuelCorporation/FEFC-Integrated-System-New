@@ -34,6 +34,58 @@ const pageHeight = 850; // Full page height (A4 paper size in pixels)
 const defaultHeaderHeight = 320; // Default approximate height for header
 const defaultFooterHeight = 120; // Default approximate height for footer
 
+const AutoShrinkAddress = ({ address }) => {
+  const textRef = useRef(null);
+  const containerRef = useRef(null);
+  const [fontSize, setFontSize] = useState(14); // start at max
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const text = textRef.current;
+
+    if (!container || !text) return;
+
+    let newSize = 14;
+
+    text.style.fontSize = `${newSize}px`;
+
+    while (text.scrollWidth > container.offsetWidth && newSize > 6) {
+      newSize -= 0.5;
+      text.style.fontSize = `${newSize}px`;
+    }
+
+    setFontSize(newSize);
+  }, [address]);
+
+  return (
+    <Box
+      ref={containerRef}
+      sx={{
+        position: "absolute",
+        zIndex: 0,
+        top: "110px",
+        left: "100px",
+        width: "520px",
+        height: "14px",
+        display: "flex",
+        alignItems: "center", // vertical center
+      }}
+    >
+      <Typography
+        ref={textRef}
+        sx={{
+          fontFamily: '"Arial Narrow", Arial, sans-serif',
+          whiteSpace: "nowrap",
+          fontSize: `${fontSize}px`,
+          lineHeight: 1,
+        }}
+      >
+        {address}
+      </Typography>
+    </Box>
+  );
+};
+
 const BillingInvoice = ({
   row,
   verify = null,
@@ -859,7 +911,7 @@ const BillingInvoice = ({
                     position: "absolute",
                     zIndex: 0,
                     top: "90px",
-                    left: "120px",
+                    left: "100px",
                     width: "480px",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -868,13 +920,13 @@ const BillingInvoice = ({
                 >
                   {row.Client?.billerName}
                 </Typography>
-                <Box
+                {/* <Box
                   sx={{
                     position: "absolute",
                     zIndex: 0,
                     top: "110px",
-                    left: "120px",
-                    width: "480px",
+                    left: "100px",
+                    width: "520px",
                     height: "20px",
                     display: "flex",
                     alignItems: "center",
@@ -884,7 +936,7 @@ const BillingInvoice = ({
                     sx={{
                       fontFamily: '"Arial Narrow", Arial, sans-serif',
                       fontSize: "10px", // base font size
-                      transform: "scaleX(calc(min(1, 480px / (100%))))", // pseudo autoshrink
+                      transform: "scaleX(calc(min(1, 520px / (100%))))", // pseudo autoshrink
                       transformOrigin: "left center",
                       lineHeight: "1", // fits better in 14px height
                       whiteSpace: "nowrap",
@@ -892,13 +944,14 @@ const BillingInvoice = ({
                   >
                     {row.Client?.billerAddress}
                   </Typography>
-                </Box>
+                </Box> */}
+                <AutoShrinkAddress address={row.Client?.billerAddress} />
                 <Typography
                   sx={{
                     fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
-                    top: "150px",
+                    top: "160px",
                     right: "20px",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -916,7 +969,7 @@ const BillingInvoice = ({
                     position: "absolute",
                     zIndex: 0,
                     top: "130px",
-                    left: "120px",
+                    left: "100px",
                   }}
                 >
                   {row.Client?.billerTinNumber}
@@ -1159,7 +1212,7 @@ const BillingInvoice = ({
                     position: "absolute",
                     zIndex: 0,
                     top: "840px",
-                    left: "60px",
+                    left: "40px",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -1170,7 +1223,7 @@ const BillingInvoice = ({
                 </Typography>
                 <SignatureComponent
                   signature={financeStaffSignature}
-                  style={{ top: "758px", left: "80px" }}
+                  style={{ top: "758px", left: "60px" }}
                 />
               </Box>
             </Box>

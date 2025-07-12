@@ -441,6 +441,14 @@ const BillingContent = ({
                   const hasFixedRateIndividual =
                     waste.QuotationWaste?.hasFixedRate;
 
+                  console.log(waste);
+                  console.log(isMonthly);
+                  console.log(hasFixedRateIndividual);
+                  console.log(fixedWeight);
+                  console.log(usedWeight);
+                  console.log(waste.QuotationWaste.unitPrice);
+                  console.log(waste.QuotationWaste.fixedPrice);
+
                   return (
                     <Box>
                       {newClient && isPerClientToBill && (
@@ -661,7 +669,7 @@ const BillingContent = ({
                             }}
                           >
                             {hasFixedRateIndividual && !isMonthly
-                              ? formatNumber2(fixedPrice)
+                              ? formatNumber2(waste.QuotationWaste.fixedPrice)
                               : formatNumber(
                                   waste.duration
                                     ? waste.duration *

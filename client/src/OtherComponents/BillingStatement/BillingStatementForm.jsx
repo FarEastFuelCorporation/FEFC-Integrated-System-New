@@ -756,8 +756,6 @@ const BillingStatementForm = ({
                   const shouldIncludeRow =
                     !isChargeToProcess || waste[9] !== "BUYING";
 
-                  console.log(waste);
-
                   bodyRows.BillingTableHead.content.push(
                     <TableBody key={`waste-body-${index}`}>
                       {shouldIncludeRow && (

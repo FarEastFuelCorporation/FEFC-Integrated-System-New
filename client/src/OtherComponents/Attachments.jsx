@@ -121,6 +121,7 @@ const Attachments = ({ row, user }) => {
 
   const handleAttachmentFormSubmit = async (e) => {
     e.preventDefault();
+    handleCloseAttachmentModal();
 
     attachmentFormData.attachment = selectedFile;
 

@@ -868,21 +868,31 @@ const BillingInvoice = ({
                 >
                   {row.Client?.billerName}
                 </Typography>
-                <Typography
+                <Box
                   sx={{
-                    fontFamily: '"Arial Narrow", Arial, sans-serif',
                     position: "absolute",
                     zIndex: 0,
                     top: "110px",
                     left: "120px",
                     width: "480px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    height: "20px",
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  {row.Client?.billerAddress}
-                </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Arial Narrow", Arial, sans-serif',
+                      fontSize: "10px", // base font size
+                      transform: "scaleX(calc(min(1, 480px / (100%))))", // pseudo autoshrink
+                      transformOrigin: "left center",
+                      lineHeight: "1", // fits better in 14px height
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {row.Client?.billerAddress}
+                  </Typography>
+                </Box>
                 <Typography
                   sx={{
                     fontFamily: '"Arial Narrow", Arial, sans-serif',

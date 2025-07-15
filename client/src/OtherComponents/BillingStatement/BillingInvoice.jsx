@@ -916,6 +916,7 @@ const BillingInvoice = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    fontWeight: "bold",
                   }}
                 >
                   {row.Client?.billerName}
@@ -956,6 +957,7 @@ const BillingInvoice = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    fontWeight: "bold",
                   }}
                 >
                   {row.BilledTransaction?.[0]?.billedDate
@@ -970,6 +972,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "130px",
                     left: "100px",
+                    fontWeight: "bold",
                   }}
                 >
                   {row.Client?.billerTinNumber}
@@ -999,6 +1002,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "281px",
                     left: "270px",
+                    fontWeight: "bold",
                   }}
                 >
                   Total Non-Vatable Sales
@@ -1011,6 +1015,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "281px",
                     right: "20px",
+                    fontWeight: "bold",
                   }}
                 >
                   {nonVatableSales}
@@ -1023,6 +1028,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "302px",
                     left: "270px",
+                    fontWeight: "bold",
                   }}
                 >
                   Total Vatable Sales
@@ -1035,6 +1041,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "302px",
                     right: "20px",
+                    fontWeight: "bold",
                   }}
                 >
                   {vatableSales}
@@ -1047,6 +1054,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "323px",
                     left: "270px",
+                    fontWeight: "bold",
                   }}
                 >
                   Vat (12%)
@@ -1059,6 +1067,7 @@ const BillingInvoice = ({
                     zIndex: 0,
                     top: "323px",
                     right: "20px",
+                    fontWeight: "bold",
                   }}
                 >
                   {vatSales}
